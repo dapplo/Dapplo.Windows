@@ -19,15 +19,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-using System.Runtime.InteropServices;
-
-namespace Dapplo.Windows.Dwm {
-	[StructLayout(LayoutKind.Sequential)]
-	public struct DWM_BLURBEHIND {
-		public DWM_BB dwFlags;
-		public bool fEnable;
-		public IntPtr hRgnBlur;
-		public bool fTransitionOnMaximized;
+namespace Dapplo.Windows.Native {
+	/// <summary>
+	/// Used for User32.SetWinEventHook
+	/// See: http://msdn.microsoft.com/en-us/library/windows/desktop/dd373640.aspx
+	/// </summary>
+	public enum WinEventHookFlags : int {
+		WINEVENT_OUTOFCONTEXT = 0,
+		WINEVENT_SKIPOWNTHREAD = 1,
+		WINEVENT_SKIPOWNPROCESS = 2,
+		WINEVENT_INCONTEXT = 4
 	}
 }

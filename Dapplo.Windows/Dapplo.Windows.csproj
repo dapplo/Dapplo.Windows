@@ -44,6 +44,7 @@
     <Compile Include="App\IAppVisibility.cs" />
     <Compile Include="App\MonitorAppVisibility.cs" />
     <Compile Include="Desktop\NativeWindows.cs" />
+    <Compile Include="Desktop\WindowsInfo.cs" />
     <Compile Include="Dwm\DWMWINDOWATTRIBUTE.cs" />
     <Compile Include="Dwm\DWM_BB.cs" />
     <Compile Include="Dwm\DWM_BLURBEHIND.cs" />
@@ -51,7 +52,10 @@
     <Compile Include="Native\DeviceInfo.cs" />
     <Compile Include="Dwm\Dwm.cs" />
     <Compile Include="Dwm\DWM_THUMBNAIL_PROPERTIES.cs" />
+    <Compile Include="Native\EventObjects.cs" />
+    <Compile Include="Native\HookType.cs" />
     <Compile Include="Native\MonitorInfoEx.cs" />
+    <Compile Include="Native\MSLLHOOK.cs" />
     <Compile Include="Native\POINT.cs" />
     <Compile Include="Native\RECT.cs" />
     <Compile Include="Native\HRESULT.cs" />
@@ -60,6 +64,10 @@
     <Compile Include="Native\MonitorInfoFlags.cs" />
     <Compile Include="Native\Win32Error.cs" />
     <Compile Include="Native\WINDOWINFO.cs" />
+    <Compile Include="Native\WinEvent.cs" />
+    <Compile Include="Native\WinEventHookFlags.cs" />
+    <Compile Include="WindowsEventHook.cs" />
+    <Compile Include="WindowsHook.cs" />
     <Compile Include="Native\WindowsMessages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

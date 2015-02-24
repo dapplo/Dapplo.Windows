@@ -20,14 +20,47 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Windows;
 
-namespace Dapplo.Windows.Dwm {
-	[StructLayout(LayoutKind.Sequential)]
-	public struct DWM_BLURBEHIND {
-		public DWM_BB dwFlags;
-		public bool fEnable;
-		public IntPtr hRgnBlur;
-		public bool fTransitionOnMaximized;
+namespace Dapplo.Windows.Desktop {
+	public class WindowInfo {
+		public static WindowInfo CreateFor(IntPtr handle) {
+			return new WindowInfo {
+				Handle = handle
+			};
+		}
+		public Rect Bounds {
+			get;
+			set;
+		}
+		public bool HasParent {
+			get;
+			set;
+		}
+		public IntPtr Parent {
+			get;
+			set;
+		}
+		public bool HasClassname {
+			get;
+			set;
+		}
+		public string Classname {
+			get;
+			set;
+		}
+		public string Text {
+			get;
+			set;
+		}
+		public IntPtr Handle {
+			get;
+			set;
+		}
+		public IList<WindowInfo> Children {
+			get;
+			set;
+		}
 	}
 }

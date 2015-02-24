@@ -22,12 +22,17 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Dapplo.Windows.Dwm {
+namespace Dapplo.Windows.Native {
+	/// <summary>
+	/// This struct is passed in the WH_MOUSE_LL hook
+	/// See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms644970.aspx
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
-	public struct DWM_BLURBEHIND {
-		public DWM_BB dwFlags;
-		public bool fEnable;
-		public IntPtr hRgnBlur;
-		public bool fTransitionOnMaximized;
+	public struct MSLLHOOK {
+		public POINT pt;
+		public IntPtr hwnd;
+		public uint wHitTestCode;
+		public IntPtr dwExtraInfo;
 	}
+
 }
