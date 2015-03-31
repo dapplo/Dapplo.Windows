@@ -66,6 +66,8 @@
     <Compile Include="Native\WINDOWINFO.cs" />
     <Compile Include="Native\WinEvent.cs" />
     <Compile Include="Native\WinEventHookFlags.cs" />
+    <Compile Include="WindowsTitleMonitor.cs" />
+    <Compile Include="WindowsMonitor.cs" />
     <Compile Include="WindowsEventHook.cs" />
     <Compile Include="WindowsHook.cs" />
     <Compile Include="Native\WindowsMessages.cs" />
