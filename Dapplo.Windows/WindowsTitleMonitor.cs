@@ -69,9 +69,11 @@ namespace Dapplo.Windows {
 			remove {
 				lock (lockObject) {
 					_titleChangeEvent -= value;
-					if (_titleChangeEvent.GetInvocationList().Length == 0) {
-						_hook.Dispose();
-						_hook = null;
+					if (_titleChangeEvent == null || _titleChangeEvent.GetInvocationList().Length == 0) {
+						if (_hook != null) {
+							_hook.Dispose();
+							_hook = null;
+						}
 					}
 				}
 			}
