@@ -50,7 +50,7 @@ namespace Dapplo.Windows {
 	/// </summary>
 	public class WindowsTitleMonitor : IDisposable {
 		private WindowsEventHook _hook;
-
+		private object lockObject = new object();
 		private event TitleChangeEventDelegate _titleChangeEvent;
 
 		/// <summary>
@@ -58,7 +58,7 @@ namespace Dapplo.Windows {
 		/// </summary>
 		public event TitleChangeEventDelegate TitleChangeEvent {
 			add {
-				lock (_titleChangeEvent) {
+				lock (lockObject) {
 					if (_hook == null) {
 						_hook = new WindowsEventHook();
 						_hook.Hook(WinEvent.EVENT_OBJECT_NAMECHANGE, WinEventHandler);
@@ -67,10 +67,12 @@ namespace Dapplo.Windows {
 				}
 			}
 			remove {
-				_titleChangeEvent -= value;
-				if (_titleChangeEvent.GetInvocationList().Length == 0) {
-					_hook.Dispose();
-					_hook = null;
+				lock (lockObject) {
+					_titleChangeEvent -= value;
+					if (_titleChangeEvent.GetInvocationList().Length == 0) {
+						_hook.Dispose();
+						_hook = null;
+					}
 				}
 			}
 		}
