@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Dapplo.Windows</id>
+        <version>$version$</version>
+        <title>Dapplo.Windows</title>
+        <authors>Robin Krom</authors>
+        <owners>dapplo</owners>
+        <licenseUrl>https://en.wikipedia.org/wiki/GNU_General_Public_License</licenseUrl>
+        <projectUrl>http://www.dapplo.net/blocks/Dapplo.Windows.html</projectUrl>
+        <iconUrl>http://www.dapplo.net/favicon.ico</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Dapplo.Windows has native code for accessing Windows, e.g monitoring the title changes of windows.</description>
+        <language>en-US</language>
+    </metadata>
+</package>
