@@ -16,4 +16,10 @@
 		<copyright>Dapplo</copyright>
 		<tags>windows native desktop</tags>
     </metadata>
+	<files>
+		<file src="bin\release\Dapplo.Windows.pdb" target="lib\net451" />
+		<file src="bin\release\Dapplo.Windows.dll" target="lib\net451" />
+		<file src="**\*.cs" exclude="**\obj\**\*.cs;**\release\**\*.cs" target="src" />
+	</files>
+		
 </package>
