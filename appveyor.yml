@@ -12,6 +12,7 @@ assembly_info:
 build:
   project: Dapplo.Windows.sln
   publish_nuget: true
+  publish_nuget_symbols: true
   verbosity: minimal
 artifacts:
 - path: '*.nupkg'
@@ -31,5 +32,6 @@ deploy:
   artifact: /.*\.nupkg/
   draft: false
 - provider: NuGet
+  skip_symbols: false
   api_key:
     secure: xkDQ385+smLqdzhESsXBJvnUjK4FZ4Djjrqi9tFR29dwESIvPYOrQAqgri5Nf/fA
