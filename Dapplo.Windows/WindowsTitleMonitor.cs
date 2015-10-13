@@ -22,6 +22,7 @@
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows
 {
@@ -29,12 +30,15 @@ namespace Dapplo.Windows
 	/// <summary>
 	/// Event arguments for the TitleChangeEvent
 	/// </summary>
-	public class TitleChangeEventArgs : EventArgs {
-		public IntPtr HWnd {
+	public class TitleChangeEventArgs : EventArgs
+	{
+		public IntPtr HWnd
+		{
 			get;
 			set;
 		}
-		public string Title {
+		public string Title
+		{
 			get;
 			set;
 		}
@@ -49,7 +53,8 @@ namespace Dapplo.Windows
 	/// <summary>
 	/// Monitor all title changes
 	/// </summary>
-	public class WindowsTitleMonitor : IDisposable {
+	public class WindowsTitleMonitor : IDisposable
+	{
 		private WindowsEventHook _hook;
 		private object lockObject = new object();
 		private event TitleChangeEventDelegate _titleChangeEvent;
@@ -57,21 +62,29 @@ namespace Dapplo.Windows
 		/// <summary>
 		/// Add / remove event handler to the title monitor
 		/// </summary>
-		public event TitleChangeEventDelegate TitleChangeEvent {
-			add {
-				lock (lockObject) {
-					if (_hook == null) {
+		public event TitleChangeEventDelegate TitleChangeEvent
+		{
+			add
+			{
+				lock (lockObject)
+				{
+					if (_hook == null)
+					{
 						_hook = new WindowsEventHook();
 						_hook.Hook(WinEvent.EVENT_OBJECT_NAMECHANGE, WinEventHandler);
 					}
 					_titleChangeEvent += value;
 				}
 			}
-			remove {
-				lock (lockObject) {
+			remove
+			{
+				lock (lockObject)
+				{
 					_titleChangeEvent -= value;
-					if (_titleChangeEvent == null || _titleChangeEvent.GetInvocationList().Length == 0) {
-						if (_hook != null) {
+					if (_titleChangeEvent == null || _titleChangeEvent.GetInvocationList().Length == 0)
+					{
+						if (_hook != null)
+						{
 							_hook.Dispose();
 							_hook = null;
 						}
@@ -90,43 +103,50 @@ namespace Dapplo.Windows
 		/// <param name="idChild"></param>
 		/// <param name="dwEventThread"></param>
 		/// <param name="dwmsEventTime"></param>
-		private void WinEventHandler(WinEvent eventType, IntPtr hWnd, EventObjects idObject, int idChild, uint dwEventThread, uint dwmsEventTime) {
-			if (hWnd == IntPtr.Zero || idObject != EventObjects.OBJID_WINDOW) {
+		private void WinEventHandler(WinEvent eventType, IntPtr hWnd, EventObjects idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+		{
+			if (hWnd == IntPtr.Zero || idObject != EventObjects.OBJID_WINDOW)
+			{
 				return;
 			}
-			if (eventType == WinEvent.EVENT_OBJECT_NAMECHANGE) {
-				string newTitle = User32.GetText(hWnd);
-				if (_titleChangeEvent != null) {
+			if (eventType == WinEvent.EVENT_OBJECT_NAMECHANGE)
+			{
+				if (_titleChangeEvent != null)
+				{
+					string newTitle = User32.GetText(hWnd);
 					_titleChangeEvent(new TitleChangeEventArgs { HWnd = hWnd, Title = newTitle });
 				}
 			}
 		}
 
-		#region Dispose
-		/// <summary>
-		/// Dispose
-		/// </summary>
-		public void Dispose() {
+		#region IDisposable Support
+
+		private bool disposedValue = false; // To detect redundant calls
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				_hook.Dispose();
+				_hook = null;
+				disposedValue = true;
+			}
+		}
+
+		~WindowsTitleMonitor()
+		{
+			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+			Dispose(false);
+		}
+
+		// This code added to correctly implement the disposable pattern.
+		public void Dispose()
+		{
+			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
-		/// <summary>
-		/// Dispose all managed resources
-		/// </summary>
-		/// <param name="disposing">when true is passed all managed resources are disposed.</param>
-		protected virtual void Dispose(bool disposing) {
-			if (disposing) {
-				foreach (TitleChangeEventDelegate eventDelegate in _titleChangeEvent.GetInvocationList()) {
-					_titleChangeEvent -= eventDelegate;
-				}
-				// free managed resources
-				if (_hook != null) {
-					_hook.Dispose();
-					_hook = null;
-				}
-			}
-		}
 		#endregion
 	}
 }

@@ -20,30 +20,18 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	/// The structure for the WindowInfo
-	/// See: http://msdn.microsoft.com/en-us/library/windows/desktop/ms632610.aspx
+	/// See: http://www.pinvoke.net/default.aspx/Enums/SendMessageTimeoutFlags.html
 	/// </summary>
-	[StructLayout(LayoutKind.Sequential), Serializable]
-	public struct WINDOWINFO {
-		public uint cbSize;
-		public RECT rcWindow;
-		public RECT rcClient;
-		public uint dwStyle;
-		public uint dwExStyle;
-		public uint dwWindowStatus;
-		public uint cxWindowBorders;
-		public uint cyWindowBorders;
-		public ushort atomWindowType;
-		public ushort wCreatorVersion;
-		// Allows automatic initialization of "cbSize" with "new WINDOWINFO(null/true/false)".
-		public WINDOWINFO(bool? filler)
-			: this() {
-			cbSize = (uint)(Marshal.SizeOf(typeof(WINDOWINFO)));
-		}
+	[Flags]
+	public enum SendMessageTimeoutFlags : uint
+	{
+		SMTO_NORMAL = 0x0,
+		SMTO_BLOCK = 0x1,
+		SMTO_ABORTIFHUNG = 0x2,
+		SMTO_NOTIMEOUTIFNOTHUNG = 0x8
 	}
 }

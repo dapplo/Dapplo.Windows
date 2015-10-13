@@ -21,12 +21,14 @@
 
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.SafeHandles;
 using Dapplo.Windows.Structs;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace Dapplo.Windows.Native
 {
@@ -36,45 +38,222 @@ namespace Dapplo.Windows.Native
 	public class User32
 	{
 		private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
+		public delegate int EnumWindowsProc(IntPtr hwnd, int lParam);
 
 		#region Native imports
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool IsWindowVisible(IntPtr hWnd);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int processId);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr GetParent(IntPtr hWnd);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern int SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommand uCmd);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern int ShowWindow(IntPtr hWnd, ShowWindowCommand nCmdShow);
+
+		[DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
+		public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int cch);
+
+		[DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
+		public static extern int GetWindowTextLength(IntPtr hWnd);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern uint GetSysColor(int nIndex);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool BringWindowToTop(IntPtr hWnd);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr GetForegroundWindow();
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr GetDesktopWindow();
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool GetWindowPlacement(IntPtr hWnd, ref WindowPlacement lpwndpl);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WindowPlacement lpwndpl);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool IsIconic(IntPtr hWnd);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool IsZoomed(IntPtr hwnd);
+
+		[DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
+		public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+		private static extern IntPtr GetClassLong(IntPtr hWnd, int nIndex);
+
+		[DllImport("user32", SetLastError = true, EntryPoint = "GetClassLongPtr")]
+		public static extern IntPtr GetClassLongPtr(IntPtr hWnd, int nIndex);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool PrintWindow(IntPtr hwnd, IntPtr hDC, uint nFlags);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, IntPtr lParam);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
+
+		[DllImport("user32", SetLastError = true, EntryPoint = "GetWindowLong")]
+		public static extern int GetWindowLong(IntPtr hwnd, int index);
+
+		[DllImport("user32", SetLastError = true, EntryPoint = "GetWindowLongPtr")]
+		public static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int nIndex);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern int SetWindowLong(IntPtr hWnd, int index, int styleFlags);
+
+		[DllImport("user32", SetLastError = true, EntryPoint = "SetWindowLongPtr")]
+		public static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int index, IntPtr styleFlags);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr MonitorFromRect([In] ref RECT lprc, uint dwFlags);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern int EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern int EnumChildWindows(IntPtr hWndParent, EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool GetScrollInfo(IntPtr hwnd, int fnBar, ref SCROLLINFO lpsi);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool ShowScrollBar(IntPtr hwnd, ScrollBarDirection scrollBar, bool show);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern int SetScrollPos(IntPtr hWnd, Orientation nBar, int nPos, bool bRedraw);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern RegionResult GetWindowRgn(IntPtr hWnd, SafeHandle hRgn);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, WindowPos uFlags);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr GetTopWindow(IntPtr hWnd);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr GetDC(IntPtr hwnd);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr GetClipboardOwner();
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr SetClipboardViewer(IntPtr hWndNewViewer);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern bool ChangeClipboardChain(IntPtr hWndRemove, IntPtr hWndNewNext);
+
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+		public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+
+		/// uiFlags: 0 - Count of GDI objects
+		/// uiFlags: 1 - Count of USER objects
+		/// - Win32 GDI objects (pens, brushes, fonts, palettes, regions, device contexts, bitmap headers)
+		/// - Win32 USER objects:
+		///	- 	WIN32 resources (accelerator tables, bitmap resources, dialog box templates, font resources, menu resources, raw data resources, string table entries, message table entries, cursors/icons)
+		/// - Other USER objects (windows, menus)
+		///
+		[DllImport("user32", SetLastError = true)]
+		public static extern uint GetGuiResources(IntPtr hProcess, uint uiFlags);
+
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+		public static extern uint RegisterWindowMessage(string lpString);
+
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+		public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out UIntPtr lpdwResult);
+
+		[DllImport("user32", SetLastError = true)]
+		private static extern bool GetPhysicalCursorPos(out POINT cursorLocation);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, ref POINT lpPoints, [MarshalAs(UnmanagedType.U4)] int cPoints);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern int GetSystemMetrics(SystemMetric index);
+
+		/// <summary>
+		/// The following is used for Icon handling
+		/// </summary>
+		/// <param name="hIcon"></param>
+		/// <returns></returns>
+		[DllImport("user32", SetLastError = true)]
+		public static extern SafeIconHandle CopyIcon(IntPtr hIcon);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern bool DestroyIcon(IntPtr hIcon);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern bool GetCursorInfo(out CursorInfo cursorInfo);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern bool GetIconInfo(SafeIconHandle iconHandle, out IconInfo iconInfo);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr SetCapture(IntPtr hWnd);
+
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool ReleaseCapture();
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
+
+		[DllImport("user32", SetLastError = true)]
+		internal static extern IntPtr OpenInputDesktop(uint dwFlags, bool fInherit, DesktopAccessRight dwDesiredAccess);
+
+		[DllImport("user32", SetLastError = true)]
+		internal static extern bool SetThreadDesktop(IntPtr hDesktop);
+
+		[DllImport("user32", SetLastError = true)]
+		internal static extern bool CloseDesktop(IntPtr hDesktop);
+
 		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
 		private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
 		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
 		private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
 
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		private static extern IntPtr GetParent(IntPtr hWnd);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		private extern static int GetWindowText(IntPtr hWnd, StringBuilder lpString, int cch);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		private extern static int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		private extern static IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, IntPtr lParam);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		private static extern IntPtr GetClassLong(IntPtr hWnd, int nIndex);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		private static extern IntPtr GetClassLongPtr(IntPtr hWnd, int nIndex);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		private extern static bool IsZoomed(IntPtr hwnd);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		private extern static bool IsWindowVisible(IntPtr hWnd);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		public static extern IntPtr MonitorFromRect([In] ref RECT lprc, uint dwFlags);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		private static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
-		[DllImport("user32", SetLastError = true)]
-		public static extern int GetSystemMetrics(SystemMetric index);
-
-		[DllImport("user32", SetLastError = true)]
-		public static extern bool DestroyIcon(IntPtr hIcon);
 		#endregion
 
 		/// <summary>

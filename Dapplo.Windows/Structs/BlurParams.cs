@@ -28,7 +28,7 @@ namespace Dapplo.Windows.Structs
 	/// </summary>
 	/// <remarks>Cannot be pinned with GCHandle due to bool value.</remarks>
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	internal struct BlurParams
+	public struct BlurParams
 	{
 		/// <summary>
 		/// Real number that specifies the blur radius (the radius of the Gaussian convolution kernel) in 

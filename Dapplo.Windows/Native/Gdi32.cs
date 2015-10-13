@@ -31,7 +31,7 @@ namespace Dapplo.Windows.Native
 	/// <summary>
 	/// GDI32 Helpers
 	/// </summary>
-	public static class GDI32
+	public static class Gdi32
 	{
 		[DllImport("gdi32", SetLastError = true)]
 		public static extern bool BitBlt(SafeHandle hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, SafeHandle hdcSrc, int nXSrc, int nYSrc, CopyPixelOperation dwRop);

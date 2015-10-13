@@ -19,31 +19,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using Dapplo.Windows.Native;
+using Microsoft.Win32.SafeHandles;
 using System;
-using System.Runtime.InteropServices;
+using System.Security.Permissions;
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.SafeHandles
 {
 	/// <summary>
-	/// The structure for the WindowInfo
-	/// See: http://msdn.microsoft.com/en-us/library/windows/desktop/ms632610.aspx
+	/// A SafeHandle class implementation for the hIcon
 	/// </summary>
-	[StructLayout(LayoutKind.Sequential), Serializable]
-	public struct WINDOWINFO {
-		public uint cbSize;
-		public RECT rcWindow;
-		public RECT rcClient;
-		public uint dwStyle;
-		public uint dwExStyle;
-		public uint dwWindowStatus;
-		public uint cxWindowBorders;
-		public uint cyWindowBorders;
-		public ushort atomWindowType;
-		public ushort wCreatorVersion;
-		// Allows automatic initialization of "cbSize" with "new WINDOWINFO(null/true/false)".
-		public WINDOWINFO(bool? filler)
-			: this() {
-			cbSize = (uint)(Marshal.SizeOf(typeof(WINDOWINFO)));
+	public class SafeIconHandle : SafeHandleZeroOrMinusOneIsInvalid
+	{
+		private SafeIconHandle() : base(true)
+		{
+		}
+
+		public SafeIconHandle(IntPtr hIcon) : base(true)
+		{
+			SetHandle(hIcon);
+		}
+
+		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+		protected override bool ReleaseHandle()
+		{
+			return User32.DestroyIcon(handle);
 		}
 	}
 }

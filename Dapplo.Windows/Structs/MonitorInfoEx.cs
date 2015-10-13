@@ -30,7 +30,7 @@ namespace Dapplo.Windows.Structs
 	/// for the display monitor.
 	/// </summary>
 	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-	internal struct MonitorInfoEx {
+	public struct MonitorInfoEx {
 		/// <summary>
 		/// The size, in bytes, of the structure. Set this member to sizeof(MONITORINFOEX) (72) before calling the GetMonitorInfo function. 
 		/// Doing so lets the function determine the type of structure you are passing to it.
