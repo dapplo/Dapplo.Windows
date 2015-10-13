@@ -19,16 +19,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using Dapplo.Windows.Enums;
 using System;
 using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Structs
 {
 	[StructLayout(LayoutKind.Sequential)]
-	public struct CursorInfo
+	public struct CURSORINFO
 	{
 		public int cbSize;
-		public int flags;
+		public CursorInfoFlags flags;
 		public IntPtr hCursor;
 		public POINT ptScreenPos;
 	}

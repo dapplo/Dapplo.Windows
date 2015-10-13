@@ -20,46 +20,17 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
-using System.Windows;
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Enums
 {
-	[StructLayout(LayoutKind.Sequential), Serializable()]
-	public struct SIZE
+	/// <summary>
+	/// Flags for the CURSOR_INFO "flags" field, see: https://msdn.microsoft.com/en-us/library/windows/desktop/ms648381.aspx
+	/// </summary>
+	[Flags]
+	public enum CursorInfoFlags : uint
 	{
-		public int width;
-		public int height;
-
-		public SIZE(Size size)
-			: this((int)size.Width, (int)size.Height)
-		{
-
-		}
-
-		public SIZE(System.Drawing.Size size) : this(size.Width, size.Height)
-		{
-		}
-
-		public SIZE(int width, int height)
-		{
-			this.width = width;
-			this.height = height;
-		}
-
-		public Size ToSize()
-		{
-			return new Size(width, height);
-		}
-
-		public System.Drawing.Size ToSystemDrawingSize()
-		{
-			return new System.Drawing.Size(width, height);
-		}
-
-		public bool IsEmpty()
-		{
-			return width * height == 0;
-		}
+		CURSOR_HIDDEN = 0,
+		CURSOR_SHOWING = 1,
+		CURSOR_SUPPRESSED = 2
 	}
 }

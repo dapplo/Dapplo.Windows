@@ -99,5 +99,17 @@ namespace Dapplo.Windows.Desktop
 			}
 			return returnValue.Bounds;
 		}
+
+		/// <summary>
+		/// Implementation like Screen.GetBounds
+		/// https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx
+		/// </summary>
+		/// <param name="point">System.Drawing.Point</param>
+		/// <returns>Rect</returns>
+		public static System.Drawing.Rectangle GetBounds(System.Drawing.Point point)
+		{
+			var rect = GetBounds(new Point(point.X, point.Y));
+			return new System.Drawing.Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
+        }
 	}
 }

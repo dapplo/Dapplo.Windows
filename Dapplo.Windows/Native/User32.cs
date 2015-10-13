@@ -231,7 +231,7 @@ namespace Dapplo.Windows.Native
 		public static extern bool DestroyIcon(IntPtr hIcon);
 
 		[DllImport("user32", SetLastError = true)]
-		public static extern bool GetCursorInfo(out CursorInfo cursorInfo);
+		public static extern bool GetCursorInfo(out CURSORINFO cursorInfo);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern bool GetIconInfo(SafeIconHandle iconHandle, out IconInfo iconInfo);
@@ -476,7 +476,7 @@ namespace Dapplo.Windows.Native
 						//LOG.ErrorFormat("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
 					}
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					//LOG.Error("Exception retrieving PhysicalCursorPos, no longer calling this. Cause :", ex);
 					_CanCallGetPhysicalCursorPos = false;

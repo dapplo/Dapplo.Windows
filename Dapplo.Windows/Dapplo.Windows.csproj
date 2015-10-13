@@ -53,6 +53,7 @@
     <Compile Include="Desktop\NativeWindows.cs" />
     <Compile Include="Desktop\WindowsInfo.cs" />
     <Compile Include="Enums\BI_COMPRESSION.cs" />
+    <Compile Include="Enums\CursorInfoFlags.cs" />
     <Compile Include="Enums\DesktopAccessRight.cs" />
     <Compile Include="Enums\DeviceCaps.cs" />
     <Compile Include="Enums\DWMWINDOWATTRIBUTE.cs" />
@@ -96,7 +97,7 @@
     <Compile Include="Structs\BlurParams.cs" />
     <Compile Include="Structs\CIEXYZ.cs" />
     <Compile Include="Structs\CIEXYZTRIPLE.cs" />
-    <Compile Include="Structs\CursorInfo.cs" />
+    <Compile Include="Structs\CURSORINFO.cs" />
     <Compile Include="Structs\DWM_BLURBEHIND.cs" />
     <Compile Include="Interop\DisposableCom.cs" />
     <Compile Include="Enums\ClassLongIndex.cs" />
