@@ -53,7 +53,19 @@ namespace Dapplo.Windows.Desktop
 			set;
 		}
 
+		public System.Drawing.Rectangle BoundsRectangle
+		{
+			get;
+			set;
+		}
+
 		public Rect WorkingArea
+		{
+			get;
+			set;
+		}
+
+		public System.Drawing.Rectangle WorkingAreaRectangle
 		{
 			get;
 			set;

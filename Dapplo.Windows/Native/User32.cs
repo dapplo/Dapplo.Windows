@@ -113,6 +113,9 @@ namespace Dapplo.Windows.Native
 		public static extern bool PrintWindow(IntPtr hwnd, IntPtr hDC, uint nFlags);
 
 		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, SysCommands sysCommand, IntPtr lParam);
+
+		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, IntPtr lParam);
 
 		[DllImport("user32", SetLastError = true)]
@@ -283,7 +286,9 @@ namespace Dapplo.Windows.Native
 					displayInfo.ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left);
 					displayInfo.ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top);
 					displayInfo.Bounds = monitorInfoEx.Monitor.ToRect();
+					displayInfo.BoundsRectangle = monitorInfoEx.Monitor.ToRectangle();
 					displayInfo.WorkingArea = monitorInfoEx.WorkArea.ToRect();
+					displayInfo.WorkingAreaRectangle = monitorInfoEx.WorkArea.ToRectangle();
 					displayInfo.IsPrimary = (monitorInfoEx.Flags | MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY;
 					result.Add(displayInfo);
 				}

@@ -31,7 +31,7 @@ namespace Dapplo.Windows.App {
 	/// <summary>
 	/// Helper class to support with Windows Store apps
 	/// </summary>
-	public class AppQuery {
+	public static class AppQuery {
 		public const string ModernuiWindowsClass = "Windows.UI.Core.CoreWindow";
 		public const string ModernuiApplauncherClass = "ImmersiveLauncher";
 		public const string ModernuiGutterClass = "ImmersiveGutter";
