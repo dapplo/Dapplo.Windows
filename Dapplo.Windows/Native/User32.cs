@@ -125,16 +125,16 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
 		[DllImport("user32", SetLastError = true, EntryPoint = "GetWindowLong")]
-		public static extern int GetWindowLong(IntPtr hwnd, int index);
+		private static extern int GetWindowLong(IntPtr hwnd, int index);
 
 		[DllImport("user32", SetLastError = true, EntryPoint = "GetWindowLongPtr")]
-		public static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int nIndex);
+		private static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int nIndex);
 
 		[DllImport("user32", SetLastError = true)]
-		public static extern int SetWindowLong(IntPtr hWnd, int index, int styleFlags);
+		private static extern int SetWindowLong(IntPtr hWnd, int index, int styleFlags);
 
 		[DllImport("user32", SetLastError = true, EntryPoint = "SetWindowLongPtr")]
-		public static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int index, IntPtr styleFlags);
+		private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int index, IntPtr styleFlags);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
@@ -491,15 +491,15 @@ namespace Dapplo.Windows.Native
 		/// <param name="hwnd"></param>
 		/// <param name="nIndex"></param>
 		/// <returns></returns>
-		public static long GetWindowLongWrapper(IntPtr hwnd, int nIndex)
+		public static long GetWindowLongWrapper(IntPtr hwnd, WindowLongIndex nIndex)
 		{
 			if (IntPtr.Size == 8)
 			{
-				return GetWindowLongPtr(hwnd, nIndex).ToInt64();
+				return GetWindowLongPtr(hwnd, (int)nIndex).ToInt64();
 			}
 			else
 			{
-				return GetWindowLong(hwnd, nIndex);
+				return GetWindowLong(hwnd, (int)nIndex);
 			}
 		}
 
@@ -509,15 +509,15 @@ namespace Dapplo.Windows.Native
 		/// <param name="hwnd"></param>
 		/// <param name="nIndex"></param>
 		/// <param name="styleFlags"></param>
-		public static void SetWindowLongWrapper(IntPtr hwnd, int nIndex, IntPtr styleFlags)
+		public static void SetWindowLongWrapper(IntPtr hwnd, WindowLongIndex nIndex, IntPtr styleFlags)
 		{
 			if (IntPtr.Size == 8)
 			{
-				SetWindowLongPtr(hwnd, nIndex, styleFlags);
+				SetWindowLongPtr(hwnd, (int)nIndex, styleFlags);
 			}
 			else
 			{
-				SetWindowLong(hwnd, nIndex, styleFlags.ToInt32());
+				SetWindowLong(hwnd, (int)nIndex, styleFlags.ToInt32());
 			}
 		}
 
