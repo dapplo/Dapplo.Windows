@@ -20,12 +20,13 @@
  */
 
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Native;
+using Dapplo.Windows.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Dapplo.Windows {
+namespace Dapplo.Windows
+{
 	/// <summary>
 	/// The WinEventHook registers itself to all for us important Windows events.
 	/// This makes it possible to know a.o. when a window is created, moved, updated and closed.

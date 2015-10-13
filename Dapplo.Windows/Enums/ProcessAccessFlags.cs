@@ -19,18 +19,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
+using System;
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
-		}
+namespace Dapplo.Windows.Enums
+{
+	[Flags]
+	public enum ProcessAccessFlags : uint
+	{
+		All = 0x001F0FFF,
+		Terminate = 0x00000001,
+		CreateThread = 0x00000002,
+		VMOperation = 0x00000008,
+		VMRead = 0x00000010,
+		VMWrite = 0x00000020,
+		DupHandle = 0x00000040,
+		SetInformation = 0x00000200,
+		QueryInformation = 0x00000400,
+		Synchronize = 0x00100000
 	}
 }

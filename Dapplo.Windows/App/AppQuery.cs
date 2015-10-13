@@ -19,7 +19,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using Dapplo.Windows.Interop;
 using Dapplo.Windows.Native;
+using Dapplo.Windows.Structs;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -37,7 +39,7 @@ namespace Dapplo.Windows.App {
 
 		// All currently known classes: "ImmersiveGutter", "Snapped Desktop", "ImmersiveBackgroundWindow","ImmersiveLauncher","Windows.UI.Core.CoreWindow","ApplicationManager_ImmersiveShellWindow","SearchPane","MetroGhostWindow","EdgeUiInputWndClass", "NativeHWNDHost", "Shell_CharmWindow"
 
-		private static readonly IAppVisibility _appVisibility;
+		private static readonly IDisposableCom<IAppVisibility> _appVisibility;
 		// For MonitorFromWindow
 		public const int MONITOR_DEFAULTTONULL = 0;
 		public const int MONITOR_DEFAULTTOPRIMARY = 1;
@@ -45,8 +47,8 @@ namespace Dapplo.Windows.App {
 
 		static AppQuery() {
 			try {
-				Type tIAppVisibility = Type.GetTypeFromCLSID(CoClassGuidIAppVisibility);
-				_appVisibility = (IAppVisibility)Activator.CreateInstance(tIAppVisibility);
+				Type appVisibilityType = Type.GetTypeFromCLSID(new Guid("7E5FE3D9-985F-4908-91F9-EE19F9FD1514"));
+				_appVisibility = DisposableCom.Create((IAppVisibility)Activator.CreateInstance(appVisibilityType));
 			} catch {
 				_appVisibility = null;
 			}
@@ -58,7 +60,7 @@ namespace Dapplo.Windows.App {
 		public static bool IsLauncherVisible {
 			get {
 				if (_appVisibility != null) {
-					return _appVisibility.IsLauncherVisible;
+					return _appVisibility.ComObject.IsLauncherVisible;
 				}
 				return false;
 			}
@@ -87,7 +89,7 @@ namespace Dapplo.Windows.App {
 				return true;
 			}
 
-			foreach (var screen in User32.GetDisplays()) {
+			foreach (var screen in User32.AllDisplays()) {
 				if (screen.Bounds.Contains(windowBounds)) {
 					if (windowBounds.Equals(screen.Bounds)) {
 						// Fullscreen, it's "visible" when AppVisibilityOnMonitor says yes
@@ -95,7 +97,7 @@ namespace Dapplo.Windows.App {
 						RECT rect = new RECT(screen.Bounds);
 						IntPtr monitor = User32.MonitorFromRect(ref rect, MONITOR_DEFAULTTONULL);
 						if (monitor != IntPtr.Zero) {
-							var monitorAppVisibility = _appVisibility.GetAppVisibilityOnMonitor(monitor);
+							var monitorAppVisibility = _appVisibility.ComObject.GetAppVisibilityOnMonitor(monitor);
 							if (monitorAppVisibility == MonitorAppVisibility.MAV_APP_VISIBLE) {
 								return true;
 							}

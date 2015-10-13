@@ -19,18 +19,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
-
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
-		}
+namespace Dapplo.Windows.Enums
+{
+	/// <summary>
+	/// List of HookTypes for the 
+	/// </summary>
+	public enum HookType : int {
+		WH_JOURNALRECORD = 0,
+		WH_JOURNALPLAYBACK = 1,
+		WH_KEYBOARD = 2,
+		WH_GETMESSAGE = 3,
+		WH_CALLWNDPROC = 4,
+		WH_CBT = 5,
+		WH_SYSMSGFILTER = 6,
+		WH_MOUSE = 7,
+		WH_HARDWARE = 8,
+		WH_DEBUG = 9,
+		WH_SHELL = 10,
+		WH_FOREGROUNDIDLE = 11,
+		WH_CALLWNDPROCRET = 12,
+		WH_KEYBOARD_LL = 13,
+		WH_MOUSE_LL = 14
 	}
 }

@@ -19,7 +19,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
+using Dapplo.Windows.Structs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -19,18 +19,27 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
+using Microsoft.Win32.SafeHandles;
+using System;
+using System.Runtime.InteropServices;
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
+namespace Dapplo.Windows.SafeHandles
+{
+	/// <summary>
+	/// Abstract class SafeObjectHandle which contains all handles that are cleaned with DeleteObject
+	/// </summary>
+	public abstract class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
+	{
+		[DllImport("gdi32", SetLastError = true)]
+		private static extern bool DeleteObject(IntPtr hObject);
+
+		protected SafeObjectHandle(bool ownsHandle) : base(ownsHandle)
+		{
+		}
+
+		protected override bool ReleaseHandle()
+		{
+			return DeleteObject(handle);
 		}
 	}
 }

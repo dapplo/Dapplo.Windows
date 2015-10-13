@@ -19,18 +19,42 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
+using System;
+using System.Runtime.InteropServices;
+using System.Windows;
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
+namespace Dapplo.Windows.Structs
+{
+	[StructLayout(LayoutKind.Sequential), Serializable()]
+	public struct SIZE
+	{
+		public int width;
+		public int height;
+
+		public SIZE(Size size)
+			: this((int)size.Width, (int)size.Height)
+		{
+
+		}
+
+		public SIZE(System.Drawing.Size size) : this(size.Width, size.Height)
+		{
+		}
+
+		public SIZE(int width, int height)
+		{
+			this.width = width;
+			this.height = height;
+		}
+
+		public Size ToSize()
+		{
+			return new Size(width, height);
+		}
+
+		public System.Drawing.Size ToSystemDrawingSize()
+		{
+			return new System.Drawing.Size(width, height);
 		}
 	}
 }

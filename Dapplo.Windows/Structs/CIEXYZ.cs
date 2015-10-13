@@ -19,18 +19,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
+using System.Runtime.InteropServices;
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
+namespace Dapplo.Windows.Structs
+{
+	[StructLayout(LayoutKind.Sequential)]
+	public struct CIEXYZ
+	{
+		public uint ciexyzX; //FXPT2DOT30
+		public uint ciexyzY; //FXPT2DOT30
+		public uint ciexyzZ; //FXPT2DOT30
+
+		public CIEXYZ(uint FXPT2DOT30)
+		{
+			ciexyzX = FXPT2DOT30;
+			ciexyzY = FXPT2DOT30;
+			ciexyzZ = FXPT2DOT30;
 		}
 	}
 }

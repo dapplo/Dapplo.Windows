@@ -19,18 +19,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
+using System;
+using System.Runtime.InteropServices;
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
+namespace Dapplo.Windows.Structs
+{
+	/// <summary>
+	/// The structure for the WindowInfo
+	/// See: http://msdn.microsoft.com/en-us/library/windows/desktop/ms632610.aspx
+	/// </summary>
+	[StructLayout(LayoutKind.Sequential), Serializable]
+	internal struct WINDOWINFO {
+		public uint cbSize;
+		public RECT rcWindow;
+		public RECT rcClient;
+		public uint dwStyle;
+		public uint dwExStyle;
+		public uint dwWindowStatus;
+		public uint cxWindowBorders;
+		public uint cyWindowBorders;
+		public ushort atomWindowType;
+		public ushort wCreatorVersion;
+		// Allows automatic initialization of "cbSize" with "new WINDOWINFO(null/true/false)".
+		public WINDOWINFO(bool? filler)
+			: this() {
+			cbSize = (uint)(Marshal.SizeOf(typeof(WINDOWINFO)));
 		}
 	}
 }

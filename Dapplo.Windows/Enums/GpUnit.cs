@@ -19,18 +19,46 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
+namespace Dapplo.Windows.Enums
+{
+	/// <summary>
+	/// GDI Plus unit description.
+	/// </summary>
+	public enum GpUnit
+	{
+		/// <summary>
+		/// World coordinate (non-physical unit).
+		/// </summary>
+		UnitWorld,
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
-		}
+		/// <summary>
+		/// Variable - for PageTransform only.
+		/// </summary>
+		UnitDisplay,
+
+		/// <summary>
+		/// Each unit is one device pixel.
+		/// </summary>
+		UnitPixel,
+
+		/// <summary>
+		/// Each unit is a printer's point, or 1/72 inch.
+		/// </summary>
+		UnitPoint,
+
+		/// <summary>
+		/// Each unit is 1 inch.
+		/// </summary>
+		UnitInch,
+
+		/// <summary>
+		/// Each unit is 1/300 inch.
+		/// </summary>
+		UnitDocument,
+
+		/// <summary>
+		/// Each unit is 1 millimeter.
+		/// </summary>
+		UnitMillimeter
 	}
 }

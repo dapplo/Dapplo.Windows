@@ -19,18 +19,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
+using Dapplo.Windows.Enums;
+using System;
+using System.Runtime.InteropServices;
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
-		}
+namespace Dapplo.Windows.Native
+{
+	/// <summary>
+	/// Windows Media 
+	/// </summary>
+	public class WinMM
+	{
+		[DllImport("winmm.dll", SetLastError = true)]
+		public static extern bool PlaySound(byte[] ptrToSound, UIntPtr hmod, SoundFlags fdwSound);
+
+		[DllImport("winmm.dll", SetLastError = true)]
+		public static extern bool PlaySound(IntPtr ptrToSound, UIntPtr hmod, SoundFlags fdwSound);
 	}
 }

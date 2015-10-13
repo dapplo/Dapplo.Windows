@@ -19,17 +19,35 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
+namespace Dapplo.Windows.Native
+{
+	/// <summary>
+	/// Description of PsAPI.
+	/// </summary>
+	public class PsAPI
+	{
+		[DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
+		public static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, StringBuilder lpFilename, uint nSize);
+
+		[DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
+		public static extern uint GetProcessImageFileName(IntPtr hProcess, StringBuilder lpImageFileName, uint nSize);
+
+		[DllImport("psapi")]
+		private static extern int EmptyWorkingSet(IntPtr hwProc);
+
+		/// <summary>
+		/// Make the process use less memory by emptying the working set
+		/// </summary>
+		public static void EmptyWorkingSet()
+		{
+			using (Process currentProcess = Process.GetCurrentProcess())
+			{
+				EmptyWorkingSet(currentProcess.Handle);
 			}
 		}
 	}

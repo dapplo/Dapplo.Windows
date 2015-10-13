@@ -19,17 +19,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Enums;
+using Dapplo.Windows.Structs;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 
-namespace Dapplo.Windows.Native {
+namespace Dapplo.Windows.Native
+{
 	/// <summary>
 	/// Native wrappers for the User32 DLL
 	/// </summary>
-	public class User32 {
+	public class User32
+	{
 		private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
 
 		#region Native imports
@@ -65,39 +70,47 @@ namespace Dapplo.Windows.Native {
 		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
 		public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+		[DllImport("user32", SetLastError = true)]
+		public static extern int GetSystemMetrics(SystemMetric index);
+
+		[DllImport("user32", SetLastError = true)]
+		public static extern bool DestroyIcon(IntPtr hIcon);
 		#endregion
 
 		/// <summary>
 		/// Helper method to cast the GetLastWin32Error result to a Win32Error
 		/// </summary>
 		/// <returns></returns>
-		private static Win32Error GetLastErrorCode() {
+		private static Win32Error GetLastErrorCode()
+		{
 			return (Win32Error)Marshal.GetLastWin32Error();
 		}
 
+		private const uint MONITORINFOF_PRIMARY = 1;
 		/// <summary>
 		/// Returns the number of Displays using the Win32 functions
 		/// </summary>
 		/// <returns>collection of Display Info</returns>
-		public static List<DisplayInfo> GetDisplays() {
-			List<DisplayInfo> displayInfoList = new List<DisplayInfo>();
-
-			EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero,
-				delegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData) {
-					MonitorInfoEx monitorInfoEx = new MonitorInfoEx();
-					monitorInfoEx.Init();
-					bool success = GetMonitorInfo(hMonitor, ref monitorInfoEx);
-					if (success) {
-						DisplayInfo displayInfo = new DisplayInfo();
-						displayInfo.Bounds = monitorInfoEx.Monitor.ToRect();
-						displayInfo.WorkArea = monitorInfoEx.WorkArea.ToRect();
-						displayInfo.DeviceName = monitorInfoEx.DeviceName;
-						displayInfo.Flags = (MonitorInfoFlags)monitorInfoEx.Flags;
-						displayInfoList.Add(displayInfo);
-					}
-					return true;
-				}, IntPtr.Zero);
-			return displayInfoList;
+		public static IList<DisplayInfo> AllDisplays()
+		{
+			var result = new List<DisplayInfo>();
+			User32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, delegate (IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData) {
+				var monitorInfoEx = new MonitorInfoEx();
+				monitorInfoEx.Init();
+				bool success = User32.GetMonitorInfo(hMonitor, ref monitorInfoEx);
+				if (success)
+				{
+					DisplayInfo displayInfo = new DisplayInfo();
+					displayInfo.ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left);
+					displayInfo.ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top);
+					displayInfo.Bounds = monitorInfoEx.Monitor.ToRect();
+					displayInfo.WorkingArea = monitorInfoEx.WorkArea.ToRect();
+					displayInfo.IsPrimary = (monitorInfoEx.Flags | MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY;
+					result.Add(displayInfo);
+				}
+				return true;
+			}, IntPtr.Zero);
+			return result;
 		}
 
 		/// <summary>
@@ -106,13 +119,17 @@ namespace Dapplo.Windows.Native {
 		/// <param name="hWnd"></param>
 		/// <param name="rectangle">out Rectangle</param>
 		/// <returns>bool true if it worked</returns>		
-		public static bool GetWindowRect(IntPtr hWnd, out Rect rectangle) {
+		public static bool GetWindowRect(IntPtr hWnd, out Rect rectangle)
+		{
 			WINDOWINFO windowInfo = new WINDOWINFO();
 			// Get the Window Info for this window
 			bool result = GetWindowInfo(hWnd, ref windowInfo);
-			if (result) {
+			if (result)
+			{
 				rectangle = windowInfo.rcWindow.ToRect();
-			} else {
+			}
+			else
+			{
 				rectangle = Rect.Empty;
 			}
 			return result;
@@ -124,13 +141,17 @@ namespace Dapplo.Windows.Native {
 		/// <param name="hWnd"></param>
 		/// <param name="rectangle">out Rectangle</param>
 		/// <returns>bool true if it worked</returns>		
-		public static bool GetClientRect(IntPtr hWnd, out Rect rectangle) {
+		public static bool GetClientRect(IntPtr hWnd, out Rect rectangle)
+		{
 			WINDOWINFO windowInfo = new WINDOWINFO();
 			// Get the Window Info for this window
 			bool result = GetWindowInfo(hWnd, ref windowInfo);
-			if (result) {
+			if (result)
+			{
 				rectangle = windowInfo.rcClient.ToRect();
-			} else {
+			}
+			else
+			{
 				rectangle = Rect.Empty;
 			}
 			return result;
@@ -142,13 +163,17 @@ namespace Dapplo.Windows.Native {
 		/// <param name="hWnd"></param>
 		/// <param name="size"></param>
 		/// <returns>bool true if it worked</returns>	
-		public static bool GetBorderSize(IntPtr hWnd, out Size size) {
+		public static bool GetBorderSize(IntPtr hWnd, out Size size)
+		{
 			WINDOWINFO windowInfo = new WINDOWINFO();
 			// Get the Window Info for this window
 			bool result = GetWindowInfo(hWnd, ref windowInfo);
-			if (result) {
+			if (result)
+			{
 				size = new Size((int)windowInfo.cxWindowBorders, (int)windowInfo.cyWindowBorders);
-			} else {
+			}
+			else
+			{
 				size = Size.Empty;
 			}
 			return result;
@@ -160,8 +185,10 @@ namespace Dapplo.Windows.Native {
 		/// <param name="hWnd">IntPtr</param>
 		/// <param name="nIndex">int</param>
 		/// <returns>IntPtr</returns>
-		public static IntPtr GetClassLongWrapper(IntPtr hWnd, int nIndex) {
-			if (IntPtr.Size > 4) {
+		public static IntPtr GetClassLongWrapper(IntPtr hWnd, int nIndex)
+		{
+			if (IntPtr.Size > 4)
+			{
 				return GetClassLongPtr(hWnd, nIndex);
 			}
 			return GetClassLong(hWnd, nIndex);
@@ -172,12 +199,15 @@ namespace Dapplo.Windows.Native {
 		/// </summary>
 		/// <param name="hWnd">IntPtr for the window</param>
 		/// <returns>string</returns>
-		public static string GetText(IntPtr hWnd) {
+		public static string GetText(IntPtr hWnd)
+		{
 			StringBuilder title = new StringBuilder(260, 260);
 			int length = GetWindowText(hWnd, title, title.Capacity);
-			if (length == 0) {
+			if (length == 0)
+			{
 				Win32Error error = GetLastErrorCode();
-				if (error != Win32Error.Success) {
+				if (error != Win32Error.Success)
+				{
 					return null;
 				}
 			}
@@ -189,10 +219,12 @@ namespace Dapplo.Windows.Native {
 		/// </summary>
 		/// <param name="hWnd">IntPtr for the window</param>
 		/// <returns>string</returns>
-		public static string GetClassname(IntPtr hWnd) {
+		public static string GetClassname(IntPtr hWnd)
+		{
 			StringBuilder classNameBuilder = new StringBuilder(260, 260);
 			int hresult = GetClassName(hWnd, classNameBuilder, classNameBuilder.Capacity);
-			if (hresult == 0) {
+			if (hresult == 0)
+			{
 				return null;
 			}
 			return classNameBuilder.ToString();
@@ -203,26 +235,32 @@ namespace Dapplo.Windows.Native {
 		/// </summary>
 		/// <param name="hWnd"></param>
 		/// <returns>System.Drawing.Icon</returns>
-		public static System.Drawing.Icon GetIcon(IntPtr hWnd) {
+		public static System.Drawing.Icon GetIcon(IntPtr hWnd)
+		{
 			IntPtr iconSmall = IntPtr.Zero;
 			IntPtr iconBig = new IntPtr(1);
 			IntPtr iconSmall2 = new IntPtr(2);
 
 			IntPtr iconHandle = SendMessage(hWnd, (int)WindowsMessages.WM_GETICON, iconSmall2, IntPtr.Zero);
-			if (iconHandle == IntPtr.Zero) {
+			if (iconHandle == IntPtr.Zero)
+			{
 				iconHandle = SendMessage(hWnd, (int)WindowsMessages.WM_GETICON, iconSmall, IntPtr.Zero);
 			}
-			if (iconHandle == IntPtr.Zero) {
+			if (iconHandle == IntPtr.Zero)
+			{
 				iconHandle = GetClassLongWrapper(hWnd, (int)ClassLongIndex.GCL_HICONSM);
 			}
-			if (iconHandle == IntPtr.Zero) {
+			if (iconHandle == IntPtr.Zero)
+			{
 				iconHandle = SendMessage(hWnd, (int)WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero);
 			}
-			if (iconHandle == IntPtr.Zero) {
+			if (iconHandle == IntPtr.Zero)
+			{
 				iconHandle = GetClassLongWrapper(hWnd, (int)ClassLongIndex.GCL_HICON);
 			}
 
-			if (iconHandle == IntPtr.Zero) {
+			if (iconHandle == IntPtr.Zero)
+			{
 				return null;
 			}
 

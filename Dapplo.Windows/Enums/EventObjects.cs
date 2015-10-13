@@ -19,18 +19,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
-
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
-		}
+namespace Dapplo.Windows.Enums {
+	/// <summary>
+	/// Used for User32.SetWinEventHook
+	/// See WinUser.h or: http://msdn.microsoft.com/en-us/library/windows/desktop/dd373606.aspx
+	/// </summary>
+	public enum EventObjects : int {
+		OBJID_WINDOW = 0,
+		OBJID_SYSMENU = -1,
+		OBJID_TITLEBAR = -2,
+		OBJID_MENU = -3,
+		OBJID_CLIENT = -4,
+		OBJID_VSCROLL = -5,
+		OBJID_HSCROLL = -6,
+		OBJID_SIZEGRIP = -7,
+		OBJID_CARET = -8,
+		OBJID_CURSOR = -9,
+		OBJID_ALERT = -10,
+		OBJID_SOUND = -11,
+		OBJID_QUERYCLASSNAMEIDX = -12,
+		OBJID_NATIVEOM = -16
 	}
 }

@@ -19,12 +19,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
+using Dapplo.Windows.Structs;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Dapplo.Windows.Desktop {
+namespace Dapplo.Windows.Desktop
+{
 	public class NativeWindows {
 		[DllImport("user32", SetLastError = true)]
 		private static extern IntPtr GetParent(IntPtr hWnd);

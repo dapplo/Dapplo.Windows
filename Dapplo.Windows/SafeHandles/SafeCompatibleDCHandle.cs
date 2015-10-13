@@ -19,18 +19,39 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
+using System;
+using System.Runtime.InteropServices;
+using System.Security;
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
+namespace Dapplo.Windows.SafeHandles
+{
+	/// <summary>
+	/// A CompatibleDC SafeHandle implementation
+	/// </summary>
+	public class SafeCompatibleDCHandle : SafeDCHandle
+	{
+		[DllImport("gdi32", SetLastError = true)]
+		private static extern bool DeleteDC(IntPtr hDC);
+
+		[SecurityCritical]
+		private SafeCompatibleDCHandle() : base(true)
+		{
+		}
+
+		[SecurityCritical]
+		public SafeCompatibleDCHandle(IntPtr preexistingHandle) : base(true)
+		{
+			SetHandle(preexistingHandle);
+		}
+
+		public SafeSelectObjectHandle SelectObject(SafeHandle newHandle)
+		{
+			return new SafeSelectObjectHandle(this, newHandle);
+		}
+
+		protected override bool ReleaseHandle()
+		{
+			return DeleteDC(handle);
 		}
 	}
 }

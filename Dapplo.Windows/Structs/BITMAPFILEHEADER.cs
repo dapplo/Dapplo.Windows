@@ -19,18 +19,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
+using System.Runtime.InteropServices;
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
-	public class TestGetDisplays {
-		[TestMethod]
-		public void TestMethod1() {
-			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
-		}
+namespace Dapplo.Windows.Structs
+{
+	[StructLayout(LayoutKind.Sequential, Pack = 2)]
+	public struct BITMAPFILEHEADER
+	{
+		public static readonly short BM = 0x4d42; // BM
+		public short bfType;
+		public int bfSize;
+		public short bfReserved1;
+		public short bfReserved2;
+		public int bfOffBits;
 	}
 }
