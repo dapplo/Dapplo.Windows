@@ -25,6 +25,8 @@ using Dapplo.Windows.SafeHandles;
 using Dapplo.Windows.Structs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
@@ -39,6 +41,7 @@ namespace Dapplo.Windows.Native
 	{
 		private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
 		public delegate int EnumWindowsProc(IntPtr hwnd, int lParam);
+		private static bool _CanCallGetPhysicalCursorPos = true;
 
 		#region Native imports
 		[DllImport("user32", SetLastError = true)]
@@ -451,5 +454,99 @@ namespace Dapplo.Windows.Native
 			return System.Drawing.Icon.FromHandle(iconHandle);
 		}
 
+		/// <summary>
+		/// Retrieves the cursor location safely, accounting for DPI settings in Vista/Windows 7.
+		/// </summary>
+		/// <returns>Point with cursor location, relative to the origin of the monitor setup
+		/// (i.e. negative coordinates arepossible in multiscreen setups)</returns>
+		public static Point GetCursorLocation()
+		{
+			if (Environment.OSVersion.Version.Major >= 6 && _CanCallGetPhysicalCursorPos)
+			{
+				POINT cursorLocation;
+				try
+				{
+					if (GetPhysicalCursorPos(out cursorLocation))
+					{
+						return new Point(cursorLocation.X, cursorLocation.Y);
+					}
+					else
+					{
+						Win32Error error = Win32.GetLastErrorCode();
+						//LOG.ErrorFormat("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
+					}
+				}
+				catch (Exception ex)
+				{
+					//LOG.Error("Exception retrieving PhysicalCursorPos, no longer calling this. Cause :", ex);
+					_CanCallGetPhysicalCursorPos = false;
+				}
+			}
+			return new Point(Cursor.Position.X, Cursor.Position.Y);
+		}
+
+		/// <summary>
+		/// Wrapper for the GetWindowLong which decides if the system is 64-bit or not and calls the right one.
+		/// </summary>
+		/// <param name="hwnd"></param>
+		/// <param name="nIndex"></param>
+		/// <returns></returns>
+		public static long GetWindowLongWrapper(IntPtr hwnd, int nIndex)
+		{
+			if (IntPtr.Size == 8)
+			{
+				return GetWindowLongPtr(hwnd, nIndex).ToInt64();
+			}
+			else
+			{
+				return GetWindowLong(hwnd, nIndex);
+			}
+		}
+
+		/// <summary>
+		/// Wrapper for the SetWindowLong which decides if the system is 64-bit or not and calls the right one.
+		/// </summary>
+		/// <param name="hwnd"></param>
+		/// <param name="nIndex"></param>
+		/// <param name="styleFlags"></param>
+		public static void SetWindowLongWrapper(IntPtr hwnd, int nIndex, IntPtr styleFlags)
+		{
+			if (IntPtr.Size == 8)
+			{
+				SetWindowLongPtr(hwnd, nIndex, styleFlags);
+			}
+			else
+			{
+				SetWindowLong(hwnd, nIndex, styleFlags.ToInt32());
+			}
+		}
+
+		public static uint GetGuiResourcesGDICount()
+		{
+			using (Process currentProcess = Process.GetCurrentProcess())
+			{
+				return GetGuiResources(currentProcess.Handle, 0);
+			}
+		}
+
+		public static uint GetGuiResourcesUserCount()
+		{
+			using (Process currentProcess = Process.GetCurrentProcess())
+			{
+				return GetGuiResources(currentProcess.Handle, 1);
+			}
+		}
+
+		/// <summary>
+		/// Helper method to create a Win32 exception with the windows message in it
+		/// </summary>
+		/// <param name="method">string with current method</param>
+		/// <returns>Exception</returns>
+		public static Exception CreateWin32Exception(string method)
+		{
+			Win32Exception exceptionToThrow = new Win32Exception();
+			exceptionToThrow.Data.Add("Method", method);
+			return exceptionToThrow;
+		}
 	}
 }
