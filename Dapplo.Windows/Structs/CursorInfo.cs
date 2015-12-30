@@ -1,6 +1,6 @@
 ﻿/*
  * dapplo - building blocks for desktop applications
- * Copyright (C) 2015 Robin Krom
+ * Copyright (C) Dapplo 2015-2016
  * 
  * For more information see: http://dapplo.net/
  * dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -32,5 +32,10 @@ namespace Dapplo.Windows.Structs
 		public CursorInfoFlags flags;
 		public IntPtr hCursor;
 		public POINT ptScreenPos;
+
+		public void Init()
+		{
+			cbSize = Marshal.SizeOf(this);
+		}
 	}
 }
