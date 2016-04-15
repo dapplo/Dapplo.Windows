@@ -24,6 +24,7 @@ using Dapplo.Windows.Native;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Security.Permissions;
+using Dapplo.LogFacade;
 
 namespace Dapplo.Windows.SafeHandles
 {
@@ -32,29 +33,39 @@ namespace Dapplo.Windows.SafeHandles
 	/// </summary>
 	public class SafeCurrentInputDesktopHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
+		private static readonly LogSource Log = new LogSource();
+
+		/// <summary>
+		/// Default constructor, this opens the input destop with GENERIC_ALL
+		/// </summary>
 		public SafeCurrentInputDesktopHandle() : base(true)
 		{
-			IntPtr hDesktop = User32.OpenInputDesktop(0, true, DesktopAccessRight.GENERIC_ALL);
+			var hDesktop = User32.OpenInputDesktop(0, true, DesktopAccessRight.GENERIC_ALL);
 			if (hDesktop != IntPtr.Zero)
 			{
+				// Got desktop, store it as handle for the ReleaseHandle
 				SetHandle(hDesktop);
 				if (User32.SetThreadDesktop(hDesktop))
 				{
-					//LOG.DebugFormat("Switched to desktop {0}", hDesktop);
+					Log.Debug().WriteLine("Switched to desktop {0}", hDesktop);
 				}
 				else
 				{
-					//LOG.WarnFormat("Couldn't switch to desktop {0}", hDesktop);
-					//LOG.Error(User32.CreateWin32Exception("SetThreadDesktop"));
+					Log.Warn().WriteLine("Couldn't switch to desktop {0}", hDesktop);
+					Log.Error().WriteLine(User32.CreateWin32Exception("SetThreadDesktop"));
 				}
 			}
 			else
 			{
-				//LOG.Warn("Couldn't get current desktop.");
-				//LOG.Error(User32.CreateWin32Exception("OpenInputDesktop"));
+				Log.Warn().WriteLine("Couldn't get current desktop.");
+				Log.Error().WriteLine(User32.CreateWin32Exception("OpenInputDesktop"));
 			}
 		}
 
+		/// <summary>
+		/// Close the desktop
+		/// </summary>
+		/// <returns>true if this succeeded</returns>
 		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 		protected override bool ReleaseHandle()
 		{

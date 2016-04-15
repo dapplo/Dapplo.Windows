@@ -24,6 +24,9 @@ using System.Drawing;
 
 namespace Dapplo.Windows.Native
 {
+	/// <summary>
+	/// Some extensions for GDI stuff
+	/// </summary>
 	public static class GdiExtensions
 	{
 		/// <summary>
@@ -50,11 +53,31 @@ namespace Dapplo.Windows.Native
 		/// <summary>
 		/// Get a SafeHandle for the GetHdc, so one can use using to automatically cleanup the devicecontext
 		/// </summary>
-		/// <param name="graphics"></param>
+		/// <param name="graphics">Graphics</param>
 		/// <returns>SafeDeviceContextHandle</returns>
 		public static SafeDeviceContextHandle GetSafeDeviceContext(this Graphics graphics)
 		{
-			return SafeDeviceContextHandle.fromGraphics(graphics);
+			return SafeDeviceContextHandle.FromGraphics(graphics);
+		}
+
+		/// <summary>
+		/// Get a SafeIconHandle so one can use using to automatically cleanup the HIcon
+		/// </summary>
+		/// <param name="bitmap">Bitmap</param>
+		/// <returns>SafeIconHandle</returns>
+		public static SafeIconHandle GetSafeIconHandle(this Bitmap bitmap)
+		{
+			return new SafeIconHandle(bitmap);
+		}
+
+		/// <summary>
+		/// Get a SafeHBitmapHandle so one can use using to automatically cleanup the HBitmap
+		/// </summary>
+		/// <param name="bitmap">Bitmap</param>
+		/// <returns>SafeHBitmapHandle</returns>
+		public static SafeHBitmapHandle GetSafeHBitmapHandle(this Bitmap bitmap)
+		{
+			return new SafeHBitmapHandle(bitmap);
 		}
 	}
 }

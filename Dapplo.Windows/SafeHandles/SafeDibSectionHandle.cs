@@ -25,15 +25,15 @@ using System.Security;
 namespace Dapplo.Windows.SafeHandles
 {
 	/// <summary>
-	/// A dibsection SafeHandle implementation
+	/// A DIB Section SafeHandle implementation
 	/// </summary>
 	public class SafeDibSectionHandle : SafeObjectHandle
 	{
-		[SecurityCritical]
-		private SafeDibSectionHandle() : base(true)
-		{
-		}
 
+		/// <summary>
+		/// Create a SafeDibSectionHandle for an existing DIB Section
+		/// </summary>
+		/// <param name="preexistingHandle"></param>
 		[SecurityCritical]
 		public SafeDibSectionHandle(IntPtr preexistingHandle) : base(true)
 		{

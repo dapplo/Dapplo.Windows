@@ -285,14 +285,16 @@ namespace Dapplo.Windows.Native
 				bool success = User32.GetMonitorInfo(hMonitor, ref monitorInfoEx);
 				if (success)
 				{
-					DisplayInfo displayInfo = new DisplayInfo();
-					displayInfo.ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left);
-					displayInfo.ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top);
-					displayInfo.Bounds = monitorInfoEx.Monitor.ToRect();
-					displayInfo.BoundsRectangle = monitorInfoEx.Monitor.ToRectangle();
-					displayInfo.WorkingArea = monitorInfoEx.WorkArea.ToRect();
-					displayInfo.WorkingAreaRectangle = monitorInfoEx.WorkArea.ToRectangle();
-					displayInfo.IsPrimary = (monitorInfoEx.Flags | MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY;
+					var displayInfo = new DisplayInfo
+					{
+						ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left),
+						ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
+						Bounds = monitorInfoEx.Monitor.ToRect(),
+						BoundsRectangle = monitorInfoEx.Monitor.ToRectangle(),
+						WorkingArea = monitorInfoEx.WorkArea.ToRect(),
+						WorkingAreaRectangle = monitorInfoEx.WorkArea.ToRectangle(),
+						IsPrimary = (monitorInfoEx.Flags | MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY
+					};
 					result.Add(displayInfo);
 				}
 				return true;

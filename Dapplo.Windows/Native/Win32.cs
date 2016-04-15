@@ -26,31 +26,52 @@ using System.Text;
 
 namespace Dapplo.Windows.Native
 {
+	/// <summary>
+	/// Kernel 32 methods
+	/// </summary>
 	public static class Win32
 	{
 		[DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-		private static extern uint FormatMessage(uint dwFlags, IntPtr lpSource, uint dwMessageId, uint dwLanguageId, [Out] StringBuilder lpBuffer, int nSize, IntPtr Arguments);
+		private static extern uint FormatMessage(uint dwFlags, IntPtr lpSource, uint dwMessageId, uint dwLanguageId, [Out] StringBuilder lpBuffer, int nSize, IntPtr arguments);
 
+		/// <summary>
+		/// Change the last error
+		/// </summary>
+		/// <param name="dwErrCode"></param>
 		[DllImport("kernel32.dll")]
 		public static extern void SetLastError(uint dwErrCode);
 
+		/// <summary>
+		/// Get the last Win32 error as an exception
+		/// </summary>
+		/// <returns></returns>
 		public static Win32Error GetLastErrorCode()
 		{
 			return (Win32Error)Marshal.GetLastWin32Error();
 		}
 
+		/// <summary>
+		/// Get the error code from the Win32Error
+		/// </summary>
+		/// <param name="errorCode"></param>
+		/// <returns></returns>
 		public static long GetHResult(Win32Error errorCode)
 		{
 			int error = (int)errorCode;
 
 			if ((error & 0x80000000) == 0x80000000)
 			{
-				return (long)error;
+				return error;
 			}
 
-			return (long)(0x80070000 | (uint)(error & 0xffff));
+			return 0x80070000 | (uint)(error & 0xffff);
 		}
 
+		/// <summary>
+		/// Get the message for a Win32 error
+		/// </summary>
+		/// <param name="errorCode">Win32Error</param>
+		/// <returns>string with the message</returns>
 		public static string GetMessage(Win32Error errorCode)
 		{
 			StringBuilder buffer = new StringBuilder(0x100);

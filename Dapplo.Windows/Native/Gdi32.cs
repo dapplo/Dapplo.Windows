@@ -40,7 +40,7 @@ namespace Dapplo.Windows.Native
 		private static extern bool StretchBlt(SafeHandle hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, SafeHandle hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, CopyPixelOperation dwRop);
 
 		[DllImport("gdi32", SetLastError = true)]
-		public static extern SafeCompatibleDCHandle CreateCompatibleDC(SafeHandle hDC);
+		public static extern SafeCompatibleDcHandle CreateCompatibleDC(SafeHandle hDC);
 
 		[DllImport("gdi32", SetLastError = true)]
 		public static extern IntPtr SelectObject(SafeHandle hDC, SafeHandle hObject);
@@ -67,9 +67,9 @@ namespace Dapplo.Windows.Native
 		{
 			using (SafeDeviceContextHandle targetDC = target.GetSafeDeviceContext())
 			{
-				using (SafeCompatibleDCHandle safeCompatibleDCHandle = CreateCompatibleDC(targetDC))
+				using (SafeCompatibleDcHandle safeCompatibleDCHandle = CreateCompatibleDC(targetDC))
 				{
-					using (SafeHBitmapHandle hBitmapHandle = new SafeHBitmapHandle(sourceBitmap.GetHbitmap()))
+					using (SafeHBitmapHandle hBitmapHandle = new SafeHBitmapHandle(sourceBitmap))
 					{
 						using (safeCompatibleDCHandle.SelectObject(hBitmapHandle))
 						{
@@ -89,7 +89,7 @@ namespace Dapplo.Windows.Native
 		{
 			using (SafeDeviceContextHandle targetDC = target.GetSafeDeviceContext())
 			{
-				using (SafeCompatibleDCHandle safeCompatibleDCHandle = CreateCompatibleDC(targetDC))
+				using (SafeCompatibleDcHandle safeCompatibleDCHandle = CreateCompatibleDC(targetDC))
 				{
 					using (SafeHBitmapHandle hBitmapHandle = new SafeHBitmapHandle(sourceBitmap.GetHbitmap()))
 					{

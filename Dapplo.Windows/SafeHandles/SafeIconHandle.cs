@@ -22,6 +22,7 @@
 using Dapplo.Windows.Native;
 using Microsoft.Win32.SafeHandles;
 using System;
+using System.Drawing;
 using System.Security.Permissions;
 
 namespace Dapplo.Windows.SafeHandles
@@ -31,15 +32,27 @@ namespace Dapplo.Windows.SafeHandles
 	/// </summary>
 	public class SafeIconHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
-		private SafeIconHandle() : base(true)
+		/// <summary>
+		/// Create a SafeIconHandle from a bitmap by calling GetHicon
+		/// </summary>
+		/// <param name="bitmap">Bitmap</param>
+		public SafeIconHandle(Bitmap bitmap) : base(true)
 		{
+			SetHandle(bitmap.GetHicon());
 		}
-
+	
+		/// <summary>
+		/// Create a SafeIconHandle from a hIcon
+		/// </summary>
+		/// <param name="hIcon">IntPtr to an icon</param>
 		public SafeIconHandle(IntPtr hIcon) : base(true)
 		{
 			SetHandle(hIcon);
 		}
-
+		/// <summary>
+		/// Call destroy icon
+		/// </summary>
+		/// <returns>true if this worked</returns>
 		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 		protected override bool ReleaseHandle()
 		{

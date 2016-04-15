@@ -24,7 +24,6 @@ using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Windows;
 
 namespace Dapplo.Windows.App {

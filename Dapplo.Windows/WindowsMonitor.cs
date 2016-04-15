@@ -35,27 +35,26 @@ namespace Dapplo.Windows
 	/// </summary>
 	public class WindowsMonitor : IDisposable {
 		private readonly IDictionary<IntPtr, WindowInfo> _windowsCache = new ConcurrentDictionary<IntPtr, WindowInfo>();
-		private WindowsEventHook hook = new WindowsEventHook();
+		private readonly WindowsEventHook _hook = new WindowsEventHook();
 
-		public void Dispose() {
+		void IDisposable.Dispose() {
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
+		/// <summary>
+		/// Dispose the hook
+		/// </summary>
+		/// <param name="disposing"></param>
 		protected virtual void Dispose(bool disposing) {
 			if (disposing) {
-				hook.Dispose();
+				_hook.Dispose();
 			}
 		}
 
-		public WindowsMonitor() {
-
-		}
-
 		/// <summary>
-		/// WinEventDelegate for the creation & destruction
+		/// WinEventDelegate for the creation and destruction
 		/// </summary>
-		/// <param name="hWinEventHook"></param>
 		/// <param name="eventType"></param>
 		/// <param name="hWnd"></param>
 		/// <param name="idObject"></param>

@@ -29,48 +29,72 @@ namespace Dapplo.Windows.Desktop
 	/// </summary>
 	public class DisplayInfo
 	{
+		/// <summary>
+		/// Is this the primary monitor
+		/// </summary>
 		public bool IsPrimary
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Height of  the screen
+		/// </summary>
 		public int ScreenHeight
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Width of the screen
+		/// </summary>
 		public int ScreenWidth
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Screen bounds
+		/// </summary>
 		public Rect Bounds
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Bounds as Rectangle
+		/// </summary>
 		public System.Drawing.Rectangle BoundsRectangle
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Desktop working area
+		/// </summary>
 		public Rect WorkingArea
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Desktop working area as Rectangle
+		/// </summary>
 		public System.Drawing.Rectangle WorkingAreaRectangle
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Device name
+		/// </summary>
 		public string DeviceName
 		{
 			get;
@@ -97,7 +121,7 @@ namespace Dapplo.Windows.Desktop
 					returnValue = display;
 				}
 			}
-			return returnValue.Bounds;
+			return returnValue?.Bounds ?? Rect.Empty;
 		}
 
 		/// <summary>

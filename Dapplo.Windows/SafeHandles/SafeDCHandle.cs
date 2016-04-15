@@ -19,13 +19,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Microsoft.Win32.SafeHandles;
+ using Microsoft.Win32.SafeHandles;
 
 namespace Dapplo.Windows.SafeHandles
 {
-	public abstract class SafeDCHandle : SafeHandleZeroOrMinusOneIsInvalid
+	/// <summary>
+	/// Base class for all Safe "DC" Handles
+	/// </summary>
+	public abstract class SafeDcHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
-		protected SafeDCHandle(bool ownsHandle) : base(ownsHandle)
+		/// <summary>
+		/// Constructor which passes the SafeHandleZeroOrMinusOneIsInvalid to the base
+		/// </summary>
+		/// <param name="ownsHandle"></param>
+		protected SafeDcHandle(bool ownsHandle) : base(ownsHandle)
 		{
 		}
 	}

@@ -29,34 +29,48 @@ namespace Dapplo.Windows.SafeHandles
 	/// <summary>
 	/// A DeviceContext SafeHandle implementation
 	/// </summary>
-	public class SafeDeviceContextHandle : SafeDCHandle
+	public class SafeDeviceContextHandle : SafeDcHandle
 	{
-		private Graphics graphics = null;
+		private Graphics _graphics;
 
-		[SecurityCritical]
-		private SafeDeviceContextHandle() : base(true)
-		{
-		}
-
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="graphics"></param>
+		/// <param name="preexistingHandle"></param>
 		[SecurityCritical]
 		public SafeDeviceContextHandle(Graphics graphics, IntPtr preexistingHandle) : base(true)
 		{
-			this.graphics = graphics;
+			_graphics = graphics;
 			SetHandle(preexistingHandle);
 		}
 
+		/// <summary>
+		/// Call graphics.ReleaseHdc
+		/// </summary>
+		/// <returns>always true</returns>
 		protected override bool ReleaseHandle()
 		{
-			graphics.ReleaseHdc(handle);
+			_graphics.ReleaseHdc(handle);
 			return true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="newHandle"></param>
+		/// <returns></returns>
 		public SafeSelectObjectHandle SelectObject(SafeHandle newHandle)
 		{
 			return new SafeSelectObjectHandle(this, newHandle);
 		}
 
-		public static SafeDeviceContextHandle fromGraphics(Graphics graphics)
+		/// <summary>
+		/// Create a SafeDeviceContextHandle from a Graphics object
+		/// </summary>
+		/// <param name="graphics">Graphics object</param>
+		/// <returns>SafeDeviceContextHandle</returns>
+		public static SafeDeviceContextHandle FromGraphics(Graphics graphics)
 		{
 			return new SafeDeviceContextHandle(graphics, graphics.GetHdc());
 		}

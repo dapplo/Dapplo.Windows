@@ -32,6 +32,15 @@ namespace Dapplo.Windows.Native
 	/// </summary>
 	public static class Shell32
 	{
+		/// <summary>
+		/// Get the Icon from a file
+		/// </summary>
+		/// <param name="sFile"></param>
+		/// <param name="iIndex"></param>
+		/// <param name="piLargeVersion"></param>
+		/// <param name="piSmallVersion"></param>
+		/// <param name="amountIcons"></param>
+		/// <returns></returns>
 		[DllImport("shell32", CharSet = CharSet.Unicode)]
 		public static extern int ExtractIconEx(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
 
@@ -42,37 +51,6 @@ namespace Dapplo.Windows.Native
 		private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbFileInfo, uint uFlags);
 
 		#region Structs
-
-		[StructLayout(LayoutKind.Sequential)]
-		private struct SHITEMID
-		{
-			public ushort cb;
-
-			[MarshalAs(UnmanagedType.LPArray)]
-			public byte[] abID;
-		}
-
-		[StructLayout(LayoutKind.Sequential)]
-		private struct ITEMIDLIST
-		{
-			public SHITEMID mkid;
-		}
-
-		[StructLayout(LayoutKind.Sequential)]
-		private struct BROWSEINFO
-		{
-			public IntPtr hwndOwner;
-			public IntPtr pidlRoot;
-			public IntPtr pszDisplayName;
-
-			[MarshalAs(UnmanagedType.LPTStr)]
-			public string lpszTitle;
-
-			public uint ulFlags;
-			public IntPtr lpfn;
-			public int lParam;
-			public IntPtr iImage;
-		}
 
 		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 		private struct SHFILEINFO
@@ -167,7 +145,7 @@ namespace Dapplo.Windows.Native
 		/// Returns an icon for a given file extension - indicated by the name parameter.
 		/// See: http://msdn.microsoft.com/en-us/library/windows/desktop/bb762179(v=vs.85).aspx
 		/// </summary>
-		/// <param name="name">Filename</param>
+		/// <param name="filename">Filename</param>
 		/// <param name="size">Large or small</param>
 		/// <param name="linkOverlay">Whether to include the link icon</param>
 		/// <returns>System.Drawing.Icon</returns>
@@ -175,24 +153,24 @@ namespace Dapplo.Windows.Native
 		{
 			SHFILEINFO shfi = new SHFILEINFO();
 			// SHGFI_USEFILEATTRIBUTES makes it simulate, just gets the icon for the extension
-			uint flags = Shell32.SHGFI_ICON | Shell32.SHGFI_USEFILEATTRIBUTES;
+			uint flags = SHGFI_ICON | SHGFI_USEFILEATTRIBUTES;
 
-			if (true == linkOverlay)
+			if (linkOverlay)
 			{
-				flags += Shell32.SHGFI_LINKOVERLAY;
+				flags += SHGFI_LINKOVERLAY;
 			}
 
 			// Check the size specified for return.
 			if (IconSize.Small == size)
 			{
-				flags += Shell32.SHGFI_SMALLICON;
+				flags += SHGFI_SMALLICON;
 			}
 			else
 			{
-				flags += Shell32.SHGFI_LARGEICON;
+				flags += SHGFI_LARGEICON;
 			}
 
-			SHGetFileInfo(Path.GetFileName(filename), Shell32.FILE_ATTRIBUTE_NORMAL, ref shfi, (uint)Marshal.SizeOf(shfi), flags);
+			SHGetFileInfo(Path.GetFileName(filename), FILE_ATTRIBUTE_NORMAL, ref shfi, (uint)Marshal.SizeOf(shfi), flags);
 
 			// Only return an icon if we really got one
 			if (shfi.hIcon != IntPtr.Zero)

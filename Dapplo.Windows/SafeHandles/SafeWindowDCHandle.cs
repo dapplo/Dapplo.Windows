@@ -31,38 +31,46 @@ namespace Dapplo.Windows.SafeHandles
 	/// <summary>
 	/// A WindowDC SafeHandle implementation
 	/// </summary>
-	public class SafeWindowDCHandle : SafeHandleZeroOrMinusOneIsInvalid
+	public class SafeWindowDcHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
 		[DllImport("user32", SetLastError = true)]
 		private static extern IntPtr GetWindowDC(IntPtr hWnd);
 		[DllImport("user32", SetLastError = true)]
-		private static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
+		private static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDc);
 
-		private IntPtr hWnd;
+		private readonly IntPtr _hWnd;
+
+		/// <summary>
+		/// Create a SafeWindowDcHandle for an existing handöe
+		/// </summary>
+		/// <param name="hWnd">IntPtr for the window</param>
+		/// <param name="existingDcHandle">IntPtr to the DC</param>
 		[SecurityCritical]
-		private SafeWindowDCHandle() : base(true)
+		public SafeWindowDcHandle(IntPtr hWnd, IntPtr existingDcHandle) : base(true)
 		{
+			_hWnd = hWnd;
+			SetHandle(existingDcHandle);
 		}
 
-		[SecurityCritical]
-		public SafeWindowDCHandle(IntPtr hWnd, IntPtr preexistingHandle) : base(true)
-		{
-			this.hWnd = hWnd;
-			SetHandle(preexistingHandle);
-		}
-
+		/// <summary>
+		/// ReleaseDC for the original Window
+		/// </summary>
+		/// <returns>true if this worked</returns>
 		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 		protected override bool ReleaseHandle()
 		{
-			bool returnValue = ReleaseDC(hWnd, handle);
-			return returnValue;
+			return ReleaseDC(_hWnd, handle);
 		}
 
-		public static SafeWindowDCHandle fromDesktop()
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public static SafeWindowDcHandle FromDesktop()
 		{
-			IntPtr hWndDesktop = User32.GetDesktopWindow();
-			IntPtr hDCDesktop = GetWindowDC(hWndDesktop);
-			return new SafeWindowDCHandle(hWndDesktop, hDCDesktop);
+			var hWndDesktop = User32.GetDesktopWindow();
+			var hDcDesktop = GetWindowDC(hWndDesktop);
+			return new SafeWindowDcHandle(hWndDesktop, hDcDesktop);
 		}
 	}
 }

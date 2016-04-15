@@ -23,6 +23,9 @@ using System;
 
 namespace Dapplo.Windows.Enums
 {
+	/// <summary>
+	/// Used to open a desktop
+	/// </summary>
 	[Flags]
 	public enum DesktopAccessRight : uint
 	{

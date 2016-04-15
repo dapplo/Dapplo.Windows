@@ -21,6 +21,7 @@
 
 using System;
 using System.Security;
+using Dapplo.Windows.Native;
 
 namespace Dapplo.Windows.SafeHandles
 {
@@ -29,15 +30,27 @@ namespace Dapplo.Windows.SafeHandles
 	/// </summary>
 	public class SafeRegionHandle : SafeObjectHandle
 	{
-		[SecurityCritical]
-		private SafeRegionHandle() : base(true)
-		{
-		}
-
+		/// <summary>
+		/// Create a SafeRegionHandle from an existing handle
+		/// </summary>
+		/// <param name="preexistingHandle">IntPtr to region</param>
 		[SecurityCritical]
 		public SafeRegionHandle(IntPtr preexistingHandle) : base(true)
 		{
 			SetHandle(preexistingHandle);
+		}
+
+		/// <summary>
+		/// Directly call Gdi32.CreateRectRgn
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="top"></param>
+		/// <param name="right"></param>
+		/// <param name="bottom"></param>
+		/// <returns>SafeRegionHandle</returns>
+		public static SafeRegionHandle CreateRectRgn(int left, int top, int right, int bottom)
+		{
+			return Gdi32.CreateRectRgn(left, top, right, bottom);
 		}
 	}
 }

@@ -121,6 +121,10 @@ namespace Dapplo.Windows.Structs
 				_Bottom = value;
 			}
 		}
+
+		/// <summary>
+		/// Heigh of the RECT
+		/// </summary>
 		public int Height
 		{
 			get
@@ -132,6 +136,9 @@ namespace Dapplo.Windows.Structs
 				_Bottom = unchecked(value - _Top);
 			}
 		}
+		/// <summary>
+		/// Width of the RECT
+		/// </summary>
 		public int Width
 		{
 			get
@@ -143,6 +150,10 @@ namespace Dapplo.Windows.Structs
 				_Right = unchecked(value + _Left);
 			}
 		}
+
+		/// <summary>
+		/// Location for this RECT
+		/// </summary>
 		public Point Location
 		{
 			get
@@ -155,6 +166,9 @@ namespace Dapplo.Windows.Structs
 				_Top = (int)value.Y;
 			}
 		}
+		/// <summary>
+		/// Size for this RECT
+		/// </summary>
 		public Size Size
 		{
 			get
@@ -168,25 +182,52 @@ namespace Dapplo.Windows.Structs
 			}
 		}
 
+		/// <summary>
+		/// Cast RECT to Rect
+		/// </summary>
+		/// <param name="rectangle">RECT</param>
+		/// <returns>Rect</returns>
 		public static implicit operator Rect(RECT rectangle)
 		{
 			return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
 		}
+
+		/// <summary>
+		/// Cast Rect to RECT
+		/// </summary>
+		/// <param name="rectangle">Rect</param>
+		/// <returns>RECT</returns>
 		public static implicit operator RECT(Rect rectangle)
 		{
 			return new RECT((int)rectangle.Left, (int)rectangle.Top, (int)rectangle.Right, (int)rectangle.Bottom);
 		}
 
+		/// <summary>
+		/// Cast RECT to Rectangle
+		/// </summary>
+		/// <param name="rectangle">RECT</param>
+		/// <returns>Rectangle</returns>
 		public static implicit operator System.Drawing.Rectangle(RECT rectangle)
 		{
 			return new System.Drawing.Rectangle(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
 		}
 
+		/// <summary>
+		/// Cast Rectangle to RECT
+		/// </summary>
+		/// <param name="rectangle"></param>
+		/// <returns>RECT</returns>
 		public static implicit operator RECT(System.Drawing.Rectangle rectangle)
 		{
 			return new RECT(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
 		}
 
+		/// <summary>
+		/// Equals for RECT
+		/// </summary>
+		/// <param name="rectangle1">RECT</param>
+		/// <param name="rectangle2">RECT</param>
+		/// <returns>bool true if they are equal</returns>
 		public static bool operator ==(RECT rectangle1, RECT rectangle2)
 		{
 			return rectangle1.Equals(rectangle2);

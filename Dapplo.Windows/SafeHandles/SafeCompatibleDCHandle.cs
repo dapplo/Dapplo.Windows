@@ -28,27 +28,35 @@ namespace Dapplo.Windows.SafeHandles
 	/// <summary>
 	/// A CompatibleDC SafeHandle implementation
 	/// </summary>
-	public class SafeCompatibleDCHandle : SafeDCHandle
+	public class SafeCompatibleDcHandle : SafeDcHandle
 	{
 		[DllImport("gdi32", SetLastError = true)]
-		private static extern bool DeleteDC(IntPtr hDC);
+		private static extern bool DeleteDC(IntPtr hDc);
 
+		/// <summary>
+		/// Create SafeCompatibleDcHandle from existing handle
+		/// </summary>
+		/// <param name="preexistingHandle">IntPtr with existing handle</param>
 		[SecurityCritical]
-		private SafeCompatibleDCHandle() : base(true)
-		{
-		}
-
-		[SecurityCritical]
-		public SafeCompatibleDCHandle(IntPtr preexistingHandle) : base(true)
+		public SafeCompatibleDcHandle(IntPtr preexistingHandle) : base(true)
 		{
 			SetHandle(preexistingHandle);
 		}
 
-		public SafeSelectObjectHandle SelectObject(SafeHandle newHandle)
+		/// <summary>
+		/// Select an object onto the DC
+		/// </summary>
+		/// <param name="objectSafeHandle">SafeHandle for object</param>
+		/// <returns>SafeSelectObjectHandle</returns>
+		public SafeSelectObjectHandle SelectObject(SafeHandle objectSafeHandle)
 		{
-			return new SafeSelectObjectHandle(this, newHandle);
+			return new SafeSelectObjectHandle(this, objectSafeHandle);
 		}
 
+		/// <summary>
+		/// Call DeleteDC, this disposes the unmanaged resources
+		/// </summary>
+		/// <returns>bool true if the DC was deleted</returns>
 		protected override bool ReleaseHandle()
 		{
 			return DeleteDC(handle);
