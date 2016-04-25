@@ -34,6 +34,14 @@ namespace Dapplo.Windows.SafeHandles
 		private Graphics _graphics;
 
 		/// <summary>
+		/// Default constructor is needed to support marshalling!!
+		/// </summary>
+		[SecurityCritical]
+		public SafeDeviceContextHandle() : base(true)
+		{
+		}
+
+		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="graphics"></param>

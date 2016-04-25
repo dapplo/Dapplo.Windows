@@ -42,7 +42,7 @@ namespace Dapplo.Windows.Native
 		public static extern bool AllocConsole();
 
 		[DllImport("kernel32", SetLastError = true)]
-		public static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+		public static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwThreadId);
 
 		[DllImport("kernel32", SetLastError = true)]
 		public static extern uint SuspendThread(IntPtr hThread);
@@ -51,9 +51,10 @@ namespace Dapplo.Windows.Native
 		public static extern int ResumeThread(IntPtr hThread);
 
 		[DllImport("kernel32", SetLastError = true)]
-		public static extern IntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+		public static extern IntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
 
 		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
 
 		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -63,6 +64,7 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr GetModuleHandle(string lpModuleName);
 
 		[DllImport("kernel32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool CloseHandle(IntPtr hObject);
 
 		/// <summary>

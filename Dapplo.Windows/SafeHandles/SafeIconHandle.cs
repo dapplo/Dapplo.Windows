@@ -23,6 +23,7 @@ using Dapplo.Windows.Native;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Drawing;
+using System.Security;
 using System.Security.Permissions;
 
 namespace Dapplo.Windows.SafeHandles
@@ -32,6 +33,14 @@ namespace Dapplo.Windows.SafeHandles
 	/// </summary>
 	public class SafeIconHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
+		/// <summary>
+		/// Default constructor is needed to support marshalling!!
+		/// </summary>
+		[SecurityCritical]
+		public SafeIconHandle() : base(true)
+		{
+		}
+
 		/// <summary>
 		/// Create a SafeIconHandle from a bitmap by calling GetHicon
 		/// </summary>

@@ -31,6 +31,14 @@ namespace Dapplo.Windows.SafeHandles
 	public class SafeHBitmapHandle : SafeObjectHandle
 	{
 		/// <summary>
+		/// Default constructor is needed to support marshalling!!
+		/// </summary>
+		[SecurityCritical]
+		public SafeHBitmapHandle() : base(true)
+		{
+		}
+
+		/// <summary>
 		/// Create a SafeHBitmapHandle from an existing handle
 		/// </summary>
 		/// <param name="preexistingHandle">IntPtr to HBitmap</param>

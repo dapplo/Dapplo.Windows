@@ -31,6 +31,7 @@ namespace Dapplo.Windows.SafeHandles
 	public abstract class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
 		[DllImport("gdi32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool DeleteObject(IntPtr hObject);
 
 		/// <summary>

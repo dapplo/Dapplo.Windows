@@ -45,6 +45,14 @@ namespace Dapplo.Windows.SafeHandles
 		private readonly SafeHandle _hdc;
 
 		/// <summary>
+		/// Default constructor is needed to support marshalling!!
+		/// </summary>
+		[SecurityCritical]
+		public SafeSelectObjectHandle() : base(true)
+		{
+		}
+
+		/// <summary>
 		/// Constructor for the SafeSelectObjectHandle
 		/// </summary>
 		/// <param name="hdc">SafeHandle for the DC</param>

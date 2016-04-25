@@ -31,6 +31,14 @@ namespace Dapplo.Windows.SafeHandles
 	public class SafeRegionHandle : SafeObjectHandle
 	{
 		/// <summary>
+		/// Default constructor is needed to support marshalling!!
+		/// </summary>
+		[SecurityCritical]
+		public SafeRegionHandle() : base(true)
+		{
+		}
+
+		/// <summary>
 		/// Create a SafeRegionHandle from an existing handle
 		/// </summary>
 		/// <param name="preexistingHandle">IntPtr to region</param>

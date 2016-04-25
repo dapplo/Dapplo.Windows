@@ -34,12 +34,14 @@ namespace Dapplo.Windows.Native
 	public static class Gdi32
 	{
 		[DllImport("gdi32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool BitBlt(SafeHandle hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, SafeHandle hdcSrc, int nXSrc, int nYSrc, CopyPixelOperation dwRop);
 
 		[DllImport("gdi32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool StretchBlt(SafeHandle hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, SafeHandle hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, CopyPixelOperation dwRop);
 
-		[DllImport("gdi32", SetLastError = true)]
+		[DllImport("gdi32.dll", SetLastError = true)]
 		public static extern SafeCompatibleDcHandle CreateCompatibleDC(SafeHandle hDC);
 
 		[DllImport("gdi32", SetLastError = true)]

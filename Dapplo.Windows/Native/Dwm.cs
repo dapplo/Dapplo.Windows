@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Native
 
 		// Deprecated as of Windows 8 Release Preview
 		[DllImport("dwmapi.dll", SetLastError = true)]
-		public static extern int DwmIsCompositionEnabled(out bool enabled);
+		public static extern int DwmIsCompositionEnabled([MarshalAs(UnmanagedType.Bool)] out bool enabled);
 		[DllImport("dwmapi.dll", SetLastError = true)]
 		public static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute, out RECT lpRect, int size);
 		[DllImport("dwmapi.dll", SetLastError = true)]

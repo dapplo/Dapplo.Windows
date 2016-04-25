@@ -31,7 +31,16 @@ namespace Dapplo.Windows.SafeHandles
 	public class SafeCompatibleDcHandle : SafeDcHandle
 	{
 		[DllImport("gdi32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool DeleteDC(IntPtr hDc);
+
+		/// <summary>
+		/// Default constructor is needed to support marshalling!!
+		/// </summary>
+		[SecurityCritical]
+		public SafeCompatibleDcHandle() : base(true)
+		{
+		}
 
 		/// <summary>
 		/// Create SafeCompatibleDcHandle from existing handle

@@ -121,7 +121,7 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, IntPtr lParam);
 
-		[DllImport("user32", SetLastError = true)]
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
 		[DllImport("user32", SetLastError = true, EntryPoint = "GetWindowLong")]
@@ -158,10 +158,10 @@ namespace Dapplo.Windows.Native
 
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool ShowScrollBar(IntPtr hwnd, ScrollBarDirection scrollBar, bool show);
+		public static extern bool ShowScrollBar(IntPtr hwnd, ScrollBarDirection scrollBar, [MarshalAs(UnmanagedType.Bool)] bool show);
 
 		[DllImport("user32", SetLastError = true)]
-		public static extern int SetScrollPos(IntPtr hWnd, Orientation nBar, int nPos, bool bRedraw);
+		public static extern int SetScrollPos(IntPtr hWnd, Orientation nBar, int nPos, [MarshalAs(UnmanagedType.Bool)] bool bRedraw);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern RegionResult GetWindowRgn(IntPtr hWnd, SafeHandle hRgn);
@@ -177,6 +177,7 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr GetDC(IntPtr hwnd);
 
 		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
 		[DllImport("user32", SetLastError = true)]
@@ -186,6 +187,7 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr SetClipboardViewer(IntPtr hWndNewViewer);
 
 		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool ChangeClipboardChain(IntPtr hWndRemove, IntPtr hWndNewNext);
 
 		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -211,6 +213,7 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out UIntPtr lpdwResult);
 
 		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool GetPhysicalCursorPos(out POINT cursorLocation);
 
 		[DllImport("user32", SetLastError = true)]
@@ -228,9 +231,11 @@ namespace Dapplo.Windows.Native
 		public static extern SafeIconHandle CopyIcon(IntPtr hIcon);
 
 		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool DestroyIcon(IntPtr hIcon);
 
 		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool GetCursorInfo(out CURSORINFO cursorInfo);
 
 		[DllImport("user32", SetLastError = true)]
@@ -247,17 +252,20 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
 
 		[DllImport("user32", SetLastError = true)]
-		internal static extern IntPtr OpenInputDesktop(uint dwFlags, bool fInherit, DesktopAccessRight dwDesiredAccess);
+		internal static extern IntPtr OpenInputDesktop(uint dwFlags, [MarshalAs(UnmanagedType.Bool)] bool fInherit, DesktopAccessRight dwDesiredAccess);
 
 		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool SetThreadDesktop(IntPtr hDesktop);
 
 		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool CloseDesktop(IntPtr hDesktop);
 
 		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
 		private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
 		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
 
 		#endregion

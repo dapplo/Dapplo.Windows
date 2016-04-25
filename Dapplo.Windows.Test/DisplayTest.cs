@@ -27,7 +27,7 @@ namespace Dapplo.Windows.Test {
 	[TestClass]
 	public class TestGetDisplays {
 		[TestMethod]
-		public void TestMethod1() {
+		public void TestAllDisplays() {
 			foreach(var display in User32.AllDisplays()) {
 				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
 			}

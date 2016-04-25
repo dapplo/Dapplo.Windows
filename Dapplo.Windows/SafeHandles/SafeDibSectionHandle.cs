@@ -29,7 +29,13 @@ namespace Dapplo.Windows.SafeHandles
 	/// </summary>
 	public class SafeDibSectionHandle : SafeObjectHandle
 	{
-
+		/// <summary>
+		/// Default constructor is needed to support marshalling!!
+		/// </summary>
+		[SecurityCritical]
+		public SafeDibSectionHandle() : base(true)
+		{
+		}
 		/// <summary>
 		/// Create a SafeDibSectionHandle for an existing DIB Section
 		/// </summary>

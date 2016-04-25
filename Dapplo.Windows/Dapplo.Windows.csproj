@@ -84,9 +84,9 @@
     <Compile Include="Native\Shell32.cs" />
     <Compile Include="Native\Win32.cs" />
     <Compile Include="Native\WinMM.cs" />
-    <Compile Include="SafeHandles\SafeCompatibleDCHandle.cs" />
+    <Compile Include="SafeHandles\SafeCompatibleDcHandle.cs" />
     <Compile Include="SafeHandles\SafeCurrentInputDesktopHandle.cs" />
-    <Compile Include="SafeHandles\SafeDCHandle.cs" />
+    <Compile Include="SafeHandles\SafeDcHandle.cs" />
     <Compile Include="SafeHandles\SafeDeviceContextHandle.cs" />
     <Compile Include="SafeHandles\SafeDibSectionHandle.cs" />
     <Compile Include="SafeHandles\SafeHBitmapHandle.cs" />
@@ -94,7 +94,7 @@
     <Compile Include="SafeHandles\SafeObjectHandle.cs" />
     <Compile Include="SafeHandles\SafeRegionHandle.cs" />
     <Compile Include="SafeHandles\SafeSelectObjectHandle.cs" />
-    <Compile Include="SafeHandles\SafeWindowDCHandle.cs" />
+    <Compile Include="SafeHandles\SafeWindowDcHandle.cs" />
     <Compile Include="Structs\BitfieldColorMask.cs" />
     <Compile Include="Structs\BITMAPFILEHEADER.cs" />
     <Compile Include="Structs\BITMAPINFOHEADER.cs" />

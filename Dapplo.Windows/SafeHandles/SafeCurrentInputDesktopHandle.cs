@@ -25,6 +25,7 @@ using Microsoft.Win32.SafeHandles;
 using System;
 using System.Security.Permissions;
 using Dapplo.LogFacade;
+using System.Security;
 
 namespace Dapplo.Windows.SafeHandles
 {
@@ -37,6 +38,7 @@ namespace Dapplo.Windows.SafeHandles
 
 		/// <summary>
 		/// Default constructor, this opens the input destop with GENERIC_ALL
+		/// This is needed to support marshalling!!
 		/// </summary>
 		public SafeCurrentInputDesktopHandle() : base(true)
 		{

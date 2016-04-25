@@ -50,9 +50,9 @@ namespace Dapplo.Windows.Desktop
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
-		[DllImport("user32", SetLastError = true)]
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
 		private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-		[DllImport("user32", SetLastError = true)]
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
 		private static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
 	}
 }

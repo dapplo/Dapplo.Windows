@@ -35,10 +35,20 @@ namespace Dapplo.Windows.SafeHandles
 	{
 		[DllImport("user32", SetLastError = true)]
 		private static extern IntPtr GetWindowDC(IntPtr hWnd);
+
 		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDc);
 
 		private readonly IntPtr _hWnd;
+
+		/// <summary>
+		/// Default constructor is needed to support marshalling!!
+		/// </summary>
+		[SecurityCritical]
+		public SafeWindowDcHandle() : base(true)
+		{
+		}
 
 		/// <summary>
 		/// Create a SafeWindowDcHandle for an existing handöe

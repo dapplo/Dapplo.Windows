@@ -36,7 +36,7 @@ namespace Dapplo.Windows.Native
 	public static class Gdiplus
 	{
 		[DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
-		private static extern int GdipBitmapApplyEffect(IntPtr bitmap, IntPtr effect, ref RECT rectOfInterest, bool useAuxData, IntPtr auxData, int auxDataSize);
+		private static extern int GdipBitmapApplyEffect(IntPtr bitmap, IntPtr effect, ref RECT rectOfInterest, [MarshalAs(UnmanagedType.Bool)] bool useAuxData, IntPtr auxData, int auxDataSize);
 
 		[DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
 		private static extern int GdipDrawImageFX(IntPtr graphics, IntPtr bitmap, ref RECTF source, IntPtr matrix, IntPtr effect, IntPtr imageAttributes, GpUnit srcUnit);

@@ -31,9 +31,11 @@ namespace Dapplo.Windows.Native
 	public class WinMM
 	{
 		[DllImport("winmm.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool PlaySound(byte[] ptrToSound, UIntPtr hmod, SoundFlags fdwSound);
 
 		[DllImport("winmm.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool PlaySound(IntPtr ptrToSound, UIntPtr hmod, SoundFlags fdwSound);
 	}
 }
