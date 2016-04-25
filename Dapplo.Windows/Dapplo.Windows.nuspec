@@ -17,8 +17,8 @@
 		<tags>windows native desktop</tags>
     </metadata>
 	<files>
-		<file src="Dapplo.Windows\bin\release\$id$.pdb" target="lib\net45" />
-		<file src="Dapplo.Windows\bin\release\$id$.xml" target="lib\net45" />
-		<file src="Dapplo.Windows\bin\release\$id$.dll" target="lib\net45" />
-	<files>
+		<file src="Dapplo.Windows\bin\release\$id$.pdb" target="lib\net451" />
+		<file src="Dapplo.Windows\bin\release\$id$.xml" target="lib\net451" />
+		<file src="Dapplo.Windows\bin\release\$id$.dll" target="lib\net451" />
+	</files>
 </package>
