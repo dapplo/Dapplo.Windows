@@ -121,25 +121,33 @@ namespace Dapplo.Windows
 
 		#region IDisposable Support
 
-		private bool disposedValue = false; // To detect redundant calls
+		private bool _disposedValue = false; // To detect redundant calls
 
+		/// <summary>
+		/// Dispose the underlying hook
+		/// </summary>
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!disposedValue)
+			if (!_disposedValue)
 			{
-				_hook.Dispose();
+				_hook?.Dispose();
 				_hook = null;
-				disposedValue = true;
+				_disposedValue = true;
 			}
 		}
 
+		/// <summary>
+		/// Make sure the finalizer disposes the underlying hook
+		/// </summary>
 		~WindowsTitleMonitor()
 		{
 			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
 			Dispose(false);
 		}
 
-		// This code added to correctly implement the disposable pattern.
+		/// <summary>
+		/// Dispose the underlying hook
+		/// </summary>
 		public void Dispose()
 		{
 			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
