@@ -3,6 +3,9 @@ skip_tags: true
 configuration: Release
 platform: Any CPU
 clone_depth: 2
+branches:
+  only:
+  - master
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
