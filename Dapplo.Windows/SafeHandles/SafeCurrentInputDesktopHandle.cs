@@ -24,7 +24,7 @@ using Dapplo.Windows.Native;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Security.Permissions;
-using Dapplo.LogFacade;
+using Dapplo.Log.Facade;
 using System.Security;
 
 namespace Dapplo.Windows.SafeHandles

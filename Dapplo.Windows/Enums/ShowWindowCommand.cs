@@ -19,9 +19,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using Dapplo.Windows.Native;
+
 namespace Dapplo.Windows.Enums
 {
-
+	/// <summary>
+	/// Used by User32.ShowWindow
+	/// </summary>
 	public enum ShowWindowCommand : uint
 	{
 		/// <summary>
@@ -54,7 +58,7 @@ namespace Dapplo.Windows.Enums
 
 		/// <summary>
 		/// Displays a window in its most recent size and position. This value
-		/// is similar to <see cref="Win32.ShowWindowCommand.Normal"/>, except
+		/// is similar to <see cref="ShowWindowCommand.Normal"/>, except
 		/// the window is not actived.
 		/// </summary>
 		ShowNoActivate = 4,
@@ -72,14 +76,14 @@ namespace Dapplo.Windows.Enums
 
 		/// <summary>
 		/// Displays the window as a minimized window. This value is similar to
-		/// <see cref="Win32.ShowWindowCommand.ShowMinimized"/>, except the
+		/// <see cref="ShowWindowCommand.ShowMinimized"/>, except the
 		/// window is not activated.
 		/// </summary>
 		ShowMinNoActive = 7,
 
 		/// <summary>
 		/// Displays the window in its current size and position. This value is
-		/// similar to <see cref="Win32.ShowWindowCommand.Show"/>, except the
+		/// similar to <see cref="ShowWindowCommand.Show"/>, except the
 		/// window is not activated.
 		/// </summary>
 		ShowNA = 8,

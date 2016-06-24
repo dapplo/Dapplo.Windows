@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Dapplo.Windows</RootNamespace>
     <AssemblyName>Dapplo.Windows</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -37,8 +37,8 @@
     <DocumentationFile>bin\Release\Dapplo.Windows.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapplo.LogFacade, Version=0.2.45.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.LogFacade.0.2.45\lib\net45\Dapplo.LogFacade.dll</HintPath>
+    <Reference Include="Dapplo.Log.Facade, Version=0.4.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Log.Facade.0.4.4\lib\net45\Dapplo.Log.Facade.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />

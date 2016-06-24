@@ -20,16 +20,25 @@
  */
 
 using Dapplo.Windows.Native;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
+using Dapplo.Log.Facade;
+using Dapplo.Log.XUnit;
+using Xunit;
+using Xunit.Abstractions;
 
-namespace Dapplo.Windows.Test {
-	[TestClass]
+namespace Dapplo.Windows.Tests {
+
 	public class TestGetDisplays {
-		[TestMethod]
+		private static readonly LogSource Log = new LogSource();
+		public TestGetDisplays(ITestOutputHelper testOutputHelper)
+		{
+			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper); ;
+		}
+
+		[Fact]
 		public void TestAllDisplays() {
 			foreach(var display in User32.AllDisplays()) {
-				Debug.WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
+				Log.Debug().WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
 			}
 		}
 	}
