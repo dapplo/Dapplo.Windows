@@ -129,6 +129,7 @@ namespace Dapplo.Windows
 		/// </summary>
 		public Keys Key { get; set; } = Keys.None;
 
+		/// <inheritdoc />
 		public override string ToString()
 		{
 			var dump = new StringBuilder();

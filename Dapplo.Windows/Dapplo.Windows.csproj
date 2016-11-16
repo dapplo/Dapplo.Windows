@@ -89,6 +89,7 @@
     <Compile Include="Enums\ThreadAccess.cs" />
     <Compile Include="Enums\WindowPlacementFlags.cs" />
     <Compile Include="Enums\WindowStyleFlags.cs" />
+    <Compile Include="Hotkey.cs" />
     <Compile Include="KeyboardHook.cs" />
     <Compile Include="KeyboardHookEventArgs.cs" />
     <Compile Include="Native\Gdi32.cs" />
