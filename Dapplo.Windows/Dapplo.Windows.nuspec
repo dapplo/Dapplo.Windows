@@ -7,7 +7,7 @@
         <authors>Robin Krom</authors>
         <owners>Dapplo</owners>
         <licenseUrl>https://en.wikipedia.org/wiki/GNU_General_Public_License</licenseUrl>
-        <projectUrl>http://www.dapplo.net/blocks/Dapplo.Windows.html</projectUrl>
+        <projectUrl>http://www.dapplo.net/blocks/Dapplo.Windows</projectUrl>
         <iconUrl>http://www.dapplo.net/favicon.ico</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Dapplo.Windows has native code for accessing Windows, e.g getting the size/title/location of a window or monitoring the title changes of windows.</description>

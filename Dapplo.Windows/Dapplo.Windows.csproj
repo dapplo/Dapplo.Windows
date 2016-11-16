@@ -37,8 +37,8 @@
     <DocumentationFile>bin\Release\Dapplo.Windows.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapplo.Log.Facade, Version=0.5.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.Log.Facade.0.5.4\lib\net45\Dapplo.Log.Facade.dll</HintPath>
+    <Reference Include="Dapplo.Log, Version=1.0.22.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Log.1.0.22\lib\net45\Dapplo.Log.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -46,6 +46,19 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Core.3.1.0\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Interfaces.3.1.0\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Linq.3.1.0\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -76,6 +89,8 @@
     <Compile Include="Enums\ThreadAccess.cs" />
     <Compile Include="Enums\WindowPlacementFlags.cs" />
     <Compile Include="Enums\WindowStyleFlags.cs" />
+    <Compile Include="KeyboardHook.cs" />
+    <Compile Include="KeyboardHookEventArgs.cs" />
     <Compile Include="Native\Gdi32.cs" />
     <Compile Include="Native\GdiExtensions.cs" />
     <Compile Include="Native\Gdiplus.cs" />
@@ -127,12 +142,15 @@
     <Compile Include="Enums\WinEvent.cs" />
     <Compile Include="Enums\WinEventHookFlags.cs" />
     <Compile Include="Structs\WindowPlacement.cs" />
+    <Compile Include="TitleChangeEventArgs.cs" />
+    <Compile Include="TitleChangeEventDelegate.cs" />
     <Compile Include="WindowsTitleMonitor.cs" />
     <Compile Include="WindowsMonitor.cs" />
     <Compile Include="WindowsEventHook.cs" />
     <Compile Include="WindowsHook.cs" />
     <Compile Include="Enums\WindowsMessages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WinProcHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

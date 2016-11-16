@@ -1,23 +1,25 @@
-﻿/*
- * dapplo - building blocks for desktop applications
- * Copyright (C) Dapplo 2015-2016
- * 
- * For more information see: http://dapplo.net/
- * dapplo repositories are hosted on GitHub: https://github.com/dapplo
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 1 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
+
+#region using
 
 using System;
 using System.Drawing;
@@ -25,15 +27,95 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
+#endregion
+
 namespace Dapplo.Windows.Native
 {
 	/// <summary>
-	/// Description of Shell32.
+	///     Description of Shell32.
 	/// </summary>
 	public static class Shell32
 	{
 		/// <summary>
-		/// Get the Icon from a file
+		///     Options to specify whether folders should be in the open or closed state.
+		/// </summary>
+		public enum FolderType
+		{
+			/// <summary>
+			///     Specify open folder.
+			/// </summary>
+			Open = 0,
+
+			/// <summary>
+			///     Specify closed folder.
+			/// </summary>
+			Closed = 1
+		}
+
+		/// <summary>
+		///     Options to specify the size of icons to return.
+		/// </summary>
+		public enum IconSize
+		{
+			/// <summary>
+			///     Specify large icon - 32 pixels by 32 pixels.
+			/// </summary>
+			Large = 0,
+
+			/// <summary>
+			///     Specify small icon - 16 pixels by 16 pixels.
+			/// </summary>
+			Small = 1
+		}
+
+		[DllImport("shell32", CharSet = CharSet.Unicode)]
+		internal static extern IntPtr ExtractAssociatedIcon(HandleRef hInst, StringBuilder iconPath, ref int index);
+
+		/// <summary>
+		///     Returns an icon representation of an image contained in the specified file.
+		///     This function is identical to System.Drawing.Icon.ExtractAssociatedIcon, xcept this version works.
+		///     See: http://stackoverflow.com/questions/1842226/how-to-get-the-associated-icon-from-a-network-share-file
+		/// </summary>
+		/// <param name="filePath">The path to the file that contains an image.</param>
+		/// <returns>The System.Drawing.Icon representation of the image contained in the specified file.</returns>
+		public static Icon ExtractAssociatedIcon(string filePath)
+		{
+			var index = 0;
+
+			Uri uri;
+			if (filePath == null)
+			{
+				throw new ArgumentException(string.Format("'{0}' is not valid for '{1}'", "null", "filePath"), "filePath");
+			}
+			try
+			{
+				uri = new Uri(filePath);
+			}
+			catch (UriFormatException)
+			{
+				filePath = Path.GetFullPath(filePath);
+				uri = new Uri(filePath);
+			}
+
+			if (uri.IsFile)
+			{
+				if (File.Exists(filePath))
+				{
+					var iconPath = new StringBuilder(1024);
+					iconPath.Append(filePath);
+
+					var handle = ExtractAssociatedIcon(new HandleRef(null, IntPtr.Zero), iconPath, ref index);
+					if (handle != IntPtr.Zero)
+					{
+						return Icon.FromHandle(handle);
+					}
+				}
+			}
+			return null;
+		}
+
+		/// <summary>
+		///     Get the Icon from a file
 		/// </summary>
 		/// <param name="sFile"></param>
 		/// <param name="iIndex"></param>
@@ -44,8 +126,86 @@ namespace Dapplo.Windows.Native
 		[DllImport("shell32", CharSet = CharSet.Unicode)]
 		public static extern int ExtractIconEx(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
 
-		[DllImport("shell32", CharSet = CharSet.Unicode)]
-		internal static extern IntPtr ExtractAssociatedIcon(HandleRef hInst, StringBuilder iconPath, ref int index);
+		/// <summary>
+		///     Returns an icon for a given file extension - indicated by the name parameter.
+		///     See: http://msdn.microsoft.com/en-us/library/windows/desktop/bb762179(v=vs.85).aspx
+		/// </summary>
+		/// <param name="filename">Filename</param>
+		/// <param name="size">Large or small</param>
+		/// <param name="linkOverlay">Whether to include the link icon</param>
+		/// <returns>System.Drawing.Icon</returns>
+		public static Icon GetFileIcon(string filename, IconSize size, bool linkOverlay)
+		{
+			var shfi = new SHFILEINFO();
+			// SHGFI_USEFILEATTRIBUTES makes it simulate, just gets the icon for the extension
+			var flags = SHGFI_ICON | SHGFI_USEFILEATTRIBUTES;
+
+			if (linkOverlay)
+			{
+				flags += SHGFI_LINKOVERLAY;
+			}
+
+			// Check the size specified for return.
+			if (IconSize.Small == size)
+			{
+				flags += SHGFI_SMALLICON;
+			}
+			else
+			{
+				flags += SHGFI_LARGEICON;
+			}
+
+			SHGetFileInfo(Path.GetFileName(filename), FILE_ATTRIBUTE_NORMAL, ref shfi, (uint) Marshal.SizeOf(shfi), flags);
+
+			// Only return an icon if we really got one
+			if (shfi.hIcon != IntPtr.Zero)
+			{
+				// Copy (clone) the returned icon to a new object, thus allowing us to clean-up properly
+				var icon = (Icon) Icon.FromHandle(shfi.hIcon).Clone();
+				// Cleanup
+				User32.DestroyIcon(shfi.hIcon);
+				return icon;
+			}
+			return null;
+		}
+
+		/// <summary>
+		///     Used to access system folder icons.
+		/// </summary>
+		/// <param name="size">Specify large or small icons.</param>
+		/// <param name="folderType">Specify open or closed FolderType.</param>
+		/// <returns>System.Drawing.Icon</returns>
+		public static Icon GetFolderIcon(IconSize size, FolderType folderType)
+		{
+			// Need to add size check, although errors generated at present!
+			var flags = SHGFI_ICON | SHGFI_USEFILEATTRIBUTES;
+
+			if (FolderType.Open == folderType)
+			{
+				flags += SHGFI_OPENICON;
+			}
+
+			if (IconSize.Small == size)
+			{
+				flags += SHGFI_SMALLICON;
+			}
+			else
+			{
+				flags += SHGFI_LARGEICON;
+			}
+
+			// Get the folder icon
+			var shfi = new SHFILEINFO();
+			SHGetFileInfo(null, FILE_ATTRIBUTE_DIRECTORY, ref shfi, (uint) Marshal.SizeOf(shfi), flags);
+
+			//Icon.FromHandle(shfi.hIcon);	// Load the icon from an HICON handle
+			// Now clone the icon, so that it can be successfully stored in an ImageList
+			var icon = (Icon) Icon.FromHandle(shfi.hIcon).Clone();
+
+			// Cleanup
+			User32.DestroyIcon(shfi.hIcon);
+			return icon;
+		}
 
 		[DllImport("shell32", CharSet = CharSet.Unicode)]
 		private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbFileInfo, uint uFlags);
@@ -55,16 +215,14 @@ namespace Dapplo.Windows.Native
 		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 		private struct SHFILEINFO
 		{
-			public IntPtr hIcon;
-			public int iIcon;
-			public uint dwAttributes;
+			public readonly IntPtr hIcon;
+			public readonly int iIcon;
+			public readonly uint dwAttributes;
 
-			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-			public string szDisplayName;
+			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] public readonly string szDisplayName;
 
-			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
-			public string szTypeName;
-		};
+			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)] public readonly string szTypeName;
+		}
 
 		#endregion
 
@@ -78,7 +236,7 @@ namespace Dapplo.Windows.Native
 		private const uint BIF_EDITBOX = 0x0010;
 		private const uint BIF_VALIDATE = 0x0020;
 		private const uint BIF_NEWDIALOGSTYLE = 0x0040;
-		private const uint BIF_USENEWUI = (BIF_NEWDIALOGSTYLE | BIF_EDITBOX);
+		private const uint BIF_USENEWUI = BIF_NEWDIALOGSTYLE | BIF_EDITBOX;
 		private const uint BIF_BROWSEINCLUDEURLS = 0x0080;
 		private const uint BIF_BROWSEFORCOMPUTER = 0x1000;
 		private const uint BIF_BROWSEFORPRINTER = 0x2000;
@@ -108,161 +266,5 @@ namespace Dapplo.Windows.Native
 		private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080;
 
 		#endregion
-
-		/// <summary>
-		/// Options to specify the size of icons to return.
-		/// </summary>
-		public enum IconSize
-		{
-			/// <summary>
-			/// Specify large icon - 32 pixels by 32 pixels.
-			/// </summary>
-			Large = 0,
-
-			/// <summary>
-			/// Specify small icon - 16 pixels by 16 pixels.
-			/// </summary>
-			Small = 1
-		}
-
-		/// <summary>
-		/// Options to specify whether folders should be in the open or closed state.
-		/// </summary>
-		public enum FolderType
-		{
-			/// <summary>
-			/// Specify open folder.
-			/// </summary>
-			Open = 0,
-
-			/// <summary>
-			/// Specify closed folder.
-			/// </summary>
-			Closed = 1
-		}
-
-		/// <summary>
-		/// Returns an icon for a given file extension - indicated by the name parameter.
-		/// See: http://msdn.microsoft.com/en-us/library/windows/desktop/bb762179(v=vs.85).aspx
-		/// </summary>
-		/// <param name="filename">Filename</param>
-		/// <param name="size">Large or small</param>
-		/// <param name="linkOverlay">Whether to include the link icon</param>
-		/// <returns>System.Drawing.Icon</returns>
-		public static Icon GetFileIcon(string filename, IconSize size, bool linkOverlay)
-		{
-			SHFILEINFO shfi = new SHFILEINFO();
-			// SHGFI_USEFILEATTRIBUTES makes it simulate, just gets the icon for the extension
-			uint flags = SHGFI_ICON | SHGFI_USEFILEATTRIBUTES;
-
-			if (linkOverlay)
-			{
-				flags += SHGFI_LINKOVERLAY;
-			}
-
-			// Check the size specified for return.
-			if (IconSize.Small == size)
-			{
-				flags += SHGFI_SMALLICON;
-			}
-			else
-			{
-				flags += SHGFI_LARGEICON;
-			}
-
-			SHGetFileInfo(Path.GetFileName(filename), FILE_ATTRIBUTE_NORMAL, ref shfi, (uint)Marshal.SizeOf(shfi), flags);
-
-			// Only return an icon if we really got one
-			if (shfi.hIcon != IntPtr.Zero)
-			{
-				// Copy (clone) the returned icon to a new object, thus allowing us to clean-up properly
-				Icon icon = (Icon)Icon.FromHandle(shfi.hIcon).Clone();
-				// Cleanup
-				User32.DestroyIcon(shfi.hIcon);
-				return icon;
-			}
-			return null;
-		}
-
-		/// <summary>
-		/// Used to access system folder icons.
-		/// </summary>
-		/// <param name="size">Specify large or small icons.</param>
-		/// <param name="folderType">Specify open or closed FolderType.</param>
-		/// <returns>System.Drawing.Icon</returns>
-		public static Icon GetFolderIcon(IconSize size, FolderType folderType)
-		{
-			// Need to add size check, although errors generated at present!
-			uint flags = SHGFI_ICON | SHGFI_USEFILEATTRIBUTES;
-
-			if (FolderType.Open == folderType)
-			{
-				flags += SHGFI_OPENICON;
-			}
-
-			if (IconSize.Small == size)
-			{
-				flags += SHGFI_SMALLICON;
-			}
-			else
-			{
-				flags += SHGFI_LARGEICON;
-			}
-
-			// Get the folder icon
-			SHFILEINFO shfi = new SHFILEINFO();
-			SHGetFileInfo(null, FILE_ATTRIBUTE_DIRECTORY, ref shfi, (uint)Marshal.SizeOf(shfi), flags);
-
-			//Icon.FromHandle(shfi.hIcon);	// Load the icon from an HICON handle
-			// Now clone the icon, so that it can be successfully stored in an ImageList
-			Icon icon = (Icon)Icon.FromHandle(shfi.hIcon).Clone();
-
-			// Cleanup
-			User32.DestroyIcon(shfi.hIcon);
-			return icon;
-		}
-
-		/// <summary>
-		/// Returns an icon representation of an image contained in the specified file.
-		/// This function is identical to System.Drawing.Icon.ExtractAssociatedIcon, xcept this version works.
-		/// See: http://stackoverflow.com/questions/1842226/how-to-get-the-associated-icon-from-a-network-share-file
-		/// </summary>
-		/// <param name="filePath">The path to the file that contains an image.</param>
-		/// <returns>The System.Drawing.Icon representation of the image contained in the specified file.</returns>
-		public static Icon ExtractAssociatedIcon(String filePath)
-		{
-			int index = 0;
-
-			Uri uri;
-			if (filePath == null)
-			{
-				throw new ArgumentException(String.Format("'{0}' is not valid for '{1}'", "null", "filePath"), "filePath");
-			}
-			try
-			{
-				uri = new Uri(filePath);
-			}
-			catch (UriFormatException)
-			{
-				filePath = Path.GetFullPath(filePath);
-				uri = new Uri(filePath);
-			}
-
-			if (uri.IsFile)
-			{
-				if (File.Exists(filePath))
-				{
-					StringBuilder iconPath = new StringBuilder(1024);
-					iconPath.Append(filePath);
-
-					IntPtr handle = ExtractAssociatedIcon(new HandleRef(null, IntPtr.Zero), iconPath, ref index);
-					if (handle != IntPtr.Zero)
-					{
-						return Icon.FromHandle(handle);
-					}
-				}
-			}
-			return null;
-		}
 	}
 }

@@ -1,109 +1,83 @@
-﻿/*
- * dapplo - building blocks for desktop applications
- * Copyright (C) Dapplo 2015-2016
- * 
- * For more information see: http://dapplo.net/
- * dapplo repositories are hosted on GitHub: https://github.com/dapplo
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 1 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using Dapplo.Windows.Native;
+#region using
+
+using System.Drawing;
 using System.Windows;
+using Dapplo.Windows.Native;
+using Point = System.Windows.Point;
+
+#endregion
 
 namespace Dapplo.Windows.Desktop
 {
 	/// <summary>
-	/// The DisplayInfo class is like the Screen class, only not cached.
+	///     The DisplayInfo class is like the Screen class, only not cached.
 	/// </summary>
 	public class DisplayInfo
 	{
 		/// <summary>
-		/// Is this the primary monitor
+		///     Screen bounds
 		/// </summary>
-		public bool IsPrimary
-		{
-			get;
-			set;
-		}
+		public Rect Bounds { get; set; }
 
 		/// <summary>
-		/// Height of  the screen
+		///     Bounds as Rectangle
 		/// </summary>
-		public int ScreenHeight
-		{
-			get;
-			set;
-		}
+		public Rectangle BoundsRectangle { get; set; }
 
 		/// <summary>
-		/// Width of the screen
+		///     Device name
 		/// </summary>
-		public int ScreenWidth
-		{
-			get;
-			set;
-		}
+		public string DeviceName { get; set; }
 
 		/// <summary>
-		/// Screen bounds
+		///     Is this the primary monitor
 		/// </summary>
-		public Rect Bounds
-		{
-			get;
-			set;
-		}
+		public bool IsPrimary { get; set; }
 
 		/// <summary>
-		/// Bounds as Rectangle
+		///     Height of  the screen
 		/// </summary>
-		public System.Drawing.Rectangle BoundsRectangle
-		{
-			get;
-			set;
-		}
+		public int ScreenHeight { get; set; }
 
 		/// <summary>
-		/// Desktop working area
+		///     Width of the screen
 		/// </summary>
-		public Rect WorkingArea
-		{
-			get;
-			set;
-		}
+		public int ScreenWidth { get; set; }
 
 		/// <summary>
-		/// Desktop working area as Rectangle
+		///     Desktop working area
 		/// </summary>
-		public System.Drawing.Rectangle WorkingAreaRectangle
-		{
-			get;
-			set;
-		}
+		public Rect WorkingArea { get; set; }
 
 		/// <summary>
-		/// Device name
+		///     Desktop working area as Rectangle
 		/// </summary>
-		public string DeviceName
-		{
-			get;
-			set;
-		}
+		public Rectangle WorkingAreaRectangle { get; set; }
 
 		/// <summary>
-		/// Implementation like Screen.GetBounds
-		/// https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx
+		///     Implementation like Screen.GetBounds
+		///     https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx
 		/// </summary>
 		/// <param name="point"></param>
 		/// <returns></returns>
@@ -112,7 +86,7 @@ namespace Dapplo.Windows.Desktop
 			DisplayInfo returnValue = null;
 			foreach (var display in User32.AllDisplays())
 			{
-				if (display.IsPrimary && returnValue == null)
+				if (display.IsPrimary && (returnValue == null))
 				{
 					returnValue = display;
 				}
@@ -125,15 +99,15 @@ namespace Dapplo.Windows.Desktop
 		}
 
 		/// <summary>
-		/// Implementation like Screen.GetBounds
-		/// https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx
+		///     Implementation like Screen.GetBounds
+		///     https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx
 		/// </summary>
 		/// <param name="point">System.Drawing.Point</param>
 		/// <returns>Rect</returns>
-		public static System.Drawing.Rectangle GetBounds(System.Drawing.Point point)
+		public static Rectangle GetBounds(System.Drawing.Point point)
 		{
 			var rect = GetBounds(new Point(point.X, point.Y));
-			return new System.Drawing.Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
-        }
+			return new Rectangle((int) rect.X, (int) rect.Y, (int) rect.Width, (int) rect.Height);
+		}
 	}
 }

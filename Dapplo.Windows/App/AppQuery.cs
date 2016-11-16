@@ -1,77 +1,78 @@
-﻿/*
- * dapplo - building blocks for desktop applications
- * Copyright (C) Dapplo 2015-2016
- * 
- * For more information see: http://dapplo.net/
- * dapplo repositories are hosted on GitHub: https://github.com/dapplo
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 1 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using Dapplo.Windows.Interop;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.Structs;
+#region using
+
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using Dapplo.Windows.Interop;
+using Dapplo.Windows.Native;
+using Dapplo.Windows.Structs;
 
-namespace Dapplo.Windows.App {
+#endregion
+
+namespace Dapplo.Windows.App
+{
 	/// <summary>
-	/// Helper class to support with Windows Store apps
+	///     Helper class to support with Windows Store apps
 	/// </summary>
-	public static class AppQuery {
+	public static class AppQuery
+	{
 		public const string ModernuiWindowsClass = "Windows.UI.Core.CoreWindow";
 		public const string ModernuiApplauncherClass = "ImmersiveLauncher";
 		public const string ModernuiGutterClass = "ImmersiveGutter";
+		// For MonitorFromWindow
+		public const int MONITOR_DEFAULTTONULL = 0;
+		public const int MONITOR_DEFAULTTOPRIMARY = 1;
+		public const int MONITOR_DEFAULTTONEAREST = 2;
 		private static Guid CoClassGuidIAppVisibility = new Guid("7E5FE3D9-985F-4908-91F9-EE19F9FD1514");
 
 		// All currently known classes: "ImmersiveGutter", "Snapped Desktop", "ImmersiveBackgroundWindow","ImmersiveLauncher","Windows.UI.Core.CoreWindow","ApplicationManager_ImmersiveShellWindow","SearchPane","MetroGhostWindow","EdgeUiInputWndClass", "NativeHWNDHost", "Shell_CharmWindow"
 
 		private static readonly IDisposableCom<IAppVisibility> _appVisibility;
-		// For MonitorFromWindow
-		public const int MONITOR_DEFAULTTONULL = 0;
-		public const int MONITOR_DEFAULTTOPRIMARY = 1;
-		public const int MONITOR_DEFAULTTONEAREST = 2;
 
-		static AppQuery() {
-			try {
-				Type appVisibilityType = Type.GetTypeFromCLSID(new Guid("7E5FE3D9-985F-4908-91F9-EE19F9FD1514"));
-				_appVisibility = DisposableCom.Create((IAppVisibility)Activator.CreateInstance(appVisibilityType));
-			} catch {
+		static AppQuery()
+		{
+			try
+			{
+				var appVisibilityType = Type.GetTypeFromCLSID(new Guid("7E5FE3D9-985F-4908-91F9-EE19F9FD1514"));
+				_appVisibility = DisposableCom.Create((IAppVisibility) Activator.CreateInstance(appVisibilityType));
+			}
+			catch
+			{
 				_appVisibility = null;
 			}
 		}
 
 		/// <summary>
-		/// Return true if the app-launcher is visible
+		///     Get the hWnd for the AppLauncer
 		/// </summary>
-		public static bool IsLauncherVisible {
-			get {
-				if (_appVisibility != null) {
-					return _appVisibility.ComObject.IsLauncherVisible;
-				}
-				return false;
-			}
-		}
-
-		/// <summary>
-		/// Get the hWnd for the AppLauncer
-		/// </summary>
-		public static IntPtr AppLauncher {
-			get {
+		public static IntPtr AppLauncher
+		{
+			get
+			{
 				// If there is no _appVisibility COM object, there can be no AppLauncher
-				if (_appVisibility == null) {
+				if (_appVisibility == null)
+				{
 					return IntPtr.Zero;
 				}
 				return User32.FindWindow(ModernuiApplauncherClass, null);
@@ -79,57 +80,86 @@ namespace Dapplo.Windows.App {
 		}
 
 		/// <summary>
-		/// Check if a Windows Store App (WinRT) is visible
+		///     Return true if the app-launcher is visible
+		/// </summary>
+		public static bool IsLauncherVisible
+		{
+			get
+			{
+				if (_appVisibility != null)
+				{
+					return _appVisibility.ComObject.IsLauncherVisible;
+				}
+				return false;
+			}
+		}
+
+		/// <summary>
+		///     Retrieve all Windows Store apps
+		/// </summary>
+		public static IEnumerable<IntPtr> WindowsStoreApps
+		{
+			get
+			{
+				// if the appVisibility != null we have Windows 8.
+				if (_appVisibility == null)
+				{
+					yield break;
+				}
+				var nextHandle = User32.FindWindow(ModernuiWindowsClass, null);
+				while (nextHandle != IntPtr.Zero)
+				{
+					yield return nextHandle;
+					nextHandle = User32.FindWindowEx(IntPtr.Zero, nextHandle, ModernuiWindowsClass, null);
+				}
+				// check for gutter
+				var gutterHandle = User32.FindWindow(ModernuiGutterClass, null);
+				if (gutterHandle != IntPtr.Zero)
+				{
+					yield return gutterHandle;
+				}
+			}
+		}
+
+		/// <summary>
+		///     Check if a Windows Store App (WinRT) is visible
 		/// </summary>
 		/// <param name="windowBounds"></param>
 		/// <returns>true if an app, covering the supplied rect, is visisble</returns>
-		public static bool AppVisible(Rect windowBounds) {
-			if (_appVisibility == null) {
+		public static bool AppVisible(Rect windowBounds)
+		{
+			if (_appVisibility == null)
+			{
 				return true;
 			}
 
-			foreach (var screen in User32.AllDisplays()) {
-				if (screen.Bounds.Contains(windowBounds)) {
-					if (windowBounds.Equals(screen.Bounds)) {
+			foreach (var screen in User32.AllDisplays())
+			{
+				if (screen.Bounds.Contains(windowBounds))
+				{
+					if (windowBounds.Equals(screen.Bounds))
+					{
 						// Fullscreen, it's "visible" when AppVisibilityOnMonitor says yes
 						// Although it might be the other App, this is not "very" important
-						RECT rect = new RECT(screen.Bounds);
-						IntPtr monitor = User32.MonitorFromRect(ref rect, MONITOR_DEFAULTTONULL);
-						if (monitor != IntPtr.Zero) {
+						var rect = new RECT(screen.Bounds);
+						var monitor = User32.MonitorFromRect(ref rect, MONITOR_DEFAULTTONULL);
+						if (monitor != IntPtr.Zero)
+						{
 							var monitorAppVisibility = _appVisibility.ComObject.GetAppVisibilityOnMonitor(monitor);
-							if (monitorAppVisibility == MonitorAppVisibility.MAV_APP_VISIBLE) {
+							if (monitorAppVisibility == MonitorAppVisibility.MAV_APP_VISIBLE)
+							{
 								return true;
 							}
 						}
-					} else {
+					}
+					else
+					{
 						// Is only partly on the screen, when this happens the app is allways visible!
 						return true;
 					}
 				}
 			}
 			return false;
-		}
-
-		/// <summary>
-		/// Retrieve all Windows Store apps
-		/// </summary>
-		public static IEnumerable<IntPtr> WindowsStoreApps {
-			get {
-				// if the appVisibility != null we have Windows 8.
-				if (_appVisibility == null) {
-					yield break;
-				}
-				IntPtr nextHandle = User32.FindWindow(ModernuiWindowsClass, null);
-				while (nextHandle != IntPtr.Zero) {
-					yield return nextHandle;
-					nextHandle = User32.FindWindowEx(IntPtr.Zero, nextHandle, ModernuiWindowsClass, null);
-				}
-				// check for gutter
-				IntPtr gutterHandle = User32.FindWindow(ModernuiGutterClass, null);
-				if (gutterHandle != IntPtr.Zero) {
-					yield return gutterHandle;
-				}
-			}
 		}
 	}
 }

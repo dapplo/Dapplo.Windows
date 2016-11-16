@@ -22,47 +22,24 @@
 #region using
 
 using System;
-using System.Security;
-using Dapplo.Windows.Native;
 
 #endregion
 
-namespace Dapplo.Windows.SafeHandles
+namespace Dapplo.Windows
 {
 	/// <summary>
-	///     A hRegion SafeHandle implementation
+	///     Event arguments for the TitleChangeEvent
 	/// </summary>
-	public class SafeRegionHandle : SafeObjectHandle
+	public class TitleChangeEventArgs : EventArgs
 	{
 		/// <summary>
-		///     Default constructor is needed to support marshalling!!
+		///     HWnd of the window which has a changed title
 		/// </summary>
-		[SecurityCritical]
-		public SafeRegionHandle() : base(true)
-		{
-		}
+		public IntPtr HWnd { get; set; }
 
 		/// <summary>
-		///     Create a SafeRegionHandle from an existing handle
+		///     Title which is changed
 		/// </summary>
-		/// <param name="preexistingHandle">IntPtr to region</param>
-		[SecurityCritical]
-		public SafeRegionHandle(IntPtr preexistingHandle) : base(true)
-		{
-			SetHandle(preexistingHandle);
-		}
-
-		/// <summary>
-		///     Directly call Gdi32.CreateRectRgn
-		/// </summary>
-		/// <param name="left"></param>
-		/// <param name="top"></param>
-		/// <param name="right"></param>
-		/// <param name="bottom"></param>
-		/// <returns>SafeRegionHandle</returns>
-		public static SafeRegionHandle CreateRectRgn(int left, int top, int right, int bottom)
-		{
-			return Gdi32.CreateRectRgn(left, top, right, bottom);
-		}
+		public string Title { get; set; }
 	}
 }

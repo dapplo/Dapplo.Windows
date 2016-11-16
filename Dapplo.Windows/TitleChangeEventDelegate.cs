@@ -19,19 +19,11 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-using System;
-
-#endregion
-
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows
 {
-	[Flags]
-	public enum DWM_BB
-	{
-		Enable = 1,
-		BlurRegion = 2,
-		TransitionMaximized = 4
-	}
+	/// <summary>
+	///     Delegate for the title change event
+	/// </summary>
+	/// <param name="eventArgs"></param>
+	public delegate void TitleChangeEventDelegate(TitleChangeEventArgs eventArgs);
 }

@@ -1,72 +1,52 @@
-﻿/*
- * dapplo - building blocks for desktop applications
- * Copyright (C) Dapplo 2015-2016
- * 
- * For more information see: http://dapplo.net/
- * dapplo repositories are hosted on GitHub: https://github.com/dapplo
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 1 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#region using
+
+using System;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
-using System;
-using System.Runtime.InteropServices;
+
+#endregion
 
 namespace Dapplo.Windows
 {
-
 	/// <summary>
-	/// Event arguments for the TitleChangeEvent
+	///     Monitor all title changes
 	/// </summary>
-	public class TitleChangeEventArgs : EventArgs
+	public sealed class WindowsTitleMonitor : IDisposable
 	{
-		public IntPtr HWnd
-		{
-			get;
-			set;
-		}
-		public string Title
-		{
-			get;
-			set;
-		}
-	}
-
-	/// <summary>
-	/// Delegate for the title change event
-	/// </summary>
-	/// <param name="eventArgs"></param>
-	public delegate void TitleChangeEventDelegate(TitleChangeEventArgs eventArgs);
-
-	/// <summary>
-	/// Monitor all title changes
-	/// </summary>
-	public class WindowsTitleMonitor : IDisposable
-	{
+		private readonly object _lockObject = new object();
 		private WindowsEventHook _hook;
-		private object lockObject = new object();
+		// ReSharper disable once InconsistentNaming
 		private event TitleChangeEventDelegate _titleChangeEvent;
 
 		/// <summary>
-		/// Add / remove event handler to the title monitor
+		///     Add / remove event handler to the title monitor
 		/// </summary>
 		public event TitleChangeEventDelegate TitleChangeEvent
 		{
 			add
 			{
-				lock (lockObject)
+				lock (_lockObject)
 				{
 					if (_hook == null)
 					{
@@ -78,10 +58,10 @@ namespace Dapplo.Windows
 			}
 			remove
 			{
-				lock (lockObject)
+				lock (_lockObject)
 				{
 					_titleChangeEvent -= value;
-					if (_titleChangeEvent == null || _titleChangeEvent.GetInvocationList().Length == 0)
+					if ((_titleChangeEvent == null) || (_titleChangeEvent.GetInvocationList().Length == 0))
 					{
 						if (_hook != null)
 						{
@@ -94,9 +74,8 @@ namespace Dapplo.Windows
 		}
 
 		/// <summary>
-		/// WinEventDelegate for the creation & destruction
+		///     WinEventDelegate for the creation & destruction
 		/// </summary>
-		/// <param name="hWinEventHook"></param>
 		/// <param name="eventType"></param>
 		/// <param name="hWnd"></param>
 		/// <param name="idObject"></param>
@@ -105,7 +84,7 @@ namespace Dapplo.Windows
 		/// <param name="dwmsEventTime"></param>
 		private void WinEventHandler(WinEvent eventType, IntPtr hWnd, EventObjects idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
 		{
-			if (hWnd == IntPtr.Zero || idObject != EventObjects.OBJID_WINDOW)
+			if ((hWnd == IntPtr.Zero) || (idObject != EventObjects.OBJID_WINDOW))
 			{
 				return;
 			}
@@ -113,31 +92,34 @@ namespace Dapplo.Windows
 			{
 				if (_titleChangeEvent != null)
 				{
-					string newTitle = User32.GetText(hWnd);
-					_titleChangeEvent(new TitleChangeEventArgs { HWnd = hWnd, Title = newTitle });
+					var newTitle = User32.GetText(hWnd);
+					_titleChangeEvent(new TitleChangeEventArgs {HWnd = hWnd, Title = newTitle});
 				}
 			}
 		}
 
 		#region IDisposable Support
 
-		private bool _disposedValue = false; // To detect redundant calls
+		private bool _disposedValue; // To detect redundant calls
 
 		/// <summary>
-		/// Dispose the underlying hook
+		///     Dispose the underlying hook
 		/// </summary>
-		protected virtual void Dispose(bool disposing)
+		public void Dispose(bool disposing)
 		{
-			if (!_disposedValue)
+			if (_disposedValue)
+			{
+				return;
+			}
+			lock (_lockObject)
 			{
 				_hook?.Dispose();
-				_hook = null;
-				_disposedValue = true;
 			}
+			_disposedValue = true;
 		}
 
 		/// <summary>
-		/// Make sure the finalizer disposes the underlying hook
+		///     Make sure the finalizer disposes the underlying hook
 		/// </summary>
 		~WindowsTitleMonitor()
 		{
@@ -146,7 +128,7 @@ namespace Dapplo.Windows
 		}
 
 		/// <summary>
-		/// Dispose the underlying hook
+		///     Dispose the underlying hook
 		/// </summary>
 		public void Dispose()
 		{

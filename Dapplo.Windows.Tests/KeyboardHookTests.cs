@@ -21,17 +21,39 @@
 
 #region using
 
-using System;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using Dapplo.Log;
+using Dapplo.Log.XUnit;
+using Xunit;
+using Xunit.Abstractions;
 
 #endregion
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Tests
 {
-	[Flags]
-	public enum DWM_BB
+	public class KeyboardHookTests
 	{
-		Enable = 1,
-		BlurRegion = 2,
-		TransitionMaximized = 4
+		public KeyboardHookTests(ITestOutputHelper testOutputHelper)
+		{
+			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+		}
+
+		//[StaFact]
+		private async Task TestHandlingKey()
+		{
+			await KeyboardHook.KeyboardEvents.Where(args => args.IsWindows && args.IsShift && args.IsControl && args.IsAlt)
+				.Select(args =>
+				{
+					args.Handled = true;
+					return args;
+				}).FirstAsync();
+		}
+
+		//[StaFact]
+		private async Task TestMapping()
+		{
+			await KeyboardHook.KeyboardEvents.FirstAsync(info => info.IsLeftShift && info.IsKeyDown);
+		}
 	}
 }
