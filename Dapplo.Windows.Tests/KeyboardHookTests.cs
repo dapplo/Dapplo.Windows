@@ -27,6 +27,7 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Xunit;
 using Xunit.Abstractions;
+using System.Windows.Forms;
 
 #endregion
 
@@ -54,6 +55,20 @@ namespace Dapplo.Windows.Tests
 		private async Task TestMapping()
 		{
 			await KeyboardHook.KeyboardEvents.FirstAsync(info => info.IsLeftShift && info.IsKeyDown);
+		}
+
+		//[StaFact]
+		private async Task TestSuppressVolume()
+		{
+			await KeyboardHook.KeyboardEvents.Where(args =>
+			{
+				if (args.Key != Keys.VolumeUp)
+				{
+					return true;
+				}
+				args.Handled = true;
+				return false;
+			}).FirstAsync();
 		}
 	}
 }
