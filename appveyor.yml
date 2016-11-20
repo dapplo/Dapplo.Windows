@@ -36,16 +36,6 @@ notifications:
   on_build_failure: true
   on_build_status_changed: false
 deploy:
-- provider: GitHub
-  release: Dapplo.Windows-v$(appveyor_build_version)
-  auth_token:
-    secure: eBQPtXg53XgcvdcVY3wQAw6kkwNh+QhcsTDwzyQLLh6IOPyiePEaEhJR0D2YBjAj
-  artifact: /.*\.nupkg/
-  draft: false
-  on:
-    branch: master
-    is_not_pr: true
-    appveyor_repo_commit_message_extended: /\[release\]/
 - provider: NuGet
   skip_symbols: true
   api_key:
