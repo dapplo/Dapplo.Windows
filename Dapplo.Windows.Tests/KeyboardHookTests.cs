@@ -41,7 +41,7 @@ namespace Dapplo.Windows.Tests
 		}
 
 		//[StaFact]
-		private async Task TestHandlingKey()
+		private async Task TestHandlingKeyAsync()
 		{
 			await KeyboardHook.KeyboardEvents.Where(args => args.IsWindows && args.IsShift && args.IsControl && args.IsAlt)
 				.Select(args =>
@@ -52,13 +52,13 @@ namespace Dapplo.Windows.Tests
 		}
 
 		//[StaFact]
-		private async Task TestMapping()
+		private async Task TestMappingAsync()
 		{
 			await KeyboardHook.KeyboardEvents.FirstAsync(info => info.IsLeftShift && info.IsKeyDown);
 		}
 
 		//[StaFact]
-		private async Task TestSuppressVolume()
+		private async Task TestSuppressVolumeAsync()
 		{
 			await KeyboardHook.KeyboardEvents.Where(args =>
 			{
