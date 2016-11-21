@@ -370,6 +370,11 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern uint GetSysColor(int nIndex);
 
+		/// <summary>
+		/// Bring the specified window to the front
+		/// </summary>
+		/// <param name="hWnd">IntPtr specifying the hWnd</param>
+		/// <returns>true if the call was successfull</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool BringWindowToTop(IntPtr hWnd);
@@ -377,31 +382,69 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr GetForegroundWindow();
 
+		/// <summary>
+		/// Get the hWnd of the Desktop window
+		/// </summary>
+		/// <returns>IntPtr</returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr GetDesktopWindow();
 
+		/// <summary>
+		/// Set the current foreground window
+		/// </summary>
+		/// <param name="hWnd"></param>
+		/// <returns>IntPtr</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SetForegroundWindow(IntPtr hWnd);
 
+		/// <summary>
+		/// Get the WindowPlacement for the specified window
+		/// </summary>
+		/// <param name="hWnd">IntPtr</param>
+		/// <param name="windowPlacement">WindowPlacement</param>
+		/// <returns>true if success</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool GetWindowPlacement(IntPtr hWnd, ref WindowPlacement lpwndpl);
+		public static extern bool GetWindowPlacement(IntPtr hWnd, ref WindowPlacement windowPlacement);
 
+		/// <summary>
+		/// Set the WindowPlacement for the specified window
+		/// </summary>
+		/// <param name="hWnd">IntPtr</param>
+		/// <param name="windowPlacement">WindowPlacement</param>
+		/// <returns>true if the call was sucessfull</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WindowPlacement lpwndpl);
+		public static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WindowPlacement windowPlacement);
 
+		/// <summary>
+		/// Return true if the specified window is minimized
+		/// </summary>
+		/// <param name="hWnd">IntPtr for the hWnd</param>
+		/// <returns>true if minimized</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool IsIconic(IntPtr hWnd);
 
+		/// <summary>
+		/// Return true if the specified window is maximized
+		/// </summary>
+		/// <param name="hwnd">IntPtr for the hWnd</param>
+		/// <returns>true if maximized</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool IsZoomed(IntPtr hwnd);
 
+		/// <summary>
+		/// Get the classname of the specified window
+		/// </summary>
+		/// <param name="hWnd">IntPtr with the hWnd</param>
+		/// <param name="className">StringBuilder to place the classname into</param>
+		/// <param name="nMaxCount">max size for the string builder length</param>
+		/// <returns>nr of characters returned</returns>
 		[DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
-		public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+		public static extern int GetClassName(IntPtr hWnd, StringBuilder className, int nMaxCount);
 
 		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
 		private static extern IntPtr GetClassLong(IntPtr hWnd, int nIndex);
