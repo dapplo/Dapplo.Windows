@@ -148,6 +148,7 @@
     <Compile Include="Structs\WindowPlacement.cs" />
     <Compile Include="TitleChangeEventArgs.cs" />
     <Compile Include="TitleChangeEventDelegate.cs" />
+    <Compile Include="WindowScroller.cs" />
     <Compile Include="WindowsTitleMonitor.cs" />
     <Compile Include="WindowsMonitor.cs" />
     <Compile Include="WindowsEventHook.cs" />

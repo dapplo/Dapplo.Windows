@@ -1,18 +1,47 @@
-﻿using Dapplo.Windows.Native;
+﻿#region Dapplo 2016 - GNU Lesser General Public License
+
+// Dapplo - building blocks for .NET applications
+// Copyright (C) 2017 Dapplo
+// 
+// For more information see: http://dapplo.net/
+// Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+// This file is part of Dapplo.Windows
+// 
+// Dapplo.Windows is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// Dapplo.Windows is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have a copy of the GNU Lesser General Public License
+// along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
+
+#endregion
+
+#region Usings
+
 using System;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapplo.Windows.Native;
+
+#endregion
 
 namespace Dapplo.Windows.Desktop
 {
 	/// <summary>
-	/// EnumWindows wrapper for .NET
+	///     EnumWindows wrapper for .NET
 	/// </summary>
 	public static class WindowsEnumerator
 	{
 		/// <summary>
-		/// Enumerate the windows / child windows via an Observable
+		///     Enumerate the windows / child windows via an Observable
 		/// </summary>
 		/// <param name="hWndParent">IntPtr with the hwnd of the parent, or null for all</param>
 		/// <param name="cancellationToken">CancellationToken</param>
@@ -21,7 +50,7 @@ namespace Dapplo.Windows.Desktop
 		{
 			return Observable.Create<WindowInfo>(observer =>
 			{
-				bool continueWithEnumeration = true;
+				var continueWithEnumeration = true;
 				Task.Run(() =>
 				{
 					User32.EnumChildWindows(hWndParent ?? IntPtr.Zero, (hwnd, param) =>
@@ -43,7 +72,6 @@ namespace Dapplo.Windows.Desktop
 					continueWithEnumeration = false;
 				};
 			});
-
 		}
 	}
 }

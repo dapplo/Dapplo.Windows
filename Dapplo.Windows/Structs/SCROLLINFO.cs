@@ -23,6 +23,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Dapplo.Windows.Enums;
 
 #endregion
 
@@ -35,12 +36,44 @@ namespace Dapplo.Windows.Structs
 	[StructLayout(LayoutKind.Sequential)]
 	public struct SCROLLINFO
 	{
+		/// <summary>
+		/// Size of this struct
+		/// </summary>
 		public uint cbSize;
+		/// <summary>
+		/// Mask specifying which values to get
+		/// </summary>
 		public uint fMask;
+		/// <summary>
+		/// Minimum value to scroll to, e.g. the start
+		/// </summary>
 		public int nMin;
+		/// <summary>
+		/// Maximum value to scroll to, e.g. the end
+		/// </summary>
 		public int nMax;
+		/// <summary>
+		/// Size of a page
+		/// </summary>
 		public uint nPage;
+		/// <summary>
+		/// Current position
+		/// </summary>
 		public int nPos;
+		/// <summary>
+		/// Current tracking position
+		/// </summary>
 		public int nTrackPos;
+
+		public SCROLLINFO(ScrollInfoMask mask)
+		{
+			cbSize = (uint) Marshal.SizeOf(typeof(SCROLLINFO));
+			fMask = (uint) mask;
+			nMin = 0;
+			nMax = 0;
+			nPage = 0;
+			nPos = 0;
+			nTrackPos = 0;
+		}
 	}
 }

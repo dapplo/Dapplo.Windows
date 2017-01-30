@@ -21,19 +21,14 @@
 
 #region using
 
-using System;
 using System.Diagnostics;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Enums;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.Structs;
 
 #endregion
 
@@ -55,40 +50,22 @@ namespace Dapplo.Windows.Tests
 			{
 				Assert.NotNull(process);
 				process.WaitForInputIdle();
+
 				var notepadWindow = await WindowsEnumerator.EnumerateWindowsAsync().Where(info => info.Fill().Text.Contains("setupact.log")).FirstOrDefaultAsync();
 				Assert.NotNull(notepadWindow);
-				SCROLLINFO scrollInfo = new SCROLLINFO();
-				scrollInfo.cbSize = (uint)Marshal.SizeOf(scrollInfo);
-				scrollInfo.fMask = (uint)ScrollInfoMask.All;
 
-				var scrollingWindow = await WindowsEnumerator.EnumerateWindowsAsync(notepadWindow.Handle).Where(childWindow => User32.GetScrollInfo(childWindow.Handle, ScrollBarDirection.Vertical, ref scrollInfo)).FirstOrDefaultAsync();
-				Assert.NotNull(scrollingWindow);
+				var scroller = await WindowScroller.CreateAsync(notepadWindow);
 
-				scrollingWindow.Fill();
+				Assert.NotNull(scroller);
 
+				scroller.Start();
+				await Task.Delay(100);
+				Assert.True(scroller.IsAtStart);
 				do
 				{
-					if (!User32.GetScrollInfo(scrollingWindow.Handle, ScrollBarDirection.Vertical, ref scrollInfo))
-					{
-						var error = Win32.GetLastErrorCode();
-						Log.Error().WriteLine("Error calling GetScrollInfo : {0}", Win32.GetMessage(error, 0x0C09));
-						break;
-					}
-					if (scrollInfo.nMax == Math.Max(scrollInfo.nPos, scrollInfo.nTrackPos) + scrollInfo.nPage - 1)
-					{
-						// End reached
-						break;
-					}
-					scrollInfo.nPos = scrollInfo.nPos + (int)scrollInfo.nPage;
-					if (!User32.SetScrollInfo(scrollingWindow.Handle, ScrollBarDirection.Vertical, ref scrollInfo, true))
-					{
-						var error = Win32.GetLastErrorCode();
-						Log.Error().WriteLine("Error calling SetScrollInfo : {0}", Win32.GetMessage(error, 0x0C09));
-						break;
-					}
-					User32.SendMessage(scrollingWindow.Handle, WindowsMessages.WM_VSCROLL, new IntPtr(4 + 0x10000 * scrollInfo.nPos), IntPtr.Zero);
+					scroller.Next();
 					await Task.Delay(100);
-				} while (true);
+				} while (!scroller.IsAtEnd);
 
 
 				process.Kill();
