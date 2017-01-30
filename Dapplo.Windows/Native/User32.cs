@@ -52,7 +52,7 @@ namespace Dapplo.Windows.Native
 		/// </summary>
 		/// <param name="hwnd"></param>
 		/// <param name="lParam"></param>
-		public delegate int EnumWindowsProc(IntPtr hwnd, int lParam);
+		public delegate bool EnumWindowsProc(IntPtr hwnd, int lParam);
 
 		// ReSharper disable once InconsistentNaming
 		private const uint MONITORINFOF_PRIMARY = 1;

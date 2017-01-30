@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
@@ -41,6 +42,20 @@ namespace Dapplo.Windows.Tests
 		public WindowsEnumeratorTests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+		}
+
+		[StaFact]
+		private void EnumerateWindows()
+		{
+			var windows = WindowsEnumerator.EnumerateWindows().ToList();
+			Assert.True(windows.Count > 0);
+		}
+
+		[StaFact]
+		private void EnumerateWindows_Take10()
+		{
+			var windows = WindowsEnumerator.EnumerateWindows().Take(10).ToList();
+			Assert.True(windows.Count == 10);
 		}
 
 		[StaFact]

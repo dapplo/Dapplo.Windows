@@ -26,6 +26,7 @@
 #region Usings
 
 using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,11 +59,11 @@ namespace Dapplo.Windows.Desktop
 						// check if we should continue
 						if (cancellationToken.IsCancellationRequested || !continueWithEnumeration)
 						{
-							return 0;
+							return false;
 						}
 						var windowInfo = WindowInfo.CreateFor(hwnd);
 						observer.OnNext(windowInfo);
-						return continueWithEnumeration ? 1 : 0;
+						return continueWithEnumeration;
 					}, IntPtr.Zero);
 					observer.OnCompleted();
 				}, cancellationToken);
@@ -72,6 +73,30 @@ namespace Dapplo.Windows.Desktop
 					continueWithEnumeration = false;
 				};
 			});
+		}
+
+		/// <summary>
+		///     Enumerate the windows / child windows (currrently this is NOT lazy)
+		/// </summary>
+		/// <param name="hWndParent">IntPtr with the hwnd of the parent, or null for all</param>
+		/// <param name="wherePredicate">Func for the where</param>
+		/// <param name="takeWhileFunc"></param>
+		/// <returns>IEnumerable with WindowInfo</returns>
+		public static IEnumerable<WindowInfo> EnumerateWindows(IntPtr? hWndParent = null, Func<WindowInfo, bool> wherePredicate = null, Func<WindowInfo,bool> takeWhileFunc = null)
+		{
+			var result = new List<WindowInfo>();
+			User32.EnumChildWindows(hWndParent ?? IntPtr.Zero, (hwnd, param) =>
+			{
+				// check if we should continue
+				var windowInfo = WindowInfo.CreateFor(hwnd);
+
+				if (wherePredicate?.Invoke(windowInfo) != false)
+				{
+					result.Add(windowInfo);
+				}
+				return takeWhileFunc?.Invoke(windowInfo) != false;
+			}, IntPtr.Zero);
+			return result;
 		}
 	}
 }

@@ -43,34 +43,51 @@ namespace Dapplo.Windows.Tests
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
 		}
 
+		/// <summary>
+		/// Test scrolling a window
+		/// </summary>
+		/// <returns></returns>
 		[StaFact]
-		private async Task TestScrolling()
+		private async Task TestScrollingAsync()
 		{
+			// Start a process to test against
 			using (var process = Process.Start("notepad.exe", "C:\\Windows\\setupact.log"))
 			{
+				// Make sure it's started
 				Assert.NotNull(process);
+				// Wait until the process started it's message pump (listening for input)
 				process.WaitForInputIdle();
 
+				// Find the belonging window
+				// TODO: Do this by process ID
 				var notepadWindow = await WindowsEnumerator.EnumerateWindowsAsync().Where(info => info.Fill().Text.Contains("setupact.log")).FirstOrDefaultAsync();
 				Assert.NotNull(notepadWindow);
 
+				// Create a WindowScroller
 				var scroller = await WindowScroller.CreateAsync(notepadWindow);
-
 				Assert.NotNull(scroller);
 
+				// Move the window to the start
 				scroller.Start();
+				// A delay to make the window move
 				await Task.Delay(100);
+
+				// Check if it did move to the start
 				Assert.True(scroller.IsAtStart);
+
+				// Loop
 				do
 				{
+					// Next "page"
 					scroller.Next();
+					// Wait a bit, so the 
 					await Task.Delay(100);
+					// Loop as long as we are not at the end yet
 				} while (!scroller.IsAtEnd);
 
-
+				// Kill the process
 				process.Kill();
 			}
 		}
-
 	}
 }
