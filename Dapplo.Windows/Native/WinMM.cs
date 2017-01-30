@@ -34,9 +34,16 @@ namespace Dapplo.Windows.Native
 	/// </summary>
 	public class WinMM
 	{
+		/// <summary>
+		/// Play a sound via WinMM
+		/// </summary>
+		/// <param name="soundBytes">byte array with the wave information</param>
+		/// <param name="hmod"></param>
+		/// <param name="fdwSound"></param>
+		/// <returns></returns>
 		[DllImport("winmm.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool PlaySound(byte[] ptrToSound, UIntPtr hmod, SoundFlags fdwSound);
+		public static extern bool PlaySound(byte[] soundBytes, UIntPtr hmod, SoundFlags fdwSound);
 
 		[DllImport("winmm.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]

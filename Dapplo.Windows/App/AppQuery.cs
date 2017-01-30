@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Interop;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
@@ -37,9 +38,14 @@ namespace Dapplo.Windows.App
 	/// </summary>
 	public static class AppQuery
 	{
-		public const string ModernuiWindowsClass = "Windows.UI.Core.CoreWindow";
-		public const string ModernuiApplauncherClass = "ImmersiveLauncher";
-		public const string ModernuiGutterClass = "ImmersiveGutter";
+		private const string W8AppWindowClass = "Windows.UI.Core.CoreWindow"; //Used for Windows 8(.1)
+		private const string W10AppWindowClass = "ApplicationFrameWindow"; // Windows 10 uses ApplicationFrameWindow
+		private const string ApplauncherClass = "ImmersiveLauncher";
+		private const string GutterClass = "ImmersiveGutter";
+
+		// the window class for the App window, this depends on the windows version and will be set in the static initializer
+		private static readonly string AppWindowsClass;
+
 		// For MonitorFromWindow
 		public const int MONITOR_DEFAULTTONULL = 0;
 		public const int MONITOR_DEFAULTTOPRIMARY = 1;
@@ -52,6 +58,7 @@ namespace Dapplo.Windows.App
 
 		static AppQuery()
 		{
+			AppWindowsClass = Environment.OSVersion.IsWindows8() ? W8AppWindowClass : W10AppWindowClass;
 			try
 			{
 				var appVisibilityType = Type.GetTypeFromCLSID(new Guid("7E5FE3D9-985F-4908-91F9-EE19F9FD1514"));
@@ -75,50 +82,91 @@ namespace Dapplo.Windows.App
 				{
 					return IntPtr.Zero;
 				}
-				return User32.FindWindow(ModernuiApplauncherClass, null);
+				return User32.FindWindow(ApplauncherClass, null);
 			}
 		}
 
 		/// <summary>
 		///     Return true if the app-launcher is visible
 		/// </summary>
-		public static bool IsLauncherVisible
-		{
-			get
-			{
-				if (_appVisibility != null)
-				{
-					return _appVisibility.ComObject.IsLauncherVisible;
-				}
-				return false;
-			}
-		}
+		public static bool IsLauncherVisible => _appVisibility?.ComObject.IsLauncherVisible == true;
 
 		/// <summary>
-		///     Retrieve all Windows Store apps
+		///     Retrieve handles of all Windows store apps
 		/// </summary>
 		public static IEnumerable<IntPtr> WindowsStoreApps
 		{
 			get
 			{
-				// if the appVisibility != null we have Windows 8.
+				// if the appVisibility != null we have Windows 8 or later
 				if (_appVisibility == null)
 				{
 					yield break;
 				}
-				var nextHandle = User32.FindWindow(ModernuiWindowsClass, null);
+				var nextHandle = User32.FindWindow(AppWindowsClass, null);
 				while (nextHandle != IntPtr.Zero)
 				{
 					yield return nextHandle;
-					nextHandle = User32.FindWindowEx(IntPtr.Zero, nextHandle, ModernuiWindowsClass, null);
+					nextHandle = User32.FindWindowEx(IntPtr.Zero, nextHandle, AppWindowsClass, null);
 				}
 				// check for gutter
-				var gutterHandle = User32.FindWindow(ModernuiGutterClass, null);
+				var gutterHandle = User32.FindWindow(GutterClass, null);
 				if (gutterHandle != IntPtr.Zero)
 				{
 					yield return gutterHandle;
 				}
 			}
+		}
+
+
+		/// <summary>
+		/// This checks if the window is an App (Win8 or Win10)
+		/// </summary>
+		public static bool IsApp(this WindowInfo windowInfo)
+		{
+			return AppWindowsClass.Equals(windowInfo.Classname);
+		}
+
+		/// <summary>
+		/// This checks if the window is a Windows 8 App
+		/// For Windows 10 most normal code works, as it's hosted inside "ApplicationFrameWindow"
+		/// </summary>
+		public static bool IsWin8App(this WindowInfo windowInfo)
+		{
+			return W8AppWindowClass.Equals(windowInfo.Classname);
+		}
+
+		/// <summary>
+		/// This checks if the window is a Windows 10 App
+		/// For Windows 10 apps are hosted inside "ApplicationFrameWindow"
+		/// </summary>
+		public static bool IsWin10App(this WindowInfo windowInfo)
+		{
+			return W10AppWindowClass.Equals(windowInfo.Classname);
+		}
+
+		/// <summary>
+		/// Check if the window is the metro gutter (sizeable separator)
+		/// </summary>
+		public static bool IsGutter(this WindowInfo windowInfo)
+		{
+			return GutterClass.Equals(windowInfo.Classname);
+		}
+
+		/// <summary>
+		/// Test if this window is for the App-Launcher
+		/// </summary>
+		public static bool IsAppLauncher(this WindowInfo windowInfo)
+		{
+			return ApplauncherClass.Equals(windowInfo.Classname);
+		}
+
+		/// <summary>
+		/// Check if this window is the window of a metro app
+		/// </summary>
+		public static bool IsMetroApp(this WindowInfo windowInfo)
+		{
+			return windowInfo.IsAppLauncher() || windowInfo.IsWin8App();
 		}
 
 		/// <summary>

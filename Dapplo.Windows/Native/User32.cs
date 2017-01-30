@@ -128,15 +128,15 @@ namespace Dapplo.Windows.Native
 		///     Wrapper for the GetClassLong which decides if the system is 64-bit or not and calls the right one.
 		/// </summary>
 		/// <param name="hWnd">IntPtr</param>
-		/// <param name="nIndex">int</param>
+		/// <param name="index">ClassLongIndex</param>
 		/// <returns>IntPtr</returns>
-		public static IntPtr GetClassLongWrapper(IntPtr hWnd, int nIndex)
+		public static IntPtr GetClassLongWrapper(IntPtr hWnd, ClassLongIndex index)
 		{
 			if (IntPtr.Size > 4)
 			{
-				return GetClassLongPtr(hWnd, nIndex);
+				return GetClassLongPtr(hWnd, index);
 			}
-			return GetClassLong(hWnd, nIndex);
+			return GetClassLong(hWnd, index);
 		}
 
 		/// <summary>
@@ -235,22 +235,22 @@ namespace Dapplo.Windows.Native
 			var iconBig = new IntPtr(1);
 			var iconSmall2 = new IntPtr(2);
 
-			var iconHandle = SendMessage(hWnd, (int) WindowsMessages.WM_GETICON, iconSmall2, IntPtr.Zero);
+			var iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall2, IntPtr.Zero);
 			if (iconHandle == IntPtr.Zero)
 			{
-				iconHandle = SendMessage(hWnd, (int) WindowsMessages.WM_GETICON, iconSmall, IntPtr.Zero);
+				iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall, IntPtr.Zero);
 			}
 			if (iconHandle == IntPtr.Zero)
 			{
-				iconHandle = GetClassLongWrapper(hWnd, (int) ClassLongIndex.GCL_HICONSM);
+				iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.GCL_HICONSM);
 			}
 			if (iconHandle == IntPtr.Zero)
 			{
-				iconHandle = SendMessage(hWnd, (int) WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero);
+				iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero);
 			}
 			if (iconHandle == IntPtr.Zero)
 			{
-				iconHandle = GetClassLongWrapper(hWnd, (int) ClassLongIndex.GCL_HICON);
+				iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.GCL_HICON);
 			}
 
 			if (iconHandle == IntPtr.Zero)
@@ -279,36 +279,28 @@ namespace Dapplo.Windows.Native
 		{
 			var title = new StringBuilder(260, 260);
 			var length = GetWindowText(hWnd, title, title.Capacity);
-			if (length == 0)
-			{
-				var error = GetLastErrorCode();
-				if (error != Win32Error.Success)
-				{
-					return null;
-				}
-			}
 			return title.ToString();
 		}
 
 		/// <summary>
 		///     Wrapper for the GetWindowLong which decides if the system is 64-bit or not and calls the right one.
 		/// </summary>
-		/// <param name="hwnd"></param>
-		/// <param name="nIndex"></param>
+		/// <param name="hwnd">IntPtr</param>
+		/// <param name="index">WindowLongIndex</param>
 		/// <returns></returns>
-		public static long GetWindowLongWrapper(IntPtr hwnd, WindowLongIndex nIndex)
+		public static long GetWindowLongWrapper(IntPtr hwnd, WindowLongIndex index)
 		{
 			if (IntPtr.Size == 8)
 			{
-				return GetWindowLongPtr(hwnd, (int) nIndex).ToInt64();
+				return GetWindowLongPtr(hwnd, index).ToInt64();
 			}
-			return GetWindowLong(hwnd, (int) nIndex);
+			return GetWindowLong(hwnd, index);
 		}
 
 		/// <summary>
 		///     Helper method to get the window size for GDI Windows
 		/// </summary>
-		/// <param name="hWnd"></param>
+		/// <param name="hWnd">IntPtr</param>
 		/// <param name="rectangle">out Rectangle</param>
 		/// <returns>bool true if it worked</returns>
 		public static bool GetWindowRect(IntPtr hWnd, out Rect rectangle)
@@ -323,18 +315,18 @@ namespace Dapplo.Windows.Native
 		/// <summary>
 		///     Wrapper for the SetWindowLong which decides if the system is 64-bit or not and calls the right one.
 		/// </summary>
-		/// <param name="hwnd"></param>
-		/// <param name="nIndex"></param>
+		/// <param name="hwnd">IntPtr</param>
+		/// <param name="index">WindowLongIndex</param>
 		/// <param name="styleFlags"></param>
-		public static void SetWindowLongWrapper(IntPtr hwnd, WindowLongIndex nIndex, IntPtr styleFlags)
+		public static void SetWindowLongWrapper(IntPtr hwnd, WindowLongIndex index, IntPtr styleFlags)
 		{
 			if (IntPtr.Size == 8)
 			{
-				SetWindowLongPtr(hwnd, (int) nIndex, styleFlags);
+				SetWindowLongPtr(hwnd, index, styleFlags);
 			}
 			else
 			{
-				SetWindowLong(hwnd, (int) nIndex, styleFlags.ToInt32());
+				SetWindowLong(hwnd, index, styleFlags.ToInt32());
 			}
 		}
 
@@ -447,35 +439,35 @@ namespace Dapplo.Windows.Native
 		public static extern int GetClassName(IntPtr hWnd, StringBuilder className, int nMaxCount);
 
 		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
-		private static extern IntPtr GetClassLong(IntPtr hWnd, int nIndex);
+		private static extern IntPtr GetClassLong(IntPtr hWnd, ClassLongIndex index);
 
 		[DllImport("user32", SetLastError = true, EntryPoint = "GetClassLongPtr")]
-		public static extern IntPtr GetClassLongPtr(IntPtr hWnd, int nIndex);
+		public static extern IntPtr GetClassLongPtr(IntPtr hWnd, ClassLongIndex index);
 
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool PrintWindow(IntPtr hwnd, IntPtr hDC, uint nFlags);
+		public static extern bool PrintWindow(IntPtr hwnd, IntPtr hDc, uint nFlags);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, SysCommands sysCommand, IntPtr lParam);
 
 		[DllImport("user32", SetLastError = true)]
-		public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, IntPtr lParam);
+		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, IntPtr lParam);
 
 		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
-		public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
+		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
 		[DllImport("user32", SetLastError = true, EntryPoint = "GetWindowLong")]
-		private static extern int GetWindowLong(IntPtr hwnd, int index);
+		private static extern int GetWindowLong(IntPtr hwnd, WindowLongIndex index);
 
 		[DllImport("user32", SetLastError = true, EntryPoint = "GetWindowLongPtr")]
-		private static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int nIndex);
+		private static extern IntPtr GetWindowLongPtr(IntPtr hwnd, WindowLongIndex nIndex);
 
 		[DllImport("user32", SetLastError = true)]
-		private static extern int SetWindowLong(IntPtr hWnd, int index, int styleFlags);
+		private static extern int SetWindowLong(IntPtr hWnd, WindowLongIndex index, int styleFlags);
 
 		[DllImport("user32", SetLastError = true, EntryPoint = "SetWindowLongPtr")]
-		private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int index, IntPtr styleFlags);
+		private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, WindowLongIndex index, IntPtr styleFlags);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
@@ -487,19 +479,53 @@ namespace Dapplo.Windows.Native
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a>
+		/// </summary>
+		/// <param name="enumFunc">EnumWindowsProc</param>
+		/// <param name="param">An application-defined value to be passed to the callback function.</param>
+		/// <returns>true if success</returns>
 		[DllImport("user32", SetLastError = true)]
-		public static extern int EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool EnumWindows(EnumWindowsProc enumFunc, IntPtr param);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a>
+		/// </summary>
+		/// <param name="hWndParent">IntPtr with hwnd of parent window, if this is IntPtr.Zero this function behaves as EnumWindows</param>
+		/// <param name="enumFunc">EnumWindowsProc</param>
+		/// <param name="param">An application-defined value to be passed to the callback function.</param>
+		/// <returns>true if success</returns>
 		[DllImport("user32", SetLastError = true)]
-		public static extern int EnumChildWindows(IntPtr hWndParent, EnumWindowsProc lpEnumFunc, IntPtr lParam);
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool EnumChildWindows(IntPtr hWndParent, EnumWindowsProc enumFunc, IntPtr param);
+
+		/// <summary>
+		/// See <a href="http://pinvoke.net/default.aspx/user32/GetScrollInfo.html">here</a> for more information.
+		/// </summary>
+		/// <param name="hwnd">IntPtr with the window handle</param>
+		/// <param name="direction">ScrollBarDirection</param>
+		/// <param name="scrollinfo">SCROLLINFO ref</param>
+		/// <returns>bool if it worked</returns>
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool GetScrollInfo(IntPtr hwnd, ScrollBarDirection direction, ref SCROLLINFO scrollinfo);
+
+		/// <summary>
+		/// See <a href="http://pinvoke.net/default.aspx/user32/SetScrollInfo.html">here</a> for more information.
+		/// </summary>
+		/// <param name="hwnd">IntPtr with the window handle</param>
+		/// <param name="direction">ScrollBarDirection</param>
+		/// <param name="scrollinfo">SCROLLINFO</param>
+		/// <param name="redraw">bool to specify if a redraw should be made</param>
+		/// <returns>bool if it worked</returns>
+		[DllImport("user32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool SetScrollInfo(IntPtr hwnd, ScrollBarDirection direction, ref SCROLLINFO scrollinfo, bool redraw);
 
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool GetScrollInfo(IntPtr hwnd, int fnBar, ref SCROLLINFO lpsi);
-
-		[DllImport("user32", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool ShowScrollBar(IntPtr hwnd, ScrollBarDirection scrollBar, [MarshalAs(UnmanagedType.Bool)] bool show);
+		public static extern bool ShowScrollBar(IntPtr hwnd, ScrollBarDirection direction, [MarshalAs(UnmanagedType.Bool)] bool show);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern int SetScrollPos(IntPtr hWnd, Orientation nBar, int nPos, [MarshalAs(UnmanagedType.Bool)] bool bRedraw);

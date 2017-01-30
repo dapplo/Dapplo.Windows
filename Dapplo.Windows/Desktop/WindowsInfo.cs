@@ -29,24 +29,67 @@ using System.Windows;
 
 namespace Dapplo.Windows.Desktop
 {
+	/// <summary>
+	/// Information about a native window
+	/// Note: This is a dumb container, and doesn't retrieve anything about the window itself
+	/// </summary>
 	public class WindowInfo
 	{
+		/// <summary>
+		/// Returns the bounds of this window
+		/// </summary>
 		public Rect Bounds { get; set; }
 
+		/// <summary>
+		/// Returns the children of this window
+		/// </summary>
 		public IList<WindowInfo> Children { get; set; }
 
+		/// <summary>
+		/// string with the name of the internal class for the window
+		/// </summary>
 		public string Classname { get; set; }
 
+		/// <summary>
+		/// Handle (ID) of the window
+		/// </summary>
 		public IntPtr Handle { get; set; }
 
-		public bool HasClassname { get; set; }
+		/// <summary>
+		/// Does the window have a classname?
+		/// </summary>
+		public bool HasClassname => !string.IsNullOrEmpty(Classname);
 
-		public bool HasParent { get; set; }
+		/// <summary>
+		/// Does this window have parent?
+		/// </summary>
+		public bool HasParent => Parent != IntPtr.Zero;
 
-		public IntPtr Parent { get; set; }
+		/// <summary>
+		/// The parent window to which this window belongs
+		/// </summary>
+		public IntPtr Parent { get; set; } = IntPtr.Zero;
 
+		/// <summary>
+		/// Return the text (title) of the window, if any
+		/// </summary>
 		public string Text { get; set; }
 
+		/// <summary>
+		/// Returns true if the window is visible
+		/// </summary>
+		public bool IsVisible { get; set; }
+
+		/// <summary>
+		/// Returns true if the window is minimized
+		/// </summary>
+		public bool IsMinimized { get; set; }
+
+		/// <summary>
+		/// Create a WindowInfo for the supplied handle
+		/// </summary>
+		/// <param name="handle">IntPtr</param>
+		/// <returns>WindowInfo</returns>
 		public static WindowInfo CreateFor(IntPtr handle)
 		{
 			return new WindowInfo

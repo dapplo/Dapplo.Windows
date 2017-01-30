@@ -37,8 +37,8 @@
     <DocumentationFile>bin\Release\Dapplo.Windows.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapplo.Log, Version=1.0.22.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.Log.1.0.22\lib\net45\Dapplo.Log.dll</HintPath>
+    <Reference Include="Dapplo.Log, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Log.1.0.23\lib\net45\Dapplo.Log.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -67,9 +67,12 @@
     <Compile Include="App\IAppVisibility.cs" />
     <Compile Include="App\MonitorAppVisibility.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
-    <Compile Include="Desktop\NativeWindows.cs" />
+    <Compile Include="Desktop\WindowQuery.cs" />
+    <Compile Include="Desktop\WindowsEnumerator.cs" />
     <Compile Include="Desktop\WindowsInfo.cs" />
+    <Compile Include="Desktop\WindowsInfoExtensions.cs" />
     <Compile Include="Enums\BI_COMPRESSION.cs" />
+    <Compile Include="Enums\ScrollInfoMask.cs" />
     <Compile Include="Enums\CursorInfoFlags.cs" />
     <Compile Include="Enums\DesktopAccessRight.cs" />
     <Compile Include="Enums\DeviceCaps.cs" />
@@ -151,6 +154,7 @@
     <Compile Include="WindowsHook.cs" />
     <Compile Include="Enums\WindowsMessages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WindowsVersion.cs" />
     <Compile Include="WinProcHandler.cs" />
   </ItemGroup>
   <ItemGroup>

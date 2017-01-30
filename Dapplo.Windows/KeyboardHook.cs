@@ -242,6 +242,11 @@ namespace Dapplo.Windows
 
 		private const int KeyPressed = 0x8000;
 
+		/// <summary>
+		/// Test if the supplied key is pressed
+		/// </summary>
+		/// <param name="key">Keys</param>
+		/// <returns>true if pressed</returns>
 		public static bool IsPressed(Keys key)
 		{
 			return Convert.ToBoolean(GetKeyState(key) & KeyPressed);

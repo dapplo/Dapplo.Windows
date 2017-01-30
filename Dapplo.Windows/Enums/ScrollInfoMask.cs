@@ -19,28 +19,40 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System;
+
 namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	/// See <a href="http://pinvoke.net/default.aspx/Enums/SBOrientation.html">here</a>
+	/// The ScrollInfoMask enum is used for retrieving the SCROLLINFO via the GetScrollInfo
+	/// See <a href="http://pinvoke.net/default.aspx/Enums/ScrollInfoMask.html">here</a>
 	/// </summary>
-	public enum ScrollBarDirection
+	[Flags]
+	public enum ScrollInfoMask
 	{
 		/// <summary>
-		/// The horizontal scroll bar of the specified window
+		/// Copies the scroll range to the nMin and nMax members of the SCROLLINFO structure pointed to by lpsi.
 		/// </summary>
-		Horizontal = 0,
+		Range = 0x1,
 		/// <summary>
-		/// The vertical scroll bar of the specified window
+		/// Copies the scroll page to the nPage member of the SCROLLINFO structure pointed to by lpsi.
 		/// </summary>
-		Vertical = 1,
+		Page = 0x2,
 		/// <summary>
-		/// A scroll bar control
+		/// Copies the scroll position to the nPos member of the SCROLLINFO structure pointed to by lpsi.
 		/// </summary>
-		Control = 2,
+		Pos = 0x4,
 		/// <summary>
-		/// The horizontal and vertical scroll bars of the specified window
+		/// Unknown
 		/// </summary>
-		Both = 3
+		DisableNoScroll = 0x8,
+		/// <summary>
+		/// Copies the current scroll box tracking position to the nTrackPos member of the SCROLLINFO structure pointed to by lpsi.
+		/// </summary>
+		Trackpos = 0x10,
+		/// <summary>
+		/// All of the above
+		/// </summary>
+		All = (Range | Page | Pos | Trackpos),
 	}
 }

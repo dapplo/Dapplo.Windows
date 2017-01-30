@@ -28,15 +28,18 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Structs
 {
+	/// <summary>
+	/// See <a href="http://pinvoke.net/default.aspx/Structures/SCROLLINFO.html">here</a>
+	/// </summary>
 	[Serializable]
 	[StructLayout(LayoutKind.Sequential)]
 	public struct SCROLLINFO
 	{
-		public int cbSize;
-		public int fMask;
+		public uint cbSize;
+		public uint fMask;
 		public int nMin;
 		public int nMax;
-		public int nPage;
+		public uint nPage;
 		public int nPos;
 		public int nTrackPos;
 	}
