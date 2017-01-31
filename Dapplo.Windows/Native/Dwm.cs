@@ -98,7 +98,7 @@ namespace Dapplo.Windows.Native
 		}
 
 		[DllImport("dwmapi.dll", SetLastError = true)]
-		public static extern int DwmEnableBlurBehindWindow(IntPtr hwnd, ref DWM_BLURBEHIND blurBehind);
+		public static extern int DwmEnableBlurBehindWindow(IntPtr hwnd, ref DwmBlurBehind blurBehind);
 
 		[DllImport("dwmapi.dll", SetLastError = true)]
 		public static extern uint DwmEnableComposition(uint uCompositionAction);
@@ -120,7 +120,7 @@ namespace Dapplo.Windows.Native
 		public static extern int DwmUnregisterThumbnail(IntPtr thumb);
 
 		[DllImport("dwmapi.dll", SetLastError = true)]
-		public static extern int DwmUpdateThumbnailProperties(IntPtr hThumb, ref DWM_THUMBNAIL_PROPERTIES props);
+		public static extern int DwmUpdateThumbnailProperties(IntPtr hThumb, ref DwmThumbnailProperties props);
 
 		public static void EnableComposition()
 		{
@@ -135,7 +135,7 @@ namespace Dapplo.Windows.Native
 		public static bool GetExtendedFrameBounds(IntPtr hWnd, out Rect rectangle)
 		{
 			RECT rect;
-			var result = DwmGetWindowAttribute(hWnd, (int) DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS, out rect, Marshal.SizeOf(typeof(RECT)));
+			var result = DwmGetWindowAttribute(hWnd, (int) DwmWindowAttributes.DWMWA_EXTENDED_FRAME_BOUNDS, out rect, Marshal.SizeOf(typeof(RECT)));
 			if (result >= 0)
 			{
 				rectangle = rect.ToRect();

@@ -21,6 +21,9 @@
 
 namespace Dapplo.Windows.Enums
 {
+	/// <summary>
+	/// All possible windows messages
+	/// </summary>
 	public enum WindowsMessages
 	{
 		WM_NULL = 0x0000,

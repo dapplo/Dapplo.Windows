@@ -67,7 +67,7 @@ namespace Dapplo.Windows.Native
 		public static extern SafeCompatibleDcHandle CreateCompatibleDC(SafeHandle hDC);
 
 		[DllImport("gdi32", SetLastError = true)]
-		public static extern SafeDibSectionHandle CreateDIBSection(SafeHandle hdc, ref BITMAPINFOHEADER bmi, uint Usage, out IntPtr bits, IntPtr hSection, uint dwOffset);
+		public static extern SafeDibSectionHandle CreateDIBSection(SafeHandle hdc, ref BitmapInfoHeader bmi, uint Usage, out IntPtr bits, IntPtr hSection, uint dwOffset);
 
 		[DllImport("gdi32", SetLastError = true)]
 		public static extern SafeRegionHandle CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);

@@ -1,25 +1,29 @@
-﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016 Dapplo
-// 
-//  For more information see: http://dapplo.net/
-//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
-// 
-//  This file is part of Dapplo.Windows
-// 
-//  Dapplo.Windows is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU Lesser General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-// 
-//  Dapplo.Windows is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU Lesser General Public License for more details.
-// 
-//  You should have a copy of the GNU Lesser General Public License
-//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
+﻿#region Dapplo 2016 - GNU Lesser General Public License
 
-#region using
+// Dapplo - building blocks for .NET applications
+// Copyright (C) 2017 Dapplo
+// 
+// For more information see: http://dapplo.net/
+// Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+// This file is part of Dapplo.Windows
+// 
+// Dapplo.Windows is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// Dapplo.Windows is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have a copy of the GNU Lesser General Public License
+// along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
+
+#endregion
+
+#region Usings
 
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Enums;
@@ -29,7 +33,7 @@ using Dapplo.Windows.Enums;
 namespace Dapplo.Windows.Structs
 {
 	[StructLayout(LayoutKind.Explicit)]
-	public struct BITMAPINFOHEADER
+	public struct BitmapInfoHeader
 	{
 		[FieldOffset(0)] public uint biSize;
 
@@ -41,7 +45,7 @@ namespace Dapplo.Windows.Structs
 
 		[FieldOffset(14)] public ushort biBitCount;
 
-		[FieldOffset(16)] public BI_COMPRESSION biCompression;
+		[FieldOffset(16)] public BitmapCompressionMethods biCompression;
 
 		[FieldOffset(20)] public uint biSizeImage;
 
@@ -63,7 +67,7 @@ namespace Dapplo.Windows.Structs
 
 		[FieldOffset(56)] public uint bV5CSType;
 
-		[FieldOffset(60)] public CIEXYZTRIPLE bV5Endpoints;
+		[FieldOffset(60)] public CieXyzTripple bV5Endpoints;
 
 		[FieldOffset(96)] public uint bV5GammaRed;
 
@@ -81,15 +85,15 @@ namespace Dapplo.Windows.Structs
 
 		public const int DIB_RGB_COLORS = 0;
 
-		public BITMAPINFOHEADER(int width, int height, ushort bpp)
+		public BitmapInfoHeader(int width, int height, ushort bpp)
 		{
-			biSize = (uint) Marshal.SizeOf(typeof(BITMAPINFOHEADER)); // BITMAPINFOHEADER < DIBV5 is 40 bytes
+			biSize = (uint) Marshal.SizeOf(typeof(BitmapInfoHeader)); // BITMAPINFOHEADER < DIBV5 is 40 bytes
 			biPlanes = 1; // Should allways be 1
-			biCompression = BI_COMPRESSION.BI_RGB;
+			biCompression = BitmapCompressionMethods.BI_RGB;
 			biWidth = width;
 			biHeight = height;
 			biBitCount = bpp;
-			biSizeImage = (uint) (width*height*(bpp >> 3));
+			biSizeImage = (uint) (width * height * (bpp >> 3));
 			biXPelsPerMeter = 0;
 			biYPelsPerMeter = 0;
 			biClrUsed = 0;
@@ -101,10 +105,10 @@ namespace Dapplo.Windows.Structs
 			bV5BlueMask = 255;
 			bV5AlphaMask = (uint) 255 << 24;
 			bV5CSType = 1934772034; // sRGB
-			bV5Endpoints = new CIEXYZTRIPLE();
-			bV5Endpoints.ciexyzBlue = new CIEXYZ(0);
-			bV5Endpoints.ciexyzGreen = new CIEXYZ(0);
-			bV5Endpoints.ciexyzRed = new CIEXYZ(0);
+			bV5Endpoints = new CieXyzTripple();
+			bV5Endpoints.CieXyzBlue = new CieXyz(0);
+			bV5Endpoints.CieXyzGreen = new CieXyz(0);
+			bV5Endpoints.CieXyzRed = new CieXyz(0);
 			bV5GammaRed = 0;
 			bV5GammaGreen = 0;
 			bV5GammaBlue = 0;
@@ -118,7 +122,7 @@ namespace Dapplo.Windows.Structs
 		{
 			get
 			{
-				var sizeOfBMI = (uint) Marshal.SizeOf(typeof(BITMAPINFOHEADER));
+				var sizeOfBMI = (uint) Marshal.SizeOf(typeof(BitmapInfoHeader));
 				return biSize >= sizeOfBMI;
 			}
 		}
@@ -127,10 +131,10 @@ namespace Dapplo.Windows.Structs
 		{
 			get
 			{
-				if (biCompression == BI_COMPRESSION.BI_BITFIELDS)
+				if (biCompression == BitmapCompressionMethods.BI_BITFIELDS)
 				{
 					// Add 3x4 bytes for the bitfield color mask
-					return biSize + 3*4;
+					return biSize + 3 * 4;
 				}
 				return biSize;
 			}

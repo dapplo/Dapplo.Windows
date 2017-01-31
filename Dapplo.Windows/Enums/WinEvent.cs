@@ -23,9 +23,9 @@ namespace Dapplo.Windows.Enums
 {
 	/// <summary>
 	///     Used for SetWinEventHook
-	///     See MSDN: http://msdn.microsoft.com/en-us/library/windows/desktop/dd318066.aspx
-	///     and http://source.winehq.org/source/include/winuser.h
-	///     and http://msdn.microsoft.com/en-us/library/windows/desktop/dd742691.aspx
+	///     See at <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd318066.aspx">MSDN</a>
+	///     and <a href="http://source.winehq.org/source/include/winuser.h">here</a>
+	///     and <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd742691.aspx">here</a>
 	/// </summary>
 	public enum WinEvent : uint
 	{

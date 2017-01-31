@@ -29,7 +29,7 @@ namespace Dapplo.Windows.Enums
 {
 	/// <summary>
 	///     Used for User32.SetWinEventHook
-	///     See: http://msdn.microsoft.com/en-us/library/windows/desktop/dd373640.aspx
+	///     See <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd373640.aspx">here</a>
 	/// </summary>
 	[Flags]
 	public enum WinEventHookFlags

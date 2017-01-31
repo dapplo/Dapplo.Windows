@@ -21,25 +21,14 @@
 
 namespace Dapplo.Windows.Enums
 {
-	/// <summary>
-	///     List of HookTypes for the
-	/// </summary>
-	public enum HookType
+	public enum GetWindowCommands : uint
 	{
-		WH_JOURNALRECORD = 0,
-		WH_JOURNALPLAYBACK = 1,
-		WH_KEYBOARD = 2,
-		WH_GETMESSAGE = 3,
-		WH_CALLWNDPROC = 4,
-		WH_CBT = 5,
-		WH_SYSMSGFILTER = 6,
-		WH_MOUSE = 7,
-		WH_HARDWARE = 8,
-		WH_DEBUG = 9,
-		WH_SHELL = 10,
-		WH_FOREGROUNDIDLE = 11,
-		WH_CALLWNDPROCRET = 12,
-		WH_KEYBOARD_LL = 13,
-		WH_MOUSE_LL = 14
+		GW_HWNDFIRST = 0,
+		GW_HWNDLAST = 1,
+		GW_HWNDNEXT = 2,
+		GW_HWNDPREV = 3,
+		GW_OWNER = 4,
+		GW_CHILD = 5,
+		GW_ENABLEDPOPUP = 6
 	}
 }

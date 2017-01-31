@@ -1,4 +1,4 @@
-﻿#region Dapplo 2016 - GNU Lesser General Public License
+#region Dapplo 2016 - GNU Lesser General Public License
 
 // Dapplo - building blocks for .NET applications
 // Copyright (C) 2017 Dapplo
@@ -23,25 +23,26 @@
 
 #endregion
 
-#region Usings
-
-using System;
-using System.Runtime.InteropServices;
-
-#endregion
-
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	///     This struct is passed in the WH_MOUSE_LL hook
-	///     See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms644970.aspx
+	///     Scroll-modes for the WindowScroller
 	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct MSLLHOOK
+	public enum ScrollModes
 	{
-		public POINT pt;
-		public IntPtr hwnd;
-		public uint wHitTestCode;
-		public IntPtr dwExtraInfo;
+		/// <summary>
+		///     Send message to the window
+		/// </summary>
+		WindowsMessage,
+
+		/// <summary>
+		///     Send a mousewheel event
+		/// </summary>
+		MouseWheel,
+
+		/// <summary>
+		///     Send page up or down as key press
+		/// </summary>
+		KeyboardPageUpDown
 	}
 }

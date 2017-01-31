@@ -63,34 +63,60 @@ namespace Dapplo.Windows
 		public bool ShowChanges { get; set; } = true;
 
 		/// <summary>
-		///     Returns true if you reached the start
+		/// Specify which scroll mode needs to be used
+		/// </summary>
+		public ScrollModes ScrollMode { get; set; } = ScrollModes.WindowsMessage;
+
+		/// <summary>
+		/// This is used to be able to reset the location, and also detect if we are at the end.
+		/// Some windows might add content when the user is (almost) at the end.
+		/// </summary>
+		public ScrollInfo InitialScrollInfo { get; }
+
+		/// <summary>
+		/// Some windows might add content when the user is (almost) at the end.
+		/// If this is true, the scrolling doesn't go beyond the intial bounds.
+		/// If this is false, the initial value is only used for reset.
+		/// </summary>
+		public bool KeepInitialBounds { get; set; } = true;
+
+		/// <summary>
+		///     Returns true if the scroller is at the start
 		/// </summary>
 		/// <returns>bool</returns>
 		public bool IsAtStart
 		{
 			get
 			{
-				SCROLLINFO scrollInfo;
+				ScrollInfo scrollInfo;
 				if (!GetPosition(out scrollInfo))
 				{
 					return false;
+				}
+				if (KeepInitialBounds)
+				{
+					return InitialScrollInfo.nMin >= Math.Max(scrollInfo.nPos, scrollInfo.nTrackPos);
 				}
 				return scrollInfo.nMin >= Math.Max(scrollInfo.nPos, scrollInfo.nTrackPos);
 			}
 		}
 
 		/// <summary>
-		///     Returns true if you reached the end
+		///     Returns true if the scroller is at the end
 		/// </summary>
 		/// <returns>bool</returns>
 		public bool IsAtEnd
 		{
 			get
 			{
-				SCROLLINFO scrollInfo;
+				ScrollInfo scrollInfo;
 				if (!GetPosition(out scrollInfo))
 				{
 					return false;
+				}
+				if (KeepInitialBounds)
+				{
+					return InitialScrollInfo.nMax <= Math.Max(scrollInfo.nPos, scrollInfo.nTrackPos) + scrollInfo.nPage - 1;
 				}
 				return scrollInfo.nMax <= Math.Max(scrollInfo.nPos, scrollInfo.nTrackPos) + scrollInfo.nPage - 1;
 			}
@@ -105,12 +131,12 @@ namespace Dapplo.Windows
 		public static async Task<WindowScroller> CreateAsync(WindowInfo windowToScroll, ScrollBarDirection direction = ScrollBarDirection.Vertical)
 		{
 			var scrollingArea = windowToScroll;
-			var scrollInfo = new SCROLLINFO(ScrollInfoMask.All);
-			if (!User32.GetScrollInfo(windowToScroll.Handle, direction, ref scrollInfo))
+			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
+			if (!User32.GetScrollInfo(windowToScroll.Handle, direction, ref initialScrollInfo))
 			{
 				scrollingArea =
 					await WindowsEnumerator.EnumerateWindowsAsync(windowToScroll.Handle)
-						.Where(childWindow => User32.GetScrollInfo(childWindow.Handle, direction, ref scrollInfo))
+						.Where(childWindow => User32.GetScrollInfo(childWindow.Handle, direction, ref initialScrollInfo))
 						.FirstOrDefaultAsync();
 				if (scrollingArea == null)
 				{
@@ -121,7 +147,8 @@ namespace Dapplo.Windows
 			{
 				WindowToScroll = windowToScroll,
 				ScrollingArea = scrollingArea,
-				Direction = direction
+				Direction = direction,
+
 			};
 			return windowScroller;
 		}
@@ -130,9 +157,9 @@ namespace Dapplo.Windows
 		/// Get position
 		/// </summary>
 		/// <returns>SCROLLINFO</returns>
-		private bool GetPosition(out SCROLLINFO scrollInfo)
+		private bool GetPosition(out ScrollInfo scrollInfo)
 		{
-			scrollInfo = new SCROLLINFO(ScrollInfoMask.All);
+			scrollInfo = new ScrollInfo(ScrollInfoMask.All);
 
 			return User32.GetScrollInfo(ScrollingArea.Handle, Direction, ref scrollInfo);
 		}
@@ -142,7 +169,7 @@ namespace Dapplo.Windows
 		/// </summary>
 		/// <param name="scrollInfo">SCROLLINFO ref</param>
 		/// <returns>bool</returns>
-		private bool ApplyPosition(ref SCROLLINFO scrollInfo)
+		private bool ApplyPosition(ref ScrollInfo scrollInfo)
 		{
 			if (ShowChanges)
 			{
@@ -161,7 +188,12 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool Start()
 		{
-			SCROLLINFO scrollInfo;
+			// Only in this mode we can move to the start
+			if (ScrollMode != ScrollModes.WindowsMessage)
+			{
+				return false;
+			}
+			ScrollInfo scrollInfo;
 			if (!GetPosition(out scrollInfo))
 			{
 				return false;
@@ -176,7 +208,12 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool End()
 		{
-			SCROLLINFO scrollInfo;
+			// Only in this mode we can move to the end
+			if (ScrollMode != ScrollModes.WindowsMessage)
+			{
+				return false;
+			}
+			ScrollInfo scrollInfo;
 			if (!GetPosition(out scrollInfo))
 			{
 				return false;
@@ -192,15 +229,27 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool Previous()
 		{
-			SCROLLINFO scrollInfo;
-			if (!GetPosition(out scrollInfo))
+
+			switch (ScrollMode)
 			{
-				return false;
+				case ScrollModes.KeyboardPageUpDown:
+					// TODO: Send page up / down
+					break;
+				case ScrollModes.WindowsMessage:
+					// Calculate previous position
+					ScrollInfo scrollInfo;
+					if (!GetPosition(out scrollInfo))
+					{
+						return false;
+					}
+					scrollInfo.nPos = Math.Max(scrollInfo.nMin, scrollInfo.nPos - (int)scrollInfo.nPage);
+					return ApplyPosition(ref scrollInfo);
+				case ScrollModes.MouseWheel:
+					// TODO: Send mousewheel
+					break;
 			}
 
-			// Calculate previous position
-			scrollInfo.nPos = Math.Max(scrollInfo.nMin, scrollInfo.nPos - (int) scrollInfo.nPage);
-			return ApplyPosition(ref scrollInfo);
+			return true;
 		}
 
 		/// <summary>
@@ -209,15 +258,36 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool Next()
 		{
-			SCROLLINFO scrollInfo;
-			if (!GetPosition(out scrollInfo))
+			switch (ScrollMode)
 			{
-				return false;
-			}
+				case ScrollModes.KeyboardPageUpDown:
+					// TODO: Send page up / down
+					break;
+				case ScrollModes.WindowsMessage:
+					ScrollInfo scrollInfo;
+					if (!GetPosition(out scrollInfo))
+					{
+						return false;
+					}
 
-			// Calculate next position
-			scrollInfo.nPos = Math.Min(scrollInfo.nMax, scrollInfo.nPos + (int) scrollInfo.nPage);
-			return ApplyPosition(ref scrollInfo);
+					// Calculate next position
+					scrollInfo.nPos = Math.Min(scrollInfo.nMax, scrollInfo.nPos + (int)scrollInfo.nPage);
+					return ApplyPosition(ref scrollInfo);
+				case ScrollModes.MouseWheel:
+					// TODO: Send mousewheel
+					break;
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// Set the position back to the original
+		/// </summary>
+		/// <returns>true if this worked</returns>
+		public bool Reset()
+		{
+			ScrollInfo initialScrollInfo = InitialScrollInfo;
+			return ApplyPosition(ref initialScrollInfo);
 		}
 	}
 }

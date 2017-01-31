@@ -28,7 +28,7 @@ using System;
 namespace Dapplo.Windows.Enums
 {
 	[Flags]
-	public enum DWM_BB
+	public enum DwmBlurBehindFlags
 	{
 		Enable = 1,
 		BlurRegion = 2,

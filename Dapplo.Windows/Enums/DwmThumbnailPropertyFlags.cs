@@ -19,15 +19,26 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#region using
+
+using System;
+
+#endregion
+
 namespace Dapplo.Windows.Enums
 {
-	public enum BI_COMPRESSION : uint
+	[Flags]
+	public enum DwmThumbnailPropertyFlags
 	{
-		BI_RGB = 0, // Uncompressed
-		BI_RLE8 = 1, // RLE 8BPP
-		BI_RLE4 = 2, // RLE 4BPP
-		BI_BITFIELDS = 3, // Specifies that the bitmap is not compressed and that the color table consists of three DWORD color masks that specify the red, green, and blue components, respectively, of each pixel. This is valid when used with 16- and 32-bpp bitmaps.
-		BI_JPEG = 4, // Indicates that the image is a JPEG image.
-		BI_PNG = 5 // Indicates that the image is a PNG image.
+		// A value for the rcDestination member has been specified.
+		DWM_TNP_RECTDESTINATION = 0x00000001,
+		// A value for the rcSource member has been specified.
+		DWM_TNP_RECTSOURCE = 0x00000002,
+		// A value for the opacity member has been specified.
+		DWM_TNP_OPACITY = 0x00000004,
+		// A value for the fVisible member has been specfied.
+		DWM_TNP_VISIBLE = 0x00000008,
+		// A value for the fSourceClientAreaOnly member has been specified.
+		DWM_TNP_SOURCECLIENTAREAONLY = 0x00000010
 	}
 }

@@ -80,7 +80,7 @@ namespace Dapplo.Windows
 		/// <param name="hookType">Specify your HookType</param>
 		/// <param name="callback">The callback that is called</param>
 		/// <returns>IntPtr for the internalHook, so it can be unhooked again</returns>
-		public static IntPtr BasicHook(HookType hookType, BasicHookDelegate callback)
+		public static IntPtr BasicHook(HookTypes hookType, BasicHookDelegate callback)
 		{
 			InternalHookDelegate internalHook = delegate(int nCode, IntPtr wParam, IntPtr lParam)
 			{
@@ -140,7 +140,7 @@ namespace Dapplo.Windows
 			};
 
 			// Trap the reference, otherwise it will be removed by the GC
-			var hookId = SetHook(HookType.WH_KEYBOARD_LL, internalHook);
+			var hookId = SetHook(HookTypes.WH_KEYBOARD_LL, internalHook);
 			Hooks.Add(hookId, internalHook);
 			return hookId;
 		}
@@ -185,7 +185,7 @@ namespace Dapplo.Windows
 			};
 
 			// Trap the reference, otherwise it will be removed by the GC
-			var hookId = SetHook(HookType.WH_MOUSE_LL, internalHook);
+			var hookId = SetHook(HookTypes.WH_MOUSE_LL, internalHook);
 			Hooks.Add(hookId, internalHook);
 			return hookId;
 		}
@@ -196,7 +196,7 @@ namespace Dapplo.Windows
 		/// <param name="hookType">HookType</param>
 		/// <param name="callback">BasicHookDelegate</param>
 		/// <returns>IntPtr for the internalHook, so it can be unhooked again</returns>
-		private static IntPtr SetHook(HookType hookType, InternalHookDelegate callback)
+		private static IntPtr SetHook(HookTypes hookType, InternalHookDelegate callback)
 		{
 			using (var curProcess = Process.GetCurrentProcess())
 			using (var curModule = curProcess.MainModule)
@@ -242,7 +242,7 @@ namespace Dapplo.Windows
 		#region DllImports
 
 		[DllImport("user32.dll")]
-		private static extern IntPtr SetWindowsHookEx(HookType hookType, InternalHookDelegate callback, IntPtr hInstance, uint threadId);
+		private static extern IntPtr SetWindowsHookEx(HookTypes hookType, InternalHookDelegate callback, IntPtr hInstance, uint threadId);
 
 		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]

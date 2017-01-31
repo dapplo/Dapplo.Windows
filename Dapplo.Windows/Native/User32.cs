@@ -334,6 +334,12 @@ namespace Dapplo.Windows.Native
 
 		#region Native imports
 
+		/// <summary>
+		/// Synthesizes keystrokes, mouse motions, and button clicks.
+		/// </summary>
+		[DllImport("user32", SetLastError = true)]
+		public static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] Input[] inputs, int cbSize);
+
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool IsWindowVisible(IntPtr hWnd);
@@ -348,10 +354,10 @@ namespace Dapplo.Windows.Native
 		public static extern int SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
 		[DllImport("user32", SetLastError = true)]
-		public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommand uCmd);
+		public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommands uCmd);
 
 		[DllImport("user32", SetLastError = true)]
-		public static extern int ShowWindow(IntPtr hWnd, ShowWindowCommand nCmdShow);
+		public static extern int ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);
 
 		[DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
 		public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int cch);
@@ -505,23 +511,23 @@ namespace Dapplo.Windows.Native
 		/// </summary>
 		/// <param name="hwnd">IntPtr with the window handle</param>
 		/// <param name="direction">ScrollBarDirection</param>
-		/// <param name="scrollinfo">SCROLLINFO ref</param>
+		/// <param name="scrollInfo">SCROLLINFO ref</param>
 		/// <returns>bool if it worked</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool GetScrollInfo(IntPtr hwnd, ScrollBarDirection direction, ref SCROLLINFO scrollinfo);
+		public static extern bool GetScrollInfo(IntPtr hwnd, ScrollBarDirection direction, ref ScrollInfo scrollInfo);
 
 		/// <summary>
 		/// See <a href="http://pinvoke.net/default.aspx/user32/SetScrollInfo.html">here</a> for more information.
 		/// </summary>
 		/// <param name="hwnd">IntPtr with the window handle</param>
 		/// <param name="direction">ScrollBarDirection</param>
-		/// <param name="scrollinfo">SCROLLINFO</param>
+		/// <param name="scrollInfo">SCROLLINFO</param>
 		/// <param name="redraw">bool to specify if a redraw should be made</param>
 		/// <returns>bool if it worked</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool SetScrollInfo(IntPtr hwnd, ScrollBarDirection direction, ref SCROLLINFO scrollinfo, bool redraw);
+		public static extern bool SetScrollInfo(IntPtr hwnd, ScrollBarDirection direction, ref ScrollInfo scrollInfo, bool redraw);
 
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
@@ -531,7 +537,7 @@ namespace Dapplo.Windows.Native
 		public static extern int SetScrollPos(IntPtr hWnd, Orientation nBar, int nPos, [MarshalAs(UnmanagedType.Bool)] bool bRedraw);
 
 		[DllImport("user32", SetLastError = true)]
-		public static extern RegionResult GetWindowRgn(IntPtr hWnd, SafeHandle hRgn);
+		public static extern RegionResults GetWindowRgn(IntPtr hWnd, SafeHandle hRgn);
 
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
@@ -602,7 +608,7 @@ namespace Dapplo.Windows.Native
 
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool GetCursorInfo(out CURSORINFO cursorInfo);
+		public static extern bool GetCursorInfo(out CursorInfo cursorInfo);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern bool GetIconInfo(SafeIconHandle iconHandle, out IconInfo iconInfo);

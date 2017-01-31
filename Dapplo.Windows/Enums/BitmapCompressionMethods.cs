@@ -21,11 +21,13 @@
 
 namespace Dapplo.Windows.Enums
 {
-	public enum RegionResult
+	public enum BitmapCompressionMethods : uint
 	{
-		REGION_ERROR = 0,
-		REGION_NULLREGION = 1,
-		REGION_SIMPLEREGION = 2,
-		REGION_COMPLEXREGION = 3
+		BI_RGB = 0, // Uncompressed
+		BI_RLE8 = 1, // RLE 8BPP
+		BI_RLE4 = 2, // RLE 4BPP
+		BI_BITFIELDS = 3, // Specifies that the bitmap is not compressed and that the color table consists of three DWORD color masks that specify the red, green, and blue components, respectively, of each pixel. This is valid when used with 16- and 32-bpp bitmaps.
+		BI_JPEG = 4, // Indicates that the image is a JPEG image.
+		BI_PNG = 5 // Indicates that the image is a PNG image.
 	}
 }

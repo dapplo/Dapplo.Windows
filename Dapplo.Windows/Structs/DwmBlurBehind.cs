@@ -27,65 +27,18 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Windows;
+using Dapplo.Windows.Enums;
 
 #endregion
 
 namespace Dapplo.Windows.Structs
 {
 	[StructLayout(LayoutKind.Sequential)]
-	[Serializable]
-	public struct POINT
+	public struct DwmBlurBehind
 	{
-		public int X;
-		public int Y;
-
-		public POINT(int x, int y)
-		{
-			X = x;
-			Y = y;
-		}
-
-		public POINT(Point point)
-		{
-			X = (int) point.X;
-			Y = (int) point.Y;
-		}
-
-		public POINT(System.Drawing.Point point)
-		{
-			X = point.X;
-			Y = point.Y;
-		}
-
-		public static implicit operator Point(POINT p)
-		{
-			return new Point(p.X, p.Y);
-		}
-
-		public static implicit operator System.Drawing.Point(POINT p)
-		{
-			return new System.Drawing.Point(p.X, p.Y);
-		}
-
-		public static implicit operator POINT(Point p)
-		{
-			return new POINT((int) p.X, (int) p.Y);
-		}
-
-		public Point ToPoint()
-		{
-			return new Point(X, Y);
-		}
-
-		public System.Drawing.Point ToSystemDrawingPoint()
-		{
-			return new System.Drawing.Point(X, Y);
-		}
-
-		public override string ToString()
-		{
-			return X + "," + Y;
-		}
+		public DwmBlurBehindFlags dwFlags;
+		public bool fEnable;
+		public IntPtr hRgnBlur;
+		public bool fTransitionOnMaximized;
 	}
 }
