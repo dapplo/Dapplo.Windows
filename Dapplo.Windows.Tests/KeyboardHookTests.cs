@@ -28,6 +28,7 @@ using Dapplo.Log.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 using System.Windows.Forms;
+using Dapplo.Windows.Reactive;
 
 #endregion
 

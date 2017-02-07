@@ -22,8 +22,7 @@
 #region using
 
 using System.Diagnostics;
-using System.IO;
-using System.Reactive.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
@@ -39,8 +38,6 @@ namespace Dapplo.Windows.Tests
 {
 	public class ScrollingTests
 	{
-		private static readonly LogSource Log = new LogSource();
-
 		public ScrollingTests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
@@ -61,39 +58,46 @@ namespace Dapplo.Windows.Tests
 				// Wait until the process started it's message pump (listening for input)
 				process.WaitForInputIdle();
 
-				// Find the belonging window, by the process id
-				var notepadWindow = await WindowsEnumerator.EnumerateWindowsAsync().Where(info =>
+				try
 				{
-					int processId;
-					User32.GetWindowThreadProcessId(info.Handle, out processId);
-					return processId == process.Id;
-				}).FirstOrDefaultAsync();
-				Assert.NotNull(notepadWindow);
 
-				// Create a WindowScroller
-				var scroller = await WindowScroller.CreateAsync(notepadWindow);
-				Assert.NotNull(scroller);
-				scroller.ScrollMode = ScrollModes.MouseWheel;
-				// Move the window to the start
-				scroller.Start();
-				// A delay to make the window move
-				await Task.Delay(100);
+					// Find the belonging window, by the process id
+					var notepadWindow = WindowsEnumerator.EnumerateWindows().FirstOrDefault(info =>
+					{
+						int processId;
+						User32.GetWindowThreadProcessId(info.Handle, out processId);
+						return processId == process.Id;
+					});
+					Assert.NotNull(notepadWindow);
 
-				// Check if it did move to the start
-				Assert.True(scroller.IsAtStart);
+					// Create a WindowScroller
+					var scroller = WindowScroller.Create(notepadWindow);
+					Assert.NotNull(scroller);
+					scroller.ScrollMode = ScrollModes.MouseWheel;
+					// Move the window to the start
+					scroller.Start();
+					// A delay to make the window move
+					await Task.Delay(100);
 
-				// Loop
-				do
+					// Check if it did move to the start
+					Assert.True(scroller.IsAtStart);
+
+					// Loop
+					do
+					{
+						// Next "page"
+						scroller.Next();
+						// Wait a bit, so the window can update
+						await Task.Delay(300);
+						// Loop as long as we are not at the end yet
+					} while (!scroller.IsAtEnd);
+				}
+				finally
 				{
-					// Next "page"
-					scroller.Next();
-					// Wait a bit, so the window can update
-					await Task.Delay(1000*5);
-					// Loop as long as we are not at the end yet
-				} while (!scroller.IsAtEnd);
+					// Kill the process
+					process.Kill();
+				}
 
-				// Kill the process
-				//process.Kill();
 			}
 		}
 	}

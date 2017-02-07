@@ -27,7 +27,7 @@ using System.Windows.Forms;
 
 #endregion
 
-namespace Dapplo.Windows
+namespace Dapplo.Windows.Reactive
 {
 	/// <summary>
 	///     Information on keyboard changes

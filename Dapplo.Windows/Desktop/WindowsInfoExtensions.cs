@@ -84,6 +84,21 @@ namespace Dapplo.Windows.Desktop
 			User32.SetWindowLongWrapper(windowInfo.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint) value));
 		}
 
+		/// <summary>
+		/// Get the process which the specified window belongs to, the value is cached into the ProcessId of the WindowInfo
+		/// </summary>
+		/// <param name="windowInfo">WindowInfo</param>
+		/// <returns>int with process Id</returns>
+		public static int GetProcessId(this WindowInfo windowInfo)
+		{
+			int processId = windowInfo.ProcessId;
+			if (processId == 0)
+			{
+				User32.GetWindowThreadProcessId(windowInfo.Handle, out processId);
+				windowInfo.ProcessId = processId;
+			}
+			return processId;
+		}
 
 	}
 }

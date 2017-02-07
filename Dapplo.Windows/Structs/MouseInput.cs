@@ -27,6 +27,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Windows;
 using Dapplo.Windows.Enums;
 
 #endregion
@@ -98,6 +99,57 @@ namespace Dapplo.Windows.Structs
 			{
 				MouseData = wheelDelta,
 				MouseEventFlags = MouseEventFlags.Wheel
+			};
+		}
+
+		/// <summary>
+		/// Create a MouseInput struct for a left mouse click
+		/// </summary>
+		/// <param name="location">Where is the click located</param>
+		/// <param name="released">true if the mouse button is released</param>
+		/// <param name="timestamp">The time stamp for the event</param>
+		/// <returns>MouseInput</returns>
+		public static MouseInput MouseLeftClick(Point location, bool released = false, int timestamp = 0)
+		{
+			return new MouseInput
+			{
+				dx = (int)location.X,
+				dy = (int)location.Y,
+				MouseEventFlags = MouseEventFlags.Absolute | (released ? MouseEventFlags.LeftUp : MouseEventFlags.LeftDown)
+			};
+		}
+
+		/// <summary>
+		/// Create a MouseInput struct for a right mouse click
+		/// </summary>
+		/// <param name="location">Where is the click located</param>
+		/// <param name="released">true if the mouse button is released</param>
+		/// <param name="timestamp">The time stamp for the event</param>
+		/// <returns>MouseInput</returns>
+		public static MouseInput MouseRightClick(Point location, bool released = false, int timestamp = 0)
+		{
+			return new MouseInput
+			{
+				dx = (int)location.X,
+				dy = (int)location.Y,
+				MouseEventFlags = MouseEventFlags.Absolute | (released ? MouseEventFlags.RightUp : MouseEventFlags.RightDown)
+			};
+		}
+
+		/// <summary>
+		/// Create a MouseInput struct for a middle mouse click
+		/// </summary>
+		/// <param name="location">Where is the click located</param>
+		/// <param name="released">true if the mouse button is released</param>
+		/// <param name="timestamp">The time stamp for the event</param>
+		/// <returns>MouseInput</returns>
+		public static MouseInput MouseMiddleClick(Point location, bool released = false, int timestamp = 0)
+		{
+			return new MouseInput
+			{
+				dx = (int)location.X,
+				dy = (int)location.Y,
+				MouseEventFlags = MouseEventFlags.Absolute | (released ? MouseEventFlags.MiddleUp : MouseEventFlags.MiddleDown)
 			};
 		}
 	}

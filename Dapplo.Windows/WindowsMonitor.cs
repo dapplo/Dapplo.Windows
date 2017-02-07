@@ -159,9 +159,9 @@ namespace Dapplo.Windows
 		/// <param name="idChild"></param>
 		/// <param name="dwEventThread"></param>
 		/// <param name="dwmsEventTime"></param>
-		private void WinEventHandler(WinEvent eventType, IntPtr hWnd, EventObjects idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+		private void WinEventHandler(WinEvent eventType, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
 		{
-			if ((hWnd == IntPtr.Zero) || ((idObject != EventObjects.OBJID_WINDOW) && (idObject != EventObjects.OBJID_CLIENT)))
+			if ((hWnd == IntPtr.Zero) || ((idObject != ObjectIdentifiers.Window) && (idObject != ObjectIdentifiers.Client)))
 			{
 				//if (idObject != EventObjects.OBJID_CARET && idObject != EventObjects.OBJID_CURSOR) {
 				//	LOG.InfoFormat("Unhandled eventType: {0}, hWnd {1}, idObject {2}, idChild {3}, dwEventThread {4}, dwmsEventTime {5}", eventType, hWnd, idObject, idChild, dwEventThread, dwmsEventTime);

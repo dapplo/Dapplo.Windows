@@ -45,7 +45,7 @@ namespace Dapplo.Windows
 		/// <param name="idChild"></param>
 		/// <param name="dwEventThread"></param>
 		/// <param name="dwmsEventTime"></param>
-		public delegate void WinEventHandler(WinEvent eventType, IntPtr hwnd, EventObjects idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
+		public delegate void WinEventHandler(WinEvent eventType, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
 
 		private readonly WinEventDelegate _winEventHandler;
 
@@ -93,7 +93,7 @@ namespace Dapplo.Windows
 		/// <param name="winEventHandler"></param>
 		public bool Hook(WinEvent winEventStart, WinEvent winEventEnd, WinEventHandler winEventHandler)
 		{
-			var hookPtr = SetWinEventHook(winEventStart, winEventEnd, IntPtr.Zero, _winEventHandler, 0, 0, WinEventHookFlags.WINEVENT_SKIPOWNPROCESS | WinEventHookFlags.WINEVENT_OUTOFCONTEXT);
+			var hookPtr = SetWinEventHook(winEventStart, winEventEnd, IntPtr.Zero, _winEventHandler, 0, 0, WinEventHookFlags.SkipOwnProcess | WinEventHookFlags.OutOfContext);
 			if (hookPtr.ToInt64() != 0)
 			{
 				_winEventHandlers.Add(hookPtr, winEventHandler);
@@ -128,7 +128,7 @@ namespace Dapplo.Windows
 		/// <param name="idChild"></param>
 		/// <param name="dwEventThread"></param>
 		/// <param name="dwmsEventTime"></param>
-		private void WinEventDelegateHandler(IntPtr hWinEventHook, WinEvent eventType, IntPtr hWnd, EventObjects idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+		private void WinEventDelegateHandler(IntPtr hWinEventHook, WinEvent eventType, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
 		{
 			WinEventHandler handler;
 			if (_winEventHandlers.TryGetValue(hWinEventHook, out handler))
@@ -155,7 +155,7 @@ namespace Dapplo.Windows
 		/// <param name="idChild"></param>
 		/// <param name="dwEventThread"></param>
 		/// <param name="dwmsEventTime"></param>
-		private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvent eventType, IntPtr hwnd, EventObjects idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
+		private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvent eventType, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
 
 		#endregion
 	}

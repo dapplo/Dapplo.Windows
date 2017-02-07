@@ -76,11 +76,11 @@ namespace Dapplo.Windows.Desktop
 		}
 
 		/// <summary>
-		///     Enumerate the windows / child windows (currrently this is NOT lazy)
+		///     Enumerate the windows / child windows (this is NOT lazy)
 		/// </summary>
 		/// <param name="hWndParent">IntPtr with the hwnd of the parent, or null for all</param>
 		/// <param name="wherePredicate">Func for the where</param>
-		/// <param name="takeWhileFunc"></param>
+		/// <param name="takeWhileFunc">Func which can decide to stop enumerating</param>
 		/// <returns>IEnumerable with WindowInfo</returns>
 		public static IEnumerable<WindowInfo> EnumerateWindows(IntPtr? hWndParent = null, Func<WindowInfo, bool> wherePredicate = null, Func<WindowInfo,bool> takeWhileFunc = null)
 		{

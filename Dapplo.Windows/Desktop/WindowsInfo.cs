@@ -86,6 +86,11 @@ namespace Dapplo.Windows.Desktop
 		public bool IsMinimized { get; set; }
 
 		/// <summary>
+		/// Get the process ID this window belongs to
+		/// </summary>
+		public int ProcessId { get; set; }
+
+		/// <summary>
 		/// Create a WindowInfo for the supplied handle
 		/// </summary>
 		/// <param name="handle">IntPtr</param>

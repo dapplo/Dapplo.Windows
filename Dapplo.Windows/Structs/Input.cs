@@ -49,7 +49,6 @@ namespace Dapplo.Windows.Structs
 		/// </summary>
 		public InputUnion InputUnion;
 
-
 		/// <summary>
 		/// A factory method to simplify creating mouse input
 		/// </summary>

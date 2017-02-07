@@ -31,7 +31,7 @@ using Dapplo.Log;
 
 #endregion
 
-namespace Dapplo.Windows
+namespace Dapplo.Windows.Reactive
 {
 	/// <summary>
 	///     A glocal keyboard hook, using System.Reactive

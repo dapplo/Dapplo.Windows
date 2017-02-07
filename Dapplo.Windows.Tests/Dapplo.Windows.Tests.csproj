@@ -39,6 +39,10 @@
       <HintPath>..\packages\Dapplo.Log.1.0.23\lib\net45\Dapplo.Log.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Dapplo.Log.Loggers, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Log.Loggers.1.0.23\lib\net45\Dapplo.Log.Loggers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Dapplo.Log.XUnit, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapplo.Log.XUnit.1.0.23\lib\net45\Dapplo.Log.XUnit.dll</HintPath>
       <Private>True</Private>
@@ -88,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DisplayTest.cs" />
+    <Compile Include="WinEventHookTests.cs" />
     <Compile Include="InputTests.cs" />
     <Compile Include="ScrollingTests.cs" />
     <Compile Include="WindowsEnumeratorTests.cs" />

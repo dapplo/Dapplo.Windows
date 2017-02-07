@@ -104,8 +104,8 @@
     <Compile Include="Enums\WindowPlacementFlags.cs" />
     <Compile Include="Enums\WindowStyleFlags.cs" />
     <Compile Include="Hotkey.cs" />
-    <Compile Include="KeyboardHook.cs" />
-    <Compile Include="KeyboardHookEventArgs.cs" />
+    <Compile Include="Reactive\KeyboardHook.cs" />
+    <Compile Include="Reactive\KeyboardHookEventArgs.cs" />
     <Compile Include="Native\Gdi32.cs" />
     <Compile Include="Native\GdiExtensions.cs" />
     <Compile Include="Native\Gdiplus.cs" />
@@ -138,7 +138,7 @@
     <Compile Include="Enums\ClassLongIndex.cs" />
     <Compile Include="Native\Dwm.cs" />
     <Compile Include="Structs\DwmThumbnailProperties.cs" />
-    <Compile Include="Enums\EventObjects.cs" />
+    <Compile Include="Enums\ObjectIdentifiers.cs" />
     <Compile Include="Enums\HookTypes.cs" />
     <Compile Include="Structs\IconInfo.cs" />
     <Compile Include="Structs\MonitorInfoEx.cs" />
@@ -159,10 +159,11 @@
     <Compile Include="Enums\WinEvent.cs" />
     <Compile Include="Enums\WinEventHookFlags.cs" />
     <Compile Include="Structs\WindowPlacement.cs" />
+    <Compile Include="Structs\WinEventInfo.cs" />
     <Compile Include="TitleChangeEventArgs.cs" />
     <Compile Include="TitleChangeEventDelegate.cs" />
     <Compile Include="WindowScroller.cs" />
-    <Compile Include="WindowsTitleMonitor.cs" />
+    <Compile Include="Reactive\WinEventHook.cs" />
     <Compile Include="WindowsMonitor.cs" />
     <Compile Include="WindowsEventHook.cs" />
     <Compile Include="WindowsHook.cs" />

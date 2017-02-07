@@ -26,6 +26,7 @@
 #region Usings
 
 using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Windows.Desktop;
@@ -152,28 +153,57 @@ namespace Dapplo.Windows
 		}
 
 		/// <summary>
-		///     Factory for the WindowScroller
+		///     Factory to create the WindowScroller async
 		/// </summary>
 		/// <param name="windowToScroll">WindowInfo is the window to scroll or contains an area which can be scrolled</param>
 		/// <param name="direction">ScrollBarDirection vertical is the default</param>
-		/// <returns>WindowScroller</returns>
+		/// <returns>Task with WindowScroller</returns>
 		public static async Task<WindowScroller> CreateAsync(WindowInfo windowToScroll, ScrollBarDirection direction = ScrollBarDirection.Vertical)
 		{
 			var scrollingArea = windowToScroll;
 			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
 			if (!User32.GetScrollInfo(windowToScroll.Handle, direction, ref initialScrollInfo))
 			{
-				scrollingArea =
-					await WindowsEnumerator.EnumerateWindowsAsync(windowToScroll.Handle)
-						.Where(childWindow => User32.GetScrollInfo(childWindow.Handle, direction, ref initialScrollInfo))
-						.FirstOrDefaultAsync();
+				scrollingArea = await WindowsEnumerator
+					.EnumerateWindowsAsync(windowToScroll.Handle)
+					.FirstOrDefaultAsync(childWindow => User32.GetScrollInfo(childWindow.Handle, direction, ref initialScrollInfo));
 				if (scrollingArea == null)
 				{
 					return null;
 				}
 			}
 
+			var windowScroller = new WindowScroller
+			{
+				WindowToScroll = windowToScroll,
+				ScrollingArea = scrollingArea,
+				Direction = direction,
+				InitialScrollInfo = initialScrollInfo,
+				WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
+			};
+			return windowScroller;
+		}
 
+		/// <summary>
+		///     Factory to create the WindowScroller
+		/// </summary>
+		/// <param name="windowToScroll">WindowInfo is the window to scroll or contains an area which can be scrolled</param>
+		/// <param name="direction">ScrollBarDirection vertical is the default</param>
+		/// <returns>WindowScroller</returns>
+		public static WindowScroller Create(WindowInfo windowToScroll, ScrollBarDirection direction = ScrollBarDirection.Vertical)
+		{
+			var scrollingArea = windowToScroll;
+			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
+			if (!User32.GetScrollInfo(windowToScroll.Handle, direction, ref initialScrollInfo))
+			{
+				scrollingArea = WindowsEnumerator
+						.EnumerateWindows(windowToScroll.Handle)
+						.FirstOrDefault(childWindow => User32.GetScrollInfo(childWindow.Handle, direction, ref initialScrollInfo));
+				if (scrollingArea == null)
+				{
+					return null;
+				}
+			}
 
 			var windowScroller = new WindowScroller
 			{
