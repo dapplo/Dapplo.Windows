@@ -22,7 +22,6 @@
 #region using
 
 using System.Diagnostics;
-using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
@@ -32,36 +31,37 @@ using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
+using Dapplo.Windows.Structs;
 
 #endregion
 
 namespace Dapplo.Windows.Tests
 {
-	public class ScrollingTests
+	public class InputTests
 	{
 		private static readonly LogSource Log = new LogSource();
 
-		public ScrollingTests(ITestOutputHelper testOutputHelper)
+		public InputTests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
 		}
 
 		/// <summary>
-		/// Test scrolling a window
+		/// Test typing in a notepad
 		/// </summary>
 		/// <returns></returns>
-		[StaFact]
-		private async Task TestScrollingAsync()
+		[Fact]
+		private async Task TestInput()
 		{
 			// Start a process to test against
-			using (var process = Process.Start("notepad.exe", "C:\\Windows\\setupact.log"))
+			using (var process = Process.Start("notepad.exe"))
 			{
 				// Make sure it's started
 				Assert.NotNull(process);
 				// Wait until the process started it's message pump (listening for input)
 				process.WaitForInputIdle();
 
-				// Find the belonging window, by the process id
+				// Find the belonging window
 				var notepadWindow = await WindowsEnumerator.EnumerateWindowsAsync().Where(info =>
 				{
 					int processId;
@@ -70,30 +70,13 @@ namespace Dapplo.Windows.Tests
 				}).FirstOrDefaultAsync();
 				Assert.NotNull(notepadWindow);
 
-				// Create a WindowScroller
-				var scroller = await WindowScroller.CreateAsync(notepadWindow);
-				Assert.NotNull(scroller);
-				scroller.ScrollMode = ScrollModes.MouseWheel;
-				// Move the window to the start
-				scroller.Start();
-				// A delay to make the window move
-				await Task.Delay(100);
-
-				// Check if it did move to the start
-				Assert.True(scroller.IsAtStart);
-
-				// Loop
-				do
-				{
-					// Next "page"
-					scroller.Next();
-					// Wait a bit, so the window can update
-					await Task.Delay(1000*5);
-					// Loop as long as we are not at the end yet
-				} while (!scroller.IsAtEnd);
+				// Send input
+				var sentInputs = User32.SendInput(Input.CreateKeyPresses(VirtualKeyCodes.KEY_R, VirtualKeyCodes.KEY_O, VirtualKeyCodes.KEY_B, VirtualKeyCodes.KEY_I, VirtualKeyCodes.KEY_N));
+				// Test if we indead sent 10 inputs (5 x down & up)
+				Assert.Equal((uint)10, sentInputs);
 
 				// Kill the process
-				//process.Kill();
+				process.Kill();
 			}
 		}
 	}

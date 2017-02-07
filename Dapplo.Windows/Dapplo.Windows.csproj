@@ -72,6 +72,7 @@
     <Compile Include="Desktop\WindowsInfo.cs" />
     <Compile Include="Desktop\WindowsInfoExtensions.cs" />
     <Compile Include="Enums\BitmapCompressionMethods.cs" />
+    <Compile Include="Enums\MonitorFromRectFlags.cs" />
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
     <Compile Include="Structs\HardwareInput.cs" />
     <Compile Include="Structs\Input.cs" />

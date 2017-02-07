@@ -26,6 +26,7 @@
 #region Usings
 
 using System.Runtime.InteropServices;
+using Dapplo.Windows.Enums;
 
 #endregion
 
@@ -34,9 +35,8 @@ namespace Dapplo.Windows.Structs
 	/// <summary>
 	///     The MONITORINFOEX structure contains information about a display monitor.
 	///     The GetMonitorInfo function stores information into a MONITORINFOEX structure or a MONITORINFO structure.
-	///     The MONITORINFOEX structure is a superset of the MONITORINFO structure. The MONITORINFOEX structure adds a string
-	///     member to contain a name
-	///     for the display monitor.
+	///     The MONITORINFOEX structure is a superset of the MONITORINFO structure.
+	///     The MONITORINFOEX structure adds a string member to contain a name for the display monitor.
 	/// </summary>
 	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
 	public struct MonitorInfoEx
@@ -66,21 +66,22 @@ namespace Dapplo.Windows.Structs
 
 		/// <summary>
 		///     The attributes of the display monitor.
-		///     This member can be the following value:
-		///     1 : MONITORINFOF_PRIMARY
 		/// </summary>
-		public uint Flags;
+		public MonitorInfoFlags Flags;
 
 		// size of a device name string
 		private const int CCHDEVICENAME = 32;
 
 		/// <summary>
-		///     A string that specifies the device name of the monitor being used. Most applications have no use for a display
-		///     monitor name,
+		///     A string that specifies the device name of the monitor being used. Most applications have no use for a display monitor name,
 		///     and so can save some bytes by using a MONITORINFO structure.
 		/// </summary>
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)] public string DeviceName;
+		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
+		public string DeviceName;
 
+		/// <summary>
+		/// Initialize the structure
+		/// </summary>
 		public void Init()
 		{
 			Size = Marshal.SizeOf(this);

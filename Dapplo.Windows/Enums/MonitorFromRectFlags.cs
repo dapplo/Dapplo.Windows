@@ -19,19 +19,31 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#region using
+
 using System;
+
+#endregion
 
 namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	/// A set of flags that represent attributes of the display monitor.
+	///     Flags for the MonitorFromRect "flags" field, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145063(v=vs.85).aspx">MonitorFromRect function</a>
 	/// </summary>
 	[Flags]
-	public enum MonitorInfoFlags
+	public enum MonitorFromRectFlags : uint
 	{
 		/// <summary>
-		/// This is the primary display monitor.
+		/// Returns a handle to the display monitor that is nearest to the rectangle.
 		/// </summary>
-		Primary = 1
+		DefaultToNearest = 0,
+		/// <summary>
+		/// Returns NULL. (why??)
+		/// </summary>
+		DefaultToNull = 1,
+		/// <summary>
+		/// Returns a handle to the primary display monitor.
+		/// </summary>
+		DefaultToPrimary = 2
 	}
 }

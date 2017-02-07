@@ -83,5 +83,7 @@ namespace Dapplo.Windows.Desktop
 		{
 			User32.SetWindowLongWrapper(windowInfo.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint) value));
 		}
+
+
 	}
 }

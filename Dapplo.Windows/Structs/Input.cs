@@ -32,15 +32,87 @@ using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Structs
 {
+	/// <summary>
+	/// A struct used by SendInput to store information for synthesizing input events such as keystrokes, mouse movement, and mouse clicks.
+	/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646270(v=vs.85).aspx">INPUT structure</a>
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	public struct Input
 	{
-		public InputTypes inputType;
-		public InputUnion inputUnion;
+		/// <summary>
+		/// The type of the input event. This member can be one of the following values.
+		/// </summary>
+		public InputTypes InputType;
 
-		public static int Size
+		/// <summary>
+		/// A union which contains the MouseInput, KeyboardInput or HardwareInput
+		/// </summary>
+		public InputUnion InputUnion;
+
+
+		/// <summary>
+		/// A factory method to simplify creating mouse input
+		/// </summary>
+		/// <returns>Array of Input structs</returns>
+		public static Input[] CreateMouseInputs(params MouseInput[] mouseInputs)
 		{
-			get { return Marshal.SizeOf(typeof(Input)); }
+			var result = new Input[mouseInputs.Length];
+			int index = 0;
+			foreach (var mouseInput in mouseInputs)
+			{
+				result[index++] = new Input
+				{
+					InputType = InputTypes.Mouse,
+					InputUnion = new InputUnion
+					{
+						MouseInput = mouseInput
+					}
+				};
+			}
+			return result;
 		}
+
+		/// <summary>
+		/// A factory method to simplify creating input
+		/// </summary>
+		/// <returns>Array of Input structs</returns>
+		public static Input[] CreateKeyboardInputs(params KeyboardInput[] keyboardInputs)
+		{
+			var result = new Input[keyboardInputs.Length];
+			int index = 0;
+			foreach (var keyboardInput in keyboardInputs)
+			{
+				result[index++] = new Input
+				{
+					InputType = InputTypes.Keyboard,
+					InputUnion = new InputUnion
+					{
+						KeyboardInput = keyboardInput
+					}
+				};
+			}
+			return result;
+		}
+
+		/// <summary>
+		/// A factory method to simplify creating input from a list of VirtualKeyCodes
+		/// </summary>
+		/// <returns>Input[]</returns>
+		public static Input[] CreateKeyPresses(params VirtualKeyCodes[] virtualKeyCodes)
+		{
+			var keyboardInputs = new KeyboardInput[virtualKeyCodes.Length];
+			int index = 0;
+			foreach (var virtualKeyCode in virtualKeyCodes)
+			{
+				keyboardInputs[index++] = KeyboardInput.ForKeyDown(virtualKeyCode);
+				keyboardInputs[index++] = KeyboardInput.ForKeyUp(virtualKeyCode);
+			}
+			return CreateKeyboardInputs(keyboardInputs);
+		}
+
+		/// <summary>
+		/// Used as the Size in the SendInput call
+		/// </summary>
+		public static int Size => Marshal.SizeOf(typeof(Input));
 	}
 }

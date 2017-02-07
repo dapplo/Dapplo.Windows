@@ -1,7 +1,14 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Dapplo.Windows.Enums
 {
+	/// <summary>
+	/// A list of possible scancodes
+	/// </summary>
+	[SuppressMessage("ReSharper", "InconsistentNaming")]
 	public enum ScanCodes : short
 	{
+#pragma warning disable 1591
 		LBUTTON = 0,
 		RBUTTON = 0,
 		CANCEL = 70,
@@ -174,5 +181,6 @@ namespace Dapplo.Windows.Enums
 		NONAME = 0,
 		PA1 = 0,
 		OEM_CLEAR = 0,
+#pragma warning restore 1591
 	}
 }

@@ -55,7 +55,6 @@ namespace Dapplo.Windows.Native
 		public delegate bool EnumWindowsProc(IntPtr hwnd, int lParam);
 
 		// ReSharper disable once InconsistentNaming
-		private const uint MONITORINFOF_PRIMARY = 1;
 		private static readonly LogSource Log = new LogSource();
 		private static bool _canCallGetPhysicalCursorPos = true;
 
@@ -66,25 +65,26 @@ namespace Dapplo.Windows.Native
 		public static IList<DisplayInfo> AllDisplays()
 		{
 			var result = new List<DisplayInfo>();
-			EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, delegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData)
+			EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr monitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr data) =>
 			{
 				var monitorInfoEx = new MonitorInfoEx();
 				monitorInfoEx.Init();
-				var success = GetMonitorInfo(hMonitor, ref monitorInfoEx);
-				if (success)
+				var success = GetMonitorInfo(monitor, ref monitorInfoEx);
+				if (!success)
 				{
-					var displayInfo = new DisplayInfo
-					{
-						ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left),
-						ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
-						Bounds = monitorInfoEx.Monitor.ToRect(),
-						BoundsRectangle = monitorInfoEx.Monitor.ToRectangle(),
-						WorkingArea = monitorInfoEx.WorkArea.ToRect(),
-						WorkingAreaRectangle = monitorInfoEx.WorkArea.ToRectangle(),
-						IsPrimary = (monitorInfoEx.Flags | MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY
-					};
-					result.Add(displayInfo);
+					return true;
 				}
+				var displayInfo = new DisplayInfo
+				{
+					ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left),
+					ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
+					Bounds = monitorInfoEx.Monitor.ToRect(),
+					BoundsRectangle = monitorInfoEx.Monitor.ToRectangle(),
+					WorkingArea = monitorInfoEx.WorkArea.ToRect(),
+					WorkingAreaRectangle = monitorInfoEx.WorkArea.ToRectangle(),
+					IsPrimary = (monitorInfoEx.Flags | MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary
+				};
+				result.Add(displayInfo);
 				return true;
 			}, IntPtr.Zero);
 			return result;
@@ -332,10 +332,24 @@ namespace Dapplo.Windows.Native
 
 		private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
 
+		/// <summary>
+		/// Wrapper to simplify sending of inputs
+		/// </summary>
+		/// <param name="inputs">Input array</param>
+		/// <returns>inputs send</returns>
+		public static uint SendInput(Input[] inputs)
+		{
+			return SendInput((uint)inputs.Length, inputs, Input.Size);
+		}
+
+
 		#region Native imports
 
 		/// <summary>
 		/// Synthesizes keystrokes, mouse motions, and button clicks.
+		/// The function returns the number of events that it successfully inserted into the keyboard or mouse input stream.
+		/// If the function returns zero, the input was already blocked by another thread.
+		/// To get extended error information, call GetLastError.
 		/// </summary>
 		[DllImport("user32", SetLastError = true)]
 		public static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] Input[] inputs, int cbSize);
@@ -478,8 +492,15 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
 
+		/// <summary>
+		/// The MonitorFromRect function retrieves a handle to the display monitor that has the largest area of intersection with a specified rectangle.
+		/// see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145063(v=vs.85).aspx">MonitorFromRect function</a>
+		/// </summary>
+		/// <param name="rect">A RECT structure that specifies the rectangle of interest in virtual-screen coordinates.</param>
+		/// <param name="monitorFromRectFlags">MonitorFromRectFlags</param>
+		/// <returns>HMONITOR handle</returns>
 		[DllImport("user32", SetLastError = true)]
-		public static extern IntPtr MonitorFromRect([In] ref RECT lprc, uint dwFlags);
+		public static extern IntPtr MonitorFromRect([In] ref RECT rect, MonitorFromRectFlags monitorFromRectFlags);
 
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]

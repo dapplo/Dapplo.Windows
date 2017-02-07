@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Enums;
 using Dapplo.Windows.Interop;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
@@ -47,10 +48,7 @@ namespace Dapplo.Windows.App
 		private static readonly string AppWindowsClass;
 
 		// For MonitorFromWindow
-		public const int MONITOR_DEFAULTTONULL = 0;
-		public const int MONITOR_DEFAULTTOPRIMARY = 1;
-		public const int MONITOR_DEFAULTTONEAREST = 2;
-		private static Guid CoClassGuidIAppVisibility = new Guid("7E5FE3D9-985F-4908-91F9-EE19F9FD1514");
+		private static readonly Guid CoClassGuidIAppVisibility = new Guid("7E5FE3D9-985F-4908-91F9-EE19F9FD1514");
 
 		// All currently known classes: "ImmersiveGutter", "Snapped Desktop", "ImmersiveBackgroundWindow","ImmersiveLauncher","Windows.UI.Core.CoreWindow","ApplicationManager_ImmersiveShellWindow","SearchPane","MetroGhostWindow","EdgeUiInputWndClass", "NativeHWNDHost", "Shell_CharmWindow"
 
@@ -61,7 +59,7 @@ namespace Dapplo.Windows.App
 			AppWindowsClass = Environment.OSVersion.IsWindows8() ? W8AppWindowClass : W10AppWindowClass;
 			try
 			{
-				var appVisibilityType = Type.GetTypeFromCLSID(new Guid("7E5FE3D9-985F-4908-91F9-EE19F9FD1514"));
+				var appVisibilityType = Type.GetTypeFromCLSID(CoClassGuidIAppVisibility);
 				_appVisibility = DisposableCom.Create((IAppVisibility) Activator.CreateInstance(appVisibilityType));
 			}
 			catch
@@ -190,7 +188,7 @@ namespace Dapplo.Windows.App
 						// Fullscreen, it's "visible" when AppVisibilityOnMonitor says yes
 						// Although it might be the other App, this is not "very" important
 						var rect = new RECT(screen.Bounds);
-						var monitor = User32.MonitorFromRect(ref rect, MONITOR_DEFAULTTONULL);
+						var monitor = User32.MonitorFromRect(ref rect, MonitorFromRectFlags.DefaultToNearest);
 						if (monitor != IntPtr.Zero)
 						{
 							var monitorAppVisibility = _appVisibility.ComObject.GetAppVisibilityOnMonitor(monitor);

@@ -32,6 +32,7 @@ using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
+using Microsoft.Win32;
 
 #endregion
 
@@ -71,7 +72,7 @@ namespace Dapplo.Windows
 		/// This is used to be able to reset the location, and also detect if we are at the end.
 		/// Some windows might add content when the user is (almost) at the end.
 		/// </summary>
-		public ScrollInfo InitialScrollInfo { get; }
+		public ScrollInfo InitialScrollInfo { get; private set; }
 
 		/// <summary>
 		/// Some windows might add content when the user is (almost) at the end.
@@ -123,6 +124,34 @@ namespace Dapplo.Windows
 		}
 
 		/// <summary>
+		/// Amount of delta the scrollwheel scrolls
+		/// </summary>
+		public int WheelDelta { get; set; }
+
+		/// <summary>
+		/// Get the scroll-lines from the registry
+		/// </summary>
+		private static int ScrollWheelLinesFromRegistry
+		{
+			get
+			{
+				using (var key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", false))
+				{
+					string wheelScrollLines = key?.GetValue("WheelScrollLines") as string;
+					if (wheelScrollLines != null)
+					{
+						int scrollLines;
+						if (int.TryParse(wheelScrollLines, out scrollLines))
+						{
+							return scrollLines;
+						}
+					}
+				}
+				return 3;
+			}
+		}
+
+		/// <summary>
 		///     Factory for the WindowScroller
 		/// </summary>
 		/// <param name="windowToScroll">WindowInfo is the window to scroll or contains an area which can be scrolled</param>
@@ -143,12 +172,16 @@ namespace Dapplo.Windows
 					return null;
 				}
 			}
+
+
+
 			var windowScroller = new WindowScroller
 			{
 				WindowToScroll = windowToScroll,
 				ScrollingArea = scrollingArea,
 				Direction = direction,
-
+				InitialScrollInfo = initialScrollInfo,
+				WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
 			};
 			return windowScroller;
 		}
@@ -229,11 +262,10 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool Previous()
 		{
-
 			switch (ScrollMode)
 			{
 				case ScrollModes.KeyboardPageUpDown:
-					// TODO: Send page up / down
+					User32.SendInput(Input.CreateKeyPresses(VirtualKeyCodes.PRIOR));
 					break;
 				case ScrollModes.WindowsMessage:
 					// Calculate previous position
@@ -245,7 +277,8 @@ namespace Dapplo.Windows
 					scrollInfo.nPos = Math.Max(scrollInfo.nMin, scrollInfo.nPos - (int)scrollInfo.nPage);
 					return ApplyPosition(ref scrollInfo);
 				case ScrollModes.MouseWheel:
-					// TODO: Send mousewheel
+					var mouseWheelInput = MouseInput.MoveMouseWheel(WheelDelta);
+					User32.SendInput(Input.CreateMouseInputs(mouseWheelInput));
 					break;
 			}
 
@@ -261,7 +294,7 @@ namespace Dapplo.Windows
 			switch (ScrollMode)
 			{
 				case ScrollModes.KeyboardPageUpDown:
-					// TODO: Send page up / down
+					User32.SendInput(Input.CreateKeyPresses(VirtualKeyCodes.NEXT));
 					break;
 				case ScrollModes.WindowsMessage:
 					ScrollInfo scrollInfo;
@@ -274,7 +307,8 @@ namespace Dapplo.Windows
 					scrollInfo.nPos = Math.Min(scrollInfo.nMax, scrollInfo.nPos + (int)scrollInfo.nPage);
 					return ApplyPosition(ref scrollInfo);
 				case ScrollModes.MouseWheel:
-					// TODO: Send mousewheel
+					var mouseWheelInput = MouseInput.MoveMouseWheel(-WheelDelta);
+					User32.SendInput(Input.CreateMouseInputs(mouseWheelInput));
 					break;
 			}
 			return true;
