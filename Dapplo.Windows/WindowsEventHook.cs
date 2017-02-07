@@ -45,7 +45,7 @@ namespace Dapplo.Windows
 		/// <param name="idChild"></param>
 		/// <param name="dwEventThread"></param>
 		/// <param name="dwmsEventTime"></param>
-		public delegate void WinEventHandler(WinEvent eventType, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
+		public delegate void WinEventHandler(WinEvents eventType, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
 
 		private readonly WinEventDelegate _winEventHandler;
 
@@ -80,7 +80,7 @@ namespace Dapplo.Windows
 		/// <param name="winEvent"></param>
 		/// <param name="winEventHandler"></param>
 		/// <returns>true if success</returns>
-		public bool Hook(WinEvent winEvent, WinEventHandler winEventHandler)
+		public bool Hook(WinEvents winEvent, WinEventHandler winEventHandler)
 		{
 			return Hook(winEvent, winEvent, winEventHandler);
 		}
@@ -91,7 +91,7 @@ namespace Dapplo.Windows
 		/// <param name="winEventStart"></param>
 		/// <param name="winEventEnd"></param>
 		/// <param name="winEventHandler"></param>
-		public bool Hook(WinEvent winEventStart, WinEvent winEventEnd, WinEventHandler winEventHandler)
+		public bool Hook(WinEvents winEventStart, WinEvents winEventEnd, WinEventHandler winEventHandler)
 		{
 			var hookPtr = SetWinEventHook(winEventStart, winEventEnd, IntPtr.Zero, _winEventHandler, 0, 0, WinEventHookFlags.SkipOwnProcess | WinEventHookFlags.OutOfContext);
 			if (hookPtr.ToInt64() != 0)
@@ -128,7 +128,7 @@ namespace Dapplo.Windows
 		/// <param name="idChild"></param>
 		/// <param name="dwEventThread"></param>
 		/// <param name="dwmsEventTime"></param>
-		private void WinEventDelegateHandler(IntPtr hWinEventHook, WinEvent eventType, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+		private void WinEventDelegateHandler(IntPtr hWinEventHook, WinEvents eventType, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
 		{
 			WinEventHandler handler;
 			if (_winEventHandlers.TryGetValue(hWinEventHook, out handler))
@@ -143,7 +143,7 @@ namespace Dapplo.Windows
 		private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
 		[DllImport("user32", SetLastError = true)]
-		private static extern IntPtr SetWinEventHook(WinEvent eventMin, WinEvent eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, int idProcess, int idThread, WinEventHookFlags dwFlags);
+		private static extern IntPtr SetWinEventHook(WinEvents eventMin, WinEvents eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, int idProcess, int idThread, WinEventHookFlags dwFlags);
 
 		/// <summary>
 		///     Used with SetWinEventHook
@@ -155,7 +155,7 @@ namespace Dapplo.Windows
 		/// <param name="idChild"></param>
 		/// <param name="dwEventThread"></param>
 		/// <param name="dwmsEventTime"></param>
-		private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvent eventType, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
+		private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvents eventType, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
 
 		#endregion
 	}

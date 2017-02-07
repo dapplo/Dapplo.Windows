@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Reactive
 		/// <param name="process"></param>
 		/// <param name="thread"></param>
 		/// <returns>IObservable which procudes WinEventInfo</returns>
-		public static IObservable<WinEventInfo> Create(WinEvent winEventStart, WinEvent? winEventEnd = null, int process = 0, int thread = 0)
+		public static IObservable<WinEventInfo> Create(WinEvents winEventStart, WinEvents? winEventEnd = null, int process = 0, int thread = 0)
 		{
 			return Observable.Create<WinEventInfo>(observer =>
 			{
@@ -74,7 +74,7 @@ namespace Dapplo.Windows.Reactive
 		/// <returns>IObservable with WinEventInfo</returns>
 		public static IObservable<WinEventInfo> WindowTileChangeObservable()
 		{
-			return Create(WinEvent.EVENT_OBJECT_NAMECHANGE).Where(winEventInfo => winEventInfo.ObjectIdentifier == ObjectIdentifiers.Window);
+			return Create(WinEvents.EVENT_OBJECT_NAMECHANGE).Where(winEventInfo => winEventInfo.ObjectIdentifier == ObjectIdentifiers.Window);
 		}
 
 		#region native code
@@ -94,7 +94,7 @@ namespace Dapplo.Windows.Reactive
 		/// <param name="winEventHookFlags">WinEventHookFlags</param>
 		/// <returns>IntPtr with the hook id</returns>
 		[DllImport("user32", SetLastError = true)]
-		private static extern IntPtr SetWinEventHook(WinEvent eventMin, WinEvent eventMax, IntPtr hmodWinEventProc, WinEventDelegate eventProc, int idProcess, int idThread, WinEventHookFlags winEventHookFlags);
+		private static extern IntPtr SetWinEventHook(WinEvents eventMin, WinEvents eventMax, IntPtr hmodWinEventProc, WinEventDelegate eventProc, int idProcess, int idThread, WinEventHookFlags winEventHookFlags);
 
 		/// <summary>
 		///     The delegate called by SetWinEventHook when an event occurs
@@ -106,7 +106,7 @@ namespace Dapplo.Windows.Reactive
 		/// <param name="idChild">int</param>
 		/// <param name="eventThread">uint with EventThread</param>
 		/// <param name="eventTime">uint with EventTime</param>
-		private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvent eventType, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime);
+		private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvents eventType, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime);
 
 		#endregion
 	}

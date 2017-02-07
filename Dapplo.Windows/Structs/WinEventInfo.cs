@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		///     Specifies the event that occurred.
 		/// </summary>
-		public WinEvent Event { get; private set; }
+		public WinEvents WinEvent { get; private set; }
 
 		/// <summary>
 		///     Handle to the window that generates the event, or IntPtr.Zero if no window is associated with the event.
@@ -107,12 +107,12 @@ namespace Dapplo.Windows.Structs
 		/// <param name="eventThread">Identifies the thread that generated the event, or the thread that owns the current window.</param>
 		/// <param name="eventTime">Specifies the time, in milliseconds, that the event was generated.</param>
 		/// <returns></returns>
-		public static WinEventInfo Create(IntPtr winEventHook, WinEvent winEvent, IntPtr hWnd, ObjectIdentifiers idObject, long idChild, ulong eventThread, ulong eventTime)
+		public static WinEventInfo Create(IntPtr winEventHook, WinEvents winEvent, IntPtr hWnd, ObjectIdentifiers idObject, long idChild, ulong eventThread, ulong eventTime)
 		{
 			return new WinEventInfo
 			{
 				EventHook = winEventHook,
-				Event = winEvent,
+				WinEvent = winEvent,
 				Handle = hWnd,
 				ObjectIdentifier = idObject,
 				IdChild = idChild,

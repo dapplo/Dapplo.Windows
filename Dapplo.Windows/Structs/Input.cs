@@ -99,7 +99,7 @@ namespace Dapplo.Windows.Structs
 		/// <returns>Input[]</returns>
 		public static Input[] CreateKeyPresses(params VirtualKeyCodes[] virtualKeyCodes)
 		{
-			var keyboardInputs = new KeyboardInput[virtualKeyCodes.Length];
+			var keyboardInputs = new KeyboardInput[virtualKeyCodes.Length * 2];
 			int index = 0;
 			foreach (var virtualKeyCode in virtualKeyCodes)
 			{

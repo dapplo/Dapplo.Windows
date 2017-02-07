@@ -100,7 +100,7 @@ namespace Dapplo.Windows
 		/// </summary>
 		/// <param name="eventType"></param>
 		/// <param name="currentWindowInfo">Window to make the parent chain for</param>
-		private void UpdateParentChainFor(WinEvent eventType, WindowInfo currentWindowInfo)
+		private void UpdateParentChainFor(WinEvents eventType, WindowInfo currentWindowInfo)
 		{
 			var prevWindow = currentWindowInfo;
 			WindowInfo parentWindow;
@@ -133,7 +133,7 @@ namespace Dapplo.Windows
 			{
 				switch (eventType)
 				{
-					case WinEvent.EVENT_OBJECT_DESTROY:
+					case WinEvents.EVENT_OBJECT_DESTROY:
 						if (parentWindow.Children.Contains(currentWindowInfo))
 						{
 							parentWindow.Children.Remove(currentWindowInfo);
@@ -159,7 +159,7 @@ namespace Dapplo.Windows
 		/// <param name="idChild"></param>
 		/// <param name="dwEventThread"></param>
 		/// <param name="dwmsEventTime"></param>
-		private void WinEventHandler(WinEvent eventType, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+		private void WinEventHandler(WinEvents eventType, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
 		{
 			if ((hWnd == IntPtr.Zero) || ((idObject != ObjectIdentifiers.Window) && (idObject != ObjectIdentifiers.Client)))
 			{
@@ -173,7 +173,7 @@ namespace Dapplo.Windows
 			// Check if we know this window, if not we might want to get the details on it
 			if (!isPreviouslyCreated)
 			{
-				if (eventType == WinEvent.EVENT_OBJECT_DESTROY)
+				if (eventType == WinEvents.EVENT_OBJECT_DESTROY)
 				{
 					// Not a peeps, destroy of not know window doesn't interrest us!
 					return;
@@ -197,7 +197,7 @@ namespace Dapplo.Windows
 				if (!currentWindowInfo.HasParent)
 				{
 					// Doesn't have a parent, it's a top window! Only add as first if it's new or has focus
-					AddTopWindow(currentWindowInfo, (eventType == WinEvent.EVENT_OBJECT_CREATE) || (eventType == WinEvent.EVENT_OBJECT_FOCUS));
+					AddTopWindow(currentWindowInfo, (eventType == WinEvents.EVENT_OBJECT_CREATE) || (eventType == WinEvents.EVENT_OBJECT_FOCUS));
 					// Doesn't have a parent, it's a top window!
 				}
 			}
@@ -205,14 +205,14 @@ namespace Dapplo.Windows
 			// Handle specify events
 			switch (eventType)
 			{
-				case WinEvent.EVENT_OBJECT_NAMECHANGE:
+				case WinEvents.EVENT_OBJECT_NAMECHANGE:
 					// Force update of Text, will be automatically updated on the next get access to the property
 					currentWindowInfo.Text = null;
 					break;
-				case WinEvent.EVENT_OBJECT_CREATE:
+				case WinEvents.EVENT_OBJECT_CREATE:
 					// Nothing to do, we already handled all the logic
 					break;
-				case WinEvent.EVENT_OBJECT_DESTROY:
+				case WinEvents.EVENT_OBJECT_DESTROY:
 					if (!currentWindowInfo.HasParent)
 					{
 						// Top window!
@@ -221,7 +221,7 @@ namespace Dapplo.Windows
 					// Remove from cache
 					_windowsCache.Remove(currentWindowInfo.Handle);
 					break;
-				case WinEvent.EVENT_OBJECT_FOCUS:
+				case WinEvents.EVENT_OBJECT_FOCUS:
 					// Move the top-window with the focus to the foreground
 					if (!currentWindowInfo.HasParent)
 					{
@@ -243,9 +243,9 @@ namespace Dapplo.Windows
 						}
 					}
 					break;
-				case WinEvent.EVENT_OBJECT_LOCATIONCHANGE:
-				case WinEvent.EVENT_SYSTEM_MOVESIZESTART:
-				case WinEvent.EVENT_SYSTEM_MOVESIZEEND:
+				case WinEvents.EVENT_OBJECT_LOCATIONCHANGE:
+				case WinEvents.EVENT_SYSTEM_MOVESIZESTART:
+				case WinEvents.EVENT_SYSTEM_MOVESIZEEND:
 					// Reset location, this means at the next request the information is retrieved again.
 					//System.Drawing.Rectangle prevBounds = currentWindowInfo.Bounds;
 					currentWindowInfo.Bounds = Rect.Empty;

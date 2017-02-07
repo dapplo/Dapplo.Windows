@@ -156,7 +156,7 @@
     <Compile Include="Structs\WINDOWINFO.cs" />
     <Compile Include="Enums\WindowLongIndex.cs" />
     <Compile Include="Enums\WindowPos.cs" />
-    <Compile Include="Enums\WinEvent.cs" />
+    <Compile Include="Enums\WinEvents.cs" />
     <Compile Include="Enums\WinEventHookFlags.cs" />
     <Compile Include="Structs\WindowPlacement.cs" />
     <Compile Include="Structs\WinEventInfo.cs" />
