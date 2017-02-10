@@ -48,55 +48,55 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		///     Check if the window is a top level
 		/// </summary>
-		/// <param name="window">WindowDetails</param>
+		/// <param name="nativeWindow">WindowDetails</param>
 		/// <returns>bool</returns>
-		public static bool IsTopLevel(this WindowInfo window)
+		public static bool IsTopLevel(this NativeWindowInfo nativeWindow)
 		{
-			if (window.HasClassname && IgnoreClasses.Contains(window.Classname))
+			if (nativeWindow.HasClassname && IgnoreClasses.Contains(nativeWindow.Classname))
 			{
 				return false;
 			}
 			// Ignore windows without title
-			if (window.Text.Length == 0)
+			if (nativeWindow.Text.Length == 0)
 			{
 				return false;
 			}
 			// Windows without size
-			if (window.Bounds.Size.IsEmpty)
+			if (nativeWindow.Bounds.Size.IsEmpty)
 			{
 				return false;
 			}
-			if (window.HasParent)
+			if (nativeWindow.HasParent)
 			{
 				return false;
 			}
-			var exWindowStyle = window.GetExtendedWindowStyle();
+			var exWindowStyle = nativeWindow.GetExtendedWindowStyle();
 			if ((exWindowStyle & ExtendedWindowStyleFlags.WS_EX_TOOLWINDOW) != 0)
 			{
 				return false;
 			}
 			// Skip everything which is not rendered "normally"
-			if (!window.IsWin8App() && (exWindowStyle & ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP) != 0)
+			if (!nativeWindow.IsWin8App() && (exWindowStyle & ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP) != 0)
 			{
 				return false;
 			}
 			// Skip preview windows, like the one from Firefox
-			if ((window.GetWindowStyle() & WindowStyleFlags.WS_VISIBLE) == 0)
+			if ((nativeWindow.GetWindowStyle() & WindowStyleFlags.WS_VISIBLE) == 0)
 			{
 				return false;
 			}
-			return window.IsVisible || !window.IsMinimized;
+			return nativeWindow.IsVisible || !nativeWindow.IsMinimized;
 		}
 
 		/// <summary>
 		///     Get all the top level windows
 		/// </summary>
 		/// <returns>List WindowDetails with all the top level windows</returns>
-		public static IEnumerable<WindowInfo> GetTopLevelWindows(CancellationToken cancellationToken = default(CancellationToken))
+		public static IEnumerable<NativeWindowInfo> GetTopLevelWindows(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			foreach (var possibleTopLevelHwnd in AppQuery.WindowsStoreApps)
 			{
-				var possibleTopLevel = WindowInfo.CreateFor(possibleTopLevelHwnd);
+				var possibleTopLevel = NativeWindowInfo.CreateFor(possibleTopLevelHwnd);
 				if (possibleTopLevel.IsTopLevel())
 				{
 					yield return possibleTopLevel;

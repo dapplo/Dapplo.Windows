@@ -33,8 +33,8 @@ using System.Runtime.InteropServices;
 namespace Dapplo.Windows.Structs
 {
 	/// <summary>
-	///     The structure for the WindowInfo
-	///     See: http://msdn.microsoft.com/en-us/library/windows/desktop/ms632610.aspx
+	///     The structure for the NativeWindowInfo
+	///     See <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms632610.aspx">WINDOWINFO</a>
 	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	[Serializable]
@@ -50,7 +50,11 @@ namespace Dapplo.Windows.Structs
 		public uint cyWindowBorders;
 		public ushort atomWindowType;
 		public ushort wCreatorVersion;
-		// Allows automatic initialization of "cbSize" with "new WINDOWINFO(null/true/false)".
+
+		/// <summary>
+		/// Allows automatic initialization of "cbSize" with "new WINDOWINFO(null/true/false)".
+		/// </summary>
+		/// <param name="filler"></param>
 		public WINDOWINFO(bool? filler)
 			: this()
 		{

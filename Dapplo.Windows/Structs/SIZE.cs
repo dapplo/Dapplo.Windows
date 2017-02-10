@@ -33,41 +33,95 @@ using System.Windows;
 
 namespace Dapplo.Windows.Structs
 {
+	/// <summary>
+	/// This structure should be used everywhere where native methods need a size struct.
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	[Serializable]
 	public struct SIZE
 	{
-		public int width;
-		public int height;
+		private int _width;
+		private int _height;
 
+		/// <summary>
+		/// The Width of the size struct
+		/// </summary>
+		public int Width
+		{
+			get
+			{
+				return _width;
+			}
+			set
+			{
+				_width = value;
+			}
+		}
+
+		/// <summary>
+		/// The Width of the size struct
+		/// </summary>
+		public int Height
+		{
+			get
+			{
+				return _height;
+			}
+			set
+			{
+				_height = value;
+			}
+		}
+
+		/// <summary>
+		/// Constructor from S.W.Size
+		/// </summary>
+		/// <param name="size"></param>
 		public SIZE(Size size)
 			: this((int) size.Width, (int) size.Height)
 		{
 		}
 
+		/// <summary>
+		/// Constructor from S.D.Size
+		/// </summary>
+		/// <param name="size"></param>
 		public SIZE(System.Drawing.Size size) : this(size.Width, size.Height)
 		{
 		}
 
+		/// <summary>
+		/// Size contructor
+		/// </summary>
+		/// <param name="width">int</param>
+		/// <param name="height">int</param>
 		public SIZE(int width, int height)
 		{
-			this.width = width;
-			this.height = height;
+			_width = width;
+			_height = height;
 		}
 
-		public Size ToSize()
+		/// <summary>
+		/// Create System.Drawing.Size or System.Windows.Size depending on the generic type
+		/// </summary>
+		/// <typeparam name="TSize"></typeparam>
+		/// <returns>S.D.Size or S.W.Size</returns>
+		public TSize ToSize<TSize>()
 		{
-			return new Size(width, height);
+			if (typeof(TSize) == typeof(Size))
+			{
+				return (TSize)(object)new Size(_width, _height);
+			}
+			return (TSize)(object)new System.Drawing.Size(_width, _height);
 		}
 
-		public System.Drawing.Size ToSystemDrawingSize()
-		{
-			return new System.Drawing.Size(width, height);
-		}
-
+		/// <summary>
+		/// Checks if the width * height are 0
+		/// </summary>
+		/// <returns>true if the size is empty</returns>
 		public bool IsEmpty()
 		{
-			return width * height == 0;
+			return _width * _height == 0;
 		}
 	}
 }

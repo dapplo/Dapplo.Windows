@@ -120,51 +120,51 @@ namespace Dapplo.Windows.App
 		/// <summary>
 		/// This checks if the window is an App (Win8 or Win10)
 		/// </summary>
-		public static bool IsApp(this WindowInfo windowInfo)
+		public static bool IsApp(this NativeWindowInfo nativeWindowInfo)
 		{
-			return AppWindowsClass.Equals(windowInfo.Classname);
+			return AppWindowsClass.Equals(nativeWindowInfo.Classname);
 		}
 
 		/// <summary>
 		/// This checks if the window is a Windows 8 App
 		/// For Windows 10 most normal code works, as it's hosted inside "ApplicationFrameWindow"
 		/// </summary>
-		public static bool IsWin8App(this WindowInfo windowInfo)
+		public static bool IsWin8App(this NativeWindowInfo nativeWindowInfo)
 		{
-			return W8AppWindowClass.Equals(windowInfo.Classname);
+			return W8AppWindowClass.Equals(nativeWindowInfo.Classname);
 		}
 
 		/// <summary>
 		/// This checks if the window is a Windows 10 App
 		/// For Windows 10 apps are hosted inside "ApplicationFrameWindow"
 		/// </summary>
-		public static bool IsWin10App(this WindowInfo windowInfo)
+		public static bool IsWin10App(this NativeWindowInfo nativeWindowInfo)
 		{
-			return W10AppWindowClass.Equals(windowInfo.Classname);
+			return W10AppWindowClass.Equals(nativeWindowInfo.Classname);
 		}
 
 		/// <summary>
 		/// Check if the window is the metro gutter (sizeable separator)
 		/// </summary>
-		public static bool IsGutter(this WindowInfo windowInfo)
+		public static bool IsGutter(this NativeWindowInfo nativeWindowInfo)
 		{
-			return GutterClass.Equals(windowInfo.Classname);
+			return GutterClass.Equals(nativeWindowInfo.Classname);
 		}
 
 		/// <summary>
 		/// Test if this window is for the App-Launcher
 		/// </summary>
-		public static bool IsAppLauncher(this WindowInfo windowInfo)
+		public static bool IsAppLauncher(this NativeWindowInfo nativeWindowInfo)
 		{
-			return ApplauncherClass.Equals(windowInfo.Classname);
+			return ApplauncherClass.Equals(nativeWindowInfo.Classname);
 		}
 
 		/// <summary>
 		/// Check if this window is the window of a metro app
 		/// </summary>
-		public static bool IsMetroApp(this WindowInfo windowInfo)
+		public static bool IsMetroApp(this NativeWindowInfo nativeWindowInfo)
 		{
-			return windowInfo.IsAppLauncher() || windowInfo.IsWin8App();
+			return nativeWindowInfo.IsAppLauncher() || nativeWindowInfo.IsWin8App();
 		}
 
 		/// <summary>

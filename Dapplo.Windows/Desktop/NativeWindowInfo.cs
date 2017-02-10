@@ -33,7 +33,7 @@ namespace Dapplo.Windows.Desktop
 	/// Information about a native window
 	/// Note: This is a dumb container, and doesn't retrieve anything about the window itself
 	/// </summary>
-	public class WindowInfo
+	public class NativeWindowInfo
 	{
 		/// <summary>
 		/// Returns the bounds of this window
@@ -43,7 +43,7 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		/// Returns the children of this window
 		/// </summary>
-		public IList<WindowInfo> Children { get; set; }
+		public IList<NativeWindowInfo> Children { get; set; }
 
 		/// <summary>
 		/// string with the name of the internal class for the window
@@ -91,13 +91,13 @@ namespace Dapplo.Windows.Desktop
 		public int ProcessId { get; set; }
 
 		/// <summary>
-		/// Create a WindowInfo for the supplied handle
+		/// Create a NativeWindowInfo for the supplied handle
 		/// </summary>
 		/// <param name="handle">IntPtr</param>
-		/// <returns>WindowInfo</returns>
-		public static WindowInfo CreateFor(IntPtr handle)
+		/// <returns>NativeWindowInfo</returns>
+		public static NativeWindowInfo CreateFor(IntPtr handle)
 		{
-			return new WindowInfo
+			return new NativeWindowInfo
 			{
 				Handle = handle
 			};

@@ -35,67 +35,68 @@ using Dapplo.Windows.Native;
 namespace Dapplo.Windows.Desktop
 {
 	/// <summary>
+	/// Extensions on the NativeWindowInfo
 	/// </summary>
-	public static class WindowsInfoExtensions
+	public static class NativeWindowInfoExtensions
 	{
 		/// <summary>
-		///     Fill the information of the WindowInfo
+		///     Fill the information of the NativeWindowInfo
 		/// </summary>
-		/// <param name="windowInfo">WindowInfo</param>
-		public static WindowInfo Fill(this WindowInfo windowInfo)
+		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
+		public static NativeWindowInfo Fill(this NativeWindowInfo nativeWindowInfo)
 		{
-			windowInfo.Text = User32.GetText(windowInfo.Handle);
-			windowInfo.Classname = User32.GetClassname(windowInfo.Handle);
+			nativeWindowInfo.Text = User32.GetText(nativeWindowInfo.Handle);
+			nativeWindowInfo.Classname = User32.GetClassname(nativeWindowInfo.Handle);
 			Rect rectangle;
-			User32.GetClientRect(windowInfo.Handle, out rectangle);
-			windowInfo.Bounds = rectangle;
-			return windowInfo;
+			User32.GetClientRect(nativeWindowInfo.Handle, out rectangle);
+			nativeWindowInfo.Bounds = rectangle;
+			return nativeWindowInfo;
 		}
 
 		/// <summary>
 		///     Get the Extended WindowStyle
 		/// </summary>
-		public static ExtendedWindowStyleFlags GetExtendedWindowStyle(this WindowInfo windowInfo)
+		public static ExtendedWindowStyleFlags GetExtendedWindowStyle(this NativeWindowInfo nativeWindowInfo)
 		{
-			return (ExtendedWindowStyleFlags) User32.GetWindowLongWrapper(windowInfo.Handle, WindowLongIndex.GWL_EXSTYLE);
+			return (ExtendedWindowStyleFlags) User32.GetWindowLongWrapper(nativeWindowInfo.Handle, WindowLongIndex.GWL_EXSTYLE);
 		}
 
 		/// <summary>
 		///     Set the Extended WindowStyle
 		/// </summary>
-		public static void SetExtendedWindowStyle(this WindowInfo windowInfo, ExtendedWindowStyleFlags value)
+		public static void SetExtendedWindowStyle(this NativeWindowInfo nativeWindowInfo, ExtendedWindowStyleFlags value)
 		{
-			User32.SetWindowLongWrapper(windowInfo.Handle, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint) value));
+			User32.SetWindowLongWrapper(nativeWindowInfo.Handle, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint) value));
 		}
 
 		/// <summary>
 		///     Get the WindowStyle
 		/// </summary>
-		public static WindowStyleFlags GetWindowStyle(this WindowInfo windowInfo)
+		public static WindowStyleFlags GetWindowStyle(this NativeWindowInfo nativeWindowInfo)
 		{
-			return (WindowStyleFlags) User32.GetWindowLongWrapper(windowInfo.Handle, WindowLongIndex.GWL_STYLE);
+			return (WindowStyleFlags) User32.GetWindowLongWrapper(nativeWindowInfo.Handle, WindowLongIndex.GWL_STYLE);
 		}
 
 		/// <summary>
 		///     Set the WindowStyle
 		/// </summary>
-		public static void SetWindowStyle(this WindowInfo windowInfo, WindowStyleFlags value)
+		public static void SetWindowStyle(this NativeWindowInfo nativeWindowInfo, WindowStyleFlags value)
 		{
-			User32.SetWindowLongWrapper(windowInfo.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint) value));
+			User32.SetWindowLongWrapper(nativeWindowInfo.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint) value));
 		}
 
 		/// <summary>
 		/// Get the process which the specified window belongs to, the value is cached into the ProcessId of the WindowInfo
 		/// </summary>
-		/// <param name="windowInfo">WindowInfo</param>
+		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
 		/// <returns>int with process Id</returns>
-		public static int GetProcessId(this WindowInfo windowInfo)
+		public static int GetProcessId(this NativeWindowInfo nativeWindowInfo)
 		{
-			int processId = windowInfo.ProcessId;
+			int processId = nativeWindowInfo.ProcessId;
 			if (processId == 0)
 			{
-				User32.GetWindowThreadProcessId(windowInfo.Handle, out processId);
-				windowInfo.ProcessId = processId;
+				User32.GetWindowThreadProcessId(nativeWindowInfo.Handle, out processId);
+				nativeWindowInfo.ProcessId = processId;
 			}
 			return processId;
 		}

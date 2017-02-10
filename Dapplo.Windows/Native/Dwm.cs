@@ -36,7 +36,7 @@ namespace Dapplo.Windows.Native
 	/// <summary>
 	///     Dwm Utils class
 	/// </summary>
-	public class Dwm
+	public static class Dwm
 	{
 		private const uint DWM_EC_DISABLECOMPOSITION = 0;
 		private const uint DWM_EC_ENABLECOMPOSITION = 1;
@@ -47,23 +47,31 @@ namespace Dapplo.Windows.Native
 		/// <summary>
 		///     Return the AERO Color
 		/// </summary>
-		public static Color ColorizationColor
+		public static System.Drawing.Color ColorizationSystemDrawingColor
 		{
 			get
 			{
 				using (var key = Registry.CurrentUser.OpenSubKey(ColorizationColorKey, false))
 				{
-					if (key != null)
+					var dwordValue = key?.GetValue("ColorizationColor");
+					if (dwordValue != null)
 					{
-						var dwordValue = key.GetValue("ColorizationColor");
-						if (dwordValue != null)
-						{
-							// TODO: Convert
-							//return Color.FromArgb(Int32)dwordValue);
-						}
+						return System.Drawing.Color.FromArgb((int)dwordValue);
 					}
 				}
-				return Colors.White;
+				return System.Drawing.Color.White;
+			}
+		}
+
+		/// <summary>
+		///     Return the AERO Color
+		/// </summary>
+		public static Color ColorizationColor
+		{
+			get
+			{
+				var color = ColorizationSystemDrawingColor;
+				return Color.FromArgb(color.A, color.R, color.G, color.B);
 			}
 		}
 
@@ -92,9 +100,20 @@ namespace Dapplo.Windows.Native
 			}
 		}
 
+		/// <summary>
+		/// Disable composition
+		/// </summary>
 		public static void DisableComposition()
 		{
 			DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+		}
+
+		/// <summary>
+		/// Enable compostion
+		/// </summary>
+		public static void EnableComposition()
+		{
+			DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 		}
 
 		[DllImport("dwmapi.dll", SetLastError = true)]
@@ -104,7 +123,7 @@ namespace Dapplo.Windows.Native
 		public static extern uint DwmEnableComposition(uint uCompositionAction);
 
 		[DllImport("dwmapi.dll", SetLastError = true)]
-		public static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute, out RECT lpRect, int size);
+		public static extern int DwmGetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttribute, out RECT lpRect, int size);
 
 		// Deprecated as of Windows 8 Release Preview
 		[DllImport("dwmapi.dll", SetLastError = true)]
@@ -122,11 +141,6 @@ namespace Dapplo.Windows.Native
 		[DllImport("dwmapi.dll", SetLastError = true)]
 		public static extern int DwmUpdateThumbnailProperties(IntPtr hThumb, ref DwmThumbnailProperties props);
 
-		public static void EnableComposition()
-		{
-			DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
-		}
-
 		/// <summary>
 		///     Helper method to get the window size for DWM Windows
 		/// </summary>
@@ -135,7 +149,7 @@ namespace Dapplo.Windows.Native
 		public static bool GetExtendedFrameBounds(IntPtr hWnd, out Rect rectangle)
 		{
 			RECT rect;
-			var result = DwmGetWindowAttribute(hWnd, (int) DwmWindowAttributes.DWMWA_EXTENDED_FRAME_BOUNDS, out rect, Marshal.SizeOf(typeof(RECT)));
+			var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.DWMWA_EXTENDED_FRAME_BOUNDS, out rect, Marshal.SizeOf(typeof(RECT)));
 			if (result >= 0)
 			{
 				rectangle = rect.ToRect();

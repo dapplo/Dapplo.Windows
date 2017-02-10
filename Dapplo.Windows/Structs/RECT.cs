@@ -43,67 +43,95 @@ namespace Dapplo.Windows.Structs
 	[Serializable]
 	public struct RECT
 	{
-		private int _Left;
-		private int _Top;
-		private int _Right;
-		private int _Bottom;
+		private int _left;
+		private int _top;
+		private int _right;
+		private int _bottom;
 
-		public RECT(RECT rectangle)
-			: this(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom)
-		{
-		}
-
+		/// <summary>
+		/// Constructor from a S.W.Rect
+		/// </summary>
+		/// <param name="rectangle">S.W.Rect</param>
 		public RECT(Rect rectangle)
 			: this((int) rectangle.Left, (int) rectangle.Top, (int) rectangle.Right, (int) rectangle.Bottom)
 		{
 		}
 
+		/// <summary>
+		/// Constructor from a S.D.Rectangle
+		/// </summary>
+		/// <param name="rectangle">S.D.Rectangle</param>
 		public RECT(Rectangle rectangle) : this(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom)
 		{
 		}
 
+		/// <summary>
+		/// Constructor from left, right, top, bottom
+		/// </summary>
+		/// <param name="left">int</param>
+		/// <param name="top">int</param>
+		/// <param name="right">int</param>
+		/// <param name="bottom">int</param>
 		public RECT(int left, int top, int right, int bottom)
 		{
-			_Left = left;
-			_Top = top;
-			_Right = right;
-			_Bottom = bottom;
+			_left = left;
+			_top = top;
+			_right = right;
+			_bottom = bottom;
 		}
 
+		/// <summary>
+		/// X value
+		/// </summary>
 		public int X
 		{
-			get { return _Left; }
-			set { _Left = value; }
+			get { return _left; }
+			set { _left = value; }
 		}
 
+		/// <summary>
+		/// X location of the rectangle
+		/// </summary>
 		public int Y
 		{
-			get { return _Top; }
-			set { _Top = value; }
+			get { return _top; }
+			set { _top = value; }
 		}
 
+		/// <summary>
+		/// Left value of the rectangle
+		/// </summary>
 		public int Left
 		{
-			get { return _Left; }
-			set { _Left = value; }
+			get { return _left; }
+			set { _left = value; }
 		}
 
+		/// <summary>
+		/// Top of the rectangle
+		/// </summary>
 		public int Top
 		{
-			get { return _Top; }
-			set { _Top = value; }
+			get { return _top; }
+			set { _top = value; }
 		}
 
+		/// <summary>
+		/// Right of the rectangle
+		/// </summary>
 		public int Right
 		{
-			get { return _Right; }
-			set { _Right = value; }
+			get { return _right; }
+			set { _right = value; }
 		}
 
+		/// <summary>
+		/// Bottom of the rectangle
+		/// </summary>
 		public int Bottom
 		{
-			get { return _Bottom; }
-			set { _Bottom = value; }
+			get { return _bottom; }
+			set { _bottom = value; }
 		}
 
 		/// <summary>
@@ -111,8 +139,8 @@ namespace Dapplo.Windows.Structs
 		/// </summary>
 		public int Height
 		{
-			get { return unchecked(_Bottom - _Top); }
-			set { _Bottom = unchecked(value - _Top); }
+			get { return unchecked(_bottom - _top); }
+			set { _bottom = unchecked(value - _top); }
 		}
 
 		/// <summary>
@@ -120,8 +148,8 @@ namespace Dapplo.Windows.Structs
 		/// </summary>
 		public int Width
 		{
-			get { return unchecked(_Right - _Left); }
-			set { _Right = unchecked(value + _Left); }
+			get { return unchecked(_right - _left); }
+			set { _right = unchecked(value + _left); }
 		}
 
 		/// <summary>
@@ -132,8 +160,8 @@ namespace Dapplo.Windows.Structs
 			get { return new Point(Left, Top); }
 			set
 			{
-				_Left = (int) value.X;
-				_Top = (int) value.Y;
+				_left = (int) value.X;
+				_top = (int) value.Y;
 			}
 		}
 
@@ -145,8 +173,8 @@ namespace Dapplo.Windows.Structs
 			get { return new Size(Width, Height); }
 			set
 			{
-				_Right = unchecked((int) value.Width + _Left);
-				_Bottom = unchecked((int) value.Height + _Top);
+				_right = unchecked((int) value.Width + _left);
+				_bottom = unchecked((int) value.Height + _top);
 			}
 		}
 
@@ -157,7 +185,7 @@ namespace Dapplo.Windows.Structs
 		/// <returns>Rect</returns>
 		public static implicit operator Rect(RECT rectangle)
 		{
-			return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
+			return rectangle.ToRect();
 		}
 
 		/// <summary>
@@ -201,41 +229,65 @@ namespace Dapplo.Windows.Structs
 			return rectangle1.Equals(rectangle2);
 		}
 
+		/// <summary>
+		/// Not is operator
+		/// </summary>
+		/// <param name="rectangle1"></param>
+		/// <param name="rectangle2"></param>
+		/// <returns>bool</returns>
 		public static bool operator !=(RECT rectangle1, RECT rectangle2)
 		{
 			return !rectangle1.Equals(rectangle2);
 		}
 
+		/// <inheritdoc />
 		public override string ToString()
 		{
-			return "{Left: " + _Left + "; " + "Top: " + _Top + "; Right: " + _Right + "; Bottom: " + _Bottom + "}";
+			return "{Left: " + _left + "; " + "Top: " + _top + "; Right: " + _right + "; Bottom: " + _bottom + "}";
 		}
 
+		/// <inheritdoc />
 		public override int GetHashCode()
 		{
 			return ToString().GetHashCode();
 		}
 
+		/// <summary>
+		/// Equalss
+		/// </summary>
+		/// <param name="rectangle"></param>
+		/// <returns>bool</returns>
 		public bool Equals(RECT rectangle)
 		{
-			return rectangle.Left == _Left && rectangle.Top == _Top && rectangle.Right == _Right && rectangle.Bottom == _Bottom;
+			return rectangle.Left == _left && rectangle.Top == _top && rectangle.Right == _right && rectangle.Bottom == _bottom;
 		}
 
+		/// <summary>
+		/// Checks if this RECT is empty
+		/// </summary>
+		/// <returns>true when empty</returns>
+		public bool IsEmpty => Width * Height == 0;
+
+		/// <summary>
+		/// Create a Rect
+		/// </summary>
+		/// <returns>Rect</returns>
 		public Rect ToRect()
 		{
-			if (Width >= 0 && Height >= 0)
-			{
-				return new Rect(Left, Top, Width, Height);
-			}
-			return Rect.Empty;
+			return new Rect(Left, Top, Width, Height);
 		}
 
 
+		/// <summary>
+		/// Create a Rectangle from the RECT
+		/// </summary>
+		/// <returns>Rectangle</returns>
 		public Rectangle ToRectangle()
 		{
 			return new Rectangle(Left, Top, Width, Height);
 		}
 
+		/// <inheritdoc />
 		public override bool Equals(object Object)
 		{
 			if (Object is RECT)

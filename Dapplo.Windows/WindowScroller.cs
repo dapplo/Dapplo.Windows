@@ -45,14 +45,14 @@ namespace Dapplo.Windows
 	public class WindowScroller
 	{
 		/// <summary>
-		///     The window to scroll, this does not need to be the part of the window that actually scrolls
+		///     The nativeWindow to scroll, this does not need to be the part of the window that actually scrolls
 		/// </summary>
-		public WindowInfo WindowToScroll { get; private set; }
+		public NativeWindowInfo WindowToScroll { get; private set; }
 
 		/// <summary>
 		///     Area which is scrolling, can be the WindowToScroll
 		/// </summary>
-		public WindowInfo ScrollingArea { get; private set; }
+		public NativeWindowInfo ScrollingArea { get; private set; }
 
 		/// <summary>
 		///     What scrollbar to use
@@ -155,10 +155,10 @@ namespace Dapplo.Windows
 		/// <summary>
 		///     Factory to create the WindowScroller async
 		/// </summary>
-		/// <param name="windowToScroll">WindowInfo is the window to scroll or contains an area which can be scrolled</param>
+		/// <param name="windowToScroll">NativeWindowInfo is the window to scroll or contains an area which can be scrolled</param>
 		/// <param name="direction">ScrollBarDirection vertical is the default</param>
 		/// <returns>Task with WindowScroller</returns>
-		public static async Task<WindowScroller> CreateAsync(WindowInfo windowToScroll, ScrollBarDirection direction = ScrollBarDirection.Vertical)
+		public static async Task<WindowScroller> CreateAsync(NativeWindowInfo windowToScroll, ScrollBarDirection direction = ScrollBarDirection.Vertical)
 		{
 			var scrollingArea = windowToScroll;
 			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
@@ -187,10 +187,10 @@ namespace Dapplo.Windows
 		/// <summary>
 		///     Factory to create the WindowScroller
 		/// </summary>
-		/// <param name="windowToScroll">WindowInfo is the window to scroll or contains an area which can be scrolled</param>
+		/// <param name="windowToScroll">NativeWindowInfo is the window to scroll or contains an area which can be scrolled</param>
 		/// <param name="direction">ScrollBarDirection vertical is the default</param>
 		/// <returns>WindowScroller</returns>
-		public static WindowScroller Create(WindowInfo windowToScroll, ScrollBarDirection direction = ScrollBarDirection.Vertical)
+		public static WindowScroller Create(NativeWindowInfo windowToScroll, ScrollBarDirection direction = ScrollBarDirection.Vertical)
 		{
 			var scrollingArea = windowToScroll;
 			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
