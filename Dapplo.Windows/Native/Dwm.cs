@@ -145,18 +145,18 @@ namespace Dapplo.Windows.Native
 		///     Helper method to get the window size for DWM Windows
 		/// </summary>
 		/// <param name="hWnd">IntPtr</param>
-		/// <param name="rectangle">out Rectangle</param>
+		/// <param name="rectangle">out RECT</param>
 		/// <returns>bool true if it worked</returns>
-		public static bool GetExtendedFrameBounds(IntPtr hWnd, out Rect rectangle)
+		public static bool GetExtendedFrameBounds(IntPtr hWnd, out RECT rectangle)
 		{
 			RECT rect;
 			var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.DWMWA_EXTENDED_FRAME_BOUNDS, out rect, Marshal.SizeOf(typeof(RECT)));
 			if (result >= 0)
 			{
-				rectangle = rect.ToRect();
+				rectangle = rect;
 				return true;
 			}
-			rectangle = Rect.Empty;
+			rectangle = RECT.Empty;
 			return false;
 		}
 	}

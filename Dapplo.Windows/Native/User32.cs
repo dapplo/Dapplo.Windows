@@ -299,14 +299,14 @@ namespace Dapplo.Windows.Native
 		///     Helper method to get the window size for GDI Windows
 		/// </summary>
 		/// <param name="hWnd">IntPtr</param>
-		/// <param name="rectangle">out Rectangle</param>
+		/// <param name="rectangle">out RECT</param>
 		/// <returns>bool true if it worked</returns>
-		public static bool GetWindowRect(IntPtr hWnd, out Rect rectangle)
+		public static bool GetWindowRect(IntPtr hWnd, out RECT rectangle)
 		{
 			var windowInfo = new WINDOWINFO();
 			// Get the Window Info for this window
 			var result = GetWindowInfo(hWnd, ref windowInfo);
-			rectangle = result ? windowInfo.rcWindow.ToRect() : Rect.Empty;
+			rectangle = result ? windowInfo.rcWindow : RECT.Empty;
 			return result;
 		}
 
