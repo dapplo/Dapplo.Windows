@@ -35,8 +35,6 @@ using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.SafeHandles;
 using Dapplo.Windows.Structs;
-using Point = System.Windows.Point;
-using Size = System.Windows.Size;
 
 #endregion
 
@@ -105,21 +103,21 @@ namespace Dapplo.Windows.Native
 		/// <summary>
 		///     Helper method to get the Border size for GDI Windows
 		/// </summary>
-		/// <param name="hWnd"></param>
-		/// <param name="size"></param>
+		/// <param name="hWnd">IntPtr</param>
+		/// <param name="size">SIZE</param>
 		/// <returns>bool true if it worked</returns>
-		public static bool GetBorderSize(IntPtr hWnd, out Size size)
+		public static bool GetBorderSize(IntPtr hWnd, out SIZE size)
 		{
 			var windowInfo = new WINDOWINFO();
 			// Get the Window Info for this window
 			var result = GetWindowInfo(hWnd, ref windowInfo);
 			if (result)
 			{
-				size = new Size((int) windowInfo.cxWindowBorders, (int) windowInfo.cyWindowBorders);
+				size = new SIZE((int) windowInfo.cxWindowBorders, (int) windowInfo.cyWindowBorders);
 			}
 			else
 			{
-				size = Size.Empty;
+				size = SIZE.Empty;
 			}
 			return result;
 		}
@@ -159,14 +157,14 @@ namespace Dapplo.Windows.Native
 		///     Helper method to get the window size for GDI Windows
 		/// </summary>
 		/// <param name="hWnd"></param>
-		/// <param name="rectangle">out Rectangle</param>
+		/// <param name="rectangle">out RECT</param>
 		/// <returns>bool true if it worked</returns>
-		public static bool GetClientRect(IntPtr hWnd, out Rect rectangle)
+		public static bool GetClientRect(IntPtr hWnd, out RECT rectangle)
 		{
 			var windowInfo = new WINDOWINFO();
 			// Get the Window Info for this window
 			var result = GetWindowInfo(hWnd, ref windowInfo);
-			rectangle = result ? windowInfo.rcClient.ToRect() : Rect.Empty;
+			rectangle = result ? windowInfo.rcClient : RECT.Empty;
 			return result;
 		}
 
@@ -174,10 +172,10 @@ namespace Dapplo.Windows.Native
 		///     Retrieves the cursor location safely, accounting for DPI settings in Vista/Windows 7.
 		/// </summary>
 		/// <returns>
-		///     Point with cursor location, relative to the origin of the monitor setup
+		///     POINT with cursor location, relative to the origin of the monitor setup
 		///     (i.e. negative coordinates arepossible in multiscreen setups)
 		/// </returns>
-		public static Point GetCursorLocation()
+		public static POINT GetCursorLocation()
 		{
 			if ((Environment.OSVersion.Version.Major >= 6) && _canCallGetPhysicalCursorPos)
 			{
@@ -186,7 +184,7 @@ namespace Dapplo.Windows.Native
 					POINT cursorLocation;
 					if (GetPhysicalCursorPos(out cursorLocation))
 					{
-						return new Point(cursorLocation.X, cursorLocation.Y);
+						return cursorLocation;
 					}
 					var error = Win32.GetLastErrorCode();
 					Log.Error().WriteLine("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
@@ -197,7 +195,7 @@ namespace Dapplo.Windows.Native
 					_canCallGetPhysicalCursorPos = false;
 				}
 			}
-			return new Point(Cursor.Position.X, Cursor.Position.Y);
+			return new POINT(Cursor.Position.X, Cursor.Position.Y);
 		}
 
 		/// <summary>

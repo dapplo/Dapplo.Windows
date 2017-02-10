@@ -29,6 +29,7 @@ using System;
 using System.Windows;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
+using Dapplo.Windows.Structs;
 
 #endregion
 
@@ -47,7 +48,7 @@ namespace Dapplo.Windows.Desktop
 		{
 			nativeWindowInfo.Text = User32.GetText(nativeWindowInfo.Handle);
 			nativeWindowInfo.Classname = User32.GetClassname(nativeWindowInfo.Handle);
-			Rect rectangle;
+			RECT rectangle;
 			User32.GetClientRect(nativeWindowInfo.Handle, out rectangle);
 			nativeWindowInfo.Bounds = rectangle;
 			return nativeWindowInfo;

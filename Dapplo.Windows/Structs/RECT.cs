@@ -304,5 +304,10 @@ namespace Dapplo.Windows.Structs
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Empty RECT
+		/// </summary>
+		public static RECT Empty => new RECT();
 	}
 }

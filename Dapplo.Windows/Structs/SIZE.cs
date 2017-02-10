@@ -74,6 +74,11 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
+		/// Returns an empty size
+		/// </summary>
+		public static SIZE Empty => new SIZE(0, 0);
+
+		/// <summary>
 		/// Constructor from S.W.Size
 		/// </summary>
 		/// <param name="size"></param>
@@ -110,18 +115,15 @@ namespace Dapplo.Windows.Structs
 		{
 			if (typeof(TSize) == typeof(Size))
 			{
-				return (TSize)(object)new Size(_width, _height);
+				return (TSize)(object)(IsEmpty ? Size.Empty : new Size(_width, _height));
 			}
-			return (TSize)(object)new System.Drawing.Size(_width, _height);
+			return (TSize)(object) (IsEmpty ? System.Drawing.Size.Empty : new System.Drawing.Size(_width, _height));
 		}
 
 		/// <summary>
 		/// Checks if the width * height are 0
 		/// </summary>
 		/// <returns>true if the size is empty</returns>
-		public bool IsEmpty()
-		{
-			return _width * _height == 0;
-		}
+		public bool IsEmpty => _width * _height == 0;
 	}
 }
