@@ -33,6 +33,9 @@ using System.Windows;
 
 namespace Dapplo.Windows.Structs
 {
+	/// <summary>
+	/// POINT structure for calling native methods
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	[Serializable]
 	public struct POINT
@@ -73,16 +76,21 @@ namespace Dapplo.Windows.Structs
 			return new POINT((int) p.X, (int) p.Y);
 		}
 
-		public Point ToPoint()
+		/// <summary>
+		/// Create System.Drawing.Point or System.Windows.Point depending on the generic type
+		/// </summary>
+		/// <typeparam name="TPoint">Type for the point</typeparam>
+		/// <returns>S.D.Point or S.W.Point</returns>
+		public TPoint ToPoint<TPoint>()
 		{
-			return new Point(X, Y);
+			if (typeof(TPoint) == typeof(Point))
+			{
+				return (TPoint)(object)new Point(X, Y);
+			}
+			return (TPoint)(object)new System.Drawing.Point(X, Y);
 		}
 
-		public System.Drawing.Point ToSystemDrawingPoint()
-		{
-			return new System.Drawing.Point(X, Y);
-		}
-
+		/// <inheritdoc />
 		public override string ToString()
 		{
 			return X + "," + Y;
