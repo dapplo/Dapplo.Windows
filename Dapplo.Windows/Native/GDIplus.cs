@@ -27,6 +27,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Dapplo.Log;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
 
@@ -37,20 +38,21 @@ namespace Dapplo.Windows.Native
 	/// <summary>
 	///     GDIplus Helpers
 	/// </summary>
-	public static class Gdiplus
+	public static class GdiPlus
 	{
+		private static readonly LogSource Log = new LogSource();
 		private static readonly Guid BlurEffectGuid = new Guid("{633C80A4-1843-482B-9EF2-BE2834C5FDD4}");
 
 		// Constant "FieldInfo" for getting the nativeImage from the Bitmap
-		private static readonly FieldInfo FIELD_INFO_NATIVE_IMAGE = typeof(Bitmap).GetField("nativeImage", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
+		private static readonly FieldInfo FieldInfoNativeImage = typeof(Bitmap).GetField("nativeImage", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
 		// Constant "FieldInfo" for getting the NativeGraphics from the Graphics
-		private static readonly FieldInfo FIELD_INFO_NATIVE_GRAPHICS = typeof(Graphics).GetField("nativeGraphics", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
+		private static readonly FieldInfo FieldInfoNativeGraphics = typeof(Graphics).GetField("nativeGraphics", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
 		// Constant "FieldInfo" for getting the nativeMatrix from the Matrix
-		private static readonly FieldInfo FIELD_INFO_NATIVE_MATRIX = typeof(Matrix).GetField("nativeMatrix", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
+		private static readonly FieldInfo FieldInfoNativeMatrix = typeof(Matrix).GetField("nativeMatrix", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
 		// Constant "FieldInfo" for getting the nativeImageAttributes from the ImageAttributes
-		private static readonly FieldInfo FIELD_INFO_NATIVE_IMAGEATTRIBUTES = typeof(ImageAttributes).GetField("nativeImageAttributes", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
+		private static readonly FieldInfo FieldInfoNativeImageattributes = typeof(ImageAttributes).GetField("nativeImageAttributes", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
 
-		private static bool isBlurEnabled = Environment.OSVersion.Version.Major >= 6;
+		private static bool _isBlurEnabled = Environment.OSVersion.Version.Major >= 6;
 
 		/// <summary>
 		///     Use the GDI+ blur effect on the bitmap
@@ -72,9 +74,11 @@ namespace Dapplo.Windows.Native
 			try
 			{
 				// Create a BlurParams struct and set the values
-				var blurParams = new BlurParams();
-				blurParams.Radius = radius;
-				blurParams.ExpandEdges = expandEdges;
+				var blurParams = new BlurParams
+				{
+					Radius = radius,
+					ExpandEdges = expandEdges
+				};
 
 				// Allocate space in unmanaged memory
 				hBlurParams = Marshal.AllocHGlobal(Marshal.SizeOf(blurParams));
@@ -83,9 +87,19 @@ namespace Dapplo.Windows.Native
 
 				// Create the GDI+ BlurEffect, using the Guid
 				var status = GdipCreateEffect(BlurEffectGuid, out hEffect);
+				if (status != GdiPlusStatus.Ok)
+				{
+					Log.Error().WriteLine("Couldn't create effect {0}: {1}", BlurEffectGuid, status);
+					return false;
+				}
 
 				// Set the blurParams to the effect
-				GdipSetEffectParameters(hEffect, hBlurParams, (uint) Marshal.SizeOf(blurParams));
+				status = GdipSetEffectParameters(hEffect, hBlurParams, (uint) Marshal.SizeOf(blurParams));
+				if (status != GdiPlusStatus.Ok)
+				{
+					Log.Error().WriteLine("Couldn't set effect parameter: {0}", status);
+					return false;
+				}
 
 				// Somewhere it said we can use destinationBitmap.GetHbitmap(), this doesn't work!!
 				// Get the private nativeImage property from the Bitmap
@@ -94,15 +108,20 @@ namespace Dapplo.Windows.Native
 				// Create a RECT from the Rectangle
 				var rec = new RECT(area);
 				// Apply the effect to the bitmap in the specified area
-				GdipBitmapApplyEffect(hBitmap, hEffect, ref rec, false, IntPtr.Zero, 0);
+				status = GdipBitmapApplyEffect(hBitmap, hEffect, ref rec, false, IntPtr.Zero, 0);
+				if (status != GdiPlusStatus.Ok)
+				{
+					Log.Error().WriteLine("Couldn't apply effect: {0}", status);
+					return false;
+				}
 
 				// Everything worked, return true
 				return true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				isBlurEnabled = false;
-				// LOG.Error("Problem using GdipBitmapApplyEffect: ", ex);
+				_isBlurEnabled = false;
+				Log.Error().WriteLine(ex, "Problem using GdipBitmapApplyEffect: ");
 				return false;
 			}
 			finally
@@ -112,7 +131,11 @@ namespace Dapplo.Windows.Native
 					if (hEffect != IntPtr.Zero)
 					{
 						// Delete the effect
-						GdipDeleteEffect(hEffect);
+						var status = GdipDeleteEffect(hEffect);
+						if (status != GdiPlusStatus.Ok)
+						{
+							Log.Error().WriteLine("Couldn't delete effect: {0}", status);
+						}
 					}
 					if (hBlurParams != IntPtr.Zero)
 					{
@@ -120,10 +143,10 @@ namespace Dapplo.Windows.Native
 						Marshal.FreeHGlobal(hBlurParams);
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
-					isBlurEnabled = false;
-					// LOG.Error("Problem cleaning up ApplyBlur: ", ex);
+					_isBlurEnabled = false;
+					Log.Error().WriteLine(ex, "Problem cleaning up ApplyBlur: ");
 				}
 			}
 		}
@@ -145,10 +168,12 @@ namespace Dapplo.Windows.Native
 			try
 			{
 				// Create a BlurParams struct and set the values
-				var blurParams = new BlurParams();
-				blurParams.Radius = radius;
-				//blurParams.Padding = radius;
-				blurParams.ExpandEdges = false;
+				var blurParams = new BlurParams
+				{
+					Radius = radius,
+					ExpandEdges = false
+					//blurParams.Padding = radius;
+				};
 
 				// Allocate space in unmanaged memory
 				hBlurParams = Marshal.AllocHGlobal(Marshal.SizeOf(blurParams));
@@ -157,9 +182,19 @@ namespace Dapplo.Windows.Native
 
 				// Create the GDI+ BlurEffect, using the Guid
 				var status = GdipCreateEffect(BlurEffectGuid, out hEffect);
+				if (status != GdiPlusStatus.Ok)
+				{
+					Log.Error().WriteLine("Couldn't create effect {0}: {1}", BlurEffectGuid, status);
+					return false;
+				}
 
 				// Set the blurParams to the effect
-				GdipSetEffectParameters(hEffect, hBlurParams, (uint) Marshal.SizeOf(blurParams));
+				status = GdipSetEffectParameters(hEffect, hBlurParams, (uint) Marshal.SizeOf(blurParams));
+				if (status != GdiPlusStatus.Ok)
+				{
+					Log.Error().WriteLine("Couldn't apply parameters: {0}", status);
+					return false;
+				}
 
 				// Somewhere it said we can use destinationBitmap.GetHbitmap(), this doesn't work!!
 				// Get the private nativeImage property from the Bitmap
@@ -169,17 +204,22 @@ namespace Dapplo.Windows.Native
 				var hAttributes = GetNativeImageAttributes(imageAttributes);
 
 				// Create a RECT from the Rectangle
-				var sourceRECF = new RECTF(source);
+				var sourceRecf = new RECTF(source);
 				// Apply the effect to the bitmap in the specified area
-				GdipDrawImageFX(hGraphics, hBitmap, ref sourceRECF, hMatrix, hEffect, hAttributes, GpUnit.UnitPixel);
+				status = GdipDrawImageFX(hGraphics, hBitmap, ref sourceRecf, hMatrix, hEffect, hAttributes, GpUnit.UnitPixel);
+				if (status != GdiPlusStatus.Ok)
+				{
+					Log.Error().WriteLine("Couldn't draw image: {0}", status);
+					return false;
+				}
 
 				// Everything worked, return true
 				return true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				isBlurEnabled = false;
-				//LOG.Error("Problem using GdipDrawImageFX: ", ex);
+				_isBlurEnabled = false;
+				Log.Error().WriteLine(ex, "Problem using GdipDrawImageFX: ");
 				return false;
 			}
 			finally
@@ -189,7 +229,12 @@ namespace Dapplo.Windows.Native
 					if (hEffect != IntPtr.Zero)
 					{
 						// Delete the effect
-						GdipDeleteEffect(hEffect);
+						var status = GdipDeleteEffect(hEffect);
+						if (status != GdiPlusStatus.Ok)
+						{
+							Log.Error().WriteLine("Couldn't delete effect: {0}", status);
+						}
+
 					}
 					if (hBlurParams != IntPtr.Zero)
 					{
@@ -197,28 +242,28 @@ namespace Dapplo.Windows.Native
 						Marshal.FreeHGlobal(hBlurParams);
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
-					isBlurEnabled = false;
-					//LOG.Error("Problem cleaning up DrawWithBlur: ", ex);
+					_isBlurEnabled = false;
+					Log.Error().WriteLine(ex, "Problem cleaning up DrawWithBlur: ");
 				}
 			}
 		}
 
 		[DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
-		private static extern int GdipBitmapApplyEffect(IntPtr bitmap, IntPtr effect, ref RECT rectOfInterest, [MarshalAs(UnmanagedType.Bool)] bool useAuxData, IntPtr auxData, int auxDataSize);
+		private static extern GdiPlusStatus GdipBitmapApplyEffect(IntPtr bitmap, IntPtr effect, ref RECT rectOfInterest, [MarshalAs(UnmanagedType.Bool)] bool useAuxData, IntPtr auxData, int auxDataSize);
 
 		[DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
-		private static extern int GdipCreateEffect(Guid guid, out IntPtr effect);
+		private static extern GdiPlusStatus GdipCreateEffect(Guid guid, out IntPtr effect);
 
 		[DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
-		private static extern int GdipDeleteEffect(IntPtr effect);
+		private static extern GdiPlusStatus GdipDeleteEffect(IntPtr effect);
 
 		[DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
-		private static extern int GdipDrawImageFX(IntPtr graphics, IntPtr bitmap, ref RECTF source, IntPtr matrix, IntPtr effect, IntPtr imageAttributes, GpUnit srcUnit);
+		private static extern GdiPlusStatus GdipDrawImageFX(IntPtr graphics, IntPtr bitmap, ref RECTF source, IntPtr matrix, IntPtr effect, IntPtr imageAttributes, GpUnit srcUnit);
 
 		[DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
-		private static extern int GdipSetEffectParameters(IntPtr effect, IntPtr parameters, uint size);
+		private static extern GdiPlusStatus GdipSetEffectParameters(IntPtr effect, IntPtr parameters, uint size);
 
 		/// <summary>
 		///     Get the NativeGraphics field from the graphics
@@ -231,7 +276,7 @@ namespace Dapplo.Windows.Native
 			{
 				return IntPtr.Zero;
 			}
-			return (IntPtr) FIELD_INFO_NATIVE_GRAPHICS.GetValue(graphics);
+			return (IntPtr) FieldInfoNativeGraphics.GetValue(graphics);
 		}
 
 		/// <summary>
@@ -245,7 +290,7 @@ namespace Dapplo.Windows.Native
 			{
 				return IntPtr.Zero;
 			}
-			return (IntPtr) FIELD_INFO_NATIVE_IMAGE.GetValue(bitmap);
+			return (IntPtr) FieldInfoNativeImage.GetValue(bitmap);
 		}
 
 		/// <summary>
@@ -259,7 +304,7 @@ namespace Dapplo.Windows.Native
 			{
 				return IntPtr.Zero;
 			}
-			return (IntPtr) FIELD_INFO_NATIVE_IMAGEATTRIBUTES.GetValue(imageAttributes);
+			return (IntPtr) FieldInfoNativeImageattributes.GetValue(imageAttributes);
 		}
 
 		/// <summary>
@@ -273,27 +318,26 @@ namespace Dapplo.Windows.Native
 			{
 				return IntPtr.Zero;
 			}
-			return (IntPtr) FIELD_INFO_NATIVE_MATRIX.GetValue(matrix);
+			return (IntPtr) FieldInfoNativeMatrix.GetValue(matrix);
 		}
 
 		/// <summary>
-		///     Returns if a GDIPlus blur can be made for the supplied radius.
-		///     This accounts for the "bug" I reported here:
-		///     http://social.technet.microsoft.com/Forums/en/w8itprogeneral/thread/99ddbe9d-556d-475a-8bab-84e25aa13a2c
+		/// Returns if a GDIPlus blur can be made for the supplied radius.
+		/// This accounts for the "bug" I reported here: http://social.technet.microsoft.com/Forums/en/w8itprogeneral/thread/99ddbe9d-556d-475a-8bab-84e25aa13a2c
 		/// </summary>
 		/// <param name="radius"></param>
-		/// <returns></returns>
+		/// <returns>false if blur is not possible</returns>
 		public static bool IsBlurPossible(int radius)
 		{
-			if (!isBlurEnabled)
+			if (!_isBlurEnabled)
 			{
 				return false;
 			}
-			if ((Environment.OSVersion.Version.Minor >= 2) && (radius < 20))
+			if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor < 2)
 			{
-				return false;
+				return true;
 			}
-			return true;
+			return Environment.OSVersion.Version.Major > 6 && radius >= 20;
 		}
 	}
 }

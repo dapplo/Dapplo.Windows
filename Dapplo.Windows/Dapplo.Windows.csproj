@@ -72,6 +72,7 @@
     <Compile Include="Desktop\NativeWindowInfo.cs" />
     <Compile Include="Desktop\NativeWindowInfoExtensions.cs" />
     <Compile Include="Enums\BitmapCompressionMethods.cs" />
+    <Compile Include="Enums\DwmBlurBehindFlags.cs" />
     <Compile Include="Enums\MonitorFromRectFlags.cs" />
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
     <Compile Include="Structs\HardwareInput.cs" />
@@ -87,7 +88,7 @@
     <Compile Include="Enums\DesktopAccessRight.cs" />
     <Compile Include="Enums\DeviceCaps.cs" />
     <Compile Include="Enums\DwmWindowAttributes.cs" />
-    <Compile Include="Enums\DwmBlurBehindFlags.cs" />
+    <Compile Include="Enums\GdiPlusStatus.cs" />
     <Compile Include="Enums\ExtendedWindowStyleFlags.cs" />
     <Compile Include="Enums\GetWindowCommands.cs" />
     <Compile Include="Enums\GpUnit.cs" />
@@ -108,7 +109,7 @@
     <Compile Include="Reactive\KeyboardHookEventArgs.cs" />
     <Compile Include="Native\Gdi32.cs" />
     <Compile Include="Native\GdiExtensions.cs" />
-    <Compile Include="Native\Gdiplus.cs" />
+    <Compile Include="Native\GdiPlus.cs" />
     <Compile Include="Native\Kernel32.cs" />
     <Compile Include="Native\PsAPI.cs" />
     <Compile Include="Native\Shell32.cs" />
