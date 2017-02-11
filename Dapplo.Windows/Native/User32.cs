@@ -28,7 +28,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows;
 using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Windows.Desktop;
@@ -76,10 +75,10 @@ namespace Dapplo.Windows.Native
 				{
 					ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left),
 					ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
-					Bounds = monitorInfoEx.Monitor.ToRect(),
-					BoundsRectangle = monitorInfoEx.Monitor.ToRectangle(),
-					WorkingArea = monitorInfoEx.WorkArea.ToRect(),
-					WorkingAreaRectangle = monitorInfoEx.WorkArea.ToRectangle(),
+					Bounds = monitorInfoEx.Monitor,
+					BoundsRectangle = monitorInfoEx.Monitor,
+					WorkingArea = monitorInfoEx.WorkArea,
+					WorkingAreaRectangle = monitorInfoEx.WorkArea,
 					IsPrimary = (monitorInfoEx.Flags | MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary
 				};
 				result.Add(displayInfo);
@@ -614,10 +613,10 @@ namespace Dapplo.Windows.Native
 		public static extern int GetSystemMetrics(SystemMetric index);
 
 		/// <summary>
-		///     The following is used for Icon handling
+		///     The following is used for Icon handling, and copies a hicon to a new
 		/// </summary>
-		/// <param name="hIcon"></param>
-		/// <returns></returns>
+		/// <param name="hIcon">IntPtr</param>
+		/// <returns>SafeIconHandle</returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern SafeIconHandle CopyIcon(IntPtr hIcon);
 

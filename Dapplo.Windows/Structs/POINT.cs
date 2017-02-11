@@ -40,54 +40,72 @@ namespace Dapplo.Windows.Structs
 	[Serializable]
 	public struct POINT
 	{
-		public int X;
-		public int Y;
+		private int _x;
+		private int _y;
 
-		public POINT(int x, int y)
+		/// <summary>
+		/// The X coordinate
+		/// </summary>
+		public int X
 		{
-			X = x;
-			Y = y;
-		}
-
-		public POINT(Point point)
-		{
-			X = (int) point.X;
-			Y = (int) point.Y;
-		}
-
-		public POINT(System.Drawing.Point point)
-		{
-			X = point.X;
-			Y = point.Y;
-		}
-
-		public static implicit operator Point(POINT p)
-		{
-			return new Point(p.X, p.Y);
-		}
-
-		public static implicit operator System.Drawing.Point(POINT p)
-		{
-			return new System.Drawing.Point(p.X, p.Y);
-		}
-
-		public static implicit operator POINT(Point p)
-		{
-			return new POINT((int) p.X, (int) p.Y);
+			get { return _x; }
+			set { _x = value; }
 		}
 
 		/// <summary>
-		/// Create System.Drawing.Point or System.Windows.Point depending on the generic type
+		/// The Y coordinate
 		/// </summary>
-		/// <typeparam name="TPoint">Type for the point</typeparam>
-		/// <returns>S.D.Point or S.W.Point</returns>
-		public TPoint ToPoint<TPoint>()
+		public int Y
 		{
-			if (typeof(TPoint) == typeof(Point))
-			{
-				return (TPoint)(object)new Point(X, Y);
-			}
-			return (TPoint)(object)new System.Drawing.Point(X, Y);
+			get { return _y; }
+			set { _y = value; }
+		}
+
+		/// <summary>
+		/// Constructor with x and y coordinates
+		/// </summary>
+		/// <param name="x">int</param>
+		/// <param name="y">int</param>
+		public POINT(int x, int y)
+		{
+			_x = x;
+			_y = y;
+		}
+
+		/// <summary>
+		/// Implicit cast from POINT to Point
+		/// </summary>
+		/// <param name="point">POINT</param>
+		public static implicit operator Point(POINT point)
+		{
+			return new Point(point.X, point.Y);
+		}
+
+		/// <summary>
+		/// Implicit cast from POINT to System.Drawing.Point
+		/// </summary>
+		/// <param name="point">POINT</param>
+		public static implicit operator System.Drawing.Point(POINT point)
+		{
+			return new System.Drawing.Point(point.X, point.Y);
+		}
+
+		/// <summary>
+		/// Implicit cast from Point to POINT
+		/// </summary>
+		/// <param name="point">Point</param>
+		public static implicit operator POINT(Point point)
+		{
+			return new POINT((int) point.X, (int) point.Y);
+		}
+
+		/// <summary>
+		/// Implicit cast from System.Drawing.Point to POINT
+		/// </summary>
+		/// <param name="point">System.Drawing.Point</param>
+		public static implicit operator POINT(System.Drawing.Point point)
+		{
+			return new POINT(point.X, point.Y);
 		}
 
 		/// <inheritdoc />

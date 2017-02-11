@@ -94,22 +94,6 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// A factory method to simplify creating input from a list of VirtualKeyCodes
-		/// </summary>
-		/// <returns>Input[]</returns>
-		public static Input[] CreateKeyPresses(params VirtualKeyCodes[] virtualKeyCodes)
-		{
-			var keyboardInputs = new KeyboardInput[virtualKeyCodes.Length * 2];
-			int index = 0;
-			foreach (var virtualKeyCode in virtualKeyCodes)
-			{
-				keyboardInputs[index++] = KeyboardInput.ForKeyDown(virtualKeyCode);
-				keyboardInputs[index++] = KeyboardInput.ForKeyUp(virtualKeyCode);
-			}
-			return CreateKeyboardInputs(keyboardInputs);
-		}
-
-		/// <summary>
 		/// Used as the Size in the SendInput call
 		/// </summary>
 		public static int Size => Marshal.SizeOf(typeof(Input));

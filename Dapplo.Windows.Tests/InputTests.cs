@@ -71,7 +71,7 @@ namespace Dapplo.Windows.Tests
 				Assert.NotNull(notepadWindow);
 
 				// Send input
-				var sentInputs = User32.SendInput(Input.CreateKeyPresses(VirtualKeyCodes.KEY_R, VirtualKeyCodes.KEY_O, VirtualKeyCodes.KEY_B, VirtualKeyCodes.KEY_I, VirtualKeyCodes.KEY_N));
+				var sentInputs = InputGenerator.Press(VirtualKeyCodes.KEY_R, VirtualKeyCodes.KEY_O, VirtualKeyCodes.KEY_B, VirtualKeyCodes.KEY_I, VirtualKeyCodes.KEY_N);
 				// Test if we indead sent 10 inputs (5 x down & up)
 				Assert.Equal((uint)10, sentInputs);
 

@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DisplayTest.cs" />
+    <Compile Include="DwmTest.cs" />
     <Compile Include="WinEventHookTests.cs" />
     <Compile Include="InputTests.cs" />
     <Compile Include="ScrollingTests.cs" />

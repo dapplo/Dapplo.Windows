@@ -38,7 +38,7 @@ namespace Dapplo.Windows.Desktop
 	/// <summary>
 	///     Query for native windows
 	/// </summary>
-	public static class WindowQuery
+	public static class NativeWindowQuery
 	{
 		/// <summary>
 		///     Window classes which can be ignored

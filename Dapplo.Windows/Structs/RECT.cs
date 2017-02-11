@@ -185,7 +185,7 @@ namespace Dapplo.Windows.Structs
 		/// <returns>Rect</returns>
 		public static implicit operator Rect(RECT rectangle)
 		{
-			return rectangle.ToRect();
+			return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
 		}
 
 		/// <summary>
@@ -267,26 +267,7 @@ namespace Dapplo.Windows.Structs
 		/// </summary>
 		/// <returns>true when empty</returns>
 		public bool IsEmpty => Width * Height == 0;
-
-		/// <summary>
-		/// Create a Rect
-		/// </summary>
-		/// <returns>Rect</returns>
-		public Rect ToRect()
-		{
-			return new Rect(Left, Top, Width, Height);
-		}
-
-
-		/// <summary>
-		/// Create a Rectangle from the RECT
-		/// </summary>
-		/// <returns>Rectangle</returns>
-		public Rectangle ToRectangle()
-		{
-			return new Rectangle(Left, Top, Width, Height);
-		}
-
+		
 		/// <inheritdoc />
 		public override bool Equals(object Object)
 		{

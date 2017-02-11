@@ -107,23 +107,45 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Create System.Drawing.Size or System.Windows.Size depending on the generic type
-		/// </summary>
-		/// <typeparam name="TSize"></typeparam>
-		/// <returns>S.D.Size or S.W.Size</returns>
-		public TSize ToSize<TSize>()
-		{
-			if (typeof(TSize) == typeof(Size))
-			{
-				return (TSize)(object)(IsEmpty ? Size.Empty : new Size(_width, _height));
-			}
-			return (TSize)(object) (IsEmpty ? System.Drawing.Size.Empty : new System.Drawing.Size(_width, _height));
-		}
-
-		/// <summary>
 		/// Checks if the width * height are 0
 		/// </summary>
 		/// <returns>true if the size is empty</returns>
 		public bool IsEmpty => _width * _height == 0;
+
+		/// <summary>
+		/// Implicit cast from SIZE to Size
+		/// </summary>
+		/// <param name="size">SIZE</param>
+		public static implicit operator Size(SIZE size)
+		{
+			return new Size(size.Width, size.Height);
+		}
+
+		/// <summary>
+		/// Implicit cast from Size to SIZE
+		/// </summary>
+		/// <param name="size">Size</param>
+		public static implicit operator SIZE(Size size)
+		{
+			return new SIZE((int)size.Width, (int)size.Height);
+		}
+
+		/// <summary>
+		/// Implicit cast from SIZE to System.Drawing.Size
+		/// </summary>
+		/// <param name="size">SIZE</param>
+		public static implicit operator System.Drawing.Size(SIZE size)
+		{
+			return new System.Drawing.Size(size.Width, size.Height);
+		}
+
+		/// <summary>
+		/// Implicit cast from System.Drawing.Size to SIZE
+		/// </summary>
+		/// <param name="size">System.Drawing.Size</param>
+		public static implicit operator SIZE(System.Drawing.Size size)
+		{
+			return new SIZE(size.Width, size.Height);
+		}
 	}
 }

@@ -21,25 +21,39 @@
 
 #region using
 
-using System;
+using System.Diagnostics;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using Dapplo.Log;
+using Dapplo.Log.XUnit;
+using Xunit;
+using Xunit.Abstractions;
+using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Enums;
+using Dapplo.Windows.Native;
+using Dapplo.Windows.Structs;
 
 #endregion
 
-namespace Dapplo.Windows
+namespace Dapplo.Windows.Tests
 {
-	/// <summary>
-	///     Event arguments for the TitleChangeEvent
-	/// </summary>
-	public class TitleChangeEventArgs : EventArgs
+	public class DwmTest
 	{
-		/// <summary>
-		///     HWnd of the window which has a changed title
-		/// </summary>
-		public IntPtr HWnd { get; set; }
+		private static readonly LogSource Log = new LogSource();
+
+		public DwmTest(ITestOutputHelper testOutputHelper)
+		{
+			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+		}
 
 		/// <summary>
-		///     Title which is changed
+		/// Test is Dwm is Enabled
 		/// </summary>
-		public string Title { get; set; }
+		/// <returns></returns>
+		//[Fact]
+		private void TestDwmEnabled()
+		{
+			Assert.True(Dwm.IsDwmEnabled);
+		}
 	}
 }

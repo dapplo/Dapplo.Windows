@@ -67,7 +67,7 @@
     <Compile Include="App\IAppVisibility.cs" />
     <Compile Include="App\MonitorAppVisibility.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
-    <Compile Include="Desktop\WindowQuery.cs" />
+    <Compile Include="Desktop\NativeWindowQuery.cs" />
     <Compile Include="Desktop\WindowsEnumerator.cs" />
     <Compile Include="Desktop\NativeWindowInfo.cs" />
     <Compile Include="Desktop\NativeWindowInfoExtensions.cs" />
@@ -75,6 +75,7 @@
     <Compile Include="Enums\DwmBlurBehindFlags.cs" />
     <Compile Include="Enums\MonitorFromRectFlags.cs" />
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
+    <Compile Include="InputGenerator.cs" />
     <Compile Include="Structs\HardwareInput.cs" />
     <Compile Include="Structs\Input.cs" />
     <Compile Include="Enums\InputTypes.cs" />
@@ -161,8 +162,6 @@
     <Compile Include="Enums\WinEventHookFlags.cs" />
     <Compile Include="Structs\WindowPlacement.cs" />
     <Compile Include="Structs\WinEventInfo.cs" />
-    <Compile Include="TitleChangeEventArgs.cs" />
-    <Compile Include="TitleChangeEventDelegate.cs" />
     <Compile Include="WindowScroller.cs" />
     <Compile Include="Reactive\WinEventHook.cs" />
     <Compile Include="WindowsMonitor.cs" />

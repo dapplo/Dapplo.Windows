@@ -295,7 +295,7 @@ namespace Dapplo.Windows
 			switch (ScrollMode)
 			{
 				case ScrollModes.KeyboardPageUpDown:
-					User32.SendInput(Input.CreateKeyPresses(VirtualKeyCodes.PRIOR));
+					InputGenerator.Press(VirtualKeyCodes.PRIOR);
 					break;
 				case ScrollModes.WindowsMessage:
 					// Calculate previous position
@@ -324,7 +324,7 @@ namespace Dapplo.Windows
 			switch (ScrollMode)
 			{
 				case ScrollModes.KeyboardPageUpDown:
-					User32.SendInput(Input.CreateKeyPresses(VirtualKeyCodes.NEXT));
+					InputGenerator.Press(VirtualKeyCodes.NEXT);
 					break;
 				case ScrollModes.WindowsMessage:
 					ScrollInfo scrollInfo;
