@@ -21,6 +21,7 @@
 
 #region using
 
+using System;
 using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -32,67 +33,39 @@ using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
-using System;
-using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
-using Dapplo.Log.Loggers;
-using Dapplo.Windows.Reactive;
 
 #endregion
 
 namespace Dapplo.Windows.Tests
 {
-	public class WinEventHookTests
+	public class User32Tests
 	{
 		private static readonly LogSource Log = new LogSource();
 
-		public WinEventHookTests(ITestOutputHelper testOutputHelper)
+		public User32Tests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
 		}
 
 		/// <summary>
-		/// Test typing in a notepad
+		/// Test GetWindow
 		/// </summary>
 		/// <returns></returns>
-		[StaFact]
-		private async Task TestWinEventHook()
+		//[Fact]
+		private void TestGetWindow()
 		{
-			// This takes care of having a WinProc handler, to make sure the messages arrive
-			var winProcHandler = WinProcHandler.Instance;
+			IntPtr windowPtr = User32.GetTopWindow(IntPtr.Zero);
 
-			// This buffers the observable
-			var replaySubject = new ReplaySubject<NativeWindowInfo>();
-
-			var winEventObservable =  WinEventHook.WindowTileChangeObservable()
-				.Select(info => NativeWindowInfo.CreateFor(info.Handle).Fill())
-				.Where(info => !string.IsNullOrEmpty(info.Text))
-				.Subscribe(windowInfo =>
+			do
 			{
-				Log.Debug().WriteLine("Window title change: Process ID {0} - Title: {1}", windowInfo.Handle, windowInfo.Text);
-				replaySubject.OnNext(windowInfo);
-			});
-
-			// Start a process to test against
-			using (var process = Process.Start("notepad.exe"))
-			{
-				try
+				var window = NativeWindowInfo.CreateFor(windowPtr);
+				if (!window.Fill().HasParent && !User32.IsIconic(window.Handle) && !string.IsNullOrEmpty(window.Text) && !window.Bounds.IsEmpty)
 				{
-					// Make sure it's started
-					Assert.NotNull(process);
-					// Wait until the process started it's message pump (listening for input)
-					process.WaitForInputIdle();
+					Debug.WriteLine("{0} - {1}", window.Classname, window.Text);
+				}
+				windowPtr = User32.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
 
-					// Find the belonging window
-					var notepadWindow = await replaySubject.Where(info => info.ProcessId == process.Id).FirstAsync();
-					Assert.Equal(process.Id, notepadWindow.ProcessId);
-				}
-				finally
-				{
-					process.Kill();
-					winEventObservable.Dispose();
-				}
-			}
+			} while (windowPtr != IntPtr.Zero);
 		}
 	}
 }

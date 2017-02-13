@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using Dapplo.Windows.Enums;
 
 #endregion
 
@@ -39,6 +40,11 @@ namespace Dapplo.Windows.Desktop
 		/// Returns the bounds of this window
 		/// </summary>
 		public Rect Bounds { get; set; }
+
+		/// <summary>
+		/// Returns the client bounds of this window
+		/// </summary>
+		public Rect ClientBounds { get; set; }
 
 		/// <summary>
 		/// Returns the children of this window
@@ -89,6 +95,16 @@ namespace Dapplo.Windows.Desktop
 		/// Get the process ID this window belongs to
 		/// </summary>
 		public int ProcessId { get; set; }
+
+		/// <summary>
+		/// ExtendedWindowStyleFlags for the Window
+		/// </summary>
+		public ExtendedWindowStyleFlags ExtendedWindowStyle { get; set; }
+
+		/// <summary>
+		/// WindowStyleFlags for the Window
+		/// </summary>
+		public WindowStyleFlags WindowStyle { get; set; }
 
 		/// <summary>
 		/// Create a NativeWindowInfo for the supplied handle
