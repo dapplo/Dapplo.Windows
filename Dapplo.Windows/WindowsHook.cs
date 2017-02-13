@@ -63,7 +63,7 @@ namespace Dapplo.Windows
 	/// <param name="windowsMessage">WindowsMessages</param>
 	/// <param name="mouseHookStruct">MSLLHOOK</param>
 	/// <returns>true if other hooks need to be called</returns>
-	public delegate bool MouseHookDelegate(WindowsMessages windowsMessage, MSLLHOOK mouseHookStruct);
+	public delegate bool MouseHookDelegate(WindowsMessages windowsMessage, MouseLowLevelHook mouseHookStruct);
 
 	/// <summary>
 	///     This class makes it possible to use the SetWindowsHookEx simplified.
@@ -149,7 +149,7 @@ namespace Dapplo.Windows
 		///     This is an example mouse hook for debugging
 		/// </summary>
 		/// <returns>true if other hooks need to be called</returns>
-		public static bool MouseDebugCallback(WindowsMessages windowsMessage, MSLLHOOK mouseHookStruct)
+		public static bool MouseDebugCallback(WindowsMessages windowsMessage, MouseLowLevelHook mouseHookStruct)
 		{
 			switch (windowsMessage)
 			{
@@ -175,7 +175,7 @@ namespace Dapplo.Windows
 				if (nCode == 0)
 				{
 					var windowsMessage = (WindowsMessages) wParam.ToInt32();
-					var mouseHookStruct = (MSLLHOOK) Marshal.PtrToStructure(lParam, typeof(MSLLHOOK));
+					var mouseHookStruct = (MouseLowLevelHook) Marshal.PtrToStructure(lParam, typeof(MouseLowLevelHook));
 					if (!callback(windowsMessage, mouseHookStruct))
 					{
 						return IntPtr.Zero;

@@ -1,4 +1,4 @@
-﻿#region Dapplo 2016 - GNU Lesser General Public License
+﻿#region Dapplo 2017 - GNU Lesser General Public License
 
 // Dapplo - building blocks for .NET applications
 // Copyright (C) 2017 Dapplo
@@ -26,22 +26,28 @@
 #region Usings
 
 using System;
-using System.Runtime.InteropServices;
 
 #endregion
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	///     This struct is passed in the WH_MOUSE_LL hook
-	///     See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms644970.aspx
+	///     The event-injected flags. An application can use the following values to test the flags.
+	/// Testing LLMHF_INJECTED (bit 0) will tell you whether the event was injected.
+	/// If it was, then testing LLMHF_LOWER_IL_INJECTED (bit 1) will tell you whether or not
+	/// the event was injected from a process running at lower integrity level.
 	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct MSLLHOOK
+	[Flags]
+	public enum ExtendedMouseFlags : uint
 	{
-		public POINT pt;
-		public IntPtr hwnd;
-		public uint wHitTestCode;
-		public IntPtr dwExtraInfo;
+		/// <summary>
+		///     Test the event-injected (from any process) flag.
+		/// </summary>
+		Injected = 0x01,
+
+		/// <summary>
+		///     Test the event-injected (from a process running at lower integrity level) flag.
+		/// </summary>
+		LowerIntegretyInjected = 0x02,
 	}
 }

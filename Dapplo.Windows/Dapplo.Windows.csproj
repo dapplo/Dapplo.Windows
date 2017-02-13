@@ -73,9 +73,14 @@
     <Compile Include="Desktop\NativeWindowInfoExtensions.cs" />
     <Compile Include="Enums\BitmapCompressionMethods.cs" />
     <Compile Include="Enums\DwmBlurBehindFlags.cs" />
+    <Compile Include="Enums\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\MonitorFromRectFlags.cs" />
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
     <Compile Include="InputGenerator.cs" />
+    <Compile Include="Enums\ExtendedKeyFlags.cs" />
+    <Compile Include="Reactive\MouseHookEventArgs.cs" />
+    <Compile Include="Reactive\MouseHook.cs" />
+    <Compile Include="Structs\KeyboardLowLevelHookStruct.cs" />
     <Compile Include="Structs\HardwareInput.cs" />
     <Compile Include="Structs\Input.cs" />
     <Compile Include="Enums\InputTypes.cs" />
@@ -145,7 +150,7 @@
     <Compile Include="Structs\IconInfo.cs" />
     <Compile Include="Structs\MonitorInfoEx.cs" />
     <Compile Include="Structs\MouseInput.cs" />
-    <Compile Include="Structs\MSLLHOOK.cs" />
+    <Compile Include="Structs\MouseLowLevelHookStruct.cs" />
     <Compile Include="Structs\POINT.cs" />
     <Compile Include="Structs\RECT.cs" />
     <Compile Include="Enums\HResult.cs" />
@@ -164,9 +169,8 @@
     <Compile Include="Structs\WinEventInfo.cs" />
     <Compile Include="WindowScroller.cs" />
     <Compile Include="Reactive\WinEventHook.cs" />
-    <Compile Include="WindowsMonitor.cs" />
-    <Compile Include="WindowsEventHook.cs" />
-    <Compile Include="WindowsHook.cs" />
+    <None Include="WindowsMonitor.cs" />
+    <None Include="WindowsHook.cs" />
     <Compile Include="Enums\WindowsMessages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsVersion.cs" />

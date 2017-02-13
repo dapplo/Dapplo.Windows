@@ -24,6 +24,7 @@
 using System;
 using System.Text;
 using System.Windows.Forms;
+using Dapplo.Windows.Enums;
 
 #endregion
 
@@ -127,7 +128,7 @@ namespace Dapplo.Windows.Reactive
 		/// <summary>
 		///     The key code itself
 		/// </summary>
-		public Keys Key { get; set; } = Keys.None;
+		public VirtualKeyCodes Key { get; set; } = VirtualKeyCodes.NONE;
 
 		/// <inheritdoc />
 		public override string ToString()

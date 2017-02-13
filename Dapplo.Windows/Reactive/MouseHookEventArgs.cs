@@ -19,37 +19,37 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.Windows.Enums
+#region using
+
+using System;
+using System.Text;
+using System.Windows.Forms;
+using Dapplo.Windows.Enums;
+using Dapplo.Windows.Structs;
+
+#endregion
+
+namespace Dapplo.Windows.Reactive
 {
 	/// <summary>
-	/// Type of compression used for the bitmap in the BitmapInfoHeader
+	///     Information on mouse changes
+	/// TODO: Make the information a lot clearer, than processing WindowsMessages
 	/// </summary>
-	public enum BitmapCompressionMethods : uint
+	public class MouseHookEventArgs : EventArgs
 	{
 		/// <summary>
-		/// No compression
+		///     Set this to true if the event is handled, other event-handlers in the chain will not be called
 		/// </summary>
-		BI_RGB = 0,
+		public bool Handled { get; set; }
+
 		/// <summary>
-		/// RLE 8BPP
+		/// The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
 		/// </summary>
-		BI_RLE8 = 1,
+		public POINT Point { get; set; }
+
 		/// <summary>
-		/// RLE 4BPP
+		/// The mouse message
 		/// </summary>
-		BI_RLE4 = 2,
-		/// <summary>
-		/// Specifies that the bitmap is not compressed and that the color table consists of three DWORD color masks that specify the
-		/// red, green, and blue components, respectively, of each pixel. This is valid when used with 16- and 32-bpp bitmaps.
-		/// </summary>
-		BI_BITFIELDS = 3,
-		/// <summary>
-		/// Indicates that the image is a JPEG image.
-		/// </summary>
-		BI_JPEG = 4,
-		/// <summary>
-		/// Indicates that the image is a PNG image.
-		/// </summary>
-		BI_PNG = 5
+		public WindowsMessages WindowsMessage { get; set; }
 	}
 }

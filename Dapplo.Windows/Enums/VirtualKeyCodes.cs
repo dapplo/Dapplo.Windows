@@ -33,6 +33,11 @@ namespace Dapplo.Windows.Enums
 	public enum VirtualKeyCodes : short
 	{
 		/// <summary>
+		///     Not a key
+		/// </summary>
+		NONE = 0x00,
+
+		/// <summary>
 		///     Left mouse button
 		/// </summary>
 		LBUTTON = 0x01,

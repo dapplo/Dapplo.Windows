@@ -27,6 +27,7 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
+using System.Collections.Generic;
 
 #endregion
 
@@ -39,6 +40,7 @@ namespace Dapplo.Windows.Reactive
 	/// </summary>
 	public static class WinEventHook
 	{
+		private static readonly IDictionary<IntPtr, WinEventDelegate> Delegates = new Dictionary<IntPtr, WinEventDelegate>();
 		/// <summary>
 		/// Create a WinEventHook as observable
 		/// </summary>
@@ -51,10 +53,14 @@ namespace Dapplo.Windows.Reactive
 		{
 			return Observable.Create<WinEventInfo>(observer =>
 			{
-				var hookPtr = SetWinEventHook(winEventStart, winEventEnd ?? winEventStart, IntPtr.Zero, (eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime) =>
+				WinEventDelegate winEventDelegate = (eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime) =>
 				{
 					observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime));
-				}, process, thread, WinEventHookFlags.OutOfContext);
+				};
+
+				var hookPtr = SetWinEventHook(winEventStart, winEventEnd ?? winEventStart, IntPtr.Zero, winEventDelegate, process, thread, WinEventHookFlags.OutOfContext);
+				// Store to keep a reference to it, otherwise it's GC'ed
+				Delegates[hookPtr] = winEventDelegate;
 				if (hookPtr == IntPtr.Zero)
 				{
 					observer.OnError(new Exception("Can't hook"));
@@ -64,6 +70,7 @@ namespace Dapplo.Windows.Reactive
 				return Disposable.Create(() =>
 				{
 					UnhookWinEvent(hookPtr);
+					Delegates.Remove(hookPtr);
 				});
 			}).Publish().RefCount();
 		}

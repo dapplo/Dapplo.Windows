@@ -28,6 +28,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Windows.Forms;
 using Dapplo.Log;
+using Dapplo.Windows.Enums;
+using Dapplo.Windows.Structs;
 
 #endregion
 
@@ -84,7 +86,7 @@ namespace Dapplo.Windows.Reactive
 					return CallNextHookEx(hookId, nCode, wParam, lParam);
 				};
 
-				hookId = SetWindowsHookEx(WhKeyboardLl, _callback, IntPtr.Zero, 0);
+				hookId = SetWindowsHookEx(HookTypes.WH_KEYBOARD_LL, _callback, IntPtr.Zero, 0);
 
 				return Disposable.Create(() =>
 				{
@@ -100,66 +102,67 @@ namespace Dapplo.Windows.Reactive
 		public static IObservable<KeyboardHookEventArgs> KeyboardEvents => Singleton.Value._keyObservable;
 
 		/// <summary>
-		///     Create the KeyPressInfo from the parameters which where in the event
+		///     Create the KeyboardHookEventArgs from the parameters which where in the event
 		/// </summary>
 		/// <param name="wParam">IntPtr</param>
 		/// <param name="lParam">IntPtr</param>
-		/// <returns>KeyPressInfo</returns>
+		/// <returns>KeyboardHookEventArgs</returns>
 		private static KeyboardHookEventArgs CreateKeyboardEventArgs(IntPtr wParam, IntPtr lParam)
 		{
 			var isKeyDown = (wParam == (IntPtr) WmKeydown) || (wParam == (IntPtr) WmSyskeydown);
-			var key = (Keys) Marshal.ReadInt32(lParam);
+
+			KeyboardLowLevelHookStruct keyboardLowLevelHookStruct = (KeyboardLowLevelHookStruct)Marshal.PtrToStructure(lParam, typeof(KeyboardLowLevelHookStruct));
 
 			// Check the key to find if there any modifiers, store these in the global values.
-			switch (key)
+			switch (keyboardLowLevelHookStruct.VirtualKeyCode)
 			{
-				case Keys.Capital:
+				case VirtualKeyCodes.CAPITAL:
 					if (isKeyDown)
 					{
 						_capsLock = !_capsLock;
 					}
 					break;
-				case Keys.NumLock:
+				case VirtualKeyCodes.NUMLOCK:
 					if (isKeyDown)
 					{
 						_numLock = !_numLock;
 					}
 					break;
-				case Keys.Scroll:
+				case VirtualKeyCodes.SCROLL:
 					if (isKeyDown)
 					{
 						_scrollLock = !_scrollLock;
 					}
 					break;
-				case Keys.LShiftKey:
+				case VirtualKeyCodes.LSHIFT:
 					_leftShift = isKeyDown;
 					break;
-				case Keys.RShiftKey:
+				case VirtualKeyCodes.RSHIFT:
 					_rightShift = isKeyDown;
 					break;
-				case Keys.LControlKey:
+				case VirtualKeyCodes.LCONTROL:
 					_leftCtrl = isKeyDown;
 					break;
-				case Keys.RControlKey:
+				case VirtualKeyCodes.RCONTROL:
 					_rightCtrl = isKeyDown;
 					break;
-				case Keys.LMenu:
+				case VirtualKeyCodes.LMENU:
 					_leftAlt = isKeyDown;
 					break;
-				case Keys.RMenu:
+				case VirtualKeyCodes.RMENU:
 					_rightAlt = isKeyDown;
 					break;
-				case Keys.LWin:
+				case VirtualKeyCodes.LWIN:
 					_leftWin = isKeyDown;
 					break;
-				case Keys.RWin:
+				case VirtualKeyCodes.RWIN:
 					_rightWin = isKeyDown;
 					break;
 			}
 
 			var keyEventArgs = new KeyboardHookEventArgs
 			{
-				Key = key,
+				Key = keyboardLowLevelHookStruct.VirtualKeyCode,
 				IsKeyDown = isKeyDown,
 				IsLeftShift = _leftShift,
 				IsRightShift = _rightShift,
@@ -265,18 +268,16 @@ namespace Dapplo.Windows.Reactive
 		/// <returns></returns>
 		private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-		private const int WhKeyboardLl = 13;
-
 		/// <summary>
 		///     Register a windows hook
 		/// </summary>
-		/// <param name="idHook"></param>
-		/// <param name="lpfn"></param>
-		/// <param name="hMod"></param>
-		/// <param name="dwThreadId"></param>
+		/// <param name="hookType">HookTypes</param>
+		/// <param name="lpfn">LowLevelKeyboardProc</param>
+		/// <param name="hMod">IntPtr</param>
+		/// <param name="dwThreadId">uint</param>
 		/// <returns>ID to be able to unhook it again</returns>
 		[DllImport("user32.dll", SetLastError = true)]
-		private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
+		private static extern IntPtr SetWindowsHookEx(HookTypes hookType, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
 
 		/// <summary>
 		///     Used to remove a hook which was set with SetWindowsHookEx
