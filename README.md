@@ -9,3 +9,11 @@ THIS IS WORK IN PROGRESS!
 
 
 This is actually code I wrote for Greenshot, and with this I am trying to place it into an external repository so it's easier to maintain.
+
+The following functionality is available:
+* Hooking windows events (window moved, changed title etc), mouse & Keyboard
+* Generating key presses or mouse input
+* Getting the title, location etc of windows
+* GDI / User 32 native method mapping
+* A lot of the native structs and enums
+... more
