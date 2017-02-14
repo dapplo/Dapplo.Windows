@@ -62,10 +62,10 @@ namespace Dapplo.Windows.Tests
 			var winProcHandler = WinProcHandler.Instance;
 
 			// This buffers the observable
-			var replaySubject = new ReplaySubject<NativeWindowInfo>();
+			var replaySubject = new ReplaySubject<NativeWindow>();
 
 			var winEventObservable =  WinEventHook.WindowTileChangeObservable()
-				.Select(info => NativeWindowInfo.CreateFor(info.Handle).Fill())
+				.Select(info => NativeWindow.CreateFor(info.Handle).Fill())
 				.Where(info => !string.IsNullOrEmpty(info.Text))
 				.Subscribe(windowInfo =>
 			{

@@ -69,8 +69,8 @@
     <Compile Include="Desktop\DisplayInfo.cs" />
     <Compile Include="Desktop\NativeWindowQuery.cs" />
     <Compile Include="Desktop\WindowsEnumerator.cs" />
-    <Compile Include="Desktop\NativeWindowInfo.cs" />
-    <Compile Include="Desktop\NativeWindowInfoExtensions.cs" />
+    <Compile Include="Desktop\NativeWindow.cs" />
+    <Compile Include="Desktop\NativeWindowExtensions.cs" />
     <Compile Include="Enums\BitmapCompressionMethods.cs" />
     <Compile Include="Enums\DwmBlurBehindFlags.cs" />
     <Compile Include="Enums\ExtendedMouseFlags.cs" />

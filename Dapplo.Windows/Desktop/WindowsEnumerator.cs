@@ -47,9 +47,9 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="hWndParent">IntPtr with the hwnd of the parent, or null for all</param>
 		/// <param name="cancellationToken">CancellationToken</param>
 		/// <returns>IObservable with WinWindowInfo</returns>
-		public static IObservable<NativeWindowInfo> EnumerateWindowsAsync(IntPtr? hWndParent = null, CancellationToken cancellationToken = default(CancellationToken))
+		public static IObservable<NativeWindow> EnumerateWindowsAsync(IntPtr? hWndParent = null, CancellationToken cancellationToken = default(CancellationToken))
 		{
-			return Observable.Create<NativeWindowInfo>(observer =>
+			return Observable.Create<NativeWindow>(observer =>
 			{
 				var continueWithEnumeration = true;
 				Task.Run(() =>
@@ -61,7 +61,7 @@ namespace Dapplo.Windows.Desktop
 						{
 							return false;
 						}
-						var windowInfo = NativeWindowInfo.CreateFor(hwnd);
+						var windowInfo = NativeWindow.CreateFor(hwnd);
 						observer.OnNext(windowInfo);
 						return continueWithEnumeration;
 					}, IntPtr.Zero);
@@ -81,14 +81,14 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="hWndParent">IntPtr with the hwnd of the parent, or null for all</param>
 		/// <param name="wherePredicate">Func for the where</param>
 		/// <param name="takeWhileFunc">Func which can decide to stop enumerating</param>
-		/// <returns>IEnumerable with NativeWindowInfo</returns>
-		public static IEnumerable<NativeWindowInfo> EnumerateWindows(IntPtr? hWndParent = null, Func<NativeWindowInfo, bool> wherePredicate = null, Func<NativeWindowInfo,bool> takeWhileFunc = null)
+		/// <returns>IEnumerable with NativeWindow</returns>
+		public static IEnumerable<NativeWindow> EnumerateWindows(IntPtr? hWndParent = null, Func<NativeWindow, bool> wherePredicate = null, Func<NativeWindow,bool> takeWhileFunc = null)
 		{
-			var result = new List<NativeWindowInfo>();
+			var result = new List<NativeWindow>();
 			User32.EnumChildWindows(hWndParent ?? IntPtr.Zero, (hwnd, param) =>
 			{
 				// check if we should continue
-				var windowInfo = NativeWindowInfo.CreateFor(hwnd);
+				var windowInfo = NativeWindow.CreateFor(hwnd);
 
 				if (wherePredicate?.Invoke(windowInfo) != false)
 				{

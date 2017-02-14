@@ -50,11 +50,11 @@ namespace Dapplo.Windows.Desktop
 
 		/// <summary>
 		///     Check if the window is a top level window.
-		///     This method will retrieve all information, and fill it to the NativeWindowInfo, it needs to make the decision.
+		///     This method will retrieve all information, and fill it to the NativeWindow, it needs to make the decision.
 		/// </summary>
 		/// <param name="nativeWindow">WindowDetails</param>
 		/// <returns>bool</returns>
-		public static bool IsTopLevel(this NativeWindowInfo nativeWindow)
+		public static bool IsTopLevel(this NativeWindow nativeWindow)
 		{
 			if (IgnoreClasses.Contains(nativeWindow.GetClassname()))
 			{
@@ -96,14 +96,14 @@ namespace Dapplo.Windows.Desktop
 		///     Iterate the Top level windows, from top to bottom
 		/// </summary>
 		/// <returns>IEnumerable with all the top level windows</returns>
-		public static IEnumerable<NativeWindowInfo> GetTopLevelWindows()
+		public static IEnumerable<NativeWindow> GetTopLevelWindows()
 		{
 
 			IntPtr windowPtr = User32.GetTopWindow(IntPtr.Zero);
 
 			do
 			{
-				var possibleTopLevel = NativeWindowInfo.CreateFor(windowPtr);
+				var possibleTopLevel = NativeWindow.CreateFor(windowPtr);
 
 				if (possibleTopLevel.IsTopLevel())
 				{
@@ -117,27 +117,27 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		///     Get the currently active window
 		/// </summary>
-		/// <returns>NativeWindowInfo</returns>
-		public static NativeWindowInfo GetActiveWindow()
+		/// <returns>NativeWindow</returns>
+		public static NativeWindow GetActiveWindow()
 		{
-			return NativeWindowInfo.CreateFor(User32.GetForegroundWindow());
+			return NativeWindow.CreateFor(User32.GetForegroundWindow());
 		}
 
 		/// <summary>
 		/// Gets the Desktop window
 		/// </summary>
-		/// <returns>NativeWindowInfo for the desktop window</returns>
-		public static NativeWindowInfo GetDesktopWindow()
+		/// <returns>NativeWindow for the desktop window</returns>
+		public static NativeWindow GetDesktopWindow()
 		{
-			return NativeWindowInfo.CreateFor(User32.GetDesktopWindow());
+			return NativeWindow.CreateFor(User32.GetDesktopWindow());
 		}
 
 		/// <summary>
 		/// Find windows belonging to the same process (thread) as the supplied window.
 		/// </summary>
-		/// <param name="windowToLinkTo">NativeWindowInfo</param>
-		/// <returns>IEnumerable with NativeWindowInfo</returns>
-		public static IEnumerable<NativeWindowInfo> GetLinkedWindows(this NativeWindowInfo windowToLinkTo)
+		/// <param name="windowToLinkTo">NativeWindow</param>
+		/// <returns>IEnumerable with NativeWindow</returns>
+		public static IEnumerable<NativeWindow> GetLinkedWindows(this NativeWindow windowToLinkTo)
 		{
 			int processIdSelectedWindow = windowToLinkTo.GetProcessId();
 
@@ -156,7 +156,7 @@ namespace Dapplo.Windows.Desktop
 					}
 					foreach (var handle in handles)
 					{
-						yield return NativeWindowInfo.CreateFor(handle);
+						yield return NativeWindow.CreateFor(handle);
 					}
 				}
 			}

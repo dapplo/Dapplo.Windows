@@ -62,10 +62,10 @@ namespace Dapplo.Windows.Tests
 				{
 
 					// Find the belonging window, by the process id
-					var notepadWindow = WindowsEnumerator.EnumerateWindows().FirstOrDefault(info =>
+					var notepadWindow = WindowsEnumerator.EnumerateWindows().FirstOrDefault(nativeWindow =>
 					{
 						int processId;
-						User32.GetWindowThreadProcessId(info.Handle, out processId);
+						User32.GetWindowThreadProcessId(nativeWindow, out processId);
 						return processId == process.Id;
 					});
 					Assert.NotNull(notepadWindow);

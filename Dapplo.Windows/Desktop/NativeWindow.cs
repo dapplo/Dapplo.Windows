@@ -23,7 +23,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Windows;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
 
@@ -35,8 +34,22 @@ namespace Dapplo.Windows.Desktop
 	/// Information about a native window
 	/// Note: This is a dumb container, and doesn't retrieve anything about the window itself
 	/// </summary>
-	public class NativeWindowInfo
+	public class NativeWindow
 	{
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="handle"></param>
+		internal NativeWindow(IntPtr handle)
+		{
+			Handle = handle;
+		}
+
+		/// <summary>
+		/// Handle (ID) of the window
+		/// </summary>
+		public IntPtr Handle { get; }
+
 		/// <summary>
 		/// Returns the bounds of this window
 		/// </summary>
@@ -50,17 +63,12 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		/// Returns the children of this window
 		/// </summary>
-		public IList<NativeWindowInfo> Children { get; set; }
+		public IList<NativeWindow> Children { get; set; }
 
 		/// <summary>
 		/// string with the name of the internal class for the window
 		/// </summary>
 		public string Classname { get; set; }
-
-		/// <summary>
-		/// Handle (ID) of the window
-		/// </summary>
-		public IntPtr Handle { get; set; }
 
 		/// <summary>
 		/// Does the window have a classname?
@@ -118,17 +126,52 @@ namespace Dapplo.Windows.Desktop
 		/// </summary>
 		public WindowPlacement? Placement { get; set; }
 
+		/// <inheritdoc />
+		public override int GetHashCode()
+		{
+			return Handle.GetHashCode();
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(object obj)
+		{
+			var other = obj as NativeWindow;
+			if (other == null)
+			{
+				return false;
+			}
+
+			return Handle.Equals(other.Handle);
+		}
+
 		/// <summary>
-		/// Create a NativeWindowInfo for the supplied handle
+		///     Implicit cast IntPtr to NavtiveWindowInfo
 		/// </summary>
 		/// <param name="handle">IntPtr</param>
-		/// <returns>NativeWindowInfo</returns>
-		public static NativeWindowInfo CreateFor(IntPtr handle)
+		/// <returns>NativeWindow</returns>
+		public static implicit operator NativeWindow(IntPtr handle)
 		{
-			return new NativeWindowInfo
-			{
-				Handle = handle
-			};
+			return CreateFor(handle);
+		}
+
+		/// <summary>
+		///     Implicit cast NavtiveWindowInfo to IntPtr
+		/// </summary>
+		/// <param name="nativeWindow">NativeWindow</param>
+		/// <returns>IntPtr for the handle</returns>
+		public static implicit operator IntPtr(NativeWindow nativeWindow)
+		{
+			return nativeWindow.Handle;
+		}
+
+		/// <summary>
+		/// Factory method to create a NativeWindow for the supplied handle
+		/// </summary>
+		/// <param name="handle">IntPtr</param>
+		/// <returns>NativeWindow</returns>
+		public static NativeWindow CreateFor(IntPtr handle)
+		{
+			return new NativeWindow(handle);
 		}
 	}
 }

@@ -34,7 +34,7 @@ using Dapplo.Windows.Enums;
 namespace Dapplo.Windows.Structs
 {
 	/// <summary>
-	///     The structure for the NativeWindowInfo
+	///     The structure for the WINDOWINFO
 	///     See <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms632610.aspx">WINDOWINFO</a>
 	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
