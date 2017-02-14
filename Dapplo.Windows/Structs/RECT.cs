@@ -168,9 +168,9 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		///     Size for this RECT
 		/// </summary>
-		public Size Size
+		public SIZE Size
 		{
-			get { return new Size(Width, Height); }
+			get { return new SIZE(Width, Height); }
 			set
 			{
 				_right = unchecked((int) value.Width + _left);

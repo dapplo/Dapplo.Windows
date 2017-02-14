@@ -173,6 +173,25 @@ namespace Dapplo.Windows.App
 		}
 
 		/// <summary>
+		/// Get the AppLauncher
+		/// </summary>
+		/// <returns>NativeWindow</returns>
+		public static NativeWindow GetAppLauncher()
+		{
+			// Works only if Windows 8 (or higher)
+			if (IsLauncherVisible)
+			{
+				return null;
+			}
+			IntPtr appLauncher = User32.FindWindow(ApplauncherClass, null);
+			if (appLauncher != IntPtr.Zero)
+			{
+				return NativeWindow.CreateFor(appLauncher);
+			}
+			return null;
+		}
+
+		/// <summary>
 		///     Check if a Windows Store App (WinRT) is visible
 		/// </summary>
 		/// <param name="windowBounds"></param>

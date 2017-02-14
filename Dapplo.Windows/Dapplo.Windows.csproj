@@ -24,6 +24,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <DocumentationFile>bin\Debug\Dapplo.Windows.XML</DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +36,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <DocumentationFile>bin\Release\Dapplo.Windows.XML</DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Dapplo.Log, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
@@ -77,6 +79,7 @@
     <Compile Include="Enums\MonitorFromRectFlags.cs" />
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
     <Compile Include="Enums\RasterOperations.cs" />
+    <Compile Include="Bitmaps\ImageExtensions.cs" />
     <Compile Include="InputGenerator.cs" />
     <Compile Include="Enums\ExtendedKeyFlags.cs" />
     <Compile Include="Reactive\MouseHookEventArgs.cs" />

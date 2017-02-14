@@ -27,9 +27,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
+using Dapplo.Windows.SafeHandles;
+using System.Threading.Tasks;
+using Dapplo.Log;
 
 #endregion
 
@@ -40,6 +44,7 @@ namespace Dapplo.Windows.Desktop
 	/// </summary>
 	public static class NativeWindowExtensions
 	{
+		private static readonly LogSource Log = new LogSource();
 		/// <summary>
 		///     Fill ALL the information of the NativeWindow
 		/// </summary>
@@ -256,6 +261,21 @@ namespace Dapplo.Windows.Desktop
 		}
 
 		/// <summary>
+		/// Retrieve if the window is maximized (Iconic)
+		/// </summary>
+		/// <param name="nativeWindow">NativeWindow</param>
+		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
+		/// <returns>bool true if Iconic (minimized)</returns>
+		public static bool IsMaximized(this NativeWindow nativeWindow, bool forceUpdate = false)
+		{
+			if (!nativeWindow.IsMaximized.HasValue || forceUpdate)
+			{
+				nativeWindow.IsMaximized = User32.IsZoomed(nativeWindow.Handle);
+			}
+			return nativeWindow.IsMaximized.Value;
+		}
+
+		/// <summary>
 		/// Minimize the Window
 		/// </summary>
 		/// <param name="nativeWindow">NativeWindow</param>
@@ -323,5 +343,72 @@ namespace Dapplo.Windows.Desktop
 			}
 			return children;
 		}
+
+		/// <summary>
+		/// Get the region for a window
+		/// </summary>
+		public static Region GetRegion(this NativeWindow nativeWindow)
+		{
+			using (SafeRegionHandle region = Gdi32.CreateRectRgn(0, 0, 0, 0))
+			{
+				if (!region.IsInvalid)
+				{
+					var result = User32.GetWindowRgn(nativeWindow.Handle, region);
+					if (result != RegionResults.REGION_ERROR && result != RegionResults.REGION_NULLREGION)
+					{
+						return Region.FromHrgn(region.DangerousGetHandle());
+					}
+				}
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// Set the window as foreground window
+		/// </summary>
+		/// <param name="nativeWindow">The window to bring to the foreground</param>
+		/// <param name="workaround">bool with true to use a trick to really bring the window to the foreground</param>
+		public static async Task ToForegroundAsync(this NativeWindow nativeWindow, bool workaround = true)
+		{
+			// Nothing we can do if it's not visible!
+			if (!nativeWindow.IsVisible())
+			{
+				return;
+			}
+			if (nativeWindow.IsMinimized())
+			{
+				nativeWindow.Restore();
+				while (nativeWindow.IsMinimized())
+				{
+					await Task.Delay(50).ConfigureAwait(false);
+				}
+			}
+			// See https://msdn.microsoft.com/en-us/library/windows/desktop/ms633539(v=vs.85).aspx
+			if (workaround)
+			{
+				// Simulate an "ALT" key press.
+				InputGenerator.Press(VirtualKeyCodes.MENU);
+			}
+			// Show window in forground.
+			User32.BringWindowToTop(nativeWindow.Handle);
+			User32.SetForegroundWindow(nativeWindow.Handle);
+		}
+
+		/// <summary>
+		/// Get the Border size for GDI Windows
+		/// </summary>
+		/// <param name="nativeWindow">NativeWindow</param>
+		/// <returns>bool true if it worked</returns>	
+		public static SIZE GetBorderSize(this NativeWindow nativeWindow)
+		{
+			var windowInfo = new WINDOWINFO();
+			// Get the Window Info for this window
+			if (User32.GetWindowInfo(nativeWindow.Handle, ref windowInfo))
+			{
+				return new SIZE((int)windowInfo.cxWindowBorders, (int)windowInfo.cyWindowBorders);
+			}
+			return SIZE.Empty;
+		}
+
 	}
 }
