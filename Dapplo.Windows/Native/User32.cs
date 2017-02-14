@@ -49,7 +49,7 @@ namespace Dapplo.Windows.Native
 		/// </summary>
 		/// <param name="hwnd"></param>
 		/// <param name="lParam"></param>
-		public delegate bool EnumWindowsProc(IntPtr hwnd, int lParam);
+		public delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr lParam);
 
 		// ReSharper disable once InconsistentNaming
 		private static readonly LogSource Log = new LogSource();
@@ -224,15 +224,28 @@ namespace Dapplo.Windows.Native
 		/// <summary>
 		///     Get the icon for a hWnd
 		/// </summary>
-		/// <param name="hWnd"></param>
+		/// <param name="hWnd">IntPtr</param>
+		/// <param name="useLargeIcons">true to try to get a big icon first</param>
 		/// <returns>System.Drawing.Icon</returns>
-		public static Icon GetIcon(IntPtr hWnd)
+		public static Icon GetIcon(IntPtr hWnd, bool useLargeIcons = false)
 		{
 			var iconSmall = IntPtr.Zero;
 			var iconBig = new IntPtr(1);
 			var iconSmall2 = new IntPtr(2);
 
-			var iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall2, IntPtr.Zero);
+			IntPtr iconHandle;
+			if (useLargeIcons)
+			{
+				iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero);
+				if (iconHandle == IntPtr.Zero)
+				{
+					iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.GCL_HICON);
+				}
+			}
+			else
+			{
+				iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall2, IntPtr.Zero);
+			}
 			if (iconHandle == IntPtr.Zero)
 			{
 				iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall, IntPtr.Zero);
@@ -512,6 +525,19 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool EnumWindows(EnumWindowsProc enumFunc, IntPtr param);
+
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633495(v=vs.85).aspx">EnumThreadWindows function</a>
+		/// Enumerates all nonchild windows associated with a thread by passing the handle to each window, in turn, to an application-defined callback function.
+		/// EnumThreadWindows continues until the last window is enumerated or the callback function returns FALSE.
+		/// To enumerate child windows of a particular window, use the EnumChildWindows function.
+		/// </summary>
+		/// <param name="threadId">The identifier of the thread whose windows are to be enumerated.</param>
+		/// <param name="enumFunc">EnumWindowsProc</param>
+		/// <param name="param">An application-defined value to be passed to the callback function.</param>
+		/// <returns></returns>
+		[DllImport("user32", SetLastError = true)]
+		public static extern bool EnumThreadWindows(int threadId, EnumWindowsProc enumFunc, IntPtr param);
 
 		/// <summary>
 		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a>

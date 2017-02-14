@@ -93,6 +93,11 @@ namespace Dapplo.Windows.Desktop
 		public bool? IsMinimized { get; set; }
 
 		/// <summary>
+		/// Returns true if the window is maximized
+		/// </summary>
+		public bool? IsMaximized { get; set; }
+
+		/// <summary>
 		/// Get the process ID this window belongs to
 		/// </summary>
 		public int? ProcessId { get; set; }
@@ -100,12 +105,18 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		/// ExtendedWindowStyleFlags for the Window
 		/// </summary>
-		public ExtendedWindowStyleFlags? ExtendedWindowStyle { get; set; }
+		public ExtendedWindowStyleFlags? ExtendedStyle { get; set; }
 
 		/// <summary>
 		/// WindowStyleFlags for the Window
 		/// </summary>
-		public WindowStyleFlags? WindowStyle { get; set; }
+		public WindowStyleFlags? Style { get; set; }
+
+
+		/// <summary>
+		/// WindowPlacement for the Window
+		/// </summary>
+		public WindowPlacement? Placement { get; set; }
 
 		/// <summary>
 		/// Create a NativeWindowInfo for the supplied handle

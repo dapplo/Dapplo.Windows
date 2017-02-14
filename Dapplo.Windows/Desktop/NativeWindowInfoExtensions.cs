@@ -35,7 +35,7 @@ using Dapplo.Windows.Structs;
 namespace Dapplo.Windows.Desktop
 {
 	/// <summary>
-	/// Extensions on the NativeWindowInfo
+	/// Extensions for the NativeWindowInfo, all get or set commands update the value in the NativeWindowInfo that is used.
 	/// </summary>
 	public static class NativeWindowInfoExtensions
 	{
@@ -50,10 +50,11 @@ namespace Dapplo.Windows.Desktop
 			nativeWindowInfo.GetClientBounds(forceUpdate);
 			nativeWindowInfo.GetText(forceUpdate);
 			nativeWindowInfo.GetClassname(forceUpdate);
-			nativeWindowInfo.GetExtendedWindowStyle(forceUpdate);
-			nativeWindowInfo.GetWindowStyle(forceUpdate);
+			nativeWindowInfo.GetExtendedStyle(forceUpdate);
+			nativeWindowInfo.GetStyle(forceUpdate);
 			nativeWindowInfo.GetProcessId(forceUpdate);
 			nativeWindowInfo.GetParent(forceUpdate);
+			nativeWindowInfo.GetPlacement(forceUpdate);
 			return nativeWindowInfo;
 		}
 
@@ -140,19 +141,47 @@ namespace Dapplo.Windows.Desktop
 		}
 
 		/// <summary>
+		///     Get the WindowPlacement
+		/// </summary>
+		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
+		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
+		/// <returns>WindowPlacement</returns>
+		public static WindowPlacement GetPlacement(this NativeWindowInfo nativeWindowInfo, bool forceUpdate = false)
+		{
+			if (!nativeWindowInfo.Placement.HasValue || forceUpdate)
+			{
+				WindowPlacement placement = WindowPlacement.Default;
+				User32.GetWindowPlacement(nativeWindowInfo.Handle, ref placement);
+				nativeWindowInfo.Placement = placement;
+			}
+			return nativeWindowInfo.Placement.Value;
+		}
+
+		/// <summary>
+		///     Set the WindowPlacement
+		/// </summary>
+		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
+		/// <param name="placement">WindowPlacement</param>
+		public static void SetPlacement(this NativeWindowInfo nativeWindowInfo, WindowPlacement placement)
+		{
+			User32.SetWindowPlacement(nativeWindowInfo.Handle, ref placement);
+			nativeWindowInfo.Placement = placement;
+		}
+
+		/// <summary>
 		///     Get the Extended WindowStyle
 		/// </summary>
 		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>ExtendedWindowStyleFlags</returns>
-		public static ExtendedWindowStyleFlags GetExtendedWindowStyle(this NativeWindowInfo nativeWindowInfo, bool forceUpdate = false)
+		public static ExtendedWindowStyleFlags GetExtendedStyle(this NativeWindowInfo nativeWindowInfo, bool forceUpdate = false)
 		{
-			if (!nativeWindowInfo.ExtendedWindowStyle.HasValue || forceUpdate)
+			if (!nativeWindowInfo.ExtendedStyle.HasValue || forceUpdate)
 			{
 				var extendedWindowStyleFlags = (ExtendedWindowStyleFlags)User32.GetWindowLongWrapper(nativeWindowInfo.Handle, WindowLongIndex.GWL_EXSTYLE);
-				nativeWindowInfo.ExtendedWindowStyle = extendedWindowStyleFlags;
+				nativeWindowInfo.ExtendedStyle = extendedWindowStyleFlags;
 			}
-			return nativeWindowInfo.ExtendedWindowStyle.Value;
+			return nativeWindowInfo.ExtendedStyle.Value;
 		}
 
 		/// <summary>
@@ -160,9 +189,9 @@ namespace Dapplo.Windows.Desktop
 		/// </summary>
 		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
 		/// <param name="extendedWindowStyleFlags">ExtendedWindowStyleFlags</param>
-		public static void SetExtendedWindowStyle(this NativeWindowInfo nativeWindowInfo, ExtendedWindowStyleFlags extendedWindowStyleFlags)
+		public static void SetExtendedStyle(this NativeWindowInfo nativeWindowInfo, ExtendedWindowStyleFlags extendedWindowStyleFlags)
 		{
-			nativeWindowInfo.ExtendedWindowStyle = extendedWindowStyleFlags;
+			nativeWindowInfo.ExtendedStyle = extendedWindowStyleFlags;
 			User32.SetWindowLongWrapper(nativeWindowInfo.Handle, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint)extendedWindowStyleFlags));
 		}
 
@@ -172,14 +201,14 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>WindowStyleFlags</returns>
-		public static WindowStyleFlags GetWindowStyle(this NativeWindowInfo nativeWindowInfo, bool forceUpdate = false)
+		public static WindowStyleFlags GetStyle(this NativeWindowInfo nativeWindowInfo, bool forceUpdate = false)
 		{
-			if (!nativeWindowInfo.WindowStyle.HasValue || forceUpdate)
+			if (!nativeWindowInfo.Style.HasValue || forceUpdate)
 			{
 				var windowStyleFlags = (WindowStyleFlags)User32.GetWindowLongWrapper(nativeWindowInfo.Handle, WindowLongIndex.GWL_STYLE);
-				nativeWindowInfo.WindowStyle = windowStyleFlags;
+				nativeWindowInfo.Style = windowStyleFlags;
 			}
-			return nativeWindowInfo.WindowStyle.Value;
+			return nativeWindowInfo.Style.Value;
 		}
 
 		/// <summary>
@@ -187,9 +216,9 @@ namespace Dapplo.Windows.Desktop
 		/// </summary>
 		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
 		/// <param name="windowStyleFlags">WindowStyleFlags</param>
-		public static void SetWindowStyle(this NativeWindowInfo nativeWindowInfo, WindowStyleFlags windowStyleFlags)
+		public static void SetStyle(this NativeWindowInfo nativeWindowInfo, WindowStyleFlags windowStyleFlags)
 		{
-			nativeWindowInfo.WindowStyle = windowStyleFlags;
+			nativeWindowInfo.Style = windowStyleFlags;
 			User32.SetWindowLongWrapper(nativeWindowInfo.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint)windowStyleFlags));
 		}
 
@@ -211,18 +240,51 @@ namespace Dapplo.Windows.Desktop
 		}
 
 		/// <summary>
-		/// Retrieve if the window is Iconic (minimized)
+		/// Retrieve if the window is minimized (Iconic)
 		/// </summary>
 		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>bool true if Iconic (minimized)</returns>
-		public static bool IsIconic(this NativeWindowInfo nativeWindowInfo, bool forceUpdate = false)
+		public static bool IsMinimized(this NativeWindowInfo nativeWindowInfo, bool forceUpdate = false)
 		{
 			if (!nativeWindowInfo.IsMinimized.HasValue || forceUpdate)
 			{
 				nativeWindowInfo.IsMinimized = User32.IsIconic(nativeWindowInfo.Handle);
 			}
 			return nativeWindowInfo.IsMinimized.Value;
+		}
+
+		/// <summary>
+		/// Minimize the Window
+		/// </summary>
+		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
+		public static void Minimize(this NativeWindowInfo nativeWindowInfo)
+		{
+			User32.ShowWindow(nativeWindowInfo.Handle, ShowWindowCommands.Minimize);
+			nativeWindowInfo.IsMinimized = true;
+		}
+
+		/// <summary>
+		/// Restore (Un-Minimize/Maximize) the Window
+		/// </summary>
+		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
+		public static void Restore(this NativeWindowInfo nativeWindowInfo)
+		{
+			User32.ShowWindow(nativeWindowInfo.Handle, ShowWindowCommands.Restore);
+			nativeWindowInfo.IsMinimized = false;
+			nativeWindowInfo.IsMaximized = false;
+		}
+
+
+		/// <summary>
+		/// Maximize the window
+		/// </summary>
+		/// <param name="nativeWindowInfo">NativeWindowInfo</param>
+		public static void Maximized(this NativeWindowInfo nativeWindowInfo)
+		{
+			User32.ShowWindow(nativeWindowInfo.Handle, ShowWindowCommands.Maximize);
+			nativeWindowInfo.IsMaximized = true;
+			nativeWindowInfo.IsMinimized = false;
 		}
 
 		/// <summary>

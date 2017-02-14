@@ -23,7 +23,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Windows;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Interop;
@@ -98,7 +97,7 @@ namespace Dapplo.Windows.App
 		/// <summary>
 		///     Retrieve handles of all Windows store apps
 		/// </summary>
-		public static IEnumerable<IntPtr> WindowsStoreApps
+		public static IEnumerable<NativeWindowInfo> WindowsStoreApps
 		{
 			get
 			{
@@ -110,14 +109,14 @@ namespace Dapplo.Windows.App
 				var nextHandle = User32.FindWindow(AppWindowsClass, null);
 				while (nextHandle != IntPtr.Zero)
 				{
-					yield return nextHandle;
+					yield return NativeWindowInfo.CreateFor(nextHandle);
 					nextHandle = User32.FindWindowEx(IntPtr.Zero, nextHandle, AppWindowsClass, null);
 				}
 				// check for gutter
 				var gutterHandle = User32.FindWindow(GutterClass, null);
 				if (gutterHandle != IntPtr.Zero)
 				{
-					yield return gutterHandle;
+					yield return NativeWindowInfo.CreateFor(gutterHandle);
 				}
 			}
 		}
@@ -178,7 +177,7 @@ namespace Dapplo.Windows.App
 		/// </summary>
 		/// <param name="windowBounds"></param>
 		/// <returns>true if an app, covering the supplied rect, is visisble</returns>
-		public static bool AppVisible(Rect windowBounds)
+		public static bool AppVisible(RECT windowBounds)
 		{
 			if (AppVisibility == null)
 			{

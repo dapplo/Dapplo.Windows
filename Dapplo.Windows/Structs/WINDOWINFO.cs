@@ -27,6 +27,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Dapplo.Windows.Enums;
 
 #endregion
 
@@ -43,8 +44,8 @@ namespace Dapplo.Windows.Structs
 		public uint cbSize;
 		public RECT rcWindow;
 		public RECT rcClient;
-		public uint dwStyle;
-		public uint dwExStyle;
+		public WindowStyleFlags dwStyle;
+		public ExtendedWindowStyleFlags dwExStyle;
 		public uint dwWindowStatus;
 		public uint cxWindowBorders;
 		public uint cyWindowBorders;

@@ -74,7 +74,7 @@ namespace Dapplo.Windows.Desktop
 			{
 				return false;
 			}
-			var exWindowStyle = nativeWindow.GetExtendedWindowStyle();
+			var exWindowStyle = nativeWindow.GetExtendedStyle();
 			if ((exWindowStyle & ExtendedWindowStyleFlags.WS_EX_TOOLWINDOW) != 0)
 			{
 				return false;
@@ -85,11 +85,11 @@ namespace Dapplo.Windows.Desktop
 				return false;
 			}
 			// Skip preview windows, like the one from Firefox
-			if ((nativeWindow.GetWindowStyle() & WindowStyleFlags.WS_VISIBLE) == 0)
+			if ((nativeWindow.GetStyle() & WindowStyleFlags.WS_VISIBLE) == 0)
 			{
 				return false;
 			}
-			return !nativeWindow.IsIconic();
+			return !nativeWindow.IsMinimized();
 		}
 
 		/// <summary>
@@ -112,24 +112,54 @@ namespace Dapplo.Windows.Desktop
 				windowPtr = User32.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
 
 			} while (windowPtr != IntPtr.Zero);
+		}
 
-			//foreach (var possibleTopLevelHwnd in AppQuery.WindowsStoreApps)
-			//{
-			//	var possibleTopLevel = NativeWindowInfo.CreateFor(possibleTopLevelHwnd);
-			//	if (possibleTopLevel.IsTopLevel())
-			//	{
-			//		yield return possibleTopLevel;
-			//	}
-			//}
+		/// <summary>
+		///     Get the currently active window
+		/// </summary>
+		/// <returns>NativeWindowInfo</returns>
+		public static NativeWindowInfo GetActiveWindow()
+		{
+			return NativeWindowInfo.CreateFor(User32.GetForegroundWindow());
+		}
 
+		/// <summary>
+		/// Gets the Desktop window
+		/// </summary>
+		/// <returns>NativeWindowInfo for the desktop window</returns>
+		public static NativeWindowInfo GetDesktopWindow()
+		{
+			return NativeWindowInfo.CreateFor(User32.GetDesktopWindow());
+		}
 
-			//foreach (var possibleTopLevel in await WindowsEnumerator.Enumerate().ToList().ToTask(cancellationToken))
-			//{
-			//	if (IsTopLevel(possibleTopLevel))
-			//	{
-			//		yield return possibleTopLevel;
-			//	}
-			//}
+		/// <summary>
+		/// Find windows belonging to the same process (thread) as the supplied window.
+		/// </summary>
+		/// <param name="windowToLinkTo">NativeWindowInfo</param>
+		/// <returns>IEnumerable with NativeWindowInfo</returns>
+		public static IEnumerable<NativeWindowInfo> GetLinkedWindows(this NativeWindowInfo windowToLinkTo)
+		{
+			int processIdSelectedWindow = windowToLinkTo.GetProcessId();
+
+			using (var process = Process.GetProcessById(processIdSelectedWindow))
+			{
+				foreach (ProcessThread thread in process.Threads)
+				{
+					var handles = new List<IntPtr>();
+					try
+					{
+						User32.EnumThreadWindows(thread.Id, (hWnd, lParam) => { handles.Add(hWnd); return true; }, IntPtr.Zero);
+					}
+					finally
+					{
+						thread?.Dispose();
+					}
+					foreach (var handle in handles)
+					{
+						yield return NativeWindowInfo.CreateFor(handle);
+					}
+				}
+			}
 		}
 	}
 }
