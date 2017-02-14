@@ -275,7 +275,7 @@ namespace Dapplo.Windows.Native
 		public static string GetText(IntPtr hWnd)
 		{
 			var title = new StringBuilder(260, 260);
-			var length = GetWindowText(hWnd, title, title.Capacity);
+			GetWindowText(hWnd, title, title.Capacity);
 			return title.ToString();
 		}
 

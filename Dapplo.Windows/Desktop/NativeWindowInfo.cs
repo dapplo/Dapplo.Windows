@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Structs;
 
 #endregion
 
@@ -39,12 +40,12 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		/// Returns the bounds of this window
 		/// </summary>
-		public Rect Bounds { get; set; }
+		public RECT? Bounds { get; set; }
 
 		/// <summary>
 		/// Returns the client bounds of this window
 		/// </summary>
-		public Rect ClientBounds { get; set; }
+		public RECT? ClientBounds { get; set; }
 
 		/// <summary>
 		/// Returns the children of this window
@@ -69,12 +70,12 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		/// Does this window have parent?
 		/// </summary>
-		public bool HasParent => Parent != IntPtr.Zero;
+		public bool HasParent => Parent.HasValue && Parent != IntPtr.Zero;
 
 		/// <summary>
 		/// The parent window to which this window belongs
 		/// </summary>
-		public IntPtr Parent { get; set; } = IntPtr.Zero;
+		public IntPtr? Parent { get; set; }
 
 		/// <summary>
 		/// Return the text (title) of the window, if any
@@ -84,27 +85,27 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		/// Returns true if the window is visible
 		/// </summary>
-		public bool IsVisible { get; set; }
+		public bool? IsVisible { get; set; }
 
 		/// <summary>
 		/// Returns true if the window is minimized
 		/// </summary>
-		public bool IsMinimized { get; set; }
+		public bool? IsMinimized { get; set; }
 
 		/// <summary>
 		/// Get the process ID this window belongs to
 		/// </summary>
-		public int ProcessId { get; set; }
+		public int? ProcessId { get; set; }
 
 		/// <summary>
 		/// ExtendedWindowStyleFlags for the Window
 		/// </summary>
-		public ExtendedWindowStyleFlags ExtendedWindowStyle { get; set; }
+		public ExtendedWindowStyleFlags? ExtendedWindowStyle { get; set; }
 
 		/// <summary>
 		/// WindowStyleFlags for the Window
 		/// </summary>
-		public WindowStyleFlags WindowStyle { get; set; }
+		public WindowStyleFlags? WindowStyle { get; set; }
 
 		/// <summary>
 		/// Create a NativeWindowInfo for the supplied handle

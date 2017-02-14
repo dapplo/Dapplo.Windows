@@ -25,11 +25,14 @@
 
 #region Usings
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Native;
 
 #endregion
 
@@ -46,27 +49,28 @@ namespace Dapplo.Windows.Desktop
 		public static IEnumerable<string> IgnoreClasses { get; } = new List<string>(new[] {"Progman", "Button", "Dwm"}); //"MS-SDIa"
 
 		/// <summary>
-		///     Check if the window is a top level
+		///     Check if the window is a top level window.
+		///     This method will retrieve all information, and fill it to the NativeWindowInfo, it needs to make the decision.
 		/// </summary>
 		/// <param name="nativeWindow">WindowDetails</param>
 		/// <returns>bool</returns>
 		public static bool IsTopLevel(this NativeWindowInfo nativeWindow)
 		{
-			if (nativeWindow.HasClassname && IgnoreClasses.Contains(nativeWindow.Classname))
+			if (IgnoreClasses.Contains(nativeWindow.GetClassname()))
 			{
 				return false;
 			}
 			// Ignore windows without title
-			if (nativeWindow.Text.Length == 0)
+			if (nativeWindow.GetText().Length == 0)
 			{
 				return false;
 			}
 			// Windows without size
-			if (nativeWindow.Bounds.Size.IsEmpty)
+			if (nativeWindow.GetBounds().IsEmpty)
 			{
 				return false;
 			}
-			if (nativeWindow.HasParent)
+			if (nativeWindow.GetParent() != IntPtr.Zero)
 			{
 				return false;
 			}
@@ -85,23 +89,38 @@ namespace Dapplo.Windows.Desktop
 			{
 				return false;
 			}
-			return nativeWindow.IsVisible || !nativeWindow.IsMinimized;
+			return !nativeWindow.IsIconic();
 		}
 
 		/// <summary>
-		///     Get all the top level windows
+		///     Iterate the Top level windows, from top to bottom
 		/// </summary>
-		/// <returns>List WindowDetails with all the top level windows</returns>
-		public static IEnumerable<NativeWindowInfo> GetTopLevelWindows(CancellationToken cancellationToken = default(CancellationToken))
+		/// <returns>IEnumerable with all the top level windows</returns>
+		public static IEnumerable<NativeWindowInfo> GetTopLevelWindows()
 		{
-			foreach (var possibleTopLevelHwnd in AppQuery.WindowsStoreApps)
+
+			IntPtr windowPtr = User32.GetTopWindow(IntPtr.Zero);
+
+			do
 			{
-				var possibleTopLevel = NativeWindowInfo.CreateFor(possibleTopLevelHwnd);
+				var possibleTopLevel = NativeWindowInfo.CreateFor(windowPtr);
+
 				if (possibleTopLevel.IsTopLevel())
 				{
 					yield return possibleTopLevel;
 				}
-			}
+				windowPtr = User32.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
+
+			} while (windowPtr != IntPtr.Zero);
+
+			//foreach (var possibleTopLevelHwnd in AppQuery.WindowsStoreApps)
+			//{
+			//	var possibleTopLevel = NativeWindowInfo.CreateFor(possibleTopLevelHwnd);
+			//	if (possibleTopLevel.IsTopLevel())
+			//	{
+			//		yield return possibleTopLevel;
+			//	}
+			//}
 
 
 			//foreach (var possibleTopLevel in await WindowsEnumerator.Enumerate().ToList().ToTask(cancellationToken))

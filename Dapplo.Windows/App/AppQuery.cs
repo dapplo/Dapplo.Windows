@@ -52,19 +52,25 @@ namespace Dapplo.Windows.App
 
 		// All currently known classes: "ImmersiveGutter", "Snapped Desktop", "ImmersiveBackgroundWindow","ImmersiveLauncher","Windows.UI.Core.CoreWindow","ApplicationManager_ImmersiveShellWindow","SearchPane","MetroGhostWindow","EdgeUiInputWndClass", "NativeHWNDHost", "Shell_CharmWindow"
 
-		private static readonly IDisposableCom<IAppVisibility> _appVisibility;
+		private static readonly IDisposableCom<IAppVisibility> AppVisibility;
 
 		static AppQuery()
 		{
+			// No need to check for the IAppVisibility
+			if (!Environment.OSVersion.IsWindows8OrLater())
+			{
+				AppVisibility = null;
+				return;
+			}
 			AppWindowsClass = Environment.OSVersion.IsWindows8() ? W8AppWindowClass : W10AppWindowClass;
 			try
 			{
 				var appVisibilityType = Type.GetTypeFromCLSID(CoClassGuidIAppVisibility);
-				_appVisibility = DisposableCom.Create((IAppVisibility) Activator.CreateInstance(appVisibilityType));
+				AppVisibility = DisposableCom.Create((IAppVisibility) Activator.CreateInstance(appVisibilityType));
 			}
 			catch
 			{
-				_appVisibility = null;
+				AppVisibility = null;
 			}
 		}
 
@@ -76,7 +82,7 @@ namespace Dapplo.Windows.App
 			get
 			{
 				// If there is no _appVisibility COM object, there can be no AppLauncher
-				if (_appVisibility == null)
+				if (AppVisibility == null)
 				{
 					return IntPtr.Zero;
 				}
@@ -87,7 +93,7 @@ namespace Dapplo.Windows.App
 		/// <summary>
 		///     Return true if the app-launcher is visible
 		/// </summary>
-		public static bool IsLauncherVisible => _appVisibility?.ComObject.IsLauncherVisible == true;
+		public static bool IsLauncherVisible => AppVisibility?.ComObject.IsLauncherVisible == true;
 
 		/// <summary>
 		///     Retrieve handles of all Windows store apps
@@ -97,7 +103,7 @@ namespace Dapplo.Windows.App
 			get
 			{
 				// if the appVisibility != null we have Windows 8 or later
-				if (_appVisibility == null)
+				if (AppVisibility == null)
 				{
 					yield break;
 				}
@@ -174,7 +180,7 @@ namespace Dapplo.Windows.App
 		/// <returns>true if an app, covering the supplied rect, is visisble</returns>
 		public static bool AppVisible(Rect windowBounds)
 		{
-			if (_appVisibility == null)
+			if (AppVisibility == null)
 			{
 				return true;
 			}
@@ -191,7 +197,7 @@ namespace Dapplo.Windows.App
 						var monitor = User32.MonitorFromRect(ref rect, MonitorFromRectFlags.DefaultToNearest);
 						if (monitor != IntPtr.Zero)
 						{
-							var monitorAppVisibility = _appVisibility.ComObject.GetAppVisibilityOnMonitor(monitor);
+							var monitorAppVisibility = AppVisibility.ComObject.GetAppVisibilityOnMonitor(monitor);
 							if (monitorAppVisibility == MonitorAppVisibility.MAV_APP_VISIBLE)
 							{
 								return true;

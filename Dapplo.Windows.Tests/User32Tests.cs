@@ -21,18 +21,12 @@
 
 #region using
 
-using System;
 using System.Diagnostics;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Enums;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.Structs;
 
 #endregion
 
@@ -51,21 +45,16 @@ namespace Dapplo.Windows.Tests
 		/// Test GetWindow
 		/// </summary>
 		/// <returns></returns>
-		//[Fact]
-		private void TestGetWindow()
+		[Fact]
+		private void TestGetTopLevelWindows()
 		{
-			IntPtr windowPtr = User32.GetTopWindow(IntPtr.Zero);
-
-			do
+			bool foundWindow = false;
+			foreach (var window in NativeWindowQuery.GetTopLevelWindows())
 			{
-				var window = NativeWindowInfo.CreateFor(windowPtr);
-				if (!window.Fill().HasParent && !User32.IsIconic(window.Handle) && !string.IsNullOrEmpty(window.Text) && !window.Bounds.IsEmpty)
-				{
-					Debug.WriteLine("{0} - {1}", window.Classname, window.Text);
-				}
-				windowPtr = User32.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
-
-			} while (windowPtr != IntPtr.Zero);
+				foundWindow = true;
+				Debug.WriteLine("{0} - {1}", window.Classname, window.Text);
+			}
+			Assert.True(foundWindow);
 		}
 	}
 }
