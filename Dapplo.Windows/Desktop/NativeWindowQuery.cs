@@ -29,7 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
@@ -98,19 +97,27 @@ namespace Dapplo.Windows.Desktop
 		/// <returns>IEnumerable with all the top level windows</returns>
 		public static IEnumerable<NativeWindow> GetTopLevelWindows()
 		{
-
-			IntPtr windowPtr = User32.GetTopWindow(IntPtr.Zero);
-
-			do
+			foreach (var possibleTopLevel in GetTopWindows())
 			{
-				var possibleTopLevel = NativeWindow.CreateFor(windowPtr);
-
 				if (possibleTopLevel.IsTopLevel())
 				{
 					yield return possibleTopLevel;
 				}
-				windowPtr = User32.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
+			}
+		}
 
+		/// <summary>
+		///     Iterate the windows, from top to bottom
+		/// </summary>
+		/// <param name="parent">NativeWindow as the parent, to iterate over the children, or null for all</param>
+		/// <returns>IEnumerable with all the top level windows</returns>
+		public static IEnumerable<NativeWindow> GetTopWindows(NativeWindow parent = null)
+		{
+			IntPtr windowPtr = User32.GetTopWindow(parent ?? IntPtr.Zero);
+			do
+			{
+				yield return NativeWindow.CreateFor(windowPtr);
+				windowPtr = User32.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
 			} while (windowPtr != IntPtr.Zero);
 		}
 

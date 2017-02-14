@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
 
@@ -63,7 +64,12 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		/// Returns the children of this window
 		/// </summary>
-		public IList<NativeWindow> Children { get; set; }
+		public IEnumerable<NativeWindow> Children { get; set; }
+
+		/// <summary>
+		/// Test if there are any children
+		/// </summary>
+		public bool HasChildren => Children?.Any() == true;
 
 		/// <summary>
 		/// string with the name of the internal class for the window

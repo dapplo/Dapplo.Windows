@@ -26,6 +26,7 @@
 #region Usings
 
 using System;
+using System.Collections.Generic;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
@@ -275,7 +276,6 @@ namespace Dapplo.Windows.Desktop
 			nativeWindow.IsMaximized = false;
 		}
 
-
 		/// <summary>
 		/// Maximize the window
 		/// </summary>
@@ -302,5 +302,26 @@ namespace Dapplo.Windows.Desktop
 			return nativeWindow.IsVisible.Value;
 		}
 
+		/// <summary>
+		/// Get the children of the specified NativeWindow, this is not lazy!
+		/// </summary>
+		/// <param name="nativeWindow">NativeWindow</param>
+		/// <param name="forceUpdate">True to force updating</param>
+		/// <returns>IEnumerable with NativeWindow</returns>
+		public static IEnumerable<NativeWindow> GetChildren(this NativeWindow nativeWindow, bool forceUpdate = false)
+		{
+			if (nativeWindow.HasChildren && !forceUpdate)
+			{
+				return nativeWindow.Children;
+			}
+			IList<NativeWindow> children = new List<NativeWindow>();
+			// Store it in the Children property
+			nativeWindow.Children = children;
+			foreach (var child in WindowsEnumerator.EnumerateWindows(nativeWindow))
+			{
+				children.Add(child);
+			}
+			return children;
+		}
 	}
 }

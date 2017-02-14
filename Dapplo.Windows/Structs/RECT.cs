@@ -287,6 +287,16 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
+		/// Test if this RECT contains the specified POINT
+		/// </summary>
+		/// <param name="point">POINT</param>
+		/// <returns>true if it contains</returns>
+		public bool Contains(POINT point)
+		{
+			return point.X >= Left && point.X <= Right && point.Y >= Top && point.Y <= Bottom;
+		}
+
+		/// <summary>
 		/// Empty RECT
 		/// </summary>
 		public static RECT Empty => new RECT();
