@@ -34,7 +34,7 @@ namespace Dapplo.Windows.Desktop
 	/// Information about a native window
 	/// Note: This is a dumb container, and doesn't retrieve anything about the window itself
 	/// </summary>
-	public class NativeWindow
+	public class NativeWindow : IEquatable<NativeWindow>
 	{
 		/// <summary>
 		/// Constructor
@@ -126,24 +126,6 @@ namespace Dapplo.Windows.Desktop
 		/// </summary>
 		public WindowPlacement? Placement { get; set; }
 
-		/// <inheritdoc />
-		public override int GetHashCode()
-		{
-			return Handle.GetHashCode();
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(object obj)
-		{
-			var other = obj as NativeWindow;
-			if (other == null)
-			{
-				return false;
-			}
-
-			return Handle.Equals(other.Handle);
-		}
-
 		/// <summary>
 		///     Implicit cast IntPtr to NavtiveWindowInfo
 		/// </summary>
@@ -164,6 +146,21 @@ namespace Dapplo.Windows.Desktop
 			return nativeWindow.Handle;
 		}
 
+		/// <inheritdoc />
+		public override int GetHashCode()
+		{
+			return Handle.GetHashCode();
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != GetType()) return false;
+			return Equals((NativeWindow) obj);
+		}
+
 		/// <summary>
 		/// Factory method to create a NativeWindow for the supplied handle
 		/// </summary>
@@ -172,6 +169,26 @@ namespace Dapplo.Windows.Desktop
 		public static NativeWindow CreateFor(IntPtr handle)
 		{
 			return new NativeWindow(handle);
+		}
+
+		/// <inheritdoc />
+		public bool Equals(NativeWindow other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return Handle.Equals(other.Handle);
+		}
+
+		/// <inheritdoc />
+		public static bool operator ==(NativeWindow left, NativeWindow right)
+		{
+			return Equals(left, right);
+		}
+
+		/// <inheritdoc />
+		public static bool operator !=(NativeWindow left, NativeWindow right)
+		{
+			return !Equals(left, right);
 		}
 	}
 }

@@ -76,6 +76,7 @@
     <Compile Include="Enums\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\MonitorFromRectFlags.cs" />
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
+    <Compile Include="Enums\RasterOperations.cs" />
     <Compile Include="InputGenerator.cs" />
     <Compile Include="Enums\ExtendedKeyFlags.cs" />
     <Compile Include="Reactive\MouseHookEventArgs.cs" />

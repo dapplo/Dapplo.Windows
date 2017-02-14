@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -31,8 +32,10 @@ namespace Dapplo.Windows.Enums
 	/// Status result for GDI+ calls
 	/// </summary>
 	[Flags]
+	[SuppressMessage("ReSharper", "UnusedMember.Global")]
 	public enum GdiPlusStatus
 	{
+#pragma warning disable 1591
 		Ok = 0,
 		GenericError = 1,
 		InvalidParameter = 2,
@@ -55,5 +58,6 @@ namespace Dapplo.Windows.Enums
 		PropertyNotFound = 19,
 		PropertyNotSupported = 20,
 		ProfileNotFound = 21
+#pragma warning restore 1591
 	}
 }
