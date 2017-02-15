@@ -79,7 +79,6 @@
     <Compile Include="Enums\MonitorFromRectFlags.cs" />
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
     <Compile Include="Enums\RasterOperations.cs" />
-    <Compile Include="Bitmaps\ImageExtensions.cs" />
     <Compile Include="InputGenerator.cs" />
     <Compile Include="Enums\ExtendedKeyFlags.cs" />
     <Compile Include="Reactive\MouseHookEventArgs.cs" />
@@ -156,9 +155,9 @@
     <Compile Include="Structs\MouseInput.cs" />
     <Compile Include="Structs\MouseLowLevelHookStruct.cs" />
     <Compile Include="Structs\POINT.cs" />
+    <Compile Include="Structs\RECTF.cs" />
     <Compile Include="Structs\RECT.cs" />
     <Compile Include="Enums\HResult.cs" />
-    <Compile Include="Structs\RECTF.cs" />
     <Compile Include="Structs\SCROLLINFO.cs" />
     <Compile Include="Structs\SIZE.cs" />
     <Compile Include="Native\User32.cs" />

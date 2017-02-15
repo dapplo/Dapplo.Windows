@@ -141,6 +141,17 @@ namespace Dapplo.Windows.Native
 		[DllImport("dwmapi.dll", SetLastError = true)]
 		public static extern int DwmUpdateThumbnailProperties(IntPtr hThumb, ref DwmThumbnailProperties props);
 
+		[PreserveSig]
+		[DllImport("dwmapi.dll", EntryPoint = "#101", SetLastError = true)]
+		public static extern int UpdateWindowShared(IntPtr hWnd, int one, int two, int three, IntPtr hMonitor, IntPtr unknown);
+
+		[PreserveSig]
+		[DllImport("dwmapi.dll", EntryPoint = "#100", SetLastError = true)]
+		public static extern int GetSharedSurface(IntPtr hWnd, Int64 adapterLuid, uint one, uint two, [In, Out]ref uint pD3DFormat, [Out]out IntPtr pSharedHandle, UInt64 unknown);
+
+		[DllImport("dwmapi.dll", EntryPoint = "#113", SetLastError = true)]
+		internal static extern uint DwmpActivateLivePreview(uint a, IntPtr b, uint c, uint d);
+
 		/// <summary>
 		///     Helper method to get the window size for DWM Windows
 		/// </summary>

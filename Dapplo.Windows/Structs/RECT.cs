@@ -49,23 +49,6 @@ namespace Dapplo.Windows.Structs
 		private int _bottom;
 
 		/// <summary>
-		/// Constructor from a S.W.Rect
-		/// </summary>
-		/// <param name="rectangle">S.W.Rect</param>
-		public RECT(Rect rectangle)
-			: this((int) rectangle.Left, (int) rectangle.Top, (int) rectangle.Right, (int) rectangle.Bottom)
-		{
-		}
-
-		/// <summary>
-		/// Constructor from a S.D.Rectangle
-		/// </summary>
-		/// <param name="rectangle">S.D.Rectangle</param>
-		public RECT(Rectangle rectangle) : this(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom)
-		{
-		}
-
-		/// <summary>
 		/// Constructor from left, right, top, bottom
 		/// </summary>
 		/// <param name="left">int</param>
@@ -155,9 +138,9 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		///     Location for this RECT
 		/// </summary>
-		public Point Location
+		public POINT Location
 		{
-			get { return new Point(Left, Top); }
+			get { return new POINT(Left, Top); }
 			set
 			{
 				_left = (int) value.X;
@@ -269,19 +252,21 @@ namespace Dapplo.Windows.Structs
 		public bool IsEmpty => Width * Height == 0;
 		
 		/// <inheritdoc />
-		public override bool Equals(object Object)
+		public override bool Equals(object obj)
 		{
-			if (Object is RECT)
+			if (obj is RECT)
 			{
-				return Equals((RECT) Object);
+				return Equals((RECT)obj);
 			}
-			if (Object is Rect)
+			if (obj is Rect)
 			{
-				return Equals(new RECT((Rect) Object));
+				RECT rect = (Rect)obj;
+				return Equals(rect);
 			}
-			if (Object is Rectangle)
+			if (obj is Rectangle)
 			{
-				return Equals(new RECT((Rectangle) Object));
+				RECT rect = (Rectangle)obj;
+				return Equals(rect);
 			}
 			return false;
 		}

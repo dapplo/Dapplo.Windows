@@ -106,7 +106,7 @@ namespace Dapplo.Windows.Native
 				var hBitmap = GetNativeImage(destinationBitmap);
 
 				// Create a RECT from the Rectangle
-				var rec = new RECT(area);
+				RECT rec = area;
 				// Apply the effect to the bitmap in the specified area
 				status = GdipBitmapApplyEffect(hBitmap, hEffect, ref rec, false, IntPtr.Zero, 0);
 				if (status != GdiPlusStatus.Ok)
@@ -204,7 +204,7 @@ namespace Dapplo.Windows.Native
 				var hAttributes = GetNativeImageAttributes(imageAttributes);
 
 				// Create a RECT from the Rectangle
-				var sourceRecf = new RECTF(source);
+				RECTF sourceRecf = source;
 				// Apply the effect to the bitmap in the specified area
 				status = GdipDrawImageFX(hGraphics, hBitmap, ref sourceRecf, hMatrix, hEffect, hAttributes, GpUnit.UnitPixel);
 				if (status != GdiPlusStatus.Ok)
