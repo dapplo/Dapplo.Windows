@@ -45,17 +45,18 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		///     Window classes which can be ignored
 		/// </summary>
-		public static IEnumerable<string> IgnoreClasses { get; } = new List<string>(new[] {"Progman", "Button", "Dwm"}); //"MS-SDIa"
+		public static IList<string> IgnoreClasses { get; } = new List<string>(new[] {"Progman", "Button", "Dwm"}); //"MS-SDIa"
 
 		/// <summary>
 		///     Check if the window is a top level window.
 		///     This method will retrieve all information, and fill it to the interopWindow, it needs to make the decision.
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
+		/// <param name="ignoreKnowClasses">true (default) to ignore classes from the IgnoreClasses list</param>
 		/// <returns>bool</returns>
-		public static bool IsTopLevel(this InteropWindow interopWindow)
+		public static bool IsTopLevel(this InteropWindow interopWindow, bool ignoreKnowClasses = true)
 		{
-			if (IgnoreClasses.Contains(interopWindow.GetClassname()))
+			if (ignoreKnowClasses && IgnoreClasses.Contains(interopWindow.GetClassname()))
 			{
 				return false;
 			}
