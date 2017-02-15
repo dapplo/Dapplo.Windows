@@ -69,10 +69,10 @@
     <Compile Include="App\IAppVisibility.cs" />
     <Compile Include="App\MonitorAppVisibility.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
-    <Compile Include="Desktop\NativeWindowQuery.cs" />
+    <Compile Include="Desktop\InteropWindowQuery.cs" />
     <Compile Include="Desktop\WindowsEnumerator.cs" />
-    <Compile Include="Desktop\NativeWindow.cs" />
-    <Compile Include="Desktop\NativeWindowExtensions.cs" />
+    <Compile Include="Desktop\InteropWindow.cs" />
+    <Compile Include="Desktop\InteropWindowExtensions.cs" />
     <Compile Include="Enums\BitmapCompressionMethods.cs" />
     <Compile Include="Enums\DwmBlurBehindFlags.cs" />
     <Compile Include="Enums\ExtendedMouseFlags.cs" />

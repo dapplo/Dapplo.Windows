@@ -35,14 +35,14 @@ namespace Dapplo.Windows
 	/// <summary>
 	///     The WinEventHook registers itself to all for us important Windows events.
 	///     This makes it possible to know a.o. when a window is created, moved, updated and closed.
-	///     The information in the NativeWindow objects is than updated accordingly, so when capturing everything is already
+	///     The information in the InteropWindow objects is than updated accordingly, so when capturing everything is already
 	///     available.
 	///     !!!! WORK IN PROGRESS !!!!
 	/// </summary>
 	public class WindowsMonitor : IDisposable
 	{
 		private readonly WindowsEventHook _hook = new WindowsEventHook();
-		private readonly IDictionary<IntPtr, NativeWindow> _windowsCache = new ConcurrentDictionary<IntPtr, NativeWindow>();
+		private readonly IDictionary<IntPtr, InteropWindow> _windowsCache = new ConcurrentDictionary<IntPtr, InteropWindow>();
 
 		void IDisposable.Dispose()
 		{
@@ -53,9 +53,9 @@ namespace Dapplo.Windows
 		/// <summary>
 		///     Add a Top-Window from the windows list
 		/// </summary>
-		/// <param name="nativeWindow"></param>
+		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="focus"></param>
-		private void AddTopWindow(NativeWindow nativeWindow, bool focus)
+		private void AddTopWindow(InteropWindow interopWindow, bool focus)
 		{
 			if (focus)
 			{
@@ -75,39 +75,39 @@ namespace Dapplo.Windows
 			}
 		}
 
-		private void MoveTopWindowToFront(NativeWindow nativeWindow)
+		private void MoveTopWindowToFront(InteropWindow interopWindow)
 		{
-			//int index = _windowsCache.IndexOf(nativeWindow);
+			//int index = _windowsCache.IndexOf(interopWindow);
 			//if (index > 0) {
 			//__windowsCache.Move(index, 0);
-			//LOG.DebugFormat("Focus: '{0}' - '{1}' / class '{2}'", nativeWindow.Handle, nativeWindow.Text, nativeWindow.Classname);
+			//LOG.DebugFormat("Focus: '{0}' - '{1}' / class '{2}'", interopWindow.Handle, interopWindow.Text, interopWindow.Classname);
 			//}
 		}
 
 		/// <summary>
 		///     Remove a Top window from the windows list
 		/// </summary>
-		/// <param name="nativeWindow"></param>
-		private void RemoveTopWindow(NativeWindow nativeWindow)
+		/// <param name="interopWindow"></param>
+		private void RemoveTopWindow(InteropWindow interopWindow)
 		{
-			//_windowsCache.Remove(nativeWindow.);
+			//_windowsCache.Remove(interopWindow.);
 		}
 
 		/// <summary>
-		///     Add all missing parents for the supplied nativeWindow, returns the first parent
+		///     Add all missing parents for the supplied interopWindow, returns the first parent
 		///     In this method, currently, the top-level parent is added to the chain...
 		///     This means it looks like this window has focus, even if it doesn't.
 		/// </summary>
 		/// <param name="eventType"></param>
 		/// <param name="currentNativeWindow">Window to make the parent chain for</param>
-		private void UpdateParentChainFor(WinEvents eventType, NativeWindow currentNativeWindow)
+		private void UpdateParentChainFor(WinEvents eventType, InteropWindow currentInteropWindow)
 		{
 			var prevWindow = currentNativeWindow;
-			NativeWindow parentWindow;
+			InteropWindow parentWindow;
 			// Parent not available, create chain
 			while (prevWindow.HasParent && !_windowsCache.TryGetValue(prevWindow.Parent, out parentWindow))
 			{
-				parentWindow = NativeWindow.CreateFor(prevWindow.Parent);
+				parentWindow = interopWindow.CreateFor(prevWindow.Parent);
 				// check top level window
 				if (!parentWindow.HasParent)
 				{
@@ -126,7 +126,7 @@ namespace Dapplo.Windows
 				prevWindow = parentWindow;
 			}
 			// Set the direct parent window, needed for the log statement
-			_windowsCache.TryGetValue(currentNativeWindow.Parent, out parentWindow);
+			_windowsCache.TryGetValue(currentinteropWindow.Parent, out parentWindow);
 
 			// Update children if needed
 			if (parentWindow != null)
@@ -178,14 +178,14 @@ namespace Dapplo.Windows
 					// Not a peeps, destroy of not know window doesn't interrest us!
 					return;
 				}
-				currentNativeWindow = NativeWindow.CreateFor(hWnd);
+				currentNativeWindow = interopWindow.CreateFor(hWnd);
 				// Skip OleMainThreadWndClass Windows, they are not interessting
-				if (currentNativeWindow.HasClassname && (currentNativeWindow.Classname == "OleMainThreadWndClass"))
+				if (currentinteropWindow.HasClassname && (currentinteropWindow.Classname == "OleMainThreadWndClass"))
 				{
 					// Not a peeps, this window is not interresting and only disturbs the log
 					return;
 				}
-				_windowsCache.Add(currentNativeWindow.Handle, currentNativeWindow);
+				_windowsCache.Add(currentinteropWindow.Handle, currentNativeWindow);
 			}
 
 			// currentNativeWindow can't be null!
@@ -194,10 +194,10 @@ namespace Dapplo.Windows
 			if (!isPreviouslyCreated)
 			{
 				UpdateParentChainFor(eventType, currentNativeWindow);
-				if (!currentNativeWindow.HasParent)
+				if (!currentinteropWindow.HasParent)
 				{
 					// Doesn't have a parent, it's a top window! Only add as first if it's new or has focus
-					AddTopWindow(currentNativeWindow, (eventType == WinEvents.EVENT_OBJECT_CREATE) || (eventType == WinEvents.EVENT_OBJECT_FOCUS));
+					AddTopWindow(currentinteropWindow, (eventType == WinEvents.EVENT_OBJECT_CREATE) || (eventType == WinEvents.EVENT_OBJECT_FOCUS));
 					// Doesn't have a parent, it's a top window!
 				}
 			}
@@ -207,23 +207,23 @@ namespace Dapplo.Windows
 			{
 				case WinEvents.EVENT_OBJECT_NAMECHANGE:
 					// Force update of Text, will be automatically updated on the next get access to the property
-					currentNativeWindow.Text = null;
+					currentinteropWindow.Text = null;
 					break;
 				case WinEvents.EVENT_OBJECT_CREATE:
 					// Nothing to do, we already handled all the logic
 					break;
 				case WinEvents.EVENT_OBJECT_DESTROY:
-					if (!currentNativeWindow.HasParent)
+					if (!currentinteropWindow.HasParent)
 					{
 						// Top window!
 						//RemoveTopWindow(currentNativeWindow);
 					}
 					// Remove from cache
-					_windowsCache.Remove(currentNativeWindow.Handle);
+					_windowsCache.Remove(currentinteropWindow.Handle);
 					break;
 				case WinEvents.EVENT_OBJECT_FOCUS:
 					// Move the top-window with the focus to the foreground
-					if (!currentNativeWindow.HasParent)
+					if (!currentinteropWindow.HasParent)
 					{
 						MoveTopWindowToFront(currentNativeWindow);
 					}
@@ -247,9 +247,9 @@ namespace Dapplo.Windows
 				case WinEvents.EVENT_SYSTEM_MOVESIZESTART:
 				case WinEvents.EVENT_SYSTEM_MOVESIZEEND:
 					// Reset location, this means at the next request the information is retrieved again.
-					//System.Drawing.Rectangle prevBounds = currentNativeWindow.Bounds;
-					currentNativeWindow.Bounds = Rect.Empty;
-					//LOG.InfoFormat("Move/resize: from {2} to {3} - '{0}' / class '{1}'", currentNativeWindow.Text, currentNativeWindow.Classname, prevBounds, currentNativeWindow.Bounds);
+					//System.Drawing.Rectangle prevBounds = currentinteropWindow.Bounds;
+					currentinteropWindow.Bounds = Rect.Empty;
+					//LOG.InfoFormat("Move/resize: from {2} to {3} - '{0}' / class '{1}'", currentinteropWindow.Text, currentinteropWindow.Classname, prevBounds, currentinteropWindow.Bounds);
 					break;
 			}
 		}

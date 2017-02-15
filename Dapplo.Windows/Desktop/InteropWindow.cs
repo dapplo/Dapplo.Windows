@@ -35,13 +35,13 @@ namespace Dapplo.Windows.Desktop
 	/// Information about a native window
 	/// Note: This is a dumb container, and doesn't retrieve anything about the window itself
 	/// </summary>
-	public class NativeWindow : IEquatable<NativeWindow>
+	public class InteropWindow : IEquatable<InteropWindow>
 	{
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="handle"></param>
-		internal NativeWindow(IntPtr handle)
+		internal InteropWindow(IntPtr handle)
 		{
 			Handle = handle;
 		}
@@ -64,7 +64,7 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		/// Returns the children of this window
 		/// </summary>
-		public IEnumerable<NativeWindow> Children { get; set; }
+		public IEnumerable<InteropWindow> Children { get; set; }
 
 		/// <summary>
 		/// Test if there are any children
@@ -133,23 +133,23 @@ namespace Dapplo.Windows.Desktop
 		public WindowPlacement? Placement { get; set; }
 
 		/// <summary>
-		///     Implicit cast IntPtr to NavtiveWindowInfo
+		///     Implicit cast IntPtr to InteropWindow
 		/// </summary>
 		/// <param name="handle">IntPtr</param>
-		/// <returns>NativeWindow</returns>
-		public static implicit operator NativeWindow(IntPtr handle)
+		/// <returns>InteropWindow</returns>
+		public static implicit operator InteropWindow(IntPtr handle)
 		{
 			return CreateFor(handle);
 		}
 
 		/// <summary>
-		///     Implicit cast NavtiveWindowInfo to IntPtr
+		///     Implicit cast InteropWindow to IntPtr
 		/// </summary>
-		/// <param name="nativeWindow">NativeWindow</param>
+		/// <param name="interopWindow">InteropWindow</param>
 		/// <returns>IntPtr for the handle</returns>
-		public static implicit operator IntPtr(NativeWindow nativeWindow)
+		public static implicit operator IntPtr(InteropWindow interopWindow)
 		{
-			return nativeWindow.Handle;
+			return interopWindow.Handle;
 		}
 
 		/// <inheritdoc />
@@ -164,21 +164,21 @@ namespace Dapplo.Windows.Desktop
 			if (ReferenceEquals(null, obj)) return false;
 			if (ReferenceEquals(this, obj)) return true;
 			if (obj.GetType() != GetType()) return false;
-			return Equals((NativeWindow) obj);
+			return Equals((InteropWindow) obj);
 		}
 
 		/// <summary>
-		/// Factory method to create a NativeWindow for the supplied handle
+		/// Factory method to create a InteropWindow for the supplied handle
 		/// </summary>
 		/// <param name="handle">IntPtr</param>
-		/// <returns>NativeWindow</returns>
-		public static NativeWindow CreateFor(IntPtr handle)
+		/// <returns>InteropWindow</returns>
+		public static InteropWindow CreateFor(IntPtr handle)
 		{
-			return new NativeWindow(handle);
+			return new InteropWindow(handle);
 		}
 
 		/// <inheritdoc />
-		public bool Equals(NativeWindow other)
+		public bool Equals(InteropWindow other)
 		{
 			if (ReferenceEquals(null, other)) return false;
 			if (ReferenceEquals(this, other)) return true;
@@ -186,13 +186,13 @@ namespace Dapplo.Windows.Desktop
 		}
 
 		/// <inheritdoc />
-		public static bool operator ==(NativeWindow left, NativeWindow right)
+		public static bool operator ==(InteropWindow left, InteropWindow right)
 		{
 			return Equals(left, right);
 		}
 
 		/// <inheritdoc />
-		public static bool operator !=(NativeWindow left, NativeWindow right)
+		public static bool operator !=(InteropWindow left, InteropWindow right)
 		{
 			return !Equals(left, right);
 		}

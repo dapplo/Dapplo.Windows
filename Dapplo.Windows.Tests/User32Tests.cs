@@ -49,7 +49,7 @@ namespace Dapplo.Windows.Tests
 		private void TestGetTopLevelWindows()
 		{
 			bool foundWindow = false;
-			foreach (var window in NativeWindowQuery.GetTopLevelWindows())
+			foreach (var window in InteropWindowQuery.GetTopLevelWindows())
 			{
 				foundWindow = true;
 				Debug.WriteLine("{0} - {1}", window.Classname, window.Text);

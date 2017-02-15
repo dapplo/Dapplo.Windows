@@ -40,7 +40,7 @@ namespace Dapplo.Windows.Desktop
 	/// <summary>
 	///     Query for native windows
 	/// </summary>
-	public static class NativeWindowQuery
+	public static class InteropWindowQuery
 	{
 		/// <summary>
 		///     Window classes which can be ignored
@@ -49,53 +49,53 @@ namespace Dapplo.Windows.Desktop
 
 		/// <summary>
 		///     Check if the window is a top level window.
-		///     This method will retrieve all information, and fill it to the NativeWindow, it needs to make the decision.
+		///     This method will retrieve all information, and fill it to the interopWindow, it needs to make the decision.
 		/// </summary>
-		/// <param name="nativeWindow">WindowDetails</param>
+		/// <param name="interopWindow">InteropWindow</param>
 		/// <returns>bool</returns>
-		public static bool IsTopLevel(this NativeWindow nativeWindow)
+		public static bool IsTopLevel(this InteropWindow interopWindow)
 		{
-			if (IgnoreClasses.Contains(nativeWindow.GetClassname()))
+			if (IgnoreClasses.Contains(interopWindow.GetClassname()))
 			{
 				return false;
 			}
 			// Ignore windows without title
-			if (nativeWindow.GetText().Length == 0)
+			if (interopWindow.GetText().Length == 0)
 			{
 				return false;
 			}
 			// Windows without size
-			if (nativeWindow.GetBounds().IsEmpty)
+			if (interopWindow.GetBounds().IsEmpty)
 			{
 				return false;
 			}
-			if (nativeWindow.GetParent() != IntPtr.Zero)
+			if (interopWindow.GetParent() != IntPtr.Zero)
 			{
 				return false;
 			}
-			var exWindowStyle = nativeWindow.GetExtendedStyle();
+			var exWindowStyle = interopWindow.GetExtendedStyle();
 			if ((exWindowStyle & ExtendedWindowStyleFlags.WS_EX_TOOLWINDOW) != 0)
 			{
 				return false;
 			}
 			// Skip everything which is not rendered "normally"
-			if (!nativeWindow.IsWin8App() && (exWindowStyle & ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP) != 0)
+			if (!interopWindow.IsWin8App() && (exWindowStyle & ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP) != 0)
 			{
 				return false;
 			}
 			// Skip preview windows, like the one from Firefox
-			if ((nativeWindow.GetStyle() & WindowStyleFlags.WS_VISIBLE) == 0)
+			if ((interopWindow.GetStyle() & WindowStyleFlags.WS_VISIBLE) == 0)
 			{
 				return false;
 			}
-			return !nativeWindow.IsMinimized();
+			return !interopWindow.IsMinimized();
 		}
 
 		/// <summary>
 		///     Iterate the Top level windows, from top to bottom
 		/// </summary>
 		/// <returns>IEnumerable with all the top level windows</returns>
-		public static IEnumerable<NativeWindow> GetTopLevelWindows()
+		public static IEnumerable<InteropWindow> GetTopLevelWindows()
 		{
 			foreach (var possibleTopLevel in GetTopWindows())
 			{
@@ -109,14 +109,14 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		///     Iterate the windows, from top to bottom
 		/// </summary>
-		/// <param name="parent">NativeWindow as the parent, to iterate over the children, or null for all</param>
+		/// <param name="parent">InteropWindow as the parent, to iterate over the children, or null for all</param>
 		/// <returns>IEnumerable with all the top level windows</returns>
-		public static IEnumerable<NativeWindow> GetTopWindows(NativeWindow parent = null)
+		public static IEnumerable<InteropWindow> GetTopWindows(InteropWindow parent = null)
 		{
 			IntPtr windowPtr = User32.GetTopWindow(parent ?? IntPtr.Zero);
 			do
 			{
-				yield return NativeWindow.CreateFor(windowPtr);
+				yield return InteropWindow.CreateFor(windowPtr);
 				windowPtr = User32.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
 			} while (windowPtr != IntPtr.Zero);
 		}
@@ -124,27 +124,27 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		///     Get the currently active window
 		/// </summary>
-		/// <returns>NativeWindow</returns>
-		public static NativeWindow GetActiveWindow()
+		/// <returns>InteropWindow</returns>
+		public static InteropWindow GetActiveWindow()
 		{
-			return NativeWindow.CreateFor(User32.GetForegroundWindow());
+			return InteropWindow.CreateFor(User32.GetForegroundWindow());
 		}
 
 		/// <summary>
 		/// Gets the Desktop window
 		/// </summary>
-		/// <returns>NativeWindow for the desktop window</returns>
-		public static NativeWindow GetDesktopWindow()
+		/// <returns>InteropWindow for the desktop window</returns>
+		public static InteropWindow GetDesktopWindow()
 		{
-			return NativeWindow.CreateFor(User32.GetDesktopWindow());
+			return InteropWindow.CreateFor(User32.GetDesktopWindow());
 		}
 
 		/// <summary>
 		/// Find windows belonging to the same process (thread) as the supplied window.
 		/// </summary>
-		/// <param name="windowToLinkTo">NativeWindow</param>
-		/// <returns>IEnumerable with NativeWindow</returns>
-		public static IEnumerable<NativeWindow> GetLinkedWindows(this NativeWindow windowToLinkTo)
+		/// <param name="windowToLinkTo">InteropWindow</param>
+		/// <returns>IEnumerable with InteropWindow</returns>
+		public static IEnumerable<InteropWindow> GetLinkedWindows(this InteropWindow windowToLinkTo)
 		{
 			int processIdSelectedWindow = windowToLinkTo.GetProcessId();
 
@@ -163,7 +163,7 @@ namespace Dapplo.Windows.Desktop
 					}
 					foreach (var handle in handles)
 					{
-						yield return NativeWindow.CreateFor(handle);
+						yield return InteropWindow.CreateFor(handle);
 					}
 				}
 			}
