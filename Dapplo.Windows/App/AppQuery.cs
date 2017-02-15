@@ -127,7 +127,7 @@ namespace Dapplo.Windows.App
 		/// </summary>
 		public static bool IsApp(this InteropWindow interopWindow)
 		{
-			return AppWindowsClass.Equals(interopWindow.Classname);
+			return AppWindowsClass.Equals(interopWindow.GetClassname());
 		}
 
 		/// <summary>
@@ -136,7 +136,7 @@ namespace Dapplo.Windows.App
 		/// </summary>
 		public static bool IsWin8App(this InteropWindow interopWindow)
 		{
-			return W8AppWindowClass.Equals(interopWindow.Classname);
+			return W8AppWindowClass.Equals(interopWindow.GetClassname());
 		}
 
 		/// <summary>
@@ -145,7 +145,7 @@ namespace Dapplo.Windows.App
 		/// </summary>
 		public static bool IsWin10App(this InteropWindow interopWindow)
 		{
-			return W10AppWindowClass.Equals(interopWindow.Classname);
+			return W10AppWindowClass.Equals(interopWindow.GetClassname());
 		}
 
 		/// <summary>
@@ -153,7 +153,7 @@ namespace Dapplo.Windows.App
 		/// </summary>
 		public static bool IsGutter(this InteropWindow interopWindow)
 		{
-			return GutterClass.Equals(interopWindow.Classname);
+			return GutterClass.Equals(interopWindow.GetClassname());
 		}
 
 		/// <summary>
@@ -161,7 +161,7 @@ namespace Dapplo.Windows.App
 		/// </summary>
 		public static bool IsAppLauncher(this InteropWindow interopWindow)
 		{
-			return ApplauncherClass.Equals(interopWindow.Classname);
+			return ApplauncherClass.Equals(interopWindow.GetClassname());
 		}
 
 		/// <summary>
