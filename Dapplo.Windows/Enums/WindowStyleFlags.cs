@@ -31,7 +31,7 @@ namespace Dapplo.Windows.Enums
 	///     Window Style Flags
 	/// </summary>
 	[Flags]
-	public enum WindowStyleFlags : long
+	public enum WindowStyleFlags : uint
 	{
 		//WS_OVERLAPPED       = 0x00000000,
 		WS_POPUP = 0x80000000,
