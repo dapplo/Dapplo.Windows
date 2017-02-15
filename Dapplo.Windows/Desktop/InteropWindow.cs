@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
 
@@ -189,6 +190,37 @@ namespace Dapplo.Windows.Desktop
 		public static bool operator ==(InteropWindow left, InteropWindow right)
 		{
 			return Equals(left, right);
+		}
+
+		/// <summary>
+		/// Dump the information in the InteropWindow for debugging
+		/// </summary>
+		/// <param name="dump">StringBuilder to dump to</param>
+		/// <param name="indentation">int</param>
+		/// <returns>StringBuilder</returns>
+		public StringBuilder Dump(StringBuilder dump = null, string indentation = "")
+		{
+			dump = dump ?? new StringBuilder();
+			this.Fill(false);
+			dump.AppendLine($"{indentation}{nameof(Handle)}={Handle}");
+			dump.AppendLine($"{indentation}{nameof(Classname)}={Classname}");
+			dump.AppendLine($"{indentation}{nameof(Text)}={Text}");
+			dump.AppendLine($"{indentation}{nameof(Bounds)}={Bounds}");
+			dump.AppendLine($"{indentation}{nameof(ClientBounds)}={Bounds}");
+			dump.AppendLine($"{indentation}{nameof(ExtendedStyle)}={ExtendedStyle}");
+			dump.AppendLine($"{indentation}{nameof(Style)}={Style}");
+			dump.AppendLine($"{indentation}{nameof(IsMaximized)}={IsMaximized}");
+			dump.AppendLine($"{indentation}{nameof(IsMinimized)}={IsMinimized}");
+			dump.AppendLine($"{indentation}{nameof(IsVisible)}={IsVisible}");
+			dump.AppendLine($"{indentation}{nameof(Parent)}={Parent}");
+			if (!HasParent)
+			{
+				foreach (var child in this.GetZOrderedChildren())
+				{
+					child.Dump(dump, indentation + "\t");
+				}
+			}
+			return dump;
 		}
 
 		/// <inheritdoc />

@@ -22,11 +22,15 @@
 #region using
 
 using System.Diagnostics;
+using System.Linq;
 using Dapplo.Log;
+using Dapplo.Log.Loggers;
 using Dapplo.Log.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Native;
+using Dapplo.Windows.Structs;
 
 #endregion
 
@@ -49,10 +53,11 @@ namespace Dapplo.Windows.Tests
 		private void TestGetTopLevelWindows()
 		{
 			bool foundWindow = false;
-			foreach (var window in InteropWindowQuery.GetTopLevelWindows())
+			foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible() && window.GetBounds().Contains(new POINT(1850,1050))))
 			{
 				foundWindow = true;
-				Debug.WriteLine("{0} - {1}", window.Classname, window.Text);
+				Log.Debug().WriteLine("{0}", window.Dump());
+
 			}
 			Assert.True(foundWindow);
 		}

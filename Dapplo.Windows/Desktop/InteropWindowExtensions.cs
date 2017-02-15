@@ -45,12 +45,14 @@ namespace Dapplo.Windows.Desktop
 	public static class InteropWindowExtensions
 	{
 		private static readonly LogSource Log = new LogSource();
+
 		/// <summary>
 		///     Fill ALL the information of the InteropWindow
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
+		/// <param name="children">true to also get the children</param>
 		/// <param name="forceUpdate">true to force updating the values</param>
-		public static InteropWindow Fill(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static InteropWindow Fill(this InteropWindow interopWindow, bool children = true, bool forceUpdate = false)
 		{
 			interopWindow.GetBounds(forceUpdate);
 			interopWindow.GetClientBounds(forceUpdate);
@@ -60,6 +62,14 @@ namespace Dapplo.Windows.Desktop
 			interopWindow.GetStyle(forceUpdate);
 			interopWindow.GetProcessId(forceUpdate);
 			interopWindow.GetParent(forceUpdate);
+			interopWindow.GetPlacement(forceUpdate);
+			interopWindow.IsVisible(forceUpdate);
+			interopWindow.IsMaximized(forceUpdate);
+			interopWindow.IsMinimized(forceUpdate);
+			if (children)
+			{
+				interopWindow.GetChildren(forceUpdate);
+			}
 			interopWindow.GetPlacement(forceUpdate);
 			return interopWindow;
 		}
@@ -338,6 +348,29 @@ namespace Dapplo.Windows.Desktop
 			// Store it in the Children property
 			interopWindow.Children = children;
 			foreach (var child in WindowsEnumerator.EnumerateWindows(interopWindow))
+			{
+				children.Add(child);
+			}
+			return children;
+		}
+
+		/// <summary>
+		/// Get the children of the specified interopWindow, from top to bottom. This is not lazy
+		/// This might get different results than the GetChildren
+		/// </summary>
+		/// <param name="interopWindow">InteropWindow</param>
+		/// <param name="forceUpdate">True to force updating</param>
+		/// <returns>IEnumerable with InteropWindow</returns>
+		public static IEnumerable<InteropWindow> GetZOrderedChildren(this InteropWindow interopWindow, bool forceUpdate = false)
+		{
+			if (interopWindow.HasChildren && !forceUpdate)
+			{
+				return interopWindow.Children;
+			}
+			IList<InteropWindow> children = new List<InteropWindow>();
+			// Store it in the Children property
+			interopWindow.Children = children;
+			foreach (var child in InteropWindowQuery.GetTopWindows(interopWindow))
 			{
 				children.Add(child);
 			}

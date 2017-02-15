@@ -28,7 +28,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
@@ -95,12 +94,13 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		///     Iterate the Top level windows, from top to bottom
 		/// </summary>
+		/// <param name="ignoreKnownClasses">true to ignore windows with certain known classes</param>
 		/// <returns>IEnumerable with all the top level windows</returns>
-		public static IEnumerable<InteropWindow> GetTopLevelWindows()
+		public static IEnumerable<InteropWindow> GetTopLevelWindows(bool ignoreKnownClasses = true)
 		{
 			foreach (var possibleTopLevel in GetTopWindows())
 			{
-				if (possibleTopLevel.IsTopLevel())
+				if (possibleTopLevel.IsTopLevel(ignoreKnownClasses))
 				{
 					yield return possibleTopLevel;
 				}
@@ -114,7 +114,7 @@ namespace Dapplo.Windows.Desktop
 		/// <returns>IEnumerable with all the top level windows</returns>
 		public static IEnumerable<InteropWindow> GetTopWindows(InteropWindow parent = null)
 		{
-			IntPtr windowPtr = User32.GetTopWindow(parent ?? IntPtr.Zero);
+			IntPtr windowPtr = parent == null ? User32.GetTopWindow(IntPtr.Zero) : User32.GetWindow(parent, GetWindowCommands.GW_CHILD);
 			do
 			{
 				yield return InteropWindow.CreateFor(windowPtr);
