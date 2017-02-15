@@ -53,10 +53,11 @@ namespace Dapplo.Windows.Tests
 		private void TestGetTopLevelWindows()
 		{
 			bool foundWindow = false;
-			foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible() && window.GetBounds().Contains(new POINT(1850,1050))))
+			foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()))
 			{
 				foundWindow = true;
 				Log.Debug().WriteLine("{0}", window.Dump());
+				break;
 
 			}
 			Assert.True(foundWindow);
