@@ -55,13 +55,13 @@ namespace Dapplo.Windows.App
 
 		static AppQuery()
 		{
+			AppWindowsClass = Environment.OSVersion.IsWindows8() ? W8AppWindowClass : W10AppWindowClass;
 			// No need to check for the IAppVisibility
 			if (!Environment.OSVersion.IsWindows8OrLater())
 			{
 				AppVisibility = null;
 				return;
 			}
-			AppWindowsClass = Environment.OSVersion.IsWindows8() ? W8AppWindowClass : W10AppWindowClass;
 			try
 			{
 				var appVisibilityType = Type.GetTypeFromCLSID(CoClassGuidIAppVisibility);

@@ -27,6 +27,10 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Enums
 {
+	/// <summary>
+	/// The HRESULT represents Windows error codes
+	/// See <a href="https://en.wikipedia.org/wiki/HRESULT">wikipedia</a>
+	/// </summary>
 	public enum HRESULT : long
 	{
 		S_OK = 0,
