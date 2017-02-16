@@ -70,7 +70,7 @@ namespace Dapplo.Windows
 		///     Generate key press(es)
 		/// </summary>
 		/// <param name="keycodes">params VirtualKeyCodes</param>
-		public static uint Press(params VirtualKeyCodes[] keycodes)
+		public static uint KeyPress(params VirtualKeyCodes[] keycodes)
 		{
 			var keyboardInputs = new KeyboardInput[keycodes.Length * 2];
 			int index = 0;

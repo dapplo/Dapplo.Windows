@@ -251,18 +251,23 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool Start()
 		{
-			// Only in this mode we can move to the start
-			if (ScrollMode != ScrollModes.WindowsMessage)
+			switch (ScrollMode)
 			{
-				return false;
+				case ScrollModes.KeyboardPageUpDown:
+					InputGenerator.KeyDown(VirtualKeyCodes.CONTROL);
+					InputGenerator.KeyPress(VirtualKeyCodes.HOME);
+					InputGenerator.KeyUp(VirtualKeyCodes.CONTROL);
+					break;
+				case ScrollModes.WindowsMessage:
+					ScrollInfo scrollInfo;
+					if (!GetPosition(out scrollInfo))
+					{
+						return false;
+					}
+					scrollInfo.nPos = scrollInfo.nMin;
+					return ApplyPosition(ref scrollInfo);
 			}
-			ScrollInfo scrollInfo;
-			if (!GetPosition(out scrollInfo))
-			{
-				return false;
-			}
-			scrollInfo.nPos = scrollInfo.nMin;
-			return ApplyPosition(ref scrollInfo);
+			return false;
 		}
 
 		/// <summary>
@@ -271,19 +276,24 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool End()
 		{
-			// Only in this mode we can move to the end
-			if (ScrollMode != ScrollModes.WindowsMessage)
+			switch (ScrollMode)
 			{
-				return false;
-			}
-			ScrollInfo scrollInfo;
-			if (!GetPosition(out scrollInfo))
-			{
-				return false;
-			}
+				case ScrollModes.KeyboardPageUpDown:
+					InputGenerator.KeyDown(VirtualKeyCodes.CONTROL);
+					InputGenerator.KeyPress(VirtualKeyCodes.END);
+					InputGenerator.KeyUp(VirtualKeyCodes.CONTROL);
+					break;
+				case ScrollModes.WindowsMessage:
+					ScrollInfo scrollInfo;
+					if (!GetPosition(out scrollInfo))
+					{
+						return false;
+					}
 
-			scrollInfo.nPos = scrollInfo.nMax;
-			return ApplyPosition(ref scrollInfo);
+					scrollInfo.nPos = scrollInfo.nMax;
+					return ApplyPosition(ref scrollInfo);
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -295,7 +305,7 @@ namespace Dapplo.Windows
 			switch (ScrollMode)
 			{
 				case ScrollModes.KeyboardPageUpDown:
-					InputGenerator.Press(VirtualKeyCodes.PRIOR);
+					InputGenerator.KeyPress(VirtualKeyCodes.PRIOR);
 					break;
 				case ScrollModes.WindowsMessage:
 					// Calculate previous position
@@ -324,7 +334,7 @@ namespace Dapplo.Windows
 			switch (ScrollMode)
 			{
 				case ScrollModes.KeyboardPageUpDown:
-					InputGenerator.Press(VirtualKeyCodes.NEXT);
+					InputGenerator.KeyPress(VirtualKeyCodes.NEXT);
 					break;
 				case ScrollModes.WindowsMessage:
 					ScrollInfo scrollInfo;

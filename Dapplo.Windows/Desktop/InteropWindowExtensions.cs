@@ -421,7 +421,7 @@ namespace Dapplo.Windows.Desktop
 			if (workaround)
 			{
 				// Simulate an "ALT" key press.
-				InputGenerator.Press(VirtualKeyCodes.MENU);
+				InputGenerator.KeyPress(VirtualKeyCodes.MENU);
 			}
 			// Show window in forground.
 			User32.BringWindowToTop(interopWindow.Handle);

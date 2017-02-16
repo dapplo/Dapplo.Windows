@@ -73,11 +73,14 @@ namespace Dapplo.Windows.Tests
 					// Create a WindowScroller
 					var scroller = WindowScroller.Create(notepadWindow);
 					Assert.NotNull(scroller);
-					scroller.ScrollMode = ScrollModes.MouseWheel;
+					await Task.Delay(1000);
+					InputGenerator.KeyPress(VirtualKeyCodes.NEXT);
+					await Task.Delay(2000);
+					scroller.ScrollMode = ScrollModes.KeyboardPageUpDown;
 					// Move the window to the start
 					scroller.Start();
 					// A delay to make the window move
-					await Task.Delay(100);
+					await Task.Delay(2000);
 
 					// Check if it did move to the start
 					Assert.True(scroller.IsAtStart);
