@@ -29,8 +29,6 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
-using Point = System.Windows.Point;
-using Size = System.Windows.Size;
 
 #endregion
 
@@ -143,8 +141,8 @@ namespace Dapplo.Windows.Structs
 			get { return new POINT(Left, Top); }
 			set
 			{
-				_left = (int) value.X;
-				_top = (int) value.Y;
+				_left = value.X;
+				_top = value.Y;
 			}
 		}
 
@@ -156,8 +154,8 @@ namespace Dapplo.Windows.Structs
 			get { return new SIZE(Width, Height); }
 			set
 			{
-				_right = unchecked((int) value.Width + _left);
-				_bottom = unchecked((int) value.Height + _top);
+				_right = unchecked(value.Width + _left);
+				_bottom = unchecked(value.Height + _top);
 			}
 		}
 
@@ -226,7 +224,7 @@ namespace Dapplo.Windows.Structs
 		/// <inheritdoc />
 		public override string ToString()
 		{
-			return "{Left: " + _left + "; " + "Top: " + _top + "; Right: " + _right + "; Bottom: " + _bottom + "}";
+			return $"{{Left: {_left}; Top: {_top}; Right: {_right}; Bottom: {_bottom};}}";
 		}
 
 		/// <inheritdoc />

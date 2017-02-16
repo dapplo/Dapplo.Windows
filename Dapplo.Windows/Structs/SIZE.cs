@@ -147,5 +147,11 @@ namespace Dapplo.Windows.Structs
 		{
 			return new SIZE(size.Width, size.Height);
 		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"{{Width: {_width}; Height: {_height};}}";
+		}
 	}
 }

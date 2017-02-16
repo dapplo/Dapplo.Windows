@@ -21,6 +21,7 @@
 
 #region using
 
+using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 using Dapplo.Log;
@@ -31,6 +32,9 @@ using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 #endregion
 
@@ -56,10 +60,36 @@ namespace Dapplo.Windows.Tests
 			foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()))
 			{
 				foundWindow = true;
+
 				Log.Debug().WriteLine("{0}", window.Dump());
 				break;
 
 			}
+			Assert.True(foundWindow);
+		}
+
+		/// <summary>
+		/// Test GetWindow
+		/// </summary>
+		/// <returns></returns>
+		[Fact]
+		private void TestDetectChanges()
+		{
+			bool foundWindow = false;
+			IList<InteropWindow> initialWindows = InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()).ToList();
+
+			while (true)
+			{
+				Thread.Sleep(1000);
+				var newWindow = InteropWindowQuery.GetTopWindows().FirstOrDefault(window => window.IsVisible() && !initialWindows.Contains(window));
+				if (newWindow != null)
+				{
+					foundWindow = true;
+					Log.Debug().WriteLine("{0}", newWindow.Dump());
+					break;
+				}
+			}
+
 			Assert.True(foundWindow);
 		}
 	}

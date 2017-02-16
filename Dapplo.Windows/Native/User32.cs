@@ -536,7 +536,7 @@ namespace Dapplo.Windows.Native
 		/// <param name="wParam">int with the capacity of the string builder</param>
 		/// <param name="lParam">StringBuilder</param>
 		/// <returns></returns>
-		[DllImport("user32", SetLastError = true)]
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, StringBuilder lParam);
 
 		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
