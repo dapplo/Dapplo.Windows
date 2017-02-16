@@ -29,6 +29,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Forms;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Desktop;
@@ -176,12 +177,12 @@ namespace Dapplo.Windows.Structs
 				mouseEventFlags |= MouseEventFlags.MiddleDown;
 			}
 			int mouseData = 0;
-			if (mouseButtons.HasFlag(MouseButtons.X1))
+			if (mouseButtons.HasFlag(MouseButtons.XButton1))
 			{
 				mouseEventFlags |= MouseEventFlags.XDown;
 				mouseData |= 1;
 			}
-			if (mouseButtons.HasFlag(MouseButtons.X2))
+			if (mouseButtons.HasFlag(MouseButtons.XButton2))
 			{
 				mouseEventFlags |= MouseEventFlags.XDown;
 				mouseData |= 2;
@@ -224,12 +225,12 @@ namespace Dapplo.Windows.Structs
 				mouseEventFlags |= MouseEventFlags.MiddleUp;
 			}
 			int mouseData = 0;
-			if (mouseButtons.HasFlag(MouseButtons.X1))
+			if (mouseButtons.HasFlag(MouseButtons.XButton1))
 			{
 				mouseEventFlags |= MouseEventFlags.XUp;
 				mouseData |= 1;
 			}
-			if (mouseButtons.HasFlag(MouseButtons.X2))
+			if (mouseButtons.HasFlag(MouseButtons.XButton2))
 			{
 				mouseEventFlags |= MouseEventFlags.XUp;
 				mouseData |= 2;

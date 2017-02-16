@@ -21,6 +21,7 @@
 
 #region using
 
+using System.Windows.Forms;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
