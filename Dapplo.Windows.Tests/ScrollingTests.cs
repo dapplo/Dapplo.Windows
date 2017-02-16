@@ -60,9 +60,13 @@ namespace Dapplo.Windows.Tests
 
 				try
 				{
-
 					// Find the belonging window, by the process id
-					var notepadWindow = WindowsEnumerator.EnumerateWindows().FirstOrDefault(interopWindow => interopWindow.GetText().Contains("Notepad++"));
+					var notepadWindow = WindowsEnumerator.EnumerateWindows().FirstOrDefault(interopWindow =>
+					{
+						int processId;
+						User32.GetWindowThreadProcessId(interopWindow, out processId);
+						return processId == process.Id;
+					});
 					Assert.NotNull(notepadWindow);
 
 					// Create a WindowScroller
