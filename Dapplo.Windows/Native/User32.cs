@@ -281,15 +281,36 @@ namespace Dapplo.Windows.Native
 		}
 
 		/// <summary>
-		///     Retrieve the windows title, also called Text
+		///     Retrieve the windows caption, also called Text
 		/// </summary>
 		/// <param name="hWnd">IntPtr for the window</param>
 		/// <returns>string</returns>
 		public static string GetText(IntPtr hWnd)
 		{
-			var title = new StringBuilder(260, 260);
-			GetWindowText(hWnd, title, title.Capacity);
-			return title.ToString();
+			var caption = new StringBuilder(260, 260);
+			GetWindowText(hWnd, caption, caption.Capacity);
+			return caption.ToString();
+		}
+
+		/// <summary>
+		/// Get the text of a control, this is not the caption
+		/// </summary>
+		/// <param name="hWnd">IntPtr</param>
+		/// <returns>string with the text</returns>
+		public static string GetTextFromWindow(IntPtr hWnd)
+		{
+			// Get the size of the string required to hold the window's text. 
+			var size = SendMessage(hWnd, WindowsMessages.WM_GETTEXTLENGTH, 0, 0).ToInt32();
+
+			// If the return is 0, there is no text. 
+			if (size <= 0)
+			{
+				return null;
+			}
+			var text = new StringBuilder(size + 1);
+
+			SendMessage(hWnd, WindowsMessages.WM_GETTEXT, text.Capacity, text);
+			return text.ToString();
 		}
 
 		/// <summary>
@@ -495,6 +516,28 @@ namespace Dapplo.Windows.Native
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, IntPtr lParam);
+
+		/// <summary>
+		/// Used for calls where the arguments are int
+		/// </summary>
+		/// <param name="hWnd">IntPtr for the Window handle</param>
+		/// <param name="windowsMessage">WindowsMessages</param>
+		/// <param name="wParam">int</param>
+		/// <param name="lParam">int</param>
+		/// <returns></returns>
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, int lParam);
+
+		/// <summary>
+		/// Used for WM_GETTEXT
+		/// </summary>
+		/// <param name="hWnd">IntPtr for the Window handle</param>
+		/// <param name="windowsMessage"></param>
+		/// <param name="wParam">int with the capacity of the string builder</param>
+		/// <param name="lParam">StringBuilder</param>
+		/// <returns></returns>
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, StringBuilder lParam);
 
 		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);

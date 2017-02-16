@@ -60,7 +60,7 @@ namespace Dapplo.Windows.Desktop
 				return false;
 			}
 			// Ignore windows without title
-			if (interopWindow.GetText().Length == 0)
+			if (interopWindow.GetCaption().Length == 0)
 			{
 				return false;
 			}

@@ -93,7 +93,12 @@ namespace Dapplo.Windows.Desktop
 		public IntPtr? Parent { get; set; }
 
 		/// <summary>
-		/// Return the text (title) of the window, if any
+		/// Return the title of the window, if any
+		/// </summary>
+		public string Caption { get; set; }
+
+		/// <summary>
+		/// Return the text (not title) of the window, if any
 		/// </summary>
 		public string Text { get; set; }
 
@@ -204,6 +209,7 @@ namespace Dapplo.Windows.Desktop
 			this.Fill(false);
 			dump.AppendLine($"{indentation}{nameof(Handle)}={Handle}");
 			dump.AppendLine($"{indentation}{nameof(Classname)}={Classname}");
+			dump.AppendLine($"{indentation}{nameof(Caption)}={Caption}");
 			dump.AppendLine($"{indentation}{nameof(Text)}={Text}");
 			dump.AppendLine($"{indentation}{nameof(Bounds)}={Bounds}");
 			dump.AppendLine($"{indentation}{nameof(ClientBounds)}={Bounds}");

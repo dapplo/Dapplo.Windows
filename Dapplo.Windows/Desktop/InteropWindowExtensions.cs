@@ -56,7 +56,7 @@ namespace Dapplo.Windows.Desktop
 		{
 			interopWindow.GetBounds(forceUpdate);
 			interopWindow.GetClientBounds(forceUpdate);
-			interopWindow.GetText(forceUpdate);
+			interopWindow.GetCaption(forceUpdate);
 			interopWindow.GetClassname(forceUpdate);
 			interopWindow.GetExtendedStyle(forceUpdate);
 			interopWindow.GetStyle(forceUpdate);
@@ -71,6 +71,7 @@ namespace Dapplo.Windows.Desktop
 				interopWindow.GetChildren(forceUpdate);
 			}
 			interopWindow.GetPlacement(forceUpdate);
+			interopWindow.GetText(forceUpdate);
 			return interopWindow;
 		}
 
@@ -109,7 +110,23 @@ namespace Dapplo.Windows.Desktop
 		}
 
 		/// <summary>
-		/// Get the Windows text (title)
+		/// Get the Windows caption (title)
+		/// </summary>
+		/// <param name="interopWindow">InteropWindow</param>
+		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
+		/// <returns>string with the caption</returns>
+		public static string GetCaption(this InteropWindow interopWindow, bool forceUpdate = false)
+		{
+			if (interopWindow.Caption == null || forceUpdate)
+			{
+				var caption = User32.GetText(interopWindow.Handle);
+				interopWindow.Caption = caption;
+			}
+			return interopWindow.Caption;
+		}
+
+		/// <summary>
+		/// Get text from the window
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
@@ -118,7 +135,7 @@ namespace Dapplo.Windows.Desktop
 		{
 			if (interopWindow.Text == null || forceUpdate)
 			{
-				var text = User32.GetText(interopWindow.Handle);
+				var text = User32.GetTextFromWindow(interopWindow.Handle);
 				interopWindow.Text = text;
 			}
 			return interopWindow.Text;

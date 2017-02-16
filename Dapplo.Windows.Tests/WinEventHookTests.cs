@@ -66,10 +66,10 @@ namespace Dapplo.Windows.Tests
 
 			var winEventObservable =  WinEventHook.WindowTileChangeObservable()
 				.Select(info => InteropWindow.CreateFor(info.Handle).Fill())
-				.Where(info => !string.IsNullOrEmpty(info.Text))
+				.Where(info => !string.IsNullOrEmpty(info.Caption))
 				.Subscribe(windowInfo =>
 			{
-				Log.Debug().WriteLine("Window title change: Process ID {0} - Title: {1}", windowInfo.Handle, windowInfo.Text);
+				Log.Debug().WriteLine("Window title change: Process ID {0} - Title: {1}", windowInfo.Handle, windowInfo.Caption);
 				replaySubject.OnNext(windowInfo);
 			});
 

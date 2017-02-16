@@ -86,7 +86,7 @@ namespace Dapplo.Windows.Tests
 			Application.DoEvents();
 
 			await Task.Delay(400);
-			var window = await WindowsEnumerator.EnumerateWindowsAsync().Where(info => info.Fill().Text.Contains(textValue)).FirstOrDefaultAsync();
+			var window = await WindowsEnumerator.EnumerateWindowsAsync().Where(info => info.Fill().Caption.Contains(textValue)).FirstOrDefaultAsync();
 
 			Assert.NotNull(window);
 		}
