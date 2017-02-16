@@ -72,7 +72,7 @@ namespace Dapplo.Windows.Tests
 		/// Test GetWindow
 		/// </summary>
 		/// <returns></returns>
-		[Fact]
+		//[Fact]
 		private void TestDetectChanges()
 		{
 			bool foundWindow = false;
