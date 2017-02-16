@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Tests
 		/// Test scrolling a window
 		/// </summary>
 		/// <returns></returns>
-		[StaFact]
+		//[StaFact]
 		private async Task TestScrollingAsync()
 		{
 			// Start a process to test against
