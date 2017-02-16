@@ -26,9 +26,12 @@
 #region Usings
 
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Native;
+using Dapplo.Windows.Desktop;
 
 #endregion
 
@@ -41,6 +44,8 @@ namespace Dapplo.Windows.Structs
 	[StructLayout(LayoutKind.Sequential)]
 	public struct MouseInput
 	{
+		private const MouseEventFlags MouseMoveMouseEventFlags = MouseEventFlags.Absolute | MouseEventFlags.Virtualdesk | MouseEventFlags.Move;
+
 		/// <summary>
 		/// The absolute position of the mouse, or the amount of motion since the last mouse event was generated,
 		/// depending on the value of the dwFlags member.
@@ -69,7 +74,9 @@ namespace Dapplo.Windows.Structs
 		/// 
 		/// If dwFlags does not contain MOUSEEVENTF_WHEEL, MOUSEEVENTF_XDOWN, or MOUSEEVENTF_XUP, then mouseData should be zero.
 		/// If dwFlags contains MOUSEEVENTF_XDOWN or MOUSEEVENTF_XUP, then mouseData specifies which X buttons were pressed or released.
-		/// This value may be any combination of the following flags.
+		/// This value may be any combination of the following flags:
+		/// XBUTTON1 0x0001 Set if the first X button is pressed or released.
+		/// XBUTTON2 0x0002 Set if the second X button is pressed or released.
 		/// </summary>
 		int MouseData;
 
@@ -88,68 +95,152 @@ namespace Dapplo.Windows.Structs
 		UIntPtr dwExtraInfo;
 
 		/// <summary>
+		/// The coordinates need to be mapped from 0-65535 where 0 is left and 65535 is right
+		/// </summary>
+		/// <param name="location">POINT</param>
+		/// <returns>POINT</returns>
+		private static POINT RemapLocation(POINT location)
+		{
+			var bounds = DisplayInfo.GetAllScreenBounds();
+			return new POINT(location.X * (65535 / bounds.Width), location.Y * (65535 / bounds.Height));
+		}
+
+		/// <summary>
 		/// Create a MouseInput struct for a wheel move
 		/// </summary>
 		/// <param name="wheelDelta">How much does the wheel move</param>
+		/// <param name="location">Location of the event</param>
 		/// <param name="timestamp">The time stamp for the event</param>
 		/// <returns>MouseInput</returns>
-		public static MouseInput MoveMouseWheel(int wheelDelta, int timestamp = 0)
+		public static MouseInput MoveMouseWheel(int wheelDelta, POINT? location = null, uint timestamp = 0)
 		{
+			if (location.HasValue)
+			{
+				location = RemapLocation(location.Value);
+			}
+			MouseEventFlags mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
 			return new MouseInput
 			{
 				MouseData = wheelDelta,
-				MouseEventFlags = MouseEventFlags.Wheel
+				dx = location?.X ?? 0,
+				dy = location?.Y ?? 0,
+				Timestamp = timestamp,
+				MouseEventFlags = mouseEventFlags | MouseEventFlags.Wheel
 			};
 		}
 
 		/// <summary>
-		/// Create a MouseInput struct for a left mouse click
+		/// Create a MouseInput struct for a mouse move
 		/// </summary>
 		/// <param name="location">Where is the click located</param>
-		/// <param name="released">true if the mouse button is released</param>
 		/// <param name="timestamp">The time stamp for the event</param>
 		/// <returns>MouseInput</returns>
-		public static MouseInput MouseLeftClick(Point location, bool released = false, int timestamp = 0)
+		public static MouseInput MouseMove(POINT location, uint timestamp = 0)
 		{
+			location = RemapLocation(location);
+			var bounds = DisplayInfo.GetAllScreenBounds();
 			return new MouseInput
 			{
-				dx = (int)location.X,
-				dy = (int)location.Y,
-				MouseEventFlags = MouseEventFlags.Absolute | (released ? MouseEventFlags.LeftUp : MouseEventFlags.LeftDown)
+				dx = location.X * (65535 / bounds.Width),
+				dy = location.Y * (65535 / bounds.Height),
+				Timestamp = timestamp,
+				MouseEventFlags = MouseMoveMouseEventFlags
 			};
 		}
 
 		/// <summary>
-		/// Create a MouseInput struct for a right mouse click
+		/// Create a MouseInput struct for a mouse button down
 		/// </summary>
+		/// <param name="mouseButtons">MouseButtons to specify which mouse buttons</param>
 		/// <param name="location">Where is the click located</param>
-		/// <param name="released">true if the mouse button is released</param>
 		/// <param name="timestamp">The time stamp for the event</param>
 		/// <returns>MouseInput</returns>
-		public static MouseInput MouseRightClick(Point location, bool released = false, int timestamp = 0)
+		public static MouseInput MouseDown(MouseButtons mouseButtons, POINT? location = null, uint timestamp = 0)
 		{
+			if (location.HasValue)
+			{
+				location = RemapLocation(location.Value);
+			}
+			MouseEventFlags mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
+	
+			if (mouseButtons.HasFlag(MouseButtons.Left))
+			{
+				mouseEventFlags |= MouseEventFlags.LeftDown;
+			}
+			if (mouseButtons.HasFlag(MouseButtons.Right))
+			{
+				mouseEventFlags |= MouseEventFlags.RightDown;
+			}
+			if (mouseButtons.HasFlag(MouseButtons.Middle))
+			{
+				mouseEventFlags |= MouseEventFlags.MiddleDown;
+			}
+			int mouseData = 0;
+			if (mouseButtons.HasFlag(MouseButtons.X1))
+			{
+				mouseEventFlags |= MouseEventFlags.XDown;
+				mouseData |= 1;
+			}
+			if (mouseButtons.HasFlag(MouseButtons.X2))
+			{
+				mouseEventFlags |= MouseEventFlags.XDown;
+				mouseData |= 2;
+			}
 			return new MouseInput
 			{
-				dx = (int)location.X,
-				dy = (int)location.Y,
-				MouseEventFlags = MouseEventFlags.Absolute | (released ? MouseEventFlags.RightUp : MouseEventFlags.RightDown)
+				dx = location?.X ?? 0,
+				dy = location?.Y ?? 0,
+				Timestamp = timestamp,
+				MouseData = mouseData,
+				MouseEventFlags = mouseEventFlags
 			};
 		}
 
 		/// <summary>
-		/// Create a MouseInput struct for a middle mouse click
+		/// Create a MouseInput struct for a mouse button up
 		/// </summary>
+		/// <param name="mouseButtons">MouseButtons to specify which mouse buttons</param>
 		/// <param name="location">Where is the click located</param>
-		/// <param name="released">true if the mouse button is released</param>
 		/// <param name="timestamp">The time stamp for the event</param>
 		/// <returns>MouseInput</returns>
-		public static MouseInput MouseMiddleClick(Point location, bool released = false, int timestamp = 0)
+		public static MouseInput MouseUp(MouseButtons mouseButtons, POINT? location = null, uint timestamp = 0)
 		{
+			if (location.HasValue)
+			{
+				location = RemapLocation(location.Value);
+			}
+			MouseEventFlags mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
+
+			if (mouseButtons.HasFlag(MouseButtons.Left))
+			{
+				mouseEventFlags |= MouseEventFlags.LeftUp;
+			}
+			if (mouseButtons.HasFlag(MouseButtons.Right))
+			{
+				mouseEventFlags |= MouseEventFlags.RightUp;
+			}
+			if (mouseButtons.HasFlag(MouseButtons.Middle))
+			{
+				mouseEventFlags |= MouseEventFlags.MiddleUp;
+			}
+			int mouseData = 0;
+			if (mouseButtons.HasFlag(MouseButtons.X1))
+			{
+				mouseEventFlags |= MouseEventFlags.XUp;
+				mouseData |= 1;
+			}
+			if (mouseButtons.HasFlag(MouseButtons.X2))
+			{
+				mouseEventFlags |= MouseEventFlags.XUp;
+				mouseData |= 2;
+			}
 			return new MouseInput
 			{
-				dx = (int)location.X,
-				dy = (int)location.Y,
-				MouseEventFlags = MouseEventFlags.Absolute | (released ? MouseEventFlags.MiddleUp : MouseEventFlags.MiddleDown)
+				dx = location?.X ?? 0,
+				dy = location?.Y ?? 0,
+				Timestamp = timestamp,
+				MouseData = mouseData,
+				MouseEventFlags = mouseEventFlags
 			};
 		}
 	}

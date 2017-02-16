@@ -414,11 +414,23 @@ namespace Dapplo.Windows.Native
 		/// <summary>
 		/// Set the current foreground window
 		/// </summary>
-		/// <param name="hWnd"></param>
-		/// <returns>IntPtr</returns>
+		/// <param name="hWnd">IntPtr with the handle to the window</param>
+		/// <returns>bool</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+		/// <summary>
+		/// Sets the keyboard focus to the specified window. The window must be attached to the calling thread's message queue.
+		/// </summary>
+		/// <param name="hWnd">A handle to the window that will receive the keyboard input. If this parameter is NULL, keystrokes are ignored.</param>
+		/// <returns>IntPtr
+		/// If the function succeeds, the return value is the handle to the window that previously had the keyboard focus.
+		/// If the hWnd parameter is invalid or the window is not attached to the calling thread's message queue, the return value is NULL.
+		/// To get extended error information, call GetLastError.
+		/// </returns>
+		[DllImport("user32", SetLastError = true)]
+		public static extern IntPtr SetFocus(IntPtr hWnd);
 
 		/// <summary>
 		/// Get the WindowPlacement for the specified window

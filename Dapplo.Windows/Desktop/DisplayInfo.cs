@@ -21,9 +21,11 @@
 
 #region using
 
+using System;
 using System.Drawing;
 using System.Windows;
 using Dapplo.Windows.Native;
+using Dapplo.Windows.Structs;
 using Point = System.Windows.Point;
 
 #endregion
@@ -38,12 +40,12 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		///     Screen bounds
 		/// </summary>
-		public Rect Bounds { get; set; }
+		public RECT Bounds { get; set; }
 
 		/// <summary>
 		///     Bounds as Rectangle
 		/// </summary>
-		public Rectangle BoundsRectangle { get; set; }
+		public RECT BoundsRectangle { get; set; }
 
 		/// <summary>
 		///     Device name
@@ -68,7 +70,7 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		///     Desktop working area
 		/// </summary>
-		public Rect WorkingArea { get; set; }
+		public RECT WorkingArea { get; set; }
 
 		/// <summary>
 		///     Desktop working area as Rectangle
@@ -76,12 +78,11 @@ namespace Dapplo.Windows.Desktop
 		public Rectangle WorkingAreaRectangle { get; set; }
 
 		/// <summary>
-		///     Implementation like Screen.GetBounds
-		///     https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx
+		///		 Implementation like <a href="https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx">Screen.GetBounds</a>
 		/// </summary>
 		/// <param name="point"></param>
 		/// <returns></returns>
-		public static Rect GetBounds(Point point)
+		public static RECT GetBounds(POINT point)
 		{
 			DisplayInfo returnValue = null;
 			foreach (var display in User32.AllDisplays())
@@ -99,15 +100,22 @@ namespace Dapplo.Windows.Desktop
 		}
 
 		/// <summary>
-		///     Implementation like Screen.GetBounds
-		///     https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx
+		///     Get the bounds of the complete screen
 		/// </summary>
-		/// <param name="point">System.Drawing.Point</param>
-		/// <returns>Rect</returns>
-		public static Rectangle GetBounds(System.Drawing.Point point)
+		/// <returns></returns>
+		public static RECT GetAllScreenBounds()
 		{
-			var rect = GetBounds(new Point(point.X, point.Y));
-			return new Rectangle((int) rect.X, (int) rect.Y, (int) rect.Width, (int) rect.Height);
+			int left = 0, top = 0, bottom = 0, right = 0;
+			foreach (var display in User32.AllDisplays())
+			{
+				left = Math.Min(left, display.Bounds.X);
+				top = Math.Min(top, display.Bounds.Y);
+				var screenAbsRight = display.Bounds.X + display.Bounds.Width;
+				var screenAbsBottom = display.Bounds.Y + display.Bounds.Height;
+				right = Math.Max(right, screenAbsRight);
+				bottom = Math.Max(bottom, screenAbsBottom);
+			}
+			return new RECT(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
 		}
 	}
 }

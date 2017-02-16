@@ -17,6 +17,10 @@ namespace Dapplo.Windows.Enums
 	public enum MouseEventFlags : uint
 	{
 		/// <summary>
+		/// Default value
+		/// </summary>
+		None = 0,
+		/// <summary>
 		/// Movement occurred.
 		/// </summary>
 		Move = 0x0001,

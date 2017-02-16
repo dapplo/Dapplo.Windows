@@ -266,9 +266,18 @@ namespace Dapplo.Windows
 					}
 					scrollInfo.nPos = scrollInfo.nMin;
 					return ApplyPosition(ref scrollInfo);
+				case ScrollModes.MouseWheel:
+					var bounds = ScrollingArea.GetBounds();
+					var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+					while (!IsAtStart)
+					{
+						InputGenerator.MoveMouseWheel(WheelDelta, middlePoint);
+					}
+					return true;
 			}
 			return false;
 		}
+
 
 		/// <summary>
 		///     Move to the end
@@ -292,6 +301,14 @@ namespace Dapplo.Windows
 
 					scrollInfo.nPos = scrollInfo.nMax;
 					return ApplyPosition(ref scrollInfo);
+				case ScrollModes.MouseWheel:
+					var bounds = ScrollingArea.GetBounds();
+					var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+					while (!IsAtEnd)
+					{
+						InputGenerator.MoveMouseWheel(-WheelDelta, middlePoint);
+					}
+					return true;
 			}
 			return false;
 		}
@@ -317,8 +334,9 @@ namespace Dapplo.Windows
 					scrollInfo.nPos = Math.Max(scrollInfo.nMin, scrollInfo.nPos - (int)scrollInfo.nPage);
 					return ApplyPosition(ref scrollInfo);
 				case ScrollModes.MouseWheel:
-					var mouseWheelInput = MouseInput.MoveMouseWheel(WheelDelta);
-					User32.SendInput(Input.CreateMouseInputs(mouseWheelInput));
+					var bounds = ScrollingArea.GetBounds();
+					var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+					InputGenerator.MoveMouseWheel(WheelDelta, middlePoint);
 					break;
 			}
 
@@ -347,8 +365,9 @@ namespace Dapplo.Windows
 					scrollInfo.nPos = Math.Min(scrollInfo.nMax, scrollInfo.nPos + (int)scrollInfo.nPage);
 					return ApplyPosition(ref scrollInfo);
 				case ScrollModes.MouseWheel:
-					var mouseWheelInput = MouseInput.MoveMouseWheel(-WheelDelta);
-					User32.SendInput(Input.CreateMouseInputs(mouseWheelInput));
+					var bounds = ScrollingArea.GetBounds();
+					var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+					InputGenerator.MoveMouseWheel(-WheelDelta, middlePoint);
 					break;
 			}
 			return true;

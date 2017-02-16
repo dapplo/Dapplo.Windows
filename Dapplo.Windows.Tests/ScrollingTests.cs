@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Tests
 		/// Test scrolling a window
 		/// </summary>
 		/// <returns></returns>
-		//[StaFact]
+		[StaFact]
 		private async Task TestScrollingAsync()
 		{
 			// Start a process to test against
@@ -62,21 +62,19 @@ namespace Dapplo.Windows.Tests
 				{
 
 					// Find the belonging window, by the process id
-					var notepadWindow = WindowsEnumerator.EnumerateWindows().FirstOrDefault(interopWindow =>
-					{
-						int processId;
-						User32.GetWindowThreadProcessId(interopWindow, out processId);
-						return processId == process.Id;
-					});
+					var notepadWindow = WindowsEnumerator.EnumerateWindows().FirstOrDefault(interopWindow => interopWindow.GetText().Contains("Notepad++"));
 					Assert.NotNull(notepadWindow);
 
 					// Create a WindowScroller
 					var scroller = WindowScroller.Create(notepadWindow);
+
 					Assert.NotNull(scroller);
+
+					User32.SetForegroundWindow(scroller.ScrollingArea);
 					await Task.Delay(1000);
 					InputGenerator.KeyPress(VirtualKeyCodes.NEXT);
 					await Task.Delay(2000);
-					scroller.ScrollMode = ScrollModes.KeyboardPageUpDown;
+					scroller.ScrollMode = ScrollModes.MouseWheel;
 					// Move the window to the start
 					scroller.Start();
 					// A delay to make the window move
@@ -94,6 +92,7 @@ namespace Dapplo.Windows.Tests
 						await Task.Delay(300);
 						// Loop as long as we are not at the end yet
 					} while (!scroller.IsAtEnd);
+					scroller.Reset();
 				}
 				finally
 				{

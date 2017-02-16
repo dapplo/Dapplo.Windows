@@ -282,6 +282,19 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
+		/// Test if this RECT contains the specified RECT
+		/// </summary>
+		/// <param name="rect">RECT</param>
+		/// <returns>true if it is contained</returns>
+		public bool Contains(RECT rect)
+		{
+			return rect.Left >= Left && rect.Left <= Right
+				&& rect.Right <= Right && rect.Right >= Left
+				&& rect.Top >= Top && rect.Top <= Bottom
+				&& rect.Bottom >= Top && rect.Bottom <= Bottom;
+		}
+
+		/// <summary>
 		/// Empty RECT
 		/// </summary>
 		public static RECT Empty => new RECT();

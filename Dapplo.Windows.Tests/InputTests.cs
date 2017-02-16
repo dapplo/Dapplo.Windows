@@ -23,6 +23,7 @@
 
 using System.Diagnostics;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
@@ -44,6 +45,19 @@ namespace Dapplo.Windows.Tests
 		public InputTests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+		}
+
+		/// <summary>
+		/// Test typing in a notepad
+		/// </summary>
+		/// <returns></returns>
+		[Fact]
+		private void TestMouseInput()
+		{
+			InputGenerator.MoveMouse(new POINT(10, 10));
+			Thread.Sleep(1000);
+			InputGenerator.MoveMouse(new POINT(100, 100));
+			Thread.Sleep(1000);
 		}
 
 		/// <summary>

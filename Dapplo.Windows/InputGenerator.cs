@@ -35,6 +35,69 @@ namespace Dapplo.Windows
 	public static class InputGenerator
 	{
 		/// <summary>
+		/// Generate mouse wheel moves
+		/// </summary>
+		/// <param name="location">POINT to specify where the mouse moves</param>
+		/// <param name="timestamp">The time stamp for the event</param>
+		/// <returns>number of input events generated</returns>
+		public static uint MoveMouse(POINT location, uint timestamp = 0)
+		{
+			var mouseMoveInput = MouseInput.MouseMove(location, timestamp);
+			return User32.SendInput(Input.CreateMouseInputs(mouseMoveInput));
+		}
+
+		/// <summary>
+		/// Generate mouse wheel moves
+		/// </summary>
+		/// <param name="wheelDelta"></param>
+		/// <param name="location">optional POINT to specify where the mouse wheel takes place</param>
+		/// <param name="timestamp">The time stamp for the event</param>
+		/// <returns>number of input events generated</returns>
+		public static uint MoveMouseWheel(int wheelDelta, POINT? location = null, uint timestamp = 0)
+		{
+			var mouseWheelInput = MouseInput.MoveMouseWheel(wheelDelta, location, timestamp);
+			return User32.SendInput(Input.CreateMouseInputs(mouseWheelInput));
+		}
+
+		/// <summary>
+		/// Generate mouse button(s) down
+		/// </summary>
+		/// <param name="mouseButtons">MouseButtons specifying which buttons are down</param>
+		/// <param name="location">optional POINT to specify where the mouse down takes place</param>
+		/// <param name="timestamp">The time stamp for the event</param>
+		/// <returns>number of input events generated</returns>
+		public static uint MouseDown(MouseButtons mouseButtons, POINT? location = null, uint timestamp = 0)
+		{
+			var mouseWheelInput = MouseInput.MouseDown(mouseButtons, location, timestamp);
+			return User32.SendInput(Input.CreateMouseInputs(mouseWheelInput));
+		}
+
+		/// <summary>
+		/// Generate mouse button(s) Up
+		/// </summary>
+		/// <param name="mouseButtons">MouseButtons specifying which buttons are up</param>
+		/// <param name="location">optional POINT to specify where the mouse up takes place</param>
+		/// <param name="timestamp">The time stamp for the event</param>
+		/// <returns>number of input events generated</returns>
+		public static uint MouseUp(MouseButtons mouseButtons, POINT? location = null, uint timestamp = 0)
+		{
+			var mouseWheelInput = MouseInput.MouseUp(mouseButtons, location, timestamp);
+			return User32.SendInput(Input.CreateMouseInputs(mouseWheelInput));
+		}
+
+		/// <summary>
+		/// Generate mouse button(s) click
+		/// </summary>
+		/// <param name="mouseButtons">MouseButtons specifying which buttons are pressed</param>
+		/// <param name="location">optional POINT to specify where the mouse click takes place</param>
+		/// <param name="timestamp">The time stamp for the event</param>
+		/// <returns>number of input events generated</returns>
+		public static uint MouseClick(MouseButtons mouseButtons, POINT? location = null, uint timestamp = 0)
+		{
+			return User32.SendInput(Input.CreateMouseInputs(MouseInput.MouseDown(mouseButtons, location, timestamp), MouseInput.MouseDown(mouseButtons, location, timestamp)));
+		}
+
+		/// <summary>
 		///     Generate key down
 		/// </summary>
 		/// <param name="keycodes">VirtualKeyCodes for the key downs</param>
