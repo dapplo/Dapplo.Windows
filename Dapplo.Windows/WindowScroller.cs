@@ -234,10 +234,10 @@ namespace Dapplo.Windows
 		}
 
 		/// <summary>
-		/// Get position
+		/// Get current position
 		/// </summary>
 		/// <returns>SCROLLINFO</returns>
-		private bool GetPosition(out ScrollInfo scrollInfo)
+		public bool GetPosition(out ScrollInfo scrollInfo)
 		{
 			scrollInfo = new ScrollInfo(ScrollInfoMask.All);
 

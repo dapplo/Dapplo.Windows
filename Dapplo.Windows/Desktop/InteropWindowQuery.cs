@@ -114,6 +114,7 @@ namespace Dapplo.Windows.Desktop
 		/// <returns>IEnumerable with all the top level windows</returns>
 		public static IEnumerable<InteropWindow> GetTopWindows(InteropWindow parent = null)
 		{
+			// TODO: Guard against looping
 			IntPtr windowPtr = parent == null ? User32.GetTopWindow(IntPtr.Zero) : User32.GetWindow(parent, GetWindowCommands.GW_CHILD);
 			do
 			{

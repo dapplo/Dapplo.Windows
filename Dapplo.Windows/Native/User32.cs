@@ -392,6 +392,15 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int processId);
 
+		/// <summary>
+		/// Retrieves a handle to the specified window's parent or owner.
+		///To retrieve a handle to a specified ancestor, use the GetAncestor function.
+		/// </summary>
+		/// <param name="hWnd">A handle to the window whose parent window handle is to be retrieved.</param>
+		/// <returns>
+		/// IntPtr handle to the parent window or IntPtr.Zero if none
+		/// If the window is a child window, the return value is a handle to the parent window. If the window is a top-level window with the WS_POPUP style, the return value is a handle to the owner window.
+		/// </returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr GetParent(IntPtr hWnd);
 
@@ -408,8 +417,15 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
+		/// <summary>
+		/// Retrieves a handle to a window that has the specified relationship (Z-Order or owner) to the specified window.
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633515(v=vs.85).aspx">GetWindow function</a>
+		/// </summary>
+		/// <param name="hWnd">IntPtr A handle to a window. The window handle retrieved is relative to this window, based on the value of the uCmd parameter.</param>
+		/// <param name="getWindowCommand">GetWindowCommands The relationship between the specified window and the window whose handle is to be retrieved. See GetWindowCommands</param>
+		/// <returns></returns>
 		[DllImport("user32", SetLastError = true)]
-		public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommands uCmd);
+		public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommands getWindowCommand);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern int ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);

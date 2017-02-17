@@ -23,6 +23,7 @@ namespace Dapplo.Windows.Enums
 {
 	/// <summary>
 	/// Used by the user32.GetWindow function
+	/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633515(v=vs.85).aspx">GetWindow function</a>
 	/// The relationship between the specified window and the window whose handle is to be retrieved. This parameter can be one of the following values.
 	/// </summary>
 	public enum GetWindowCommands : uint
