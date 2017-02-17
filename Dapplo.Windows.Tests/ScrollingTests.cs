@@ -51,7 +51,7 @@ namespace Dapplo.Windows.Tests
 		/// Test scrolling a window
 		/// </summary>
 		/// <returns></returns>
-		[StaFact]
+		//[StaFact]
 		private async Task TestScrollingAsync()
 		{
 			bool breakScroll = false;
@@ -86,7 +86,7 @@ namespace Dapplo.Windows.Tests
 						// Notepad should have ScrollBarInfo
 						Assert.True(scroller.ScrollBarInfo.HasValue);
 
-                        Log.Info().WriteLine("Scrollbar info: {0}", scroller.ScrollBarInfo.Value);
+						Log.Info().WriteLine("Scrollbar info: {0}", scroller.ScrollBarInfo.Value);
 
 						User32.SetForegroundWindow(scroller.ScrollingArea);
 						await Task.Delay(1000);
