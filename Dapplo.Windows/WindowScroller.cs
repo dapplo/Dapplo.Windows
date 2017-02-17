@@ -46,6 +46,80 @@ namespace Dapplo.Windows
 		private static readonly LogSource Log = new LogSource();
 
 		/// <summary>
+		///     Factory to create the WindowScroller
+		/// </summary>
+		/// <param name="windowToScroll">InteropWindow is the window to scroll or contains an area which can be scrolled</param>
+		/// <param name="scrollBar">ScrollBar vertical is the default</param>
+		/// <returns>WindowScroller</returns>
+		public static WindowScroller Create(InteropWindow windowToScroll, ScrollBarTypes scrollBar = ScrollBarTypes.Vertical)
+		{
+			var scrollingArea = windowToScroll;
+			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
+			if (!User32.GetScrollInfo(windowToScroll.Handle, scrollBar, ref initialScrollInfo))
+			{
+				// Try control, the initialScrollInfo is only valid if nMin != nMax
+				if (User32.GetScrollInfo(windowToScroll.Handle, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
+				{
+					scrollBar = ScrollBarTypes.Control;
+				}
+				else
+				{
+					scrollingArea = WindowsEnumerator
+							.EnumerateWindows(windowToScroll.Handle)
+							.FirstOrDefault(childWindow => User32.GetScrollInfo(childWindow.Handle, scrollBar, ref initialScrollInfo));
+					if (scrollingArea == null)
+					{
+						return null;
+					}
+				}
+
+			}
+
+			var windowScroller = new WindowScroller
+			{
+				WindowToScroll = windowToScroll,
+				ScrollingArea = scrollingArea,
+				ScrollBar = scrollBar,
+				InitialScrollInfo = initialScrollInfo,
+				WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
+			};
+			windowScroller.FillScrollbarInfo();
+			return windowScroller;
+		}
+
+		/// <summary>
+		/// Method to set the ScrollbarInfo, if we can get it
+		/// </summary>
+		private void FillScrollbarInfo()
+		{
+			ObjectIdentifiers objectId = ObjectIdentifiers.Client;
+			switch (ScrollBar)
+			{
+				case ScrollBarTypes.Control:
+					objectId = ObjectIdentifiers.Client;
+					break;
+				case ScrollBarTypes.Vertical:
+					objectId = ObjectIdentifiers.VerticalScrollbar;
+					break;
+				case ScrollBarTypes.Horizontal:
+					objectId = ObjectIdentifiers.HorizontalScrollbar;
+					break;
+
+			}
+			ScrollBarInfo scrollbarInfo = new ScrollBarInfo(true);
+			bool hasScrollbarInfo = User32.GetScrollBarInfo(ScrollingArea, objectId, ref scrollbarInfo);
+			if (!hasScrollbarInfo)
+			{
+				var error = Win32.GetLastErrorCode();
+				Log.Verbose().WriteLine("Error retrieving Scrollbar info : {0}", Win32.GetMessage(error));
+			}
+			else
+			{
+				ScrollBarInfo = scrollbarInfo;
+			}
+		}
+
+		/// <summary>
 		///     The InteropWindow to scroll, this does not need to be the part of the window that actually scrolls
 		/// </summary>
 		public InteropWindow WindowToScroll { get; private set; }
@@ -58,7 +132,13 @@ namespace Dapplo.Windows
 		/// <summary>
 		///     What scrollbar to use
 		/// </summary>
-		public ScrollBarDirection Direction { get; private set; } = ScrollBarDirection.Vertical;
+		public ScrollBarTypes ScrollBar { get; private set; } = ScrollBarTypes.Vertical;
+
+		/// <summary>
+		/// Get the information on the used scrollbar, if any.
+		/// This can be used to detect the location of the scrollbar
+		/// </summary>
+		public ScrollBarInfo? ScrollBarInfo { get; private set; }
 
 		/// <summary>
 		///     Does the scrollbar need to represent the changes?
@@ -154,38 +234,6 @@ namespace Dapplo.Windows
 		}
 
 		/// <summary>
-		///     Factory to create the WindowScroller
-		/// </summary>
-		/// <param name="windowToScroll">InteropWindow is the window to scroll or contains an area which can be scrolled</param>
-		/// <param name="direction">ScrollBarDirection vertical is the default</param>
-		/// <returns>WindowScroller</returns>
-		public static WindowScroller Create(InteropWindow windowToScroll, ScrollBarDirection direction = ScrollBarDirection.Vertical)
-		{
-			var scrollingArea = windowToScroll;
-			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
-			if (!User32.GetScrollInfo(windowToScroll.Handle, direction, ref initialScrollInfo))
-			{
-				scrollingArea = WindowsEnumerator
-						.EnumerateWindows(windowToScroll.Handle)
-						.FirstOrDefault(childWindow => User32.GetScrollInfo(childWindow.Handle, direction, ref initialScrollInfo));
-				if (scrollingArea == null)
-				{
-					return null;
-				}
-			}
-
-			var windowScroller = new WindowScroller
-			{
-				WindowToScroll = windowToScroll,
-				ScrollingArea = scrollingArea,
-				Direction = direction,
-				InitialScrollInfo = initialScrollInfo,
-				WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
-			};
-			return windowScroller;
-		}
-
-		/// <summary>
 		/// Get position
 		/// </summary>
 		/// <returns>SCROLLINFO</returns>
@@ -193,7 +241,7 @@ namespace Dapplo.Windows
 		{
 			scrollInfo = new ScrollInfo(ScrollInfoMask.All);
 
-			return User32.GetScrollInfo(ScrollingArea.Handle, Direction, ref scrollInfo);
+			return User32.GetScrollInfo(ScrollingArea.Handle, ScrollBar, ref scrollInfo);
 		}
 
 		/// <summary>
@@ -205,9 +253,18 @@ namespace Dapplo.Windows
 		{
 			if (ShowChanges)
 			{
-				User32.SetScrollInfo(ScrollingArea.Handle, Direction, ref scrollInfo, true);
+				User32.SetScrollInfo(ScrollingArea.Handle, ScrollBar, ref scrollInfo, true);
 			}
-			User32.SendMessage(ScrollingArea.Handle, WindowsMessages.WM_VSCROLL,4 + 0x10000 * scrollInfo.nPos, 0);
+			switch (ScrollBar)
+			{
+					case ScrollBarTypes.Horizontal:
+						User32.SendMessage(ScrollingArea.Handle, WindowsMessages.WM_HSCROLL, 4 + 0x10000 * scrollInfo.nPos, 0);
+						break;
+					case ScrollBarTypes.Vertical:
+					case ScrollBarTypes.Control:
+						User32.SendMessage(ScrollingArea.Handle, WindowsMessages.WM_VSCROLL, 4 + 0x10000 * scrollInfo.nPos, 0);
+						break;
+			}
 			return true;
 		}
 

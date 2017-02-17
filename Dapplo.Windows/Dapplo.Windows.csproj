@@ -80,6 +80,8 @@
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
     <Compile Include="Enums\PrintWindowFlags.cs" />
     <Compile Include="Enums\RasterOperations.cs" />
+    <Compile Include="Enums\ObjectStates.cs" />
+    <Compile Include="Enums\ScrollBarStateIndexes.cs" />
     <Compile Include="InputGenerator.cs" />
     <Compile Include="Enums\ExtendedKeyFlags.cs" />
     <Compile Include="Reactive\MouseHookEventArgs.cs" />
@@ -104,7 +106,7 @@
     <Compile Include="Enums\GpUnit.cs" />
     <Compile Include="Enums\ProcessAccessFlags.cs" />
     <Compile Include="Enums\RegionResults.cs" />
-    <Compile Include="Enums\ScrollBarDirection.cs" />
+    <Compile Include="Enums\ScrollBarTypes.cs" />
     <Compile Include="Enums\SendMessageTimeoutFlags.cs" />
     <Compile Include="Enums\ShowWindowCommands.cs" />
     <Compile Include="Enums\SoundFlags.cs" />
@@ -159,7 +161,8 @@
     <Compile Include="Structs\RECTF.cs" />
     <Compile Include="Structs\RECT.cs" />
     <Compile Include="Enums\HResult.cs" />
-    <Compile Include="Structs\SCROLLINFO.cs" />
+    <Compile Include="Structs\ScrollBarInfo.cs" />
+    <Compile Include="Structs\ScrollInfo.cs" />
     <Compile Include="Structs\SIZE.cs" />
     <Compile Include="Native\User32.cs" />
     <Compile Include="Enums\MonitorInfoFlags.cs" />

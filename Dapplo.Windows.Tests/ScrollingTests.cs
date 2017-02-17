@@ -23,6 +23,7 @@
 
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
@@ -31,6 +32,8 @@ using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
+using Dapplo.Windows.Reactive;
+using System;
 
 #endregion
 
@@ -38,6 +41,7 @@ namespace Dapplo.Windows.Tests
 {
 	public class ScrollingTests
 	{
+		private static readonly LogSource Log = new LogSource();
 		public ScrollingTests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
@@ -47,66 +51,85 @@ namespace Dapplo.Windows.Tests
 		/// Test scrolling a window
 		/// </summary>
 		/// <returns></returns>
-		//[StaFact]
+		[StaFact]
 		private async Task TestScrollingAsync()
 		{
-			// Start a process to test against
-			using (var process = Process.Start("notepad.exe", "C:\\Windows\\setupact.log"))
+			bool breakScroll = false;
+
+			IDisposable keyboardhook = null;
+			try
 			{
-				// Make sure it's started
-				Assert.NotNull(process);
-				// Wait until the process started it's message pump (listening for input)
-				process.WaitForInputIdle();
-
-				try
+				keyboardhook = KeyboardHook.KeyboardEvents.Where(args => args.Key == VirtualKeyCodes.ESCAPE).Subscribe(args => breakScroll = true);
+				// Start a process to test against
+				using (var process = Process.Start("notepad.exe", "C:\\Windows\\setupact.log"))
 				{
-					// Find the belonging window, by the process id
-					var notepadWindow = WindowsEnumerator.EnumerateWindows().FirstOrDefault(interopWindow =>
+					// Make sure it's started
+					Assert.NotNull(process);
+					// Wait until the process started it's message pump (listening for input)
+					process.WaitForInputIdle();
+
+					try
 					{
-						int processId;
-						User32.GetWindowThreadProcessId(interopWindow, out processId);
-						return processId == process.Id;
-					});
-					Assert.NotNull(notepadWindow);
+						// Find the belonging window, by the process id
+						var notepadWindow = WindowsEnumerator.EnumerateWindows().FirstOrDefault(interopWindow =>
+						{
+							int processId;
+							User32.GetWindowThreadProcessId(interopWindow, out processId);
+							return processId == process.Id;
+						});
+						Assert.NotNull(notepadWindow);
 
-					// Create a WindowScroller
-					var scroller = WindowScroller.Create(notepadWindow);
+						// Create a WindowScroller
+						var scroller = WindowScroller.Create(notepadWindow);
 
-					Assert.NotNull(scroller);
+						Assert.NotNull(scroller);
+						// Notepad should have ScrollBarInfo
+						Assert.True(scroller.ScrollBarInfo.HasValue);
 
-					User32.SetForegroundWindow(scroller.ScrollingArea);
-					await Task.Delay(1000);
-					// Just make sure the window is changed
-					InputGenerator.KeyPress(VirtualKeyCodes.NEXT);
-					await Task.Delay(2000);
-					scroller.ScrollMode = ScrollModes.MouseWheel;
-					scroller.ShowChanges = false;
-					// Move the window to the start
-					Assert.True(scroller.Start());
-					// A delay to make the window move
-					await Task.Delay(2000);
+                        Log.Info().WriteLine("Scrollbar info: {0}", scroller.ScrollBarInfo.Value);
 
-					// Check if it did move to the start
-					Assert.True(scroller.IsAtStart);
+						User32.SetForegroundWindow(scroller.ScrollingArea);
+						await Task.Delay(1000);
+						// Just make sure the window is changed
+						InputGenerator.KeyPress(VirtualKeyCodes.NEXT);
+						await Task.Delay(2000);
+						scroller.ScrollMode = ScrollModes.MouseWheel;
+						scroller.ShowChanges = false;
+						// Move the window to the start
+						Assert.True(scroller.Start());
+						// A delay to make the window move
+						await Task.Delay(2000);
 
-					// Loop
-					do
+						// Check if it did move to the start
+						Assert.True(scroller.IsAtStart);
+
+						// Loop
+						do
+						{
+							if (breakScroll)
+							{
+								break;
+							}
+							// Next "page"
+							Assert.True(scroller.Next());
+							// Wait a bit, so the window can update
+							await Task.Delay(300);
+							// Loop as long as we are not at the end yet
+						} while (!scroller.IsAtEnd );
+						scroller.Reset();
+					}
+					finally
 					{
-						// Next "page"
-						Assert.True(scroller.Next());
-						// Wait a bit, so the window can update
-						await Task.Delay(300);
-						// Loop as long as we are not at the end yet
-					} while (!scroller.IsAtEnd);
-					scroller.Reset();
+						// Kill the process
+						process.Kill();
+					}
 				}
-				finally
-				{
-					// Kill the process
-					process.Kill();
-				}
-
 			}
+			finally
+			{
+				keyboardhook?.Dispose();
+			}
+
 		}
 	}
 }

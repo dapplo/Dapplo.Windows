@@ -21,26 +21,34 @@
 
 namespace Dapplo.Windows.Enums
 {
-	/// <summary>
-	/// See <a href="http://pinvoke.net/default.aspx/Enums/SBOrientation.html">here</a>
-	/// </summary>
-	public enum ScrollBarDirection
-	{
-		/// <summary>
-		/// The horizontal scroll bar of the specified window
-		/// </summary>
-		Horizontal = 0,
-		/// <summary>
-		/// The vertical scroll bar of the specified window
-		/// </summary>
-		Vertical = 1,
-		/// <summary>
-		/// A scroll bar control
-		/// </summary>
-		Control = 2,
-		/// <summary>
-		/// The horizontal and vertical scroll bars of the specified window
-		/// </summary>
-		Both = 3
-	}
+    /// <summary>
+    /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787535(v=vs.85).aspx">here</a>
+    /// </summary>
+    public enum ScrollBarStateIndexes : uint
+    {
+        /// <summary>
+        /// The scroll bar itself.
+        /// </summary>
+        Scrollbar,
+        /// <summary>
+        /// The top or right arrow button.
+        /// </summary>
+        TopOrRightArrow,
+        /// <summary>
+        /// The page up or page right region.
+        /// </summary>
+        PageUpOrRightRegion,
+        /// <summary>
+        /// 	The scroll box (thumb).
+        /// </summary>
+        ScrollBox,
+        /// <summary>
+        /// 	The page down or page left region.
+        /// </summary>
+        PageDownOrLeftRegion,
+        /// <summary>
+        /// 	The bottom or left arrow button.
+        /// </summary>
+        ButtonOrLeftArrow
+    }
 }

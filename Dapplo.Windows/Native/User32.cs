@@ -404,7 +404,7 @@ namespace Dapplo.Windows.Native
 		/// <returns>
 		/// If the function succeeds, the return value is a handle to the previous parent window.
 		/// If the function fails, the return value is NULL. To get extended error information, call GetLastError.
-	    /// </returns>
+		/// </returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
@@ -623,34 +623,52 @@ namespace Dapplo.Windows.Native
 		public static extern bool EnumChildWindows(IntPtr hWndParent, EnumWindowsProc enumFunc, IntPtr param);
 
 		/// <summary>
-		/// See <a href="http://pinvoke.net/default.aspx/user32/GetScrollInfo.html">here</a> for more information.
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787583(v=vs.85).aspx">GetScrollInfo</a> for more information.
 		/// </summary>
 		/// <param name="hwnd">IntPtr with the window handle</param>
-		/// <param name="direction">ScrollBarDirection</param>
-		/// <param name="scrollInfo">SCROLLINFO ref</param>
+		/// <param name="scrollBar">ScrollBarTypes</param>
+		/// <param name="scrollInfo">ScrollInfo ref</param>
 		/// <returns>bool if it worked</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool GetScrollInfo(IntPtr hwnd, ScrollBarDirection direction, ref ScrollInfo scrollInfo);
+		public static extern bool GetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo);
 
 		/// <summary>
-		/// See <a href="http://pinvoke.net/default.aspx/user32/SetScrollInfo.html">here</a> for more information.
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787595(v=vs.85).aspx">SetScrollInfo</a> for more information.
 		/// </summary>
 		/// <param name="hwnd">IntPtr with the window handle</param>
-		/// <param name="direction">ScrollBarDirection</param>
-		/// <param name="scrollInfo">SCROLLINFO</param>
+		/// <param name="scrollBar">ScrollBarTypes</param>
+		/// <param name="scrollInfo">ScrollInfo ref</param>
 		/// <param name="redraw">bool to specify if a redraw should be made</param>
 		/// <returns>bool if it worked</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool SetScrollInfo(IntPtr hwnd, ScrollBarDirection direction, ref ScrollInfo scrollInfo, bool redraw);
+		public static extern bool SetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo, bool redraw);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787601(v=vs.85).aspx">ShowScrollBar function</a> for more information.
+		/// </summary>
+		/// <param name="hwnd">IntPtr</param>
+		/// <param name="scrollBar">ScrollBarTypes</param>
+		/// <param name="show">true to show, false to hide</param>
+		/// <returns>
+		/// If the function succeeds, the return value is nonzero.
+		/// If the function fails, the return value is zero. To get extended error information, call GetLastError.
+		/// </returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool ShowScrollBar(IntPtr hwnd, ScrollBarDirection direction, [MarshalAs(UnmanagedType.Bool)] bool show);
+		public static extern bool ShowScrollBar(IntPtr hwnd, ScrollBarTypes scrollBar, [MarshalAs(UnmanagedType.Bool)] bool show);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787581(v=vs.85).aspx">GetScrollBarInfo function</a> for more information.
+		/// </summary>
+		/// <param name="hwnd">Handle to a window associated with the scroll bar whose information is to be retrieved. If the idObject parameter is OBJID_CLIENT, hwnd is a handle to a scroll bar control. Otherwise, hwnd is a handle to a window created with WS_VSCROLL and/or WS_HSCROLL style.</param>
+		/// <param name="idObject">Specifies the scroll bar object. Can be ObjectIdentifiers.Client, ObjectIdentifiers.HorizontalScrollbar, ObjectIdentifiers.VerticalScrollbar</param>
+		/// <param name="scrollBarInfo">ScrollBarInfo ref</param>
+		/// <returns>bool</returns>
 		[DllImport("user32", SetLastError = true)]
-		public static extern int SetScrollPos(IntPtr hWnd, Orientation nBar, int nPos, [MarshalAs(UnmanagedType.Bool)] bool bRedraw);
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool GetScrollBarInfo(IntPtr hwnd, ObjectIdentifiers idObject, ref ScrollBarInfo scrollBarInfo);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern RegionResults GetWindowRgn(IntPtr hWnd, SafeHandle hRgn);
