@@ -27,8 +27,7 @@
 
 using System;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
+using Dapplo.Log;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
@@ -44,6 +43,8 @@ namespace Dapplo.Windows
 	/// </summary>
 	public class WindowScroller
 	{
+		private static readonly LogSource Log = new LogSource();
+
 		/// <summary>
 		///     The InteropWindow to scroll, this does not need to be the part of the window that actually scrolls
 		/// </summary>
@@ -153,38 +154,6 @@ namespace Dapplo.Windows
 		}
 
 		/// <summary>
-		///     Factory to create the WindowScroller async
-		/// </summary>
-		/// <param name="windowToScroll">InteropWindow is the window to scroll or contains an area which can be scrolled</param>
-		/// <param name="direction">ScrollBarDirection vertical is the default</param>
-		/// <returns>Task with WindowScroller</returns>
-		public static async Task<WindowScroller> CreateAsync(InteropWindow windowToScroll, ScrollBarDirection direction = ScrollBarDirection.Vertical)
-		{
-			var scrollingArea = windowToScroll;
-			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
-			if (!User32.GetScrollInfo(windowToScroll.Handle, direction, ref initialScrollInfo))
-			{
-				scrollingArea = await WindowsEnumerator
-					.EnumerateWindowsAsync(windowToScroll.Handle)
-					.FirstOrDefaultAsync(childWindow => User32.GetScrollInfo(childWindow.Handle, direction, ref initialScrollInfo));
-				if (scrollingArea == null)
-				{
-					return null;
-				}
-			}
-
-			var windowScroller = new WindowScroller
-			{
-				WindowToScroll = windowToScroll,
-				ScrollingArea = scrollingArea,
-				Direction = direction,
-				InitialScrollInfo = initialScrollInfo,
-				WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
-			};
-			return windowScroller;
-		}
-
-		/// <summary>
 		///     Factory to create the WindowScroller
 		/// </summary>
 		/// <param name="windowToScroll">InteropWindow is the window to scroll or contains an area which can be scrolled</param>
@@ -228,7 +197,7 @@ namespace Dapplo.Windows
 		}
 
 		/// <summary>
-		/// Apply position
+		/// Apply position from the scrollInfo
 		/// </summary>
 		/// <param name="scrollInfo">SCROLLINFO ref</param>
 		/// <returns>bool</returns>
@@ -236,13 +205,32 @@ namespace Dapplo.Windows
 		{
 			if (ShowChanges)
 			{
-				if (!User32.SetScrollInfo(ScrollingArea.Handle, Direction, ref scrollInfo, true))
+				User32.SetScrollInfo(ScrollingArea.Handle, Direction, ref scrollInfo, true);
+			}
+			User32.SendMessage(ScrollingArea.Handle, WindowsMessages.WM_VSCROLL,4 + 0x10000 * scrollInfo.nPos, 0);
+			return true;
+		}
+
+		/// <summary>
+		/// Retrieve position from the scrollInfo
+		/// </summary>
+		/// <param name="scrollInfo">ScrollInfo out</param>
+		/// <returns>bool</returns>
+		private bool TryRetrievePosition(out ScrollInfo scrollInfo)
+		{
+			bool hasScrollInfo = GetPosition(out scrollInfo);
+			if (Log.IsVerboseEnabled())
+			{
+				if (hasScrollInfo)
 				{
-					return false;
+					Log.Verbose().WriteLine("Retrieved ScrollInfo: {0}", scrollInfo);
+				}
+				else
+				{
+					Log.Verbose().WriteLine("Couldn't get scrollinfo.");
 				}
 			}
-			User32.SendMessage(ScrollingArea.Handle, WindowsMessages.WM_VSCROLL, new IntPtr(4 + 0x10000 * scrollInfo.nPos), IntPtr.Zero);
-			return true;
+			return hasScrollInfo;
 		}
 
 		/// <summary>
@@ -251,31 +239,39 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool Start()
 		{
+			bool result = false;
+			ScrollInfo scrollInfoBefore;
+			bool hasScrollInfo = TryRetrievePosition(out scrollInfoBefore);
 			switch (ScrollMode)
 			{
 				case ScrollModes.KeyboardPageUpDown:
 					InputGenerator.KeyDown(VirtualKeyCodes.CONTROL);
 					InputGenerator.KeyPress(VirtualKeyCodes.HOME);
 					InputGenerator.KeyUp(VirtualKeyCodes.CONTROL);
+					result = true;
 					break;
 				case ScrollModes.WindowsMessage:
-					ScrollInfo scrollInfo;
-					if (!GetPosition(out scrollInfo))
+					result = hasScrollInfo;
+					if (hasScrollInfo)
 					{
-						return false;
+						// Calculate start position, clone the scrollInfoBefore
+						var scrollInfoForStart = scrollInfoBefore;
+						scrollInfoForStart.nPos = scrollInfoBefore.nMin;
+						result = ApplyPosition(ref scrollInfoForStart);
 					}
-					scrollInfo.nPos = scrollInfo.nMin;
-					return ApplyPosition(ref scrollInfo);
+					break;
 				case ScrollModes.MouseWheel:
-					var bounds = ScrollingArea.GetBounds();
-					var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+					result = true;
 					while (!IsAtStart)
 					{
-						InputGenerator.MoveMouseWheel(WheelDelta, middlePoint);
+						if (!Previous())
+						{
+							break;
+						}
 					}
-					return true;
+					break;
 			}
-			return false;
+			return result;
 		}
 
 
@@ -285,32 +281,39 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool End()
 		{
+			bool result = false;
+			ScrollInfo scrollInfoBefore;
+			bool hasScrollInfo = TryRetrievePosition(out scrollInfoBefore);
 			switch (ScrollMode)
 			{
 				case ScrollModes.KeyboardPageUpDown:
 					InputGenerator.KeyDown(VirtualKeyCodes.CONTROL);
 					InputGenerator.KeyPress(VirtualKeyCodes.END);
 					InputGenerator.KeyUp(VirtualKeyCodes.CONTROL);
+					result = true;
 					break;
 				case ScrollModes.WindowsMessage:
-					ScrollInfo scrollInfo;
-					if (!GetPosition(out scrollInfo))
+					result = hasScrollInfo;
+					if (hasScrollInfo)
 					{
-						return false;
+						// Calculate end position, clone the scrollInfoBefore
+						var scrollInfoForEnd = scrollInfoBefore;
+						scrollInfoForEnd.nPos = scrollInfoBefore.nMax;
+						result = ApplyPosition(ref scrollInfoForEnd);
 					}
-
-					scrollInfo.nPos = scrollInfo.nMax;
-					return ApplyPosition(ref scrollInfo);
+					break;
 				case ScrollModes.MouseWheel:
-					var bounds = ScrollingArea.GetBounds();
-					var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+					result = true;
 					while (!IsAtEnd)
 					{
-						InputGenerator.MoveMouseWheel(-WheelDelta, middlePoint);
+						if (!Next())
+						{
+							break;
+						}
 					}
-					return true;
+					break;
 			}
-			return false;
+			return result;
 		}
 
 		/// <summary>
@@ -319,28 +322,32 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool Previous()
 		{
+			bool result = false;
+			ScrollInfo scrollInfoBefore;
+			bool hasScrollInfo = TryRetrievePosition(out scrollInfoBefore);
+
 			switch (ScrollMode)
 			{
 				case ScrollModes.KeyboardPageUpDown:
-					InputGenerator.KeyPress(VirtualKeyCodes.PRIOR);
+					result = InputGenerator.KeyPress(VirtualKeyCodes.PRIOR) == 2;
 					break;
 				case ScrollModes.WindowsMessage:
-					// Calculate previous position
-					ScrollInfo scrollInfo;
-					if (!GetPosition(out scrollInfo))
+					if (!hasScrollInfo)
 					{
 						return false;
 					}
-					scrollInfo.nPos = Math.Max(scrollInfo.nMin, scrollInfo.nPos - (int)scrollInfo.nPage);
-					return ApplyPosition(ref scrollInfo);
+					// Calculate previous position, clone the scrollInfoBefore
+					var scrollInfoForPrevious = scrollInfoBefore;
+					scrollInfoForPrevious.nPos = Math.Max(scrollInfoBefore.nMin, scrollInfoBefore.nPos - (int)scrollInfoBefore.nPage);
+					result = ApplyPosition(ref scrollInfoForPrevious);
+					break;
 				case ScrollModes.MouseWheel:
 					var bounds = ScrollingArea.GetBounds();
 					var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
-					InputGenerator.MoveMouseWheel(WheelDelta, middlePoint);
+					result = InputGenerator.MoveMouseWheel(WheelDelta, middlePoint) == 1;
 					break;
 			}
-
-			return true;
+			return result;
 		}
 
 		/// <summary>
@@ -349,37 +356,41 @@ namespace Dapplo.Windows
 		/// <returns>bool if this worked</returns>
 		public bool Next()
 		{
+			bool result = false;
+			ScrollInfo scrollInfoBefore;
+			bool hasScrollInfo = TryRetrievePosition(out scrollInfoBefore);
+
 			switch (ScrollMode)
 			{
 				case ScrollModes.KeyboardPageUpDown:
-					InputGenerator.KeyPress(VirtualKeyCodes.NEXT);
+					result = InputGenerator.KeyPress(VirtualKeyCodes.NEXT) == 2;
 					break;
 				case ScrollModes.WindowsMessage:
-					ScrollInfo scrollInfo;
-					if (!GetPosition(out scrollInfo))
+					if (!hasScrollInfo)
 					{
 						return false;
 					}
-
-					// Calculate next position
-					scrollInfo.nPos = Math.Min(scrollInfo.nMax, scrollInfo.nPos + (int)scrollInfo.nPage);
-					return ApplyPosition(ref scrollInfo);
+					// Calculate next position, clone the scrollInfoBefore
+					var scrollInfoForPrevious = scrollInfoBefore;
+					scrollInfoForPrevious.nPos = Math.Min(scrollInfoBefore.nMax, scrollInfoBefore.nPos + (int)scrollInfoBefore.nPage);
+					result = ApplyPosition(ref scrollInfoForPrevious);
+					break;
 				case ScrollModes.MouseWheel:
 					var bounds = ScrollingArea.GetBounds();
 					var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
-					InputGenerator.MoveMouseWheel(-WheelDelta, middlePoint);
+					result = InputGenerator.MoveMouseWheel(-WheelDelta, middlePoint) == 1;
 					break;
 			}
-			return true;
+			return result;
 		}
 
 		/// <summary>
-		/// Set the position back to the original
+		/// Set the position back to the original, only works for windows which support ScrollModes.WindowsMessage
 		/// </summary>
 		/// <returns>true if this worked</returns>
 		public bool Reset()
 		{
-			ScrollInfo initialScrollInfo = InitialScrollInfo;
+			var initialScrollInfo = InitialScrollInfo;
 			return ApplyPosition(ref initialScrollInfo);
 		}
 	}

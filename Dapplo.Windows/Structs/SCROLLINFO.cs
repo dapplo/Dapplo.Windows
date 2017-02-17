@@ -75,6 +75,16 @@ namespace Dapplo.Windows.Structs
 		/// </summary>
 		public int nTrackPos;
 
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"{{nMin = {nMin}; nMax = {nMax};nPage = {nPage};nPos = {nPos};nTrackPos = {nTrackPos};}}";
+		}
+
+		/// <summary>
+		/// Create a ScrollInfo struct with the specified mask
+		/// </summary>
+		/// <param name="mask">ScrollInfoMask</param>
 		public ScrollInfo(ScrollInfoMask mask)
 		{
 			cbSize = (uint) Marshal.SizeOf(typeof(ScrollInfo));

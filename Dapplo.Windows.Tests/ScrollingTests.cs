@@ -76,11 +76,13 @@ namespace Dapplo.Windows.Tests
 
 					User32.SetForegroundWindow(scroller.ScrollingArea);
 					await Task.Delay(1000);
+					// Just make sure the window is changed
 					InputGenerator.KeyPress(VirtualKeyCodes.NEXT);
 					await Task.Delay(2000);
 					scroller.ScrollMode = ScrollModes.MouseWheel;
+					scroller.ShowChanges = false;
 					// Move the window to the start
-					scroller.Start();
+					Assert.True(scroller.Start());
 					// A delay to make the window move
 					await Task.Delay(2000);
 
@@ -91,7 +93,7 @@ namespace Dapplo.Windows.Tests
 					do
 					{
 						// Next "page"
-						scroller.Next();
+						Assert.True(scroller.Next());
 						// Wait a bit, so the window can update
 						await Task.Delay(300);
 						// Loop as long as we are not at the end yet
