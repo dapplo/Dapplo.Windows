@@ -395,8 +395,18 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr GetParent(IntPtr hWnd);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633541(v=vs.85).aspx">SetParent function</a>
+		/// Changes the parent window of the specified child window.
+		/// </summary>
+		/// <param name="hWndChild">IntPtr</param>
+		/// <param name="hWndNewParent">IntPtr</param>
+		/// <returns>
+		/// If the function succeeds, the return value is a handle to the previous parent window.
+		/// If the function fails, the return value is NULL. To get extended error information, call GetLastError.
+	    /// </returns>
 		[DllImport("user32", SetLastError = true)]
-		public static extern int SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+		public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommands uCmd);
@@ -507,9 +517,16 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true, EntryPoint = "GetClassLongPtr")]
 		public static extern IntPtr GetClassLongPtr(IntPtr hWnd, ClassLongIndex index);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd162869(v=vs.85).aspx">PrintWindow function</a>
+		/// </summary>
+		/// <param name="hwnd">IntPtr</param>
+		/// <param name="hDc">IntPtr</param>
+		/// <param name="printWindowFlags">PrintWindowFlags</param>
+		/// <returns>bool</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool PrintWindow(IntPtr hwnd, IntPtr hDc, uint nFlags);
+		public static extern bool PrintWindow(IntPtr hwnd, IntPtr hDc, PrintWindowFlags printWindowFlags);
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, SysCommands sysCommand, IntPtr lParam);
