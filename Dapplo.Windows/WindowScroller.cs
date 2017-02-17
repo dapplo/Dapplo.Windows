@@ -26,7 +26,7 @@
 #region Usings
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using Dapplo.Log;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
@@ -51,40 +51,63 @@ namespace Dapplo.Windows
 		/// <param name="windowToScroll">InteropWindow is the window to scroll or contains an area which can be scrolled</param>
 		/// <param name="scrollBar">ScrollBar vertical is the default</param>
 		/// <returns>WindowScroller</returns>
-		public static WindowScroller Create(InteropWindow windowToScroll, ScrollBarTypes scrollBar = ScrollBarTypes.Vertical)
+		public static IEnumerable<WindowScroller> Create(InteropWindow windowToScroll, ScrollBarTypes scrollBar = ScrollBarTypes.Vertical)
 		{
-			var scrollingArea = windowToScroll;
-			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
-			if (!User32.GetScrollInfo(windowToScroll.Handle, scrollBar, ref initialScrollInfo))
-			{
-				// Try control, the initialScrollInfo is only valid if nMin != nMax
-				if (User32.GetScrollInfo(windowToScroll.Handle, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
-				{
-					scrollBar = ScrollBarTypes.Control;
-				}
-				else
-				{
-					scrollingArea = WindowsEnumerator
-							.EnumerateWindows(windowToScroll.Handle)
-							.FirstOrDefault(childWindow => User32.GetScrollInfo(childWindow.Handle, scrollBar, ref initialScrollInfo));
-					if (scrollingArea == null)
-					{
-						return null;
-					}
-				}
+			WindowScroller windowScroller;
 
+			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
+			if (User32.GetScrollInfo(windowToScroll, scrollBar, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
+			{
+				windowScroller = new WindowScroller
+				{
+					ScrollingArea = windowToScroll,
+					ScrollBar = scrollBar,
+					InitialScrollInfo = initialScrollInfo,
+					WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
+				};
+				windowScroller.FillScrollbarInfo();
+				yield return windowScroller;
+			}
+			else if (User32.GetScrollInfo(windowToScroll, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
+			{
+				windowScroller = new WindowScroller
+				{
+					ScrollingArea = windowToScroll,
+					ScrollBar = ScrollBarTypes.Control,
+					InitialScrollInfo = initialScrollInfo,
+					WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
+				};
+				windowScroller.FillScrollbarInfo();
+				yield return windowScroller;
 			}
 
-			var windowScroller = new WindowScroller
+			foreach (var childWindow in WindowsEnumerator.EnumerateWindows(windowToScroll.Handle))
 			{
-				WindowToScroll = windowToScroll,
-				ScrollingArea = scrollingArea,
-				ScrollBar = scrollBar,
-				InitialScrollInfo = initialScrollInfo,
-				WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
-			};
-			windowScroller.FillScrollbarInfo();
-			return windowScroller;
+				if (User32.GetScrollInfo(childWindow, scrollBar, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
+				{
+					windowScroller = new WindowScroller
+					{
+						ScrollingArea = childWindow,
+						ScrollBar = scrollBar,
+						InitialScrollInfo = initialScrollInfo,
+						WheelDelta = (int) (120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
+					};
+					windowScroller.FillScrollbarInfo();
+					yield return windowScroller;
+				}
+				else if (User32.GetScrollInfo(childWindow, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
+				{
+					windowScroller = new WindowScroller
+					{
+						ScrollingArea = childWindow,
+						ScrollBar = ScrollBarTypes.Control,
+						InitialScrollInfo = initialScrollInfo,
+						WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
+					};
+					windowScroller.FillScrollbarInfo();
+					yield return windowScroller;
+				}
+			}
 		}
 
 		/// <summary>
@@ -106,7 +129,7 @@ namespace Dapplo.Windows
 					break;
 
 			}
-			ScrollBarInfo scrollbarInfo = new ScrollBarInfo(true);
+			var scrollbarInfo = new ScrollBarInfo(true);
 			bool hasScrollbarInfo = User32.GetScrollBarInfo(ScrollingArea, objectId, ref scrollbarInfo);
 			if (!hasScrollbarInfo)
 			{
@@ -120,14 +143,9 @@ namespace Dapplo.Windows
 		}
 
 		/// <summary>
-		///     The InteropWindow to scroll, this does not need to be the part of the window that actually scrolls
-		/// </summary>
-		public InteropWindow WindowToScroll { get; private set; }
-
-		/// <summary>
 		///     Area which is scrolling, can be the WindowToScroll
 		/// </summary>
-		public InteropWindow ScrollingArea { get; private set; }
+		public InteropWindow ScrollingArea { get; set; }
 
 		/// <summary>
 		///     What scrollbar to use
@@ -262,10 +280,30 @@ namespace Dapplo.Windows
 						break;
 					case ScrollBarTypes.Vertical:
 					case ScrollBarTypes.Control:
-						User32.SendMessage(ScrollingArea.Handle, WindowsMessages.WM_VSCROLL, 4 + 0x10000 * scrollInfo.nPos, 0);
+						User32.SendMessage(ScrollingArea.Handle, WindowsMessages.WM_VSCROLL, (int)(((uint)ScrollBarCommands.SB_THUMBPOSITION) + (scrollInfo.nPos << 16)), 0);
 						break;
 			}
 			return true;
+		}
+
+		/// <summary>
+		/// Helper method to send the right message
+		/// </summary>
+		/// <param name="scrollBarCommand">ScrollBarCommands enum to specify where to scroll</param>
+		/// <returns>true if this was possible</returns>
+		private bool SendScrollMessage(ScrollBarCommands scrollBarCommand)
+		{
+			switch (ScrollBar)
+			{
+				case ScrollBarTypes.Horizontal:
+					User32.SendMessage(ScrollingArea.Handle, WindowsMessages.WM_HSCROLL, scrollBarCommand, 0);
+					return true;
+				case ScrollBarTypes.Vertical:
+					User32.SendMessage(ScrollingArea.Handle, WindowsMessages.WM_VSCROLL, scrollBarCommand, 0);
+					return true;
+				default:
+					return false;
+			}
 		}
 
 		/// <summary>
@@ -308,6 +346,9 @@ namespace Dapplo.Windows
 					result = true;
 					break;
 				case ScrollModes.WindowsMessage:
+					result = SendScrollMessage(ScrollBarCommands.SB_TOP);
+					break;
+				case ScrollModes.AbsoluteWindowMessage:
 					result = hasScrollInfo;
 					if (hasScrollInfo)
 					{
@@ -350,6 +391,9 @@ namespace Dapplo.Windows
 					result = true;
 					break;
 				case ScrollModes.WindowsMessage:
+					result = SendScrollMessage(ScrollBarCommands.SB_BOTTOM);
+					break;
+				case ScrollModes.AbsoluteWindowMessage:
 					result = hasScrollInfo;
 					if (hasScrollInfo)
 					{
@@ -389,6 +433,9 @@ namespace Dapplo.Windows
 					result = InputGenerator.KeyPress(VirtualKeyCodes.PRIOR) == 2;
 					break;
 				case ScrollModes.WindowsMessage:
+					result = SendScrollMessage(ScrollBarCommands.SB_PAGEUP);
+					break;
+				case ScrollModes.AbsoluteWindowMessage:
 					if (!hasScrollInfo)
 					{
 						return false;
@@ -423,6 +470,9 @@ namespace Dapplo.Windows
 					result = InputGenerator.KeyPress(VirtualKeyCodes.NEXT) == 2;
 					break;
 				case ScrollModes.WindowsMessage:
+					result = SendScrollMessage(ScrollBarCommands.SB_PAGEDOWN);
+					break;
+				case ScrollModes.AbsoluteWindowMessage:
 					if (!hasScrollInfo)
 					{
 						return false;

@@ -83,6 +83,7 @@
     <Compile Include="Enums\RasterOperations.cs" />
     <Compile Include="Enums\ObjectStates.cs" />
     <Compile Include="Enums\ScrollBarStateIndexes.cs" />
+    <Compile Include="Enums\ScrollBarCommands.cs" />
     <Compile Include="InputGenerator.cs" />
     <Compile Include="Enums\ExtendedKeyFlags.cs" />
     <Compile Include="Reactive\MouseHookEventArgs.cs" />

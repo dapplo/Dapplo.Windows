@@ -80,7 +80,7 @@ namespace Dapplo.Windows.Tests
 						Assert.NotNull(notepadWindow);
 
 						// Create a WindowScroller
-						var scroller = WindowScroller.Create(notepadWindow);
+						var scroller = WindowScroller.Create(notepadWindow).FirstOrDefault();
 
 						Assert.NotNull(scroller);
 						// Notepad should have ScrollBarInfo
@@ -91,9 +91,9 @@ namespace Dapplo.Windows.Tests
 						User32.SetForegroundWindow(scroller.ScrollingArea);
 						await Task.Delay(1000);
 						// Just make sure the window is changed
-						InputGenerator.KeyPress(VirtualKeyCodes.NEXT);
+						InputGenerator.KeyPress(VirtualKeyCodes.NEXT, VirtualKeyCodes.DOWN);
 						await Task.Delay(2000);
-						scroller.ScrollMode = ScrollModes.MouseWheel;
+						scroller.ScrollMode = ScrollModes.WindowsMessage;
 						scroller.ShowChanges = false;
 						// Move the window to the start
 						Assert.True(scroller.Start());

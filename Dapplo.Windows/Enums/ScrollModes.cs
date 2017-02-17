@@ -31,7 +31,11 @@ namespace Dapplo.Windows.Enums
 	public enum ScrollModes
 	{
 		/// <summary>
-		///     Send message to the window
+		///     Send message to the window with an absolute position
+		/// </summary>
+		AbsoluteWindowMessage,
+		/// <summary>
+		///     Send message to the window for page up or down
 		/// </summary>
 		WindowsMessage,
 

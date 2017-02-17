@@ -547,6 +547,17 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, SysCommands sysCommand, IntPtr lParam);
 
+		/// <summary>
+		/// Used for WM_VSCROLL and WM_HSCROLL
+		/// </summary>
+		/// <param name="hWnd">IntPtr</param>
+		/// <param name="windowsMessage">WindowsMessages</param>
+		/// <param name="scrollBarCommand">ScrollBarCommands</param>
+		/// <param name="lParam"></param>
+		/// <returns>0</returns>
+		[DllImport("user32", SetLastError = true)]
+		public static extern int SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, ScrollBarCommands scrollBarCommand, int lParam);
+
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, IntPtr lParam);
 
