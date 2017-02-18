@@ -81,7 +81,7 @@ namespace Dapplo.Windows
 				yield return windowScroller;
 			}
 
-			foreach (var childWindow in WindowsEnumerator.EnumerateWindows(windowToScroll.Handle))
+			foreach (var childWindow in windowToScroll.GetChildren())
 			{
 				if (User32.GetScrollInfo(childWindow, scrollBar, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
 				{
@@ -326,6 +326,15 @@ namespace Dapplo.Windows
 				}
 			}
 			return hasScrollInfo;
+		}
+
+		/// <summary>
+		/// Returns true if the window needs focus to scroll
+		/// </summary>
+		/// <returns>true if focus is needed</returns>
+		public bool NeedsFocus()
+		{
+			return ScrollMode == ScrollModes.KeyboardPageUpDown;
 		}
 
 		/// <summary>
