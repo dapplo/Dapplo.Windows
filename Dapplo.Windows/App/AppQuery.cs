@@ -97,7 +97,7 @@ namespace Dapplo.Windows.App
 		/// <summary>
 		///     Retrieve handles of all Windows store apps
 		/// </summary>
-		public static IEnumerable<InteropWindow> WindowsStoreApps
+		public static IEnumerable<IInteropWindow> WindowsStoreApps
 		{
 			get
 			{
@@ -109,14 +109,14 @@ namespace Dapplo.Windows.App
 				var nextHandle = User32.FindWindow(AppWindowsClass, null);
 				while (nextHandle != IntPtr.Zero)
 				{
-					yield return InteropWindow.CreateFor(nextHandle);
+					yield return InteropWindowFactory.CreateFor(nextHandle);
 					nextHandle = User32.FindWindowEx(IntPtr.Zero, nextHandle, AppWindowsClass, null);
 				}
 				// check for gutter
 				var gutterHandle = User32.FindWindow(GutterClass, null);
 				if (gutterHandle != IntPtr.Zero)
 				{
-					yield return InteropWindow.CreateFor(gutterHandle);
+					yield return InteropWindowFactory.CreateFor(gutterHandle);
 				}
 			}
 		}
@@ -125,7 +125,7 @@ namespace Dapplo.Windows.App
 		/// <summary>
 		/// This checks if the window is an App (Win8 or Win10)
 		/// </summary>
-		public static bool IsApp(this InteropWindow interopWindow)
+		public static bool IsApp(this IInteropWindow interopWindow)
 		{
 			return AppWindowsClass.Equals(interopWindow.GetClassname());
 		}
@@ -134,7 +134,7 @@ namespace Dapplo.Windows.App
 		/// This checks if the window is a Windows 8 App
 		/// For Windows 10 most normal code works, as it's hosted inside "ApplicationFrameWindow"
 		/// </summary>
-		public static bool IsWin8App(this InteropWindow interopWindow)
+		public static bool IsWin8App(this IInteropWindow interopWindow)
 		{
 			return W8AppWindowClass.Equals(interopWindow.GetClassname());
 		}
@@ -143,7 +143,7 @@ namespace Dapplo.Windows.App
 		/// This checks if the window is a Windows 10 App
 		/// For Windows 10 apps are hosted inside "ApplicationFrameWindow"
 		/// </summary>
-		public static bool IsWin10App(this InteropWindow interopWindow)
+		public static bool IsWin10App(this IInteropWindow interopWindow)
 		{
 			return W10AppWindowClass.Equals(interopWindow.GetClassname());
 		}
@@ -151,7 +151,7 @@ namespace Dapplo.Windows.App
 		/// <summary>
 		/// Check if the window is the metro gutter (sizeable separator)
 		/// </summary>
-		public static bool IsGutter(this InteropWindow interopWindow)
+		public static bool IsGutter(this IInteropWindow interopWindow)
 		{
 			return GutterClass.Equals(interopWindow.GetClassname());
 		}
@@ -159,7 +159,7 @@ namespace Dapplo.Windows.App
 		/// <summary>
 		/// Test if this window is for the App-Launcher
 		/// </summary>
-		public static bool IsAppLauncher(this InteropWindow interopWindow)
+		public static bool IsAppLauncher(this IInteropWindow interopWindow)
 		{
 			return ApplauncherClass.Equals(interopWindow.GetClassname());
 		}
@@ -167,7 +167,7 @@ namespace Dapplo.Windows.App
 		/// <summary>
 		/// Check if this window is the window of a metro app
 		/// </summary>
-		public static bool IsMetroApp(this InteropWindow interopWindow)
+		public static bool IsMetroApp(this IInteropWindow interopWindow)
 		{
 			return interopWindow.IsAppLauncher() || interopWindow.IsWin8App();
 		}
@@ -175,8 +175,8 @@ namespace Dapplo.Windows.App
 		/// <summary>
 		/// Get the AppLauncher
 		/// </summary>
-		/// <returns>InteropWindow</returns>
-		public static InteropWindow GetAppLauncher()
+		/// <returns>IInteropWindow</returns>
+		public static IInteropWindow GetAppLauncher()
 		{
 			// Works only if Windows 8 (or higher)
 			if (IsLauncherVisible)
@@ -186,7 +186,7 @@ namespace Dapplo.Windows.App
 			IntPtr appLauncher = User32.FindWindow(ApplauncherClass, null);
 			if (appLauncher != IntPtr.Zero)
 			{
-				return InteropWindow.CreateFor(appLauncher);
+				return InteropWindowFactory.CreateFor(appLauncher);
 			}
 			return null;
 		}

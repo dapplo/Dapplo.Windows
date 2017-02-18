@@ -36,7 +36,7 @@ namespace Dapplo.Windows.Desktop
 	/// Information about a native window
 	/// Note: This is a dumb container, and doesn't retrieve anything about the window itself
 	/// </summary>
-	public class InteropWindow : IEquatable<InteropWindow>
+	public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
 	{
 		/// <summary>
 		/// Constructor
@@ -47,112 +47,70 @@ namespace Dapplo.Windows.Desktop
 			Handle = handle;
 		}
 
-		/// <summary>
-		/// Handle (ID) of the window
-		/// </summary>
+		/// <inheritdoc />
 		public IntPtr Handle { get; }
 
-		/// <summary>
-		/// Returns the bounds of this window
-		/// </summary>
+		/// <inheritdoc />
 		public RECT? Bounds { get; set; }
 
-		/// <summary>
-		/// Returns the client bounds of this window
-		/// </summary>
+		/// <inheritdoc />
 		public RECT? ClientBounds { get; set; }
 
-		/// <summary>
-		/// Returns the children of this window
-		/// </summary>
-		public IEnumerable<InteropWindow> Children { get; set; }
+		/// <inheritdoc />
+		public IEnumerable<IInteropWindow> Children { get; set; }
 
-		/// <summary>
-		/// Test if there are any children
-		/// </summary>
+		/// <inheritdoc />
 		public bool HasChildren => Children?.Any() == true;
 
-		/// <summary>
-		/// string with the name of the internal class for the window
-		/// </summary>
+		/// <inheritdoc />
 		public string Classname { get; set; }
 
-		/// <summary>
-		/// Does the window have a classname?
-		/// </summary>
+		/// <inheritdoc />
 		public bool HasClassname => !string.IsNullOrEmpty(Classname);
 
-		/// <summary>
-		/// Does this window have parent?
-		/// </summary>
+		/// <inheritdoc />
 		public bool HasParent => Parent.HasValue && Parent != IntPtr.Zero;
 
-		/// <summary>
-		/// The parent window to which this window belongs
-		/// </summary>
+		/// <inheritdoc />
 		public IntPtr? Parent { get; set; }
 
-		/// <summary>
-		/// Return the title of the window, if any
-		/// </summary>
+		/// <inheritdoc />
 		public string Caption { get; set; }
 
-		/// <summary>
-		/// Return the text (not title) of the window, if any
-		/// </summary>
+		/// <inheritdoc />
 		public string Text { get; set; }
 
-		/// <summary>
-		/// Returns true if the window is visible
-		/// </summary>
+		/// <inheritdoc />
 		public bool? IsVisible { get; set; }
 
-		/// <summary>
-		/// Returns true if the window is minimized
-		/// </summary>
+		/// <inheritdoc />
 		public bool? IsMinimized { get; set; }
 
-		/// <summary>
-		/// Returns true if the window is maximized
-		/// </summary>
+		/// <inheritdoc />
 		public bool? IsMaximized { get; set; }
 
-		/// <summary>
-		/// Get the process ID this window belongs to
-		/// </summary>
+		/// <inheritdoc />
 		public int? ProcessId { get; set; }
 
-		/// <summary>
-		/// ExtendedWindowStyleFlags for the Window
-		/// </summary>
+		/// <inheritdoc />
 		public ExtendedWindowStyleFlags? ExtendedStyle { get; set; }
 
-		/// <summary>
-		/// WindowStyleFlags for the Window
-		/// </summary>
+		/// <inheritdoc />
 		public WindowStyleFlags? Style { get; set; }
 
-
-		/// <summary>
-		/// WindowPlacement for the Window
-		/// </summary>
+		/// <inheritdoc />
 		public WindowPlacement? Placement { get; set; }
 
-		/// <summary>
-		///     Implicit cast IntPtr to InteropWindow
-		/// </summary>
-		/// <param name="handle">IntPtr</param>
-		/// <returns>InteropWindow</returns>
+		/// <inheritdoc />
+		public bool? CanScroll { get; set; }
+
+		/// <inheritdoc />
 		public static implicit operator InteropWindow(IntPtr handle)
 		{
-			return CreateFor(handle);
+			return InteropWindowFactory.CreateFor(handle);
 		}
 
-		/// <summary>
-		///     Implicit cast InteropWindow to IntPtr
-		/// </summary>
-		/// <param name="interopWindow">InteropWindow</param>
-		/// <returns>IntPtr for the handle</returns>
+		/// <inheritdoc />
 		public static implicit operator IntPtr(InteropWindow interopWindow)
 		{
 			return interopWindow.Handle;
@@ -170,21 +128,11 @@ namespace Dapplo.Windows.Desktop
 			if (ReferenceEquals(null, obj)) return false;
 			if (ReferenceEquals(this, obj)) return true;
 			if (obj.GetType() != GetType()) return false;
-			return Equals((InteropWindow) obj);
-		}
-
-		/// <summary>
-		/// Factory method to create a InteropWindow for the supplied handle
-		/// </summary>
-		/// <param name="handle">IntPtr</param>
-		/// <returns>InteropWindow</returns>
-		public static InteropWindow CreateFor(IntPtr handle)
-		{
-			return new InteropWindow(handle);
+			return Equals((IInteropWindow) obj);
 		}
 
 		/// <inheritdoc />
-		public bool Equals(InteropWindow other)
+		public bool Equals(IInteropWindow other)
 		{
 			if (ReferenceEquals(null, other)) return false;
 			if (ReferenceEquals(this, other)) return true;
@@ -197,16 +145,11 @@ namespace Dapplo.Windows.Desktop
 			return Equals(left, right);
 		}
 
-		/// <summary>
-		/// Dump the information in the InteropWindow for debugging
-		/// </summary>
-		/// <param name="dump">StringBuilder to dump to</param>
-		/// <param name="indentation">int</param>
-		/// <returns>StringBuilder</returns>
+		/// <inheritdoc />
 		public StringBuilder Dump(StringBuilder dump = null, string indentation = "")
 		{
 			dump = dump ?? new StringBuilder();
-			this.Fill(false);
+			this.Fill();
 			dump.AppendLine($"{indentation}{nameof(Handle)}={Handle}");
 			dump.AppendLine($"{indentation}{nameof(Classname)}={Classname}");
 			dump.AppendLine($"{indentation}{nameof(Caption)}={Caption}");

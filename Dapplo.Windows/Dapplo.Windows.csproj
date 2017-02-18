@@ -69,6 +69,8 @@
     <Compile Include="App\IAppVisibility.cs" />
     <Compile Include="App\MonitorAppVisibility.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
+    <Compile Include="Desktop\IInteropWindow.cs" />
+    <Compile Include="Desktop\InteropWindowFactory.cs" />
     <Compile Include="Desktop\InteropWindowQuery.cs" />
     <Compile Include="Desktop\WindowsEnumerator.cs" />
     <Compile Include="Desktop\InteropWindow.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="Enums\ColorSpaceEnum.cs" />
     <Compile Include="Enums\DwmBlurBehindFlags.cs" />
     <Compile Include="Enums\ExtendedMouseFlags.cs" />
+    <Compile Include="Enums\InteropWindowCacheFlags.cs" />
     <Compile Include="Enums\MonitorFromRectFlags.cs" />
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
     <Compile Include="Enums\PrintWindowFlags.cs" />

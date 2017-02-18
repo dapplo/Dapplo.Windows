@@ -50,28 +50,67 @@ namespace Dapplo.Windows.Desktop
 		///     Fill ALL the information of the InteropWindow
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
-		/// <param name="children">true to also get the children</param>
-		/// <param name="forceUpdate">true to force updating the values</param>
-		public static InteropWindow Fill(this InteropWindow interopWindow, bool children = true, bool forceUpdate = false)
+		/// <param name="flags">InteropWindowCacheFlags to specify which information is retrieved and what not</param>
+		public static IInteropWindow Fill(this IInteropWindow interopWindow, InteropWindowCacheFlags flags = InteropWindowCacheFlags.CacheAll)
 		{
-			interopWindow.GetBounds(forceUpdate);
-			interopWindow.GetClientBounds(forceUpdate);
-			interopWindow.GetCaption(forceUpdate);
-			interopWindow.GetClassname(forceUpdate);
-			interopWindow.GetExtendedStyle(forceUpdate);
-			interopWindow.GetStyle(forceUpdate);
-			interopWindow.GetProcessId(forceUpdate);
-			interopWindow.GetParent(forceUpdate);
-			interopWindow.GetPlacement(forceUpdate);
-			interopWindow.IsVisible(forceUpdate);
-			interopWindow.IsMaximized(forceUpdate);
-			interopWindow.IsMinimized(forceUpdate);
-			if (children)
+			bool forceUpdate = flags.HasFlag(InteropWindowCacheFlags.ForceUpdate);
+
+			if (flags.HasFlag(InteropWindowCacheFlags.Bounds))
+			{
+				interopWindow.GetBounds(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.ClientBounds))
+			{
+				interopWindow.GetClientBounds(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.Caption))
+			{
+				interopWindow.GetCaption(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.Classname))
+			{
+				interopWindow.GetClassname(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.ExtendedStyle))
+			{
+				interopWindow.GetExtendedStyle(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.Style))
+			{
+				interopWindow.GetStyle(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.ProcessId))
+			{
+				interopWindow.GetProcessId(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.Parent))
+			{
+				interopWindow.GetParent(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.Visible))
+			{
+				interopWindow.IsVisible(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.Maximized))
+			{
+				interopWindow.IsMaximized(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.Minimized))
+			{
+				interopWindow.IsMinimized(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.Children))
 			{
 				interopWindow.GetChildren(forceUpdate);
 			}
-			interopWindow.GetPlacement(forceUpdate);
-			interopWindow.GetText(forceUpdate);
+			if (flags.HasFlag(InteropWindowCacheFlags.Placement))
+			{
+				interopWindow.GetPlacement(forceUpdate);
+			}
+			if (flags.HasFlag(InteropWindowCacheFlags.Text))
+			{
+				interopWindow.GetText(forceUpdate);
+			}
 			return interopWindow;
 		}
 
@@ -81,7 +120,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>RECT</returns>
-		public static RECT GetBounds(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static RECT GetBounds(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (!interopWindow.Bounds.HasValue || forceUpdate)
 			{
@@ -98,7 +137,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>RECT</returns>
-		public static RECT GetClientBounds(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static RECT GetClientBounds(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (!interopWindow.ClientBounds.HasValue || forceUpdate)
 			{
@@ -115,7 +154,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>string with the caption</returns>
-		public static string GetCaption(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static string GetCaption(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (interopWindow.Caption == null || forceUpdate)
 			{
@@ -131,7 +170,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>string with the text</returns>
-		public static string GetText(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static string GetText(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (interopWindow.Text == null || forceUpdate)
 			{
@@ -147,7 +186,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>IntPtr for the parent</returns>
-		public static IntPtr GetParent(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static IntPtr GetParent(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (!interopWindow.Parent.HasValue || forceUpdate)
 			{
@@ -163,7 +202,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>string with the classname</returns>
-		public static string GetClassname(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static string GetClassname(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (interopWindow.Classname == null || forceUpdate)
 			{
@@ -179,7 +218,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>WindowPlacement</returns>
-		public static WindowPlacement GetPlacement(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static WindowPlacement GetPlacement(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (!interopWindow.Placement.HasValue || forceUpdate)
 			{
@@ -195,7 +234,7 @@ namespace Dapplo.Windows.Desktop
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="placement">WindowPlacement</param>
-		public static void SetPlacement(this InteropWindow interopWindow, WindowPlacement placement)
+		public static void SetPlacement(this IInteropWindow interopWindow, WindowPlacement placement)
 		{
 			User32.SetWindowPlacement(interopWindow.Handle, ref placement);
 			interopWindow.Placement = placement;
@@ -207,7 +246,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>ExtendedWindowStyleFlags</returns>
-		public static ExtendedWindowStyleFlags GetExtendedStyle(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static ExtendedWindowStyleFlags GetExtendedStyle(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (!interopWindow.ExtendedStyle.HasValue || forceUpdate)
 			{
@@ -222,7 +261,7 @@ namespace Dapplo.Windows.Desktop
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="extendedWindowStyleFlags">ExtendedWindowStyleFlags</param>
-		public static void SetExtendedStyle(this InteropWindow interopWindow, ExtendedWindowStyleFlags extendedWindowStyleFlags)
+		public static void SetExtendedStyle(this IInteropWindow interopWindow, ExtendedWindowStyleFlags extendedWindowStyleFlags)
 		{
 			interopWindow.ExtendedStyle = extendedWindowStyleFlags;
 			User32.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint)extendedWindowStyleFlags));
@@ -234,7 +273,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>WindowStyleFlags</returns>
-		public static WindowStyleFlags GetStyle(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static WindowStyleFlags GetStyle(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (!interopWindow.Style.HasValue || forceUpdate)
 			{
@@ -249,7 +288,7 @@ namespace Dapplo.Windows.Desktop
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="windowStyleFlags">WindowStyleFlags</param>
-		public static void SetStyle(this InteropWindow interopWindow, WindowStyleFlags windowStyleFlags)
+		public static void SetStyle(this IInteropWindow interopWindow, WindowStyleFlags windowStyleFlags)
 		{
 			interopWindow.Style = windowStyleFlags;
 			User32.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint)windowStyleFlags));
@@ -261,7 +300,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>int with process Id</returns>
-		public static int GetProcessId(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static int GetProcessId(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (!interopWindow.ProcessId.HasValue || forceUpdate)
 			{
@@ -278,7 +317,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>bool true if Iconic (minimized)</returns>
-		public static bool IsMinimized(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static bool IsMinimized(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (!interopWindow.IsMinimized.HasValue || forceUpdate)
 			{
@@ -293,7 +332,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>bool true if Iconic (minimized)</returns>
-		public static bool IsMaximized(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static bool IsMaximized(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (!interopWindow.IsMaximized.HasValue || forceUpdate)
 			{
@@ -306,7 +345,7 @@ namespace Dapplo.Windows.Desktop
 		/// Minimize the Window
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
-		public static void Minimize(this InteropWindow interopWindow)
+		public static void Minimize(this IInteropWindow interopWindow)
 		{
 			User32.ShowWindow(interopWindow.Handle, ShowWindowCommands.Minimize);
 			interopWindow.IsMinimized = true;
@@ -316,7 +355,7 @@ namespace Dapplo.Windows.Desktop
 		/// Restore (Un-Minimize/Maximize) the Window
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
-		public static void Restore(this InteropWindow interopWindow)
+		public static void Restore(this IInteropWindow interopWindow)
 		{
 			User32.ShowWindow(interopWindow.Handle, ShowWindowCommands.Restore);
 			interopWindow.IsMinimized = false;
@@ -327,7 +366,7 @@ namespace Dapplo.Windows.Desktop
 		/// Maximize the window
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
-		public static void Maximized(this InteropWindow interopWindow)
+		public static void Maximized(this IInteropWindow interopWindow)
 		{
 			User32.ShowWindow(interopWindow.Handle, ShowWindowCommands.Maximize);
 			interopWindow.IsMaximized = true;
@@ -340,7 +379,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
 		/// <returns>bool true if minimizedIconic (minimized)</returns>
-		public static bool IsVisible(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static bool IsVisible(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (!interopWindow.IsVisible.HasValue || forceUpdate)
 			{
@@ -355,13 +394,13 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">True to force updating</param>
 		/// <returns>IEnumerable with InteropWindow</returns>
-		public static IEnumerable<InteropWindow> GetChildren(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static IEnumerable<IInteropWindow> GetChildren(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (interopWindow.HasChildren && !forceUpdate)
 			{
 				return interopWindow.Children;
 			}
-			IList<InteropWindow> children = new List<InteropWindow>();
+			var children = new List<IInteropWindow>();
 			// Store it in the Children property
 			interopWindow.Children = children;
 			foreach (var child in WindowsEnumerator.EnumerateWindows(interopWindow))
@@ -378,13 +417,13 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">True to force updating</param>
 		/// <returns>IEnumerable with InteropWindow</returns>
-		public static IEnumerable<InteropWindow> GetZOrderedChildren(this InteropWindow interopWindow, bool forceUpdate = false)
+		public static IEnumerable<IInteropWindow> GetZOrderedChildren(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
 			if (interopWindow.HasChildren && !forceUpdate)
 			{
 				return interopWindow.Children;
 			}
-			IList<InteropWindow> children = new List<InteropWindow>();
+			var children = new List<IInteropWindow>();
 			// Store it in the Children property
 			interopWindow.Children = children;
 			foreach (var child in InteropWindowQuery.GetTopWindows(interopWindow))
@@ -398,7 +437,7 @@ namespace Dapplo.Windows.Desktop
 		/// Get the region for a window
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
-		public static Region GetRegion(this InteropWindow interopWindow)
+		public static Region GetRegion(this IInteropWindow interopWindow)
 		{
 			using (SafeRegionHandle region = Gdi32.CreateRectRgn(0, 0, 0, 0))
 			{
@@ -419,7 +458,7 @@ namespace Dapplo.Windows.Desktop
 		/// </summary>
 		/// <param name="interopWindow">The window to bring to the foreground</param>
 		/// <param name="workaround">bool with true to use a trick to really bring the window to the foreground</param>
-		public static async Task ToForegroundAsync(this InteropWindow interopWindow, bool workaround = true)
+		public static async Task ToForegroundAsync(this IInteropWindow interopWindow, bool workaround = true)
 		{
 			// Nothing we can do if it's not visible!
 			if (!interopWindow.IsVisible())
@@ -450,7 +489,7 @@ namespace Dapplo.Windows.Desktop
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <returns>bool true if it worked</returns>	
-		public static SIZE GetBorderSize(this InteropWindow interopWindow)
+		public static SIZE GetBorderSize(this IInteropWindow interopWindow)
 		{
 			var windowInfo = new WINDOWINFO();
 			// Get the Window Info for this window
@@ -459,6 +498,50 @@ namespace Dapplo.Windows.Desktop
 				return new SIZE((int)windowInfo.cxWindowBorders, (int)windowInfo.cyWindowBorders);
 			}
 			return SIZE.Empty;
+		}
+
+		/// <summary>
+		/// Extension method to create a WindowScroller
+		/// </summary>
+		/// <param name="interopWindow">IInteropWindow</param>
+		/// <param name="scrollBar">ScrollBarTypes</param>
+		/// <param name="forceUpdate">true to force a retry, even if the previous check failed</param>
+		/// <returns>WindowScroller or null</returns>
+		public static WindowScroller GetWindowScroller(this IInteropWindow interopWindow, ScrollBarTypes scrollBar, bool forceUpdate = false)
+		{
+			if (!forceUpdate && interopWindow.CanScroll.HasValue && !interopWindow.CanScroll.Value)
+			{
+				return null;
+			}
+			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
+			if (User32.GetScrollInfo(interopWindow.Handle, scrollBar, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
+			{
+				var windowScroller = new WindowScroller
+				{
+					ScrollingArea = interopWindow,
+					ScrollBar = scrollBar,
+					InitialScrollInfo = initialScrollInfo,
+					WheelDelta = (int)(120 * (initialScrollInfo.nPage / WindowScroller.ScrollWheelLinesFromRegistry))
+				};
+				windowScroller.FillScrollbarInfo();
+				interopWindow.CanScroll = true;
+				return windowScroller;
+			}
+			if (User32.GetScrollInfo(interopWindow.Handle, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
+			{
+				var windowScroller = new WindowScroller
+				{
+					ScrollingArea = interopWindow,
+					ScrollBar = ScrollBarTypes.Control,
+					InitialScrollInfo = initialScrollInfo,
+					WheelDelta = (int)(120 * (initialScrollInfo.nPage / WindowScroller.ScrollWheelLinesFromRegistry))
+				};
+				interopWindow.CanScroll = true;
+				windowScroller.FillScrollbarInfo();
+				return windowScroller;
+			}
+			interopWindow.CanScroll = false;
+			return null;
 		}
 
 	}

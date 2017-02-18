@@ -74,13 +74,13 @@ namespace Dapplo.Windows.Tests
 						var notepadWindow = WindowsEnumerator.EnumerateWindows().FirstOrDefault(interopWindow =>
 						{
 							int processId;
-							User32.GetWindowThreadProcessId(interopWindow, out processId);
+							User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
 							return processId == process.Id;
 						});
 						Assert.NotNull(notepadWindow);
 
 						// Create a WindowScroller
-						var scroller = WindowScroller.Create(notepadWindow).FirstOrDefault();
+						var scroller = notepadWindow.GetChildren().Select(window => window.GetWindowScroller(ScrollBarTypes.Vertical)).FirstOrDefault();
 
 						Assert.NotNull(scroller);
 						// Notepad should have ScrollBarInfo
@@ -88,7 +88,7 @@ namespace Dapplo.Windows.Tests
 
 						Log.Info().WriteLine("Scrollbar info: {0}", scroller.ScrollBarInfo.Value);
 
-						User32.SetForegroundWindow(scroller.ScrollingArea);
+						User32.SetForegroundWindow(scroller.ScrollingArea.Handle);
 						await Task.Delay(1000);
 						// Just make sure the window is changed
 						InputGenerator.KeyPress(VirtualKeyCodes.NEXT, VirtualKeyCodes.DOWN);

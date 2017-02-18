@@ -79,7 +79,7 @@ namespace Dapplo.Windows.Tests
 				var notepadWindow = await WindowsEnumerator.EnumerateWindowsAsync().Where(interopWindow =>
 				{
 					int processId;
-					User32.GetWindowThreadProcessId(interopWindow, out processId);
+					User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
 					return processId == process.Id;
 				}).FirstOrDefaultAsync();
 				Assert.NotNull(notepadWindow);

@@ -76,7 +76,7 @@ namespace Dapplo.Windows.Tests
 		private void TestDetectChanges()
 		{
 			bool foundWindow = false;
-			IList<InteropWindow> initialWindows = InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()).ToList();
+			IList<IInteropWindow> initialWindows = InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()).ToList();
 
 			while (true)
 			{

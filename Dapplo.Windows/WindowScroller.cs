@@ -46,76 +46,11 @@ namespace Dapplo.Windows
 		private static readonly LogSource Log = new LogSource();
 
 		/// <summary>
-		///     Factory to create the WindowScroller
-		/// </summary>
-		/// <param name="windowToScroll">InteropWindow is the window to scroll or contains an area which can be scrolled</param>
-		/// <param name="scrollBar">ScrollBar vertical is the default</param>
-		/// <returns>WindowScroller</returns>
-		public static IEnumerable<WindowScroller> Create(InteropWindow windowToScroll, ScrollBarTypes scrollBar = ScrollBarTypes.Vertical)
-		{
-			WindowScroller windowScroller;
-
-			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
-			if (User32.GetScrollInfo(windowToScroll, scrollBar, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
-			{
-				windowScroller = new WindowScroller
-				{
-					ScrollingArea = windowToScroll,
-					ScrollBar = scrollBar,
-					InitialScrollInfo = initialScrollInfo,
-					WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
-				};
-				windowScroller.FillScrollbarInfo();
-				yield return windowScroller;
-			}
-			else if (User32.GetScrollInfo(windowToScroll, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
-			{
-				windowScroller = new WindowScroller
-				{
-					ScrollingArea = windowToScroll,
-					ScrollBar = ScrollBarTypes.Control,
-					InitialScrollInfo = initialScrollInfo,
-					WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
-				};
-				windowScroller.FillScrollbarInfo();
-				yield return windowScroller;
-			}
-
-			foreach (var childWindow in windowToScroll.GetChildren())
-			{
-				if (User32.GetScrollInfo(childWindow, scrollBar, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
-				{
-					windowScroller = new WindowScroller
-					{
-						ScrollingArea = childWindow,
-						ScrollBar = scrollBar,
-						InitialScrollInfo = initialScrollInfo,
-						WheelDelta = (int) (120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
-					};
-					windowScroller.FillScrollbarInfo();
-					yield return windowScroller;
-				}
-				else if (User32.GetScrollInfo(childWindow, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
-				{
-					windowScroller = new WindowScroller
-					{
-						ScrollingArea = childWindow,
-						ScrollBar = ScrollBarTypes.Control,
-						InitialScrollInfo = initialScrollInfo,
-						WheelDelta = (int)(120 * (initialScrollInfo.nPage / ScrollWheelLinesFromRegistry))
-					};
-					windowScroller.FillScrollbarInfo();
-					yield return windowScroller;
-				}
-			}
-		}
-
-		/// <summary>
 		/// Method to set the ScrollbarInfo, if we can get it
 		/// </summary>
-		private void FillScrollbarInfo()
+		internal void FillScrollbarInfo()
 		{
-			ObjectIdentifiers objectId = ObjectIdentifiers.Client;
+			var objectId = ObjectIdentifiers.Client;
 			switch (ScrollBar)
 			{
 				case ScrollBarTypes.Control:
@@ -130,7 +65,7 @@ namespace Dapplo.Windows
 
 			}
 			var scrollbarInfo = new ScrollBarInfo(true);
-			bool hasScrollbarInfo = User32.GetScrollBarInfo(ScrollingArea, objectId, ref scrollbarInfo);
+			bool hasScrollbarInfo = User32.GetScrollBarInfo(ScrollingArea.Handle, objectId, ref scrollbarInfo);
 			if (!hasScrollbarInfo)
 			{
 				var error = Win32.GetLastErrorCode();
@@ -145,18 +80,18 @@ namespace Dapplo.Windows
 		/// <summary>
 		///     Area which is scrolling, can be the WindowToScroll
 		/// </summary>
-		public InteropWindow ScrollingArea { get; set; }
+		public IInteropWindow ScrollingArea { get; set; }
 
 		/// <summary>
 		///     What scrollbar to use
 		/// </summary>
-		public ScrollBarTypes ScrollBar { get; private set; } = ScrollBarTypes.Vertical;
+		public ScrollBarTypes ScrollBar { get; internal set; } = ScrollBarTypes.Vertical;
 
 		/// <summary>
 		/// Get the information on the used scrollbar, if any.
 		/// This can be used to detect the location of the scrollbar
 		/// </summary>
-		public ScrollBarInfo? ScrollBarInfo { get; private set; }
+		public ScrollBarInfo? ScrollBarInfo { get; internal set; }
 
 		/// <summary>
 		///     Does the scrollbar need to represent the changes?
@@ -172,7 +107,7 @@ namespace Dapplo.Windows
 		/// This is used to be able to reset the location, and also detect if we are at the end.
 		/// Some windows might add content when the user is (almost) at the end.
 		/// </summary>
-		public ScrollInfo InitialScrollInfo { get; private set; }
+		public ScrollInfo InitialScrollInfo { get; internal set; }
 
 		/// <summary>
 		/// Some windows might add content when the user is (almost) at the end.
@@ -231,7 +166,7 @@ namespace Dapplo.Windows
 		/// <summary>
 		/// Get the scroll-lines from the registry
 		/// </summary>
-		private static int ScrollWheelLinesFromRegistry
+		public static int ScrollWheelLinesFromRegistry
 		{
 			get
 			{
