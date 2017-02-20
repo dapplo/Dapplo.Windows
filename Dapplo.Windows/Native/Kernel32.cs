@@ -134,7 +134,7 @@ namespace Dapplo.Windows.Native
 		/// <returns>If the function fails, the return value is false. To get extended error information, call GetLastError.</returns>
 		[DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		private static extern bool GetVersionEx(ref OsVersionInfoEx osVersionInfo);
+		public static extern bool GetVersionEx(ref OsVersionInfoEx osVersionInfo);
 
 		/// <summary>
 		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724358.aspx">GetProductInfo function</a>
@@ -149,6 +149,6 @@ namespace Dapplo.Windows.Native
 		/// <returns></returns>
 		[DllImport("Kernel32")]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static extern bool GetProductInfo(int osMajorVersion, int osMinorVersion, int spMajorVersion, int spMinorVersion, out WindowsProducts edition);
+		public static extern bool GetProductInfo(int osMajorVersion, int osMinorVersion, int spMajorVersion, int spMinorVersion, out WindowsProducts edition);
 	}
 }
