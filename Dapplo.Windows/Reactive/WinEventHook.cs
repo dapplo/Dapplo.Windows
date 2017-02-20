@@ -22,12 +22,12 @@
 #region using
 
 using System;
+using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
-using System.Collections.Generic;
 
 #endregion
 
@@ -41,8 +41,9 @@ namespace Dapplo.Windows.Reactive
 	public static class WinEventHook
 	{
 		private static readonly IDictionary<IntPtr, WinEventDelegate> Delegates = new Dictionary<IntPtr, WinEventDelegate>();
+
 		/// <summary>
-		/// Create a WinEventHook as observable
+		///     Create a WinEventHook as observable
 		/// </summary>
 		/// <param name="winEventStart">WinEvent "start" of which you are interested</param>
 		/// <param name="winEventEnd">WinEvent "end" of which you are interested</param>
@@ -53,10 +54,7 @@ namespace Dapplo.Windows.Reactive
 		{
 			return Observable.Create<WinEventInfo>(observer =>
 			{
-				WinEventDelegate winEventDelegate = (eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime) =>
-				{
-					observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime));
-				};
+				WinEventDelegate winEventDelegate = (eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime) => { observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime)); };
 
 				var hookPtr = SetWinEventHook(winEventStart, winEventEnd ?? winEventStart, IntPtr.Zero, winEventDelegate, process, thread, WinEventHookFlags.OutOfContext);
 				// Store to keep a reference to it, otherwise it's GC'ed
@@ -76,7 +74,7 @@ namespace Dapplo.Windows.Reactive
 		}
 
 		/// <summary>
-		/// Create an observable which only monitors title changes
+		///     Create an observable which only monitors title changes
 		/// </summary>
 		/// <returns>IObservable with WinEventInfo</returns>
 		public static IObservable<WinEventInfo> WindowTileChangeObservable()
@@ -90,14 +88,30 @@ namespace Dapplo.Windows.Reactive
 		private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
 		/// <summary>
-		/// Hook to win events
+		///     Hook to win events
 		/// </summary>
-		/// <param name="eventMin">Specifies the event constant for the lowest event value in the range of events that are handled by the hook function. This parameter can be set to EVENT_MIN to indicate the lowest possible event value.</param>
-		/// <param name="eventMax">Specifies the event constant for the highest event value in the range of events that are handled by the hook function. This parameter can be set to EVENT_MAX to indicate the highest possible event value.</param>
-		/// <param name="hmodWinEventProc">Handle to the DLL that contains the hook function at lpfnWinEventProc, if the WINEVENT_INCONTEXT flag is specified in the dwFlags parameter. If the hook function is not located in a DLL, or if the WINEVENT_OUTOFCONTEXT flag is specified, this parameter is NULL.</param>
+		/// <param name="eventMin">
+		///     Specifies the event constant for the lowest event value in the range of events that are handled
+		///     by the hook function. This parameter can be set to EVENT_MIN to indicate the lowest possible event value.
+		/// </param>
+		/// <param name="eventMax">
+		///     Specifies the event constant for the highest event value in the range of events that are handled
+		///     by the hook function. This parameter can be set to EVENT_MAX to indicate the highest possible event value.
+		/// </param>
+		/// <param name="hmodWinEventProc">
+		///     Handle to the DLL that contains the hook function at lpfnWinEventProc, if the
+		///     WINEVENT_INCONTEXT flag is specified in the dwFlags parameter. If the hook function is not located in a DLL, or if
+		///     the WINEVENT_OUTOFCONTEXT flag is specified, this parameter is NULL.
+		/// </param>
 		/// <param name="eventProc">WinEventDelegate</param>
-		/// <param name="idProcess">Specifies the ID of the process from which the hook function receives events. Specify zero (0) to receive events from all processes on the current desktop.</param>
-		/// <param name="idThread">Specifies the ID of the thread from which the hook function receives events. If this parameter is zero, the hook function is associated with all existing threads on the current desktop.</param>
+		/// <param name="idProcess">
+		///     Specifies the ID of the process from which the hook function receives events. Specify zero (0)
+		///     to receive events from all processes on the current desktop.
+		/// </param>
+		/// <param name="idThread">
+		///     Specifies the ID of the thread from which the hook function receives events. If this parameter
+		///     is zero, the hook function is associated with all existing threads on the current desktop.
+		/// </param>
 		/// <param name="winEventHookFlags">WinEventHookFlags</param>
 		/// <returns>IntPtr with the hook id</returns>
 		[DllImport("user32", SetLastError = true)]

@@ -23,7 +23,6 @@
 
 using System;
 using System.Text;
-using System.Windows.Forms;
 using Dapplo.Windows.Enums;
 
 #endregion

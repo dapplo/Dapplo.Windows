@@ -176,7 +176,7 @@ namespace Dapplo.Windows.Native
 		/// </returns>
 		public static POINT GetCursorLocation()
 		{
-			if ((Environment.OSVersion.Version.Major >= 6) && _canCallGetPhysicalCursorPos)
+			if (Environment.OSVersion.Version.Major >= 6 && _canCallGetPhysicalCursorPos)
 			{
 				try
 				{
@@ -293,7 +293,7 @@ namespace Dapplo.Windows.Native
 		}
 
 		/// <summary>
-		/// Get the text of a control, this is not the caption
+		///     Get the text of a control, this is not the caption
 		/// </summary>
 		/// <param name="hWnd">IntPtr</param>
 		/// <returns>string with the text</returns>
@@ -344,6 +344,16 @@ namespace Dapplo.Windows.Native
 		}
 
 		/// <summary>
+		///     Wrapper to simplify sending of inputs
+		/// </summary>
+		/// <param name="inputs">Input array</param>
+		/// <returns>inputs send</returns>
+		public static uint SendInput(Input[] inputs)
+		{
+			return SendInput((uint) inputs.Length, inputs, Input.Size);
+		}
+
+		/// <summary>
 		///     Wrapper for the SetWindowLong which decides if the system is 64-bit or not and calls the right one.
 		/// </summary>
 		/// <param name="hwnd">IntPtr</param>
@@ -363,27 +373,16 @@ namespace Dapplo.Windows.Native
 
 		private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
 
-		/// <summary>
-		/// Wrapper to simplify sending of inputs
-		/// </summary>
-		/// <param name="inputs">Input array</param>
-		/// <returns>inputs send</returns>
-		public static uint SendInput(Input[] inputs)
-		{
-			return SendInput((uint)inputs.Length, inputs, Input.Size);
-		}
-
-
 		#region Native imports
 
 		/// <summary>
-		/// Synthesizes keystrokes, mouse motions, and button clicks.
-		/// The function returns the number of events that it successfully inserted into the keyboard or mouse input stream.
-		/// If the function returns zero, the input was already blocked by another thread.
-		/// To get extended error information, call GetLastError.
+		///     Synthesizes keystrokes, mouse motions, and button clicks.
+		///     The function returns the number of events that it successfully inserted into the keyboard or mouse input stream.
+		///     If the function returns zero, the input was already blocked by another thread.
+		///     To get extended error information, call GetLastError.
 		/// </summary>
 		[DllImport("user32", SetLastError = true)]
-		public static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] Input[] inputs, int cbSize);
+		public static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray)] [In] Input[] inputs, int cbSize);
 
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
@@ -393,36 +392,45 @@ namespace Dapplo.Windows.Native
 		public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int processId);
 
 		/// <summary>
-		/// Retrieves a handle to the specified window's parent or owner.
-		///To retrieve a handle to a specified ancestor, use the GetAncestor function.
+		///     Retrieves a handle to the specified window's parent or owner.
+		///     To retrieve a handle to a specified ancestor, use the GetAncestor function.
 		/// </summary>
 		/// <param name="hWnd">A handle to the window whose parent window handle is to be retrieved.</param>
 		/// <returns>
-		/// IntPtr handle to the parent window or IntPtr.Zero if none
-		/// If the window is a child window, the return value is a handle to the parent window. If the window is a top-level window with the WS_POPUP style, the return value is a handle to the owner window.
+		///     IntPtr handle to the parent window or IntPtr.Zero if none
+		///     If the window is a child window, the return value is a handle to the parent window. If the window is a top-level
+		///     window with the WS_POPUP style, the return value is a handle to the owner window.
 		/// </returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr GetParent(IntPtr hWnd);
 
 		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633541(v=vs.85).aspx">SetParent function</a>
-		/// Changes the parent window of the specified child window.
+		///     See
+		///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633541(v=vs.85).aspx">SetParent function</a>
+		///     Changes the parent window of the specified child window.
 		/// </summary>
 		/// <param name="hWndChild">IntPtr</param>
 		/// <param name="hWndNewParent">IntPtr</param>
 		/// <returns>
-		/// If the function succeeds, the return value is a handle to the previous parent window.
-		/// If the function fails, the return value is NULL. To get extended error information, call GetLastError.
+		///     If the function succeeds, the return value is a handle to the previous parent window.
+		///     If the function fails, the return value is NULL. To get extended error information, call GetLastError.
 		/// </returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
 		/// <summary>
-		/// Retrieves a handle to a window that has the specified relationship (Z-Order or owner) to the specified window.
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633515(v=vs.85).aspx">GetWindow function</a>
+		///     Retrieves a handle to a window that has the specified relationship (Z-Order or owner) to the specified window.
+		///     See
+		///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633515(v=vs.85).aspx">GetWindow function</a>
 		/// </summary>
-		/// <param name="hWnd">IntPtr A handle to a window. The window handle retrieved is relative to this window, based on the value of the uCmd parameter.</param>
-		/// <param name="getWindowCommand">GetWindowCommands The relationship between the specified window and the window whose handle is to be retrieved. See GetWindowCommands</param>
+		/// <param name="hWnd">
+		///     IntPtr A handle to a window. The window handle retrieved is relative to this window, based on the
+		///     value of the uCmd parameter.
+		/// </param>
+		/// <param name="getWindowCommand">
+		///     GetWindowCommands The relationship between the specified window and the window whose
+		///     handle is to be retrieved. See GetWindowCommands
+		/// </param>
 		/// <returns></returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommands getWindowCommand);
@@ -440,7 +448,7 @@ namespace Dapplo.Windows.Native
 		public static extern uint GetSysColor(int nIndex);
 
 		/// <summary>
-		/// Bring the specified window to the front
+		///     Bring the specified window to the front
 		/// </summary>
 		/// <param name="hWnd">IntPtr specifying the hWnd</param>
 		/// <returns>true if the call was successfull</returns>
@@ -452,14 +460,14 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr GetForegroundWindow();
 
 		/// <summary>
-		/// Get the hWnd of the Desktop window
+		///     Get the hWnd of the Desktop window
 		/// </summary>
 		/// <returns>IntPtr</returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr GetDesktopWindow();
 
 		/// <summary>
-		/// Set the current foreground window
+		///     Set the current foreground window
 		/// </summary>
 		/// <param name="hWnd">IntPtr with the handle to the window</param>
 		/// <returns>bool</returns>
@@ -468,19 +476,24 @@ namespace Dapplo.Windows.Native
 		public static extern bool SetForegroundWindow(IntPtr hWnd);
 
 		/// <summary>
-		/// Sets the keyboard focus to the specified window. The window must be attached to the calling thread's message queue.
+		///     Sets the keyboard focus to the specified window. The window must be attached to the calling thread's message queue.
 		/// </summary>
-		/// <param name="hWnd">A handle to the window that will receive the keyboard input. If this parameter is NULL, keystrokes are ignored.</param>
-		/// <returns>IntPtr
-		/// If the function succeeds, the return value is the handle to the window that previously had the keyboard focus.
-		/// If the hWnd parameter is invalid or the window is not attached to the calling thread's message queue, the return value is NULL.
-		/// To get extended error information, call GetLastError.
+		/// <param name="hWnd">
+		///     A handle to the window that will receive the keyboard input. If this parameter is NULL, keystrokes
+		///     are ignored.
+		/// </param>
+		/// <returns>
+		///     IntPtr
+		///     If the function succeeds, the return value is the handle to the window that previously had the keyboard focus.
+		///     If the hWnd parameter is invalid or the window is not attached to the calling thread's message queue, the return
+		///     value is NULL.
+		///     To get extended error information, call GetLastError.
 		/// </returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SetFocus(IntPtr hWnd);
 
 		/// <summary>
-		/// Get the WindowPlacement for the specified window
+		///     Get the WindowPlacement for the specified window
 		/// </summary>
 		/// <param name="hWnd">IntPtr</param>
 		/// <param name="windowPlacement">WindowPlacement</param>
@@ -490,7 +503,7 @@ namespace Dapplo.Windows.Native
 		public static extern bool GetWindowPlacement(IntPtr hWnd, ref WindowPlacement windowPlacement);
 
 		/// <summary>
-		/// Set the WindowPlacement for the specified window
+		///     Set the WindowPlacement for the specified window
 		/// </summary>
 		/// <param name="hWnd">IntPtr</param>
 		/// <param name="windowPlacement">WindowPlacement</param>
@@ -500,7 +513,7 @@ namespace Dapplo.Windows.Native
 		public static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WindowPlacement windowPlacement);
 
 		/// <summary>
-		/// Return true if the specified window is minimized
+		///     Return true if the specified window is minimized
 		/// </summary>
 		/// <param name="hWnd">IntPtr for the hWnd</param>
 		/// <returns>true if minimized</returns>
@@ -509,7 +522,7 @@ namespace Dapplo.Windows.Native
 		public static extern bool IsIconic(IntPtr hWnd);
 
 		/// <summary>
-		/// Return true if the specified window is maximized
+		///     Return true if the specified window is maximized
 		/// </summary>
 		/// <param name="hwnd">IntPtr for the hWnd</param>
 		/// <returns>true if maximized</returns>
@@ -518,7 +531,7 @@ namespace Dapplo.Windows.Native
 		public static extern bool IsZoomed(IntPtr hwnd);
 
 		/// <summary>
-		/// Get the classname of the specified window
+		///     Get the classname of the specified window
 		/// </summary>
 		/// <param name="hWnd">IntPtr with the hWnd</param>
 		/// <param name="className">StringBuilder to place the classname into</param>
@@ -534,7 +547,8 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr GetClassLongPtr(IntPtr hWnd, ClassLongIndex index);
 
 		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd162869(v=vs.85).aspx">PrintWindow function</a>
+		///     See
+		///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd162869(v=vs.85).aspx">PrintWindow function</a>
 		/// </summary>
 		/// <param name="hwnd">IntPtr</param>
 		/// <param name="hDc">IntPtr</param>
@@ -548,7 +562,7 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, SysCommands sysCommand, IntPtr lParam);
 
 		/// <summary>
-		/// Used for WM_VSCROLL and WM_HSCROLL
+		///     Used for WM_VSCROLL and WM_HSCROLL
 		/// </summary>
 		/// <param name="hWnd">IntPtr</param>
 		/// <param name="windowsMessage">WindowsMessages</param>
@@ -562,7 +576,7 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, IntPtr lParam);
 
 		/// <summary>
-		/// Used for calls where the arguments are int
+		///     Used for calls where the arguments are int
 		/// </summary>
 		/// <param name="hWnd">IntPtr for the Window handle</param>
 		/// <param name="windowsMessage">WindowsMessages</param>
@@ -573,7 +587,7 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, int lParam);
 
 		/// <summary>
-		/// Used for WM_GETTEXT
+		///     Used for WM_GETTEXT
 		/// </summary>
 		/// <param name="hWnd">IntPtr for the Window handle</param>
 		/// <param name="windowsMessage"></param>
@@ -602,8 +616,10 @@ namespace Dapplo.Windows.Native
 		public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
 
 		/// <summary>
-		/// The MonitorFromRect function retrieves a handle to the display monitor that has the largest area of intersection with a specified rectangle.
-		/// see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145063(v=vs.85).aspx">MonitorFromRect function</a>
+		///     The MonitorFromRect function retrieves a handle to the display monitor that has the largest area of intersection
+		///     with a specified rectangle.
+		///     see
+		///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145063(v=vs.85).aspx">MonitorFromRect function</a>
 		/// </summary>
 		/// <param name="rect">A RECT structure that specifies the rectangle of interest in virtual-screen coordinates.</param>
 		/// <param name="monitorFromRectFlags">MonitorFromRectFlags</param>
@@ -616,7 +632,7 @@ namespace Dapplo.Windows.Native
 		public static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
 
 		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a>
+		///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a>
 		/// </summary>
 		/// <param name="enumFunc">EnumWindowsProc</param>
 		/// <param name="param">An application-defined value to be passed to the callback function.</param>
@@ -626,10 +642,15 @@ namespace Dapplo.Windows.Native
 		public static extern bool EnumWindows(EnumWindowsProc enumFunc, IntPtr param);
 
 		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633495(v=vs.85).aspx">EnumThreadWindows function</a>
-		/// Enumerates all nonchild windows associated with a thread by passing the handle to each window, in turn, to an application-defined callback function.
-		/// EnumThreadWindows continues until the last window is enumerated or the callback function returns FALSE.
-		/// To enumerate child windows of a particular window, use the EnumChildWindows function.
+		///     See
+		///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633495(v=vs.85).aspx">
+		///         EnumThreadWindows
+		///         function
+		///     </a>
+		///     Enumerates all nonchild windows associated with a thread by passing the handle to each window, in turn, to an
+		///     application-defined callback function.
+		///     EnumThreadWindows continues until the last window is enumerated or the callback function returns FALSE.
+		///     To enumerate child windows of a particular window, use the EnumChildWindows function.
 		/// </summary>
 		/// <param name="threadId">The identifier of the thread whose windows are to be enumerated.</param>
 		/// <param name="enumFunc">EnumWindowsProc</param>
@@ -639,7 +660,7 @@ namespace Dapplo.Windows.Native
 		public static extern bool EnumThreadWindows(int threadId, EnumWindowsProc enumFunc, IntPtr param);
 
 		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a>
+		///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a>
 		/// </summary>
 		/// <param name="hWndParent">IntPtr with hwnd of parent window, if this is IntPtr.Zero this function behaves as EnumWindows</param>
 		/// <param name="enumFunc">EnumWindowsProc</param>
@@ -650,7 +671,8 @@ namespace Dapplo.Windows.Native
 		public static extern bool EnumChildWindows(IntPtr hWndParent, EnumWindowsProc enumFunc, IntPtr param);
 
 		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787583(v=vs.85).aspx">GetScrollInfo</a> for more information.
+		///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787583(v=vs.85).aspx">GetScrollInfo</a> for
+		///     more information.
 		/// </summary>
 		/// <param name="hwnd">IntPtr with the window handle</param>
 		/// <param name="scrollBar">ScrollBarTypes</param>
@@ -661,7 +683,8 @@ namespace Dapplo.Windows.Native
 		public static extern bool GetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo);
 
 		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787595(v=vs.85).aspx">SetScrollInfo</a> for more information.
+		///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787595(v=vs.85).aspx">SetScrollInfo</a> for
+		///     more information.
 		/// </summary>
 		/// <param name="hwnd">IntPtr with the window handle</param>
 		/// <param name="scrollBar">ScrollBarTypes</param>
@@ -673,24 +696,35 @@ namespace Dapplo.Windows.Native
 		public static extern bool SetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo, bool redraw);
 
 		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787601(v=vs.85).aspx">ShowScrollBar function</a> for more information.
+		///     See
+		///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787601(v=vs.85).aspx">ShowScrollBar function</a>
+		///     for more information.
 		/// </summary>
 		/// <param name="hwnd">IntPtr</param>
 		/// <param name="scrollBar">ScrollBarTypes</param>
 		/// <param name="show">true to show, false to hide</param>
 		/// <returns>
-		/// If the function succeeds, the return value is nonzero.
-		/// If the function fails, the return value is zero. To get extended error information, call GetLastError.
+		///     If the function succeeds, the return value is nonzero.
+		///     If the function fails, the return value is zero. To get extended error information, call GetLastError.
 		/// </returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool ShowScrollBar(IntPtr hwnd, ScrollBarTypes scrollBar, [MarshalAs(UnmanagedType.Bool)] bool show);
 
 		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787581(v=vs.85).aspx">GetScrollBarInfo function</a> for more information.
+		///     See
+		///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787581(v=vs.85).aspx">GetScrollBarInfo function</a>
+		///     for more information.
 		/// </summary>
-		/// <param name="hwnd">Handle to a window associated with the scroll bar whose information is to be retrieved. If the idObject parameter is OBJID_CLIENT, hwnd is a handle to a scroll bar control. Otherwise, hwnd is a handle to a window created with WS_VSCROLL and/or WS_HSCROLL style.</param>
-		/// <param name="idObject">Specifies the scroll bar object. Can be ObjectIdentifiers.Client, ObjectIdentifiers.HorizontalScrollbar, ObjectIdentifiers.VerticalScrollbar</param>
+		/// <param name="hwnd">
+		///     Handle to a window associated with the scroll bar whose information is to be retrieved. If the
+		///     idObject parameter is OBJID_CLIENT, hwnd is a handle to a scroll bar control. Otherwise, hwnd is a handle to a
+		///     window created with WS_VSCROLL and/or WS_HSCROLL style.
+		/// </param>
+		/// <param name="idObject">
+		///     Specifies the scroll bar object. Can be ObjectIdentifiers.Client,
+		///     ObjectIdentifiers.HorizontalScrollbar, ObjectIdentifiers.VerticalScrollbar
+		/// </param>
 		/// <param name="scrollBarInfo">ScrollBarInfo ref</param>
 		/// <returns>bool</returns>
 		[DllImport("user32", SetLastError = true)]

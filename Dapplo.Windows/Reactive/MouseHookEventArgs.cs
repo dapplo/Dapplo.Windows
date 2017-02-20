@@ -22,8 +22,6 @@
 #region using
 
 using System;
-using System.Text;
-using System.Windows.Forms;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
 
@@ -33,7 +31,7 @@ namespace Dapplo.Windows.Reactive
 {
 	/// <summary>
 	///     Information on mouse changes
-	/// TODO: Make the information a lot clearer, than processing WindowsMessages
+	///     TODO: Make the information a lot clearer, than processing WindowsMessages
 	/// </summary>
 	public class MouseHookEventArgs : EventArgs
 	{
@@ -43,12 +41,12 @@ namespace Dapplo.Windows.Reactive
 		public bool Handled { get; set; }
 
 		/// <summary>
-		/// The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
+		///     The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
 		/// </summary>
 		public POINT Point { get; set; }
 
 		/// <summary>
-		/// The mouse message
+		///     The mouse message
 		/// </summary>
 		public WindowsMessages WindowsMessage { get; set; }
 	}

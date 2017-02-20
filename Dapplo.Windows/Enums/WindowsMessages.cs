@@ -22,7 +22,7 @@
 namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	/// All possible windows messages
+	///     All possible windows messages
 	/// </summary>
 	public enum WindowsMessages
 	{

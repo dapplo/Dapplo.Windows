@@ -1,29 +1,25 @@
-﻿#region Dapplo 2017 - GNU Lesser General Public License
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2017 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-// Dapplo - building blocks for .NET applications
-// Copyright (C) 2017 Dapplo
-// 
-// For more information see: http://dapplo.net/
-// Dapplo repositories are hosted on GitHub: https://github.com/dapplo
-// 
-// This file is part of Dapplo.Windows
-// 
-// Dapplo.Windows is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// Dapplo.Windows is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have a copy of the GNU Lesser General Public License
-// along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
-
-#endregion
-
-#region Usings
+#region using
 
 using System;
 using Dapplo.Windows.Enums;
@@ -45,21 +41,20 @@ namespace Dapplo.Windows.Structs
 		public IntPtr EventHook { get; private set; }
 
 		/// <summary>
-		///     Specifies the event that occurred.
+		///     Identifies the thread that generated the event, or the thread that owns the current window.
 		/// </summary>
-		public WinEvents WinEvent { get; private set; }
+		public ulong EventThread { get; private set; }
+
+		/// <summary>
+		///     Specifies the time, in milliseconds, that the event was generated.
+		/// </summary>
+		public ulong EventTime { get; private set; }
 
 		/// <summary>
 		///     Handle to the window that generates the event, or IntPtr.Zero if no window is associated with the event.
 		///     For example, the mouse pointer is not associated with a window.
 		/// </summary>
 		public IntPtr Handle { get; private set; }
-
-		/// <summary>
-		///     Handle to the window that generates the event, or IntPtr.Zero if no window is associated with the event.
-		///     For example, the mouse pointer is not associated with a window.
-		/// </summary>
-		public ObjectIdentifiers ObjectIdentifier { get; private set; }
 
 		/// <summary>
 		///     Identifies whether the event was triggered by an object or a child element of the object.
@@ -74,14 +69,15 @@ namespace Dapplo.Windows.Structs
 		public bool IsSelf => IdChild == 0;
 
 		/// <summary>
-		///     Identifies the thread that generated the event, or the thread that owns the current window.
+		///     Handle to the window that generates the event, or IntPtr.Zero if no window is associated with the event.
+		///     For example, the mouse pointer is not associated with a window.
 		/// </summary>
-		public ulong EventThread { get; private set; }
+		public ObjectIdentifiers ObjectIdentifier { get; private set; }
 
 		/// <summary>
-		///     Specifies the time, in milliseconds, that the event was generated.
+		///     Specifies the event that occurred.
 		/// </summary>
-		public ulong EventTime { get; private set; }
+		public WinEvents WinEvent { get; private set; }
 
 		/// <summary>
 		///     Create a WinEventInfo instance

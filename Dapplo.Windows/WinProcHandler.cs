@@ -51,7 +51,7 @@ namespace Dapplo.Windows
 		private readonly HwndSource _hwndSource = new HwndSource(0, 0, 0, 0, 0, 0, 0, null, new IntPtr(-3));
 
 		/// <summary>
-		/// Singleton instance of the WinProcHandler
+		///     Singleton instance of the WinProcHandler
 		/// </summary>
 		public static WinProcHandler Instance => Singleton.Value;
 

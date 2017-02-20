@@ -109,9 +109,9 @@ namespace Dapplo.Windows.Reactive
 		/// <returns>KeyboardHookEventArgs</returns>
 		private static KeyboardHookEventArgs CreateKeyboardEventArgs(IntPtr wParam, IntPtr lParam)
 		{
-			var isKeyDown = (wParam == (IntPtr) WmKeydown) || (wParam == (IntPtr) WmSyskeydown);
+			var isKeyDown = wParam == (IntPtr) WmKeydown || wParam == (IntPtr) WmSyskeydown;
 
-			KeyboardLowLevelHookStruct keyboardLowLevelHookStruct = (KeyboardLowLevelHookStruct)Marshal.PtrToStructure(lParam, typeof(KeyboardLowLevelHookStruct));
+			var keyboardLowLevelHookStruct = (KeyboardLowLevelHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardLowLevelHookStruct));
 
 			// Check the key to find if there any modifiers, store these in the global values.
 			switch (keyboardLowLevelHookStruct.VirtualKeyCode)
@@ -179,12 +179,12 @@ namespace Dapplo.Windows.Reactive
 
 			// Do we need this??
 			//http://msdn.microsoft.com/en-us/library/windows/desktop/ms646286(v=vs.85).aspx
-			if (!keyEventArgs.IsAlt && (wParam == (IntPtr) WmSyskeydown))
+			if (!keyEventArgs.IsAlt && wParam == (IntPtr) WmSyskeydown)
 			{
 				keyEventArgs.IsLeftAlt = true;
 				keyEventArgs.IsSystemKey = true;
 			}
-			else if (!keyEventArgs.IsAlt && (wParam == (IntPtr) WmSyskeyup))
+			else if (!keyEventArgs.IsAlt && wParam == (IntPtr) WmSyskeyup)
 			{
 				keyEventArgs.IsLeftAlt = true;
 				keyEventArgs.IsSystemKey = true;
@@ -246,7 +246,7 @@ namespace Dapplo.Windows.Reactive
 		private const int KeyPressed = 0x8000;
 
 		/// <summary>
-		/// Test if the supplied key is pressed
+		///     Test if the supplied key is pressed
 		/// </summary>
 		/// <param name="key">Keys</param>
 		/// <returns>true if pressed</returns>

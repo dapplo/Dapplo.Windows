@@ -101,13 +101,13 @@ namespace Dapplo.Windows.Reactive
 		/// <returns>MouseEventArgs</returns>
 		private static MouseHookEventArgs CreateMouseEventArgs(IntPtr wParam, IntPtr lParam)
 		{
-			MouseLowLevelHookStruct mouseLowLevelHookStruct = (MouseLowLevelHookStruct)Marshal.PtrToStructure(lParam, typeof(MouseLowLevelHookStruct));
+			var mouseLowLevelHookStruct = (MouseLowLevelHookStruct) Marshal.PtrToStructure(lParam, typeof(MouseLowLevelHookStruct));
 
 
 			var mouseEventArgs = new MouseHookEventArgs
 			{
-				WindowsMessage = (WindowsMessages)wParam.ToInt32(),
-				Point =  mouseLowLevelHookStruct.pt
+				WindowsMessage = (WindowsMessages) wParam.ToInt32(),
+				Point = mouseLowLevelHookStruct.pt
 			};
 
 			return mouseEventArgs;

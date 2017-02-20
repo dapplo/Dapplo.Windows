@@ -22,53 +22,62 @@
 namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	/// See <a href="https://msdn.microsoft.com/de-de/library/windows/desktop/bb787577(v=vs.85).aspx">WM_VSCROLL message</a>
+	///     See
+	///     <a href="https://msdn.microsoft.com/de-de/library/windows/desktop/bb787577(v=vs.85).aspx">WM_VSCROLL message</a>
 	/// </summary>
 	public enum ScrollBarCommands : uint
 	{
 		/// <summary>
-		/// Scrolls one line up.
+		///     Scrolls one line up.
 		/// </summary>
 		SB_LINEUP = 0,
 		SB_LINELEFT = 0,
+
 		/// <summary>
-		/// Scrolls one line down.
+		///     Scrolls one line down.
 		/// </summary>
 		SB_LINEDOWN = 1,
 		SB_LINERIGHT = 1,
+
 		/// <summary>
-		/// Scrolls one page up.
+		///     Scrolls one page up.
 		/// </summary>
 		SB_PAGEUP = 2,
 		SB_PAGELEFT = 2,
+
 		/// <summary>
-		/// Scrolls one page down.
+		///     Scrolls one page down.
 		/// </summary>
 		SB_PAGEDOWN = 3,
 		SB_PAGERIGHT = 3,
+
 		/// <summary>
-		/// The user has dragged the scroll box (thumb) and released the mouse button.
-		/// The HIWORD indicates the position of the scroll box at the end of the drag operation.
+		///     The user has dragged the scroll box (thumb) and released the mouse button.
+		///     The HIWORD indicates the position of the scroll box at the end of the drag operation.
 		/// </summary>
 		SB_THUMBPOSITION = 4,
+
 		/// <summary>
-		/// The user is dragging the scroll box.
-		/// This message is sent repeatedly until the user releases the mouse button.
-		/// The HIWORD indicates the position that the scroll box has been dragged to.
+		///     The user is dragging the scroll box.
+		///     This message is sent repeatedly until the user releases the mouse button.
+		///     The HIWORD indicates the position that the scroll box has been dragged to.
 		/// </summary>
 		SB_THUMBTRACK = 5,
+
 		/// <summary>
-		/// Scrolls to the upper left.
+		///     Scrolls to the upper left.
 		/// </summary>
 		SB_TOP = 6,
 		SB_LEFT = 6,
+
 		/// <summary>
-		/// Scrolls to the lower right.
+		///     Scrolls to the lower right.
 		/// </summary>
 		SB_BOTTOM = 7,
 		SB_RIGHT = 7,
+
 		/// <summary>
-		/// Ends scroll.
+		///     Ends scroll.
 		/// </summary>
 		SB_ENDSCROLL = 8
 	}

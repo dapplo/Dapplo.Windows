@@ -21,27 +21,25 @@
 
 #region using
 
-using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Xunit;
-using Xunit.Abstractions;
-using System.Windows.Forms;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Reactive;
+using Xunit.Abstractions;
 
 #endregion
 
 namespace Dapplo.Windows.Tests
 {
 	/// <summary>
-	/// Test mouse hooking
+	///     Test mouse hooking
 	/// </summary>
 	public class MouseHookTests
 	{
 		private readonly LogSource Log = new LogSource();
+
 		public MouseHookTests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);

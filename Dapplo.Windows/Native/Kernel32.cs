@@ -87,7 +87,7 @@ namespace Dapplo.Windows.Native
 				{
 					// Try this method for Vista or higher operating systems
 					var size = (uint) pathBuffer.Capacity;
-					if ((Environment.OSVersion.Version.Major >= 6) && QueryFullProcessImageName(hprocess, 0, pathBuffer, ref size) && (size > 0))
+					if (Environment.OSVersion.Version.Major >= 6 && QueryFullProcessImageName(hprocess, 0, pathBuffer, ref size) && size > 0)
 					{
 						return pathBuffer.ToString();
 					}
@@ -117,30 +117,14 @@ namespace Dapplo.Windows.Native
 			return string.Empty;
 		}
 
-		[DllImport("kernel32", SetLastError = true)]
-		public static extern IntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
-
-		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-		public static extern uint QueryDosDevice(string lpDeviceName, StringBuilder lpTargetPath, uint uuchMax);
-
-		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
-
 		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724451(v=vs.85).aspx">GetVersionEx function</a>
+		///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724358.aspx">GetProductInfo function</a>
 		/// </summary>
-		/// <param name="osVersionInfo">OsVersionInfoEx</param>
-		/// <returns>If the function fails, the return value is false. To get extended error information, call GetLastError.</returns>
-		[DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool GetVersionEx(ref OsVersionInfoEx osVersionInfo);
-
-		/// <summary>
-		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724358.aspx">GetProductInfo function</a>
-		/// </summary>
-		/// <param name="osMajorVersion">The major version number of the operating system. The minimum value is 6.
-		///The combination of the dwOSMajorVersion, dwOSMinorVersion, dwSpMajorVersion, and dwSpMinorVersion parameters describes the maximum target operating system version for the application. For example, Windows Vista and Windows Server 2008 are version 6.0.0.0 and Windows 7 and Windows Server 2008 R2 are version 6.1.0.0.
+		/// <param name="osMajorVersion">
+		///     The major version number of the operating system. The minimum value is 6.
+		///     The combination of the dwOSMajorVersion, dwOSMinorVersion, dwSpMajorVersion, and dwSpMinorVersion parameters
+		///     describes the maximum target operating system version for the application. For example, Windows Vista and Windows
+		///     Server 2008 are version 6.0.0.0 and Windows 7 and Windows Server 2008 R2 are version 6.1.0.0.
 		/// </param>
 		/// <param name="osMinorVersion">The minor version number of the operating system. The minimum value is 0.</param>
 		/// <param name="spMajorVersion">The major version number of the operating system service pack. The minimum value is 0.</param>
@@ -150,5 +134,25 @@ namespace Dapplo.Windows.Native
 		[DllImport("Kernel32")]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool GetProductInfo(int osMajorVersion, int osMinorVersion, int spMajorVersion, int spMinorVersion, out WindowsProducts edition);
+
+		/// <summary>
+		///     See
+		///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724451(v=vs.85).aspx">GetVersionEx function</a>
+		/// </summary>
+		/// <param name="osVersionInfo">OsVersionInfoEx</param>
+		/// <returns>If the function fails, the return value is false. To get extended error information, call GetLastError.</returns>
+		[DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool GetVersionEx(ref OsVersionInfoEx osVersionInfo);
+
+		[DllImport("kernel32", SetLastError = true)]
+		public static extern IntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
+
+		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+		public static extern uint QueryDosDevice(string lpDeviceName, StringBuilder lpTargetPath, uint uuchMax);
+
+		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
 	}
 }

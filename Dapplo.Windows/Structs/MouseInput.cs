@@ -1,46 +1,40 @@
-#region Dapplo 2017 - GNU Lesser General Public License
+//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2017 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-// Dapplo - building blocks for .NET applications
-// Copyright (C) 2017 Dapplo
-// 
-// For more information see: http://dapplo.net/
-// Dapplo repositories are hosted on GitHub: https://github.com/dapplo
-// 
-// This file is part of Dapplo.Windows
-// 
-// Dapplo.Windows is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// Dapplo.Windows is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have a copy of the GNU Lesser General Public License
-// along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
-
-#endregion
-
-#region Usings
+#region using
 
 using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Windows;
 using System.Windows.Forms;
-using Dapplo.Windows.Enums;
-using Dapplo.Windows.Native;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Enums;
 
 #endregion
 
 namespace Dapplo.Windows.Structs
 {
 	/// <summary>
-	/// Contains information about a simulated mouse event.
-	/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646273(v=vs.85).aspx">MOUSEINPUT structure</a>
+	///     Contains information about a simulated mouse event.
+	///     See
+	///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646273(v=vs.85).aspx">MOUSEINPUT structure</a>
 	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	public struct MouseInput
@@ -48,55 +42,59 @@ namespace Dapplo.Windows.Structs
 		private const MouseEventFlags MouseMoveMouseEventFlags = MouseEventFlags.Absolute | MouseEventFlags.Virtualdesk | MouseEventFlags.Move;
 
 		/// <summary>
-		/// The absolute position of the mouse, or the amount of motion since the last mouse event was generated,
-		/// depending on the value of the dwFlags member.
-		/// Absolute data is specified as the x coordinate of the mouse;
-		/// relative data is specified as the number of pixels moved.
+		///     The absolute position of the mouse, or the amount of motion since the last mouse event was generated,
+		///     depending on the value of the dwFlags member.
+		///     Absolute data is specified as the x coordinate of the mouse;
+		///     relative data is specified as the number of pixels moved.
 		/// </summary>
-		int dx;
-		/// <summary>
-		/// The absolute position of the mouse, or the amount of motion since the last mouse event was generated,
-		/// depending on the value of the dwFlags member.
-		/// Absolute data is specified as the y coordinate of the mouse;
-		/// relative data is specified as the number of pixels moved.
-		/// </summary>
-		int dy;
+		private int dx;
 
 		/// <summary>
-		/// If dwFlags contains MOUSEEVENTF_WHEEL, then mouseData specifies the amount of wheel movement.
-		/// A positive value indicates that the wheel was rotated forward, away from the user;
-		/// a negative value indicates that the wheel was rotated backward, toward the user.
-		/// One wheel click is defined as WHEEL_DELTA, which is 120.
-		/// 
-		/// Windows Vista: If dwFlags contains MOUSEEVENTF_HWHEEL, then dwData specifies the amount of wheel movement.
-		/// A positive value indicates that the wheel was rotated to the right;
-		/// a negative value indicates that the wheel was rotated to the left.
-		/// One wheel click is defined as WHEEL_DELTA, which is 120.
-		/// 
-		/// If dwFlags does not contain MOUSEEVENTF_WHEEL, MOUSEEVENTF_XDOWN, or MOUSEEVENTF_XUP, then mouseData should be zero.
-		/// If dwFlags contains MOUSEEVENTF_XDOWN or MOUSEEVENTF_XUP, then mouseData specifies which X buttons were pressed or released.
-		/// This value may be any combination of the following flags:
-		/// XBUTTON1 0x0001 Set if the first X button is pressed or released.
-		/// XBUTTON2 0x0002 Set if the second X button is pressed or released.
+		///     The absolute position of the mouse, or the amount of motion since the last mouse event was generated,
+		///     depending on the value of the dwFlags member.
+		///     Absolute data is specified as the y coordinate of the mouse;
+		///     relative data is specified as the number of pixels moved.
 		/// </summary>
-		int MouseData;
+		private int dy;
 
 		/// <summary>
-		/// A set of bit flags that specify various aspects of mouse motion and button clicks.
-		/// The bits in this member can be any reasonable combination of the following values.
+		///     If dwFlags contains MOUSEEVENTF_WHEEL, then mouseData specifies the amount of wheel movement.
+		///     A positive value indicates that the wheel was rotated forward, away from the user;
+		///     a negative value indicates that the wheel was rotated backward, toward the user.
+		///     One wheel click is defined as WHEEL_DELTA, which is 120.
+		///     Windows Vista: If dwFlags contains MOUSEEVENTF_HWHEEL, then dwData specifies the amount of wheel movement.
+		///     A positive value indicates that the wheel was rotated to the right;
+		///     a negative value indicates that the wheel was rotated to the left.
+		///     One wheel click is defined as WHEEL_DELTA, which is 120.
+		///     If dwFlags does not contain MOUSEEVENTF_WHEEL, MOUSEEVENTF_XDOWN, or MOUSEEVENTF_XUP, then mouseData should be
+		///     zero.
+		///     If dwFlags contains MOUSEEVENTF_XDOWN or MOUSEEVENTF_XUP, then mouseData specifies which X buttons were pressed or
+		///     released.
+		///     This value may be any combination of the following flags:
+		///     XBUTTON1 0x0001 Set if the first X button is pressed or released.
+		///     XBUTTON2 0x0002 Set if the second X button is pressed or released.
 		/// </summary>
-		MouseEventFlags MouseEventFlags;
-		/// <summary>
-		/// The time stamp for the event, in milliseconds. If this parameter is 0, the system will provide its own time stamp.
-		/// </summary>
-		uint Timestamp;
-		/// <summary>
-		/// An additional value associated with the mouse event. An application calls GetMessageExtraInfo to obtain this extra information.
-		/// </summary>
-		UIntPtr dwExtraInfo;
+		private int MouseData;
 
 		/// <summary>
-		/// The coordinates need to be mapped from 0-65535 where 0 is left and 65535 is right
+		///     A set of bit flags that specify various aspects of mouse motion and button clicks.
+		///     The bits in this member can be any reasonable combination of the following values.
+		/// </summary>
+		private MouseEventFlags MouseEventFlags;
+
+		/// <summary>
+		///     The time stamp for the event, in milliseconds. If this parameter is 0, the system will provide its own time stamp.
+		/// </summary>
+		private uint Timestamp;
+
+		/// <summary>
+		///     An additional value associated with the mouse event. An application calls GetMessageExtraInfo to obtain this extra
+		///     information.
+		/// </summary>
+		private readonly UIntPtr dwExtraInfo;
+
+		/// <summary>
+		///     The coordinates need to be mapped from 0-65535 where 0 is left and 65535 is right
 		/// </summary>
 		/// <param name="location">POINT</param>
 		/// <returns>POINT</returns>
@@ -107,7 +105,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Create a MouseInput struct for a wheel move
+		///     Create a MouseInput struct for a wheel move
 		/// </summary>
 		/// <param name="wheelDelta">How much does the wheel move</param>
 		/// <param name="location">Location of the event</param>
@@ -119,7 +117,7 @@ namespace Dapplo.Windows.Structs
 			{
 				location = RemapLocation(location.Value);
 			}
-			MouseEventFlags mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
+			var mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
 			return new MouseInput
 			{
 				MouseData = wheelDelta,
@@ -131,7 +129,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Create a MouseInput struct for a mouse move
+		///     Create a MouseInput struct for a mouse move
 		/// </summary>
 		/// <param name="location">Where is the click located</param>
 		/// <param name="timestamp">The time stamp for the event</param>
@@ -150,7 +148,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Create a MouseInput struct for a mouse button down
+		///     Create a MouseInput struct for a mouse button down
 		/// </summary>
 		/// <param name="mouseButtons">MouseButtons to specify which mouse buttons</param>
 		/// <param name="location">Where is the click located</param>
@@ -162,8 +160,8 @@ namespace Dapplo.Windows.Structs
 			{
 				location = RemapLocation(location.Value);
 			}
-			MouseEventFlags mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
-	
+			var mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
+
 			if (mouseButtons.HasFlag(MouseButtons.Left))
 			{
 				mouseEventFlags |= MouseEventFlags.LeftDown;
@@ -176,7 +174,7 @@ namespace Dapplo.Windows.Structs
 			{
 				mouseEventFlags |= MouseEventFlags.MiddleDown;
 			}
-			int mouseData = 0;
+			var mouseData = 0;
 			if (mouseButtons.HasFlag(MouseButtons.XButton1))
 			{
 				mouseEventFlags |= MouseEventFlags.XDown;
@@ -198,7 +196,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Create a MouseInput struct for a mouse button up
+		///     Create a MouseInput struct for a mouse button up
 		/// </summary>
 		/// <param name="mouseButtons">MouseButtons to specify which mouse buttons</param>
 		/// <param name="location">Where is the click located</param>
@@ -210,7 +208,7 @@ namespace Dapplo.Windows.Structs
 			{
 				location = RemapLocation(location.Value);
 			}
-			MouseEventFlags mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
+			var mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
 
 			if (mouseButtons.HasFlag(MouseButtons.Left))
 			{
@@ -224,7 +222,7 @@ namespace Dapplo.Windows.Structs
 			{
 				mouseEventFlags |= MouseEventFlags.MiddleUp;
 			}
-			int mouseData = 0;
+			var mouseData = 0;
 			if (mouseButtons.HasFlag(MouseButtons.XButton1))
 			{
 				mouseEventFlags |= MouseEventFlags.XUp;

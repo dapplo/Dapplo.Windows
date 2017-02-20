@@ -33,18 +33,26 @@ using Dapplo.Windows.Structs;
 namespace Dapplo.Windows.Desktop
 {
 	/// <summary>
-	/// Information about a native window
-	/// Note: This is a dumb container, and doesn't retrieve anything about the window itself
+	///     Information about a native window
+	///     Note: This is a dumb container, and doesn't retrieve anything about the window itself
 	/// </summary>
 	public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
 	{
 		/// <summary>
-		/// Constructor
+		///     Constructor
 		/// </summary>
 		/// <param name="handle"></param>
 		internal InteropWindow(IntPtr handle)
 		{
 			Handle = handle;
+		}
+
+		/// <inheritdoc />
+		public bool Equals(IInteropWindow other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return Handle.Equals(other.Handle);
 		}
 
 		/// <inheritdoc />
@@ -75,6 +83,9 @@ namespace Dapplo.Windows.Desktop
 		public IntPtr? Parent { get; set; }
 
 		/// <inheritdoc />
+		public IInteropWindow ParentWindow { get; set; }
+
+		/// <inheritdoc />
 		public string Caption { get; set; }
 
 		/// <inheritdoc />
@@ -103,47 +114,6 @@ namespace Dapplo.Windows.Desktop
 
 		/// <inheritdoc />
 		public bool? CanScroll { get; set; }
-
-		/// <inheritdoc />
-		public static implicit operator InteropWindow(IntPtr handle)
-		{
-			return InteropWindowFactory.CreateFor(handle);
-		}
-
-		/// <inheritdoc />
-		public static implicit operator IntPtr(InteropWindow interopWindow)
-		{
-			return interopWindow.Handle;
-		}
-
-		/// <inheritdoc />
-		public override int GetHashCode()
-		{
-			return Handle.GetHashCode();
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(object obj)
-		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != GetType()) return false;
-			return Equals((IInteropWindow) obj);
-		}
-
-		/// <inheritdoc />
-		public bool Equals(IInteropWindow other)
-		{
-			if (ReferenceEquals(null, other)) return false;
-			if (ReferenceEquals(this, other)) return true;
-			return Handle.Equals(other.Handle);
-		}
-
-		/// <inheritdoc />
-		public static bool operator ==(InteropWindow left, InteropWindow right)
-		{
-			return Equals(left, right);
-		}
 
 		/// <inheritdoc />
 		public StringBuilder Dump(InteropWindowCacheFlags cacheFlags = InteropWindowCacheFlags.CacheAll, StringBuilder dump = null, string indentation = "")
@@ -222,6 +192,39 @@ namespace Dapplo.Windows.Desktop
 				}
 			}
 			return dump;
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != GetType()) return false;
+			return Equals((IInteropWindow) obj);
+		}
+
+		/// <inheritdoc />
+		public override int GetHashCode()
+		{
+			return Handle.GetHashCode();
+		}
+
+		/// <inheritdoc />
+		public static bool operator ==(InteropWindow left, InteropWindow right)
+		{
+			return Equals(left, right);
+		}
+
+		/// <inheritdoc />
+		public static implicit operator InteropWindow(IntPtr handle)
+		{
+			return InteropWindowFactory.CreateFor(handle);
+		}
+
+		/// <inheritdoc />
+		public static implicit operator IntPtr(InteropWindow interopWindow)
+		{
+			return interopWindow.Handle;
 		}
 
 		/// <inheritdoc />

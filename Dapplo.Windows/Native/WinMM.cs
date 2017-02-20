@@ -35,7 +35,7 @@ namespace Dapplo.Windows.Native
 	public class WinMM
 	{
 		/// <summary>
-		/// Play a sound via WinMM
+		///     Play a sound via WinMM
 		/// </summary>
 		/// <param name="soundBytes">byte array with the wave information</param>
 		/// <param name="hmod"></param>

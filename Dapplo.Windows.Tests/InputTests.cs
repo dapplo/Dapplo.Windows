@@ -27,12 +27,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Xunit;
-using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
+using Xunit;
+using Xunit.Abstractions;
 
 #endregion
 
@@ -48,20 +48,7 @@ namespace Dapplo.Windows.Tests
 		}
 
 		/// <summary>
-		/// Test typing in a notepad
-		/// </summary>
-		/// <returns></returns>
-		[Fact]
-		private void TestMouseInput()
-		{
-			InputGenerator.MoveMouse(new POINT(10, 10));
-			Thread.Sleep(1000);
-			InputGenerator.MoveMouse(new POINT(100, 100));
-			Thread.Sleep(1000);
-		}
-
-		/// <summary>
-		/// Test typing in a notepad
+		///     Test typing in a notepad
 		/// </summary>
 		/// <returns></returns>
 		[Fact]
@@ -87,11 +74,24 @@ namespace Dapplo.Windows.Tests
 				// Send input
 				var sentInputs = InputGenerator.KeyPress(VirtualKeyCodes.KEY_R, VirtualKeyCodes.KEY_O, VirtualKeyCodes.KEY_B, VirtualKeyCodes.KEY_I, VirtualKeyCodes.KEY_N);
 				// Test if we indead sent 10 inputs (5 x down & up)
-				Assert.Equal((uint)10, sentInputs);
+				Assert.Equal((uint) 10, sentInputs);
 
 				// Kill the process
 				process.Kill();
 			}
+		}
+
+		/// <summary>
+		///     Test typing in a notepad
+		/// </summary>
+		/// <returns></returns>
+		[Fact]
+		private void TestMouseInput()
+		{
+			InputGenerator.MoveMouse(new POINT(10, 10));
+			Thread.Sleep(1000);
+			InputGenerator.MoveMouse(new POINT(100, 100));
+			Thread.Sleep(1000);
 		}
 	}
 }

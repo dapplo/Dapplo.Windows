@@ -21,19 +21,19 @@
 
 #region using
 
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Xunit;
-using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Reactive;
-using System;
+using Xunit;
+using Xunit.Abstractions;
 
 #endregion
 
@@ -42,19 +42,20 @@ namespace Dapplo.Windows.Tests
 	public class ScrollingTests
 	{
 		private static readonly LogSource Log = new LogSource();
+
 		public ScrollingTests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
 		}
 
 		/// <summary>
-		/// Test scrolling a window
+		///     Test scrolling a window
 		/// </summary>
 		/// <returns></returns>
 		//[StaFact]
 		private async Task TestScrollingAsync()
 		{
-			bool breakScroll = false;
+			var breakScroll = false;
 
 			IDisposable keyboardhook = null;
 			try
@@ -84,11 +85,12 @@ namespace Dapplo.Windows.Tests
 
 						Assert.NotNull(scroller);
 						// Notepad should have ScrollBarInfo
+						scroller.GetScrollbarInfo();
 						Assert.True(scroller.ScrollBarInfo.HasValue);
 
 						Log.Info().WriteLine("Scrollbar info: {0}", scroller.ScrollBarInfo.Value);
 
-						User32.SetForegroundWindow(scroller.ScrollingArea.Handle);
+						User32.SetForegroundWindow(scroller.ScrollingWindow.Handle);
 						await Task.Delay(1000);
 						// Just make sure the window is changed
 						InputGenerator.KeyPress(VirtualKeyCodes.NEXT, VirtualKeyCodes.DOWN);
@@ -115,7 +117,7 @@ namespace Dapplo.Windows.Tests
 							// Wait a bit, so the window can update
 							await Task.Delay(300);
 							// Loop as long as we are not at the end yet
-						} while (!scroller.IsAtEnd );
+						} while (!scroller.IsAtEnd);
 						scroller.Reset();
 					}
 					finally
@@ -129,7 +131,6 @@ namespace Dapplo.Windows.Tests
 			{
 				keyboardhook?.Dispose();
 			}
-
 		}
 	}
 }

@@ -19,6 +19,8 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#region using
+
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Extensions;
@@ -26,108 +28,106 @@ using Dapplo.Windows.Structs;
 using Xunit;
 using Xunit.Abstractions;
 
+#endregion
+
 namespace Dapplo.Windows.Tests
 {
-    /// <summary>
-    /// Tests for the RECT struct, and it'S extensions
-    /// </summary>
-    public class RectTests
-    {
-        private static readonly LogSource Log = new LogSource();
+	/// <summary>
+	///     Tests for the RECT struct, and it'S extensions
+	/// </summary>
+	public class RectTests
+	{
+		private static readonly LogSource Log = new LogSource();
 
-        public RectTests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+		public RectTests(ITestOutputHelper testOutputHelper)
+		{
+			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+		}
 
-        [Fact]
-        public void Ctor_L_R_T_B()
-        {
-            var rect = new RECT(10, 20, 100, 200);
-            Assert.Equal(10, rect.Left);
-            Assert.Equal(20, rect.Top);
-            Assert.Equal(100, rect.Right);
-            Assert.Equal(200, rect.Bottom);
-            Assert.Equal(100 - 10, rect.Width);
-            Assert.Equal(200 - 20 , rect.Height);
-            Assert.Equal(new POINT(10,20), rect.Location);
-            Assert.Equal(new SIZE(100-10, 200-20), rect.Size);
-        }
+		[Fact]
+		public void Ctor_L_R_SIZE()
+		{
+			var rect = new RECT(10, 20, new SIZE(100, 200));
+			Assert.Equal(10, rect.Left);
+			Assert.Equal(20, rect.Top);
+			Assert.Equal(100 + 10, rect.Right);
+			Assert.Equal(200 + 20, rect.Bottom);
+			Assert.Equal(100, rect.Width);
+			Assert.Equal(200, rect.Height);
+			Assert.Equal(new POINT(10, 20), rect.Location);
+			Assert.Equal(new SIZE(100, 200), rect.Size);
+		}
 
-        [Fact]
-        public void Ctor_L_R_SIZE()
-        {
-            var rect = new RECT(10, 20, new SIZE(100, 200));
-            Assert.Equal(10, rect.Left);
-            Assert.Equal(20, rect.Top);
-            Assert.Equal(100 + 10, rect.Right);
-            Assert.Equal(200 + 20, rect.Bottom);
-            Assert.Equal(100, rect.Width);
-            Assert.Equal(200, rect.Height);
-            Assert.Equal(new POINT(10, 20), rect.Location);
-            Assert.Equal(new SIZE(100, 200), rect.Size);
-        }
+		[Fact]
+		public void Ctor_L_R_T_B()
+		{
+			var rect = new RECT(10, 20, 100, 200);
+			Assert.Equal(10, rect.Left);
+			Assert.Equal(20, rect.Top);
+			Assert.Equal(100, rect.Right);
+			Assert.Equal(200, rect.Bottom);
+			Assert.Equal(100 - 10, rect.Width);
+			Assert.Equal(200 - 20, rect.Height);
+			Assert.Equal(new POINT(10, 20), rect.Location);
+			Assert.Equal(new SIZE(100 - 10, 200 - 20), rect.Size);
+		}
 
-        [Fact]
-        public void Ctor_POINT_SIZE()
-        {
-            var rect = new RECT(new POINT(10, 20), new SIZE(100, 200));
-            Assert.Equal(10, rect.Left);
-            Assert.Equal(20, rect.Top);
-            Assert.Equal(100 + 10, rect.Right);
-            Assert.Equal(200 + 20, rect.Bottom);
-            Assert.Equal(100, rect.Width);
-            Assert.Equal(200, rect.Height);
-            Assert.Equal(new POINT(10, 20), rect.Location);
-            Assert.Equal(new SIZE(100, 200), rect.Size);
-        }
+		[Fact]
+		public void Ctor_POINT_SIZE()
+		{
+			var rect = new RECT(new POINT(10, 20), new SIZE(100, 200));
+			Assert.Equal(10, rect.Left);
+			Assert.Equal(20, rect.Top);
+			Assert.Equal(100 + 10, rect.Right);
+			Assert.Equal(200 + 20, rect.Bottom);
+			Assert.Equal(100, rect.Width);
+			Assert.Equal(200, rect.Height);
+			Assert.Equal(new POINT(10, 20), rect.Location);
+			Assert.Equal(new SIZE(100, 200), rect.Size);
+		}
 
-        [Fact]
-        public void IsAdjacent()
-        {
-            int width = 100;
-            int height = 100;
+		[Fact]
+		public void IsAdjacent()
+		{
+			var width = 100;
+			var height = 100;
 
-            int left = 200;
-            int top = 200;
+			var left = 200;
+			var top = 200;
 
-            // left
-            var rect1 = new RECT(new POINT(left, top), new SIZE(width, height));
-            var rect2 = new RECT(new POINT(left - width, top), new SIZE(width, height));
-            Assert.True(rect1.IsAdjacent(rect2));
-            // Right
-            rect2 = new RECT(new POINT(left+ width, top), new SIZE(width, height));
-            Assert.True(rect1.IsAdjacent(rect2));
-            // Bottom
-            rect2 = new RECT(new POINT(left, top+height), new SIZE(width, height));
-            Assert.True(rect1.IsAdjacent(rect2));
-            // Top
-            rect2 = new RECT(new POINT(left, top - height), new SIZE(width, height));
-            Assert.True(rect1.IsAdjacent(rect2));
-        }
+			// left
+			var rect1 = new RECT(new POINT(left, top), new SIZE(width, height));
+			var rect2 = new RECT(new POINT(left - width, top), new SIZE(width, height));
+			Assert.True(rect1.IsAdjacent(rect2));
+			// Right
+			rect2 = new RECT(new POINT(left + width, top), new SIZE(width, height));
+			Assert.True(rect1.IsAdjacent(rect2));
+			// Bottom
+			rect2 = new RECT(new POINT(left, top + height), new SIZE(width, height));
+			Assert.True(rect1.IsAdjacent(rect2));
+			// Top
+			rect2 = new RECT(new POINT(left, top - height), new SIZE(width, height));
+			Assert.True(rect1.IsAdjacent(rect2));
+		}
 
-        [Fact]
-        public void Not_IsAdjacent()
-        {
-            int width = 100;
-            int height = 100;
+		[Fact]
+		public void IsDocked()
+		{
+			var width = 100;
+			var height = 100;
 
-            int left = 200;
-            int top = 200;
+			var left = 200;
+			var top = 200;
 
-            // left
-            var rect1 = new RECT(new POINT(left, top), new SIZE(width, height));
-            var rect2 = new RECT(new POINT(left - width-1, top), new SIZE(width, height));
-            Assert.False(rect1.IsAdjacent(rect2));
-            // Right
-            rect2 = new RECT(new POINT(left + width+1, top), new SIZE(width, height));
-            Assert.False(rect1.IsAdjacent(rect2));
-            // Bottom
-            rect2 = new RECT(new POINT(left, top + height+1), new SIZE(width, height));
-            Assert.False(rect1.IsAdjacent(rect2));
-            // Top
-            rect2 = new RECT(new POINT(left, top - height -1), new SIZE(width, height));
-            Assert.False(rect1.IsAdjacent(rect2));
-        }
-    }
+			// left
+			var rect1 = new RECT(new POINT(left, top), new SIZE(width, height));
+			var rect2 = new RECT(new POINT(left - width - 1, top), new SIZE(width, height));
+			Assert.True(rect2.IsDockedToLeftOf(rect1));
+			Assert.False(rect2.IsDockedToRightOf(rect1));
+			// Right
+			rect2 = new RECT(new POINT(left + width + 1, top), new SIZE(width, height));
+			Assert.True(rect2.IsDockedToRightOf(rect1));
+			Assert.False(rect2.IsDockedToLeftOf(rect1));
+		}
+	}
 }

@@ -68,7 +68,10 @@ namespace Dapplo.Windows.Native
 		///     Get the message for a Win32 error
 		/// </summary>
 		/// <param name="errorCode">Win32Error</param>
-		/// <param name="languageId">uint with language ID, see <a href="https://msdn.microsoft.com/en-us/library/dd318693.aspx">here</a></param>
+		/// <param name="languageId">
+		///     uint with language ID, see
+		///     <a href="https://msdn.microsoft.com/en-us/library/dd318693.aspx">here</a>
+		/// </param>
 		/// <returns>string with the message</returns>
 		public static string GetMessage(Win32Error errorCode, uint languageId = 0)
 		{

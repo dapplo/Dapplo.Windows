@@ -122,76 +122,6 @@ namespace Dapplo.Windows.App
 			}
 		}
 
-
-		/// <summary>
-		/// This checks if the window is an App (Win8 or Win10)
-		/// </summary>
-		public static bool IsApp(this IInteropWindow interopWindow)
-		{
-			return AppWindowsClass.Equals(interopWindow.GetClassname());
-		}
-
-		/// <summary>
-		/// This checks if the window is a Windows 8 App
-		/// For Windows 10 most normal code works, as it's hosted inside "ApplicationFrameWindow"
-		/// </summary>
-		public static bool IsWin8App(this IInteropWindow interopWindow)
-		{
-			return W8AppWindowClass.Equals(interopWindow.GetClassname());
-		}
-
-		/// <summary>
-		/// This checks if the window is a Windows 10 App
-		/// For Windows 10 apps are hosted inside "ApplicationFrameWindow"
-		/// </summary>
-		public static bool IsWin10App(this IInteropWindow interopWindow)
-		{
-			return W10AppWindowClass.Equals(interopWindow.GetClassname());
-		}
-
-		/// <summary>
-		/// Check if the window is the metro gutter (sizeable separator)
-		/// </summary>
-		public static bool IsGutter(this IInteropWindow interopWindow)
-		{
-			return GutterClass.Equals(interopWindow.GetClassname());
-		}
-
-		/// <summary>
-		/// Test if this window is for the App-Launcher
-		/// </summary>
-		public static bool IsAppLauncher(this IInteropWindow interopWindow)
-		{
-			return ApplauncherClass.Equals(interopWindow.GetClassname());
-		}
-
-		/// <summary>
-		/// Check if this window is the window of a metro app
-		/// </summary>
-		public static bool IsMetroApp(this IInteropWindow interopWindow)
-		{
-			return interopWindow.IsAppLauncher() || interopWindow.IsWin8App();
-		}
-
-		/// <summary>
-		/// Get the AppLauncher
-		/// </summary>
-		/// <returns>IInteropWindow</returns>
-		public static IInteropWindow GetAppLauncher()
-		{
-			// Works only if Windows 8 (or higher)
-			if (IsLauncherVisible)
-			{
-				return null;
-			}
-			IntPtr appLauncher = User32.FindWindow(ApplauncherClass, null);
-			if (appLauncher != IntPtr.Zero)
-			{
-				return InteropWindowFactory.CreateFor(appLauncher);
-			}
-			return null;
-		}
-
 		/// <summary>
 		///     Check if a Windows Store App (WinRT) is visible
 		/// </summary>
@@ -212,7 +142,7 @@ namespace Dapplo.Windows.App
 					{
 						// Fullscreen, it's "visible" when AppVisibilityOnMonitor says yes
 						// Although it might be the other App, this is not "very" important
-						RECT rect = screen.Bounds;
+						var rect = screen.Bounds;
 						var monitor = User32.MonitorFromRect(ref rect, MonitorFromRectFlags.DefaultToNearest);
 						if (monitor != IntPtr.Zero)
 						{
@@ -231,6 +161,76 @@ namespace Dapplo.Windows.App
 				}
 			}
 			return false;
+		}
+
+		/// <summary>
+		///     Get the AppLauncher
+		/// </summary>
+		/// <returns>IInteropWindow</returns>
+		public static IInteropWindow GetAppLauncher()
+		{
+			// Works only if Windows 8 (or higher)
+			if (IsLauncherVisible)
+			{
+				return null;
+			}
+			var appLauncher = User32.FindWindow(ApplauncherClass, null);
+			if (appLauncher != IntPtr.Zero)
+			{
+				return InteropWindowFactory.CreateFor(appLauncher);
+			}
+			return null;
+		}
+
+
+		/// <summary>
+		///     This checks if the window is an App (Win8 or Win10)
+		/// </summary>
+		public static bool IsApp(this IInteropWindow interopWindow)
+		{
+			return AppWindowsClass.Equals(interopWindow.GetClassname());
+		}
+
+		/// <summary>
+		///     Test if this window is for the App-Launcher
+		/// </summary>
+		public static bool IsAppLauncher(this IInteropWindow interopWindow)
+		{
+			return ApplauncherClass.Equals(interopWindow.GetClassname());
+		}
+
+		/// <summary>
+		///     Check if the window is the metro gutter (sizeable separator)
+		/// </summary>
+		public static bool IsGutter(this IInteropWindow interopWindow)
+		{
+			return GutterClass.Equals(interopWindow.GetClassname());
+		}
+
+		/// <summary>
+		///     Check if this window is the window of a metro app
+		/// </summary>
+		public static bool IsMetroApp(this IInteropWindow interopWindow)
+		{
+			return interopWindow.IsAppLauncher() || interopWindow.IsWin8App();
+		}
+
+		/// <summary>
+		///     This checks if the window is a Windows 10 App
+		///     For Windows 10 apps are hosted inside "ApplicationFrameWindow"
+		/// </summary>
+		public static bool IsWin10App(this IInteropWindow interopWindow)
+		{
+			return W10AppWindowClass.Equals(interopWindow.GetClassname());
+		}
+
+		/// <summary>
+		///     This checks if the window is a Windows 8 App
+		///     For Windows 10 most normal code works, as it's hosted inside "ApplicationFrameWindow"
+		/// </summary>
+		public static bool IsWin8App(this IInteropWindow interopWindow)
+		{
+			return W8AppWindowClass.Equals(interopWindow.GetClassname());
 		}
 	}
 }

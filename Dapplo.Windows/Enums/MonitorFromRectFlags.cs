@@ -28,21 +28,24 @@ using System;
 namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	///     Flags for the MonitorFromRect "flags" field, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145063(v=vs.85).aspx">MonitorFromRect function</a>
+	///     Flags for the MonitorFromRect "flags" field, see
+	///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145063(v=vs.85).aspx">MonitorFromRect function</a>
 	/// </summary>
 	[Flags]
 	public enum MonitorFromRectFlags : uint
 	{
 		/// <summary>
-		/// Returns a handle to the display monitor that is nearest to the rectangle.
+		///     Returns a handle to the display monitor that is nearest to the rectangle.
 		/// </summary>
 		DefaultToNearest = 0,
+
 		/// <summary>
-		/// Returns NULL. (why??)
+		///     Returns NULL. (why??)
 		/// </summary>
 		DefaultToNull = 1,
+
 		/// <summary>
-		/// Returns a handle to the primary display monitor.
+		///     Returns a handle to the primary display monitor.
 		/// </summary>
 		DefaultToPrimary = 2
 	}

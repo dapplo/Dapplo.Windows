@@ -25,11 +25,9 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Xunit;
-using Xunit.Abstractions;
-using System.Windows.Forms;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Reactive;
+using Xunit.Abstractions;
 
 #endregion
 

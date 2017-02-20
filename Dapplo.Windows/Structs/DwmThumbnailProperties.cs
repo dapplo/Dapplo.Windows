@@ -1,29 +1,25 @@
-﻿#region Dapplo 2017 - GNU Lesser General Public License
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2017 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-// Dapplo - building blocks for .NET applications
-// Copyright (C) 2017 Dapplo
-// 
-// For more information see: http://dapplo.net/
-// Dapplo repositories are hosted on GitHub: https://github.com/dapplo
-// 
-// This file is part of Dapplo.Windows
-// 
-// Dapplo.Windows is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// Dapplo.Windows is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have a copy of the GNU Lesser General Public License
-// along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
-
-#endregion
-
-#region Usings
+#region using
 
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Enums;
@@ -40,27 +36,33 @@ namespace Dapplo.Windows.Structs
 	public struct DwmThumbnailProperties
 	{
 		/// <summary>
-		/// A bitwise combination of DWM thumbnail constant values that indicates which members of this structure are set.
+		///     A bitwise combination of DWM thumbnail constant values that indicates which members of this structure are set.
 		/// </summary>
 		public DwmThumbnailPropertyFlags dwFlags;
+
 		/// <summary>
-		/// The area in the destination window where the thumbnail will be rendered.
+		///     The area in the destination window where the thumbnail will be rendered.
 		/// </summary>
 		public RECT rcDestination;
+
 		/// <summary>
-		/// The region of the source window to use as the thumbnail. By default, the entire window is used as the thumbnail.
+		///     The region of the source window to use as the thumbnail. By default, the entire window is used as the thumbnail.
 		/// </summary>
 		public RECT rcSource;
+
 		/// <summary>
-		/// The opacity with which to render the thumbnail. 0 is fully transparent while 255 is fully opaque. The default value is 255.
+		///     The opacity with which to render the thumbnail. 0 is fully transparent while 255 is fully opaque. The default value
+		///     is 255.
 		/// </summary>
 		public byte opacity;
+
 		/// <summary>
-		/// TRUE to make the thumbnail visible; otherwise, FALSE. The default is FALSE.
+		///     TRUE to make the thumbnail visible; otherwise, FALSE. The default is FALSE.
 		/// </summary>
 		public bool fVisible;
+
 		/// <summary>
-		/// TRUE to use only the thumbnail source's client area; otherwise, FALSE. The default is FALSE.
+		///     TRUE to use only the thumbnail source's client area; otherwise, FALSE. The default is FALSE.
 		/// </summary>
 		public bool fSourceClientAreaOnly;
 

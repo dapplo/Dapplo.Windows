@@ -35,7 +35,7 @@ namespace Dapplo.Windows.Interop
 	public interface IDisposableCom<out T> : IDisposable
 	{
 		/// <summary>
-		/// The actual com object
+		///     The actual com object
 		/// </summary>
 		T ComObject { get; }
 	}

@@ -1,29 +1,25 @@
-﻿#region Dapplo 2017 - GNU Lesser General Public License
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2017 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-// Dapplo - building blocks for .NET applications
-// Copyright (C) 2017 Dapplo
-// 
-// For more information see: http://dapplo.net/
-// Dapplo repositories are hosted on GitHub: https://github.com/dapplo
-// 
-// This file is part of Dapplo.Windows
-// 
-// Dapplo.Windows is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// Dapplo.Windows is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have a copy of the GNU Lesser General Public License
-// along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
-
-#endregion
-
-#region Usings
+#region using
 
 using System;
 using System.Runtime.InteropServices;
@@ -34,7 +30,8 @@ using Dapplo.Windows.Enums;
 namespace Dapplo.Windows.Structs
 {
 	/// <summary>
-	///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787535(v=vs.85).aspx">SCROLLBARINFO structure</a>
+	///     See
+	///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787535(v=vs.85).aspx">SCROLLBARINFO structure</a>
 	/// </summary>
 	[Serializable]
 	[StructLayout(LayoutKind.Sequential)]
@@ -51,30 +48,30 @@ namespace Dapplo.Windows.Structs
 		public RECT rcScrollBar;
 
 		/// <summary>
-		///    Height or width of the thumb.
+		///     Height or width of the thumb.
 		/// </summary>
 		public int dxyLineButton;
 
 		/// <summary>
-		///    Position of the bottom or right of the thumb.
+		///     Position of the bottom or right of the thumb.
 		/// </summary>
 		public int xyThumbBottom;
 
 		/// <summary>
-		///    Position of the top or left of the thumb.
+		///     Position of the top or left of the thumb.
 		/// </summary>
 		public int xyThumbTop;
 
 		/// <summary>
-		///    Reserved.
+		///     Reserved.
 		/// </summary>
 		public int reserved;
 
 		/// <summary>
-		///    An array of DWORD elements. Each element indicates the state of a scroll bar component, the element is specified via the ScrollBarStateIndexes.
+		///     An array of DWORD elements. Each element indicates the state of a scroll bar component, the element is specified
+		///     via the ScrollBarStateIndexes.
 		/// </summary>
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
-		public ObjectStates[] states;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)] public ObjectStates[] states;
 
 		/// <inheritdoc />
 		public override string ToString()
@@ -84,7 +81,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Create a ScrollInfo struct with the specified mask
+		///     Create a ScrollInfo struct with the specified mask
 		/// </summary>
 		public ScrollBarInfo(bool? dummy = false)
 		{

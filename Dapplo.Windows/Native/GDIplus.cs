@@ -234,7 +234,6 @@ namespace Dapplo.Windows.Native
 						{
 							Log.Error().WriteLine("Couldn't delete effect: {0}", status);
 						}
-
 					}
 					if (hBlurParams != IntPtr.Zero)
 					{
@@ -322,8 +321,9 @@ namespace Dapplo.Windows.Native
 		}
 
 		/// <summary>
-		/// Returns if a GDIPlus blur can be made for the supplied radius.
-		/// This accounts for the "bug" I reported here: http://social.technet.microsoft.com/Forums/en/w8itprogeneral/thread/99ddbe9d-556d-475a-8bab-84e25aa13a2c
+		///     Returns if a GDIPlus blur can be made for the supplied radius.
+		///     This accounts for the "bug" I reported here:
+		///     http://social.technet.microsoft.com/Forums/en/w8itprogeneral/thread/99ddbe9d-556d-475a-8bab-84e25aa13a2c
 		/// </summary>
 		/// <param name="radius"></param>
 		/// <returns>false if blur is not possible</returns>

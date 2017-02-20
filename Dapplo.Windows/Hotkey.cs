@@ -69,7 +69,7 @@ namespace Dapplo.Windows
 	}
 
 	/// <summary>
-	/// Some code to help with hotkeys
+	///     Some code to help with hotkeys
 	/// </summary>
 	public class Hotkey
 	{
@@ -238,7 +238,7 @@ namespace Dapplo.Windows
 			{
 				hotkeyString.Append(GetKeyName(Keys.Shift)).Append(" + ");
 			}
-			if ((modifierKeyCode == Keys.LWin) || (modifierKeyCode == Keys.RWin))
+			if (modifierKeyCode == Keys.LWin || modifierKeyCode == Keys.RWin)
 			{
 				hotkeyString.Append("Win").Append(" + ");
 			}
@@ -265,7 +265,7 @@ namespace Dapplo.Windows
 			{
 				hotkeyString.Append("Shift").Append(" + ");
 			}
-			if ((modifierKeyCode == Keys.LWin) || (modifierKeyCode == Keys.RWin))
+			if (modifierKeyCode == Keys.LWin || modifierKeyCode == Keys.RWin)
 			{
 				hotkeyString.Append("Win").Append(" + ");
 			}

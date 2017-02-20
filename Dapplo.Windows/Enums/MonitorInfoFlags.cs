@@ -19,18 +19,22 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#region using
+
 using System;
+
+#endregion
 
 namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	/// A set of flags that represent attributes of the display monitor.
+	///     A set of flags that represent attributes of the display monitor.
 	/// </summary>
 	[Flags]
 	public enum MonitorInfoFlags
 	{
 		/// <summary>
-		/// This is the primary display monitor.
+		///     This is the primary display monitor.
 		/// </summary>
 		Primary = 1
 	}

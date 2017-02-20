@@ -21,17 +21,11 @@
 
 #region using
 
-using System.Diagnostics;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Native;
 using Xunit;
 using Xunit.Abstractions;
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Enums;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.Structs;
 
 #endregion
 
@@ -47,7 +41,7 @@ namespace Dapplo.Windows.Tests
 		}
 
 		/// <summary>
-		/// Test is Dwm is Enabled
+		///     Test is Dwm is Enabled
 		/// </summary>
 		/// <returns></returns>
 		//[Fact]

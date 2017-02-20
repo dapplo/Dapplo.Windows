@@ -21,20 +21,14 @@
 
 #region using
 
-using System.Collections;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Dapplo.Log;
-using Dapplo.Log.Loggers;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Desktop;
 using Xunit;
 using Xunit.Abstractions;
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.Structs;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 #endregion
 
@@ -50,32 +44,13 @@ namespace Dapplo.Windows.Tests
 		}
 
 		/// <summary>
-		/// Test GetWindow
-		/// </summary>
-		/// <returns></returns>
-		[Fact]
-		private void TestGetTopLevelWindows()
-		{
-			bool foundWindow = false;
-			foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()))
-			{
-				foundWindow = true;
-
-				Log.Debug().WriteLine("{0}", window.Dump());
-				break;
-
-			}
-			Assert.True(foundWindow);
-		}
-
-		/// <summary>
-		/// Test GetWindow
+		///     Test GetWindow
 		/// </summary>
 		/// <returns></returns>
 		//[Fact]
 		private void TestDetectChanges()
 		{
-			bool foundWindow = false;
+			var foundWindow = false;
 			IList<IInteropWindow> initialWindows = InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()).ToList();
 
 			while (true)
@@ -90,6 +65,24 @@ namespace Dapplo.Windows.Tests
 				}
 			}
 
+			Assert.True(foundWindow);
+		}
+
+		/// <summary>
+		///     Test GetWindow
+		/// </summary>
+		/// <returns></returns>
+		[Fact]
+		private void TestGetTopLevelWindows()
+		{
+			var foundWindow = false;
+			foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()))
+			{
+				foundWindow = true;
+
+				Log.Debug().WriteLine("{0}", window.Dump());
+				break;
+			}
 			Assert.True(foundWindow);
 		}
 	}

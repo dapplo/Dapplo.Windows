@@ -1,95 +1,139 @@
-﻿using System;
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2017 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
+
+#region using
+
+using System;
+
+#endregion
 
 namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	/// These flags define which values are retrieved and if they are cached or not
+	///     These flags define which values are retrieved and if they are cached or not
 	/// </summary>
 	[Flags]
 	public enum InteropWindowCacheFlags : uint
 	{
 		/// <summary>
-		/// 
 		/// </summary>
 		None = 0,
+
 		/// <summary>
-		/// Forces an update of the specified flags.
+		///     Forces an update of the specified flags.
 		/// </summary>
 		ForceUpdate = 1 << 0,
+
 		/// <summary>
-		/// Retrieve the bounds
+		///     Retrieve the bounds
 		/// </summary>
 		Bounds = 1 << 1,
+
 		/// <summary>
-		/// Retrieve the client bounds
+		///     Retrieve the client bounds
 		/// </summary>
 		ClientBounds = 1 << 2,
+
 		/// <summary>
-		/// Retrieve the caption
+		///     Retrieve the caption
 		/// </summary>
 		Caption = 1 << 3,
+
 		/// <summary>
-		/// Retrieve the class name
+		///     Retrieve the class name
 		/// </summary>
 		Classname = 1 << 4,
+
 		/// <summary>
-		/// Retrieve the extended style
+		///     Retrieve the extended style
 		/// </summary>
 		ExtendedStyle = 1 << 5,
+
 		/// <summary>
-		/// Retrieve the style
+		///     Retrieve the style
 		/// </summary>
 		Style = 1 << 6,
+
 		/// <summary>
-		/// Retrieve the matching process id
+		///     Retrieve the matching process id
 		/// </summary>
 		ProcessId = 1 << 7,
+
 		/// <summary>
-		/// Retrieve the parent
+		///     Retrieve the parent
 		/// </summary>
 		Parent = 1 << 8,
+
 		/// <summary>
-		/// Retrieve the placement
+		///     Retrieve the placement
 		/// </summary>
 		Placement = 1 << 9,
+
 		/// <summary>
-		/// Retrieve the is visible
+		///     Retrieve the is visible
 		/// </summary>
 		Visible = 1 << 10,
+
 		/// <summary>
-		/// Retrieve the zoom state (maximized)
+		///     Retrieve the zoom state (maximized)
 		/// </summary>
 		Maximized = 1 << 11,
+
 		/// <summary>
-		/// Retrieve the icon state (minimized)
+		///     Retrieve the icon state (minimized)
 		/// </summary>
 		Minimized = 1 << 12,
+
 		/// <summary>
-		/// Retrieve the text
+		///     Retrieve the text
 		/// </summary>
 		Text = 1 << 13,
+
 		/// <summary>
-		/// Retrieve the scroll info
+		///     Retrieve the scroll info
 		/// </summary>
 		ScrollInfo = 1 << 14,
+
 		/// <summary>
-		/// Retrieve the children
+		///     Retrieve the children
 		/// </summary>
 		Children = 1 << 15,
+
 		/// <summary>
-		/// Retrieve the children by zorder
+		///     Retrieve the children by zorder
 		/// </summary>
 		ZOrderedChildren = 1 << 16,
+
 		/// <summary>
-		/// Cache all, except children, don't force reloading
+		///     Cache all, except children, don't force reloading
 		/// </summary>
-		CacheAll = Bounds | Caption | Classname | ClientBounds | ExtendedStyle | Maximized |Minimized | Parent | Placement | ProcessId | Style | Text | Visible | ScrollInfo,
+		CacheAll = Bounds | Caption | Classname | ClientBounds | ExtendedStyle | Maximized | Minimized | Parent | Placement | ProcessId | Style | Text | Visible | ScrollInfo,
+
 		/// <summary>
-		/// Cache all, with children, don't force reloading
+		///     Cache all, with children, don't force reloading
 		/// </summary>
 		CacheAllWithChildren = Children | Bounds | Caption | Classname | ClientBounds | ExtendedStyle | Maximized | Minimized | Parent | Placement | ProcessId | Style | Text | Visible | ScrollInfo,
+
 		/// <summary>
-		/// Cache all, don't force reloading
+		///     Cache all, don't force reloading
 		/// </summary>
 		CacheAllChildZorder = ZOrderedChildren | Bounds | Caption | Classname | ClientBounds | ExtendedStyle | Maximized | Minimized | Parent | Placement | ProcessId | Style | Text | Visible | ScrollInfo
 	}

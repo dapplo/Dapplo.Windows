@@ -23,7 +23,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Windows;
 using System.Windows.Media;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
@@ -47,6 +46,18 @@ namespace Dapplo.Windows.Native
 		/// <summary>
 		///     Return the AERO Color
 		/// </summary>
+		public static Color ColorizationColor
+		{
+			get
+			{
+				var color = ColorizationSystemDrawingColor;
+				return Color.FromArgb(color.A, color.R, color.G, color.B);
+			}
+		}
+
+		/// <summary>
+		///     Return the AERO Color
+		/// </summary>
 		public static System.Drawing.Color ColorizationSystemDrawingColor
 		{
 			get
@@ -56,22 +67,10 @@ namespace Dapplo.Windows.Native
 					var dwordValue = key?.GetValue("ColorizationColor");
 					if (dwordValue != null)
 					{
-						return System.Drawing.Color.FromArgb((int)dwordValue);
+						return System.Drawing.Color.FromArgb((int) dwordValue);
 					}
 				}
 				return System.Drawing.Color.White;
-			}
-		}
-
-		/// <summary>
-		///     Return the AERO Color
-		/// </summary>
-		public static Color ColorizationColor
-		{
-			get
-			{
-				var color = ColorizationSystemDrawingColor;
-				return Color.FromArgb(color.A, color.R, color.G, color.B);
 			}
 		}
 
@@ -86,7 +85,7 @@ namespace Dapplo.Windows.Native
 				// According to: http://technet.microsoft.com/en-us/subscriptions/aa969538%28v=vs.85%29.aspx
 				// And: http://msdn.microsoft.com/en-us/library/windows/desktop/aa969510%28v=vs.85%29.aspx
 				// DMW is always enabled on Windows 8! So return true and save a check! ;-)
-				if ((Environment.OSVersion.Version.Major == 6) && (Environment.OSVersion.Version.Minor == 2))
+				if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 2)
 				{
 					return true;
 				}
@@ -101,19 +100,11 @@ namespace Dapplo.Windows.Native
 		}
 
 		/// <summary>
-		/// Disable composition
+		///     Disable composition
 		/// </summary>
 		public static void DisableComposition()
 		{
 			DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
-		}
-
-		/// <summary>
-		/// Enable compostion
-		/// </summary>
-		public static void EnableComposition()
-		{
-			DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 		}
 
 		[DllImport("dwmapi.dll", SetLastError = true)]
@@ -129,6 +120,9 @@ namespace Dapplo.Windows.Native
 		[DllImport("dwmapi.dll", SetLastError = true)]
 		public static extern int DwmIsCompositionEnabled([MarshalAs(UnmanagedType.Bool)] out bool enabled);
 
+		[DllImport("dwmapi.dll", EntryPoint = "#113", SetLastError = true)]
+		internal static extern uint DwmpActivateLivePreview(uint a, IntPtr b, uint c, uint d);
+
 		[DllImport("dwmapi.dll", SetLastError = true)]
 		public static extern int DwmQueryThumbnailSourceSize(IntPtr thumb, out SIZE size);
 
@@ -141,16 +135,13 @@ namespace Dapplo.Windows.Native
 		[DllImport("dwmapi.dll", SetLastError = true)]
 		public static extern int DwmUpdateThumbnailProperties(IntPtr hThumb, ref DwmThumbnailProperties props);
 
-		[PreserveSig]
-		[DllImport("dwmapi.dll", EntryPoint = "#101", SetLastError = true)]
-		public static extern int UpdateWindowShared(IntPtr hWnd, int one, int two, int three, IntPtr hMonitor, IntPtr unknown);
-
-		[PreserveSig]
-		[DllImport("dwmapi.dll", EntryPoint = "#100", SetLastError = true)]
-		public static extern int GetSharedSurface(IntPtr hWnd, Int64 adapterLuid, uint one, uint two, [In, Out]ref uint pD3DFormat, [Out]out IntPtr pSharedHandle, UInt64 unknown);
-
-		[DllImport("dwmapi.dll", EntryPoint = "#113", SetLastError = true)]
-		internal static extern uint DwmpActivateLivePreview(uint a, IntPtr b, uint c, uint d);
+		/// <summary>
+		///     Enable compostion
+		/// </summary>
+		public static void EnableComposition()
+		{
+			DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+		}
 
 		/// <summary>
 		///     Helper method to get the window size for DWM Windows
@@ -170,5 +161,13 @@ namespace Dapplo.Windows.Native
 			rectangle = RECT.Empty;
 			return false;
 		}
+
+		[PreserveSig]
+		[DllImport("dwmapi.dll", EntryPoint = "#100", SetLastError = true)]
+		public static extern int GetSharedSurface(IntPtr hWnd, long adapterLuid, uint one, uint two, [In] [Out] ref uint pD3DFormat, [Out] out IntPtr pSharedHandle, ulong unknown);
+
+		[PreserveSig]
+		[DllImport("dwmapi.dll", EntryPoint = "#101", SetLastError = true)]
+		public static extern int UpdateWindowShared(IntPtr hWnd, int one, int two, int three, IntPtr hMonitor, IntPtr unknown);
 	}
 }

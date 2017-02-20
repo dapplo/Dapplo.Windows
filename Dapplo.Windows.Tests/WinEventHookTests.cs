@@ -21,22 +21,17 @@
 
 #region using
 
+using System;
 using System.Diagnostics;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Reactive;
 using Xunit;
 using Xunit.Abstractions;
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Enums;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.Structs;
-using System;
-using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
-using Dapplo.Log.Loggers;
-using Dapplo.Windows.Reactive;
 
 #endregion
 
@@ -52,7 +47,7 @@ namespace Dapplo.Windows.Tests
 		}
 
 		/// <summary>
-		/// Test typing in a notepad
+		///     Test typing in a notepad
 		/// </summary>
 		/// <returns></returns>
 		[StaFact]
@@ -64,14 +59,14 @@ namespace Dapplo.Windows.Tests
 			// This buffers the observable
 			var replaySubject = new ReplaySubject<IInteropWindow>();
 
-			var winEventObservable =  WinEventHook.WindowTileChangeObservable()
+			var winEventObservable = WinEventHook.WindowTileChangeObservable()
 				.Select(info => InteropWindowFactory.CreateFor(info.Handle).Fill())
 				.Where(info => !string.IsNullOrEmpty(info.Caption))
 				.Subscribe(windowInfo =>
-			{
-				Log.Debug().WriteLine("Window title change: Process ID {0} - Title: {1}", windowInfo.Handle, windowInfo.Caption);
-				replaySubject.OnNext(windowInfo);
-			});
+				{
+					Log.Debug().WriteLine("Window title change: Process ID {0} - Title: {1}", windowInfo.Handle, windowInfo.Caption);
+					replaySubject.OnNext(windowInfo);
+				});
 
 			// Start a process to test against
 			using (var process = Process.Start("notepad.exe"))

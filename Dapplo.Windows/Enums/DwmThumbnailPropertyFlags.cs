@@ -28,29 +28,33 @@ using System;
 namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	/// A flag to indicate which properties are set by the DwmUpdateThumbnailProperties method
+	///     A flag to indicate which properties are set by the DwmUpdateThumbnailProperties method
 	/// </summary>
 	[Flags]
 	public enum DwmThumbnailPropertyFlags
 	{
 		/// <summary>
-		/// A value for the rcDestination member has been specified.
+		///     A value for the rcDestination member has been specified.
 		/// </summary>
 		DWM_TNP_RECTDESTINATION = 0x00000001,
+
 		/// <summary>
-		/// A value for the rcSource member has been specified.
+		///     A value for the rcSource member has been specified.
 		/// </summary>
 		DWM_TNP_RECTSOURCE = 0x00000002,
+
 		/// <summary>
-		/// A value for the opacity member has been specified.
+		///     A value for the opacity member has been specified.
 		/// </summary>
 		DWM_TNP_OPACITY = 0x00000004,
+
 		/// <summary>
-		/// A value for the fVisible member has been specfied.
+		///     A value for the fVisible member has been specfied.
 		/// </summary>
 		DWM_TNP_VISIBLE = 0x00000008,
+
 		/// <summary>
-		/// A value for the fSourceClientAreaOnly member has been specified.
+		///     A value for the fSourceClientAreaOnly member has been specified.
 		/// </summary>
 		DWM_TNP_SOURCECLIENTAREAONLY = 0x00000010
 	}

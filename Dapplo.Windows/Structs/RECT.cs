@@ -1,29 +1,25 @@
-﻿#region Dapplo 2017 - GNU Lesser General Public License
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2017 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-// Dapplo - building blocks for .NET applications
-// Copyright (C) 2017 Dapplo
-// 
-// For more information see: http://dapplo.net/
-// Dapplo repositories are hosted on GitHub: https://github.com/dapplo
-// 
-// This file is part of Dapplo.Windows
-// 
-// Dapplo.Windows is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// Dapplo.Windows is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have a copy of the GNU Lesser General Public License
-// along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
-
-#endregion
-
-#region Usings
+#region using
 
 using System;
 using System.Drawing;
@@ -47,7 +43,7 @@ namespace Dapplo.Windows.Structs
 		private int _bottom;
 
 		/// <summary>
-		/// Constructor from left, right, top, bottom
+		///     Constructor from left, right, top, bottom
 		/// </summary>
 		/// <param name="left">int</param>
 		/// <param name="top">int</param>
@@ -62,7 +58,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Constructor from location and size
+		///     Constructor from location and size
 		/// </summary>
 		/// <param name="location">POINT</param>
 		/// <param name="size">SIZE</param>
@@ -75,7 +71,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Constructor from left, right and size
+		///     Constructor from left, right and size
 		/// </summary>
 		/// <param name="left">int</param>
 		/// <param name="top">int</param>
@@ -85,7 +81,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// X value
+		///     X value
 		/// </summary>
 		public int X
 		{
@@ -94,7 +90,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// X location of the rectangle
+		///     X location of the rectangle
 		/// </summary>
 		public int Y
 		{
@@ -103,7 +99,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Left value of the rectangle
+		///     Left value of the rectangle
 		/// </summary>
 		public int Left
 		{
@@ -112,7 +108,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Top of the rectangle
+		///     Top of the rectangle
 		/// </summary>
 		public int Top
 		{
@@ -121,7 +117,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Right of the rectangle
+		///     Right of the rectangle
 		/// </summary>
 		public int Right
 		{
@@ -130,7 +126,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Bottom of the rectangle
+		///     Bottom of the rectangle
 		/// </summary>
 		public int Bottom
 		{
@@ -167,22 +163,22 @@ namespace Dapplo.Windows.Structs
 		public SIZE Size => new SIZE(Width, Height);
 
 		/// <summary>
-		/// Coordinates of the bottom left
+		///     Coordinates of the bottom left
 		/// </summary>
 		public POINT BottomLeft => new POINT(X, Y + Height);
 
 		/// <summary>
-		/// Coordinates of the top left
+		///     Coordinates of the top left
 		/// </summary>
 		public POINT TopLeft => new POINT(X, Y);
 
 		/// <summary>
-		/// Coordinates of the bottom right
+		///     Coordinates of the bottom right
 		/// </summary>
 		public POINT BottomRight => new POINT(X + Width, Y + Height);
 
 		/// <summary>
-		/// Coordinates of the top right
+		///     Coordinates of the top right
 		/// </summary>
 		public POINT TopRight => new POINT(X + Width, Y);
 
@@ -238,7 +234,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Not is operator
+		///     Not is operator
 		/// </summary>
 		/// <param name="rectangle1"></param>
 		/// <param name="rectangle2"></param>
@@ -261,7 +257,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Equalss
+		///     Equalss
 		/// </summary>
 		/// <param name="rectangle"></param>
 		/// <returns>bool</returns>
@@ -271,33 +267,33 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Checks if this RECT is empty
+		///     Checks if this RECT is empty
 		/// </summary>
 		/// <returns>true when empty</returns>
 		public bool IsEmpty => Width * Height == 0;
-		
+
 		/// <inheritdoc />
 		public override bool Equals(object obj)
 		{
 			if (obj is RECT)
 			{
-				return Equals((RECT)obj);
+				return Equals((RECT) obj);
 			}
 			if (obj is Rect)
 			{
-				RECT rect = (Rect)obj;
+				RECT rect = (Rect) obj;
 				return Equals(rect);
 			}
 			if (obj is Rectangle)
 			{
-				RECT rect = (Rectangle)obj;
+				RECT rect = (Rectangle) obj;
 				return Equals(rect);
 			}
 			return false;
 		}
 
 		/// <summary>
-		/// Empty RECT
+		///     Empty RECT
 		/// </summary>
 		public static RECT Empty => new RECT();
 	}

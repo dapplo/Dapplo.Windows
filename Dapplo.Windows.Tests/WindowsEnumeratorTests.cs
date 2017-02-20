@@ -26,12 +26,12 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Desktop;
 using Xunit;
 using Xunit.Abstractions;
-using System.Windows.Forms;
-using Dapplo.Windows.Desktop;
 
 #endregion
 
@@ -66,13 +66,6 @@ namespace Dapplo.Windows.Tests
 		}
 
 		[StaFact]
-		private async Task EnumerateWindowsAsync_Take10()
-		{
-			var windows = await WindowsEnumerator.EnumerateWindowsAsync().Take(10).ToList().ToTask().ConfigureAwait(false);
-			Assert.True(windows.Count == 10);
-		}
-
-		[StaFact]
 		private async Task EnumerateWindowsAsync_Find()
 		{
 			var textValue = Guid.NewGuid().ToString();
@@ -89,6 +82,13 @@ namespace Dapplo.Windows.Tests
 			var window = await WindowsEnumerator.EnumerateWindowsAsync().Where(info => info.Fill().Caption.Contains(textValue)).FirstOrDefaultAsync();
 
 			Assert.NotNull(window);
+		}
+
+		[StaFact]
+		private async Task EnumerateWindowsAsync_Take10()
+		{
+			var windows = await WindowsEnumerator.EnumerateWindowsAsync().Take(10).ToList().ToTask().ConfigureAwait(false);
+			Assert.True(windows.Count == 10);
 		}
 	}
 }

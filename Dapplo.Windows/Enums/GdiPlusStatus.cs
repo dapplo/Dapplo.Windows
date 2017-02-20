@@ -29,7 +29,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Dapplo.Windows.Enums
 {
 	/// <summary>
-	/// Status result for GDI+ calls
+	///     Status result for GDI+ calls
 	/// </summary>
 	[Flags]
 	[SuppressMessage("ReSharper", "UnusedMember.Global")]

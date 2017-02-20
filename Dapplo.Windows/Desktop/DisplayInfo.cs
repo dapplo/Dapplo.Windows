@@ -27,7 +27,6 @@ using System.Windows;
 using Dapplo.Windows.Extensions;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
-using Point = System.Windows.Point;
 
 #endregion
 
@@ -79,28 +78,6 @@ namespace Dapplo.Windows.Desktop
 		public Rectangle WorkingAreaRectangle { get; set; }
 
 		/// <summary>
-		///		 Implementation like <a href="https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx">Screen.GetBounds</a>
-		/// </summary>
-		/// <param name="point"></param>
-		/// <returns></returns>
-		public static RECT GetBounds(POINT point)
-		{
-			DisplayInfo returnValue = null;
-			foreach (var display in User32.AllDisplays())
-			{
-				if (display.IsPrimary && (returnValue == null))
-				{
-					returnValue = display;
-				}
-				if (display.Bounds.Contains(point))
-				{
-					returnValue = display;
-				}
-			}
-			return returnValue?.Bounds ?? Rect.Empty;
-		}
-
-		/// <summary>
 		///     Get the bounds of the complete screen
 		/// </summary>
 		/// <returns></returns>
@@ -117,6 +94,28 @@ namespace Dapplo.Windows.Desktop
 				bottom = Math.Max(bottom, screenAbsBottom);
 			}
 			return new RECT(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
+		}
+
+		/// <summary>
+		///     Implementation like <a href="https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx">Screen.GetBounds</a>
+		/// </summary>
+		/// <param name="point"></param>
+		/// <returns></returns>
+		public static RECT GetBounds(POINT point)
+		{
+			DisplayInfo returnValue = null;
+			foreach (var display in User32.AllDisplays())
+			{
+				if (display.IsPrimary && returnValue == null)
+				{
+					returnValue = display;
+				}
+				if (display.Bounds.Contains(point))
+				{
+					returnValue = display;
+				}
+			}
+			return returnValue?.Bounds ?? Rect.Empty;
 		}
 	}
 }

@@ -1,29 +1,25 @@
-﻿#region Dapplo 2017 - GNU Lesser General Public License
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2017 Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-// Dapplo - building blocks for .NET applications
-// Copyright (C) 2017 Dapplo
-// 
-// For more information see: http://dapplo.net/
-// Dapplo repositories are hosted on GitHub: https://github.com/dapplo
-// 
-// This file is part of Dapplo.Windows
-// 
-// Dapplo.Windows is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// Dapplo.Windows is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have a copy of the GNU Lesser General Public License
-// along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
-
-#endregion
-
-#region Usings
+#region using
 
 using System;
 using System.Runtime.InteropServices;
@@ -34,7 +30,7 @@ using System.Windows;
 namespace Dapplo.Windows.Structs
 {
 	/// <summary>
-	/// This structure should be used everywhere where native methods need a size struct.
+	///     This structure should be used everywhere where native methods need a size struct.
 	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	[Serializable]
@@ -44,42 +40,30 @@ namespace Dapplo.Windows.Structs
 		private int _height;
 
 		/// <summary>
-		/// The Width of the size struct
+		///     The Width of the size struct
 		/// </summary>
 		public int Width
 		{
-			get
-			{
-				return _width;
-			}
-			set
-			{
-				_width = value;
-			}
+			get { return _width; }
+			set { _width = value; }
 		}
 
 		/// <summary>
-		/// The Width of the size struct
+		///     The Width of the size struct
 		/// </summary>
 		public int Height
 		{
-			get
-			{
-				return _height;
-			}
-			set
-			{
-				_height = value;
-			}
+			get { return _height; }
+			set { _height = value; }
 		}
 
 		/// <summary>
-		/// Returns an empty size
+		///     Returns an empty size
 		/// </summary>
 		public static SIZE Empty => new SIZE(0, 0);
 
 		/// <summary>
-		/// Constructor from S.W.Size
+		///     Constructor from S.W.Size
 		/// </summary>
 		/// <param name="size"></param>
 		public SIZE(Size size)
@@ -88,7 +72,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Constructor from S.D.Size
+		///     Constructor from S.D.Size
 		/// </summary>
 		/// <param name="size"></param>
 		public SIZE(System.Drawing.Size size) : this(size.Width, size.Height)
@@ -96,7 +80,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Size contructor
+		///     Size contructor
 		/// </summary>
 		/// <param name="width">int</param>
 		/// <param name="height">int</param>
@@ -107,13 +91,13 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Checks if the width * height are 0
+		///     Checks if the width * height are 0
 		/// </summary>
 		/// <returns>true if the size is empty</returns>
 		public bool IsEmpty => _width * _height == 0;
 
 		/// <summary>
-		/// Implicit cast from SIZE to Size
+		///     Implicit cast from SIZE to Size
 		/// </summary>
 		/// <param name="size">SIZE</param>
 		public static implicit operator Size(SIZE size)
@@ -122,16 +106,16 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Implicit cast from Size to SIZE
+		///     Implicit cast from Size to SIZE
 		/// </summary>
 		/// <param name="size">Size</param>
 		public static implicit operator SIZE(Size size)
 		{
-			return new SIZE((int)size.Width, (int)size.Height);
+			return new SIZE((int) size.Width, (int) size.Height);
 		}
 
 		/// <summary>
-		/// Implicit cast from SIZE to System.Drawing.Size
+		///     Implicit cast from SIZE to System.Drawing.Size
 		/// </summary>
 		/// <param name="size">SIZE</param>
 		public static implicit operator System.Drawing.Size(SIZE size)
@@ -140,7 +124,7 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		/// Implicit cast from System.Drawing.Size to SIZE
+		///     Implicit cast from System.Drawing.Size to SIZE
 		/// </summary>
 		/// <param name="size">System.Drawing.Size</param>
 		public static implicit operator SIZE(System.Drawing.Size size)
