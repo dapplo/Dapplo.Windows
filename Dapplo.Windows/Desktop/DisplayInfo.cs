@@ -24,6 +24,7 @@
 using System;
 using System.Drawing;
 using System.Windows;
+using Dapplo.Windows.Extensions;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
 using Point = System.Windows.Point;

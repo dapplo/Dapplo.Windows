@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Extensions;
 using Dapplo.Windows.Interop;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;

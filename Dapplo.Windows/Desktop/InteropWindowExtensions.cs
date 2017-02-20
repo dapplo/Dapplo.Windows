@@ -1,4 +1,4 @@
-﻿#region Dapplo 2016 - GNU Lesser General Public License
+﻿#region Dapplo 2017 - GNU Lesser General Public License
 
 // Dapplo - building blocks for .NET applications
 // Copyright (C) 2017 Dapplo
@@ -33,6 +33,7 @@ using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
 using Dapplo.Windows.SafeHandles;
 using System.Threading.Tasks;
+using Dapplo.Windows.Extensions;
 
 #endregion
 
@@ -50,10 +51,10 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="cacheFlags">InteropWindowCacheFlags to specify which information is retrieved and what not</param>
 		public static IInteropWindow Fill(this IInteropWindow interopWindow, InteropWindowCacheFlags cacheFlags = InteropWindowCacheFlags.CacheAll)
 		{
-		    if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children) && cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
-		    {
-		        throw new ArgumentException("Can't have both Children & ZOrderedChildren", nameof(cacheFlags));
-		    }
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children) && cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
+			{
+				throw new ArgumentException("Can't have both Children & ZOrderedChildren", nameof(cacheFlags));
+			}
 			bool forceUpdate = cacheFlags.HasFlag(InteropWindowCacheFlags.ForceUpdate);
 
 			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Bounds))
@@ -553,5 +554,30 @@ namespace Dapplo.Windows.Desktop
 			return null;
 		}
 
+		/// <summary>
+		/// Returns if the IInteropWindow is docked to the left of the other IInteropWindow
+		/// </summary>
+		/// <param name="window1">IInteropWindow</param>
+		/// <param name="window2">IInteropWindow</param>
+		/// <param name="retrieveBoundsFunc">Function which returns the bounds for the IInteropWindow</param>
+		/// <returns>bool true if docked</returns>
+		public static bool IsDockedToLeft(this IInteropWindow window1, IInteropWindow window2, Func<IInteropWindow, RECT> retrieveBoundsFunc = null)
+		{
+			retrieveBoundsFunc = retrieveBoundsFunc ?? (window => window.GetBounds());
+			return retrieveBoundsFunc(window1).IsDockedToLeft(retrieveBoundsFunc(window2));
+		}
+
+		/// <summary>
+		/// Returns if the IInteropWindow is docked to the left of the other IInteropWindow
+		/// </summary>
+		/// <param name="window1">IInteropWindow</param>
+		/// <param name="window2">IInteropWindow</param>
+		/// <param name="retrieveBoundsFunc">Function which returns the bounds for the IInteropWindow</param>
+		/// <returns>bool true if docked</returns>
+		public static bool IsDockedToRight(this IInteropWindow window1, IInteropWindow window2, Func<IInteropWindow, RECT> retrieveBoundsFunc = null)
+		{
+			retrieveBoundsFunc = retrieveBoundsFunc ?? (window => window.GetBounds());
+			return retrieveBoundsFunc(window1).IsDockedToRight(retrieveBoundsFunc(window2));
+		}
 	}
 }

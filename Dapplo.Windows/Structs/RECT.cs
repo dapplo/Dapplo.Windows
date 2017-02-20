@@ -1,4 +1,4 @@
-﻿#region Dapplo 2016 - GNU Lesser General Public License
+﻿#region Dapplo 2017 - GNU Lesser General Public License
 
 // Dapplo - building blocks for .NET applications
 // Copyright (C) 2017 Dapplo
@@ -35,7 +35,7 @@ using System.Windows;
 namespace Dapplo.Windows.Structs
 {
 	/// <summary>
-	///     See: https://msdn.microsoft.com/en-us/library/windows/desktop/dd162897.aspx
+	///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd162897.aspx">RECT struct</a>
 	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	[Serializable]
@@ -59,6 +59,29 @@ namespace Dapplo.Windows.Structs
 			_top = top;
 			_right = right;
 			_bottom = bottom;
+		}
+
+		/// <summary>
+		/// Constructor from location and size
+		/// </summary>
+		/// <param name="location">POINT</param>
+		/// <param name="size">SIZE</param>
+		public RECT(POINT location, SIZE size)
+		{
+			_left = location.X;
+			_top = location.Y;
+			_right = _left + size.Width;
+			_bottom = _top + size.Height;
+		}
+
+		/// <summary>
+		/// Constructor from left, right and size
+		/// </summary>
+		/// <param name="left">int</param>
+		/// <param name="top">int</param>
+		/// <param name="size">SIZE</param>
+		public RECT(int left, int top, SIZE size) : this(new POINT(left, top), size)
+		{
 		}
 
 		/// <summary>
@@ -134,30 +157,34 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		///     Location for this RECT
+		///     Location (for this RECT
 		/// </summary>
-		public POINT Location
-		{
-			get { return new POINT(Left, Top); }
-			set
-			{
-				_left = value.X;
-				_top = value.Y;
-			}
-		}
+		public POINT Location => new POINT(Left, Top);
 
 		/// <summary>
 		///     Size for this RECT
 		/// </summary>
-		public SIZE Size
-		{
-			get { return new SIZE(Width, Height); }
-			set
-			{
-				_right = unchecked(value.Width + _left);
-				_bottom = unchecked(value.Height + _top);
-			}
-		}
+		public SIZE Size => new SIZE(Width, Height);
+
+		/// <summary>
+		/// Coordinates of the bottom left
+		/// </summary>
+		public POINT BottomLeft => new POINT(X, Y + Height);
+
+		/// <summary>
+		/// Coordinates of the top left
+		/// </summary>
+		public POINT TopLeft => new POINT(X, Y);
+
+		/// <summary>
+		/// Coordinates of the bottom right
+		/// </summary>
+		public POINT BottomRight => new POINT(X + Width, Y + Height);
+
+		/// <summary>
+		/// Coordinates of the top right
+		/// </summary>
+		public POINT TopRight => new POINT(X + Width, Y);
 
 		/// <summary>
 		///     Cast RECT to Rect
@@ -267,29 +294,6 @@ namespace Dapplo.Windows.Structs
 				return Equals(rect);
 			}
 			return false;
-		}
-
-		/// <summary>
-		/// Test if this RECT contains the specified POINT
-		/// </summary>
-		/// <param name="point">POINT</param>
-		/// <returns>true if it contains</returns>
-		public bool Contains(POINT point)
-		{
-			return point.X >= Left && point.X <= Right && point.Y >= Top && point.Y <= Bottom;
-		}
-
-		/// <summary>
-		/// Test if this RECT contains the specified RECT
-		/// </summary>
-		/// <param name="rect">RECT</param>
-		/// <returns>true if it is contained</returns>
-		public bool Contains(RECT rect)
-		{
-			return rect.Left >= Left && rect.Left <= Right
-				&& rect.Right <= Right && rect.Right >= Left
-				&& rect.Top >= Top && rect.Top <= Bottom
-				&& rect.Bottom >= Top && rect.Bottom <= Bottom;
 		}
 
 		/// <summary>

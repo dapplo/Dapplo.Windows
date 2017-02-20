@@ -1,4 +1,4 @@
-#region Dapplo 2016 - GNU Lesser General Public License
+#region Dapplo 2017 - GNU Lesser General Public License
 
 // Dapplo - building blocks for .NET applications
 // Copyright (C) 2017 Dapplo
