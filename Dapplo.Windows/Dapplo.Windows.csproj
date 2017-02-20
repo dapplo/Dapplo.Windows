@@ -87,6 +87,9 @@
     <Compile Include="Enums\ObjectStates.cs" />
     <Compile Include="Enums\ScrollBarStateIndexes.cs" />
     <Compile Include="Enums\ScrollBarCommands.cs" />
+    <Compile Include="Enums\WindowsProducts.cs" />
+    <Compile Include="Enums\WindowsProductTypes.cs" />
+    <Compile Include="Enums\WindowsSuites.cs" />
     <Compile Include="InputGenerator.cs" />
     <Compile Include="Enums\ExtendedKeyFlags.cs" />
     <Compile Include="Reactive\MouseHookEventArgs.cs" />
@@ -162,6 +165,7 @@
     <Compile Include="Structs\MonitorInfoEx.cs" />
     <Compile Include="Structs\MouseInput.cs" />
     <Compile Include="Structs\MouseLowLevelHookStruct.cs" />
+    <Compile Include="Structs\OsVersionInfoEx.cs" />
     <Compile Include="Structs\POINT.cs" />
     <Compile Include="Structs\RECTF.cs" />
     <Compile Include="Structs\RECT.cs" />

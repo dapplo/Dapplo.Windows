@@ -109,9 +109,10 @@ namespace Dapplo.Windows.Desktop
 		/// <summary>
 		/// Dump the information in the InteropWindow for debugging
 		/// </summary>
+		/// <param name="cacheFlags">InteropWindowCacheFlags to specify what to dump</param>
 		/// <param name="dump">StringBuilder to dump to</param>
 		/// <param name="indentation">int</param>
 		/// <returns>StringBuilder</returns>
-		StringBuilder Dump(StringBuilder dump = null, string indentation = "");
+		StringBuilder Dump(InteropWindowCacheFlags cacheFlags = InteropWindowCacheFlags.CacheAll, StringBuilder dump = null, string indentation = "");
 	}
 }

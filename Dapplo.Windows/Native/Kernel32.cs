@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016 Dapplo
+//  Copyright (C) 2016-2017 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -25,13 +25,14 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Structs;
 
 #endregion
 
 namespace Dapplo.Windows.Native
 {
 	/// <summary>
-	///     Description of Kernel32.
+	///     Kernel 32 functionality
 	/// </summary>
 	public class Kernel32
 	{
@@ -59,7 +60,7 @@ namespace Dapplo.Windows.Native
 		/// <returns></returns>
 		public static string GetProcessPath(int processid)
 		{
-			var _PathBuffer = new StringBuilder(512);
+			var pathBuffer = new StringBuilder(512);
 			// Try the GetModuleFileName method first since it's the fastest. 
 			// May return ACCESS_DENIED (due to VM_READ flag) if the process is not owned by the current user.
 			// Will fail if we are compiled as x86 and we're trying to open a 64 bit process...not allowed.
@@ -68,9 +69,9 @@ namespace Dapplo.Windows.Native
 			{
 				try
 				{
-					if (PsAPI.GetModuleFileNameEx(hprocess, IntPtr.Zero, _PathBuffer, (uint) _PathBuffer.Capacity) > 0)
+					if (PsAPI.GetModuleFileNameEx(hprocess, IntPtr.Zero, pathBuffer, (uint) pathBuffer.Capacity) > 0)
 					{
-						return _PathBuffer.ToString();
+						return pathBuffer.ToString();
 					}
 				}
 				finally
@@ -85,23 +86,23 @@ namespace Dapplo.Windows.Native
 				try
 				{
 					// Try this method for Vista or higher operating systems
-					var size = (uint) _PathBuffer.Capacity;
-					if ((Environment.OSVersion.Version.Major >= 6) && QueryFullProcessImageName(hprocess, 0, _PathBuffer, ref size) && (size > 0))
+					var size = (uint) pathBuffer.Capacity;
+					if ((Environment.OSVersion.Version.Major >= 6) && QueryFullProcessImageName(hprocess, 0, pathBuffer, ref size) && (size > 0))
 					{
-						return _PathBuffer.ToString();
+						return pathBuffer.ToString();
 					}
 
 					// Try the GetProcessImageFileName method
-					if (PsAPI.GetProcessImageFileName(hprocess, _PathBuffer, (uint) _PathBuffer.Capacity) > 0)
+					if (PsAPI.GetProcessImageFileName(hprocess, pathBuffer, (uint) pathBuffer.Capacity) > 0)
 					{
-						var dospath = _PathBuffer.ToString();
+						var dospath = pathBuffer.ToString();
 						foreach (var drive in Environment.GetLogicalDrives())
 						{
-							if (QueryDosDevice(drive.TrimEnd('\\'), _PathBuffer, (uint) _PathBuffer.Capacity) > 0)
+							if (QueryDosDevice(drive.TrimEnd('\\'), pathBuffer, (uint) pathBuffer.Capacity) > 0)
 							{
-								if (dospath.StartsWith(_PathBuffer.ToString()))
+								if (dospath.StartsWith(pathBuffer.ToString()))
 								{
-									return drive + dospath.Remove(0, _PathBuffer.Length);
+									return drive + dospath.Remove(0, pathBuffer.Length);
 								}
 							}
 						}
@@ -119,9 +120,6 @@ namespace Dapplo.Windows.Native
 		[DllImport("kernel32", SetLastError = true)]
 		public static extern IntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
 
-		[DllImport("kernel32", SetLastError = true)]
-		public static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwThreadId);
-
 		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
 		public static extern uint QueryDosDevice(string lpDeviceName, StringBuilder lpTargetPath, uint uuchMax);
 
@@ -129,10 +127,28 @@ namespace Dapplo.Windows.Native
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
 
-		[DllImport("kernel32", SetLastError = true)]
-		public static extern int ResumeThread(IntPtr hThread);
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724451(v=vs.85).aspx">GetVersionEx function</a>
+		/// </summary>
+		/// <param name="osVersionInfo">OsVersionInfoEx</param>
+		/// <returns>If the function fails, the return value is false. To get extended error information, call GetLastError.</returns>
+		[DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool GetVersionEx(ref OsVersionInfoEx osVersionInfo);
 
-		[DllImport("kernel32", SetLastError = true)]
-		public static extern uint SuspendThread(IntPtr hThread);
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724358.aspx">GetProductInfo function</a>
+		/// </summary>
+		/// <param name="osMajorVersion">The major version number of the operating system. The minimum value is 6.
+		///The combination of the dwOSMajorVersion, dwOSMinorVersion, dwSpMajorVersion, and dwSpMinorVersion parameters describes the maximum target operating system version for the application. For example, Windows Vista and Windows Server 2008 are version 6.0.0.0 and Windows 7 and Windows Server 2008 R2 are version 6.1.0.0.
+		/// </param>
+		/// <param name="osMinorVersion">The minor version number of the operating system. The minimum value is 0.</param>
+		/// <param name="spMajorVersion">The major version number of the operating system service pack. The minimum value is 0.</param>
+		/// <param name="spMinorVersion">The minor version number of the operating system service pack. The minimum value is 0.</param>
+		/// <param name="edition">WindowsProducts</param>
+		/// <returns></returns>
+		[DllImport("Kernel32")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		internal static extern bool GetProductInfo(int osMajorVersion, int osMinorVersion, int spMajorVersion, int spMinorVersion, out WindowsProducts edition);
 	}
 }

@@ -33,7 +33,6 @@ using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
 using Dapplo.Windows.SafeHandles;
 using System.Threading.Tasks;
-using Dapplo.Log;
 
 #endregion
 
@@ -44,70 +43,76 @@ namespace Dapplo.Windows.Desktop
 	/// </summary>
 	public static class InteropWindowExtensions
 	{
-		private static readonly LogSource Log = new LogSource();
-
 		/// <summary>
 		///     Fill ALL the information of the InteropWindow
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
-		/// <param name="flags">InteropWindowCacheFlags to specify which information is retrieved and what not</param>
-		public static IInteropWindow Fill(this IInteropWindow interopWindow, InteropWindowCacheFlags flags = InteropWindowCacheFlags.CacheAll)
+		/// <param name="cacheFlags">InteropWindowCacheFlags to specify which information is retrieved and what not</param>
+		public static IInteropWindow Fill(this IInteropWindow interopWindow, InteropWindowCacheFlags cacheFlags = InteropWindowCacheFlags.CacheAll)
 		{
-			bool forceUpdate = flags.HasFlag(InteropWindowCacheFlags.ForceUpdate);
+			bool forceUpdate = cacheFlags.HasFlag(InteropWindowCacheFlags.ForceUpdate);
 
-			if (flags.HasFlag(InteropWindowCacheFlags.Bounds))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Bounds))
 			{
 				interopWindow.GetBounds(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.ClientBounds))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ClientBounds))
 			{
 				interopWindow.GetClientBounds(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.Caption))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Caption))
 			{
 				interopWindow.GetCaption(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.Classname))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Classname))
 			{
 				interopWindow.GetClassname(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.ExtendedStyle))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ExtendedStyle))
 			{
 				interopWindow.GetExtendedStyle(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.Style))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Style))
 			{
 				interopWindow.GetStyle(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.ProcessId))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ProcessId))
 			{
 				interopWindow.GetProcessId(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.Parent))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Parent))
 			{
 				interopWindow.GetParent(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.Visible))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Visible))
 			{
 				interopWindow.IsVisible(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.Maximized))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Maximized))
 			{
 				interopWindow.IsMaximized(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.Minimized))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Minimized))
 			{
 				interopWindow.IsMinimized(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.Children))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ScrollInfo))
+			{
+				interopWindow.GetWindowScroller(forceUpdate: forceUpdate);
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children))
 			{
 				interopWindow.GetChildren(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.Placement))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
+			{
+				interopWindow.GetZOrderedChildren(forceUpdate);
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Placement))
 			{
 				interopWindow.GetPlacement(forceUpdate);
 			}
-			if (flags.HasFlag(InteropWindowCacheFlags.Text))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Text))
 			{
 				interopWindow.GetText(forceUpdate);
 			}
@@ -507,7 +512,7 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="scrollBar">ScrollBarTypes</param>
 		/// <param name="forceUpdate">true to force a retry, even if the previous check failed</param>
 		/// <returns>WindowScroller or null</returns>
-		public static WindowScroller GetWindowScroller(this IInteropWindow interopWindow, ScrollBarTypes scrollBar, bool forceUpdate = false)
+		public static WindowScroller GetWindowScroller(this IInteropWindow interopWindow, ScrollBarTypes scrollBar = ScrollBarTypes.Vertical, bool forceUpdate = false)
 		{
 			if (!forceUpdate && interopWindow.CanScroll.HasValue && !interopWindow.CanScroll.Value)
 			{

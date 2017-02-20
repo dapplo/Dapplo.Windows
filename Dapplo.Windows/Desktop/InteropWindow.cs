@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016 Dapplo
+//  Copyright (C) 2016-2017 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -146,27 +146,79 @@ namespace Dapplo.Windows.Desktop
 		}
 
 		/// <inheritdoc />
-		public StringBuilder Dump(StringBuilder dump = null, string indentation = "")
+		public StringBuilder Dump(InteropWindowCacheFlags cacheFlags = InteropWindowCacheFlags.CacheAll, StringBuilder dump = null, string indentation = "")
 		{
+			this.Fill(cacheFlags);
+
 			dump = dump ?? new StringBuilder();
-			this.Fill();
 			dump.AppendLine($"{indentation}{nameof(Handle)}={Handle}");
-			dump.AppendLine($"{indentation}{nameof(Classname)}={Classname}");
-			dump.AppendLine($"{indentation}{nameof(Caption)}={Caption}");
-			dump.AppendLine($"{indentation}{nameof(Text)}={Text}");
-			dump.AppendLine($"{indentation}{nameof(Bounds)}={Bounds}");
-			dump.AppendLine($"{indentation}{nameof(ClientBounds)}={Bounds}");
-			dump.AppendLine($"{indentation}{nameof(ExtendedStyle)}={ExtendedStyle}");
-			dump.AppendLine($"{indentation}{nameof(Style)}={Style}");
-			dump.AppendLine($"{indentation}{nameof(IsMaximized)}={IsMaximized}");
-			dump.AppendLine($"{indentation}{nameof(IsMinimized)}={IsMinimized}");
-			dump.AppendLine($"{indentation}{nameof(IsVisible)}={IsVisible}");
-			dump.AppendLine($"{indentation}{nameof(Parent)}={Parent}");
-			if (!HasParent)
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Classname))
 			{
-				foreach (var child in this.GetZOrderedChildren())
+				dump.AppendLine($"{indentation}{nameof(Classname)}={Classname}");
+			}
+
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Caption))
+			{
+				dump.AppendLine($"{indentation}{nameof(Caption)}={Caption}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Text))
+			{
+				dump.AppendLine($"{indentation}{nameof(Text)}={Text}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Bounds))
+			{
+				dump.AppendLine($"{indentation}{nameof(Bounds)}={Bounds}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ClientBounds))
+			{
+				dump.AppendLine($"{indentation}{nameof(ClientBounds)}={Bounds}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ExtendedStyle))
+			{
+				dump.AppendLine($"{indentation}{nameof(ExtendedStyle)}={ExtendedStyle}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Style))
+			{
+				dump.AppendLine($"{indentation}{nameof(Style)}={Style}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Maximized))
+			{
+				dump.AppendLine($"{indentation}{nameof(IsMaximized)}={IsMaximized}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Minimized))
+			{
+				dump.AppendLine($"{indentation}{nameof(IsMinimized)}={IsMinimized}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Visible))
+			{
+				dump.AppendLine($"{indentation}{nameof(IsVisible)}={IsVisible}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Parent))
+			{
+				dump.AppendLine($"{indentation}{nameof(Parent)}={Parent}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ScrollInfo))
+			{
+				dump.AppendLine($"{indentation}{nameof(CanScroll)}={CanScroll}");
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children))
+			{
+				if (!HasParent)
 				{
-					child.Dump(dump, indentation + "\t");
+					foreach (var child in this.GetChildren())
+					{
+						child.Dump(cacheFlags, dump, indentation + "\t");
+					}
+				}
+			}
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
+			{
+				if (!HasParent)
+				{
+					foreach (var child in this.GetZOrderedChildren())
+					{
+						child.Dump(cacheFlags, dump, indentation + "\t");
+					}
 				}
 			}
 			return dump;
