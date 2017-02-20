@@ -50,6 +50,10 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="cacheFlags">InteropWindowCacheFlags to specify which information is retrieved and what not</param>
 		public static IInteropWindow Fill(this IInteropWindow interopWindow, InteropWindowCacheFlags cacheFlags = InteropWindowCacheFlags.CacheAll)
 		{
+		    if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children) && cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
+		    {
+		        throw new ArgumentException("Can't have both Children & ZOrderedChildren", nameof(cacheFlags));
+		    }
 			bool forceUpdate = cacheFlags.HasFlag(InteropWindowCacheFlags.ForceUpdate);
 
 			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Bounds))

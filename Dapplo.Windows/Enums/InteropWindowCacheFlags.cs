@@ -65,32 +65,32 @@ namespace Dapplo.Windows.Enums
 		/// </summary>
 		Minimized = 1 << 12,
 		/// <summary>
-		/// Retrieve the children
-		/// </summary>
-		Children = 1 << 13,
-		/// <summary>
-		/// Retrieve the children by zorder
-		/// </summary>
-		ZOrderedChildren = 1 << 14,
-		/// <summary>
 		/// Retrieve the text
 		/// </summary>
-		Text = 1 << 15,
+		Text = 1 << 13,
 		/// <summary>
 		/// Retrieve the scroll info
 		/// </summary>
-		ScrollInfo = 1 << 16,
+		ScrollInfo = 1 << 14,
+		/// <summary>
+		/// Retrieve the children
+		/// </summary>
+		Children = 1 << 15,
+		/// <summary>
+		/// Retrieve the children by zorder
+		/// </summary>
+		ZOrderedChildren = 1 << 16,
 		/// <summary>
 		/// Cache all, except children, don't force reloading
 		/// </summary>
-		CacheAll = 0xfffffffe & (ZOrderedChildren | Children),
+		CacheAll = Bounds | Caption | Classname | ClientBounds | ExtendedStyle | Maximized |Minimized | Parent | Placement | ProcessId | Style | Text | Visible | ScrollInfo,
 		/// <summary>
 		/// Cache all, with children, don't force reloading
 		/// </summary>
-		CacheAllWithChildren = 0xfffffffe & ZOrderedChildren,
+		CacheAllWithChildren = Children | Bounds | Caption | Classname | ClientBounds | ExtendedStyle | Maximized | Minimized | Parent | Placement | ProcessId | Style | Text | Visible | ScrollInfo,
 		/// <summary>
 		/// Cache all, don't force reloading
 		/// </summary>
-		CacheAllChildZorder = 0xfffffffe & Children,
+		CacheAllChildZorder = ZOrderedChildren | Bounds | Caption | Classname | ClientBounds | ExtendedStyle | Maximized | Minimized | Parent | Placement | ProcessId | Style | Text | Visible | ScrollInfo
 	}
 }
