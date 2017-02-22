@@ -29,11 +29,11 @@ using System.Runtime.Versioning;
 using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Windows.Enums;
-using Dapplo.Windows.Structs;
+using Dapplo.Windows.Keyboard.Native;
 
 #endregion
 
-namespace Dapplo.Windows.Reactive
+namespace Dapplo.Windows.Keyboard
 {
 	/// <summary>
 	///     A glocal keyboard hook, using System.Reactive

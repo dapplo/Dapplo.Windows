@@ -22,45 +22,46 @@
 #region using
 
 using System;
+using System.Runtime.InteropServices;
+using Dapplo.Windows.Enums;
 
 #endregion
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Keyboard.Native
 {
 	/// <summary>
-	///     The extended-key flag, event-injected flags, context code, and transition-state flag.
-	///     This member is specified as follows.
-	///     An application can use the following values to test the keystroke flags.
-	///     Testing LLKHF_INJECTED (bit 4) will tell you whether the event was injected.
-	///     If it was, then testing LLKHF_LOWER_IL_INJECTED (bit 1) will tell you whether or not the event was injected from a
-	///     process running at lower integrity level.
+	///     Contains information about a low-level keyboard input event.
 	/// </summary>
-	[Flags]
-	public enum ExtendedKeyFlags : uint
+	[StructLayout(LayoutKind.Sequential)]
+	public struct KeyboardLowLevelHookStruct
 	{
 		/// <summary>
-		///     Test the extended-key flag.
+		///     A virtual-key code. The code must be a value in the range 1 to 254.
 		/// </summary>
-		Extended = 0x01,
+		public VirtualKeyCodes VirtualKeyCode;
 
 		/// <summary>
-		///     Test the event-injected (from a process running at lower integrity level) flag.
+		///     A hardware scan code for the key.
 		/// </summary>
-		LowerIntegretyInjected = 0x02,
+		public ScanCodes ScanCode;
 
 		/// <summary>
-		///     Test the event-injected (from any process) flag.
+		///     The extended-key flag, event-injected flags, context code, and transition-state flag.
+		///     This member is specified as follows. An application can use the following values to test the keystroke flags.
+		///     Testing LLKHF_INJECTED (bit 4) will tell you whether the event was injected.
+		///     If it was, then testing LLKHF_LOWER_IL_INJECTED (bit 1) will tell you whether or not the event
+		///     was injected from a process running at lower integrity level.
 		/// </summary>
-		Injected = 0x10,
+		public ExtendedKeyFlags Flags;
 
 		/// <summary>
-		///     Test the context code.
+		///     The time stamp for this message, equivalent to what GetMessageTime would return for this message.
 		/// </summary>
-		AltDown = 0x20,
+		public uint TimeStamp;
 
 		/// <summary>
-		///     Test the transition-state flag.
+		///     Additional information associated with the message.
 		/// </summary>
-		Up = 0x80
+		public UIntPtr dwExtraInfo;
 	}
 }

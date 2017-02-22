@@ -48,12 +48,17 @@ namespace Dapplo.Windows
 		/// <summary>
 		///     Special HwndSource which is only there for handling messages
 		/// </summary>
-		private readonly HwndSource _hwndSource = new HwndSource(0, 0, 0, 0, 0, 0, 0, null, new IntPtr(-3));
+		private readonly HwndSource _hwndSource = new HwndSource(0, 0, 0, 0, 0, 0, 0, "DapploWinProc", IntPtr.Zero);
 
 		/// <summary>
 		///     Singleton instance of the WinProcHandler
 		/// </summary>
 		public static WinProcHandler Instance => Singleton.Value;
+
+		/// <summary>
+		/// The actual handle for the HwndSource
+		/// </summary>
+		public IntPtr Handle => _hwndSource.Handle;
 
 		/// <summary>
 		///     Add a hook to handle messages

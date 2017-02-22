@@ -21,33 +21,41 @@
 
 #region using
 
+using System.Threading.Tasks;
+using Dapplo.Log;
+using Dapplo.Log.XUnit;
+using Dapplo.Windows.Clipboard;
+using Xunit;
+using Xunit.Abstractions;
 using System;
-using Dapplo.Windows.Enums;
-using Dapplo.Windows.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Reactive
+namespace Dapplo.Windows.Tests
 {
-	/// <summary>
-	///     Information on mouse changes
-	///     TODO: Make the information a lot clearer, than processing WindowsMessages
-	/// </summary>
-	public class MouseHookEventArgs : EventArgs
+	public class ClipboardTests
 	{
-		/// <summary>
-		///     Set this to true if the event is handled, other event-handlers in the chain will not be called
-		/// </summary>
-		public bool Handled { get; set; }
+		private static readonly LogSource Log = new LogSource();
+
+		public ClipboardTests(ITestOutputHelper testOutputHelper)
+		{
+			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+		}
 
 		/// <summary>
-		///     The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
+		///     Test monitoring the clipboard
 		/// </summary>
-		public POINT Point { get; set; }
+		/// <returns></returns>
+		[StaFact]
+		private async Task TestClipboardMonitor()
+		{
+			bool hasNewContent = false;
+			ClipboardMonitor.ClipboardUpdateEvents.Subscribe(args => hasNewContent = true);
 
-		/// <summary>
-		///     The mouse message
-		/// </summary>
-		public WindowsMessages WindowsMessage { get; set; }
+			System.Windows.Clipboard.SetText("Testing");
+
+			await Task.Delay(1000);
+			Assert.True(hasNewContent);
+		}
 	}
 }

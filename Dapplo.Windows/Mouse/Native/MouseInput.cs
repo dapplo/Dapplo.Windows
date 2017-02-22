@@ -26,10 +26,11 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Mouse.Native
 {
 	/// <summary>
 	///     Contains information about a simulated mouse event.

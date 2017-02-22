@@ -23,15 +23,15 @@
 
 using System;
 using Dapplo.Log;
-using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Keyboard.Native;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
 using Microsoft.Win32;
 
 #endregion
 
-namespace Dapplo.Windows
+namespace Dapplo.Windows.Desktop
 {
 	/// <summary>
 	///     The is a container class to help to scroll a window

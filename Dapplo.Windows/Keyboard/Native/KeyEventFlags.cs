@@ -21,33 +21,40 @@
 
 #region using
 
-using System.Runtime.InteropServices;
-using Dapplo.Windows.Keyboard.Native;
-using Dapplo.Windows.Mouse.Native;
+using System;
 
 #endregion
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Keyboard.Native
 {
 	/// <summary>
-	///     A "union" containing a specific input struct
+	///     This enum specifies various aspects of a keystroke. This member can be certain combinations of the following
+	///     values.
+	///     See
+	///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646271(v=vs.85).aspx">KEYBDINPUT structure</a>
 	/// </summary>
-	[StructLayout(LayoutKind.Explicit)]
-	public struct InputUnion
+	[Flags]
+	public enum KeyEventFlags : uint
 	{
 		/// <summary>
-		///     Assign this if the input is MouseInput
+		///     If specified, the scan code was preceded by a prefix byte that has the value 0xE0 (224).
 		/// </summary>
-		[FieldOffset(0)] public MouseInput MouseInput;
+		ExtendedKey = 0x0001,
 
 		/// <summary>
-		///     Assign this if the input is MouseInputKeyboardInput
+		///     If specified, the key is being released. If not specified, the key is being pressed.
 		/// </summary>
-		[FieldOffset(0)] public KeyboardInput KeyboardInput;
+		KeyUp = 0x0002,
 
 		/// <summary>
-		///     Assign this if the input is HardwareInput
+		///     If specified, the system synthesizes a VK_PACKET keystroke. The VirtualKeyCode parameter must be zero.
+		///     This flag can only be combined with the KeyUp flag. For more information, see the Remarks section.
 		/// </summary>
-		[FieldOffset(0)] public HardwareInput HardwareInput;
+		Unicode = 0x0004,
+
+		/// <summary>
+		///     If specified, wScan identifies the key and VirtualKeyCode is ignored.
+		/// </summary>
+		Scancode = 0x0008
 	}
 }

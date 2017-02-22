@@ -21,33 +21,33 @@
 
 #region using
 
-using System.Runtime.InteropServices;
-using Dapplo.Windows.Keyboard.Native;
-using Dapplo.Windows.Mouse.Native;
+using System;
+using Dapplo.Windows.Enums;
+using Dapplo.Windows.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Mouse
 {
 	/// <summary>
-	///     A "union" containing a specific input struct
+	///     Information on mouse changes
+	///     TODO: Make the information a lot clearer, than processing WindowsMessages
 	/// </summary>
-	[StructLayout(LayoutKind.Explicit)]
-	public struct InputUnion
+	public class MouseHookEventArgs : EventArgs
 	{
 		/// <summary>
-		///     Assign this if the input is MouseInput
+		///     Set this to true if the event is handled, other event-handlers in the chain will not be called
 		/// </summary>
-		[FieldOffset(0)] public MouseInput MouseInput;
+		public bool Handled { get; set; }
 
 		/// <summary>
-		///     Assign this if the input is MouseInputKeyboardInput
+		///     The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
 		/// </summary>
-		[FieldOffset(0)] public KeyboardInput KeyboardInput;
+		public POINT Point { get; set; }
 
 		/// <summary>
-		///     Assign this if the input is HardwareInput
+		///     The mouse message
 		/// </summary>
-		[FieldOffset(0)] public HardwareInput HardwareInput;
+		public WindowsMessages WindowsMessage { get; set; }
 	}
 }

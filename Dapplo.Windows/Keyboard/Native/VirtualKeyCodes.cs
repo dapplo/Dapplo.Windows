@@ -19,7 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Keyboard.Native
 {
 	/// <summary>
 	///     Symbolic constant names, hexadecimal values, and mouse or keyboard equivalents for the virtual-key codes used by

@@ -24,10 +24,11 @@
 using System;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Mouse.Native
 {
 	/// <summary>
 	///     This struct is passed in the WH_MOUSE_LL hook

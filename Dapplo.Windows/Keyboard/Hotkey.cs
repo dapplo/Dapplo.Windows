@@ -29,7 +29,7 @@ using Dapplo.Log;
 
 #endregion
 
-namespace Dapplo.Windows
+namespace Dapplo.Windows.Keyboard
 {
 	internal enum MapVkType : uint
 	{

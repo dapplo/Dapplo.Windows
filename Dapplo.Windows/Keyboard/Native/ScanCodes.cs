@@ -25,7 +25,7 @@ using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Keyboard.Native
 {
 	/// <summary>
 	///     A list of possible scancodes

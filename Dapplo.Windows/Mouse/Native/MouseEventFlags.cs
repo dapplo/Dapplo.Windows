@@ -25,7 +25,7 @@ using System;
 
 #endregion
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Mouse.Native
 {
 	/// <summary>
 	///     A set of bit flags that specify various aspects of mouse motion and button clicks.

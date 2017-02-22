@@ -27,7 +27,7 @@ using Dapplo.Windows.Enums;
 
 #endregion
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Keyboard.Native
 {
 	/// <summary>
 	///     This struct contains information about a simulated keyboard event.

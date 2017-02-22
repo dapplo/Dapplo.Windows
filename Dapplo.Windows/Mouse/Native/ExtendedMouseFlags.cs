@@ -25,36 +25,25 @@ using System;
 
 #endregion
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Mouse.Native
 {
 	/// <summary>
-	///     This enum specifies various aspects of a keystroke. This member can be certain combinations of the following
-	///     values.
-	///     See
-	///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646271(v=vs.85).aspx">KEYBDINPUT structure</a>
+	///     The event-injected flags. An application can use the following values to test the flags.
+	///     Testing LLMHF_INJECTED (bit 0) will tell you whether the event was injected.
+	///     If it was, then testing LLMHF_LOWER_IL_INJECTED (bit 1) will tell you whether or not
+	///     the event was injected from a process running at lower integrity level.
 	/// </summary>
 	[Flags]
-	public enum KeyEventFlags : uint
+	public enum ExtendedMouseFlags : uint
 	{
 		/// <summary>
-		///     If specified, the scan code was preceded by a prefix byte that has the value 0xE0 (224).
+		///     Test the event-injected (from any process) flag.
 		/// </summary>
-		ExtendedKey = 0x0001,
+		Injected = 0x01,
 
 		/// <summary>
-		///     If specified, the key is being released. If not specified, the key is being pressed.
+		///     Test the event-injected (from a process running at lower integrity level) flag.
 		/// </summary>
-		KeyUp = 0x0002,
-
-		/// <summary>
-		///     If specified, the system synthesizes a VK_PACKET keystroke. The VirtualKeyCode parameter must be zero.
-		///     This flag can only be combined with the KeyUp flag. For more information, see the Remarks section.
-		/// </summary>
-		Unicode = 0x0004,
-
-		/// <summary>
-		///     If specified, wScan identifies the key and VirtualKeyCode is ignored.
-		/// </summary>
-		Scancode = 0x0008
+		LowerIntegretyInjected = 0x02
 	}
 }

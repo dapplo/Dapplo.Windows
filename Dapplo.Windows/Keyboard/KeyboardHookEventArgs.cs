@@ -24,10 +24,11 @@
 using System;
 using System.Text;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Keyboard.Native;
 
 #endregion
 
-namespace Dapplo.Windows.Reactive
+namespace Dapplo.Windows.Keyboard
 {
 	/// <summary>
 	///     Information on keyboard changes

@@ -30,8 +30,9 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Keyboard;
+using Dapplo.Windows.Keyboard.Native;
 using Dapplo.Windows.Native;
-using Dapplo.Windows.Reactive;
 using Xunit;
 using Xunit.Abstractions;
 

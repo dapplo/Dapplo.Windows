@@ -23,6 +23,8 @@
 
 using System.Windows.Forms;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Keyboard.Native;
+using Dapplo.Windows.Mouse.Native;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
 

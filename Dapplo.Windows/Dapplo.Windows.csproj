@@ -68,6 +68,7 @@
     <Compile Include="App\AppQuery.cs" />
     <Compile Include="App\IAppVisibility.cs" />
     <Compile Include="App\MonitorAppVisibility.cs" />
+    <Compile Include="Clipboard\ClipboardMonitor.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
     <Compile Include="Desktop\IInteropWindow.cs" />
     <Compile Include="Desktop\InteropWindowFactory.cs" />
@@ -78,7 +79,7 @@
     <Compile Include="Enums\BitmapCompressionMethods.cs" />
     <Compile Include="Enums\ColorSpaceEnum.cs" />
     <Compile Include="Enums\DwmBlurBehindFlags.cs" />
-    <Compile Include="Enums\ExtendedMouseFlags.cs" />
+    <Compile Include="Mouse\Native\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\InteropWindowCacheFlags.cs" />
     <Compile Include="Enums\MonitorFromRectFlags.cs" />
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
@@ -92,18 +93,18 @@
     <Compile Include="Enums\WindowsSuites.cs" />
     <Compile Include="Extensions\RectExensions.cs" />
     <Compile Include="InputGenerator.cs" />
-    <Compile Include="Enums\ExtendedKeyFlags.cs" />
-    <Compile Include="Reactive\MouseHookEventArgs.cs" />
-    <Compile Include="Reactive\MouseHook.cs" />
-    <Compile Include="Structs\KeyboardLowLevelHookStruct.cs" />
+    <Compile Include="Keyboard\Native\ExtendedKeyFlags.cs" />
+    <Compile Include="Mouse\MouseHookEventArgs.cs" />
+    <Compile Include="Mouse\MouseHook.cs" />
+    <Compile Include="Keyboard\Native\KeyboardLowLevelHookStruct.cs" />
     <Compile Include="Structs\HardwareInput.cs" />
     <Compile Include="Structs\Input.cs" />
     <Compile Include="Enums\InputTypes.cs" />
     <Compile Include="Structs\InputUnion.cs" />
-    <Compile Include="Structs\KeyboardInput.cs" />
-    <Compile Include="Enums\KeyEventFlags.cs" />
-    <Compile Include="Enums\MouseEventFlags.cs" />
-    <Compile Include="Enums\ScanCodes.cs" />
+    <Compile Include="Keyboard\Native\KeyboardInput.cs" />
+    <Compile Include="Keyboard\Native\KeyEventFlags.cs" />
+    <Compile Include="Mouse\Native\MouseEventFlags.cs" />
+    <Compile Include="Keyboard\Native\ScanCodes.cs" />
     <Compile Include="Enums\ScrollInfoMask.cs" />
     <Compile Include="Enums\CursorInfoFlags.cs" />
     <Compile Include="Enums\DesktopAccessRight.cs" />
@@ -122,12 +123,12 @@
     <Compile Include="Enums\SysCommands.cs" />
     <Compile Include="Enums\SystemMetric.cs" />
     <Compile Include="Enums\ThreadAccess.cs" />
-    <Compile Include="Enums\VirtualKeyCodes.cs" />
+    <Compile Include="Keyboard\Native\VirtualKeyCodes.cs" />
     <Compile Include="Enums\WindowPlacementFlags.cs" />
     <Compile Include="Enums\WindowStyleFlags.cs" />
-    <Compile Include="Hotkey.cs" />
-    <Compile Include="Reactive\KeyboardHook.cs" />
-    <Compile Include="Reactive\KeyboardHookEventArgs.cs" />
+    <Compile Include="Keyboard\Hotkey.cs" />
+    <Compile Include="Keyboard\KeyboardHook.cs" />
+    <Compile Include="Keyboard\KeyboardHookEventArgs.cs" />
     <Compile Include="Native\Gdi32.cs" />
     <Compile Include="Native\GdiExtensions.cs" />
     <Compile Include="Native\GdiPlus.cs" />
@@ -164,8 +165,8 @@
     <Compile Include="Enums\HookTypes.cs" />
     <Compile Include="Structs\IconInfo.cs" />
     <Compile Include="Structs\MonitorInfoEx.cs" />
-    <Compile Include="Structs\MouseInput.cs" />
-    <Compile Include="Structs\MouseLowLevelHookStruct.cs" />
+    <Compile Include="Mouse\Native\MouseInput.cs" />
+    <Compile Include="Mouse\Native\MouseLowLevelHookStruct.cs" />
     <Compile Include="Structs\OsVersionInfoEx.cs" />
     <Compile Include="Structs\POINT.cs" />
     <Compile Include="Structs\RECTF.cs" />
@@ -184,18 +185,17 @@
     <Compile Include="Enums\WinEventHookFlags.cs" />
     <Compile Include="Structs\WindowPlacement.cs" />
     <Compile Include="Structs\WinEventInfo.cs" />
-    <Compile Include="WindowScroller.cs" />
-    <Compile Include="Reactive\WinEventHook.cs" />
-    <None Include="WindowsMonitor.cs" />
-    <None Include="WindowsHook.cs" />
+    <Compile Include="Desktop\WindowScroller.cs" />
+    <Compile Include="Desktop\WinEventHook.cs" />
     <Compile Include="Enums\WindowsMessages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsVersion.cs" />
-    <Compile Include="WinProcHandler.cs" />
+    <Compile Include="Desktop\WinProcHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

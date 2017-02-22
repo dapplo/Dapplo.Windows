@@ -26,7 +26,8 @@ using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Enums;
-using Dapplo.Windows.Reactive;
+using Dapplo.Windows.Keyboard;
+using Dapplo.Windows.Keyboard.Native;
 using Xunit.Abstractions;
 
 #endregion

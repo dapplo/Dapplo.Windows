@@ -23,6 +23,8 @@
 
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Keyboard.Native;
+using Dapplo.Windows.Mouse.Native;
 
 #endregion
 

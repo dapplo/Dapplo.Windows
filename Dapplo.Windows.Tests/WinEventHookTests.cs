@@ -29,7 +29,6 @@ using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Reactive;
 using Xunit;
 using Xunit.Abstractions;
 

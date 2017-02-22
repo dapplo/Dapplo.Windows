@@ -31,7 +31,7 @@ using Dapplo.Windows.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Reactive
+namespace Dapplo.Windows.Desktop
 {
 	/// <summary>
 	///     The WinEventHook can register handlers to become important windows events

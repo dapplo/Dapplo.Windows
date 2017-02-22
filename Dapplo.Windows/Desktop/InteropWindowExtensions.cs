@@ -27,6 +27,7 @@ using System.Drawing;
 using System.Threading.Tasks;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Extensions;
+using Dapplo.Windows.Keyboard.Native;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
 
