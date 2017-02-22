@@ -35,6 +35,10 @@ namespace Dapplo.Windows.Enums
 	public enum ExtendedWindowStyleFlags : uint
 	{
 		/// <summary>
+		/// Default style, with nothing
+		/// </summary>
+		WS_NONE = 0,
+		/// <summary>
 		///     The window has a double border;
 		///     the window can, optionally, be created with a title bar by specifying the WS_CAPTION style in the dwStyle
 		///     parameter.

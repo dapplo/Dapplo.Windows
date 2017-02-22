@@ -26,7 +26,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
-using Dapplo.Log;
+using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 
@@ -39,7 +39,6 @@ namespace Dapplo.Windows.Clipboard
 	/// </summary>
 	public class ClipboardMonitor
 	{
-		private static readonly LogSource Log = new LogSource();
 
 		/// <summary>
 		///     The singleton of the KeyboardHook

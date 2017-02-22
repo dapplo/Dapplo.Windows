@@ -25,16 +25,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Interop;
+using Dapplo.Log;
+using Dapplo.Windows.Enums;
 
 #endregion
 
-namespace Dapplo.Windows
+namespace Dapplo.Windows.Desktop
 {
 	/// <summary>
 	///     This can be used to handle WinProc messages, for instance when there is no running winproc
 	/// </summary>
 	public class WinProcHandler
 	{
+		/// <summary>
+		/// To create a message-only window, specify HWndMessage as the parent of the window
+		/// </summary>
+		public static readonly IntPtr HwndMessage = new IntPtr(-3);
+
+		private static readonly LogSource Log = new LogSource();
 		/// <summary>
 		///     Hold the singeton
 		/// </summary>
@@ -48,7 +56,18 @@ namespace Dapplo.Windows
 		/// <summary>
 		///     Special HwndSource which is only there for handling messages
 		/// </summary>
-		private readonly HwndSource _hwndSource = new HwndSource(0, 0, 0, 0, 0, 0, 0, "DapploWinProc", IntPtr.Zero);
+		private readonly HwndSource _hwndSource = new HwndSource(new HwndSourceParameters {
+			ParentWindow = HwndMessage,
+			Width = 0,
+			Height = 0,
+			PositionX = 0,
+			PositionY = 0,
+			AcquireHwndFocusInMenuMode = false,
+			ExtendedWindowStyle = (int)ExtendedWindowStyleFlags.WS_NONE,
+			WindowStyle = (int)WindowStyleFlags.WS_OVERLAPPED,
+			WindowClassStyle = 0,
+			WindowName = "Dapplo.Windows"
+		});
 
 		/// <summary>
 		///     Singleton instance of the WinProcHandler
@@ -66,6 +85,7 @@ namespace Dapplo.Windows
 		/// <param name="hook">HwndSourceHook</param>
 		public void AddHook(HwndSourceHook hook)
 		{
+			Log.Verbose().WriteLine("Adding a hook to handle messages.");
 			_hwndSource.AddHook(hook);
 			_hooks.Add(hook);
 		}
@@ -76,6 +96,7 @@ namespace Dapplo.Windows
 		/// <param name="hook">HwndSourceHook</param>
 		public void RemoveHook(HwndSourceHook hook)
 		{
+			Log.Verbose().WriteLine("Removing a hook to handle messages.");
 			_hwndSource.RemoveHook(hook);
 			_hooks.Remove(hook);
 		}
