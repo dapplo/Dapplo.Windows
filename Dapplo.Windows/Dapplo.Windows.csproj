@@ -87,6 +87,7 @@
     <Compile Include="Enums\HResultExtensions.cs" />
     <Compile Include="Enums\MonitorDpiType.cs" />
     <Compile Include="Forms\FormsExtensions.cs" />
+    <Compile Include="Forms\WinProcListener.cs" />
     <Compile Include="Mouse\Native\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\InteropWindowCacheFlags.cs" />
     <Compile Include="Enums\MonitorFromFlags.cs" />

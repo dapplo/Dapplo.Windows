@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using System.Windows.Interop;
+﻿using System.Windows.Forms;
 using Dapplo.Windows.Desktop;
 
 namespace Dapplo.Windows.Forms
@@ -18,12 +16,9 @@ namespace Dapplo.Windows.Forms
 		public static DpiHandler HandleDpiChanges(this Form form)
 		{
 			var dpiHandler = new DpiHandler();
-			var hwndSource = HwndSource.FromHwnd(form.Handle);
-			if (hwndSource == null)
-			{
-				throw new NotSupportedException("No HwndSource available?");
-			}
-			hwndSource.AddHook(dpiHandler.HandleMessages);
+			var listener = new WinProcListener(form);
+			listener.AddHook(dpiHandler.HandleMessages);
+			dpiHandler.MessageHandler = listener;
 			return dpiHandler;
 		}
 	}

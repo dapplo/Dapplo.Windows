@@ -10,9 +10,14 @@ namespace Dapplo.Windows.Desktop
 	/// This handles DPI changes
 	/// see u.a. <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn469266(v=vs.85).aspx">Writing DPI-Aware Desktop and Win32 Applications</a>
 	/// </summary>
-	public class DpiHandler
+	public class DpiHandler : IDisposable
 	{
 		private const double UserDefaultScreenDpi = 96d;
+
+		/// <summary>
+		/// This is that which handles the windows messages, and needs to be disposed
+		/// </summary>
+		internal IDisposable MessageHandler { get; set; }
 
 		/// <summary>
 		/// Retrieve the current DPI for the window
@@ -143,6 +148,13 @@ namespace Dapplo.Windows.Desktop
 		/// <returns>bool</returns>
 		[DllImport("shcore")]
 		private static extern bool EnableNonClientDpiScaling(IntPtr hWnd);
+
+		/// <inheritdoc />
+		public void Dispose()
+		{
+			MessageHandler?.Dispose();
+			MessageHandler = null;
+		}
 
 		#endregion
 	}

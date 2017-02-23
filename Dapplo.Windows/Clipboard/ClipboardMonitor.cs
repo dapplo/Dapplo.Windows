@@ -57,7 +57,7 @@ namespace Dapplo.Windows.Clipboard
 			_clipboardObservable = Observable.Create<EventArgs>(observer =>
 			{
 				// This handles the message
-				HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr param, IntPtr lParam, ref bool handled) =>
+				HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
 				{
 					var windowsMessage = (WindowsMessages)msg;
 					if (windowsMessage == WindowsMessages.WM_CLIPBOARDUPDATE)

@@ -107,32 +107,32 @@ namespace Dapplo.Windows.Native
 			DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 		}
 
-		[DllImport("dwmapi.dll", SetLastError = true)]
+		[DllImport("dwmapi", SetLastError = true)]
 		public static extern int DwmEnableBlurBehindWindow(IntPtr hwnd, ref DwmBlurBehind blurBehind);
 
-		[DllImport("dwmapi.dll", SetLastError = true)]
+		[DllImport("dwmapi", SetLastError = true)]
 		public static extern uint DwmEnableComposition(uint uCompositionAction);
 
-		[DllImport("dwmapi.dll", SetLastError = true)]
+		[DllImport("dwmapi", SetLastError = true)]
 		public static extern int DwmGetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttribute, out RECT lpRect, int size);
 
 		// Deprecated as of Windows 8 Release Preview
-		[DllImport("dwmapi.dll", SetLastError = true)]
+		[DllImport("dwmapi", SetLastError = true)]
 		public static extern int DwmIsCompositionEnabled([MarshalAs(UnmanagedType.Bool)] out bool enabled);
 
-		[DllImport("dwmapi.dll", EntryPoint = "#113", SetLastError = true)]
+		[DllImport("dwmapi", EntryPoint = "#113", SetLastError = true)]
 		internal static extern uint DwmpActivateLivePreview(uint a, IntPtr b, uint c, uint d);
 
-		[DllImport("dwmapi.dll", SetLastError = true)]
+		[DllImport("dwmapi", SetLastError = true)]
 		public static extern int DwmQueryThumbnailSourceSize(IntPtr thumb, out SIZE size);
 
-		[DllImport("dwmapi.dll", SetLastError = true)]
+		[DllImport("dwmapi", SetLastError = true)]
 		public static extern int DwmRegisterThumbnail(IntPtr dest, IntPtr src, out IntPtr thumb);
 
-		[DllImport("dwmapi.dll", SetLastError = true)]
+		[DllImport("dwmapi", SetLastError = true)]
 		public static extern int DwmUnregisterThumbnail(IntPtr thumb);
 
-		[DllImport("dwmapi.dll", SetLastError = true)]
+		[DllImport("dwmapi", SetLastError = true)]
 		public static extern int DwmUpdateThumbnailProperties(IntPtr hThumb, ref DwmThumbnailProperties props);
 
 		/// <summary>
@@ -163,11 +163,11 @@ namespace Dapplo.Windows.Native
 		}
 
 		[PreserveSig]
-		[DllImport("dwmapi.dll", EntryPoint = "#100", SetLastError = true)]
+		[DllImport("dwmapi", EntryPoint = "#100", SetLastError = true)]
 		public static extern int GetSharedSurface(IntPtr hWnd, long adapterLuid, uint one, uint two, [In] [Out] ref uint pD3DFormat, [Out] out IntPtr pSharedHandle, ulong unknown);
 
 		[PreserveSig]
-		[DllImport("dwmapi.dll", EntryPoint = "#101", SetLastError = true)]
+		[DllImport("dwmapi", EntryPoint = "#101", SetLastError = true)]
 		public static extern int UpdateWindowShared(IntPtr hWnd, int one, int two, int three, IntPtr hMonitor, IntPtr unknown);
 	}
 }
