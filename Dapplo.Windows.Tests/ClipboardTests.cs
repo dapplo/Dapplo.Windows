@@ -46,13 +46,18 @@ namespace Dapplo.Windows.Tests
 		///     Test monitoring the clipboard
 		/// </summary>
 		/// <returns></returns>
-		//[WpfFact]
+		[WpfFact]
 		private async Task TestClipboardMonitor()
 		{
 			bool hasNewContent = false;
-			var subscription = ClipboardMonitor.ClipboardUpdateEvents.Subscribe(args => hasNewContent = true);
+			var subscription = ClipboardMonitor.ClipboardUpdateEvents.Subscribe(args =>
+			{
+				Log.Debug().WriteLine("Detected change.");
+				hasNewContent = true;
+			});
 
-			await Task.Delay(10000);
+			System.Windows.Clipboard.SetText("Dapplo.Windows.Tests.ClipboardTests");
+			await Task.Delay(1000);
 			subscription.Dispose();
 
 			// Doesn't work!!
