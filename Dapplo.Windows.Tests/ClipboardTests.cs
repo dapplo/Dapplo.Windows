@@ -46,7 +46,7 @@ namespace Dapplo.Windows.Tests
 		///     Test monitoring the clipboard
 		/// </summary>
 		/// <returns></returns>
-		[WpfFact]
+		///[WpfFact]
 		private async Task TestClipboardMonitor()
 		{
 			bool hasNewContent = false;
