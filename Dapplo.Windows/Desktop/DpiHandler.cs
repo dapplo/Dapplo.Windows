@@ -121,16 +121,19 @@ namespace Dapplo.Windows.Desktop
 					break;
 			}
 			// Check if the DPI was changed, if so call the action (if any)
-			if (isDpiMessage && !IsEqual(Dpi, currentDpi))
+			if (isDpiMessage)
 			{
-				Dpi = currentDpi;
-				var scaleFactor = Dpi / UserDefaultScreenDpi;
-				Log.Verbose().WriteLine("Got new DPI {0} which is a scale factor of {1}", currentDpi, scaleFactor);
-				OnDpiChangedAction?.Invoke(Dpi, scaleFactor);
-			}
-			else
-			{
-				Log.Verbose().WriteLine("DPI was unchanged from {0}", Dpi);
+				if (!IsEqual(Dpi, currentDpi))
+				{
+					Dpi = currentDpi;
+					var scaleFactor = Dpi / UserDefaultScreenDpi;
+					Log.Verbose().WriteLine("Got new DPI {0} which is a scale factor of {1}", currentDpi, scaleFactor);
+					OnDpiChangedAction?.Invoke(Dpi, scaleFactor);
+				}
+				else
+				{
+					Log.Verbose().WriteLine("DPI was unchanged from {0}", Dpi);
+				}
 			}
 
 			return IntPtr.Zero;
