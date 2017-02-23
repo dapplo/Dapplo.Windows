@@ -33,6 +33,7 @@ namespace Dapplo.Windows.Enums
 	[Flags]
 	public enum DesktopAccessRight : uint
 	{
+#pragma warning disable 1591
 		DESKTOP_READOBJECTS = 0x00000001,
 		DESKTOP_CREATEWINDOW = 0x00000002,
 		DESKTOP_CREATEMENU = 0x00000004,
@@ -46,5 +47,6 @@ namespace Dapplo.Windows.Enums
 		GENERIC_ALL = DESKTOP_READOBJECTS | DESKTOP_CREATEWINDOW | DESKTOP_CREATEMENU |
 		              DESKTOP_HOOKCONTROL | DESKTOP_JOURNALRECORD | DESKTOP_JOURNALPLAYBACK |
 		              DESKTOP_ENUMERATE | DESKTOP_WRITEOBJECTS | DESKTOP_SWITCHDESKTOP
+#pragma warning restore 1591
 	}
 }

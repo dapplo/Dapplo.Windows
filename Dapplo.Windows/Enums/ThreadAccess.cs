@@ -27,6 +27,7 @@ using System;
 
 namespace Dapplo.Windows.Enums
 {
+#pragma warning disable 1591
 	[Flags]
 	public enum ThreadAccess
 	{
@@ -39,5 +40,6 @@ namespace Dapplo.Windows.Enums
 		SET_THREAD_TOKEN = 0x0080,
 		IMPERSONATE = 0x0100,
 		DIRECT_IMPERSONATION = 0x0200
+#pragma warning restore 1591
 	}
 }

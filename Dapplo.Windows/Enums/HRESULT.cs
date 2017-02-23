@@ -21,7 +21,7 @@
 
 #region using
 
-using System.Runtime.InteropServices;
+
 
 #endregion
 
@@ -31,8 +31,9 @@ namespace Dapplo.Windows.Enums
 	///     The HRESULT represents Windows error codes
 	///     See <a href="https://en.wikipedia.org/wiki/HRESULT">wikipedia</a>
 	/// </summary>
-	public enum HRESULT : long
+	public enum HResult : long
 	{
+#pragma warning disable 1591
 		S_OK = 0,
 		S_FALSE = 1,
 		E_FAIL = unchecked((int) 0x80004005),
@@ -55,26 +56,6 @@ namespace Dapplo.Windows.Enums
 		ERROR_TOO_MANY_CMDS = unchecked((int) 0x80070038),
 		ERROR_NOT_SUPPORTED = unchecked((int) 0x80070032),
 		TYPE_E_ELEMENTNOTFOUND = unchecked((int) 0x8002802B)
-	}
-
-	/// <summary>
-	///     Wrapper util to handle the HResult
-	/// </summary>
-	public static class HResult
-	{
-		public static bool Failed(HRESULT hResult)
-		{
-			return hResult < 0;
-		}
-
-		public static bool Succeeded(HRESULT hResult)
-		{
-			return hResult >= 0;
-		}
-
-		public static void ThrowOnFailure(HRESULT hResult)
-		{
-			if (Failed(hResult)) throw Marshal.GetExceptionForHR((int) hResult);
-		}
+#pragma warning restore 1591
 	}
 }

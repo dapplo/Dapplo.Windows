@@ -44,6 +44,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -62,6 +63,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +72,7 @@
     <Compile Include="App\MonitorAppVisibility.cs" />
     <Compile Include="Clipboard\ClipboardMonitor.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
+    <Compile Include="Desktop\DpiHandler.cs" />
     <Compile Include="Desktop\IInteropWindow.cs" />
     <Compile Include="Desktop\InteropWindowFactory.cs" />
     <Compile Include="Desktop\InteropWindowQuery.cs" />
@@ -78,10 +81,15 @@
     <Compile Include="Desktop\InteropWindowExtensions.cs" />
     <Compile Include="Enums\BitmapCompressionMethods.cs" />
     <Compile Include="Enums\ColorSpaceEnum.cs" />
+    <Compile Include="Enums\DpiAwareness.cs" />
+    <Compile Include="Enums\DpiAwarenessContext.cs" />
     <Compile Include="Enums\DwmBlurBehindFlags.cs" />
+    <Compile Include="Enums\HResultExtensions.cs" />
+    <Compile Include="Enums\MonitorDpiType.cs" />
+    <Compile Include="Forms\FormsExtensions.cs" />
     <Compile Include="Mouse\Native\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\InteropWindowCacheFlags.cs" />
-    <Compile Include="Enums\MonitorFromRectFlags.cs" />
+    <Compile Include="Enums\MonitorFromFlags.cs" />
     <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
     <Compile Include="Enums\PrintWindowFlags.cs" />
     <Compile Include="Enums\RasterOperations.cs" />
@@ -191,6 +199,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsVersion.cs" />
     <Compile Include="Desktop\WinProcHandler.cs" />
+    <Compile Include="Wpf\WindowExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -322,7 +322,7 @@ namespace Dapplo.Windows.Desktop
 				if (!region.IsInvalid)
 				{
 					var result = User32.GetWindowRgn(interopWindow.Handle, region);
-					if (result != RegionResults.REGION_ERROR && result != RegionResults.REGION_NULLREGION)
+					if (result != RegionResults.Error && result != RegionResults.NullRegion)
 					{
 						return Region.FromHrgn(region.DangerousGetHandle());
 					}

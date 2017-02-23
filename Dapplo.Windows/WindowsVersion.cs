@@ -79,7 +79,17 @@ namespace Dapplo.Windows
 		/// <returns>true if we are running on Windows 8 or later</returns>
 		public static bool IsWindows8OrLater(this OperatingSystem operatingSystem)
 		{
-			return operatingSystem.Version.Major == 6 && operatingSystem.Version.Minor >= 2 || operatingSystem.Version.Major > 6;
+			return (operatingSystem.Version.Major == 6 && operatingSystem.Version.Minor >= 2) || operatingSystem.Version.Major > 6;
+		}
+
+		/// <summary>
+		///     Test if the current OS is Windows 8.1 or later
+		/// </summary>
+		/// <param name="operatingSystem">OperatingSystem from Environment.OSVersion</param>
+		/// <returns>true if we are running on Windows 8.1 or later</returns>
+		public static bool IsWindows81OrLater(this OperatingSystem operatingSystem)
+		{
+			return operatingSystem.Version.Major == 6 && operatingSystem.Version.Minor >= 3 || operatingSystem.Version.Major > 6;
 		}
 
 		/// <summary>

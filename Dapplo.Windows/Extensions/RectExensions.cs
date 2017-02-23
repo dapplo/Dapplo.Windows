@@ -142,8 +142,7 @@ namespace Dapplo.Windows.Extensions
 		///     Test if a RECT is docked to the right of another RECT
 		/// </summary>
 		/// <param name="rect1">RECT to test if it's docked</param>
-		/// <param name="rect2">
-		///     RECT rect to be docked to<</param>
+		/// <param name="rect2">RECT rect to be docked to</param>
 		/// <returns>bool with true if they are docked</returns>
 		public static bool IsDockedToRightOf(this RECT rect1, RECT rect2)
 		{

@@ -63,6 +63,9 @@ namespace Dapplo.Windows.Enums
 		///     selected nor cleared and is therefore in the third or mixed state.
 		/// </summary>
 		STATE_SYSTEM_MIXED = 0x00000020,
+		/// <summary>
+		/// Same as STATE_SYSTEM_MIXED
+		/// </summary>
 		STATE_SYSTEM_INDETERMINATE = STATE_SYSTEM_MIXED,
 
 		/// <summary>
@@ -215,6 +218,9 @@ namespace Dapplo.Windows.Enums
 		///     When invoked, the object displays a pop-up menu or a window.
 		/// </summary>
 		STATE_SYSTEM_HASPOPUP = 0x40000000,
+		/// <summary>
+		/// A bitmask representing all valid state flags
+		/// </summary>
 		STATE_SYSTEM_VALID = 0x3FFFFFFF
 	}
 }

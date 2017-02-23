@@ -26,6 +26,7 @@ namespace Dapplo.Windows.Enums
 	/// </summary>
 	public enum Win32Error : uint
 	{
+#pragma warning disable 1591
 		Success = 0x0,
 		InvalidFunction = 0x1,
 		FileNotFound = 0x2,
@@ -85,5 +86,6 @@ namespace Dapplo.Windows.Enums
 		InvalidAtInterruptTime = 0x68,
 		SemOwnerDied = 0x69,
 		SemUserLimit = 0x6a
+#pragma warning restore 1591
 	}
 }

@@ -34,8 +34,17 @@ namespace Dapplo.Windows.Enums
 	[Flags]
 	public enum CursorInfoFlags : uint
 	{
-		CURSOR_HIDDEN = 0,
-		CURSOR_SHOWING = 1,
-		CURSOR_SUPPRESSED = 2
+		/// <summary>
+		/// Cursor is hidden
+		/// </summary>
+		Hidden = 0,
+		/// <summary>
+		/// Cursor is showing
+		/// </summary>
+		Showing = 1,
+		/// <summary>
+		/// Cursor is suppressed
+		/// </summary>
+		Suppressed = 2
 	}
 }

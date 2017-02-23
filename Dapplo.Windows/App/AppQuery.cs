@@ -143,7 +143,7 @@ namespace Dapplo.Windows.App
 						// Fullscreen, it's "visible" when AppVisibilityOnMonitor says yes
 						// Although it might be the other App, this is not "very" important
 						var rect = screen.Bounds;
-						var monitor = User32.MonitorFromRect(ref rect, MonitorFromRectFlags.DefaultToNearest);
+						var monitor = User32.MonitorFromRect(ref rect, MonitorFromFlags.DefaultToNearest);
 						if (monitor != IntPtr.Zero)
 						{
 							var monitorAppVisibility = AppVisibility.ComObject.GetAppVisibilityOnMonitor(monitor);

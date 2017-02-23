@@ -142,10 +142,14 @@ namespace Dapplo.Windows.Enums
 		///     Indicates whether the screen saver is secure.
 		/// </summary>
 		SCF_ISSECURE = 0x00000001,
-		/*
-		  * Obsolete names
-		  */
+		/// <summary>
+		/// Same as SC_MINIMIZE
+		/// </summary>
 		SC_ICON = SC_MINIMIZE,
+
+		/// <summary>
+		/// Same as SC_MAXIMIZE
+		/// </summary>
 		SC_ZOOM = SC_MAXIMIZE
 	}
 }

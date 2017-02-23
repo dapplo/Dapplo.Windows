@@ -161,6 +161,7 @@ namespace Dapplo.Windows.Enums
 		/// </summary>
 		WS_TABSTOP = 0x00010000,
 
+#pragma warning disable 1591
 		WS_UNK8000 = 0x00008000,
 		WS_UNK4000 = 0x00004000,
 		WS_UNK2000 = 0x00002000,
@@ -177,6 +178,7 @@ namespace Dapplo.Windows.Enums
 		WS_UNK4 = 0x00000004,
 		WS_UNK2 = 0x00000002,
 		WS_UNK1 = 0x00000001,
+#pragma warning restore 1591
 
 
 		/// <summary>

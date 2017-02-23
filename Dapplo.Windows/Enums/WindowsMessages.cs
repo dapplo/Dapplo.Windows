@@ -26,6 +26,7 @@ namespace Dapplo.Windows.Enums
 	/// </summary>
 	public enum WindowsMessages : int
 	{
+#pragma warning disable 1591
 		WM_NULL = 0x0000,
 		WM_CREATE = 0x0001,
 		WM_DESTROY = 0x0002,
@@ -93,6 +94,9 @@ namespace Dapplo.Windows.Enums
 		WM_CONTEXTMENU = 0x007B,
 		WM_STYLECHANGING = 0x007C,
 		WM_STYLECHANGED = 0x007D,
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145210(v=vs.85).aspx">WM_DISPLAYCHANGE message</a>
+		/// </summary>
 		WM_DISPLAYCHANGE = 0x007E,
 		WM_GETICON = 0x007F,
 		WM_SETICON = 0x0080,
@@ -235,9 +239,12 @@ namespace Dapplo.Windows.Enums
 
 		WM_WTSSESSION_CHANGE = 0x02B1,
 
-		WM_TABLET_FIRST = 0x02c0,
-		WM_TABLET_LAST = 0x02df,
-
+		WM_TABLET_FIRST = 0x02C0,
+		WM_TABLET_LAST = 0x02DF,
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn312083(v=vs.85).aspx">WM_DPICHANGED message</a>
+		/// </summary>
+		WM_DPICHANGED = 0x02E0,
 		WM_CUT = 0x0300,
 		WM_COPY = 0x0301,
 		WM_PASTE = 0x0302,
@@ -286,5 +293,6 @@ namespace Dapplo.Windows.Enums
 		WM_APP = 0x8000,
 		WM_REFLECT = WM_USER + 0x1C00,
 		WM_RASDIALEVENT = 0xCCCD,
+#pragma warning restore 1591
 	}
 }

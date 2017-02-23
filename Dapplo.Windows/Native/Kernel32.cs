@@ -64,7 +64,7 @@ namespace Dapplo.Windows.Native
 			// Try the GetModuleFileName method first since it's the fastest. 
 			// May return ACCESS_DENIED (due to VM_READ flag) if the process is not owned by the current user.
 			// Will fail if we are compiled as x86 and we're trying to open a 64 bit process...not allowed.
-			var hprocess = OpenProcess(ProcessAccessFlags.QueryInformation | ProcessAccessFlags.VMRead, false, processid);
+			var hprocess = OpenProcess(ProcessAccessFlags.QueryInformation | ProcessAccessFlags.VirtualMemoryRead, false, processid);
 			if (hprocess != IntPtr.Zero)
 			{
 				try

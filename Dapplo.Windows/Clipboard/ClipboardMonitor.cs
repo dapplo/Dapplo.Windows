@@ -39,7 +39,6 @@ namespace Dapplo.Windows.Clipboard
 	/// </summary>
 	public class ClipboardMonitor
 	{
-
 		/// <summary>
 		///     The singleton of the KeyboardHook
 		/// </summary>
@@ -57,9 +56,11 @@ namespace Dapplo.Windows.Clipboard
 		{
 			_clipboardObservable = Observable.Create<EventArgs>(observer =>
 			{
+				// This handles the message
 				HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr param, IntPtr lParam, ref bool handled) =>
 				{
-					if (msg == (int) WindowsMessages.WM_CLIPBOARDUPDATE)
+					var windowsMessage = (WindowsMessages)msg;
+					if (windowsMessage == WindowsMessages.WM_CLIPBOARDUPDATE)
 					{
 						observer.OnNext(EventArgs.Empty);
 					}

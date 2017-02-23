@@ -528,6 +528,35 @@ namespace Dapplo.Windows.Enums
 		SM_CMETRICS_NT = 88,
 
 		/// <summary>
+		/// The build number if the system is Windows Server 2003 R2; otherwise, 0
+		/// </summary>
+		SM_SERVERR2 = 89,
+
+		/// <summary>
+		/// Nonzero if a mouse with a horizontal scroll wheel is installed; otherwise 0.
+		/// </summary>
+		SM_MOUSEHORIZONTALWHEELPRESENT = 91,
+
+		/// <summary>
+		/// The amount of border padding for captioned windows, in pixels.
+		/// Windows XP/2000:  This value is not supported.
+		/// </summary>
+		SM_CXPADDEDBORDER = 92,
+
+		/// <summary>
+		/// Nonzero if the current operating system is Windows 7 or Windows Server 2008 R2 and the Tablet PC Input service is started; otherwise, 0. The return value is a bitmask that specifies the type of digitizer input supported by the device. For more information, see Remarks.
+		/// Windows Server 2008, Windows Vista and Windows XP/2000:  This value is not supported.
+		/// </summary>
+		SM_DIGITIZER = 94,
+
+		/// <summary>
+		/// Nonzero if there are digitizers in the system; otherwise, 0.
+		/// SM_MAXIMUMTOUCHES returns the aggregate maximum of the maximum number of contacts supported by every digitizer in the system. If the system has only single-touch digitizers, the return value is 1. If the system has multi-touch digitizers, the return value is the number of simultaneous contacts the hardware can provide.
+		/// Windows Server 2008, Windows Vista and Windows XP/2000:  This value is not supported.
+		/// </summary>
+		SM_MAXIMUMTOUCHES = 95,
+
+		/// <summary>
 		///     Windows XP (v5.1+) This system metric is used in a Terminal Services environment. If the calling process is
 		///     associated with a Terminal Services client session, the return value is nonzero. If the calling process is
 		///     associated with the Terminal Server console session, the return value is zero. The console session is not

@@ -31,25 +31,37 @@ namespace Dapplo.Windows.Enums
 		///     Scrolls one line up.
 		/// </summary>
 		SB_LINEUP = 0,
-		SB_LINELEFT = 0,
+		/// <summary>
+		/// Same as SB_LINEUP, can be used when thinking horizontally
+		/// </summary>
+		SB_LINELEFT = SB_LINEUP,
 
 		/// <summary>
 		///     Scrolls one line down.
 		/// </summary>
 		SB_LINEDOWN = 1,
-		SB_LINERIGHT = 1,
+		/// <summary>
+		/// Same as SB_LINEDOWN, can be used when thinking horizontally
+		/// </summary>
+		SB_LINERIGHT = SB_LINEDOWN,
 
 		/// <summary>
 		///     Scrolls one page up.
 		/// </summary>
 		SB_PAGEUP = 2,
-		SB_PAGELEFT = 2,
+		/// <summary>
+		/// Same as SB_PAGEUP, can be used when thinking horizontally
+		/// </summary>
+		SB_PAGELEFT = SB_PAGEUP,
 
 		/// <summary>
 		///     Scrolls one page down.
 		/// </summary>
 		SB_PAGEDOWN = 3,
-		SB_PAGERIGHT = 3,
+		/// <summary>
+		/// Same as SB_PAGEDOWN, can be used when thinking horizontally
+		/// </summary>
+		SB_PAGERIGHT = SB_PAGEDOWN,
 
 		/// <summary>
 		///     The user has dragged the scroll box (thumb) and released the mouse button.
@@ -68,13 +80,19 @@ namespace Dapplo.Windows.Enums
 		///     Scrolls to the upper left.
 		/// </summary>
 		SB_TOP = 6,
-		SB_LEFT = 6,
+		/// <summary>
+		/// Same as SB_TOP, can be used when thinking horizontally
+		/// </summary>
+		SB_LEFT = SB_TOP,
 
 		/// <summary>
 		///     Scrolls to the lower right.
 		/// </summary>
 		SB_BOTTOM = 7,
-		SB_RIGHT = 7,
+		/// <summary>
+		/// Same as SB_BOTTOM, can be used when thinking horizontally
+		/// </summary>
+		SB_RIGHT = SB_BOTTOM,
 
 		/// <summary>
 		///     Ends scroll.

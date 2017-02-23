@@ -239,7 +239,7 @@ namespace Dapplo.Windows.Native
 				iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero);
 				if (iconHandle == IntPtr.Zero)
 				{
-					iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.GCL_HICON);
+					iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.IconHandle);
 				}
 			}
 			else
@@ -252,7 +252,7 @@ namespace Dapplo.Windows.Native
 			}
 			if (iconHandle == IntPtr.Zero)
 			{
-				iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.GCL_HICONSM);
+				iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.SmallIconHandle);
 			}
 			if (iconHandle == IntPtr.Zero)
 			{
@@ -260,7 +260,7 @@ namespace Dapplo.Windows.Native
 			}
 			if (iconHandle == IntPtr.Zero)
 			{
-				iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.GCL_HICON);
+				iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.IconHandle);
 			}
 
 			if (iconHandle == IntPtr.Zero)
@@ -544,7 +544,7 @@ namespace Dapplo.Windows.Native
 		private static extern IntPtr GetClassLong(IntPtr hWnd, ClassLongIndex index);
 
 		[DllImport("user32", SetLastError = true, EntryPoint = "GetClassLongPtr")]
-		public static extern IntPtr GetClassLongPtr(IntPtr hWnd, ClassLongIndex index);
+		private static extern IntPtr GetClassLongPtr(IntPtr hWnd, ClassLongIndex index);
 
 		/// <summary>
 		///     See
@@ -612,8 +612,15 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true, EntryPoint = "SetWindowLongPtr")]
 		private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, WindowLongIndex index, IntPtr styleFlags);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145064(v=vs.85).aspx">MonitorFromWindow function</a>
+		/// The MonitorFromWindow function retrieves a handle to the display monitor that has the largest area of intersection with the bounding rectangle of a specified window.
+		/// </summary>
+		/// <param name="hwnd"></param>
+		/// <param name="monitorFromFlags">MonitorFromFlags</param>
+		/// <returns>IntPtr for the monitor</returns>
 		[DllImport("user32", SetLastError = true)]
-		public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
+		public static extern IntPtr MonitorFromWindow(IntPtr hwnd, MonitorFromFlags monitorFromFlags);
 
 		/// <summary>
 		///     The MonitorFromRect function retrieves a handle to the display monitor that has the largest area of intersection
@@ -622,11 +629,18 @@ namespace Dapplo.Windows.Native
 		///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145063(v=vs.85).aspx">MonitorFromRect function</a>
 		/// </summary>
 		/// <param name="rect">A RECT structure that specifies the rectangle of interest in virtual-screen coordinates.</param>
-		/// <param name="monitorFromRectFlags">MonitorFromRectFlags</param>
+		/// <param name="monitorFromFlags">MonitorFromRectFlags</param>
 		/// <returns>HMONITOR handle</returns>
 		[DllImport("user32", SetLastError = true)]
-		public static extern IntPtr MonitorFromRect([In] ref RECT rect, MonitorFromRectFlags monitorFromRectFlags);
+		public static extern IntPtr MonitorFromRect([In] ref RECT rect, MonitorFromFlags monitorFromFlags);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633516(v=vs.85).aspx">GetWindowInfo</a>
+		/// Retrieves information about the specified window.
+		/// </summary>
+		/// <param name="hwnd">IntPtr</param>
+		/// <param name="pwi">WINDOWINFO</param>
+		/// <returns>bool if false than get the last error</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
@@ -731,6 +745,12 @@ namespace Dapplo.Windows.Native
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool GetScrollBarInfo(IntPtr hwnd, ObjectIdentifiers idObject, ref ScrollBarInfo scrollBarInfo);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd144950(v=vs.85).aspx">GetWindowRgn function</a>
+		/// </summary>
+		/// <param name="hWnd">IntPtr</param>
+		/// <param name="hRgn">SafeHandle</param>
+		/// <returns>RegionResults</returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern RegionResults GetWindowRgn(IntPtr hWnd, SafeHandle hRgn);
 
@@ -786,6 +806,11 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, ref POINT lpPoints, [MarshalAs(UnmanagedType.U4)] int cPoints);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724385(v=vs.85).aspx">GetSystemMetrics function</a>
+		/// </summary>
+		/// <param name="index">SystemMetric</param>
+		/// <returns>int</returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern int GetSystemMetrics(SystemMetric index);
 
