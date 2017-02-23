@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
 using Dapplo.Windows.Enums;
@@ -58,6 +59,29 @@ namespace Dapplo.Windows.Desktop
 		/// </summary>
 		/// <param name="value">Action with double for the DPI and an doubke with the factor for the scaling (1.0 = 100% = 96 dpi)</param>
 		public Action<double, double> OnDpiChangedAction { get; set; }
+
+		/// <summary>
+		/// Check if the process is DPI Aware, an DpiHandler doesn't make sense if not.
+		/// </summary>
+		public static bool IsDpiAware
+		{
+			get
+			{
+				// We can only test this for Windows 8.1 or later
+				if (!Environment.OSVersion.IsWindows81OrLater())
+				{
+					Log.Verbose().WriteLine("An application can only be DPI aware starting with Window 8.1 and later.");
+					return false;
+				}
+				using (var process = Process.GetCurrentProcess())
+				{
+					DpiAwareness dpiAwareness;
+					GetProcessDpiAwareness(process.Handle, out dpiAwareness);
+					Log.Verbose().WriteLine("Process {0} has a Dpi awareness {1}", process.ProcessName, dpiAwareness);
+					return dpiAwareness == DpiAwareness.PerMonitorAware || dpiAwareness == DpiAwareness.SystemAware;
+				}
+			}
+		}
 
 		/// <summary>
 		///     Message handler of the Per_Monitor_DPI_Aware window.

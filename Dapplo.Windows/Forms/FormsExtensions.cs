@@ -36,6 +36,10 @@ namespace Dapplo.Windows.Forms
 		/// <returns>DpiHandler</returns>
 		public static DpiHandler HandleDpiChanges(this Form form)
 		{
+			if (!DpiHandler.IsDpiAware)
+			{
+				return null;
+			}
 			var dpiHandler = new DpiHandler();
 			var listener = new WinProcListener(form);
 			listener.AddHook(dpiHandler.HandleMessages);

@@ -43,6 +43,11 @@ namespace Dapplo.Windows.Wpf
 		/// <returns>DpiHandler</returns>
 		public static DpiHandler HandleDpiChanges(this Window window)
 		{
+			if (!DpiHandler.IsDpiAware)
+			{
+				return null;
+			}
+
 			var dpiHandler = new DpiHandler();
 			var hwndSource = (HwndSource) PresentationSource.FromVisual(window);
 			if (hwndSource == null)
