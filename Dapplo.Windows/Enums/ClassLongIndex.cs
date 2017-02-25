@@ -51,11 +51,11 @@ namespace Dapplo.Windows.Enums
 		/// </summary>
 		CursorHandle = -12,
 		/// <summary>
-		/// a handle to the icon associated with the class.
+		/// GCL_HICON a handle to the icon associated with the class.
 		/// </summary>
 		IconHandle = -14,
 		/// <summary>
-		/// a handle to the small icon associated with the class.
+		/// GCL_HICONSM a handle to the small icon associated with the class.
 		/// </summary>
 		SmallIconHandle = -34,
 		/// <summary>

@@ -72,7 +72,8 @@
     <Compile Include="App\MonitorAppVisibility.cs" />
     <Compile Include="Clipboard\ClipboardMonitor.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
-    <Compile Include="Desktop\DpiHandler.cs" />
+    <Compile Include="Dpi\BitmapScaleHandler.cs" />
+    <Compile Include="Dpi\DpiHandler.cs" />
     <Compile Include="Desktop\IInteropWindow.cs" />
     <Compile Include="Desktop\InteropWindowFactory.cs" />
     <Compile Include="Desktop\InteropWindowQuery.cs" />
@@ -86,8 +87,8 @@
     <Compile Include="Enums\DwmBlurBehindFlags.cs" />
     <Compile Include="Enums\HResultExtensions.cs" />
     <Compile Include="Enums\MonitorDpiType.cs" />
-    <Compile Include="Forms\FormsExtensions.cs" />
-    <Compile Include="Forms\WinProcListener.cs" />
+    <Compile Include="Dpi\FormsExtensions.cs" />
+    <Compile Include="Dpi\WinProcListener.cs" />
     <Compile Include="Mouse\Native\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\InteropWindowCacheFlags.cs" />
     <Compile Include="Enums\MonitorFromFlags.cs" />
@@ -200,7 +201,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsVersion.cs" />
     <Compile Include="Desktop\WinProcHandler.cs" />
-    <Compile Include="Wpf\WindowExtensions.cs" />
+    <Compile Include="Dpi\WindowExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

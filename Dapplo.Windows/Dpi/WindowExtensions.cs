@@ -25,11 +25,10 @@ using System;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
-using Dapplo.Windows.Desktop;
 
 #endregion
 
-namespace Dapplo.Windows.Wpf
+namespace Dapplo.Windows.Dpi
 {
 	/// <summary>
 	///     Extensions for the WPF Window class
@@ -57,7 +56,7 @@ namespace Dapplo.Windows.Wpf
 			hwndSource.AddHook(dpiHandler.HandleMessages);
 			dpiHandler.MessageHandler = hwndSource;
 			// Add the layout transform action
-			dpiHandler.OnDpiChangedAction = (dpi, scaleFactor) => window.UpdateLayoutTransform(scaleFactor);
+			dpiHandler.OnDpiChanged.Subscribe(dpi => window.UpdateLayoutTransform(dpi/DpiHandler.DefaultScreenDpi));
 			return dpiHandler;
 		}
 

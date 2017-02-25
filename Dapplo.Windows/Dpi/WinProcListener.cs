@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Windows.Interop;
 
-namespace Dapplo.Windows.Forms
+namespace Dapplo.Windows.Dpi
 {
 	/// <summary>
 	/// This is a Listener for WinProc messages

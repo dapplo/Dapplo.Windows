@@ -23,6 +23,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
 using Dapplo.Windows.Enums;
@@ -32,7 +33,7 @@ using Dapplo.Windows.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Desktop
+namespace Dapplo.Windows.Dpi
 {
 	/// <summary>
 	///     This handles DPI changes
@@ -40,13 +41,16 @@ namespace Dapplo.Windows.Desktop
 	/// </summary>
 	public class DpiHandler : IDisposable
 	{
-		private const double UserDefaultScreenDpi = 96d;
+		/// <summary>
+		/// This is the default DPI for the screen
+		/// </summary>
+		public const double DefaultScreenDpi = 96d;
 		private static readonly LogSource Log = new LogSource();
 
 		/// <summary>
 		///     Retrieve the current DPI for the window
 		/// </summary>
-		public double Dpi { get; private set; } = UserDefaultScreenDpi;
+		public double Dpi { get; private set; } = DefaultScreenDpi;
 
 		/// <summary>
 		///     This is that which handles the windows messages, and needs to be disposed
@@ -54,11 +58,9 @@ namespace Dapplo.Windows.Desktop
 		internal IDisposable MessageHandler { get; set; }
 
 		/// <summary>
-		///     The action to be called, for when a change occurs.
-		///     This is already set with a default handler, depending on the type of Window which this handler handles.
+		/// This subject publishes whenever the dpi settings change
 		/// </summary>
-		/// <param name="value">Action with double for the DPI and an doubke with the factor for the scaling (1.0 = 100% = 96 dpi)</param>
-		public Action<double, double> OnDpiChangedAction { get; set; }
+		public ISubject<double> OnDpiChanged { get; } = new Subject<double>();
 
 		/// <summary>
 		/// Check if the process is DPI Aware, an DpiHandler doesn't make sense if not.
@@ -99,7 +101,7 @@ namespace Dapplo.Windows.Desktop
 		internal IntPtr HandleMessages(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
 			var windowsMessage = (WindowsMessages) msg;
-			var currentDpi = (int) UserDefaultScreenDpi;
+			var currentDpi = (int) DefaultScreenDpi;
 			bool isDpiMessage = false;
 			switch (windowsMessage)
 			{
@@ -150,9 +152,8 @@ namespace Dapplo.Windows.Desktop
 				if (!IsEqual(Dpi, currentDpi))
 				{
 					Dpi = currentDpi;
-					var scaleFactor = Dpi / UserDefaultScreenDpi;
-					Log.Verbose().WriteLine("Got new DPI {0} which is a scale factor of {1}", currentDpi, scaleFactor);
-					OnDpiChangedAction?.Invoke(Dpi, scaleFactor);
+					Log.Verbose().WriteLine("Got new DPI {0} which is a scale factor of {1}", currentDpi);
+					OnDpiChanged.OnNext(Dpi);
 				}
 				else
 				{

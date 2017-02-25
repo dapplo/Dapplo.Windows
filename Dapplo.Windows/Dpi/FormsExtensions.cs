@@ -20,9 +20,8 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System.Windows.Forms;
-using Dapplo.Windows.Desktop;
 
-namespace Dapplo.Windows.Forms
+namespace Dapplo.Windows.Dpi
 {
 	/// <summary>
 	/// Extensions for Windows Form
