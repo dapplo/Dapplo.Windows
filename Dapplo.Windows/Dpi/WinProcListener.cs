@@ -68,7 +68,7 @@ namespace Dapplo.Windows.Dpi
 		private void OnHandleCreated(object sender, EventArgs e)
 		{
 			// Window is now created, assign handle to NativeWindow.
-			AssignHandle(((Form)sender).Handle);
+			AssignHandle(((Control)sender).Handle);
 		}
 
 		/// <summary>
