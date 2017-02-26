@@ -38,7 +38,7 @@ namespace Dapplo.Windows.Dpi
 	/// </summary>
 	public class BitmapScaleHandler
 	{
-		private static readonly Bitmap Empty = new Bitmap(0, 0);
+		private static readonly Bitmap Empty = null;
 		private readonly IDictionary<string, Bitmap> _images = new Dictionary<string, Bitmap>();
 		private bool _areWeDisposing;
 		private readonly IDisposable _dpiChangeSubscription;
@@ -184,6 +184,10 @@ namespace Dapplo.Windows.Dpi
 				return result;
 			}
 			var image = BitmapProvider(imageName, _dpi);
+			if (image == null)
+			{
+				return null;
+			}
 			result = BitmapScaler?.Invoke(image, _dpi);
 			if (result == null || Equals(image, result))
 			{

@@ -29,18 +29,18 @@ namespace Dapplo.Windows.Dpi
 	public static class FormsExtensions
 	{
 		/// <summary>
-		/// Handle DPI changes for the specified Form
+		/// Handle DPI changes for the specified Control (Form, ContextMenu etc)
 		/// </summary>
-		/// <param name="form">Form</param>
+		/// <param name="control">Control</param>
 		/// <returns>DpiHandler</returns>
-		public static DpiHandler HandleDpiChanges(this Form form)
+		public static DpiHandler HandleDpiChanges(this Control control)
 		{
 			if (!DpiHandler.IsDpiAware)
 			{
 				return null;
 			}
 			var dpiHandler = new DpiHandler();
-			var listener = new WinProcListener(form);
+			var listener = new WinProcListener(control);
 			listener.AddHook(dpiHandler.HandleMessages);
 			dpiHandler.MessageHandler = listener;
 			return dpiHandler;
