@@ -35,7 +35,7 @@ namespace Dapplo.Windows.Dpi
 		/// <summary>
 		/// Adds an event handler
 		/// </summary>
-		/// <param name="hook"></param>
+		/// <param name="hook">HwndSourceHook</param>
 		public void AddHook(HwndSourceHook hook)
 		{
 			_hooks.Add(hook);
@@ -44,7 +44,7 @@ namespace Dapplo.Windows.Dpi
 		/// <summary>
 		/// Removes the event handlers that were added by AddHook
 		/// </summary>
-		/// <param name="hook">The event handler to remove.</param>
+		/// <param name="hook">HwndSourceHook, The event handler to remove.</param>
 		public void RemoveHook(HwndSourceHook hook)
 		{
 			_hooks.Remove(hook);
@@ -74,8 +74,8 @@ namespace Dapplo.Windows.Dpi
 		/// <summary>
 		/// Remove the handle
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
+		/// <param name="sender">object</param>
+		/// <param name="e">EventArgs</param>
 		private void OnHandleDestroyed(object sender, EventArgs e)
 		{
 			// Window was destroyed, release hook.

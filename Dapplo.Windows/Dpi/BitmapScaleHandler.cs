@@ -61,7 +61,7 @@ namespace Dapplo.Windows.Dpi
 		/// <summary>
 		///     A list of actions which apply the bitmap
 		/// </summary>
-		private IList<Action> ApplyActions { get; } = new List<Action>();
+		private IDictionary<object, Action> ApplyActions { get; } = new Dictionary<object, Action>();
 
 		/// <summary>
 		///     This function retrieves the bitmap
@@ -78,9 +78,14 @@ namespace Dapplo.Windows.Dpi
 		/// </summary>
 		/// <param name="apply">Action which assigns a bitmap</param>
 		/// <param name="imageName">name of the image</param>
-		public void AddApplyAction(Action<Bitmap> apply, string imageName)
+		/// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
+		public void AddApplyAction(Action<Bitmap> apply, string imageName, bool execute = false)
 		{
-			ApplyActions.Add(() => apply(GetBitmap(imageName)));
+			ApplyActions[apply]  = () => apply(GetBitmap(imageName));
+			if (execute)
+			{
+				ApplyActions[apply]();
+			}
 		}
 
 		/// <summary>
@@ -88,9 +93,14 @@ namespace Dapplo.Windows.Dpi
 		/// </summary>
 		/// <param name="button">Button</param>
 		/// <param name="imageName">name of the image</param>
-		public void AddTarget(Button button, string imageName)
+		/// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
+		public void AddTarget(Button button, string imageName, bool execute = false)
 		{
-			ApplyActions.Add(() => button.Image = GetBitmap(imageName));
+			ApplyActions[button] = () => button.Image = GetBitmap(imageName);
+			if (execute)
+			{
+				ApplyActions[button]();
+			}
 		}
 
 		/// <summary>
@@ -98,9 +108,23 @@ namespace Dapplo.Windows.Dpi
 		/// </summary>
 		/// <param name="toolStripItem">ToolStripItem</param>
 		/// <param name="imageName">name of the image</param>
-		public void AddTarget(ToolStripItem toolStripItem, string imageName)
+		/// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
+		public void AddTarget(ToolStripItem toolStripItem, string imageName, bool execute = false)
 		{
-			ApplyActions.Add(() => toolStripItem.Image = GetBitmap(imageName));
+			ApplyActions[toolStripItem] = () => toolStripItem.Image = GetBitmap(imageName);
+			if (execute)
+			{
+				ApplyActions[toolStripItem]();
+			}
+		}
+
+		/// <summary>
+		/// Remove a previously added target for being updated.
+		/// This will not update the image, or remove it right away.
+		/// </summary>
+		public void RemoveTarget(object target)
+		{
+			ApplyActions.Remove(target);
 		}
 
 		/// <summary>
@@ -125,7 +149,7 @@ namespace Dapplo.Windows.Dpi
 			// Store the current DPI value, for creating the images
 			_dpi = dpi;
 			// Apply new images
-			foreach (var applyAction in ApplyActions)
+			foreach (var applyAction in ApplyActions.Values)
 			{
 				applyAction();
 			}
@@ -176,7 +200,7 @@ namespace Dapplo.Windows.Dpi
 		{
 			_areWeDisposing = true;
 			// Set all bitmaps to an empty one
-			foreach (var applyAction in ApplyActions)
+			foreach (var applyAction in ApplyActions.Values)
 			{
 				applyAction();
 			}
