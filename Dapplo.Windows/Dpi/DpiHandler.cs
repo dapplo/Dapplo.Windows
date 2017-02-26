@@ -152,7 +152,7 @@ namespace Dapplo.Windows.Dpi
 				if (!IsEqual(Dpi, currentDpi))
 				{
 					Dpi = currentDpi;
-					Log.Verbose().WriteLine("Got new DPI {0} which is a scale factor of {1}", currentDpi);
+					Log.Verbose().WriteLine("Got new DPI {0}", currentDpi);
 					OnDpiChanged.OnNext(Dpi);
 				}
 				else
