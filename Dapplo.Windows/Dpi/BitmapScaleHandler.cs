@@ -33,27 +33,20 @@ using System.Windows.Forms;
 namespace Dapplo.Windows.Dpi
 {
 	/// <summary>
-	///     This provides bitmaps scaled according to the current DPI.
-	///     If the DPI changes, it will reapply the bitmaps and dispose the old ones (if needed).
+	/// Factory for the generic BitmapScaleHandler
 	/// </summary>
-	public class BitmapScaleHandler
+	public static class BitmapScaleHandler
 	{
-		private static readonly Bitmap Empty = null;
-		private readonly IDictionary<string, Bitmap> _images = new Dictionary<string, Bitmap>();
-		private bool _areWeDisposing;
-		private IDisposable _dpiChangeSubscription;
-		private double _dpi;
-
 		/// <summary>
-		///     Create for a ComponentResourceManager
+		///     Create a BitmapScaleHandler with a ComponentResourceManager as resource provider
 		/// </summary>
 		/// <param name="dpiHandler">DpiHandler</param>
 		/// <param name="resourceType">Type to create the ComponentResourceManager for</param>
 		/// <param name="bitmapScaler">A function to provide a newly scaled bitmap</param>
-		public BitmapScaleHandler(DpiHandler dpiHandler, Type resourceType, Func<Bitmap, double, Bitmap> bitmapScaler = null)
+		public static BitmapScaleHandler<string> WithComponentResourceManager(DpiHandler dpiHandler, Type resourceType, Func<Bitmap, double, Bitmap> bitmapScaler = null)
 		{
 			var resources = new ComponentResourceManager(resourceType);
-			Initialize(dpiHandler, (imageName, dpi) => (Bitmap) resources.GetObject(imageName), bitmapScaler);
+			return Create<string>(dpiHandler, (imageName, dpi) => (Bitmap)resources.GetObject(imageName), bitmapScaler);
 		}
 
 		/// <summary>
@@ -62,9 +55,29 @@ namespace Dapplo.Windows.Dpi
 		/// <param name="dpiHandler">DpiHandler</param>
 		/// <param name="bitmapProvider">A function which provides the requested bitmap</param>
 		/// <param name="bitmapScaler">A function to provide a newly scaled bitmap</param>
-		public BitmapScaleHandler(DpiHandler dpiHandler, Func<string, double, Bitmap> bitmapProvider, Func<Bitmap, double, Bitmap> bitmapScaler = null)
+		public static BitmapScaleHandler<TKey> Create<TKey>(DpiHandler dpiHandler, Func<TKey, double, Bitmap> bitmapProvider, Func<Bitmap, double, Bitmap> bitmapScaler = null)
 		{
-			Initialize(dpiHandler, bitmapProvider, bitmapScaler);
+			var scaleHandler = new BitmapScaleHandler<TKey>();
+			scaleHandler.Initialize(dpiHandler, bitmapProvider, bitmapScaler);
+			return scaleHandler;
+		}
+	}
+
+	/// <summary>
+	///     This provides bitmaps scaled according to the current DPI.
+	///     If the DPI changes, it will reapply the bitmaps and dispose the old ones (if needed).
+	/// </summary>
+	public class BitmapScaleHandler<TKey>
+	{
+		private static readonly Bitmap Empty = null;
+		private readonly IDictionary<TKey, Bitmap> _images = new Dictionary<TKey, Bitmap>();
+		private bool _areWeDisposing;
+		private IDisposable _dpiChangeSubscription;
+		private double _dpi;
+
+		internal BitmapScaleHandler()
+		{
+			
 		}
 
 		/// <summary>
@@ -73,7 +86,7 @@ namespace Dapplo.Windows.Dpi
 		/// <param name="dpiHandler">DpiHandler</param>
 		/// <param name="bitmapProvider">A function which provides the requested bitmap</param>
 		/// <param name="bitmapScaler">A function to provide a newly scaled bitmap</param>
-		private void Initialize(DpiHandler dpiHandler, Func<string, double, Bitmap> bitmapProvider, Func<Bitmap, double, Bitmap> bitmapScaler = null)
+		internal void Initialize(DpiHandler dpiHandler, Func<TKey, double, Bitmap> bitmapProvider, Func<Bitmap, double, Bitmap> bitmapScaler = null)
 		{
 			BitmapProvider = bitmapProvider;
 			BitmapScaler = bitmapScaler;
@@ -88,7 +101,7 @@ namespace Dapplo.Windows.Dpi
 		/// <summary>
 		///     This function retrieves the bitmap
 		/// </summary>
-		private Func<string, double, Bitmap> BitmapProvider { get; set; }
+		private Func<TKey, double, Bitmap> BitmapProvider { get; set; }
 
 		/// <summary>
 		///     This function scales the bitmap (if needed)
@@ -99,11 +112,11 @@ namespace Dapplo.Windows.Dpi
 		///     Add an action which applies a bitmap
 		/// </summary>
 		/// <param name="apply">Action which assigns a bitmap</param>
-		/// <param name="imageName">name of the image</param>
+		/// <param name="imageKey">key of the image</param>
 		/// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
-		public void AddApplyAction(Action<Bitmap> apply, string imageName, bool execute = false)
+		public void AddApplyAction(Action<Bitmap> apply, TKey imageKey, bool execute = false)
 		{
-			ApplyActions[apply]  = () => apply(GetBitmap(imageName));
+			ApplyActions[apply]  = () => apply(GetBitmap(imageKey));
 			if (execute)
 			{
 				ApplyActions[apply]();
@@ -114,11 +127,11 @@ namespace Dapplo.Windows.Dpi
 		///     Add a Button as a Bitmap target
 		/// </summary>
 		/// <param name="button">Button</param>
-		/// <param name="imageName">name of the image</param>
+		/// <param name="imageKey">key of the image</param>
 		/// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
-		public void AddTarget(Button button, string imageName, bool execute = false)
+		public void AddTarget(Button button, TKey imageKey, bool execute = false)
 		{
-			ApplyActions[button] = () => button.Image = GetBitmap(imageName);
+			ApplyActions[button] = () => button.Image = GetBitmap(imageKey);
 			if (execute)
 			{
 				ApplyActions[button]();
@@ -129,11 +142,11 @@ namespace Dapplo.Windows.Dpi
 		///     Add a ButtonToolStripItem as a Bitmap target
 		/// </summary>
 		/// <param name="toolStripItem">ToolStripItem</param>
-		/// <param name="imageName">name of the image</param>
+		/// <param name="imageKey">key of the image</param>
 		/// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
-		public void AddTarget(ToolStripItem toolStripItem, string imageName, bool execute = false)
+		public void AddTarget(ToolStripItem toolStripItem, TKey imageKey, bool execute = false)
 		{
-			ApplyActions[toolStripItem] = () => toolStripItem.Image = GetBitmap(imageName);
+			ApplyActions[toolStripItem] = () => toolStripItem.Image = GetBitmap(imageKey);
 			if (execute)
 			{
 				ApplyActions[toolStripItem]();
@@ -192,20 +205,20 @@ namespace Dapplo.Windows.Dpi
 		/// <summary>
 		///     Get bitmaps for displaying
 		/// </summary>
-		/// <param name="imageName">string with the name</param>
+		/// <param name="imageKey">string with the name</param>
 		/// <returns>Bitmap</returns>
-		private Bitmap GetBitmap(string imageName)
+		private Bitmap GetBitmap(TKey imageKey)
 		{
 			if (_areWeDisposing)
 			{
 				return Empty;
 			}
 			Bitmap result;
-			if (_images.TryGetValue(imageName, out result))
+			if (_images.TryGetValue(imageKey, out result))
 			{
 				return result;
 			}
-			var image = BitmapProvider(imageName, _dpi);
+			var image = BitmapProvider(imageKey, _dpi);
 			if (image == null)
 			{
 				return null;
@@ -215,7 +228,7 @@ namespace Dapplo.Windows.Dpi
 			{
 				return image;
 			}
-			_images.Add(imageName, result);
+			_images.Add(imageKey, result);
 			return result;
 		}
 
