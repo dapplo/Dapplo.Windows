@@ -86,6 +86,19 @@ namespace Dapplo.Windows.Dpi
 		}
 
 		/// <summary>
+		/// Scale the supplied base width according to the supplied dpi
+		/// </summary>
+		/// <param name="baseWidth">int with e.g. 16 for 16x16 images</param>
+		/// <param name="dpi">current dpi, normal is 96.</param>
+		/// <returns>Scaled width</returns>
+		public static int ScaleWithDpi(int baseWidth, double dpi)
+		{
+			var scaleFactor = (dpi / DefaultScreenDpi);
+			var width = (int)(baseWidth + (scaleFactor - 1) * 4 * baseWidth);
+			return width;
+		}
+
+		/// <summary>
 		///     Message handler of the Per_Monitor_DPI_Aware window.
 		///     The handles the WM_DPICHANGED message and adjusts window size, graphics and text based on the DPI of the monitor.
 		///     The window message provides the new window size (lparam) and new DPI (wparam)

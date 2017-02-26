@@ -41,7 +41,7 @@ namespace Dapplo.Windows.Dpi
 		private static readonly Bitmap Empty = null;
 		private readonly IDictionary<string, Bitmap> _images = new Dictionary<string, Bitmap>();
 		private bool _areWeDisposing;
-		private readonly IDisposable _dpiChangeSubscription;
+		private IDisposable _dpiChangeSubscription;
 		private double _dpi;
 
 		/// <summary>
@@ -53,7 +53,29 @@ namespace Dapplo.Windows.Dpi
 		public BitmapScaleHandler(DpiHandler dpiHandler, Type resourceType, Func<Bitmap, double, Bitmap> bitmapScaler = null)
 		{
 			var resources = new ComponentResourceManager(resourceType);
-			BitmapProvider = (imageName, dpi) => (Bitmap) resources.GetObject(imageName);
+			Initialize(dpiHandler, (imageName, dpi) => (Bitmap) resources.GetObject(imageName), bitmapScaler);
+		}
+
+		/// <summary>
+		///     Create with your own providing logic
+		/// </summary>
+		/// <param name="dpiHandler">DpiHandler</param>
+		/// <param name="bitmapProvider">A function which provides the requested bitmap</param>
+		/// <param name="bitmapScaler">A function to provide a newly scaled bitmap</param>
+		public BitmapScaleHandler(DpiHandler dpiHandler, Func<string, double, Bitmap> bitmapProvider, Func<Bitmap, double, Bitmap> bitmapScaler = null)
+		{
+			Initialize(dpiHandler, bitmapProvider, bitmapScaler);
+		}
+
+		/// <summary>
+		///     Helper method to initialize
+		/// </summary>
+		/// <param name="dpiHandler">DpiHandler</param>
+		/// <param name="bitmapProvider">A function which provides the requested bitmap</param>
+		/// <param name="bitmapScaler">A function to provide a newly scaled bitmap</param>
+		private void Initialize(DpiHandler dpiHandler, Func<string, double, Bitmap> bitmapProvider, Func<Bitmap, double, Bitmap> bitmapScaler = null)
+		{
+			BitmapProvider = bitmapProvider;
 			BitmapScaler = bitmapScaler;
 			_dpiChangeSubscription = dpiHandler.OnDpiChanged.Subscribe(DpiChange);
 		}
@@ -66,12 +88,12 @@ namespace Dapplo.Windows.Dpi
 		/// <summary>
 		///     This function retrieves the bitmap
 		/// </summary>
-		private Func<string, double, Bitmap> BitmapProvider { get; }
+		private Func<string, double, Bitmap> BitmapProvider { get; set; }
 
 		/// <summary>
 		///     This function scales the bitmap (if needed)
 		/// </summary>
-		private Func<Bitmap, double, Bitmap> BitmapScaler { get; }
+		private Func<Bitmap, double, Bitmap> BitmapScaler { get; set; }
 
 		/// <summary>
 		///     Add an action which applies a bitmap
