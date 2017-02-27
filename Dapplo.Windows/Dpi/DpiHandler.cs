@@ -99,7 +99,7 @@ namespace Dapplo.Windows.Dpi
 		}
 
 		/// <summary>
-		/// 
+		/// Create a DpiHandler
 		/// </summary>
 		public DpiHandler()
 		{
@@ -133,23 +133,7 @@ namespace Dapplo.Windows.Dpi
 				case WindowsMessages.WM_CREATE:
 					isDpiMessage = true;
 					Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for window {1}", windowsMessage, hwnd);
-					if (Environment.OSVersion.IsWindows81OrLater())
-					{
-						var hMonitor = User32.MonitorFromWindow(hwnd, MonitorFromFlags.DefaultToNearest);
-						uint dpiX;
-						uint dpiY;
-						if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out dpiX, out dpiY))
-						{
-							currentDpi = (int) dpiX;
-						}
-					}
-					else
-					{
-						using (var hdc = new SafeDeviceContextHandle())
-						{
-							currentDpi = Gdi32.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
-						}
-					}
+					currentDpi = GetDpi(hwnd);
 					break;
 				// Handle the DPI change message, this is where it's supplied
 				case WindowsMessages.WM_DPICHANGED:
@@ -169,6 +153,17 @@ namespace Dapplo.Windows.Dpi
 					// specify that the message was handled
 					handled = true;
 					break;
+				case WindowsMessages.WM_PAINT:
+					// This is a workaround for non DPI aware applications, these don't seem to get a WM_CREATE
+					if (Math.Abs(Dpi) < double.Epsilon)
+					{
+						if (!IsDpiAware)
+						{
+							isDpiMessage = true;
+							currentDpi = GetDpi(hwnd);
+						}
+					}
+					break;
 			}
 			// Check if the DPI was changed, if so call the action (if any)
 			if (!isDpiMessage)
@@ -187,6 +182,37 @@ namespace Dapplo.Windows.Dpi
 			}
 
 			return IntPtr.Zero;
+		}
+
+		/// <summary>
+		/// Retrieve the DPI value for the supplied window handle
+		/// </summary>
+		/// <param name="hWnd">IntPtr</param>
+		/// <returns>dpi value</returns>
+		public static int GetDpi(IntPtr hWnd)
+		{
+			if (Environment.OSVersion.IsWindows10OrLater())
+			{
+				return GetDpiForWindow(hWnd);
+			}
+
+			if (Environment.OSVersion.IsWindows81OrLater())
+			{
+				var hMonitor = User32.MonitorFromWindow(hWnd, MonitorFromFlags.DefaultToNearest);
+				uint dpiX;
+				uint dpiY;
+				if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out dpiX, out dpiY))
+				{
+					return (int)dpiX;
+				}
+			}
+
+			// Fallback to the global DPI settings
+			using (var graphics = System.Drawing.Graphics.FromHwnd(hWnd))
+			using (var hdc = SafeDeviceContextHandle.FromGraphics(graphics))
+			{
+				return Gdi32.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
+			}
 		}
 
 		/// <summary>
