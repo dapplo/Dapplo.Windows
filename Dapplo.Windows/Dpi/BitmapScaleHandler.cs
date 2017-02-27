@@ -187,9 +187,9 @@ namespace Dapplo.Windows.Dpi
 			// Store the current DPI value, for creating the images
 			_dpi = dpi;
 			// Apply new images
-			foreach (var applyAction in ApplyActions.Values)
+			foreach (var key in ApplyActions.Keys)
 			{
-				applyAction();
+				ApplyActions[key]();
 			}
 			// Dispose list
 			foreach (var image in imagesToDispose)
