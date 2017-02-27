@@ -35,10 +35,6 @@ namespace Dapplo.Windows.Dpi
 		/// <returns>DpiHandler</returns>
 		public static DpiHandler HandleDpiChanges(this Control control)
 		{
-			if (!DpiHandler.IsDpiAware)
-			{
-				return null;
-			}
 			var dpiHandler = new DpiHandler();
 			var listener = new WinProcListener(control);
 			listener.AddHook(dpiHandler.HandleMessages);

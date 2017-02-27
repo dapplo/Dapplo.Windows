@@ -90,7 +90,10 @@ namespace Dapplo.Windows.Dpi
 		{
 			BitmapProvider = bitmapProvider;
 			BitmapScaler = bitmapScaler;
-			_dpiChangeSubscription = dpiHandler.OnDpiChanged.Subscribe(DpiChange);
+			if (dpiHandler != null)
+			{
+				_dpiChangeSubscription = dpiHandler.OnDpiChanged.Subscribe(DpiChange);
+			}
 		}
 
 		/// <summary>

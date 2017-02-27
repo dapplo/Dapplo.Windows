@@ -50,7 +50,7 @@ namespace Dapplo.Windows.Dpi
 		/// <summary>
 		///     Retrieve the current DPI for the window
 		/// </summary>
-		public double Dpi { get; private set; } = DefaultScreenDpi;
+		public double Dpi { get; private set; }
 
 		/// <summary>
 		///     This is that which handles the windows messages, and needs to be disposed
@@ -93,9 +93,20 @@ namespace Dapplo.Windows.Dpi
 		/// <returns>Scaled width</returns>
 		public static int ScaleWithDpi(int baseWidth, double dpi)
 		{
-			var scaleFactor = (dpi / DefaultScreenDpi);
+			var scaleFactor = dpi / DefaultScreenDpi;
 			var width = (int)(baseWidth + (scaleFactor - 1) * 4 * baseWidth);
 			return width;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public DpiHandler()
+		{
+			if (!IsDpiAware)
+			{
+				Log.Verbose().WriteLine("The DPI handler will only do one initial Dpi change event, on Window creation, when the DPI settings are different from the default.");
+			}
 		}
 
 		/// <summary>
@@ -160,18 +171,19 @@ namespace Dapplo.Windows.Dpi
 					break;
 			}
 			// Check if the DPI was changed, if so call the action (if any)
-			if (isDpiMessage)
+			if (!isDpiMessage)
 			{
-				if (!IsEqual(Dpi, currentDpi))
-				{
-					Dpi = currentDpi;
-					Log.Verbose().WriteLine("Got new DPI {0}", currentDpi);
-					OnDpiChanged.OnNext(Dpi);
-				}
-				else
-				{
-					Log.Verbose().WriteLine("DPI was unchanged from {0}", Dpi);
-				}
+				return IntPtr.Zero;
+			}
+			if (!IsEqual(Dpi, currentDpi))
+			{
+				Dpi = currentDpi;
+				Log.Verbose().WriteLine("Got new DPI {0}", currentDpi);
+				OnDpiChanged.OnNext(Dpi);
+			}
+			else
+			{
+				Log.Verbose().WriteLine("DPI was unchanged from {0}", Dpi);
 			}
 
 			return IntPtr.Zero;
