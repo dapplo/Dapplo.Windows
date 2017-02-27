@@ -69,7 +69,6 @@ namespace Dapplo.Windows.Dpi
 	/// </summary>
 	public class BitmapScaleHandler<TKey>
 	{
-		private static readonly Bitmap Empty = null;
 		private readonly IDictionary<TKey, Bitmap> _images = new Dictionary<TKey, Bitmap>();
 		private bool _areWeDisposing;
 		private IDisposable _dpiChangeSubscription;
@@ -119,7 +118,10 @@ namespace Dapplo.Windows.Dpi
 		/// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
 		public void AddApplyAction(Action<Bitmap> apply, TKey imageKey, bool execute = false)
 		{
-			ApplyActions[apply]  = () => apply(GetBitmap(imageKey));
+			ApplyActions[apply]  = () =>
+			{
+				apply(GetBitmap(imageKey));
+			};
 			if (execute)
 			{
 				ApplyActions[apply]();
@@ -134,7 +136,10 @@ namespace Dapplo.Windows.Dpi
 		/// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
 		public void AddTarget(Button button, TKey imageKey, bool execute = false)
 		{
-			ApplyActions[button] = () => button.Image = GetBitmap(imageKey);
+			ApplyActions[button] = () =>
+			{
+				button.Image = GetBitmap(imageKey);
+			};
 			if (execute)
 			{
 				ApplyActions[button]();
@@ -149,7 +154,10 @@ namespace Dapplo.Windows.Dpi
 		/// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
 		public void AddTarget(ToolStripItem toolStripItem, TKey imageKey, bool execute = false)
 		{
-			ApplyActions[toolStripItem] = () => toolStripItem.Image = GetBitmap(imageKey);
+			ApplyActions[toolStripItem] = () =>
+			{
+				toolStripItem.Image = GetBitmap(imageKey);
+			};
 			if (execute)
 			{
 				ApplyActions[toolStripItem]();
@@ -214,7 +222,7 @@ namespace Dapplo.Windows.Dpi
 		{
 			if (_areWeDisposing)
 			{
-				return Empty;
+				return null;
 			}
 			Bitmap result;
 			if (_images.TryGetValue(imageKey, out result))
