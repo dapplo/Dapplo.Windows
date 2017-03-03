@@ -34,30 +34,56 @@ namespace Dapplo.Windows.Structs
 	[StructLayout(LayoutKind.Sequential, Pack = 2)]
 	public struct BitmapFileHeader
 	{
+		private short _fileType;
+		private int _size;
+		private short _reserved1;
+		private short _reserved2;
+		private int _offsetToBitmapBits;
+
 		/// <summary>
 		/// The file type; must be BM.
 		/// </summary>
-		public short FileType;
+		public short FileType
+		{
+			get
+			{
+				return _fileType;
+			}
+			private set
+			{
+				_fileType = value;
+			}
+		}
 
 		/// <summary>
 		/// The size, in bytes, of the bitmap file.
 		/// </summary>
-		public int Size;
-
-		/// <summary>
-		/// Reserved; must be zero.
-		/// </summary>
-		public short Reserved1;
-
-		/// <summary>
-		/// Reserved; must be zero.
-		/// </summary>
-		public short Reserved2;
+		public int Size
+		{
+			get
+			{
+				return _size;
+			}
+			private set
+			{
+				_size = value;
+			}
+		}
 
 		/// <summary>
 		/// The offset, in bytes, from the beginning of the BITMAPFILEHEADER structure to the bitmap bits.
 		/// </summary>
-		public int OffsetToBitmapBits;
+		public int OffsetToBitmapBits
+		{
+			get
+			{
+				return _offsetToBitmapBits;
+			}
+			private set
+			{
+				_offsetToBitmapBits = value;
+			}
+		}
 
 		/// <summary>
 		/// Create a BitmapFileHeader which needs a BitmapInfoHeader to calculate the values
@@ -72,8 +98,8 @@ namespace Dapplo.Windows.Structs
 				FileType = 0x4d42,
 				// Size of the file, is the size of this, the size of a BitmapInfoHeader and the size of the image itself.
 				Size = (int) (bitmapFileHeaderSize + bitmapInfoHeader.biSize + bitmapInfoHeader.biSizeImage),
-				Reserved1 = 0,
-				Reserved2 = 0,
+				_reserved1 = 0,
+				_reserved2 = 0,
 				// Specify on what offset the bits are found
 				OffsetToBitmapBits = (int) (bitmapFileHeaderSize + bitmapInfoHeader.biSize + bitmapInfoHeader.biClrUsed * 4)
 			};

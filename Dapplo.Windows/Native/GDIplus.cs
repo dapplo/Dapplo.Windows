@@ -74,11 +74,7 @@ namespace Dapplo.Windows.Native
 			try
 			{
 				// Create a BlurParams struct and set the values
-				var blurParams = new BlurParams
-				{
-					Radius = radius,
-					ExpandEdges = expandEdges
-				};
+				var blurParams = BlurParams.Create(radius, expandEdges);
 
 				// Allocate space in unmanaged memory
 				hBlurParams = Marshal.AllocHGlobal(Marshal.SizeOf(blurParams));
@@ -168,12 +164,7 @@ namespace Dapplo.Windows.Native
 			try
 			{
 				// Create a BlurParams struct and set the values
-				var blurParams = new BlurParams
-				{
-					Radius = radius,
-					ExpandEdges = false
-					//blurParams.Padding = radius;
-				};
+				var blurParams = BlurParams.Create(radius, expandEdges);
 
 				// Allocate space in unmanaged memory
 				hBlurParams = Marshal.AllocHGlobal(Marshal.SizeOf(blurParams));

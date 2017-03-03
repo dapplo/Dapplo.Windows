@@ -377,7 +377,7 @@ namespace Dapplo.Windows.Desktop
 				return null;
 			}
 			var initialScrollInfo = ScrollInfo.Create(ScrollInfoMask.All);
-			if (User32.GetScrollInfo(interopWindow.Handle, scrollBarType, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
+			if (User32.GetScrollInfo(interopWindow.Handle, scrollBarType, ref initialScrollInfo) && initialScrollInfo.Minimum != initialScrollInfo.Maximum)
 			{
 				var windowScroller = new WindowScroller
 				{
@@ -385,12 +385,12 @@ namespace Dapplo.Windows.Desktop
 					ScrollBarWindow = interopWindow,
 					ScrollBarType = scrollBarType,
 					InitialScrollInfo = initialScrollInfo,
-					WheelDelta = (int) (120 * (initialScrollInfo.nPage / WindowScroller.ScrollWheelLinesFromRegistry))
+					WheelDelta = (int) (120 * (initialScrollInfo.PageSize / WindowScroller.ScrollWheelLinesFromRegistry))
 				};
 				interopWindow.CanScroll = true;
 				return windowScroller;
 			}
-			if (User32.GetScrollInfo(interopWindow.Handle, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
+			if (User32.GetScrollInfo(interopWindow.Handle, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.Minimum != initialScrollInfo.Maximum)
 			{
 				var windowScroller = new WindowScroller
 				{
@@ -398,7 +398,7 @@ namespace Dapplo.Windows.Desktop
 					ScrollBarWindow = interopWindow,
 					ScrollBarType = ScrollBarTypes.Control,
 					InitialScrollInfo = initialScrollInfo,
-					WheelDelta = (int) (120 * (initialScrollInfo.nPage / WindowScroller.ScrollWheelLinesFromRegistry))
+					WheelDelta = (int) (120 * (initialScrollInfo.PageSize / WindowScroller.ScrollWheelLinesFromRegistry))
 				};
 				interopWindow.CanScroll = true;
 				return windowScroller;

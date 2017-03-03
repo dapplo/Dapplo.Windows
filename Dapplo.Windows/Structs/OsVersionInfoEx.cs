@@ -38,62 +38,79 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		///     The size of this data structure, in bytes. Set this member to sizeof(OSVERSIONINFOEX).
 		/// </summary>
-		public int dwOSVersionInfoSize;
+		private int _dwOSVersionInfoSize;
+		private readonly int _dwMajorVersion;
+		private readonly int _dwMinorVersion;
+		private readonly int _dwBuildNumber;
+		private readonly int _dwPlatformId;
+		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+		private readonly string _szCSDVersion;
+		private readonly short _wServicePackMajor;
+		private readonly short _wServicePackMinor;
+		private readonly WindowsSuites _wSuiteMask;
+		private readonly WindowsProductTypes _wProductType;
+		private readonly byte _wReserved;
 
 		/// <summary>
 		///     The major version number of the operating system.
 		/// </summary>
-		public int dwMajorVersion;
+		public int MajorVersion => _dwMajorVersion;
 
 		/// <summary>
 		///     The minor version number of the operating system.
 		/// </summary>
-		public int dwMinorVersion;
+		public int MinorVersion => _dwMinorVersion;
 
 		/// <summary>
 		///     The build number of the operating system.
 		/// </summary>
-		public int dwBuildNumber;
+		public int BuildNumber => _dwBuildNumber;
 
 		/// <summary>
 		///     The operating system platform. This member can be VER_PLATFORM_WIN32_NT (2).
 		/// </summary>
-		public int dwPlatformId;
+		public int PlatformId => _dwPlatformId;
 
 		/// <summary>
 		///     A null-terminated string, such as "Service Pack 3", that indicates the latest Service Pack installed on the system.
 		///     If no Service Pack has been installed, the string is empty.
 		/// </summary>
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
-		public string szCSDVersion;
+		public string ServicePackVersion => _szCSDVersion;
 
 		/// <summary>
 		///     The major version number of the latest Service Pack installed on the system. For example, for Service Pack 3, the
 		///     major version number is 3.
 		///     If no Service Pack has been installed, the value is zero.
 		/// </summary>
-		public short wServicePackMajor;
+		public short ServicePackMajor => _wServicePackMajor;
 
 		/// <summary>
 		///     The minor version number of the latest Service Pack installed on the system. For example, for Service Pack 3, the
 		///     minor version number is 0.
 		/// </summary>
-		public short wServicePackMinor;
+		public short ServicePackMinor => _wServicePackMinor;
 
 		/// <summary>
 		///     A bit mask that identifies the product suites available on the system. This member can be a combination of the
 		///     following values.
 		/// </summary>
-		public WindowsSuites wSuiteMask;
+		public WindowsSuites SuiteMask => _wSuiteMask;
 
 		/// <summary>
 		///     Any additional information about the system.
 		/// </summary>
-		public WindowsProductTypes wProductType;
+		public WindowsProductTypes ProductType => _wProductType;
 
 		/// <summary>
-		///     Reserved for future use.
+		/// Factory for an empty OsVersionInfoEx
 		/// </summary>
-		public byte wReserved;
+		/// <returns></returns>
+		public static OsVersionInfoEx Create()
+		{
+			return new OsVersionInfoEx
+			{
+				_dwOSVersionInfoSize = Marshal.SizeOf(typeof(OsVersionInfoEx))
+			};
+		}
 	}
 }

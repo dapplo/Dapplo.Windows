@@ -45,5 +45,22 @@ namespace Dapplo.Windows.Structs
 		/// A CIE XYZ 1931 color space for the blue component
 		/// </summary>
 		public CieXyz CieXyzBlue;
+
+		/// <summary>
+		/// Factory method
+		/// </summary>
+		/// <param name="red">CieXyz</param>
+		/// <param name="green">CieXyz</param>
+		/// <param name="blue">CieXyz</param>
+		/// <returns>CieXyzTripple</returns>
+		public static CieXyzTripple Create(CieXyz red, CieXyz green, CieXyz blue)
+		{
+			return new CieXyzTripple
+			{
+				CieXyzRed = red,
+				CieXyzGreen = green,
+				CieXyzBlue = blue
+			};
+		}
 	}
 }

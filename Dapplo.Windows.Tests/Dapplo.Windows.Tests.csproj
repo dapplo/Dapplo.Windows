@@ -95,6 +95,7 @@
     <Compile Include="DisplayTest.cs" />
     <Compile Include="ClipboardTests.cs" />
     <Compile Include="RectTests.cs" />
+    <Compile Include="VersionTests.cs" />
     <Compile Include="User32Tests.cs" />
     <Compile Include="DwmTest.cs" />
     <Compile Include="MouseHookTests.cs" />

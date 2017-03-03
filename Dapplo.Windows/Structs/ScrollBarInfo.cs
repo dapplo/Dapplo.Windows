@@ -30,8 +30,7 @@ using Dapplo.Windows.Enums;
 namespace Dapplo.Windows.Structs
 {
 	/// <summary>
-	///     See
-	///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787535(v=vs.85).aspx">SCROLLBARINFO structure</a>
+	///     See<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787535(v=vs.85).aspx">SCROLLBARINFO structure</a>
 	/// </summary>
 	[Serializable]
 	[StructLayout(LayoutKind.Sequential)]
@@ -40,44 +39,47 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		///     Size of this struct
 		/// </summary>
-		public uint cbSize;
+		private uint _cbSize;
+
+		private RECT _rcScrollBar;
+		private int _dxyLineButton;
+		private int _thumbBottom;
+		private int _thumbTop;
+		private int _reserved;
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
+		private ObjectStates[] _states;
 
 		/// <summary>
 		///     Coordinates of the scroll bar as specified in a RECT structure.
 		/// </summary>
-		public RECT rcScrollBar;
+		public RECT Bounds => _rcScrollBar;
 
 		/// <summary>
 		///     Height or width of the thumb.
 		/// </summary>
-		public int dxyLineButton;
+		public int ThumbSize => _dxyLineButton;
 
 		/// <summary>
 		///     Position of the bottom or right of the thumb.
 		/// </summary>
-		public int xyThumbBottom;
+		public int ThumbBottom => _thumbBottom;
 
 		/// <summary>
 		///     Position of the top or left of the thumb.
 		/// </summary>
-		public int xyThumbTop;
+		public int ThumbTop => _thumbTop;
 
 		/// <summary>
-		///     Reserved.
+		///     An array of object states.
+		/// Each element indicates the state of a scroll bar component, the element is specified via the ScrollBarStateIndexes.
 		/// </summary>
-		public int reserved;
-
-		/// <summary>
-		///     An array of DWORD elements. Each element indicates the state of a scroll bar component, the element is specified
-		///     via the ScrollBarStateIndexes.
-		/// </summary>
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)] public ObjectStates[] states;
+		public ObjectStates[] States => _states;
 
 		/// <inheritdoc />
 		public override string ToString()
 		{
-			var statesString = string.Join(",", states);
-			return $"{{rcScrollBar = {rcScrollBar}; dxyLineButton = {dxyLineButton};xyThumbBottom = {xyThumbBottom};xyThumbTop = {xyThumbTop};states = {statesString};}}";
+			var statesString = string.Join(",", States);
+			return $"{{Bounds = {Bounds}; ThumbSize = {ThumbSize};ThumbBottom = {ThumbBottom};ThumbTop = {ThumbTop};States = {statesString};}}";
 		}
 
 		/// <summary>
@@ -87,13 +89,13 @@ namespace Dapplo.Windows.Structs
 		{
 			return new ScrollBarInfo
 			{
-				cbSize = (uint)Marshal.SizeOf(typeof(ScrollBarInfo)),
-				states = new ObjectStates[6],
-				rcScrollBar = new RECT(),
-				dxyLineButton = 0,
-				xyThumbBottom = 0,
-				xyThumbTop = 0,
-				reserved = 0,
+				_cbSize = (uint)Marshal.SizeOf(typeof(ScrollBarInfo)),
+				_states = new ObjectStates[6],
+				_rcScrollBar = new RECT(),
+				_dxyLineButton = 0,
+				_thumbBottom = 0,
+				_thumbTop = 0,
+				_reserved = 0,
 			};
 		}
 	}

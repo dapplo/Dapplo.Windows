@@ -38,22 +38,27 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		/// Size of the struct
 		/// </summary>
-		public int cbSize;
+		private int _cbSize;
+
+		private readonly CursorInfoFlags _flags;
+		private readonly IntPtr _hCursor;
+		private readonly POINT _ptScreenPos;
+
 
 		/// <summary>
 		/// The cursor state, as CursorInfoFlags
 		/// </summary>
-		public readonly CursorInfoFlags flags;
+		public CursorInfoFlags Flags => _flags;
 
 		/// <summary>
 		/// Handle (IntPtr) to the Cursor
 		/// </summary>
-		public readonly IntPtr hCursor;
+		public IntPtr CursorHandle => _hCursor;
 
 		/// <summary>
 		/// A structure that receives the screen coordinates of the cursor.
 		/// </summary>
-		public readonly POINT ptScreenPos;
+		public POINT Location => _ptScreenPos;
 
 		/// <summary>
 		/// Factory for the structure
@@ -62,7 +67,7 @@ namespace Dapplo.Windows.Structs
 		{
 			var result = new CursorInfo
 			{
-				cbSize = Marshal.SizeOf(typeof(CursorInfo))
+				_cbSize = Marshal.SizeOf(typeof(CursorInfo))
 			};
 			return result;
 		}

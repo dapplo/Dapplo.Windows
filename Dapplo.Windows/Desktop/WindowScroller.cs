@@ -61,9 +61,9 @@ namespace Dapplo.Windows.Desktop
 				}
 				if (KeepInitialBounds)
 				{
-					return InitialScrollInfo.nMax <= Math.Max(scrollInfo.nPos, scrollInfo.nTrackPos) + scrollInfo.nPage - 1;
+					return InitialScrollInfo.Maximum <= Math.Max(scrollInfo.Position, scrollInfo.TrackingPosition) + scrollInfo.PageSize - 1;
 				}
-				return scrollInfo.nMax <= Math.Max(scrollInfo.nPos, scrollInfo.nTrackPos) + scrollInfo.nPage - 1;
+				return scrollInfo.Maximum <= Math.Max(scrollInfo.Position, scrollInfo.TrackingPosition) + scrollInfo.PageSize - 1;
 			}
 		}
 
@@ -82,9 +82,9 @@ namespace Dapplo.Windows.Desktop
 				}
 				if (KeepInitialBounds)
 				{
-					return InitialScrollInfo.nMin >= Math.Max(scrollInfo.nPos, scrollInfo.nTrackPos);
+					return InitialScrollInfo.Minimum >= Math.Max(scrollInfo.Position, scrollInfo.TrackingPosition);
 				}
-				return scrollInfo.nMin >= Math.Max(scrollInfo.nPos, scrollInfo.nTrackPos);
+				return scrollInfo.Minimum >= Math.Max(scrollInfo.Position, scrollInfo.TrackingPosition);
 			}
 		}
 
@@ -168,11 +168,11 @@ namespace Dapplo.Windows.Desktop
 			switch (ScrollBarType)
 			{
 				case ScrollBarTypes.Horizontal:
-					User32.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_HSCROLL, 4 + 0x10000 * scrollInfo.nPos, 0);
+					User32.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_HSCROLL, 4 + 0x10000 * scrollInfo.Position, 0);
 					break;
 				case ScrollBarTypes.Vertical:
 				case ScrollBarTypes.Control:
-					User32.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_VSCROLL, (int) ((uint) ScrollBarCommands.SB_THUMBPOSITION + (scrollInfo.nPos << 16)), 0);
+					User32.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_VSCROLL, (int) ((uint) ScrollBarCommands.SB_THUMBPOSITION + (scrollInfo.Position << 16)), 0);
 					break;
 			}
 			return true;
@@ -205,7 +205,7 @@ namespace Dapplo.Windows.Desktop
 					{
 						// Calculate end position, clone the scrollInfoBefore
 						var scrollInfoForEnd = scrollInfoBefore;
-						scrollInfoForEnd.nPos = scrollInfoBefore.nMax;
+						scrollInfoForEnd.Position = scrollInfoBefore.Maximum;
 						result = ApplyPosition(ref scrollInfoForEnd);
 					}
 					break;
@@ -305,7 +305,7 @@ namespace Dapplo.Windows.Desktop
 					}
 					// Calculate next position, clone the scrollInfoBefore
 					var scrollInfoForPrevious = scrollInfoBefore;
-					scrollInfoForPrevious.nPos = Math.Min(scrollInfoBefore.nMax, scrollInfoBefore.nPos + (int) scrollInfoBefore.nPage);
+					scrollInfoForPrevious.Position = Math.Min(scrollInfoBefore.Maximum, scrollInfoBefore.Position + (int) scrollInfoBefore.PageSize);
 					result = ApplyPosition(ref scrollInfoForPrevious);
 					break;
 				case ScrollModes.MouseWheel:
@@ -342,7 +342,7 @@ namespace Dapplo.Windows.Desktop
 					}
 					// Calculate previous position, clone the scrollInfoBefore
 					var scrollInfoForPrevious = scrollInfoBefore;
-					scrollInfoForPrevious.nPos = Math.Max(scrollInfoBefore.nMin, scrollInfoBefore.nPos - (int) scrollInfoBefore.nPage);
+					scrollInfoForPrevious.Position = Math.Max(scrollInfoBefore.Minimum, scrollInfoBefore.Position - (int) scrollInfoBefore.PageSize);
 					result = ApplyPosition(ref scrollInfoForPrevious);
 					break;
 				case ScrollModes.MouseWheel:
@@ -410,7 +410,7 @@ namespace Dapplo.Windows.Desktop
 					{
 						// Calculate start position, clone the scrollInfoBefore
 						var scrollInfoForStart = scrollInfoBefore;
-						scrollInfoForStart.nPos = scrollInfoBefore.nMin;
+						scrollInfoForStart.Position = scrollInfoBefore.Minimum;
 						result = ApplyPosition(ref scrollInfoForStart);
 					}
 					break;

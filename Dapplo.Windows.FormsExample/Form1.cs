@@ -22,8 +22,9 @@ namespace Dapplo.Windows.FormsExample
 			{
 				var width = DpiHandler.ScaleWithDpi(20, dpi);
 				var size = new Size(width, width);
-				menuStrip1.ImageScalingSize = size;
+				//menuStrip1.ImageScalingSize = size;
 			});
+
 
 			ScaleHandler.AddTarget(somethingMenuItem, "somethingMenuItem.Image");
 			ScaleHandler.AddTarget(something2MenuItem, "something2MenuItem.Image");

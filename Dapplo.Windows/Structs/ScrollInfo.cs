@@ -39,42 +39,70 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		///     Size of this struct
 		/// </summary>
-		public uint cbSize;
+		private uint _cbSize;
 
 		/// <summary>
 		///     Mask specifying which values to get
 		/// </summary>
-		public uint fMask;
+		private ScrollInfoMask _fMask;
+		private int _nMin;
+		private int _nMax;
+		private uint _nPage;
+		private int _nPos;
+		private int _nTrackPos;
 
 		/// <summary>
 		///     Minimum value to scroll to, e.g. the start
 		/// </summary>
-		public int nMin;
+		public int Minimum => _nMin;
+
 
 		/// <summary>
 		///     Maximum value to scroll to, e.g. the end
 		/// </summary>
-		public int nMax;
+		public int Maximum => _nMax;
+
 
 		/// <summary>
 		///     Size of a page
 		/// </summary>
-		public uint nPage;
+		public uint PageSize => _nPage;
 
 		/// <summary>
 		///     Current position
 		/// </summary>
-		public int nPos;
+		public int Position
+		{
+			get
+			{
+				return _nPos;
+			}
+			set
+			{
+				_nPos = value;
+			}
+		}
+
 
 		/// <summary>
 		///     Current tracking position
 		/// </summary>
-		public int nTrackPos;
+		public int TrackingPosition
+		{
+			get
+			{
+				return _nTrackPos;
+			}
+			set
+			{
+				_nTrackPos = value;
+			}
+		}
 
 		/// <inheritdoc />
 		public override string ToString()
 		{
-			return $"{{nMin = {nMin}; nMax = {nMax};nPage = {nPage};nPos = {nPos};nTrackPos = {nTrackPos};}}";
+			return $"{{Minimum = {Minimum}; Maximum = {Maximum};PageSize = {PageSize};Position = {Position};TrackingPosition = {TrackingPosition};}}";
 		}
 
 		/// <summary>
@@ -85,13 +113,13 @@ namespace Dapplo.Windows.Structs
 		{
 			return new ScrollInfo()
 			{
-				cbSize = (uint)Marshal.SizeOf(typeof(ScrollInfo)),
-				fMask = (uint)mask,
-				nMin = 0,
-				nMax = 0,
-				nPage = 0,
-				nPos = 0,
-				nTrackPos = 0
+				_cbSize = (uint)Marshal.SizeOf(typeof(ScrollInfo)),
+				_fMask = mask,
+				_nMin = 0,
+				_nMax = 0,
+				_nPage = 0,
+				_nPos = 0,
+				_nTrackPos = 0
 			};
 		}
 	}

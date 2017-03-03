@@ -33,20 +33,37 @@ namespace Dapplo.Windows.Structs
 	[StructLayout(LayoutKind.Sequential)]
 	public struct BitfieldColorMask
 	{
+		private uint _blue;
+		private uint _green;
+		private uint _red;
+
 		/// <summary>
 		/// Blue component of the mask
 		/// </summary>
-		public uint Blue;
+		public uint Blue
+		{
+			get { return _blue; }
+			set { _blue = value; }
+		}
 
 		/// <summary>
 		/// Green component of the mask
 		/// </summary>
-		public uint Green;
+		public uint Green
+		{
+			get { return _green; }
+			set { _green = value; }
+		}
 
 		/// <summary>
 		/// Red component of the mask
 		/// </summary>
-		public uint Red;
+		public uint Red
+		{
+			get { return _red; }
+			set { _red = value; }
+		}
+
 
 		/// <summary>
 		/// Create with BitfieldColorMask defaults
@@ -54,7 +71,7 @@ namespace Dapplo.Windows.Structs
 		/// <param name="r">byte value for Red component of the mask</param>
 		/// <param name="g">byte value for Green component of the mask</param>
 		/// <param name="b">byte value for Blue component of the mask</param>
-		public BitfieldColorMask Create(byte r = 255, byte g = 255, byte b = 255)
+		public static BitfieldColorMask Create(byte r = 255, byte g = 255, byte b = 255)
 		{
 			return new BitfieldColorMask
 			{

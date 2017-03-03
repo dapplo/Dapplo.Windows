@@ -37,19 +37,28 @@ namespace Dapplo.Windows.Structs
 	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
 	public struct MonitorInfoEx
 	{
+		// size of a device name string
+		private const int CCHDEVICENAME = 32;
+
 		/// <summary>
 		///     The size, in bytes, of the structure. Set this member to sizeof(MONITORINFOEX) (72) before calling the
 		///     GetMonitorInfo function.
 		///     Doing so lets the function determine the type of structure you are passing to it.
 		/// </summary>
-		public int Size;
+		private int _size;
+
+		private readonly RECT _monitor;
+		private readonly RECT _workArea;
+		private readonly MonitorInfoFlags _flags;
+		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
+		private string _deviceName;
 
 		/// <summary>
 		///     A RECT structure that specifies the display monitor rectangle, expressed in virtual-screen coordinates.
 		///     Note that if the monitor is not the primary display monitor, some of the rectangle's coordinates may be negative
 		///     values.
 		/// </summary>
-		public RECT Monitor;
+		public RECT Monitor => _monitor;
 
 		/// <summary>
 		///     A RECT structure that specifies the work area rectangle of the display monitor that can be used by applications,
@@ -58,23 +67,29 @@ namespace Dapplo.Windows.Structs
 		///     Note that if the monitor is not the primary display monitor, some of the rectangle's coordinates may be negative
 		///     values.
 		/// </summary>
-		public RECT WorkArea;
+		public RECT WorkArea => _workArea;
 
 		/// <summary>
 		///     The attributes of the display monitor.
 		/// </summary>
-		public MonitorInfoFlags Flags;
-
-		// size of a device name string
-		private const int CCHDEVICENAME = 32;
+		public MonitorInfoFlags Flags => _flags;
 
 		/// <summary>
 		///     A string that specifies the device name of the monitor being used.
 		///     Most applications have no use for a display monitor name,
 		///     and so can save some bytes by using a MONITORINFO structure.
 		/// </summary>
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
-		public string DeviceName;
+		public string DeviceName
+		{
+			get
+			{
+				return _deviceName;
+			}
+			set
+			{
+				_deviceName = value;
+			}
+		}
 
 		/// <summary>
 		///     Create a MonitorInfoEx with defaults
@@ -83,7 +98,7 @@ namespace Dapplo.Windows.Structs
 		{
 			return new MonitorInfoEx
 			{
-				Size = Marshal.SizeOf(typeof(MonitorInfoEx)),
+				_size = Marshal.SizeOf(typeof(MonitorInfoEx)),
 				DeviceName = string.Empty,
 			};
 		}

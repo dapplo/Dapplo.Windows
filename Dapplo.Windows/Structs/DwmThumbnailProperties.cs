@@ -38,76 +38,111 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		///     A bitwise combination of DWM thumbnail constant values that indicates which members of this structure are set.
 		/// </summary>
-		public DwmThumbnailPropertyFlags dwFlags;
+		private DwmThumbnailPropertyFlags _dwFlags;
 
 		/// <summary>
 		///     The area in the destination window where the thumbnail will be rendered.
 		/// </summary>
-		public RECT rcDestination;
+		private RECT _rcDestination;
 
 		/// <summary>
 		///     The region of the source window to use as the thumbnail. By default, the entire window is used as the thumbnail.
 		/// </summary>
-		public RECT rcSource;
+		private RECT _rcSource;
 
 		/// <summary>
 		///     The opacity with which to render the thumbnail. 0 is fully transparent while 255 is fully opaque. The default value
 		///     is 255.
 		/// </summary>
-		public byte opacity;
+		private byte _opacity;
 
 		/// <summary>
 		///     TRUE to make the thumbnail visible; otherwise, FALSE. The default is FALSE.
 		/// </summary>
-		public bool fVisible;
+		private bool _fVisible;
 
 		/// <summary>
 		///     TRUE to use only the thumbnail source's client area; otherwise, FALSE. The default is FALSE.
 		/// </summary>
-		public bool fSourceClientAreaOnly;
+		private bool _fSourceClientAreaOnly;
 
+		/// <summary>
+		/// Property for the destination, setting this also changes the dwFlags
+		/// </summary>
 		public RECT Destination
 		{
+			get
+			{
+				return _rcDestination;
+			}
 			set
 			{
-				dwFlags |= DwmThumbnailPropertyFlags.DWM_TNP_RECTDESTINATION;
-				rcDestination = value;
+				_dwFlags |= DwmThumbnailPropertyFlags.DWM_TNP_RECTDESTINATION;
+				_rcDestination = value;
 			}
 		}
 
+		/// <summary>
+		/// Property for the source, setting this also changes the dwFlags
+		/// </summary>
 		public RECT Source
 		{
+			get
+			{
+				return _rcSource;
+			}
 			set
 			{
-				dwFlags |= DwmThumbnailPropertyFlags.DWM_TNP_RECTSOURCE;
-				rcSource = value;
+				_dwFlags |= DwmThumbnailPropertyFlags.DWM_TNP_RECTSOURCE;
+				_rcSource = value;
 			}
 		}
 
+		/// <summary>
+		/// Property for the Opacity, setting this also changes the dwFlags
+		/// </summary>
 		public byte Opacity
 		{
+			get
+			{
+				return _opacity;
+			}
 			set
 			{
-				dwFlags |= DwmThumbnailPropertyFlags.DWM_TNP_OPACITY;
-				opacity = value;
+				_dwFlags |= DwmThumbnailPropertyFlags.DWM_TNP_OPACITY;
+				_opacity = value;
 			}
 		}
 
+		/// <summary>
+		/// Visible property, setting this also changes the dwFlags
+		/// </summary>
 		public bool Visible
 		{
+			get
+			{
+				return _fVisible;
+			}
 			set
 			{
-				dwFlags |= DwmThumbnailPropertyFlags.DWM_TNP_VISIBLE;
-				fVisible = value;
+				_dwFlags |= DwmThumbnailPropertyFlags.DWM_TNP_VISIBLE;
+				_fVisible = value;
 			}
 		}
 
+		/// <summary>
+		/// Property SourceClientAreaOnly, setting this also changes the dwFlags
+		/// </summary>
 		public bool SourceClientAreaOnly
 		{
+			get
+			{
+				return _fSourceClientAreaOnly;
+			}
 			set
 			{
-				dwFlags |= DwmThumbnailPropertyFlags.DWM_TNP_SOURCECLIENTAREAONLY;
-				fSourceClientAreaOnly = value;
+				_dwFlags |= DwmThumbnailPropertyFlags.DWM_TNP_SOURCECLIENTAREAONLY;
+				_fSourceClientAreaOnly = value;
 			}
 		}
 	}

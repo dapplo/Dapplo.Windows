@@ -35,17 +35,17 @@ namespace Dapplo.Windows.Enums
 	public enum ScrollInfoMask
 	{
 		/// <summary>
-		///     Copies the scroll range to the nMin and nMax members of the SCROLLINFO structure pointed to by lpsi.
+		///     Copies the scroll range to the Minimum and Maximum members of the SCROLLINFO structure pointed to by lpsi.
 		/// </summary>
 		Range = 0x1,
 
 		/// <summary>
-		///     Copies the scroll page to the nPage member of the SCROLLINFO structure pointed to by lpsi.
+		///     Copies the scroll page to the PageSize member of the SCROLLINFO structure pointed to by lpsi.
 		/// </summary>
 		Page = 0x2,
 
 		/// <summary>
-		///     Copies the scroll position to the nPos member of the SCROLLINFO structure pointed to by lpsi.
+		///     Copies the scroll position to the Position member of the SCROLLINFO structure pointed to by lpsi.
 		/// </summary>
 		Pos = 0x4,
 
@@ -55,7 +55,7 @@ namespace Dapplo.Windows.Enums
 		DisableNoScroll = 0x8,
 
 		/// <summary>
-		///     Copies the current scroll box tracking position to the nTrackPos member of the SCROLLINFO structure pointed to by
+		///     Copies the current scroll box tracking position to the TrackingPosition member of the SCROLLINFO structure pointed to by
 		///     lpsi.
 		/// </summary>
 		Trackpos = 0x10,
