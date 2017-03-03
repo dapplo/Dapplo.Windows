@@ -73,14 +73,13 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		///     Gets the default (empty) value.
 		/// </summary>
-		public static WindowPlacement Default
+		public static WindowPlacement Create()
 		{
-			get
+			return new WindowPlacement
 			{
-				var result = new WindowPlacement();
-				result.Length = Marshal.SizeOf(result);
-				return result;
-			}
+				Length = Marshal.SizeOf(typeof(WindowPlacement))
+
+			};
 		}
 	}
 }

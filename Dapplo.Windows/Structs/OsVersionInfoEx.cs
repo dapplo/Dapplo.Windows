@@ -64,7 +64,8 @@ namespace Dapplo.Windows.Structs
 		///     A null-terminated string, such as "Service Pack 3", that indicates the latest Service Pack installed on the system.
 		///     If no Service Pack has been installed, the string is empty.
 		/// </summary>
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string szCSDVersion;
+		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+		public string szCSDVersion;
 
 		/// <summary>
 		///     The major version number of the latest Service Pack installed on the system. For example, for Service Pack 3, the

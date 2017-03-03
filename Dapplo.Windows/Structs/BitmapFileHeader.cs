@@ -27,14 +27,56 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Structs
 {
+	/// <summary>
+	/// The BITMAPFILEHEADER structure contains information about the type, size, and layout of a file that contains a DIB.
+	/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd183374(v=vs.85).aspx">BITMAPFILEHEADER structure</a>
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential, Pack = 2)]
 	public struct BitmapFileHeader
 	{
-		public static readonly short BM = 0x4d42; // BM
-		public short bfType;
-		public int bfSize;
-		public short bfReserved1;
-		public short bfReserved2;
-		public int bfOffBits;
+		/// <summary>
+		/// The file type; must be BM.
+		/// </summary>
+		public short FileType;
+
+		/// <summary>
+		/// The size, in bytes, of the bitmap file.
+		/// </summary>
+		public int Size;
+
+		/// <summary>
+		/// Reserved; must be zero.
+		/// </summary>
+		public short Reserved1;
+
+		/// <summary>
+		/// Reserved; must be zero.
+		/// </summary>
+		public short Reserved2;
+
+		/// <summary>
+		/// The offset, in bytes, from the beginning of the BITMAPFILEHEADER structure to the bitmap bits.
+		/// </summary>
+		public int OffsetToBitmapBits;
+
+		/// <summary>
+		/// Create a BitmapFileHeader which needs a BitmapInfoHeader to calculate the values
+		/// </summary>
+		/// <param name="bitmapInfoHeader">BitmapInfoHeader</param>
+		public static BitmapFileHeader Create(BitmapInfoHeader bitmapInfoHeader)
+		{
+			var bitmapFileHeaderSize = Marshal.SizeOf(typeof(BitmapFileHeader));
+			return new BitmapFileHeader
+			{
+				// Fill with "BM"
+				FileType = 0x4d42,
+				// Size of the file, is the size of this, the size of a BitmapInfoHeader and the size of the image itself.
+				Size = (int) (bitmapFileHeaderSize + bitmapInfoHeader.biSize + bitmapInfoHeader.biSizeImage),
+				Reserved1 = 0,
+				Reserved2 = 0,
+				// Specify on what offset the bits are found
+				OffsetToBitmapBits = (int) (bitmapFileHeaderSize + bitmapInfoHeader.biSize + bitmapInfoHeader.biClrUsed * 4)
+			};
+		}
 	}
 }

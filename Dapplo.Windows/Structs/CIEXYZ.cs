@@ -27,18 +27,40 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Structs
 {
+	/// <summary>
+	/// CIE XYZ 1931 color space
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	public struct CieXyz
 	{
-		public uint ciexyzX; // FXPT2DOT30 -> fixed-point values with a 2-bit integer part and a 30-bit fractional part.
-		public uint ciexyzY; // FXPT2DOT30 -> fixed-point values with a 2-bit integer part and a 30-bit fractional part.
-		public uint ciexyzZ; // FXPT2DOT30 -> fixed-point values with a 2-bit integer part and a 30-bit fractional part.
+		/// <summary>
+		/// is a mix of cone response curves chosen to be orthogonal to luminance and non-negative
+		/// FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
+		/// </summary>
+		public uint ciexyzX;
+		/// <summary>
+		/// Luminance 
+		/// FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
+		/// </summary>
+		public uint ciexyzY;
+		/// <summary>
+		/// is somewhat equal to blue
+		/// FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
+		/// </summary>
+		public uint ciexyzZ;
 
-		public CieXyz(uint FXPT2DOT30)
+		/// <summary>
+		/// Factory for a CieXyz
+		/// </summary>
+		/// <param name="fxPt2Dot30">uint</param>
+		public static CieXyz Create(uint fxPt2Dot30)
 		{
-			ciexyzX = FXPT2DOT30;
-			ciexyzY = FXPT2DOT30;
-			ciexyzZ = FXPT2DOT30;
+			return new CieXyz
+			{
+				ciexyzX = fxPt2Dot30,
+				ciexyzY = fxPt2Dot30,
+				ciexyzZ = fxPt2Dot30,
+			};
 		}
 	}
 }

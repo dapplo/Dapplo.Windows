@@ -27,18 +27,41 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Structs
 {
+	/// <summary>
+	/// Specify the color mask when the BITMAPINFOHEADER structure biCompression uses BI_BITFIELDS
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	public struct BitfieldColorMask
 	{
-		public uint blue;
-		public uint green;
-		public uint red;
+		/// <summary>
+		/// Blue component of the mask
+		/// </summary>
+		public uint Blue;
 
-		public void InitValues()
+		/// <summary>
+		/// Green component of the mask
+		/// </summary>
+		public uint Green;
+
+		/// <summary>
+		/// Red component of the mask
+		/// </summary>
+		public uint Red;
+
+		/// <summary>
+		/// Create with BitfieldColorMask defaults
+		/// </summary>
+		/// <param name="r">byte value for Red component of the mask</param>
+		/// <param name="g">byte value for Green component of the mask</param>
+		/// <param name="b">byte value for Blue component of the mask</param>
+		public BitfieldColorMask Create(byte r = 255, byte g = 255, byte b = 255)
 		{
-			red = (uint) 255 << 8;
-			green = (uint) 255 << 16;
-			blue = (uint) 255 << 24;
+			return new BitfieldColorMask
+			{
+				Red = (uint) r << 8,
+				Green = (uint) g << 16,
+				Blue = (uint) b << 24
+			};
 		}
 	}
 }

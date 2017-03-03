@@ -208,8 +208,7 @@ namespace Dapplo.Windows.Dpi
 			}
 
 			// Fallback to the global DPI settings
-			using (var graphics = System.Drawing.Graphics.FromHwnd(hWnd))
-			using (var hdc = SafeDeviceContextHandle.FromGraphics(graphics))
+			using (var hdc = SafeDeviceContextHandle.FromHWnd(hWnd))
 			{
 				return Gdi32.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
 			}

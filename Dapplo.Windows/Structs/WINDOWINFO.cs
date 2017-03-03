@@ -51,11 +51,12 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		///     Allows automatic initialization of "cbSize" with "new WINDOWINFO(null/true/false)".
 		/// </summary>
-		/// <param name="filler"></param>
-		public WINDOWINFO(bool? filler)
-			: this()
+		public static WINDOWINFO Create()
 		{
-			cbSize = (uint) Marshal.SizeOf(typeof(WINDOWINFO));
+			return new WINDOWINFO
+			{
+				cbSize = (uint) Marshal.SizeOf(typeof(WINDOWINFO))
+			};
 		}
 	}
 }

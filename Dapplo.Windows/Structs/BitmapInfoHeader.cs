@@ -229,39 +229,44 @@ namespace Dapplo.Windows.Structs
 		/// <param name="width">int with the width of the bitmap</param>
 		/// <param name="height">int with the height of the bitmap</param>
 		/// <param name="bpp">int with the bits per pixel of the bitmap</param>
-		public BitmapInfoHeader(int width, int height, ushort bpp)
+		public static BitmapInfoHeader Create(int width, int height, ushort bpp)
 		{
-			biSize = (uint) Marshal.SizeOf(typeof(BitmapInfoHeader)); // BITMAPINFOHEADER < DIBV5 is 40 bytes
-			biPlanes = 1; // Should allways be 1
-			biCompression = BitmapCompressionMethods.BI_RGB;
-			biWidth = width;
-			biHeight = height;
-			biBitCount = bpp;
-			biSizeImage = (uint) (width * height * (bpp >> 3));
-			biXPelsPerMeter = 0;
-			biYPelsPerMeter = 0;
-			biClrUsed = 0;
-			biClrImportant = 0;
-
-			// V5
-			bV5RedMask = (uint) 255 << 16;
-			bV5GreenMask = (uint) 255 << 8;
-			bV5BlueMask = 255;
-			bV5AlphaMask = (uint) 255 << 24;
-			bV5CSType = ColorSpaceEnum.LCS_sRGB; // sRGB
-			bV5Endpoints = new CieXyzTripple
+			return new BitmapInfoHeader
 			{
-				CieXyzBlue = new CieXyz(0),
-				CieXyzGreen = new CieXyz(0),
-				CieXyzRed = new CieXyz(0)
+				// BITMAPINFOHEADER < DIBV5 is 40 bytes
+				biSize = (uint) Marshal.SizeOf(typeof(BitmapInfoHeader)),
+				// Should allways be 1
+				biPlanes = 1,
+				biCompression = BitmapCompressionMethods.BI_RGB,
+				biWidth = width,
+				biHeight = height,
+				biBitCount = bpp,
+				biSizeImage = (uint) (width * height * (bpp >> 3)),
+				biXPelsPerMeter = 0,
+				biYPelsPerMeter = 0,
+				biClrUsed = 0,
+				biClrImportant = 0,
+
+				// V5
+				bV5RedMask = (uint) 255 << 16,
+				bV5GreenMask = (uint) 255 << 8,
+				bV5BlueMask = 255,
+				bV5AlphaMask = (uint) 255 << 24,
+				bV5CSType = ColorSpaceEnum.LCS_sRGB,
+				bV5Endpoints = new CieXyzTripple
+				{
+					CieXyzBlue = CieXyz.Create(0),
+					CieXyzGreen = CieXyz.Create(0),
+					CieXyzRed = CieXyz.Create(0)
+				},
+				bV5GammaRed = 0,
+				bV5GammaGreen = 0,
+				bV5GammaBlue = 0,
+				bV5Intent = ColorSpaceEnum.LCS_GM_IMAGES,
+				bV5ProfileData = 0,
+				bV5ProfileSize = 0,
+				bV5Reserved = 0
 			};
-			bV5GammaRed = 0;
-			bV5GammaGreen = 0;
-			bV5GammaBlue = 0;
-			bV5Intent = ColorSpaceEnum.LCS_GM_IMAGES;
-			bV5ProfileData = 0;
-			bV5ProfileSize = 0;
-			bV5Reserved = 0;
 		}
 
 		public bool IsDibV5

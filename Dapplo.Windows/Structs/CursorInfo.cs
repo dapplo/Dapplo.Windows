@@ -29,17 +29,42 @@ using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Structs
 {
+	/// <summary>
+	/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648381(v=vs.85).aspx"></a>
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	public struct CursorInfo
 	{
+		/// <summary>
+		/// Size of the struct
+		/// </summary>
 		public int cbSize;
-		public CursorInfoFlags flags;
-		public IntPtr hCursor;
-		public POINT ptScreenPos;
 
-		public void Init()
+		/// <summary>
+		/// The cursor state, as CursorInfoFlags
+		/// </summary>
+		public readonly CursorInfoFlags flags;
+
+		/// <summary>
+		/// Handle (IntPtr) to the Cursor
+		/// </summary>
+		public readonly IntPtr hCursor;
+
+		/// <summary>
+		/// A structure that receives the screen coordinates of the cursor.
+		/// </summary>
+		public readonly POINT ptScreenPos;
+
+		/// <summary>
+		/// Factory for the structure
+		/// </summary>
+		public static CursorInfo Create()
 		{
-			cbSize = Marshal.SizeOf(this);
+			var result = new CursorInfo
+			{
+				cbSize = Marshal.SizeOf(typeof(CursorInfo))
+			};
+			return result;
 		}
 	}
 }

@@ -87,9 +87,9 @@ namespace Dapplo.Windows.Tests
 						Assert.NotNull(scroller);
 						// Notepad should have ScrollBarInfo
 						scroller.GetScrollbarInfo();
-						Assert.True(scroller.ScrollBarInfo.HasValue);
+						Assert.True(scroller.ScrollBar.HasValue);
 
-						Log.Info().WriteLine("Scrollbar info: {0}", scroller.ScrollBarInfo.Value);
+						Log.Info().WriteLine("Scrollbar info: {0}", scroller.ScrollBar.Value);
 
 						User32.SetForegroundWindow(scroller.ScrollingWindow.Handle);
 						await Task.Delay(1000);

@@ -107,14 +107,37 @@ namespace Dapplo.Windows.Native
 			DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 		}
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969508(v=vs.85).aspx">DwmEnableBlurBehindWindow function</a>
+		/// Enables the blur effect on a specified window.
+		/// </summary>
+		/// <param name="hwnd">The handle to the window on which the blur behind data is applied.</param>
+		/// <param name="blurBehind">DwmBlurBehind</param>
+		/// <returns>HResult</returns>
 		[DllImport("dwmapi", SetLastError = true)]
-		public static extern int DwmEnableBlurBehindWindow(IntPtr hwnd, ref DwmBlurBehind blurBehind);
+		public static extern HResult DwmEnableBlurBehindWindow(IntPtr hwnd, ref DwmBlurBehind blurBehind);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969510(v=vs.85).aspx">DwmEnableComposition function</a>
+		/// As of Windows 8, calling this function with DWM_EC_DISABLECOMPOSITION has no effect. However, the function will still return a success code.
+		/// </summary>
+		/// <param name="uCompositionAction">DWM_EC_ENABLECOMPOSITION to enable DWM composition; DWM_EC_DISABLECOMPOSITION to disable composition.</param>
+		/// <returns>HResult</returns>
 		[DllImport("dwmapi", SetLastError = true)]
-		public static extern uint DwmEnableComposition(uint uCompositionAction);
+		public static extern HResult DwmEnableComposition(uint uCompositionAction);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969515(v=vs.85).aspx">DwmGetWindowAttribute function</a>
+		/// Retrieves the current value of a specified attribute applied to a window.
+		/// TODO: Currently only DWMWA_EXTENDED_FRAME_BOUNDS is supported, due to the type of lpRect
+		/// </summary>
+		/// <param name="hwnd">The handle to the window from which the attribute data is retrieved.</param>
+		/// <param name="dwAttribute">The attribute to retrieve, specified as a DwmWindowAttributes value.</param>
+		/// <param name="lpRect">A pointer to a value that, when this function returns successfully, receives the current value of the attribute. The type of the retrieved value depends on the value of the dwAttribute parameter.</param>
+		/// <param name="size"></param>
+		/// <returns>The size of the DWMWINDOWATTRIBUTE value being retrieved. The size is dependent on the type of the pvAttribute parameter.</returns>
 		[DllImport("dwmapi", SetLastError = true)]
-		public static extern int DwmGetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttribute, out RECT lpRect, int size);
+		public static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttribute, out RECT lpRect, int size);
 
 		// Deprecated as of Windows 8 Release Preview
 		[DllImport("dwmapi", SetLastError = true)]

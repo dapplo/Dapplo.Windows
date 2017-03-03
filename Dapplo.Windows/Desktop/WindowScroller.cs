@@ -99,7 +99,7 @@ namespace Dapplo.Windows.Desktop
 		///     Get the information on the used scrollbar, if any.
 		///     This can be used to detect the location of the scrollbar
 		/// </summary>
-		public ScrollBarInfo? ScrollBarInfo { get; internal set; }
+		public ScrollBarInfo? ScrollBar { get; internal set; }
 
 		/// <summary>
 		///     What scrollbar to use
@@ -229,7 +229,7 @@ namespace Dapplo.Windows.Desktop
 		/// <returns>SCROLLINFO</returns>
 		public bool GetPosition(out ScrollInfo scrollInfo)
 		{
-			scrollInfo = new ScrollInfo(ScrollInfoMask.All);
+			scrollInfo = ScrollInfo.Create(ScrollInfoMask.All);
 
 			return User32.GetScrollInfo(ScrollBarWindow.Handle, ScrollBarType, ref scrollInfo);
 		}
@@ -242,9 +242,9 @@ namespace Dapplo.Windows.Desktop
 		public ScrollBarInfo? GetScrollbarInfo(bool forceUpdate = false)
 		{
 			// Prevent updates, if there is already a value
-			if (ScrollBarInfo.HasValue && !forceUpdate)
+			if (ScrollBar.HasValue && !forceUpdate)
 			{
-				return ScrollBarInfo;
+				return ScrollBar;
 			}
 			var objectId = ObjectIdentifiers.Client;
 			switch (ScrollBarType)
@@ -259,7 +259,7 @@ namespace Dapplo.Windows.Desktop
 					objectId = ObjectIdentifiers.HorizontalScrollbar;
 					break;
 			}
-			var scrollbarInfo = new ScrollBarInfo(true);
+			var scrollbarInfo = ScrollBarInfo.Create();
 			var hasScrollbarInfo = User32.GetScrollBarInfo(ScrollBarWindow.Handle, objectId, ref scrollbarInfo);
 			if (!hasScrollbarInfo)
 			{
@@ -267,7 +267,7 @@ namespace Dapplo.Windows.Desktop
 				Log.Verbose().WriteLine("Error retrieving Scrollbar info : {0}", Win32.GetMessage(error));
 				return null;
 			}
-			ScrollBarInfo = scrollbarInfo;
+			ScrollBar = scrollbarInfo;
 			return scrollbarInfo;
 		}
 

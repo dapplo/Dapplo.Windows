@@ -36,7 +36,10 @@ namespace Dapplo.Windows.Native
 	/// </summary>
 	public class Kernel32
 	{
-		public const uint ATTACHCONSOLE_ATTACHPARENTPROCESS = 0x0ffffffff; // default value if not specifing a process ID
+		/// <summary>
+		/// default value if not specifing a process ID
+		/// </summary>
+		public const uint ATTACHCONSOLE_ATTACHPARENTPROCESS = 0x0ffffffff;
 
 		[DllImport("kernel32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]

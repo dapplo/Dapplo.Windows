@@ -287,7 +287,7 @@ namespace Dapplo.Windows.Desktop
 		{
 			if (!interopWindow.Placement.HasValue || forceUpdate)
 			{
-				var placement = WindowPlacement.Default;
+				var placement = WindowPlacement.Create();
 				User32.GetWindowPlacement(interopWindow.Handle, ref placement);
 				interopWindow.Placement = placement;
 			}
@@ -376,7 +376,7 @@ namespace Dapplo.Windows.Desktop
 			{
 				return null;
 			}
-			var initialScrollInfo = new ScrollInfo(ScrollInfoMask.All);
+			var initialScrollInfo = ScrollInfo.Create(ScrollInfoMask.All);
 			if (User32.GetScrollInfo(interopWindow.Handle, scrollBarType, ref initialScrollInfo) && initialScrollInfo.nMin != initialScrollInfo.nMax)
 			{
 				var windowScroller = new WindowScroller

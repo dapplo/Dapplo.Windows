@@ -93,7 +93,7 @@ namespace Dapplo.Windows.Native
 		///     If the function succeeds, the return value is the handle to a memory DC.
 		///     If the function fails, the return value is NULL.
 		/// </returns>
-		[DllImport("gdi32.dll", SetLastError = true)]
+		[DllImport("gdi32", SetLastError = true)]
 		public static extern SafeCompatibleDcHandle CreateCompatibleDC(SafeHandle hDc);
 
 		/// <summary>

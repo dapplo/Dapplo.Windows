@@ -69,19 +69,23 @@ namespace Dapplo.Windows.Structs
 		private const int CCHDEVICENAME = 32;
 
 		/// <summary>
-		///     A string that specifies the device name of the monitor being used. Most applications have no use for a display
-		///     monitor name,
+		///     A string that specifies the device name of the monitor being used.
+		///     Most applications have no use for a display monitor name,
 		///     and so can save some bytes by using a MONITORINFO structure.
 		/// </summary>
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)] public string DeviceName;
+		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
+		public string DeviceName;
 
 		/// <summary>
-		///     Initialize the structure
+		///     Create a MonitorInfoEx with defaults
 		/// </summary>
-		public void Init()
+		public static MonitorInfoEx Create()
 		{
-			Size = Marshal.SizeOf(this);
-			DeviceName = string.Empty;
+			return new MonitorInfoEx
+			{
+				Size = Marshal.SizeOf(typeof(MonitorInfoEx)),
+				DeviceName = string.Empty,
+			};
 		}
 	}
 }

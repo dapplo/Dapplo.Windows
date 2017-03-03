@@ -55,7 +55,8 @@ namespace Dapplo.Windows.SafeHandles
 		public SafeSelectObjectHandle(SafeHandle hdc, SafeHandle newObjectSafeHandle) : base(true)
 		{
 			_hdc = hdc;
-			SetHandle(SelectObject(hdc.DangerousGetHandle(), newObjectSafeHandle.DangerousGetHandle()));
+			var selectedObject = SelectObject(hdc.DangerousGetHandle(), newObjectSafeHandle.DangerousGetHandle());
+			SetHandle(selectedObject);
 		}
 
 		/// <summary>

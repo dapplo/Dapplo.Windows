@@ -36,6 +36,7 @@ namespace Dapplo.Windows.SafeHandles
 	public class SafeDeviceContextHandle : SafeDcHandle
 	{
 		private readonly Graphics _graphics;
+		private readonly bool _disposeGraphics;
 
 		/// <summary>
 		///     Default constructor is needed to support marshalling!!
@@ -46,13 +47,16 @@ namespace Dapplo.Windows.SafeHandles
 		}
 
 		/// <summary>
+		/// Construct a SafeDeviceContextHandle for the specified Graphics
 		/// </summary>
-		/// <param name="graphics"></param>
-		/// <param name="preexistingHandle"></param>
+		/// <param name="graphics">Graphics</param>
+		/// <param name="preexistingHandle">IntPtr hDc, from graphics.GetHdc()</param>
+		/// <param name="disposeGraphics">specifies if the Graphics object needs disposing</param>
 		[SecurityCritical]
-		public SafeDeviceContextHandle(Graphics graphics, IntPtr preexistingHandle) : base(true)
+		private SafeDeviceContextHandle(Graphics graphics, IntPtr preexistingHandle, bool disposeGraphics) : base(true)
 		{
 			_graphics = graphics;
+			_disposeGraphics = disposeGraphics;
 			SetHandle(preexistingHandle);
 		}
 
@@ -60,10 +64,21 @@ namespace Dapplo.Windows.SafeHandles
 		///     Create a SafeDeviceContextHandle from a Graphics object
 		/// </summary>
 		/// <param name="graphics">Graphics object</param>
+		/// <param name="disposeGraphics"></param>
 		/// <returns>SafeDeviceContextHandle</returns>
-		public static SafeDeviceContextHandle FromGraphics(Graphics graphics)
+		public static SafeDeviceContextHandle FromGraphics(Graphics graphics, bool disposeGraphics = false)
 		{
-			return new SafeDeviceContextHandle(graphics, graphics.GetHdc());
+			return new SafeDeviceContextHandle(graphics, graphics.GetHdc(), disposeGraphics);
+		}
+
+		/// <summary>
+		///     Create a SafeDeviceContextHandle from a hWnd
+		/// </summary>
+		/// <param name="hWnd">IntPtr for hWnd</param>
+		/// <returns>SafeDeviceContextHandle</returns>
+		public static SafeDeviceContextHandle FromHWnd(IntPtr hWnd)
+		{
+			return FromGraphics(Graphics.FromHwnd(hWnd));
 		}
 
 		/// <summary>
@@ -73,13 +88,19 @@ namespace Dapplo.Windows.SafeHandles
 		protected override bool ReleaseHandle()
 		{
 			_graphics.ReleaseHdc(handle);
+			if (_disposeGraphics)
+			{
+				_graphics.Dispose();
+			}
 			return true;
 		}
 
 		/// <summary>
+		/// The SelectObject function selects an object into the device context (DC) which this SafeDeviceContextHandle represents.
+		/// The new object replaces the previous object of the same type.
 		/// </summary>
-		/// <param name="newHandle"></param>
-		/// <returns></returns>
+		/// <param name="newHandle">SafeHandle for the new object</param>
+		/// <returns>Replaced object</returns>
 		public SafeSelectObjectHandle SelectObject(SafeHandle newHandle)
 		{
 			return new SafeSelectObjectHandle(this, newHandle);

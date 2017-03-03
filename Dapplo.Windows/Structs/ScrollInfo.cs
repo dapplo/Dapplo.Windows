@@ -81,15 +81,18 @@ namespace Dapplo.Windows.Structs
 		///     Create a ScrollInfo struct with the specified mask
 		/// </summary>
 		/// <param name="mask">ScrollInfoMask</param>
-		public ScrollInfo(ScrollInfoMask mask)
+		public static ScrollInfo Create(ScrollInfoMask mask)
 		{
-			cbSize = (uint) Marshal.SizeOf(typeof(ScrollInfo));
-			fMask = (uint) mask;
-			nMin = 0;
-			nMax = 0;
-			nPage = 0;
-			nPos = 0;
-			nTrackPos = 0;
+			return new ScrollInfo()
+			{
+				cbSize = (uint)Marshal.SizeOf(typeof(ScrollInfo)),
+				fMask = (uint)mask,
+				nMin = 0,
+				nMax = 0,
+				nPage = 0,
+				nPos = 0,
+				nTrackPos = 0
+			};
 		}
 	}
 }

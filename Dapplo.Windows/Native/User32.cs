@@ -64,8 +64,7 @@ namespace Dapplo.Windows.Native
 			var result = new List<DisplayInfo>();
 			EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr monitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr data) =>
 			{
-				var monitorInfoEx = new MonitorInfoEx();
-				monitorInfoEx.Init();
+				var monitorInfoEx = MonitorInfoEx.Create();
 				var success = GetMonitorInfo(monitor, ref monitorInfoEx);
 				if (!success)
 				{
@@ -435,8 +434,18 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommands getWindowCommand);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx">ShowWindow function</a>
+		/// </summary>
+		/// <param name="hWnd">A handle to the window.</param>
+		/// <param name="nCmdShow">ShowWindowCommands
+		/// Controls how the window is to be shown.
+		/// This parameter is ignored the first time an application calls ShowWindow, if the program that launched the application provides a STARTUPINFO structure.
+		/// Otherwise, the first time ShowWindow is called, the value should be the value obtained by the WinMain function in its nCmdShow parameter.
+		/// In subsequent calls, this parameter can be one of the following values.</param>
+		/// <returns>bool</returns>
 		[DllImport("user32", SetLastError = true)]
-		public static extern int ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);
+		public static extern bool ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);
 
 		[DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
 		public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int cch);
@@ -826,6 +835,12 @@ namespace Dapplo.Windows.Native
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool DestroyIcon(IntPtr hIcon);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648389(v=vs.85).aspx">GetCursorInfo function</a>
+		/// Retrieves information about the global cursor.
+		/// </summary>
+		/// <param name="cursorInfo">a CURSORINFO structure</param>
+		/// <returns>bool</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool GetCursorInfo(out CursorInfo cursorInfo);

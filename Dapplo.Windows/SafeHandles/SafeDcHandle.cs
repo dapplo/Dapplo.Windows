@@ -35,7 +35,7 @@ namespace Dapplo.Windows.SafeHandles
 		/// <summary>
 		///     Constructor which passes the SafeHandleZeroOrMinusOneIsInvalid to the base
 		/// </summary>
-		/// <param name="ownsHandle"></param>
+		/// <param name="ownsHandle">true to reliably release the handle during the finalization phase; false to prevent reliable release (not recommended).</param>
 		protected SafeDcHandle(bool ownsHandle) : base(ownsHandle)
 		{
 		}

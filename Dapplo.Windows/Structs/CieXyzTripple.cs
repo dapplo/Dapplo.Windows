@@ -33,8 +33,17 @@ namespace Dapplo.Windows.Structs
 	[StructLayout(LayoutKind.Sequential)]
 	public struct CieXyzTripple
 	{
+		/// <summary>
+		/// A CIE XYZ 1931 color space for the red component
+		/// </summary>
 		public CieXyz CieXyzRed;
+		/// <summary>
+		/// A CIE XYZ 1931 color space for the green component
+		/// </summary>
 		public CieXyz CieXyzGreen;
+		/// <summary>
+		/// A CIE XYZ 1931 color space for the blue component
+		/// </summary>
 		public CieXyz CieXyzBlue;
 	}
 }

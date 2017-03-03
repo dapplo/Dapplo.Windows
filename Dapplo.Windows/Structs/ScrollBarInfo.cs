@@ -81,17 +81,20 @@ namespace Dapplo.Windows.Structs
 		}
 
 		/// <summary>
-		///     Create a ScrollInfo struct with the specified mask
+		///     Create a ScrollBarInfo struct
 		/// </summary>
-		public ScrollBarInfo(bool? dummy = false)
+		public static ScrollBarInfo Create()
 		{
-			cbSize = (uint) Marshal.SizeOf(typeof(ScrollBarInfo));
-			states = new ObjectStates[6];
-			rcScrollBar = new RECT();
-			dxyLineButton = 0;
-			xyThumbBottom = 0;
-			xyThumbTop = 0;
-			reserved = 0;
+			return new ScrollBarInfo
+			{
+				cbSize = (uint)Marshal.SizeOf(typeof(ScrollBarInfo)),
+				states = new ObjectStates[6],
+				rcScrollBar = new RECT(),
+				dxyLineButton = 0,
+				xyThumbBottom = 0,
+				xyThumbTop = 0,
+				reserved = 0,
+			};
 		}
 	}
 }
