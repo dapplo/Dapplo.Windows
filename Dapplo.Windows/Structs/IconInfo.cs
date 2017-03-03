@@ -35,9 +35,9 @@ namespace Dapplo.Windows.Structs
 	[StructLayout(LayoutKind.Sequential)]
 	public struct IconInfo
 	{
-		private readonly bool _fIcon;
-		private readonly int _xHotspot;
-		private readonly int _yHotspot;
+		private bool _fIcon;
+		private int _xHotspot;
+		private int _yHotspot;
 		private readonly IntPtr _hbmMask;
 		private readonly IntPtr _hbmColor;
 
@@ -45,14 +45,36 @@ namespace Dapplo.Windows.Structs
 		/// Specifies whether this structure defines an icon or a cursor.
 		/// A value of TRUE specifies an icon; FALSE specifies a cursor.
 		/// </summary>
-		public bool IsIcon => _fIcon;
+		public bool IsIcon
+		{
+			get
+			{
+				return _fIcon;
+			}
+			set
+			{
+				_fIcon = value;
+			}
+		}
 
 		/// <summary>
 		/// The x and y coordinates of a cursor's hot spot.
 		/// If this structure defines an icon, the hot spot is always in the center of the icon,
 		/// and this member is ignored.
 		/// </summary>
-		public POINT Hotspot => new POINT(_xHotspot, _yHotspot);
+		public POINT Hotspot
+		{
+			get
+			{
+				return new POINT(_xHotspot, _yHotspot);
+			}
+			set
+			{
+				_xHotspot = value.X;
+				_yHotspot = value.Y;
+			}
+		}
+
 
 		/// <summary>
 		/// The icon bitmask bitmap.

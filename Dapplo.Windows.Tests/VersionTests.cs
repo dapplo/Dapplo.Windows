@@ -48,12 +48,12 @@ namespace Dapplo.Windows.Tests
         /// <summary>
         ///     Test GetVersionEx
         /// </summary>
-        //[Fact]
+        [Fact]
         public void TestOsVersionInfoEx()
         {
             var osVersionInfoEx = OsVersionInfoEx.Create();
             Assert.True(Kernel32.GetVersionEx(ref osVersionInfoEx));
-            Assert.Equal(10, osVersionInfoEx.MajorVersion);
+            Assert.Equal(6, osVersionInfoEx.MajorVersion);
         }
     }
 }
