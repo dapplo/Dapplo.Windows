@@ -309,7 +309,7 @@ namespace Dapplo.Windows.Desktop
 					result = ApplyPosition(ref scrollInfoForPrevious);
 					break;
 				case ScrollModes.MouseWheel:
-					var bounds = ScrollingWindow.GetBounds();
+					var bounds = ScrollingWindow.GetInfo().Bounds;
 					var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
 					result = InputGenerator.MoveMouseWheel(-WheelDelta, middlePoint) == 1;
 					break;
@@ -346,7 +346,7 @@ namespace Dapplo.Windows.Desktop
 					result = ApplyPosition(ref scrollInfoForPrevious);
 					break;
 				case ScrollModes.MouseWheel:
-					var bounds = ScrollingWindow.GetBounds();
+					var bounds = ScrollingWindow.GetInfo().Bounds;
 					var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
 					result = InputGenerator.MoveMouseWheel(WheelDelta, middlePoint) == 1;
 					break;

@@ -53,13 +53,9 @@ namespace Dapplo.Windows.Desktop
 			}
 			var forceUpdate = cacheFlags.HasFlag(InteropWindowCacheFlags.ForceUpdate);
 
-			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Bounds))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Info))
 			{
-				interopWindow.GetBounds(forceUpdate);
-			}
-			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ClientBounds))
-			{
-				interopWindow.GetClientBounds(forceUpdate);
+				interopWindow.GetInfo(forceUpdate);
 			}
 			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Caption))
 			{
@@ -68,14 +64,6 @@ namespace Dapplo.Windows.Desktop
 			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Classname))
 			{
 				interopWindow.GetClassname(forceUpdate);
-			}
-			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ExtendedStyle))
-			{
-				interopWindow.GetExtendedStyle(forceUpdate);
-			}
-			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Style))
-			{
-				interopWindow.GetStyle(forceUpdate);
 			}
 			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ProcessId))
 			{
@@ -118,39 +106,6 @@ namespace Dapplo.Windows.Desktop
 				interopWindow.GetText(forceUpdate);
 			}
 			return interopWindow;
-		}
-
-		/// <summary>
-		///     Get the Border size for GDI Windows
-		/// </summary>
-		/// <param name="interopWindow">InteropWindow</param>
-		/// <returns>bool true if it worked</returns>
-		public static SIZE GetBorderSize(this IInteropWindow interopWindow)
-		{
-			var windowInfo = new WINDOWINFO();
-			// Get the Window Info for this window
-			if (User32.GetWindowInfo(interopWindow.Handle, ref windowInfo))
-			{
-				return new SIZE((int) windowInfo.cxWindowBorders, (int) windowInfo.cyWindowBorders);
-			}
-			return SIZE.Empty;
-		}
-
-		/// <summary>
-		///     Get the Window bounds
-		/// </summary>
-		/// <param name="interopWindow">InteropWindow</param>
-		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
-		/// <returns>RECT</returns>
-		public static RECT GetBounds(this IInteropWindow interopWindow, bool forceUpdate = false)
-		{
-			if (!interopWindow.Bounds.HasValue || forceUpdate)
-			{
-				RECT rectangle;
-				User32.GetWindowRect(interopWindow.Handle, out rectangle);
-				interopWindow.Bounds = rectangle;
-			}
-			return interopWindow.Bounds.Value;
 		}
 
 		/// <summary>
@@ -209,36 +164,20 @@ namespace Dapplo.Windows.Desktop
 		}
 
 		/// <summary>
-		///     Get the client bounds
+		///     Get the WindowInfo
 		/// </summary>
 		/// <param name="interopWindow">InteropWindow</param>
 		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
-		/// <returns>RECT</returns>
-		public static RECT GetClientBounds(this IInteropWindow interopWindow, bool forceUpdate = false)
+		/// <returns>WindowInfo</returns>
+		public static WindowInfo GetInfo(this IInteropWindow interopWindow, bool forceUpdate = false)
 		{
-			if (!interopWindow.ClientBounds.HasValue || forceUpdate)
+			if (!interopWindow.Info.HasValue || forceUpdate)
 			{
-				RECT rectangle;
-				User32.GetClientRect(interopWindow.Handle, out rectangle);
-				interopWindow.ClientBounds = rectangle;
+				var windowInfo = WindowInfo.Create();
+				User32.GetWindowInfo(interopWindow.Handle, ref windowInfo);
+				interopWindow.Info = windowInfo;
 			}
-			return interopWindow.ClientBounds.Value;
-		}
-
-		/// <summary>
-		///     Get the Extended WindowStyle
-		/// </summary>
-		/// <param name="interopWindow">InteropWindow</param>
-		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
-		/// <returns>ExtendedWindowStyleFlags</returns>
-		public static ExtendedWindowStyleFlags GetExtendedStyle(this IInteropWindow interopWindow, bool forceUpdate = false)
-		{
-			if (!interopWindow.ExtendedStyle.HasValue || forceUpdate)
-			{
-				var extendedWindowStyleFlags = (ExtendedWindowStyleFlags) User32.GetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_EXSTYLE);
-				interopWindow.ExtendedStyle = extendedWindowStyleFlags;
-			}
-			return interopWindow.ExtendedStyle.Value;
+			return interopWindow.Info.Value;
 		}
 
 		/// <summary>
@@ -329,22 +268,6 @@ namespace Dapplo.Windows.Desktop
 				}
 			}
 			return null;
-		}
-
-		/// <summary>
-		///     Get the WindowStyle
-		/// </summary>
-		/// <param name="interopWindow">InteropWindow</param>
-		/// <param name="forceUpdate">set to true to make sure the value is updated</param>
-		/// <returns>WindowStyleFlags</returns>
-		public static WindowStyleFlags GetStyle(this IInteropWindow interopWindow, bool forceUpdate = false)
-		{
-			if (!interopWindow.Style.HasValue || forceUpdate)
-			{
-				var windowStyleFlags = (WindowStyleFlags) User32.GetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE);
-				interopWindow.Style = windowStyleFlags;
-			}
-			return interopWindow.Style.Value;
 		}
 
 		/// <summary>
@@ -440,7 +363,7 @@ namespace Dapplo.Windows.Desktop
 		/// <returns>bool true if docked</returns>
 		public static bool IsDockedToLeftOf(this IInteropWindow window1, IInteropWindow window2, Func<IInteropWindow, RECT> retrieveBoundsFunc = null)
 		{
-			retrieveBoundsFunc = retrieveBoundsFunc ?? (window => window.GetBounds());
+			retrieveBoundsFunc = retrieveBoundsFunc ?? (window => window.GetInfo().Bounds);
 			return retrieveBoundsFunc(window1).IsDockedToLeftOf(retrieveBoundsFunc(window2));
 		}
 
@@ -453,7 +376,7 @@ namespace Dapplo.Windows.Desktop
 		/// <returns>bool true if docked</returns>
 		public static bool IsDockedToRightOf(this IInteropWindow window1, IInteropWindow window2, Func<IInteropWindow, RECT> retrieveBoundsFunc = null)
 		{
-			retrieveBoundsFunc = retrieveBoundsFunc ?? (window => window.GetBounds());
+			retrieveBoundsFunc = retrieveBoundsFunc ?? (window => window.GetInfo().Bounds);
 			return retrieveBoundsFunc(window1).IsDockedToRightOf(retrieveBoundsFunc(window2));
 		}
 
@@ -541,8 +464,8 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="extendedWindowStyleFlags">ExtendedWindowStyleFlags</param>
 		public static void SetExtendedStyle(this IInteropWindow interopWindow, ExtendedWindowStyleFlags extendedWindowStyleFlags)
 		{
-			interopWindow.ExtendedStyle = extendedWindowStyleFlags;
 			User32.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint) extendedWindowStyleFlags));
+			interopWindow.Info = null;
 		}
 
 		/// <summary>
@@ -563,8 +486,8 @@ namespace Dapplo.Windows.Desktop
 		/// <param name="windowStyleFlags">WindowStyleFlags</param>
 		public static void SetStyle(this IInteropWindow interopWindow, WindowStyleFlags windowStyleFlags)
 		{
-			interopWindow.Style = windowStyleFlags;
 			User32.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint) windowStyleFlags));
+			interopWindow.Info = null;
 		}
 
 		/// <summary>

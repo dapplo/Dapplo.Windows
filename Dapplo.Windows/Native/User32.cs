@@ -99,28 +99,6 @@ namespace Dapplo.Windows.Native
 		}
 
 		/// <summary>
-		///     Helper method to get the Border size for GDI Windows
-		/// </summary>
-		/// <param name="hWnd">IntPtr</param>
-		/// <param name="size">SIZE</param>
-		/// <returns>bool true if it worked</returns>
-		public static bool GetBorderSize(IntPtr hWnd, out SIZE size)
-		{
-			var windowInfo = new WINDOWINFO();
-			// Get the Window Info for this window
-			var result = GetWindowInfo(hWnd, ref windowInfo);
-			if (result)
-			{
-				size = new SIZE((int) windowInfo.cxWindowBorders, (int) windowInfo.cyWindowBorders);
-			}
-			else
-			{
-				size = SIZE.Empty;
-			}
-			return result;
-		}
-
-		/// <summary>
 		///     Wrapper for the GetClassLong which decides if the system is 64-bit or not and calls the right one.
 		/// </summary>
 		/// <param name="hWnd">IntPtr</param>
@@ -149,21 +127,6 @@ namespace Dapplo.Windows.Native
 				return null;
 			}
 			return classNameBuilder.ToString();
-		}
-
-		/// <summary>
-		///     Helper method to get the window size for GDI Windows
-		/// </summary>
-		/// <param name="hWnd"></param>
-		/// <param name="rectangle">out RECT</param>
-		/// <returns>bool true if it worked</returns>
-		public static bool GetClientRect(IntPtr hWnd, out RECT rectangle)
-		{
-			var windowInfo = new WINDOWINFO();
-			// Get the Window Info for this window
-			var result = GetWindowInfo(hWnd, ref windowInfo);
-			rectangle = result ? windowInfo.rcClient : RECT.Empty;
-			return result;
 		}
 
 		/// <summary>
@@ -325,21 +288,6 @@ namespace Dapplo.Windows.Native
 				return GetWindowLongPtr(hwnd, index).ToInt64();
 			}
 			return GetWindowLong(hwnd, index);
-		}
-
-		/// <summary>
-		///     Helper method to get the window size for GDI Windows
-		/// </summary>
-		/// <param name="hWnd">IntPtr</param>
-		/// <param name="rectangle">out RECT</param>
-		/// <returns>bool true if it worked</returns>
-		public static bool GetWindowRect(IntPtr hWnd, out RECT rectangle)
-		{
-			var windowInfo = new WINDOWINFO();
-			// Get the Window Info for this window
-			var result = GetWindowInfo(hWnd, ref windowInfo);
-			rectangle = result ? windowInfo.rcWindow : RECT.Empty;
-			return result;
 		}
 
 		/// <summary>
@@ -648,11 +596,11 @@ namespace Dapplo.Windows.Native
 		/// Retrieves information about the specified window.
 		/// </summary>
 		/// <param name="hwnd">IntPtr</param>
-		/// <param name="pwi">WINDOWINFO</param>
+		/// <param name="windowInfo">WindowInfo (use WindowInfo.Create)</param>
 		/// <returns>bool if false than get the last error</returns>
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
+		public static extern bool GetWindowInfo(IntPtr hwnd, ref WindowInfo windowInfo);
 
 		/// <summary>
 		///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a>

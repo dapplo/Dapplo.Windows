@@ -37,11 +37,6 @@ namespace Dapplo.Windows.Desktop
 	public interface IInteropWindow
 	{
 		/// <summary>
-		///     Returns the bounds of this window
-		/// </summary>
-		RECT? Bounds { get; set; }
-
-		/// <summary>
 		///     Specifies if a WindowScroller can work with this window
 		/// </summary>
 		bool? CanScroll { get; set; }
@@ -62,14 +57,9 @@ namespace Dapplo.Windows.Desktop
 		string Classname { get; set; }
 
 		/// <summary>
-		///     Returns the client bounds of this window
+		///     WindowInfo for the Window
 		/// </summary>
-		RECT? ClientBounds { get; set; }
-
-		/// <summary>
-		///     ExtendedWindowStyleFlags for the Window
-		/// </summary>
-		ExtendedWindowStyleFlags? ExtendedStyle { get; set; }
+		WindowInfo? Info { get; set; }
 
 		/// <summary>
 		///     Handle (ID) of the window
@@ -126,11 +116,6 @@ namespace Dapplo.Windows.Desktop
 		///     Get the process ID this window belongs to
 		/// </summary>
 		int? ProcessId { get; set; }
-
-		/// <summary>
-		///     WindowStyleFlags for the Window
-		/// </summary>
-		WindowStyleFlags? Style { get; set; }
 
 		/// <summary>
 		///     Return the text (not title) of the window, if any

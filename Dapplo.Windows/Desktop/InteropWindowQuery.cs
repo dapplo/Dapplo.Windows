@@ -145,7 +145,7 @@ namespace Dapplo.Windows.Desktop
 				return false;
 			}
 			// Windows without size
-			if (interopWindow.GetBounds().IsEmpty)
+			if (interopWindow.GetInfo().Bounds.IsEmpty)
 			{
 				return false;
 			}
@@ -153,18 +153,18 @@ namespace Dapplo.Windows.Desktop
 			{
 				return false;
 			}
-			var exWindowStyle = interopWindow.GetExtendedStyle();
-			if ((exWindowStyle & ExtendedWindowStyleFlags.WS_EX_TOOLWINDOW) != 0)
+			var exWindowStyle = interopWindow.GetInfo().ExtendedStyle;
+			if (exWindowStyle.HasFlag(ExtendedWindowStyleFlags.WS_EX_TOOLWINDOW))
 			{
 				return false;
 			}
 			// Skip everything which is not rendered "normally"
-			if (!interopWindow.IsWin8App() && (exWindowStyle & ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP) != 0)
+			if (!interopWindow.IsWin8App() && exWindowStyle.HasFlag(ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP))
 			{
 				return false;
 			}
 			// Skip preview windows, like the one from Firefox
-			if ((interopWindow.GetStyle() & WindowStyleFlags.WS_VISIBLE) == 0)
+			if (!interopWindow.GetInfo().Style.HasFlag(WindowStyleFlags.WS_VISIBLE))
 			{
 				return false;
 			}

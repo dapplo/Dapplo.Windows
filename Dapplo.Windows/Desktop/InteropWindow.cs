@@ -59,10 +59,7 @@ namespace Dapplo.Windows.Desktop
 		public IntPtr Handle { get; }
 
 		/// <inheritdoc />
-		public RECT? Bounds { get; set; }
-
-		/// <inheritdoc />
-		public RECT? ClientBounds { get; set; }
+		public WindowInfo? Info { get; set; }
 
 		/// <inheritdoc />
 		public IEnumerable<IInteropWindow> Children { get; set; }
@@ -104,12 +101,6 @@ namespace Dapplo.Windows.Desktop
 		public int? ProcessId { get; set; }
 
 		/// <inheritdoc />
-		public ExtendedWindowStyleFlags? ExtendedStyle { get; set; }
-
-		/// <inheritdoc />
-		public WindowStyleFlags? Style { get; set; }
-
-		/// <inheritdoc />
 		public WindowPlacement? Placement { get; set; }
 
 		/// <inheritdoc />
@@ -135,21 +126,9 @@ namespace Dapplo.Windows.Desktop
 			{
 				dump.AppendLine($"{indentation}{nameof(Text)}={Text}");
 			}
-			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Bounds))
+			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Info))
 			{
-				dump.AppendLine($"{indentation}{nameof(Bounds)}={Bounds}");
-			}
-			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ClientBounds))
-			{
-				dump.AppendLine($"{indentation}{nameof(ClientBounds)}={Bounds}");
-			}
-			if (cacheFlags.HasFlag(InteropWindowCacheFlags.ExtendedStyle))
-			{
-				dump.AppendLine($"{indentation}{nameof(ExtendedStyle)}={ExtendedStyle}");
-			}
-			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Style))
-			{
-				dump.AppendLine($"{indentation}{nameof(Style)}={Style}");
+				dump.AppendLine($"{indentation}{nameof(Info)}={Info}");
 			}
 			if (cacheFlags.HasFlag(InteropWindowCacheFlags.Maximized))
 			{

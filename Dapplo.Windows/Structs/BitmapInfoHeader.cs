@@ -299,8 +299,8 @@ namespace Dapplo.Windows.Structs
 		{
 			get
 			{
-				var sizeOfBMI = (uint)Marshal.SizeOf(typeof(BitmapInfoHeader));
-				return biSize >= sizeOfBMI;
+				var sizeOfBmi = (uint)Marshal.SizeOf(typeof(BitmapInfoHeader));
+				return biSize >= sizeOfBmi;
 			}
 		}
 

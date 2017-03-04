@@ -188,7 +188,7 @@
     <Compile Include="Native\User32.cs" />
     <Compile Include="Enums\MonitorInfoFlags.cs" />
     <Compile Include="Enums\Win32Error.cs" />
-    <Compile Include="Structs\WINDOWINFO.cs" />
+    <Compile Include="Structs\WindowInfo.cs" />
     <Compile Include="Enums\WindowLongIndex.cs" />
     <Compile Include="Enums\WindowPos.cs" />
     <Compile Include="Enums\WinEvents.cs" />

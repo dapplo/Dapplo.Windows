@@ -16,7 +16,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 // 
-//  You should have a copy of the GNU Lesser General Public License
+//  You should have a copy of the GNU Lesser General Public LicenseD:\Projects\Dapplo.Windows\Dapplo.Windows\Structs\SIZE.cs
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 #region using
