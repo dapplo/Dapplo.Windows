@@ -89,6 +89,7 @@
     <Compile Include="Enums\MonitorDpiType.cs" />
     <Compile Include="Dpi\FormsExtensions.cs" />
     <Compile Include="Dpi\WinProcListener.cs" />
+    <Compile Include="Enums\TitleBarInfoIndexes.cs" />
     <Compile Include="Mouse\Native\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\InteropWindowCacheFlags.cs" />
     <Compile Include="Enums\MonitorFromFlags.cs" />
@@ -188,6 +189,7 @@
     <Compile Include="Native\User32.cs" />
     <Compile Include="Enums\MonitorInfoFlags.cs" />
     <Compile Include="Enums\Win32Error.cs" />
+    <Compile Include="Structs\TitleBarInfoEx.cs" />
     <Compile Include="Structs\WindowInfo.cs" />
     <Compile Include="Enums\WindowLongIndex.cs" />
     <Compile Include="Enums\WindowPos.cs" />

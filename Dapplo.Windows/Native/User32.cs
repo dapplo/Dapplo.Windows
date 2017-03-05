@@ -276,6 +276,18 @@ namespace Dapplo.Windows.Native
 		}
 
 		/// <summary>
+		/// Get the titlebar info ex for the specified window
+		/// </summary>
+		/// <param name="hWnd">IntPtr with the window handle</param>
+		/// <returns>TitleBarInfoEx</returns>
+		public static TitleBarInfoEx GetTitleBarInfoEx(IntPtr hWnd)
+		{
+			var result = TitleBarInfoEx.Create();
+			SendMessage(hWnd, WindowsMessages.WM_GETTITLEBARINFOEX, IntPtr.Zero, ref result);
+			return result;
+		}
+
+		/// <summary>
 		///     Wrapper for the GetWindowLong which decides if the system is 64-bit or not and calls the right one.
 		/// </summary>
 		/// <param name="hwnd">IntPtr</param>
@@ -395,8 +407,15 @@ namespace Dapplo.Windows.Native
 		[DllImport("user32", SetLastError = true)]
 		public static extern bool ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);
 
+		/// <summary>
+		/// Get the caption of the window
+		/// </summary>
+		/// <param name="hWnd">IntPtr with the window handle</param>
+		/// <param name="lpString">StringBuilder which is marshalled as buffer</param>
+		/// <param name="capacity">size of the buffer</param>
+		/// <returns>int with the size of the caption</returns>
 		[DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
-		public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int cch);
+		private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int capacity);
 
 		[DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
 		public static extern int GetWindowTextLength(IntPtr hWnd);
@@ -542,6 +561,17 @@ namespace Dapplo.Windows.Native
 		/// <returns></returns>
 		[DllImport("user32", SetLastError = true)]
 		public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, int lParam);
+
+		/// <summary>
+		/// SendMessage for getting TitleBarInfoEx
+		/// </summary>
+		/// <param name="hWnd"></param>
+		/// <param name="windowsMessage"></param>
+		/// <param name="wParam"></param>
+		/// <param name="lParam">TitleBarInfoEx</param>
+		/// <returns>LResut which is an IntPtr</returns>
+		[DllImport("user32.dll", CharSet = CharSet.Auto)]
+		internal static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, ref TitleBarInfoEx lParam);
 
 		/// <summary>
 		///     Used for WM_GETTEXT

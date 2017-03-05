@@ -37,8 +37,8 @@ namespace Dapplo.Windows.Native
 	/// </summary>
 	public static class Dwm
 	{
-		private const uint DWM_EC_DISABLECOMPOSITION = 0;
-		private const uint DWM_EC_ENABLECOMPOSITION = 1;
+		private const uint DwmEcDisablecomposition = 0;
+		private const uint DwmEcEnablecomposition = 1;
 
 		// Key to ColorizationColor for DWM
 		private const string ColorizationColorKey = @"SOFTWARE\Microsoft\Windows\DWM";
@@ -104,7 +104,7 @@ namespace Dapplo.Windows.Native
 		/// </summary>
 		public static void DisableComposition()
 		{
-			DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+			DwmEnableComposition(DwmEcDisablecomposition);
 		}
 
 		/// <summary>
@@ -163,7 +163,7 @@ namespace Dapplo.Windows.Native
 		/// </summary>
 		public static void EnableComposition()
 		{
-			DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+			DwmEnableComposition(DwmEcEnablecomposition);
 		}
 
 		/// <summary>
@@ -174,11 +174,9 @@ namespace Dapplo.Windows.Native
 		/// <returns>bool true if it worked</returns>
 		public static bool GetExtendedFrameBounds(IntPtr hWnd, out RECT rectangle)
 		{
-			RECT rect;
-			var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.DWMWA_EXTENDED_FRAME_BOUNDS, out rect, Marshal.SizeOf(typeof(RECT)));
-			if (result >= 0)
+			var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.DWMWA_EXTENDED_FRAME_BOUNDS, out rectangle, RECT.SizeOf);
+			if (result.Succeeded())
 			{
-				rectangle = rect;
 				return true;
 			}
 			rectangle = RECT.Empty;

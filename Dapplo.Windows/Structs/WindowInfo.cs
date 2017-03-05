@@ -40,7 +40,7 @@ namespace Dapplo.Windows.Structs
 		/// The size of the structure, in bytes. The caller must set this member to sizeof(WINDOWINFO).
 		/// </summary>
 		private uint _cbSize;
-		private readonly RECT _rcWindow;
+		private RECT _rcWindow;
 		private readonly RECT _rcClient;
 		private readonly WindowStyleFlags _dwStyle;
 		private readonly ExtendedWindowStyleFlags _dwExStyle;
@@ -69,7 +69,17 @@ namespace Dapplo.Windows.Structs
 		/// <summary>
 		/// The coordinates of the window.
 		/// </summary>
-		public RECT Bounds => _rcWindow;
+		public RECT Bounds
+		{
+			get
+			{
+				return _rcWindow;
+			}
+			set
+			{
+				_rcWindow = value;
+			}
+		}
 
 		/// <summary>
 		/// The coordinates of the client area.

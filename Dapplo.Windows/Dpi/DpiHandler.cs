@@ -70,7 +70,7 @@ namespace Dapplo.Windows.Dpi
 			get
 			{
 				// We can only test this for Windows 8.1 or later
-				if (!Environment.OSVersion.IsWindows81OrLater())
+				if (!WindowsVersion.IsWindows81OrLater)
 				{
 					Log.Verbose().WriteLine("An application can only be DPI aware starting with Window 8.1 and later.");
 					return false;
@@ -191,12 +191,12 @@ namespace Dapplo.Windows.Dpi
 		/// <returns>dpi value</returns>
 		public static int GetDpi(IntPtr hWnd)
 		{
-			if (Environment.OSVersion.IsWindows10OrLater())
+			if (WindowsVersion.IsWindows10OrLater)
 			{
 				return GetDpiForWindow(hWnd);
 			}
 
-			if (Environment.OSVersion.IsWindows81OrLater())
+			if (WindowsVersion.IsWindows81OrLater)
 			{
 				var hMonitor = User32.MonitorFromWindow(hWnd, MonitorFromFlags.DefaultToNearest);
 				uint dpiX;

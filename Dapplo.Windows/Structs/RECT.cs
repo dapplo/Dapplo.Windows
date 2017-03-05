@@ -296,5 +296,10 @@ namespace Dapplo.Windows.Structs
 		///     Empty RECT
 		/// </summary>
 		public static RECT Empty => new RECT();
+
+		/// <summary>
+		/// SizeOf for this struct
+		/// </summary>
+		public static int SizeOf => Marshal.SizeOf(typeof(RECT));
 	}
 }

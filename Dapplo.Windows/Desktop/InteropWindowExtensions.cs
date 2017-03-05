@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
+using Dapplo.Windows.App;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Extensions;
 using Dapplo.Windows.Keyboard.Native;
@@ -175,6 +176,20 @@ namespace Dapplo.Windows.Desktop
 			{
 				var windowInfo = WindowInfo.Create();
 				User32.GetWindowInfo(interopWindow.Handle, ref windowInfo);
+
+				// Now correct the bounds, for Windows 10
+				if (Dwm.IsDwmEnabled)
+				{
+					RECT extendedFrameBounds;
+					bool gotFrameBounds = Dwm.GetExtendedFrameBounds(interopWindow.Handle, out extendedFrameBounds);
+					if (gotFrameBounds)
+					{
+						if (interopWindow.IsApp() || (WindowsVersion.IsWindows10OrLater && !interopWindow.IsMaximized()))
+						{
+							windowInfo.Bounds = extendedFrameBounds;
+						}
+					}
+				}
 				interopWindow.Info = windowInfo;
 			}
 			return interopWindow.Info.Value;
