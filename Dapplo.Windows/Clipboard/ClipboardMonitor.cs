@@ -22,9 +22,12 @@
 #region using
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Interop;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
@@ -47,14 +50,14 @@ namespace Dapplo.Windows.Clipboard
 		/// <summary>
 		///     Used to store the observable
 		/// </summary>
-		private readonly IObservable<EventArgs> _clipboardObservable;
+		private readonly IObservable<ClipboardUpdateEventArgs> _clipboardObservable;
 
 		/// <summary>
 		///     Private constructor to create the observable
 		/// </summary>
 		private ClipboardMonitor()
 		{
-			_clipboardObservable = Observable.Create<EventArgs>(observer =>
+			_clipboardObservable = Observable.Create<ClipboardUpdateEventArgs>(observer =>
 			{
 				// This handles the message
 				HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
@@ -62,7 +65,16 @@ namespace Dapplo.Windows.Clipboard
 					var windowsMessage = (WindowsMessages)msg;
 					if (windowsMessage == WindowsMessages.WM_CLIPBOARDUPDATE)
 					{
-						observer.OnNext(EventArgs.Empty);
+						try
+						{
+							OpenClipboard(hwnd);
+							var clipboardEvent = new ClipboardUpdateEventArgs(EnumClipboardFormats());
+							observer.OnNext(clipboardEvent);
+						}
+						finally
+						{
+							CloseClipboard();
+						}
 					}
 					return IntPtr.Zero;
 				};
@@ -81,9 +93,37 @@ namespace Dapplo.Windows.Clipboard
 		}
 
 		/// <summary>
+		/// Enumerate through all formats on the clipboard 
+		/// </summary>
+		/// <returns>IEnumerable</returns>
+		private IEnumerable<string> EnumClipboardFormats()
+		{
+			uint clipboardId = 0;
+			var clipboardFormatName = new StringBuilder(256);
+			do
+			{
+				clipboardId = EnumClipboardFormats(clipboardId);
+				if (clipboardId != 0)
+				{
+					if (Enum.IsDefined(typeof(StandardClipboardFormats), clipboardId))
+					{
+						var clipboardFormat = (StandardClipboardFormats) clipboardId;
+						yield return clipboardFormat.ToString();
+					}
+					else
+					{
+						clipboardFormatName.Length = 0;
+						GetClipboardFormatName(clipboardId, clipboardFormatName, clipboardFormatName.Capacity);
+						yield return clipboardFormatName.ToString();
+					}
+				}
+			} while (clipboardId != 0);
+		}
+
+		/// <summary>
 		///     The actual clipboard hook observable
 		/// </summary>
-		public static IObservable<EventArgs> ClipboardUpdateEvents => Singleton.Value._clipboardObservable;
+		public static IObservable<ClipboardUpdateEventArgs> ClipboardUpdateEvents => Singleton.Value._clipboardObservable;
 
 		#region Native methods
 
@@ -106,6 +146,45 @@ namespace Dapplo.Windows.Clipboard
 		[DllImport("user32", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool RemoveClipboardFormatListener(IntPtr hWnd);
+
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649038(v=vs.85).aspx">EnumClipboardFormats function</a>
+		/// Enumerates the data formats currently available on the clipboard.
+		/// Clipboard data formats are stored in an ordered list. To perform an enumeration of clipboard data formats, you make a series of calls to the EnumClipboardFormats function. For each call, the format parameter specifies an available clipboard format, and the function returns the next available clipboard format.
+	    /// </summary>
+		/// <param name="format">To start an enumeration of clipboard formats, set format to zero. When format is zero, the function retrieves the first available clipboard format. For subsequent calls during an enumeration, set format to the result of the previous EnumClipboardFormats call.</param>
+		/// <returns>uint with clipboard format id</returns>
+		[DllImport("user32")]
+		private static extern uint EnumClipboardFormats(uint format);
+
+		/// <summary>
+		/// <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649048(v=vs.85).aspx"></a>
+		/// Opens the clipboard for examination and prevents other applications from modifying the clipboard content.
+		/// </summary>
+		/// <param name="hWndNewOwner">IntPtr with the hWnd of the new owner</param>
+		/// <returns>true if the clipboard is opened</returns>
+		[DllImport("user32", SetLastError = true)]
+		private static extern bool OpenClipboard(IntPtr hWndNewOwner);
+
+		/// <summary>
+		/// <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649048(v=vs.85).aspx"></a>
+		/// Opens the clipboard for examination and prevents other applications from modifying the clipboard content.
+		/// </summary>
+		/// <returns>true if the clipboard is closed</returns>
+		[DllImport("user32", SetLastError = true)]
+		private static extern bool CloseClipboard();
+
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649040(v=vs.85).aspx">GetClipboardFormatName function</a>
+		/// Retrieves from the clipboard the name of the specified registered format.
+		/// The function copies the name to the specified buffer.
+		/// </summary>
+		/// <param name="format">uint with the id of the format</param>
+		/// <param name="lpszFormatName">Name of the format</param>
+		/// <param name="cchMaxCount">Maximum size of the output</param>
+		/// <returns></returns>
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+		private static extern int GetClipboardFormatName(uint format, [Out] StringBuilder lpszFormatName, int cchMaxCount);
 
 		#endregion
 	}

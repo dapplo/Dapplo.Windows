@@ -21,47 +21,44 @@
 
 #region using
 
-using System.Threading.Tasks;
-using Dapplo.Log;
-using Dapplo.Log.XUnit;
-using Dapplo.Windows.Clipboard;
-using Xunit;
-using Xunit.Abstractions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
-namespace Dapplo.Windows.Tests
+namespace Dapplo.Windows.Clipboard
 {
-	public class ClipboardTests
+	/// <summary>
+	///     This event contains the information of clipboard changes
+	/// </summary>
+	public class ClipboardUpdateEventArgs : EventArgs
 	{
-		private static readonly LogSource Log = new LogSource();
+		private readonly IEnumerable<string> _clipboardFormats;
+		private IList<string> _clipboardFormatList;
 
-		public ClipboardTests(ITestOutputHelper testOutputHelper)
+		/// <summary>
+		/// Constructor for the EventArgs
+		/// </summary>
+		/// <param name="clipboardFormats">IEnumerable of string</param>
+		internal ClipboardUpdateEventArgs(IEnumerable<string> clipboardFormats)
 		{
-			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+			_clipboardFormats = clipboardFormats;
 		}
 
 		/// <summary>
-		///     Test monitoring the clipboard
+		///     The available formats on the clipboard
 		/// </summary>
-		/// <returns></returns>
-		//[WpfFact]
-		private async Task TestClipboardMonitor()
+		public IEnumerable<string> Formats
 		{
-			bool hasNewContent = false;
-			var subscription = ClipboardMonitor.ClipboardUpdateEvents.Subscribe(args =>
+			get
 			{
-				Log.Debug().WriteLine("Detected change {0}", string.Join(",", args.Formats));
-				hasNewContent = true;
-			});
-
-			System.Windows.Clipboard.SetText("Dapplo.Windows.Tests.ClipboardTests");
-			await Task.Delay(1000);
-			subscription.Dispose();
-
-			// Doesn't work!!
-			Assert.True(hasNewContent);
+				if (_clipboardFormatList == null)
+				{
+					_clipboardFormatList = _clipboardFormats.ToList();
+				}
+				return _clipboardFormatList;
+			}
 		}
 	}
 }

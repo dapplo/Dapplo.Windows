@@ -71,6 +71,8 @@
     <Compile Include="App\IAppVisibility.cs" />
     <Compile Include="App\MonitorAppVisibility.cs" />
     <Compile Include="Clipboard\ClipboardMonitor.cs" />
+    <Compile Include="Clipboard\ClipboardUpdateEventArgs.cs" />
+    <Compile Include="Clipboard\StandardClipboardFormats.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
     <Compile Include="Dpi\BitmapScaleHandler.cs" />
     <Compile Include="Dpi\DpiHandler.cs" />
