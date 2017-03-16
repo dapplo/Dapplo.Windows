@@ -847,13 +847,64 @@ namespace Dapplo.Windows.Native
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool CloseDesktop(IntPtr hDesktop);
 
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
 		private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
 
-		[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+		[DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
 
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947(v=vs.85).aspx">SystemParametersInfo function</a>
+		/// For setting an IntPtr
+		/// </summary>
+		/// <param name="uiAction">SystemParametersInfoActions</param>
+		/// <param name="uiParam">A parameter whose usage and format depends on the system parameter being queried or set. For more information about system-wide parameters, see the uiAction parameter. If not otherwise indicated, you must specify zero for this parameter.</param>
+		/// <param name="pvParam">IntPtr</param>
+		/// <param name="fWinIni">SystemParametersInfoBehaviors</param>
+		/// <returns>bool</returns>
+		[DllImport("user32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, IntPtr pvParam, SystemParametersInfoBehaviors fWinIni);
+
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947(v=vs.85).aspx">SystemParametersInfo function</a>
+		/// For setting a string parameter
+		/// </summary>
+		/// <param name="uiAction">SystemParametersInfoActions</param>
+		/// <param name="uiParam">A parameter whose usage and format depends on the system parameter being queried or set. For more information about system-wide parameters, see the uiAction parameter. If not otherwise indicated, you must specify zero for this parameter.</param>
+		/// <param name="pvParam">string</param>
+		/// <param name="fWinIni">SystemParametersInfoBehaviors</param>
+		/// <returns>bool</returns>
+		[DllImport("user32", CharSet = CharSet.Auto, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, string pvParam, SystemParametersInfoBehaviors fWinIni);
+
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947(v=vs.85).aspx">SystemParametersInfo function</a>
+		/// For reading a string parameter
+		/// </summary>
+		/// <param name="uiAction">SystemParametersInfoActions</param>
+		/// <param name="uiParam">A parameter whose usage and format depends on the system parameter being queried or set. For more information about system-wide parameters, see the uiAction parameter. If not otherwise indicated, you must specify zero for this parameter.</param>
+		/// <param name="pvParam">string</param>
+		/// <param name="fWinIni">SystemParametersInfoBehaviors</param>
+		/// <returns>bool</returns>
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, StringBuilder pvParam, SystemParametersInfoBehaviors fWinIni);
+
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947(v=vs.85).aspx">SystemParametersInfo function</a>
+		/// For setting AnimationInfo
+		/// </summary>
+		/// <param name="uiAction">SystemParametersInfoActions</param>
+		/// <param name="uiParam">A parameter whose usage and format depends on the system parameter being queried or set. For more information about system-wide parameters, see the uiAction parameter. If not otherwise indicated, you must specify zero for this parameter.</param>
+		/// <param name="animationInfo">AnimationInfo</param>
+		/// <param name="fWinIni">SystemParametersInfoBehaviors</param>
+		/// <returns>bool</returns>
+		[DllImport("user32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, ref AnimationInfo animationInfo, SystemParametersInfoBehaviors fWinIni);
 		#endregion
 	}
 }

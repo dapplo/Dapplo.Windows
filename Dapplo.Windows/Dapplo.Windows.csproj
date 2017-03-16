@@ -73,6 +73,8 @@
     <Compile Include="Clipboard\ClipboardMonitor.cs" />
     <Compile Include="Clipboard\ClipboardUpdateEventArgs.cs" />
     <Compile Include="Clipboard\StandardClipboardFormats.cs" />
+    <Compile Include="Desktop\EnvironmentChangedEventArgs.cs" />
+    <Compile Include="Desktop\EnvironmentMonitor.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
     <Compile Include="Dpi\BitmapScaleHandler.cs" />
     <Compile Include="Dpi\DpiHandler.cs" />
@@ -91,6 +93,8 @@
     <Compile Include="Enums\MonitorDpiType.cs" />
     <Compile Include="Dpi\FormsExtensions.cs" />
     <Compile Include="Dpi\WinProcListener.cs" />
+    <Compile Include="Enums\SystemParametersInfoBehaviors.cs" />
+    <Compile Include="Enums\SystemParametersInfoActions.cs" />
     <Compile Include="Enums\TitleBarInfoIndexes.cs" />
     <Compile Include="Mouse\Native\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\InteropWindowCacheFlags.cs" />
@@ -110,6 +114,7 @@
     <Compile Include="Mouse\MouseHookEventArgs.cs" />
     <Compile Include="Mouse\MouseHook.cs" />
     <Compile Include="Keyboard\Native\KeyboardLowLevelHookStruct.cs" />
+    <Compile Include="Structs\AnimationInfo.cs" />
     <Compile Include="Structs\HardwareInput.cs" />
     <Compile Include="Structs\Input.cs" />
     <Compile Include="Enums\InputTypes.cs" />

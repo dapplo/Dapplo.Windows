@@ -3,11 +3,14 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using Dapplo.Log;
+using Dapplo.Windows.Desktop;
 
 namespace Dapplo.Windows.FormsExample
 {
 	public partial class Form1 : Form
 	{
+		private static readonly LogSource Log = new LogSource();
 		protected readonly DpiHandler FormDpiHandler;
 		protected readonly BitmapScaleHandler<string> ScaleHandler;
 		public Form1()
@@ -28,6 +31,12 @@ namespace Dapplo.Windows.FormsExample
 
 			ScaleHandler.AddTarget(somethingMenuItem, "somethingMenuItem.Image");
 			ScaleHandler.AddTarget(something2MenuItem, "something2MenuItem.Image");
+
+			EnvironmentMonitor.EnvironmentUpdateEvents.Subscribe(args =>
+			{
+				Log.Info().WriteLine("{0} - {1}", args.SystemParametersInfoAction, args.Area);
+				MessageBox.Show(this, $"{args.SystemParametersInfoAction} - {args.Area}", "Change!");
+			});
 		}
 
 		/// <summary>
