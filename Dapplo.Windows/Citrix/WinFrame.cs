@@ -21,15 +21,23 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Dapplo.Log;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Native;
 
 namespace Dapplo.Windows.Citrix
 {
 	/// <summary>
 	/// Helper class for the WinFrame API, which is used by Citrix XenApp and XenDesktop.
 	/// </summary>
-	public class WinFrame
+	public static class WinFrame
 	{
+		private static readonly LogSource Log = new LogSource();
+
+		private const int CurrentSession = -1;
+		private static readonly IntPtr CurrentServer = IntPtr.Zero;
+
+		#region DllImports
 		/// <summary>
 		/// See <a href="https://www.citrix.com/content/dam/citrix/en_us/documents/downloads/sdk/wf-api-sdk-guide.pdf">WFQuerySessionInformation</a>
 		/// </summary>
@@ -60,8 +68,35 @@ namespace Dapplo.Windows.Citrix
 		[DllImport("WFAPI")]
 		private static extern HResult WFWaitSystemEvent(IntPtr hServer, EventMask eventMask, out EventMask pEventFlags);
 
-		private const int CurrentSession = -1;
-		private static readonly IntPtr CurrentServer = IntPtr.Zero;
+		#endregion
+
+		/// <summary>
+		/// Checks if WinFrame, the API for Citrix is available
+		/// </summary>
+		public static bool IsAvailabe
+		{
+			get
+			{
+				var modulePtr = IntPtr.Zero;
+				try
+				{
+					modulePtr = Kernel32.LoadLibrary("wfapi.dll");
+					return modulePtr != IntPtr.Zero;
+				}
+				catch (Exception ex)
+				{
+					Log.Warn().WriteLine("Couldn't load WFAPI.DLL, this could be okay. Error: {0}",ex.Message);
+				}
+				finally
+				{
+					if (modulePtr != IntPtr.Zero)
+					{
+						Kernel32.FreeLibrary(modulePtr);
+					}
+				}
+				return false;
+			}
+		}
 
 		/// <summary>
 		/// Retrieve the ip-address of the client PC
@@ -69,7 +104,7 @@ namespace Dapplo.Windows.Citrix
 		/// <returns>string with the ip address</returns>
 		public static string GetClientIpAddress()
 		{
-			return GetStruct<ClientAddress>(WinFrameInfoClasses.ClientAddress).IpAddress;
+			return QuerySessionInformation<ClientAddress>(WinFrameInfoClasses.ClientAddress).IpAddress;
 		}
 
 		/// <summary>
@@ -77,7 +112,8 @@ namespace Dapplo.Windows.Citrix
 		/// </summary>
 		/// <typeparam name="T">type of the struct to return</typeparam>
 		/// <returns>struct of type T</returns>
-		public static T GetStruct<T>(WinFrameInfoClasses infoClass)
+		public static T QuerySessionInformation<T>(WinFrameInfoClasses infoClass)
+			where T : struct 
 		{
 			IntPtr addr;
 			int returned;
@@ -99,7 +135,7 @@ namespace Dapplo.Windows.Citrix
 		/// Retrieve a string value from the WFQuerySessionInformation
 		/// </summary>
 		/// <returns>string with the value</returns>
-		public static string GetString(WinFrameInfoClasses infoClass)
+		public static string QuerySessionInformation(WinFrameInfoClasses infoClass)
 		{
 			IntPtr addr;
 			int returned;

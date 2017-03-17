@@ -80,6 +80,7 @@ namespace Dapplo.Windows.Dpi
 		{
 			// Window was destroyed, release hook.
 			ReleaseHandle();
+			_hooks.Clear();
 		}
 
 		/// <inheritdoc />

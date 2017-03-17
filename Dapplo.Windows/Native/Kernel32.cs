@@ -157,5 +157,24 @@ namespace Dapplo.Windows.Native
 		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
+
+		/// <summary>
+		/// Loads the specified module into the address space of the calling process. The specified module may cause other modules to be loaded.
+		/// See <a href="https://msdn.microsoft.com/en-us/library/ms684175(VS.85).aspx">LoadLibrary function</a>
+		/// </summary>
+		/// <param name="lpFileName">string with the library</param>
+		/// <returns>IntPtr for the module, IntPtr.Zero if this failed, use last error to see what went wrong</returns>
+		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "LoadLibraryW")]
+		public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+
+		/// <summary>
+		/// Frees the loaded dynamic-link library (DLL) module and, if necessary, decrements its reference count.
+		/// When the reference count reaches zero, the module is unloaded from the address space of the calling process and the handle is no longer valid.
+		/// </summary>
+		/// <param name="module">IntPtr</param>
+		/// <returns>true if it worked, false if an error occured</returns>
+		[DllImport("kernel32", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool FreeLibrary(IntPtr module);
 	}
 }

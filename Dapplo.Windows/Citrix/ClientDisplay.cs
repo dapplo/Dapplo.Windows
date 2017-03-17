@@ -42,7 +42,7 @@ namespace Dapplo.Windows.Citrix
 		/// <summary>
 		/// Returns the number of colors the client can display
 		/// </summary>
-		public int ColorDepth
+		public uint ColorDepth
 		{
 			get
 			{
@@ -53,11 +53,13 @@ namespace Dapplo.Windows.Citrix
 					case 2:
 						return 256;
 					case 4:
-						return 2^16;
+						return 2 ^ 16;
 					case 8:
-						return 2^24;
+						return 2 ^ 24;
+					case 16:
+						return 2 ^ 32;
 				}
-				return -1;
+				return (uint)_colorDepth;
 			}
 		}
 	}

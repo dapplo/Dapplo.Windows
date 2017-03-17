@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using Dapplo.Log;
+using Dapplo.Windows.Citrix;
 using Dapplo.Windows.Desktop;
 
 namespace Dapplo.Windows.FormsExample
@@ -31,6 +32,15 @@ namespace Dapplo.Windows.FormsExample
 
 			ScaleHandler.AddTarget(somethingMenuItem, "somethingMenuItem.Image");
 			ScaleHandler.AddTarget(something2MenuItem, "something2MenuItem.Image");
+
+			if (!WinFrame.IsAvailabe)
+			{
+				MessageBox.Show("Sorry", "Citrix not detected");
+			}
+			var clientDisplay = WinFrame.QuerySessionInformation<ClientDisplay>(WinFrameInfoClasses.ClientDisplay);
+			var clientName = WinFrame.QuerySessionInformation(WinFrameInfoClasses.ClientName);
+			MessageBox.Show($"Client {clientName} has {clientDisplay.ClientSize.Width}x{clientDisplay.ClientSize.Height} with {clientDisplay.ColorDepth} colors.",
+				"Citrix detected");
 
 			EnvironmentMonitor.EnvironmentUpdateEvents.Subscribe(args =>
 			{

@@ -164,6 +164,10 @@ namespace Dapplo.Windows.Dpi
 						}
 					}
 					break;
+				case WindowsMessages.WM_DESTROY:
+					// If the window is destroyed, we complete the subject
+					OnDpiChanged.OnCompleted();
+					break;
 			}
 			// Check if the DPI was changed, if so call the action (if any)
 			if (!isDpiMessage)
