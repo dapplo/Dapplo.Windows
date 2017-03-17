@@ -31,47 +31,49 @@ namespace Dapplo.Windows.Citrix
 	public enum EventMask : ulong
 	{
 		/// <summary>
-		/// New ICA session created Create, State Change, All
+		/// WF_EVENT_NONE: No event (this event is used only as a return value in pEventFlags)
 		/// </summary>
-		WF_EVENT_CREATE,
+		None = 0x00000000,
 		/// <summary>
-		/// Existing ICA session deleted Delete, State Change, All
+		/// WF_EVENT_CREATE: New ICA session created Create, State Change, All
 		/// </summary>
-		WF_EVENT_DELETE,
+		Create = 0x00000001,
 		/// <summary>
-		/// User logon to system (from console or WinStation) Logon, State Change, All
+		/// WF_EVENT_DELETE: Existing ICA session deleted Delete, State Change, All
 		/// </summary>
-		WF_EVENT_LOGON,
+		Delete = 0x00000002,
 		/// <summary>
-		/// User logon to system (from console or WinStation) Logon, State Change, All
+		/// WF_EVENT_LOGON: User logon to system (from console or WinStation) Logon, State Change, All
 		/// </summary>
-		WF_EVENT_LOGOFF,
+		Logon = 0x00000020,
 		/// <summary>
-		/// ICA sesion connect from client Connect, State Change, All
+		/// WF_EVENT_LOGOFF: User logoff to system (from console or WinStation) Logoff, State Change, All
 		/// </summary>
-		xWF_EVENT_CONNECT,
+		Logoff = 0x00000040,
 		/// <summary>
-		/// ICA session disconnect from client Disconnect, State Event Description Flags triggered Change, All
+		/// xWF_EVENT_CONNECT: ICA sesion connect from client Connect, State Change, All
 		/// </summary>
-		WF_EVENT_DISCONNECT,
+		Connect = 0x00000008,
 		/// <summary>
-		/// Existing ICA session renamed Rename, All
+		/// WF_EVENT_DISCONNECT: ICA session disconnect from client Disconnect, State Event Description Flags triggered Change, All
 		/// </summary>
-		WF_EVENT_RENAME,
+		Disconnect = 0x00000010,
 		/// <summary>
-		/// ICA session state change (this event is triggered when WF_CONNECTSTATE_CLASS (defined in Wfapi.h) changes)
+		/// WF_EVENT_RENAME: Existing ICA session renamed Rename, All
 		/// </summary>
-		WF_EVENT_STATECHANGE,
+		Rename = 0x00000004,
 		/// <summary>
-		/// License state change (this event is triggered when a license is added or deleted using License Manager) License, All
+		/// WF_EVENT_STATECHANGE: ICA session state change (this event is triggered when WF_CONNECTSTATE_CLASS (defined in Wfapi.h) changes)
 		/// </summary>
-		WF_EVENT_LICENSE,
+		StateChange = 0x00000080,
 		/// <summary>
-		/// Wait for any event type WF_EVENT_FLUSH Unblock all waiting events(this event is used only as an EventMask)
+		/// WF_EVENT_LICENSE: License state change (this event is triggered when a license is added or deleted using License Manager) License, All
 		/// </summary>
-		WF_EVENT_ALL,
+		License = 0x00000100,
 		/// <summary>
-		/// No event (this event is used only as a return value in pEventFlags)		/// </summary>
-		WF_EVENT_NONE
+		/// WF_EVENT_ALL: Wait for any event type WF_EVENT_FLUSH Unblock all waiting events(this event is used only as an EventMask)
+		/// </summary>
+		All = 0x7fffffff
+
 	}
 }

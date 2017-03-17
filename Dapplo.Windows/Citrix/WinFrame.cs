@@ -23,7 +23,6 @@ using System;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
 using Dapplo.Windows.Enums;
-using Dapplo.Windows.Native;
 
 namespace Dapplo.Windows.Citrix
 {
@@ -48,7 +47,7 @@ namespace Dapplo.Windows.Citrix
 		/// <param name="pBytesReturned">number of bytes returned</param>
 		/// <returns>bool if ok</returns>
 		[DllImport("WFAPI", EntryPoint = "WFQuerySessionInformationW")]
-		private static extern bool WFQuerySessionInformation(IntPtr hServer, int iSessionId, WinFrameInfoClasses infotype, out IntPtr ppBuffer, out int pBytesReturned);
+		private static extern bool WFQuerySessionInformation(IntPtr hServer, int iSessionId, InfoClasses infotype, out IntPtr ppBuffer, out int pBytesReturned);
 
 		/// <summary>
 		/// Free the memory which was reserved by the call to e.g. WFQuerySessionInformation 
@@ -59,7 +58,7 @@ namespace Dapplo.Windows.Citrix
 
 		/// <summary>
 		/// This function waits for an event (ICA session create/delete/connect, user logon/logoff, and so on)
-		///before it returns.
+		/// before it returns.
 		/// </summary>
 		/// <param name="hServer">A handle to a server. Use the WFOpenServer() function to obtain a handle for a particular server, or specify WF_CURRENT_SERVER_HANDLE to use the current server.</param>
 		/// <param name="eventMask">EventMask mask</param>
@@ -77,22 +76,14 @@ namespace Dapplo.Windows.Citrix
 		{
 			get
 			{
-				var modulePtr = IntPtr.Zero;
 				try
 				{
-					modulePtr = Kernel32.LoadLibrary("wfapi.dll");
-					return modulePtr != IntPtr.Zero;
+					QuerySessionConnectState();
+					return true;
 				}
 				catch (Exception ex)
 				{
-					Log.Warn().WriteLine("Couldn't load WFAPI.DLL, this could be okay. Error: {0}",ex.Message);
-				}
-				finally
-				{
-					if (modulePtr != IntPtr.Zero)
-					{
-						Kernel32.FreeLibrary(modulePtr);
-					}
+					Log.Warn().WriteLine("Couldn't load WFAPI.DLL, this could be okay. Error: {0}", ex.Message);
 				}
 				return false;
 			}
@@ -104,7 +95,7 @@ namespace Dapplo.Windows.Citrix
 		/// <returns>string with the ip address</returns>
 		public static string GetClientIpAddress()
 		{
-			return QuerySessionInformation<ClientAddress>(WinFrameInfoClasses.ClientAddress).IpAddress;
+			return QuerySessionInformation<ClientAddress>(InfoClasses.ClientAddress).IpAddress;
 		}
 
 		/// <summary>
@@ -112,9 +103,10 @@ namespace Dapplo.Windows.Citrix
 		/// </summary>
 		/// <typeparam name="T">type of the struct to return</typeparam>
 		/// <returns>struct of type T</returns>
-		public static T QuerySessionInformation<T>(WinFrameInfoClasses infoClass)
-			where T : struct 
+		public static T QuerySessionInformation<T>(InfoClasses infoClass)
+			where T : struct
 		{
+			var expectedType = typeof(T);
 			IntPtr addr;
 			int returned;
 			if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out addr, out returned))
@@ -123,7 +115,12 @@ namespace Dapplo.Windows.Citrix
 			}
 			try
 			{
-				return (T)Marshal.PtrToStructure(addr, typeof(T));
+				var expectedSize = Marshal.SizeOf(expectedType);
+				if (expectedSize != returned)
+				{
+					throw new ArgumentOutOfRangeException(nameof(infoClass), $"The size of struct {expectedType} is {expectedSize}, returned was {returned}");
+				}
+				return (T)Marshal.PtrToStructure(addr, expectedType);
 			}
 			finally
 			{
@@ -134,8 +131,29 @@ namespace Dapplo.Windows.Citrix
 		/// <summary>
 		/// Retrieve a string value from the WFQuerySessionInformation
 		/// </summary>
+		/// <returns>Optional ConnectStates</returns>
+		public static ConnectStates? QuerySessionConnectState()
+		{
+			IntPtr state;
+			int returned;
+			if (!WFQuerySessionInformation(CurrentServer, CurrentSession, InfoClasses.ConnectState, out state, out returned))
+			{
+				return null;
+			}
+			try
+			{
+				return (ConnectStates)state.ToInt32();
+			}
+			finally
+			{
+				WFFreeMemory(state);
+			}
+		}
+		/// <summary>
+		/// Retrieve a string value from the WFQuerySessionInformation
+		/// </summary>
 		/// <returns>string with the value</returns>
-		public static string QuerySessionInformation(WinFrameInfoClasses infoClass)
+		public static string QuerySessionInformation(InfoClasses infoClass)
 		{
 			IntPtr addr;
 			int returned;

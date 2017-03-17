@@ -24,7 +24,7 @@ namespace Dapplo.Windows.Citrix
 	/// <summary>
 	/// Type of information to be retrieved from the specified session via the WFQuerySessionInformation call.
 	/// </summary>
-	public enum WinFrameInfoClasses
+	public enum InfoClasses
 	{
 		/// <summary>
 		/// WFVersion OSVERSIONINFO

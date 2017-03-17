@@ -73,7 +73,8 @@
     <Compile Include="Citrix\ClientDisplay.cs" />
     <Compile Include="Citrix\ClientAddress.cs" />
     <Compile Include="Citrix\EventMask.cs" />
-    <Compile Include="Citrix\WinFrameInfoClasses.cs" />
+    <Compile Include="Citrix\ConnectStates.cs" />
+    <Compile Include="Citrix\InfoClasses.cs" />
     <Compile Include="Citrix\WinFrame.cs" />
     <Compile Include="Clipboard\ClipboardMonitor.cs" />
     <Compile Include="Clipboard\ClipboardUpdateEventArgs.cs" />

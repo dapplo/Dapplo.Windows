@@ -19,48 +19,52 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using System.Runtime.InteropServices;
-using Dapplo.Windows.Structs;
-
 namespace Dapplo.Windows.Citrix
 {
 	/// <summary>
-	/// This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.ClientDisplay
+	/// The connect states
 	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct ClientDisplay
+	public enum ConnectStates
 	{
-		private readonly uint _horizontalResolution;
-		private readonly uint _verticalResolution;
-		private readonly uint _colorDepth;
-
 		/// <summary>
-		/// Return the client's display size
+		/// WFActive: User logged on to WinStation
 		/// </summary>
-		public SIZE ClientSize => new SIZE((int) _horizontalResolution, (int) _verticalResolution);
-
+		Active,
 		/// <summary>
-		/// Returns the number of colors the client can display
+		/// WFConnected: WinStation connected to client
 		/// </summary>
-		public uint ColorDepth
-		{
-			get
-			{
-				switch (_colorDepth)
-				{
-					case 1:
-						return 4;
-					case 2:
-						return 8;
-					case 4:
-						return 16;
-					case 8:
-						return 24;
-					case 16:
-						return 32;
-				}
-				return (uint)_colorDepth;
-			}
-		}
+		Connected,
+		/// <summary>
+		///  WFConnectQuery: In the process of connecting to client
+		/// </summary>
+		ConnectQuery,
+		/// <summary>
+		/// WFShadow: Shadowing another WinStation
+		/// </summary>
+		Shadow,
+		/// <summary>
+		/// WFDisconnected: WinStation logged on without client
+		/// </summary>
+		Disconnected,
+		/// <summary>
+		/// WFIdle: Waiting for client to connect
+		/// </summary>
+		Idle,
+		/// <summary>
+		/// WFListen: WinStation is listening for connection
+		/// </summary>
+		Listen,
+		/// <summary>
+		/// WFReset: WinStation is being reset
+		/// </summary>
+		Reset,
+		/// <summary>
+		/// WFDown: WinStation is down due to error
+		/// </summary>
+		Down,
+		/// <summary>
+		/// WFInit: WinStation in initialization
+		/// </summary>
+		Init
 	}
 }

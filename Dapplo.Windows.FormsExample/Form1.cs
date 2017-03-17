@@ -33,14 +33,20 @@ namespace Dapplo.Windows.FormsExample
 			ScaleHandler.AddTarget(somethingMenuItem, "somethingMenuItem.Image");
 			ScaleHandler.AddTarget(something2MenuItem, "something2MenuItem.Image");
 
-			if (!WinFrame.IsAvailabe)
+			if (WinFrame.IsAvailabe)
 			{
-				MessageBox.Show("Sorry", "Citrix not detected");
+				try
+				{
+					var clientDisplay = WinFrame.QuerySessionInformation<ClientDisplay>(InfoClasses.ClientDisplay);
+					var clientName = WinFrame.QuerySessionInformation(InfoClasses.ClientName);
+					MessageBox.Show($"Client {clientName} has {clientDisplay.ClientSize.Width}x{clientDisplay.ClientSize.Height} with {clientDisplay.ColorDepth} colors.",
+						"Citrix detected");
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message, "Citrix error");
+				}
 			}
-			var clientDisplay = WinFrame.QuerySessionInformation<ClientDisplay>(WinFrameInfoClasses.ClientDisplay);
-			var clientName = WinFrame.QuerySessionInformation(WinFrameInfoClasses.ClientName);
-			MessageBox.Show($"Client {clientName} has {clientDisplay.ClientSize.Width}x{clientDisplay.ClientSize.Height} with {clientDisplay.ColorDepth} colors.",
-				"Citrix detected");
 
 			EnvironmentMonitor.EnvironmentUpdateEvents.Subscribe(args =>
 			{
