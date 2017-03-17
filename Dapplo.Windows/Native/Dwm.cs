@@ -89,13 +89,13 @@ namespace Dapplo.Windows.Native
 				{
 					return true;
 				}
-				if (Environment.OSVersion.Version.Major >= 6)
+				if (Environment.OSVersion.Version.Major < 6)
 				{
-					bool dwmEnabled;
-					DwmIsCompositionEnabled(out dwmEnabled);
-					return dwmEnabled;
+					return false;
 				}
-				return false;
+				bool dwmEnabled;
+				DwmIsCompositionEnabled(out dwmEnabled);
+				return dwmEnabled;
 			}
 		}
 
@@ -105,6 +105,14 @@ namespace Dapplo.Windows.Native
 		public static void DisableComposition()
 		{
 			DwmEnableComposition(DwmEcDisablecomposition);
+		}
+
+		/// <summary>
+		///     Enable DWM composition
+		/// </summary>
+		public static void EnableComposition()
+		{
+			DwmEnableComposition(DwmEcEnablecomposition);
 		}
 
 		/// <summary>
@@ -139,15 +147,70 @@ namespace Dapplo.Windows.Native
 		[DllImport("dwmapi", SetLastError = true)]
 		public static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttribute, out RECT lpRect, int size);
 
-		// Deprecated as of Windows 8 Release Preview
+		/// <summary>
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969518(v=vs.85).aspx">DwmIsCompositionEnabled function</a>
+		/// Obtains a value that indicates whether Desktop Window Manager (DWM) composition is enabled.
+		/// Applications on machines running Windows 7 or earlier can listen for composition state changes by handling the WM_DWMCOMPOSITIONCHANGED notification.
+		/// Note: As of Windows 8, DWM composition is always enabled.
+		/// If an app declares Windows 8 compatibility in their manifest, this function will receive a value of TRUE through pfEnabled.
+		/// If no such manifest entry is found, Windows 8 compatibility is not assumed and this function receives a value of FALSE through pfEnabled.
+		/// This is done so that older programs that interpret a value of TRUE to imply that high contrast mode is off can continue to make the correct decisions about rendering their images.
+		/// (Note that this is a bad practice—you should use the SystemParametersInfo function with the SPI_GETHIGHCONTRAST flag to determine the state of high contrast mode.)
+		/// </summary>
+		/// <param name="pfEnabled">out bool to get the current state</param>
+		/// <returns>If this function succeeds, it returns S_OK. Otherwise, it returns an HRESULT error code.</returns>
 		[DllImport("dwmapi", SetLastError = true)]
-		public static extern int DwmIsCompositionEnabled([MarshalAs(UnmanagedType.Bool)] out bool enabled);
+		private static extern HResult DwmIsCompositionEnabled([MarshalAs(UnmanagedType.Bool)] out bool pfEnabled);
 
+		/// <summary>
+		/// Activate Aero Peek
+		/// </summary>
+		/// <param name="active">uint</param>
+		/// <param name="handle"></param>
+		/// <param name="onTopHandle">IntPtr</param>
+		/// <param name="unknown">uint</param>
+		/// <returns>HResult</returns>
 		[DllImport("dwmapi", EntryPoint = "#113", SetLastError = true)]
-		internal static extern uint DwmpActivateLivePreview(uint a, IntPtr b, uint c, uint d);
+		internal static extern HResult DwmpActivateLivePreview(uint active, IntPtr handle, IntPtr onTopHandle, uint unknown);
 
+		/// <summary>
+		/// Sets a static, iconic bitmap to display a live preview (also known as a Peek preview) of a window or tab. The taskbar can use this bitmap to show a full-sized preview of a window or tab.
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd389410(v=vs.85).aspx">DwmSetIconicLivePreviewBitmap function</a>
+		/// </summary>
+		/// <param name="hwnd">IntPtr for the window Handle</param>
+		/// <param name="hbitmap">IntPtr for the bitmap</param>
+		/// <param name="ptClient">The offset of a tab window's client region (the content area inside the client window frame) from the host window's frame. This offset enables the tab window's contents to be drawn correctly in a live preview when it is drawn without its frame.</param>
+		/// <param name="setIconicLivePreviewFlags">The display options for the live preview.</param>
+		/// <returns>HResult</returns>
+		[DllImport("dwmapi", SetLastError = true)]
+		internal static extern HResult DwmSetIconicLivePreviewBitmap(IntPtr hwnd, IntPtr hbitmap, ref POINT ptClient, DwmSetIconicLivePreviewFlags setIconicLivePreviewFlags);
+
+		/// <summary>
+		/// </summary>
+		/// <param name="thumb"></param>
+		/// <param name="size"></param>
+		/// <returns></returns>
 		[DllImport("dwmapi", SetLastError = true)]
 		public static extern int DwmQueryThumbnailSourceSize(IntPtr thumb, out SIZE size);
+
+		/// <summary>
+		/// Sets the value of non-client rendering attributes for a window.
+		/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969524(v=vs.85).aspx">DwmSetWindowAttribute function</a>
+		/// </summary>
+		/// <param name="hwnd">IntPtr with the handle to the window that will receive the attributes.</param>
+		/// <param name="dwAttributeToSet">A single DWMWINDOWATTRIBUTE flag to apply to the window. This parameter specifies the attribute and the pvAttribute parameter points to the value of that attribute.</param>
+		/// <param name="pvAttributeValue">A pointer to the value of the attribute specified in the dwAttribute parameter. Different DWMWINDOWATTRIBUTE flags require different value types.</param>
+		/// <param name="cbAttribute">The size, in bytes, of the value type pointed to by the pvAttribute parameter.</param>
+		/// <returns></returns>
+		[DllImport("dwmapi", SetLastError = true)]
+		public static extern HResult DwmSetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttributeToSet, IntPtr pvAttributeValue, uint cbAttribute);
+
+		/// <summary>
+		/// Activate Windows + Tab effect
+		/// </summary>
+		/// <returns>bool if it worked</returns>
+		[DllImport("dwmapi", EntryPoint = "#105", SetLastError = true)]
+		public static extern bool DwmpStartOrStopFlip3D();
 
 		[DllImport("dwmapi", SetLastError = true)]
 		public static extern int DwmRegisterThumbnail(IntPtr dest, IntPtr src, out IntPtr thumb);
@@ -157,14 +220,6 @@ namespace Dapplo.Windows.Native
 
 		[DllImport("dwmapi", SetLastError = true)]
 		public static extern int DwmUpdateThumbnailProperties(IntPtr hThumb, ref DwmThumbnailProperties props);
-
-		/// <summary>
-		///     Enable compostion
-		/// </summary>
-		public static void EnableComposition()
-		{
-			DwmEnableComposition(DwmEcEnablecomposition);
-		}
 
 		/// <summary>
 		///     Helper method to get the window size for DWM Windows
