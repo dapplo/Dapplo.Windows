@@ -1,0 +1,97 @@
+﻿The definition of the structs for WFQuerySessionInformation{A|W}
+see : https://www.citrix.com/static/cdn/archivedsdks/winframesdk/6.5/WFAPI_SDK_XenApp65_Documentation.pdf
+
+Should be compatible with OsVersionInfoEx?
+
+Type OSVERSIONINFO
+ OSVersionInfoSize As Long
+ MajorVersion As Long
+ MinorVersion As Long
+ BuildNumber As Long
+ PlatformId As Long
+ PCSDVersion As String * 128
+End Type
+
+Already implemented as ClientAddress
+Type WF_CLIENT_ADDRESS
+ AddressFamily As Long ' AF_INET, AF_IPX, AF_NETBIOS, AF_UNSPEC
+ Address As String * 20
+' client network address
+End Type
+
+Already implemented as ClientDisplay
+Type WF_CLIENT_DISPLAY
+ HorizontalResolution As Long ' horizontal dimensions, in pixels
+ VerticalResolution As Long ' vertical dimensions, in pixels
+ ColorDepth As Long '
+1=16, 2=256, 4=64K, 8=16M
+End Type
+
+
+Type WF_CLIENT_CACHE
+ CacheTiny As Long ' size of cache for small objects (32
+ ' bytes)
+ CacheLowMem As Long ' size of cache (low memory for DOS)
+ ' virtual memory for Win16/Win32)
+ CacheXms As Long ' size of cache in XMS memory (DOS only)
+ CacheDisk As Long ' size of cache in disk (DOS only)
+ DimCacheSize As Long ' persistent cache size
+ DimBitmapMin As Long ' minimum bitmap size for persistent
+ ' cache
+ DimSignatureLevel As Long ' version of persistent caching
+ DimFilesysOverhead As Long ' The amount of overhead that the file
+ ' system on the client requires
+ ' per bitmap
+End Type
+
+Type WF_DRIVES
+ DriveLetter As Long ' ANSI value
+ Flags As Long ' see below for flag values
+End Type
+'
+' Client drive mapping flags (Flags)
+'
+Public Const WF_DRIVE_REMOVEABLE = &H1
+Public Const WF_DRIVE_FIXED = &H2
+Public Const WF_DRIVE_REMOTE = &H4
+Public Const WF_DRIVE_CDROM = &H8
+Type WF_CLIENT_DRIVES
+ fAutoClientDrives As Long ' are client drives auto-connected?
+ Count As Long ' number of actual client drives
+ Drives(26) As WF_DRIVES ' client drives (room for 26 letters)
+End Type
+
+Type WF_APP_INFO
+ Initial Program As String
+ Working Directory As String
+ Application Name As String
+End Type
+
+Type WF_CLIENT_INFO
+ Name As String
+ Directory As String
+ BuildNumber As Long
+ ProductID As Long
+ HardwareID As Long
+ Address As WF_CLIENT_ADDRESS
+End Type
+
+Type WF_USER_INFO
+ UserName As String
+ DomainName As String
+ Connection Name As String
+End Type
+
+Type WF_CLIENT_LATENCY
+ Average As Long
+ Last As Long
+ Derivation As Long
+End Type
+
+Type WF_SESSION_TIME
+ ConnectTime As Double
+ DisconnectTime As Double
+ LastInputTime As Double
+ LogonTime As Double
+ CurrentTime As Double
+End Type
