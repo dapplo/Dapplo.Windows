@@ -27,15 +27,15 @@ using System;
 
 namespace Dapplo.Windows.Enums
 {
-	/// <summary>
-	///     A set of flags that represent attributes of the display monitor.
-	/// </summary>
-	[Flags]
-	public enum MonitorInfoFlags
-	{
-		/// <summary>
-		///     This is the primary display monitor.
-		/// </summary>
-		Primary = 1
-	}
+    /// <summary>
+    ///     A set of flags that represent attributes of the display monitor.
+    /// </summary>
+    [Flags]
+    public enum MonitorInfoFlags
+    {
+        /// <summary>
+        ///     This is the primary display monitor.
+        /// </summary>
+        Primary = 1
+    }
 }

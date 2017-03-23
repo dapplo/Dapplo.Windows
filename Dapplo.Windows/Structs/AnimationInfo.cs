@@ -27,27 +27,28 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Structs
 {
-	/// <summary>
-	/// Describes the animation effects associated with user actions. This structure is used with the SystemParametersInfo function when the SPI_GETANIMATION or SPI_SETANIMATION action value is specified.
-	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct AnimationInfo
-	{
-		private uint _cbSize;
-		private int _iMinAnimate;
+    /// <summary>
+    ///     Describes the animation effects associated with user actions. This structure is used with the SystemParametersInfo
+    ///     function when the SPI_GETANIMATION or SPI_SETANIMATION action value is specified.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct AnimationInfo
+    {
+        private uint _cbSize;
+        private int _iMinAnimate;
 
-		/// <summary>
-		/// Factory method to create AnimationInfo
-		/// </summary>
-		/// <param name="enableAnimations"></param>
-		/// <returns></returns>
-		public static AnimationInfo Create(bool enableAnimations = true)
-		{
-			return new AnimationInfo
-			{
-				_cbSize = (uint) Marshal.SizeOf(typeof(AnimationInfo)),
-				_iMinAnimate = enableAnimations ? 1:0
-			};
-		}
-	}
+        /// <summary>
+        ///     Factory method to create AnimationInfo
+        /// </summary>
+        /// <param name="enableAnimations"></param>
+        /// <returns></returns>
+        public static AnimationInfo Create(bool enableAnimations = true)
+        {
+            return new AnimationInfo
+            {
+                _cbSize = (uint) Marshal.SizeOf(typeof(AnimationInfo)),
+                _iMinAnimate = enableAnimations ? 1 : 0
+            };
+        }
+    }
 }

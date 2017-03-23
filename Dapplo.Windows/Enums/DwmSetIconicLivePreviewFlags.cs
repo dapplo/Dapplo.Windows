@@ -27,20 +27,20 @@ using System;
 
 namespace Dapplo.Windows.Enums
 {
-	/// <summary>
-	///     Configuration flags for the DwmSetIconicLivePreviewBitmap function
-	/// </summary>
-	[Flags]
-	public enum DwmSetIconicLivePreviewFlags
-	{
-		/// <summary>
-		///     None
-		/// </summary>
-		None = 0,
+    /// <summary>
+    ///     Configuration flags for the DwmSetIconicLivePreviewBitmap function
+    /// </summary>
+    [Flags]
+    public enum DwmSetIconicLivePreviewFlags
+    {
+        /// <summary>
+        ///     None
+        /// </summary>
+        None = 0,
 
-		/// <summary>
-		///      Displays a frame around the provided bitmap.
-		/// </summary>
-		DisplayFrame = 1,
-	}
+        /// <summary>
+        ///     Displays a frame around the provided bitmap.
+        /// </summary>
+        DisplayFrame = 1
+    }
 }

@@ -28,7 +28,6 @@ using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Enums;
 using Dapplo.Windows.Keyboard.Native;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
@@ -39,60 +38,62 @@ using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests
 {
-	public class InputTests
-	{
-		private static readonly LogSource Log = new LogSource();
+    public class InputTests
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		public InputTests(ITestOutputHelper testOutputHelper)
-		{
-			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-		}
+        public InputTests(ITestOutputHelper testOutputHelper)
+        {
+            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
 
-		/// <summary>
-		///     Test typing in a notepad
-		/// </summary>
-		/// <returns></returns>
-		[Fact]
-		private async Task TestInput()
-		{
-			// Start a process to test against
-			using (var process = Process.Start("notepad.exe"))
-			{
-				// Make sure it's started
-				Assert.NotNull(process);
-				// Wait until the process started it's message pump (listening for input)
-				process.WaitForInputIdle();
+        /// <summary>
+        ///     Test typing in a notepad
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        private async Task TestInput()
+        {
+            // Start a process to test against
+            using (var process = Process.Start("notepad.exe"))
+            {
+                // Make sure it's started
+                Assert.NotNull(process);
+                // Wait until the process started it's message pump (listening for input)
+                process.WaitForInputIdle();
 
-				// Find the belonging window
-				var notepadWindow = await WindowsEnumerator.EnumerateWindowsAsync().Where(interopWindow =>
-				{
-					int processId;
-					User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
-					return processId == process.Id;
-				}).FirstOrDefaultAsync();
-				Assert.NotNull(notepadWindow);
+                // Find the belonging window
+                var notepadWindow = await WindowsEnumerator.EnumerateWindowsAsync()
+                    .Where(interopWindow =>
+                    {
+                        int processId;
+                        User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
+                        return processId == process.Id;
+                    })
+                    .FirstOrDefaultAsync();
+                Assert.NotNull(notepadWindow);
 
-				// Send input
-				var sentInputs = InputGenerator.KeyPress(VirtualKeyCodes.KEY_R, VirtualKeyCodes.KEY_O, VirtualKeyCodes.KEY_B, VirtualKeyCodes.KEY_I, VirtualKeyCodes.KEY_N);
-				// Test if we indead sent 10 inputs (5 x down & up)
-				Assert.Equal((uint) 10, sentInputs);
+                // Send input
+                var sentInputs = InputGenerator.KeyPress(VirtualKeyCodes.KEY_R, VirtualKeyCodes.KEY_O, VirtualKeyCodes.KEY_B, VirtualKeyCodes.KEY_I, VirtualKeyCodes.KEY_N);
+                // Test if we indead sent 10 inputs (5 x down & up)
+                Assert.Equal((uint) 10, sentInputs);
 
-				// Kill the process
-				process.Kill();
-			}
-		}
+                // Kill the process
+                process.Kill();
+            }
+        }
 
-		/// <summary>
-		///     Test typing in a notepad
-		/// </summary>
-		/// <returns></returns>
-		[Fact]
-		private void TestMouseInput()
-		{
-			InputGenerator.MoveMouse(new POINT(10, 10));
-			Thread.Sleep(1000);
-			InputGenerator.MoveMouse(new POINT(100, 100));
-			Thread.Sleep(1000);
-		}
-	}
+        /// <summary>
+        ///     Test typing in a notepad
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        private void TestMouseInput()
+        {
+            InputGenerator.MoveMouse(new POINT(10, 10));
+            Thread.Sleep(1000);
+            InputGenerator.MoveMouse(new POINT(100, 100));
+            Thread.Sleep(1000);
+        }
+    }
 }

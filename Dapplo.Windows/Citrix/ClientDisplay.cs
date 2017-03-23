@@ -19,48 +19,52 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#region using
+
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Structs;
 
+#endregion
+
 namespace Dapplo.Windows.Citrix
 {
-	/// <summary>
-	/// This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.ClientDisplay
-	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct ClientDisplay
-	{
-		private readonly uint _horizontalResolution;
-		private readonly uint _verticalResolution;
-		private readonly uint _colorDepth;
+    /// <summary>
+    ///     This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.ClientDisplay
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ClientDisplay
+    {
+        private readonly uint _horizontalResolution;
+        private readonly uint _verticalResolution;
+        private readonly uint _colorDepth;
 
-		/// <summary>
-		/// Return the client's display size
-		/// </summary>
-		public SIZE ClientSize => new SIZE((int) _horizontalResolution, (int) _verticalResolution);
+        /// <summary>
+        ///     Return the client's display size
+        /// </summary>
+        public SIZE ClientSize => new SIZE((int) _horizontalResolution, (int) _verticalResolution);
 
-		/// <summary>
-		/// Returns the number of colors the client can display
-		/// </summary>
-		public uint ColorDepth
-		{
-			get
-			{
-				switch (_colorDepth)
-				{
-					case 1:
-						return 4;
-					case 2:
-						return 8;
-					case 4:
-						return 16;
-					case 8:
-						return 24;
-					case 16:
-						return 32;
-				}
-				return (uint)_colorDepth;
-			}
-		}
-	}
+        /// <summary>
+        ///     Returns the number of colors the client can display
+        /// </summary>
+        public uint ColorDepth
+        {
+            get
+            {
+                switch (_colorDepth)
+                {
+                    case 1:
+                        return 4;
+                    case 2:
+                        return 8;
+                    case 4:
+                        return 16;
+                    case 8:
+                        return 24;
+                    case 16:
+                        return 32;
+                }
+                return _colorDepth;
+            }
+        }
+    }
 }

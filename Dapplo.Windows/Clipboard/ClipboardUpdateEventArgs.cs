@@ -29,36 +29,36 @@ using System.Linq;
 
 namespace Dapplo.Windows.Clipboard
 {
-	/// <summary>
-	///     This event contains the information of clipboard changes
-	/// </summary>
-	public class ClipboardUpdateEventArgs : EventArgs
-	{
-		private readonly IEnumerable<string> _clipboardFormats;
-		private IList<string> _clipboardFormatList;
+    /// <summary>
+    ///     This event contains the information of clipboard changes
+    /// </summary>
+    public class ClipboardUpdateEventArgs : EventArgs
+    {
+        private readonly IEnumerable<string> _clipboardFormats;
+        private IList<string> _clipboardFormatList;
 
-		/// <summary>
-		/// Constructor for the EventArgs
-		/// </summary>
-		/// <param name="clipboardFormats">IEnumerable of string</param>
-		internal ClipboardUpdateEventArgs(IEnumerable<string> clipboardFormats)
-		{
-			_clipboardFormats = clipboardFormats;
-		}
+        /// <summary>
+        ///     Constructor for the EventArgs
+        /// </summary>
+        /// <param name="clipboardFormats">IEnumerable of string</param>
+        internal ClipboardUpdateEventArgs(IEnumerable<string> clipboardFormats)
+        {
+            _clipboardFormats = clipboardFormats;
+        }
 
-		/// <summary>
-		///     The available formats on the clipboard
-		/// </summary>
-		public IEnumerable<string> Formats
-		{
-			get
-			{
-				if (_clipboardFormatList == null)
-				{
-					_clipboardFormatList = _clipboardFormats.ToList();
-				}
-				return _clipboardFormatList;
-			}
-		}
-	}
+        /// <summary>
+        ///     The available formats on the clipboard
+        /// </summary>
+        public IEnumerable<string> Formats
+        {
+            get
+            {
+                if (_clipboardFormatList == null)
+                {
+                    _clipboardFormatList = _clipboardFormats.ToList();
+                }
+                return _clipboardFormatList;
+            }
+        }
+    }
 }

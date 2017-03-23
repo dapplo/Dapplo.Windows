@@ -31,23 +31,23 @@ using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests
 {
-	public class DwmTest
-	{
-		private static readonly LogSource Log = new LogSource();
+    public class DwmTest
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		public DwmTest(ITestOutputHelper testOutputHelper)
-		{
-			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-		}
+        public DwmTest(ITestOutputHelper testOutputHelper)
+        {
+            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
 
-		/// <summary>
-		///     Test is Dwm is Enabled
-		/// </summary>
-		/// <returns></returns>
-		//[Fact]
-		private void TestDwmEnabled()
-		{
-			Assert.True(Dwm.IsDwmEnabled);
-		}
-	}
+        /// <summary>
+        ///     Test is Dwm is Enabled
+        /// </summary>
+        /// <returns></returns>
+        //[Fact]
+        private void TestDwmEnabled()
+        {
+            Assert.True(Dwm.IsDwmEnabled);
+        }
+    }
 }

@@ -27,40 +27,42 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Structs
 {
-	/// <summary>
-	///     Color representation using CIEXYZ color components
-	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct CieXyzTripple
-	{
-		/// <summary>
-		/// A CIE XYZ 1931 color space for the red component
-		/// </summary>
-		public CieXyz CieXyzRed;
-		/// <summary>
-		/// A CIE XYZ 1931 color space for the green component
-		/// </summary>
-		public CieXyz CieXyzGreen;
-		/// <summary>
-		/// A CIE XYZ 1931 color space for the blue component
-		/// </summary>
-		public CieXyz CieXyzBlue;
+    /// <summary>
+    ///     Color representation using CIEXYZ color components
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct CieXyzTripple
+    {
+        /// <summary>
+        ///     A CIE XYZ 1931 color space for the red component
+        /// </summary>
+        public CieXyz CieXyzRed;
 
-		/// <summary>
-		/// Factory method
-		/// </summary>
-		/// <param name="red">CieXyz</param>
-		/// <param name="green">CieXyz</param>
-		/// <param name="blue">CieXyz</param>
-		/// <returns>CieXyzTripple</returns>
-		public static CieXyzTripple Create(CieXyz red, CieXyz green, CieXyz blue)
-		{
-			return new CieXyzTripple
-			{
-				CieXyzRed = red,
-				CieXyzGreen = green,
-				CieXyzBlue = blue
-			};
-		}
-	}
+        /// <summary>
+        ///     A CIE XYZ 1931 color space for the green component
+        /// </summary>
+        public CieXyz CieXyzGreen;
+
+        /// <summary>
+        ///     A CIE XYZ 1931 color space for the blue component
+        /// </summary>
+        public CieXyz CieXyzBlue;
+
+        /// <summary>
+        ///     Factory method
+        /// </summary>
+        /// <param name="red">CieXyz</param>
+        /// <param name="green">CieXyz</param>
+        /// <param name="blue">CieXyz</param>
+        /// <returns>CieXyzTripple</returns>
+        public static CieXyzTripple Create(CieXyz red, CieXyz green, CieXyz blue)
+        {
+            return new CieXyzTripple
+            {
+                CieXyzRed = red,
+                CieXyzGreen = green,
+                CieXyzBlue = blue
+            };
+        }
+    }
 }

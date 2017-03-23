@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Tests", "Dap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.FormsExample", "Dapplo.Windows.FormsExample\Dapplo.Windows.FormsExample.csproj", "{5607CB5A-D4B8-4EF6-BC00-6878FE47C7D5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.WpfExample", "Dapplo.Windows.WpfExample\Dapplo.Windows.WpfExample.csproj", "{192695D4-18D3-42BF-BE52-D35D0C1A2B23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5607CB5A-D4B8-4EF6-BC00-6878FE47C7D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5607CB5A-D4B8-4EF6-BC00-6878FE47C7D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5607CB5A-D4B8-4EF6-BC00-6878FE47C7D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{192695D4-18D3-42BF-BE52-D35D0C1A2B23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{192695D4-18D3-42BF-BE52-D35D0C1A2B23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{192695D4-18D3-42BF-BE52-D35D0C1A2B23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{192695D4-18D3-42BF-BE52-D35D0C1A2B23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

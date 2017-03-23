@@ -27,30 +27,30 @@ using System;
 
 namespace Dapplo.Windows.Enums
 {
-	/// <summary>
-	///     Configuration flags for the DwmEnableBlurBehindWindow function
-	/// </summary>
-	[Flags]
-	public enum DwmBlurBehindFlags
-	{
-		/// <summary>
-		///     None
-		/// </summary>
-		None = 0,
+    /// <summary>
+    ///     Configuration flags for the DwmEnableBlurBehindWindow function
+    /// </summary>
+    [Flags]
+    public enum DwmBlurBehindFlags
+    {
+        /// <summary>
+        ///     None
+        /// </summary>
+        None = 0,
 
-		/// <summary>
-		///     Transparency Enabled
-		/// </summary>
-		Enable = 1,
+        /// <summary>
+        ///     Transparency Enabled
+        /// </summary>
+        Enable = 1,
 
-		/// <summary>
-		///     Region enabled
-		/// </summary>
-		BlurRegion = 2,
+        /// <summary>
+        ///     Region enabled
+        /// </summary>
+        BlurRegion = 2,
 
-		/// <summary>
-		///     Transition on maximized enabled
-		/// </summary>
-		TransitionMaximized = 4
-	}
+        /// <summary>
+        ///     Transition on maximized enabled
+        /// </summary>
+        TransitionMaximized = 4
+    }
 }

@@ -27,11 +27,11 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Structs
 {
-	[StructLayout(LayoutKind.Sequential)]
-	public struct HardwareInput
-	{
-		public int uMsg;
-		public short wParamL;
-		public short wParamH;
-	}
+    [StructLayout(LayoutKind.Sequential)]
+    public struct HardwareInput
+    {
+        public int uMsg;
+        public short wParamL;
+        public short wParamH;
+    }
 }

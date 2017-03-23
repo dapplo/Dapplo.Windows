@@ -19,30 +19,33 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#region using
+
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 
+#endregion
+
 namespace Dapplo.Windows.Citrix
 {
-	/// <summary>
-	/// This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.ClientAddress
-	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct ClientAddress
-	{
-		private readonly int _adressFamily;
+    /// <summary>
+    ///     This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.ClientAddress
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ClientAddress
+    {
+        private readonly int _adressFamily;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
-		private readonly byte[] _address;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)] private readonly byte[] _address;
 
-		/// <summary>
-		/// Address Family
-		/// </summary>
-		public AddressFamily AddressFamily => (AddressFamily) _adressFamily;
+        /// <summary>
+        ///     Address Family
+        /// </summary>
+        public AddressFamily AddressFamily => (AddressFamily) _adressFamily;
 
-		/// <summary>
-		/// IP Address used
-		/// </summary>
-		public string IpAddress => $"{_address[2]}.{_address[3]}.{_address[4]}.{_address[5]}";
-	}
+        /// <summary>
+        ///     IP Address used
+        /// </summary>
+        public string IpAddress => $"{_address[2]}.{_address[3]}.{_address[4]}.{_address[5]}";
+    }
 }

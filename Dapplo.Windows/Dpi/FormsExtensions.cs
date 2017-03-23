@@ -19,27 +19,31 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#region using
+
 using System.Windows.Forms;
+
+#endregion
 
 namespace Dapplo.Windows.Dpi
 {
-	/// <summary>
-	/// Extensions for Windows Form
-	/// </summary>
-	public static class FormsExtensions
-	{
-		/// <summary>
-		/// Handle DPI changes for the specified Control (Form, ContextMenu etc)
-		/// </summary>
-		/// <param name="control">Control</param>
-		/// <returns>DpiHandler</returns>
-		public static DpiHandler HandleDpiChanges(this Control control)
-		{
-			var dpiHandler = new DpiHandler();
-			var listener = new WinProcListener(control);
-			listener.AddHook(dpiHandler.HandleMessages);
-			dpiHandler.MessageHandler = listener;
-			return dpiHandler;
-		}
-	}
+    /// <summary>
+    ///     Extensions for Windows Form
+    /// </summary>
+    public static class FormsExtensions
+    {
+        /// <summary>
+        ///     Handle DPI changes for the specified Control (Form, ContextMenu etc)
+        /// </summary>
+        /// <param name="control">Control</param>
+        /// <returns>DpiHandler</returns>
+        public static DpiHandler HandleFormDpiChanges(this Control control)
+        {
+            var dpiHandler = new DpiHandler();
+            var listener = new WinProcListener(control);
+            listener.AddHook(dpiHandler.HandleMessages);
+            dpiHandler.MessageHandler = listener;
+            return dpiHandler;
+        }
+    }
 }

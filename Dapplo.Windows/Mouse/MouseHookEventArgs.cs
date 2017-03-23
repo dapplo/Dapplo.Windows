@@ -29,25 +29,25 @@ using Dapplo.Windows.Structs;
 
 namespace Dapplo.Windows.Mouse
 {
-	/// <summary>
-	///     Information on mouse changes
-	///     TODO: Make the information a lot clearer, than processing WindowsMessages
-	/// </summary>
-	public class MouseHookEventArgs : EventArgs
-	{
-		/// <summary>
-		///     Set this to true if the event is handled, other event-handlers in the chain will not be called
-		/// </summary>
-		public bool Handled { get; set; }
+    /// <summary>
+    ///     Information on mouse changes
+    ///     TODO: Make the information a lot clearer, than processing WindowsMessages
+    /// </summary>
+    public class MouseHookEventArgs : EventArgs
+    {
+        /// <summary>
+        ///     Set this to true if the event is handled, other event-handlers in the chain will not be called
+        /// </summary>
+        public bool Handled { get; set; }
 
-		/// <summary>
-		///     The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
-		/// </summary>
-		public POINT Point { get; set; }
+        /// <summary>
+        ///     The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
+        /// </summary>
+        public POINT Point { get; set; }
 
-		/// <summary>
-		///     The mouse message
-		/// </summary>
-		public WindowsMessages WindowsMessage { get; set; }
-	}
+        /// <summary>
+        ///     The mouse message
+        /// </summary>
+        public WindowsMessages WindowsMessage { get; set; }
+    }
 }

@@ -29,25 +29,25 @@ using Dapplo.Windows.Mouse.Native;
 
 namespace Dapplo.Windows.Structs
 {
-	/// <summary>
-	///     A "union" containing a specific input struct
-	/// </summary>
-	[StructLayout(LayoutKind.Explicit)]
-	public struct InputUnion
-	{
-		/// <summary>
-		///     Assign this if the input is MouseInput
-		/// </summary>
-		[FieldOffset(0)] public MouseInput MouseInput;
+    /// <summary>
+    ///     A "union" containing a specific input struct
+    /// </summary>
+    [StructLayout(LayoutKind.Explicit)]
+    public struct InputUnion
+    {
+        /// <summary>
+        ///     Assign this if the input is MouseInput
+        /// </summary>
+        [FieldOffset(0)] public MouseInput MouseInput;
 
-		/// <summary>
-		///     Assign this if the input is MouseInputKeyboardInput
-		/// </summary>
-		[FieldOffset(0)] public KeyboardInput KeyboardInput;
+        /// <summary>
+        ///     Assign this if the input is MouseInputKeyboardInput
+        /// </summary>
+        [FieldOffset(0)] public KeyboardInput KeyboardInput;
 
-		/// <summary>
-		///     Assign this if the input is HardwareInput
-		/// </summary>
-		[FieldOffset(0)] public HardwareInput HardwareInput;
-	}
+        /// <summary>
+        ///     Assign this if the input is HardwareInput
+        /// </summary>
+        [FieldOffset(0)] public HardwareInput HardwareInput;
+    }
 }

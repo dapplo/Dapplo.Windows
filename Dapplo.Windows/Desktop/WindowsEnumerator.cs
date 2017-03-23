@@ -32,67 +32,67 @@ using Dapplo.Windows.Native;
 
 namespace Dapplo.Windows.Desktop
 {
-	/// <summary>
-	///     EnumWindows wrapper for .NET
-	/// </summary>
-	public static class WindowsEnumerator
-	{
-		/// <summary>
-		///     Enumerate the windows / child windows (this is NOT lazy)
-		/// </summary>
-		/// <param name="parent">IInteropWindow with the hwnd of the parent, or null for all</param>
-		/// <param name="wherePredicate">Func for the where</param>
-		/// <param name="takeWhileFunc">Func which can decide to stop enumerating</param>
-		/// <returns>IEnumerable with InteropWindow</returns>
-		public static IEnumerable<IInteropWindow> EnumerateWindows(IInteropWindow parent = null, Func<IInteropWindow, bool> wherePredicate = null, Func<IInteropWindow, bool> takeWhileFunc = null)
-		{
-			var result = new List<IInteropWindow>();
-			User32.EnumChildWindows(parent?.Handle ?? IntPtr.Zero, (hwnd, param) =>
-			{
-				// check if we should continue
-				var windowInfo = InteropWindowFactory.CreateFor(hwnd);
+    /// <summary>
+    ///     EnumWindows wrapper for .NET
+    /// </summary>
+    public static class WindowsEnumerator
+    {
+        /// <summary>
+        ///     Enumerate the windows / child windows (this is NOT lazy)
+        /// </summary>
+        /// <param name="parent">IInteropWindow with the hwnd of the parent, or null for all</param>
+        /// <param name="wherePredicate">Func for the where</param>
+        /// <param name="takeWhileFunc">Func which can decide to stop enumerating</param>
+        /// <returns>IEnumerable with InteropWindow</returns>
+        public static IEnumerable<IInteropWindow> EnumerateWindows(IInteropWindow parent = null, Func<IInteropWindow, bool> wherePredicate = null, Func<IInteropWindow, bool> takeWhileFunc = null)
+        {
+            var result = new List<IInteropWindow>();
+            User32.EnumChildWindows(parent?.Handle ?? IntPtr.Zero, (hwnd, param) =>
+            {
+                // check if we should continue
+                var windowInfo = InteropWindowFactory.CreateFor(hwnd);
 
-				if (wherePredicate?.Invoke(windowInfo) != false)
-				{
-					result.Add(windowInfo);
-				}
-				return takeWhileFunc?.Invoke(windowInfo) != false;
-			}, IntPtr.Zero);
-			return result;
-		}
+                if (wherePredicate?.Invoke(windowInfo) != false)
+                {
+                    result.Add(windowInfo);
+                }
+                return takeWhileFunc?.Invoke(windowInfo) != false;
+            }, IntPtr.Zero);
+            return result;
+        }
 
-		/// <summary>
-		///     Enumerate the windows / child windows via an Observable
-		/// </summary>
-		/// <param name="hWndParent">IntPtr with the hwnd of the parent, or null for all</param>
-		/// <param name="cancellationToken">CancellationToken</param>
-		/// <returns>IObservable with WinWindowInfo</returns>
-		public static IObservable<IInteropWindow> EnumerateWindowsAsync(IntPtr? hWndParent = null, CancellationToken cancellationToken = default(CancellationToken))
-		{
-			return Observable.Create<IInteropWindow>(observer =>
-			{
-				var continueWithEnumeration = true;
-				Task.Run(() =>
-				{
-					User32.EnumChildWindows(hWndParent ?? IntPtr.Zero, (hwnd, param) =>
-					{
-						// check if we should continue
-						if (cancellationToken.IsCancellationRequested || !continueWithEnumeration)
-						{
-							return false;
-						}
-						var windowInfo = InteropWindowFactory.CreateFor(hwnd);
-						observer.OnNext(windowInfo);
-						return continueWithEnumeration;
-					}, IntPtr.Zero);
-					observer.OnCompleted();
-				}, cancellationToken);
-				return () =>
-				{
-					// Stop enumerating
-					continueWithEnumeration = false;
-				};
-			});
-		}
-	}
+        /// <summary>
+        ///     Enumerate the windows / child windows via an Observable
+        /// </summary>
+        /// <param name="hWndParent">IntPtr with the hwnd of the parent, or null for all</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>IObservable with WinWindowInfo</returns>
+        public static IObservable<IInteropWindow> EnumerateWindowsAsync(IntPtr? hWndParent = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Observable.Create<IInteropWindow>(observer =>
+            {
+                var continueWithEnumeration = true;
+                Task.Run(() =>
+                {
+                    User32.EnumChildWindows(hWndParent ?? IntPtr.Zero, (hwnd, param) =>
+                    {
+                        // check if we should continue
+                        if (cancellationToken.IsCancellationRequested || !continueWithEnumeration)
+                        {
+                            return false;
+                        }
+                        var windowInfo = InteropWindowFactory.CreateFor(hwnd);
+                        observer.OnNext(windowInfo);
+                        return continueWithEnumeration;
+                    }, IntPtr.Zero);
+                    observer.OnCompleted();
+                }, cancellationToken);
+                return () =>
+                {
+                    // Stop enumerating
+                    continueWithEnumeration = false;
+                };
+            });
+        }
+    }
 }

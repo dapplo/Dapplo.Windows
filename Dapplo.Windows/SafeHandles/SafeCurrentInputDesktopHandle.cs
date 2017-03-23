@@ -32,49 +32,49 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Dapplo.Windows.SafeHandles
 {
-	/// <summary>
-	///     A SafeHandle class implementation for the current input desktop
-	/// </summary>
-	public class SafeCurrentInputDesktopHandle : SafeHandleZeroOrMinusOneIsInvalid
-	{
-		private static readonly LogSource Log = new LogSource();
+    /// <summary>
+    ///     A SafeHandle class implementation for the current input desktop
+    /// </summary>
+    public class SafeCurrentInputDesktopHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		/// <summary>
-		///     Default constructor, this opens the input destop with GENERIC_ALL
-		///     This is needed to support marshalling!!
-		/// </summary>
-		public SafeCurrentInputDesktopHandle() : base(true)
-		{
-			var hDesktop = User32.OpenInputDesktop(0, true, DesktopAccessRight.GENERIC_ALL);
-			if (hDesktop != IntPtr.Zero)
-			{
-				// Got desktop, store it as handle for the ReleaseHandle
-				SetHandle(hDesktop);
-				if (User32.SetThreadDesktop(hDesktop))
-				{
-					Log.Debug().WriteLine("Switched to desktop {0}", hDesktop);
-				}
-				else
-				{
-					Log.Warn().WriteLine("Couldn't switch to desktop {0}", hDesktop);
-					Log.Error().WriteLine(User32.CreateWin32Exception("SetThreadDesktop"));
-				}
-			}
-			else
-			{
-				Log.Warn().WriteLine("Couldn't get current desktop.");
-				Log.Error().WriteLine(User32.CreateWin32Exception("OpenInputDesktop"));
-			}
-		}
+        /// <summary>
+        ///     Default constructor, this opens the input destop with GENERIC_ALL
+        ///     This is needed to support marshalling!!
+        /// </summary>
+        public SafeCurrentInputDesktopHandle() : base(true)
+        {
+            var hDesktop = User32.OpenInputDesktop(0, true, DesktopAccessRight.GENERIC_ALL);
+            if (hDesktop != IntPtr.Zero)
+            {
+                // Got desktop, store it as handle for the ReleaseHandle
+                SetHandle(hDesktop);
+                if (User32.SetThreadDesktop(hDesktop))
+                {
+                    Log.Debug().WriteLine("Switched to desktop {0}", hDesktop);
+                }
+                else
+                {
+                    Log.Warn().WriteLine("Couldn't switch to desktop {0}", hDesktop);
+                    Log.Error().WriteLine(User32.CreateWin32Exception("SetThreadDesktop"));
+                }
+            }
+            else
+            {
+                Log.Warn().WriteLine("Couldn't get current desktop.");
+                Log.Error().WriteLine(User32.CreateWin32Exception("OpenInputDesktop"));
+            }
+        }
 
-		/// <summary>
-		///     Close the desktop
-		/// </summary>
-		/// <returns>true if this succeeded</returns>
-		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
-		protected override bool ReleaseHandle()
-		{
-			return User32.CloseDesktop(handle);
-		}
-	}
+        /// <summary>
+        ///     Close the desktop
+        /// </summary>
+        /// <returns>true if this succeeded</returns>
+        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+        protected override bool ReleaseHandle()
+        {
+            return User32.CloseDesktop(handle);
+        }
+    }
 }

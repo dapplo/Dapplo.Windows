@@ -36,57 +36,57 @@ using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests
 {
-	public class WinEventHookTests
-	{
-		private static readonly LogSource Log = new LogSource();
+    public class WinEventHookTests
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		public WinEventHookTests(ITestOutputHelper testOutputHelper)
-		{
-			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-		}
+        public WinEventHookTests(ITestOutputHelper testOutputHelper)
+        {
+            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
 
-		/// <summary>
-		///     Test typing in a notepad
-		/// </summary>
-		/// <returns></returns>
-		[StaFact]
-		private async Task TestWinEventHook()
-		{
-			// This takes care of having a WinProc handler, to make sure the messages arrive
-			var winProcHandler = WinProcHandler.Instance;
+        /// <summary>
+        ///     Test typing in a notepad
+        /// </summary>
+        /// <returns></returns>
+        [StaFact]
+        private async Task TestWinEventHook()
+        {
+            // This takes care of having a WinProc handler, to make sure the messages arrive
+            var winProcHandler = WinProcHandler.Instance;
 
-			// This buffers the observable
-			var replaySubject = new ReplaySubject<IInteropWindow>();
+            // This buffers the observable
+            var replaySubject = new ReplaySubject<IInteropWindow>();
 
-			var winEventObservable = WinEventHook.WindowTileChangeObservable()
-				.Select(info => InteropWindowFactory.CreateFor(info.Handle).Fill())
-				.Where(info => !string.IsNullOrEmpty(info.Caption))
-				.Subscribe(windowInfo =>
-				{
-					Log.Debug().WriteLine("Window title change: Process ID {0} - Title: {1}", windowInfo.Handle, windowInfo.Caption);
-					replaySubject.OnNext(windowInfo);
-				});
+            var winEventObservable = WinEventHook.WindowTileChangeObservable()
+                .Select(info => InteropWindowFactory.CreateFor(info.Handle).Fill())
+                .Where(info => !string.IsNullOrEmpty(info.Caption))
+                .Subscribe(windowInfo =>
+                {
+                    Log.Debug().WriteLine("Window title change: Process ID {0} - Title: {1}", windowInfo.Handle, windowInfo.Caption);
+                    replaySubject.OnNext(windowInfo);
+                });
 
-			// Start a process to test against
-			using (var process = Process.Start("notepad.exe"))
-			{
-				try
-				{
-					// Make sure it's started
-					Assert.NotNull(process);
-					// Wait until the process started it's message pump (listening for input)
-					process.WaitForInputIdle();
+            // Start a process to test against
+            using (var process = Process.Start("notepad.exe"))
+            {
+                try
+                {
+                    // Make sure it's started
+                    Assert.NotNull(process);
+                    // Wait until the process started it's message pump (listening for input)
+                    process.WaitForInputIdle();
 
-					// Find the belonging window
-					var notepadWindow = await replaySubject.Where(info => info.ProcessId == process.Id).FirstAsync();
-					Assert.Equal(process.Id, notepadWindow.ProcessId);
-				}
-				finally
-				{
-					process.Kill();
-					winEventObservable.Dispose();
-				}
-			}
-		}
-	}
+                    // Find the belonging window
+                    var notepadWindow = await replaySubject.Where(info => info.ProcessId == process.Id).FirstAsync();
+                    Assert.Equal(process.Id, notepadWindow.ProcessId);
+                }
+                finally
+                {
+                    process.Kill();
+                    winEventObservable.Dispose();
+                }
+            }
+        }
+    }
 }

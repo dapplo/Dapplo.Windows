@@ -21,26 +21,30 @@
 
 namespace Dapplo.Windows.Enums
 {
-	/// <summary>
-	/// See See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd144950(v=vs.85).aspx">GetWindowRgn function</a>
-	/// </summary>
-	public enum RegionResults
-	{
-		/// <summary>
-		/// The specified window does not have a region, or an error occurred while attempting to return the region.
-		/// </summary>
-		Error = 0,
-		/// <summary>
-		/// The region is empty.
-		/// </summary>
-		NullRegion = 1,
-		/// <summary>
-		/// The region is a single rectangle.
-		/// </summary>
-		SimpleRegion = 2,
-		/// <summary>
-		/// The region is more than one rectangle.
-		/// </summary>
-		ComplexRegion = 3
-	}
+    /// <summary>
+    ///     See See
+    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd144950(v=vs.85).aspx">GetWindowRgn function</a>
+    /// </summary>
+    public enum RegionResults
+    {
+        /// <summary>
+        ///     The specified window does not have a region, or an error occurred while attempting to return the region.
+        /// </summary>
+        Error = 0,
+
+        /// <summary>
+        ///     The region is empty.
+        /// </summary>
+        NullRegion = 1,
+
+        /// <summary>
+        ///     The region is a single rectangle.
+        /// </summary>
+        SimpleRegion = 2,
+
+        /// <summary>
+        ///     The region is more than one rectangle.
+        /// </summary>
+        ComplexRegion = 3
+    }
 }

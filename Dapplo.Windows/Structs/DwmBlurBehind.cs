@@ -29,73 +29,69 @@ using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Structs
 {
-	/// <summary>
-	/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969500%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">DWM_BLURBEHIND structure</a>
-	/// Specifies Desktop Window Manager (DWM) blur-behind properties.
-	/// Used by the DwmEnableBlurBehindWindow function.
-	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct DwmBlurBehind
-	{
-		/// <summary>
-		/// A bitwise combination of DWM Blur Behind constant values that indicates which of the members of this structure have been set.
-		/// </summary>
-		private DwmBlurBehindFlags _dwFlags;
-		private bool _fEnable;
-		private IntPtr _hRgnBlur;
-		private bool _fTransitionOnMaximized;
+    /// <summary>
+    ///     See
+    ///     <a
+    ///         href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969500%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">
+    ///         DWM_BLURBEHIND
+    ///         structure
+    ///     </a>
+    ///     Specifies Desktop Window Manager (DWM) blur-behind properties.
+    ///     Used by the DwmEnableBlurBehindWindow function.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct DwmBlurBehind
+    {
+        /// <summary>
+        ///     A bitwise combination of DWM Blur Behind constant values that indicates which of the members of this structure have
+        ///     been set.
+        /// </summary>
+        private DwmBlurBehindFlags _dwFlags;
 
-		/// <summary>
-		/// TRUE to register the window handle to DWM blur behind;
-		/// FALSE to unregister the window handle from DWM blur behind.
-		/// </summary>
-		public bool Enable
-		{
-			get
-			{
-				return _fEnable;
-			}
-			set
-			{
-				_fEnable = value;
-				_dwFlags |= DwmBlurBehindFlags.Enable;
-			}
-		}
+        private bool _fEnable;
+        private IntPtr _hRgnBlur;
+        private bool _fTransitionOnMaximized;
 
-		/// <summary>
-		/// The region within the client area where the blur behind will be applied.
-		/// A NULL value will apply the blur behind the entire client area.
-		/// </summary>
-		public IntPtr BlurRegion
-		{
-			get
-			{
-				return _hRgnBlur;
-			}
-			set
-			{
-				_hRgnBlur = value;
-				_dwFlags |= DwmBlurBehindFlags.BlurRegion;
-			}
-		}
+        /// <summary>
+        ///     TRUE to register the window handle to DWM blur behind;
+        ///     FALSE to unregister the window handle from DWM blur behind.
+        /// </summary>
+        public bool Enable
+        {
+            get { return _fEnable; }
+            set
+            {
+                _fEnable = value;
+                _dwFlags |= DwmBlurBehindFlags.Enable;
+            }
+        }
 
-
-		/// <summary>
-		/// TRUE if the window's colorization should transition to match the maximized windows; otherwise, FALSE.
-		/// </summary>
-		public bool TransitionOnMaximized
-		{
-			get
-			{
-				return _fTransitionOnMaximized;
-			}
-			set
-			{
-				_fTransitionOnMaximized = value;
-				_dwFlags |= DwmBlurBehindFlags.TransitionMaximized;
-			}
-		}
+        /// <summary>
+        ///     The region within the client area where the blur behind will be applied.
+        ///     A NULL value will apply the blur behind the entire client area.
+        /// </summary>
+        public IntPtr BlurRegion
+        {
+            get { return _hRgnBlur; }
+            set
+            {
+                _hRgnBlur = value;
+                _dwFlags |= DwmBlurBehindFlags.BlurRegion;
+            }
+        }
 
 
-	}
+        /// <summary>
+        ///     TRUE if the window's colorization should transition to match the maximized windows; otherwise, FALSE.
+        /// </summary>
+        public bool TransitionOnMaximized
+        {
+            get { return _fTransitionOnMaximized; }
+            set
+            {
+                _fTransitionOnMaximized = value;
+                _dwFlags |= DwmBlurBehindFlags.TransitionMaximized;
+            }
+        }
+    }
 }

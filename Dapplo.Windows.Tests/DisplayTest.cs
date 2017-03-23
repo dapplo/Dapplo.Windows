@@ -31,22 +31,22 @@ using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests
 {
-	public class TestGetDisplays
-	{
-		private static readonly LogSource Log = new LogSource();
+    public class TestGetDisplays
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		public TestGetDisplays(ITestOutputHelper testOutputHelper)
-		{
-			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-		}
+        public TestGetDisplays(ITestOutputHelper testOutputHelper)
+        {
+            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
 
-		[Fact]
-		public void TestAllDisplays()
-		{
-			foreach (var display in User32.AllDisplays())
-			{
-				Log.Debug().WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
-			}
-		}
-	}
+        [Fact]
+        public void TestAllDisplays()
+        {
+            foreach (var display in User32.AllDisplays())
+            {
+                Log.Debug().WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
+            }
+        }
+    }
 }

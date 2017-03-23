@@ -19,156 +19,168 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#region using
+
 using System;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
 using Dapplo.Windows.Enums;
 
+#endregion
+
 namespace Dapplo.Windows.Citrix
 {
-	/// <summary>
-	/// Helper class for the WinFrame API, which is used by Citrix XenApp and XenDesktop.
-	/// </summary>
-	public static class WinFrame
-	{
-		private static readonly LogSource Log = new LogSource();
+    /// <summary>
+    ///     Helper class for the WinFrame API, which is used by Citrix XenApp and XenDesktop.
+    /// </summary>
+    public static class WinFrame
+    {
+        private const int CurrentSession = -1;
+        private static readonly LogSource Log = new LogSource();
+        private static readonly IntPtr CurrentServer = IntPtr.Zero;
 
-		private const int CurrentSession = -1;
-		private static readonly IntPtr CurrentServer = IntPtr.Zero;
+        /// <summary>
+        ///     Checks if WinFrame, the API for Citrix is available
+        /// </summary>
+        public static bool IsAvailabe
+        {
+            get
+            {
+                try
+                {
+                    QuerySessionConnectState();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn().WriteLine("Couldn't load WFAPI.DLL, this could be okay. Error: {0}", ex.Message);
+                }
+                return false;
+            }
+        }
 
-		#region DllImports
-		/// <summary>
-		/// See <a href="https://www.citrix.com/content/dam/citrix/en_us/documents/downloads/sdk/wf-api-sdk-guide.pdf">WFQuerySessionInformation</a>
-		/// </summary>
-		/// <param name="hServer">A handle to a server. Use the WFOpenServer() function to obtain a handle for a particular server, or specify WF_CURRENT_SERVER_HANDLE to use the current server.</param>
-		/// <param name="iSessionId">The session ID of the target session. WF_CURRENT_SESSION specifies the current session.</param>
-		/// <param name="infotype">WFInfoClasses, Type of information to be retrieved from the specified session.</param>
-		/// <param name="ppBuffer">IntPtr to the buffer where the string, struct or whatever resides</param>
-		/// <param name="pBytesReturned">number of bytes returned</param>
-		/// <returns>bool if ok</returns>
-		[DllImport("WFAPI", EntryPoint = "WFQuerySessionInformationW")]
-		private static extern bool WFQuerySessionInformation(IntPtr hServer, int iSessionId, InfoClasses infotype, out IntPtr ppBuffer, out int pBytesReturned);
+        /// <summary>
+        ///     Retrieve the ip-address of the client PC
+        /// </summary>
+        /// <returns>string with the ip address</returns>
+        public static string GetClientIpAddress()
+        {
+            return QuerySessionInformation<ClientAddress>(InfoClasses.ClientAddress).IpAddress;
+        }
 
-		/// <summary>
-		/// Free the memory which was reserved by the call to e.g. WFQuerySessionInformation 
-		/// </summary>
-		/// <param name="pMemory">IntPtr</param>
-		[DllImport("WFAPI")]
-		private static extern void WFFreeMemory(IntPtr pMemory);
+        /// <summary>
+        ///     Retrieve a string value from the WFQuerySessionInformation
+        /// </summary>
+        /// <returns>Optional ConnectStates</returns>
+        public static ConnectStates? QuerySessionConnectState()
+        {
+            IntPtr state;
+            int returned;
+            if (!WFQuerySessionInformation(CurrentServer, CurrentSession, InfoClasses.ConnectState, out state, out returned))
+            {
+                return null;
+            }
+            try
+            {
+                return (ConnectStates) state.ToInt32();
+            }
+            finally
+            {
+                WFFreeMemory(state);
+            }
+        }
 
-		/// <summary>
-		/// This function waits for an event (ICA session create/delete/connect, user logon/logoff, and so on)
-		/// before it returns.
-		/// </summary>
-		/// <param name="hServer">A handle to a server. Use the WFOpenServer() function to obtain a handle for a particular server, or specify WF_CURRENT_SERVER_HANDLE to use the current server.</param>
-		/// <param name="eventMask">EventMask mask</param>
-		/// <param name="pEventFlags">EventMask as result</param>
-		/// <returns>HResult</returns>
-		[DllImport("WFAPI")]
-		private static extern HResult WFWaitSystemEvent(IntPtr hServer, EventMask eventMask, out EventMask pEventFlags);
+        /// <summary>
+        ///     Retrieve the specified struct
+        /// </summary>
+        /// <typeparam name="T">type of the struct to return</typeparam>
+        /// <returns>struct of type T</returns>
+        public static T QuerySessionInformation<T>(InfoClasses infoClass)
+            where T : struct
+        {
+            var expectedType = typeof(T);
+            IntPtr addr;
+            int returned;
+            if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out addr, out returned))
+            {
+                return default(T);
+            }
+            try
+            {
+                var expectedSize = Marshal.SizeOf(expectedType);
+                if (expectedSize != returned)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(infoClass), $"The size of struct {expectedType} is {expectedSize}, returned was {returned}");
+                }
+                return (T) Marshal.PtrToStructure(addr, expectedType);
+            }
+            finally
+            {
+                WFFreeMemory(addr);
+            }
+        }
 
-		#endregion
+        /// <summary>
+        ///     Retrieve a string value from the WFQuerySessionInformation
+        /// </summary>
+        /// <returns>string with the value</returns>
+        public static string QuerySessionInformation(InfoClasses infoClass)
+        {
+            IntPtr addr;
+            int returned;
+            if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out addr, out returned))
+            {
+                return null;
+            }
+            try
+            {
+                return Marshal.PtrToStringAuto(addr);
+            }
+            finally
+            {
+                WFFreeMemory(addr);
+            }
+        }
 
-		/// <summary>
-		/// Checks if WinFrame, the API for Citrix is available
-		/// </summary>
-		public static bool IsAvailabe
-		{
-			get
-			{
-				try
-				{
-					QuerySessionConnectState();
-					return true;
-				}
-				catch (Exception ex)
-				{
-					Log.Warn().WriteLine("Couldn't load WFAPI.DLL, this could be okay. Error: {0}", ex.Message);
-				}
-				return false;
-			}
-		}
+        #region DllImports
 
-		/// <summary>
-		/// Retrieve the ip-address of the client PC
-		/// </summary>
-		/// <returns>string with the ip address</returns>
-		public static string GetClientIpAddress()
-		{
-			return QuerySessionInformation<ClientAddress>(InfoClasses.ClientAddress).IpAddress;
-		}
+        /// <summary>
+        ///     See
+        ///     <a href="https://www.citrix.com/content/dam/citrix/en_us/documents/downloads/sdk/wf-api-sdk-guide.pdf">WFQuerySessionInformation</a>
+        /// </summary>
+        /// <param name="hServer">
+        ///     A handle to a server. Use the WFOpenServer() function to obtain a handle for a particular server,
+        ///     or specify WF_CURRENT_SERVER_HANDLE to use the current server.
+        /// </param>
+        /// <param name="iSessionId">The session ID of the target session. WF_CURRENT_SESSION specifies the current session.</param>
+        /// <param name="infotype">WFInfoClasses, Type of information to be retrieved from the specified session.</param>
+        /// <param name="ppBuffer">IntPtr to the buffer where the string, struct or whatever resides</param>
+        /// <param name="pBytesReturned">number of bytes returned</param>
+        /// <returns>bool if ok</returns>
+        [DllImport("WFAPI", EntryPoint = "WFQuerySessionInformationW")]
+        private static extern bool WFQuerySessionInformation(IntPtr hServer, int iSessionId, InfoClasses infotype, out IntPtr ppBuffer, out int pBytesReturned);
 
-		/// <summary>
-		/// Retrieve the specified struct
-		/// </summary>
-		/// <typeparam name="T">type of the struct to return</typeparam>
-		/// <returns>struct of type T</returns>
-		public static T QuerySessionInformation<T>(InfoClasses infoClass)
-			where T : struct
-		{
-			var expectedType = typeof(T);
-			IntPtr addr;
-			int returned;
-			if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out addr, out returned))
-			{
-				return default(T);
-			}
-			try
-			{
-				var expectedSize = Marshal.SizeOf(expectedType);
-				if (expectedSize != returned)
-				{
-					throw new ArgumentOutOfRangeException(nameof(infoClass), $"The size of struct {expectedType} is {expectedSize}, returned was {returned}");
-				}
-				return (T)Marshal.PtrToStructure(addr, expectedType);
-			}
-			finally
-			{
-				WFFreeMemory(addr);
-			}
-		}
+        /// <summary>
+        ///     Free the memory which was reserved by the call to e.g. WFQuerySessionInformation
+        /// </summary>
+        /// <param name="pMemory">IntPtr</param>
+        [DllImport("WFAPI")]
+        private static extern void WFFreeMemory(IntPtr pMemory);
 
-		/// <summary>
-		/// Retrieve a string value from the WFQuerySessionInformation
-		/// </summary>
-		/// <returns>Optional ConnectStates</returns>
-		public static ConnectStates? QuerySessionConnectState()
-		{
-			IntPtr state;
-			int returned;
-			if (!WFQuerySessionInformation(CurrentServer, CurrentSession, InfoClasses.ConnectState, out state, out returned))
-			{
-				return null;
-			}
-			try
-			{
-				return (ConnectStates)state.ToInt32();
-			}
-			finally
-			{
-				WFFreeMemory(state);
-			}
-		}
-		/// <summary>
-		/// Retrieve a string value from the WFQuerySessionInformation
-		/// </summary>
-		/// <returns>string with the value</returns>
-		public static string QuerySessionInformation(InfoClasses infoClass)
-		{
-			IntPtr addr;
-			int returned;
-			if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out addr, out returned))
-			{
-				return null;
-			}
-			try
-			{
-				return Marshal.PtrToStringAuto(addr);
-			}
-			finally
-			{
-				WFFreeMemory(addr);
-			}
-		}
-	}
+        /// <summary>
+        ///     This function waits for an event (ICA session create/delete/connect, user logon/logoff, and so on)
+        ///     before it returns.
+        /// </summary>
+        /// <param name="hServer">
+        ///     A handle to a server. Use the WFOpenServer() function to obtain a handle for a particular server,
+        ///     or specify WF_CURRENT_SERVER_HANDLE to use the current server.
+        /// </param>
+        /// <param name="eventMask">EventMask mask</param>
+        /// <param name="pEventFlags">EventMask as result</param>
+        /// <returns>HResult</returns>
+        [DllImport("WFAPI")]
+        private static extern HResult WFWaitSystemEvent(IntPtr hServer, EventMask eventMask, out EventMask pEventFlags);
+
+        #endregion
+    }
 }

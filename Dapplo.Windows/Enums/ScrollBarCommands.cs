@@ -21,82 +21,88 @@
 
 namespace Dapplo.Windows.Enums
 {
-	/// <summary>
-	///     See
-	///     <a href="https://msdn.microsoft.com/de-de/library/windows/desktop/bb787577(v=vs.85).aspx">WM_VSCROLL message</a>
-	/// </summary>
-	public enum ScrollBarCommands : uint
-	{
-		/// <summary>
-		///     Scrolls one line up.
-		/// </summary>
-		SB_LINEUP = 0,
-		/// <summary>
-		/// Same as SB_LINEUP, can be used when thinking horizontally
-		/// </summary>
-		SB_LINELEFT = SB_LINEUP,
+    /// <summary>
+    ///     See
+    ///     <a href="https://msdn.microsoft.com/de-de/library/windows/desktop/bb787577(v=vs.85).aspx">WM_VSCROLL message</a>
+    /// </summary>
+    public enum ScrollBarCommands : uint
+    {
+        /// <summary>
+        ///     Scrolls one line up.
+        /// </summary>
+        SB_LINEUP = 0,
 
-		/// <summary>
-		///     Scrolls one line down.
-		/// </summary>
-		SB_LINEDOWN = 1,
-		/// <summary>
-		/// Same as SB_LINEDOWN, can be used when thinking horizontally
-		/// </summary>
-		SB_LINERIGHT = SB_LINEDOWN,
+        /// <summary>
+        ///     Same as SB_LINEUP, can be used when thinking horizontally
+        /// </summary>
+        SB_LINELEFT = SB_LINEUP,
 
-		/// <summary>
-		///     Scrolls one page up.
-		/// </summary>
-		SB_PAGEUP = 2,
-		/// <summary>
-		/// Same as SB_PAGEUP, can be used when thinking horizontally
-		/// </summary>
-		SB_PAGELEFT = SB_PAGEUP,
+        /// <summary>
+        ///     Scrolls one line down.
+        /// </summary>
+        SB_LINEDOWN = 1,
 
-		/// <summary>
-		///     Scrolls one page down.
-		/// </summary>
-		SB_PAGEDOWN = 3,
-		/// <summary>
-		/// Same as SB_PAGEDOWN, can be used when thinking horizontally
-		/// </summary>
-		SB_PAGERIGHT = SB_PAGEDOWN,
+        /// <summary>
+        ///     Same as SB_LINEDOWN, can be used when thinking horizontally
+        /// </summary>
+        SB_LINERIGHT = SB_LINEDOWN,
 
-		/// <summary>
-		///     The user has dragged the scroll box (thumb) and released the mouse button.
-		///     The HIWORD indicates the position of the scroll box at the end of the drag operation.
-		/// </summary>
-		SB_THUMBPOSITION = 4,
+        /// <summary>
+        ///     Scrolls one page up.
+        /// </summary>
+        SB_PAGEUP = 2,
 
-		/// <summary>
-		///     The user is dragging the scroll box.
-		///     This message is sent repeatedly until the user releases the mouse button.
-		///     The HIWORD indicates the position that the scroll box has been dragged to.
-		/// </summary>
-		SB_THUMBTRACK = 5,
+        /// <summary>
+        ///     Same as SB_PAGEUP, can be used when thinking horizontally
+        /// </summary>
+        SB_PAGELEFT = SB_PAGEUP,
 
-		/// <summary>
-		///     Scrolls to the upper left.
-		/// </summary>
-		SB_TOP = 6,
-		/// <summary>
-		/// Same as SB_TOP, can be used when thinking horizontally
-		/// </summary>
-		SB_LEFT = SB_TOP,
+        /// <summary>
+        ///     Scrolls one page down.
+        /// </summary>
+        SB_PAGEDOWN = 3,
 
-		/// <summary>
-		///     Scrolls to the lower right.
-		/// </summary>
-		SB_BOTTOM = 7,
-		/// <summary>
-		/// Same as SB_BOTTOM, can be used when thinking horizontally
-		/// </summary>
-		SB_RIGHT = SB_BOTTOM,
+        /// <summary>
+        ///     Same as SB_PAGEDOWN, can be used when thinking horizontally
+        /// </summary>
+        SB_PAGERIGHT = SB_PAGEDOWN,
 
-		/// <summary>
-		///     Ends scroll.
-		/// </summary>
-		SB_ENDSCROLL = 8
-	}
+        /// <summary>
+        ///     The user has dragged the scroll box (thumb) and released the mouse button.
+        ///     The HIWORD indicates the position of the scroll box at the end of the drag operation.
+        /// </summary>
+        SB_THUMBPOSITION = 4,
+
+        /// <summary>
+        ///     The user is dragging the scroll box.
+        ///     This message is sent repeatedly until the user releases the mouse button.
+        ///     The HIWORD indicates the position that the scroll box has been dragged to.
+        /// </summary>
+        SB_THUMBTRACK = 5,
+
+        /// <summary>
+        ///     Scrolls to the upper left.
+        /// </summary>
+        SB_TOP = 6,
+
+        /// <summary>
+        ///     Same as SB_TOP, can be used when thinking horizontally
+        /// </summary>
+        SB_LEFT = SB_TOP,
+
+        /// <summary>
+        ///     Scrolls to the lower right.
+        /// </summary>
+        SB_BOTTOM = 7,
+
+        /// <summary>
+        ///     Same as SB_BOTTOM, can be used when thinking horizontally
+        /// </summary>
+        SB_RIGHT = SB_BOTTOM,
+
+        /// <summary>
+        ///     Ends scroll.
+        /// </summary>
+        SB_ENDSCROLL = 8
+    }
 }

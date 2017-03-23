@@ -19,94 +19,100 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#region using
+
 using System;
 using System.Collections.Generic;
+using System.Security.Permissions;
 using System.Windows.Forms;
 using System.Windows.Interop;
 
+#endregion
+
 namespace Dapplo.Windows.Dpi
 {
-	/// <summary>
-	/// This is a Listener for WinProc messages
-	/// </summary>
-	public class WinProcListener : NativeWindow, IDisposable
-	{
-		private readonly IList<HwndSourceHook> _hooks = new List<HwndSourceHook>();
-		/// <summary>
-		/// Adds an event handler
-		/// </summary>
-		/// <param name="hook">HwndSourceHook</param>
-		public void AddHook(HwndSourceHook hook)
-		{
-			_hooks.Add(hook);
-		}
+    /// <summary>
+    ///     This is a Listener for WinProc messages
+    /// </summary>
+    public class WinProcListener : NativeWindow, IDisposable
+    {
+        private readonly IList<HwndSourceHook> _hooks = new List<HwndSourceHook>();
 
-		/// <summary>
-		/// Removes the event handlers that were added by AddHook
-		/// </summary>
-		/// <param name="hook">HwndSourceHook, The event handler to remove.</param>
-		public void RemoveHook(HwndSourceHook hook)
-		{
-			_hooks.Remove(hook);
-		}
+        /// <summary>
+        ///     Constructor for a window listener
+        /// </summary>
+        /// <param name="parent">Control to listen to</param>
+        public WinProcListener(Control parent)
+        {
+            parent.HandleCreated += OnHandleCreated;
+            parent.HandleDestroyed += OnHandleDestroyed;
+        }
 
-		/// <summary>
-		/// Constructor for a window listener
-		/// </summary>
-		/// <param name="parent">Control to listen to</param>
-		public WinProcListener(Control parent)
-		{
-			parent.HandleCreated += OnHandleCreated;
-			parent.HandleDestroyed += OnHandleDestroyed;
-		}
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _hooks.Clear();
+            ReleaseHandle();
+        }
 
-		/// <summary>
-		/// Listen for the control's window creation and then hook into it.
-		/// </summary>
-		/// <param name="sender">object</param>
-		/// <param name="e">EventArgs</param>
-		private void OnHandleCreated(object sender, EventArgs e)
-		{
-			// Window is now created, assign handle to NativeWindow.
-			AssignHandle(((Control)sender).Handle);
-		}
+        /// <summary>
+        ///     Adds an event handler
+        /// </summary>
+        /// <param name="hook">HwndSourceHook</param>
+        public void AddHook(HwndSourceHook hook)
+        {
+            _hooks.Add(hook);
+        }
 
-		/// <summary>
-		/// Remove the handle
-		/// </summary>
-		/// <param name="sender">object</param>
-		/// <param name="e">EventArgs</param>
-		private void OnHandleDestroyed(object sender, EventArgs e)
-		{
-			// Window was destroyed, release hook.
-			ReleaseHandle();
-			_hooks.Clear();
-		}
+        /// <summary>
+        ///     Listen for the control's window creation and then hook into it.
+        /// </summary>
+        /// <param name="sender">object</param>
+        /// <param name="e">EventArgs</param>
+        private void OnHandleCreated(object sender, EventArgs e)
+        {
+            // Window is now created, assign handle to NativeWindow.
+            AssignHandle(((Control) sender).Handle);
+        }
 
-		/// <inheritdoc />
-		[System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Demand, Name = "FullTrust")]
-		protected override void WndProc(ref Message m)
-		{
-			bool handled = false;
-			foreach (var hwndSourceHook in _hooks)
-			{
-				m.Result = hwndSourceHook.Invoke(m.HWnd, m.Msg, m.WParam, m.LParam, ref handled);
-				if (handled)
-				{
-					break;
-				}
-			}
-			if (!handled)
-			{
-				base.WndProc(ref m);
-			}
-		}
+        /// <summary>
+        ///     Remove the handle
+        /// </summary>
+        /// <param name="sender">object</param>
+        /// <param name="e">EventArgs</param>
+        private void OnHandleDestroyed(object sender, EventArgs e)
+        {
+            // Window was destroyed, release hook.
+            ReleaseHandle();
+            _hooks.Clear();
+        }
 
-		/// <inheritdoc />
-		public void Dispose()
-		{
-			_hooks.Clear();
-			ReleaseHandle();
-		}
-	}
+        /// <summary>
+        ///     Removes the event handlers that were added by AddHook
+        /// </summary>
+        /// <param name="hook">HwndSourceHook, The event handler to remove.</param>
+        public void RemoveHook(HwndSourceHook hook)
+        {
+            _hooks.Remove(hook);
+        }
+
+        /// <inheritdoc />
+        [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+        protected override void WndProc(ref Message m)
+        {
+            bool handled = false;
+            foreach (var hwndSourceHook in _hooks)
+            {
+                m.Result = hwndSourceHook.Invoke(m.HWnd, m.Msg, m.WParam, m.LParam, ref handled);
+                if (handled)
+                {
+                    break;
+                }
+            }
+            if (!handled)
+            {
+                base.WndProc(ref m);
+            }
+        }
+    }
 }

@@ -34,56 +34,56 @@ using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests
 {
-	public class User32Tests
-	{
-		private static readonly LogSource Log = new LogSource();
+    public class User32Tests
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		public User32Tests(ITestOutputHelper testOutputHelper)
-		{
-			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-		}
+        public User32Tests(ITestOutputHelper testOutputHelper)
+        {
+            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
 
-		/// <summary>
-		///     Test GetWindow
-		/// </summary>
-		/// <returns></returns>
-		//[Fact]
-		private void TestDetectChanges()
-		{
-			var foundWindow = false;
-			IList<IInteropWindow> initialWindows = InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()).ToList();
+        /// <summary>
+        ///     Test GetWindow
+        /// </summary>
+        /// <returns></returns>
+        //[Fact]
+        private void TestDetectChanges()
+        {
+            var foundWindow = false;
+            IList<IInteropWindow> initialWindows = InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()).ToList();
 
-			while (true)
-			{
-				Thread.Sleep(1000);
-				var newWindow = InteropWindowQuery.GetTopWindows().FirstOrDefault(window => window.IsVisible() && !initialWindows.Contains(window));
-				if (newWindow != null)
-				{
-					foundWindow = true;
-					Log.Debug().WriteLine("{0}", newWindow.Dump());
-					break;
-				}
-			}
+            while (true)
+            {
+                Thread.Sleep(1000);
+                var newWindow = InteropWindowQuery.GetTopWindows().FirstOrDefault(window => window.IsVisible() && !initialWindows.Contains(window));
+                if (newWindow != null)
+                {
+                    foundWindow = true;
+                    Log.Debug().WriteLine("{0}", newWindow.Dump());
+                    break;
+                }
+            }
 
-			Assert.True(foundWindow);
-		}
+            Assert.True(foundWindow);
+        }
 
-		/// <summary>
-		///     Test GetWindow
-		/// </summary>
-		/// <returns></returns>
-		[Fact]
-		private void TestGetTopLevelWindows()
-		{
-			var foundWindow = false;
-			foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()))
-			{
-				foundWindow = true;
+        /// <summary>
+        ///     Test GetWindow
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        private void TestGetTopLevelWindows()
+        {
+            var foundWindow = false;
+            foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()))
+            {
+                foundWindow = true;
 
-				Log.Debug().WriteLine("{0}", window.Dump());
-				break;
-			}
-			Assert.True(foundWindow);
-		}
-	}
+                Log.Debug().WriteLine("{0}", window.Dump());
+                break;
+            }
+            Assert.True(foundWindow);
+        }
+    }
 }

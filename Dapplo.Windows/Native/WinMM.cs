@@ -29,24 +29,24 @@ using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Native
 {
-	/// <summary>
-	///     Windows Media
-	/// </summary>
-	public class WinMM
-	{
-		/// <summary>
-		///     Play a sound via WinMM
-		/// </summary>
-		/// <param name="soundBytes">byte array with the wave information</param>
-		/// <param name="hmod"></param>
-		/// <param name="fdwSound"></param>
-		/// <returns></returns>
-		[DllImport("winmm.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool PlaySound(byte[] soundBytes, UIntPtr hmod, SoundFlags fdwSound);
+    /// <summary>
+    ///     Windows Media
+    /// </summary>
+    public class WinMM
+    {
+        /// <summary>
+        ///     Play a sound via WinMM
+        /// </summary>
+        /// <param name="soundBytes">byte array with the wave information</param>
+        /// <param name="hmod"></param>
+        /// <param name="fdwSound"></param>
+        /// <returns></returns>
+        [DllImport("winmm.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool PlaySound(byte[] soundBytes, UIntPtr hmod, SoundFlags fdwSound);
 
-		[DllImport("winmm.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool PlaySound(IntPtr ptrToSound, UIntPtr hmod, SoundFlags fdwSound);
-	}
+        [DllImport("winmm.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool PlaySound(IntPtr ptrToSound, UIntPtr hmod, SoundFlags fdwSound);
+    }
 }

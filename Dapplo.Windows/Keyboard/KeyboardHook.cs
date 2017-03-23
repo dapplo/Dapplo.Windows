@@ -35,270 +35,275 @@ using Dapplo.Windows.Keyboard.Native;
 
 namespace Dapplo.Windows.Keyboard
 {
-	/// <summary>
-	///     A glocal keyboard hook, using System.Reactive
-	/// </summary>
-	public sealed class KeyboardHook
-	{
-		private static readonly LogSource Log = new LogSource();
+    /// <summary>
+    ///     A glocal keyboard hook, using System.Reactive
+    /// </summary>
+    public sealed class KeyboardHook
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		/// <summary>
-		///     The singleton of the KeyboardHook
-		/// </summary>
-		private static readonly Lazy<KeyboardHook> Singleton = new Lazy<KeyboardHook>(() => new KeyboardHook());
+        /// <summary>
+        ///     The singleton of the KeyboardHook
+        /// </summary>
+        private static readonly Lazy<KeyboardHook> Singleton = new Lazy<KeyboardHook>(() => new KeyboardHook());
 
-		/// <summary>
-		///     Used to store the observable
-		/// </summary>
-		private readonly IObservable<KeyboardHookEventArgs> _keyObservable;
+        /// <summary>
+        ///     Used to store the observable
+        /// </summary>
+        private readonly IObservable<KeyboardHookEventArgs> _keyObservable;
 
-		/// <summary>
-		///     Store the handler, otherwise it might be GCed
-		/// </summary>
-		// ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-		private LowLevelKeyboardProc _callback;
+        /// <summary>
+        ///     Store the handler, otherwise it might be GCed
+        /// </summary>
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+        private LowLevelKeyboardProc _callback;
 
-		/// <summary>
-		///     Private constructor to create the observable
-		/// </summary>
-		private KeyboardHook()
-		{
-			_keyObservable = Observable.Create<KeyboardHookEventArgs>(observer =>
-			{
-				// Make sure the current state of the lock keys is retrieved
-				SyncLockState();
+        /// <summary>
+        ///     Private constructor to create the observable
+        /// </summary>
+        private KeyboardHook()
+        {
+            _keyObservable = Observable.Create<KeyboardHookEventArgs>(observer =>
+                {
+                    // Make sure the current state of the lock keys is retrieved
+                    SyncLockState();
 
-				var hookId = IntPtr.Zero;
-				// Need to hold onto this callback, otherwise it will get GC'd as it is an unmanged callback
-				_callback = (nCode, wParam, lParam) =>
-				{
-					if (nCode >= 0)
-					{
-						var eventArgs = CreateKeyboardEventArgs(wParam, lParam);
-						observer.OnNext(eventArgs);
-						if (eventArgs.Handled)
-						{
-							return (IntPtr) 1;
-						}
-					}
+                    var hookId = IntPtr.Zero;
+                    // Need to hold onto this callback, otherwise it will get GC'd as it is an unmanged callback
+                    _callback = (nCode, wParam, lParam) =>
+                    {
+                        if (nCode >= 0)
+                        {
+                            var eventArgs = CreateKeyboardEventArgs(wParam, lParam);
+                            observer.OnNext(eventArgs);
+                            if (eventArgs.Handled)
+                            {
+                                return (IntPtr) 1;
+                            }
+                        }
 
-					// ReSharper disable once AccessToModifiedClosure
-					return CallNextHookEx(hookId, nCode, wParam, lParam);
-				};
+                        // ReSharper disable once AccessToModifiedClosure
+                        return CallNextHookEx(hookId, nCode, wParam, lParam);
+                    };
 
-				hookId = SetWindowsHookEx(HookTypes.WH_KEYBOARD_LL, _callback, IntPtr.Zero, 0);
+                    hookId = SetWindowsHookEx(HookTypes.WH_KEYBOARD_LL, _callback, IntPtr.Zero, 0);
 
-				return Disposable.Create(() =>
-				{
-					UnhookWindowsHookEx(hookId);
-					_callback = null;
-				});
-			}).Publish().RefCount();
-		}
+                    return Disposable.Create(() =>
+                    {
+                        UnhookWindowsHookEx(hookId);
+                        _callback = null;
+                    });
+                })
+                .Publish()
+                .RefCount();
+        }
 
-		/// <summary>
-		///     The actual keyboard hook observable
-		/// </summary>
-		public static IObservable<KeyboardHookEventArgs> KeyboardEvents => Singleton.Value._keyObservable;
+        /// <summary>
+        ///     The actual keyboard hook observable
+        /// </summary>
+        public static IObservable<KeyboardHookEventArgs> KeyboardEvents => Singleton.Value._keyObservable;
 
-		/// <summary>
-		///     Create the KeyboardHookEventArgs from the parameters which where in the event
-		/// </summary>
-		/// <param name="wParam">IntPtr</param>
-		/// <param name="lParam">IntPtr</param>
-		/// <returns>KeyboardHookEventArgs</returns>
-		private static KeyboardHookEventArgs CreateKeyboardEventArgs(IntPtr wParam, IntPtr lParam)
-		{
-			var isKeyDown = wParam == (IntPtr) WmKeydown || wParam == (IntPtr) WmSyskeydown;
+        /// <summary>
+        ///     Create the KeyboardHookEventArgs from the parameters which where in the event
+        /// </summary>
+        /// <param name="wParam">IntPtr</param>
+        /// <param name="lParam">IntPtr</param>
+        /// <returns>KeyboardHookEventArgs</returns>
+        private static KeyboardHookEventArgs CreateKeyboardEventArgs(IntPtr wParam, IntPtr lParam)
+        {
+            var isKeyDown = wParam == (IntPtr) WmKeydown || wParam == (IntPtr) WmSyskeydown;
 
-			var keyboardLowLevelHookStruct = (KeyboardLowLevelHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardLowLevelHookStruct));
+            var keyboardLowLevelHookStruct = (KeyboardLowLevelHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardLowLevelHookStruct));
 
-			// Check the key to find if there any modifiers, store these in the global values.
-			switch (keyboardLowLevelHookStruct.VirtualKeyCode)
-			{
-				case VirtualKeyCodes.CAPITAL:
-					if (isKeyDown)
-					{
-						_capsLock = !_capsLock;
-					}
-					break;
-				case VirtualKeyCodes.NUMLOCK:
-					if (isKeyDown)
-					{
-						_numLock = !_numLock;
-					}
-					break;
-				case VirtualKeyCodes.SCROLL:
-					if (isKeyDown)
-					{
-						_scrollLock = !_scrollLock;
-					}
-					break;
-				case VirtualKeyCodes.LSHIFT:
-					_leftShift = isKeyDown;
-					break;
-				case VirtualKeyCodes.RSHIFT:
-					_rightShift = isKeyDown;
-					break;
-				case VirtualKeyCodes.LCONTROL:
-					_leftCtrl = isKeyDown;
-					break;
-				case VirtualKeyCodes.RCONTROL:
-					_rightCtrl = isKeyDown;
-					break;
-				case VirtualKeyCodes.LMENU:
-					_leftAlt = isKeyDown;
-					break;
-				case VirtualKeyCodes.RMENU:
-					_rightAlt = isKeyDown;
-					break;
-				case VirtualKeyCodes.LWIN:
-					_leftWin = isKeyDown;
-					break;
-				case VirtualKeyCodes.RWIN:
-					_rightWin = isKeyDown;
-					break;
-			}
+            // Check the key to find if there any modifiers, store these in the global values.
+            switch (keyboardLowLevelHookStruct.VirtualKeyCode)
+            {
+                case VirtualKeyCodes.CAPITAL:
+                    if (isKeyDown)
+                    {
+                        _capsLock = !_capsLock;
+                    }
+                    break;
+                case VirtualKeyCodes.NUMLOCK:
+                    if (isKeyDown)
+                    {
+                        _numLock = !_numLock;
+                    }
+                    break;
+                case VirtualKeyCodes.SCROLL:
+                    if (isKeyDown)
+                    {
+                        _scrollLock = !_scrollLock;
+                    }
+                    break;
+                case VirtualKeyCodes.LSHIFT:
+                    _leftShift = isKeyDown;
+                    break;
+                case VirtualKeyCodes.RSHIFT:
+                    _rightShift = isKeyDown;
+                    break;
+                case VirtualKeyCodes.LCONTROL:
+                    _leftCtrl = isKeyDown;
+                    break;
+                case VirtualKeyCodes.RCONTROL:
+                    _rightCtrl = isKeyDown;
+                    break;
+                case VirtualKeyCodes.LMENU:
+                    _leftAlt = isKeyDown;
+                    break;
+                case VirtualKeyCodes.RMENU:
+                    _rightAlt = isKeyDown;
+                    break;
+                case VirtualKeyCodes.LWIN:
+                    _leftWin = isKeyDown;
+                    break;
+                case VirtualKeyCodes.RWIN:
+                    _rightWin = isKeyDown;
+                    break;
+            }
 
-			var keyEventArgs = new KeyboardHookEventArgs
-			{
-				Key = keyboardLowLevelHookStruct.VirtualKeyCode,
-				IsKeyDown = isKeyDown,
-				IsLeftShift = _leftShift,
-				IsRightShift = _rightShift,
-				IsLeftAlt = _leftAlt,
-				IsRightAlt = _rightAlt,
-				IsLeftControl = _leftCtrl,
-				IsRightControl = _rightCtrl,
-				IsLeftWindows = _leftWin,
-				IsRightWindows = _rightWin,
-				IsScrollLockActive = _scrollLock,
-				IsNumLockActive = _numLock,
-				IsCapsLockActive = _capsLock
-			};
+            var keyEventArgs = new KeyboardHookEventArgs
+            {
+                Key = keyboardLowLevelHookStruct.VirtualKeyCode,
+                IsKeyDown = isKeyDown,
+                IsLeftShift = _leftShift,
+                IsRightShift = _rightShift,
+                IsLeftAlt = _leftAlt,
+                IsRightAlt = _rightAlt,
+                IsLeftControl = _leftCtrl,
+                IsRightControl = _rightCtrl,
+                IsLeftWindows = _leftWin,
+                IsRightWindows = _rightWin,
+                IsScrollLockActive = _scrollLock,
+                IsNumLockActive = _numLock,
+                IsCapsLockActive = _capsLock
+            };
 
-			// Do we need this??
-			//http://msdn.microsoft.com/en-us/library/windows/desktop/ms646286(v=vs.85).aspx
-			if (!keyEventArgs.IsAlt && wParam == (IntPtr) WmSyskeydown)
-			{
-				keyEventArgs.IsLeftAlt = true;
-				keyEventArgs.IsSystemKey = true;
-			}
-			else if (!keyEventArgs.IsAlt && wParam == (IntPtr) WmSyskeyup)
-			{
-				keyEventArgs.IsLeftAlt = true;
-				keyEventArgs.IsSystemKey = true;
-			}
+            // Do we need this??
+            //http://msdn.microsoft.com/en-us/library/windows/desktop/ms646286(v=vs.85).aspx
+            if (!keyEventArgs.IsAlt && wParam == (IntPtr) WmSyskeydown)
+            {
+                keyEventArgs.IsLeftAlt = true;
+                keyEventArgs.IsSystemKey = true;
+            }
+            else if (!keyEventArgs.IsAlt && wParam == (IntPtr) WmSyskeyup)
+            {
+                keyEventArgs.IsLeftAlt = true;
+                keyEventArgs.IsSystemKey = true;
+            }
 
-			Log.Debug().WriteLine($"{wParam}:{lParam} -> {keyEventArgs}");
+            Log.Debug().WriteLine($"{wParam}:{lParam} -> {keyEventArgs}");
 
-			return keyEventArgs;
-		}
+            return keyEventArgs;
+        }
 
-		#region Current key states
+        #region Current key states
 
-		/// <summary>
-		///     Flags for the current state
-		/// </summary>
-		private static bool _leftShift;
+        /// <summary>
+        ///     Flags for the current state
+        /// </summary>
+        private static bool _leftShift;
 
-		private static bool _rightShift;
-		private static bool _leftAlt;
-		private static bool _rightAlt;
-		private static bool _leftCtrl;
-		private static bool _rightCtrl;
-		private static bool _leftWin;
-		private static bool _rightWin;
+        private static bool _rightShift;
+        private static bool _leftAlt;
+        private static bool _rightAlt;
+        private static bool _leftCtrl;
+        private static bool _rightCtrl;
+        private static bool _leftWin;
+        private static bool _rightWin;
 
-		// Flags for the lock keys, initialize the locking keys state one time, these will be updated later
-		private static bool _capsLock;
-		private static bool _numLock;
-		private static bool _scrollLock;
+        // Flags for the lock keys, initialize the locking keys state one time, these will be updated later
+        private static bool _capsLock;
 
-		/// <summary>
-		///     Sync the lock key state
-		/// </summary>
-		private static void SyncLockState()
-		{
-			_capsLock = GetKeyState(Keys.Capital) > 0;
-			_numLock = GetKeyState(Keys.NumLock) > 0;
-			_scrollLock = GetKeyState(Keys.Scroll) > 0;
-		}
+        private static bool _numLock;
+        private static bool _scrollLock;
 
-		#endregion
+        /// <summary>
+        ///     Sync the lock key state
+        /// </summary>
+        private static void SyncLockState()
+        {
+            _capsLock = GetKeyState(Keys.Capital) > 0;
+            _numLock = GetKeyState(Keys.NumLock) > 0;
+            _scrollLock = GetKeyState(Keys.Scroll) > 0;
+        }
 
-		#region Native
+        #endregion
 
-		private const int WmKeydown = 256;
-		//private const int WmKeyup = 257;
-		private const int WmSyskeyup = 261;
-		private const int WmSyskeydown = 260;
+        #region Native
 
-		/// <summary>
-		///     Retrieve the state of a key
-		/// </summary>
-		/// <param name="keyCode"></param>
-		/// <returns></returns>
-		[DllImport("user32.dll", ExactSpelling = true)]
-		[ResourceExposure(ResourceScope.None)]
-		private static extern ushort GetKeyState(Keys keyCode);
+        private const int WmKeydown = 256;
 
-		private const int KeyPressed = 0x8000;
+        //private const int WmKeyup = 257;
+        private const int WmSyskeyup = 261;
 
-		/// <summary>
-		///     Test if the supplied key is pressed
-		/// </summary>
-		/// <param name="key">Keys</param>
-		/// <returns>true if pressed</returns>
-		public static bool IsPressed(Keys key)
-		{
-			return Convert.ToBoolean(GetKeyState(key) & KeyPressed);
-		}
+        private const int WmSyskeydown = 260;
 
-		#endregion
+        /// <summary>
+        ///     Retrieve the state of a key
+        /// </summary>
+        /// <param name="keyCode"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll", ExactSpelling = true)]
+        [ResourceExposure(ResourceScope.None)]
+        private static extern ushort GetKeyState(Keys keyCode);
 
-		#region Native code
+        private const int KeyPressed = 0x8000;
 
-		/// <summary>
-		///     The actual delegate for the p
-		/// </summary>
-		/// <param name="nCode"></param>
-		/// <param name="wParam"></param>
-		/// <param name="lParam"></param>
-		/// <returns></returns>
-		private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
+        /// <summary>
+        ///     Test if the supplied key is pressed
+        /// </summary>
+        /// <param name="key">Keys</param>
+        /// <returns>true if pressed</returns>
+        public static bool IsPressed(Keys key)
+        {
+            return Convert.ToBoolean(GetKeyState(key) & KeyPressed);
+        }
 
-		/// <summary>
-		///     Register a windows hook
-		/// </summary>
-		/// <param name="hookType">HookTypes</param>
-		/// <param name="lpfn">LowLevelKeyboardProc</param>
-		/// <param name="hMod">IntPtr</param>
-		/// <param name="dwThreadId">uint</param>
-		/// <returns>ID to be able to unhook it again</returns>
-		[DllImport("user32.dll", SetLastError = true)]
-		private static extern IntPtr SetWindowsHookEx(HookTypes hookType, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
+        #endregion
 
-		/// <summary>
-		///     Used to remove a hook which was set with SetWindowsHookEx
-		/// </summary>
-		/// <param name="hhk"></param>
-		/// <returns></returns>
-		[DllImport("user32.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		private static extern bool UnhookWindowsHookEx(IntPtr hhk);
+        #region Native code
 
-		/// <summary>
-		///     Used to call the next hook in the list, if there was any
-		/// </summary>
-		/// <param name="hhk"></param>
-		/// <param name="nCode"></param>
-		/// <param name="wParam"></param>
-		/// <param name="lParam"></param>
-		/// <returns>IntPtr</returns>
-		[DllImport("user32.dll", SetLastError = true)]
-		private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+        /// <summary>
+        ///     The actual delegate for the p
+        /// </summary>
+        /// <param name="nCode"></param>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        /// <returns></returns>
+        private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-		#endregion
-	}
+        /// <summary>
+        ///     Register a windows hook
+        /// </summary>
+        /// <param name="hookType">HookTypes</param>
+        /// <param name="lpfn">LowLevelKeyboardProc</param>
+        /// <param name="hMod">IntPtr</param>
+        /// <param name="dwThreadId">uint</param>
+        /// <returns>ID to be able to unhook it again</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr SetWindowsHookEx(HookTypes hookType, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
+
+        /// <summary>
+        ///     Used to remove a hook which was set with SetWindowsHookEx
+        /// </summary>
+        /// <param name="hhk"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool UnhookWindowsHookEx(IntPtr hhk);
+
+        /// <summary>
+        ///     Used to call the next hook in the list, if there was any
+        /// </summary>
+        /// <param name="hhk"></param>
+        /// <param name="nCode"></param>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        /// <returns>IntPtr</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+
+        #endregion
+    }
 }

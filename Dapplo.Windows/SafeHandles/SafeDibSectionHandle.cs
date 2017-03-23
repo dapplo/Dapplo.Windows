@@ -28,27 +28,27 @@ using System.Security;
 
 namespace Dapplo.Windows.SafeHandles
 {
-	/// <summary>
-	///     A DIB Section SafeHandle implementation
-	/// </summary>
-	public class SafeDibSectionHandle : SafeObjectHandle
-	{
-		/// <summary>
-		///     Default constructor is needed to support marshalling!!
-		/// </summary>
-		[SecurityCritical]
-		public SafeDibSectionHandle() : base(true)
-		{
-		}
+    /// <summary>
+    ///     A DIB Section SafeHandle implementation
+    /// </summary>
+    public class SafeDibSectionHandle : SafeObjectHandle
+    {
+        /// <summary>
+        ///     Default constructor is needed to support marshalling!!
+        /// </summary>
+        [SecurityCritical]
+        public SafeDibSectionHandle() : base(true)
+        {
+        }
 
-		/// <summary>
-		///     Create a SafeDibSectionHandle for an existing DIB Section
-		/// </summary>
-		/// <param name="preexistingHandle"></param>
-		[SecurityCritical]
-		public SafeDibSectionHandle(IntPtr preexistingHandle) : base(true)
-		{
-			SetHandle(preexistingHandle);
-		}
-	}
+        /// <summary>
+        ///     Create a SafeDibSectionHandle for an existing DIB Section
+        /// </summary>
+        /// <param name="preexistingHandle"></param>
+        [SecurityCritical]
+        public SafeDibSectionHandle(IntPtr preexistingHandle) : base(true)
+        {
+            SetHandle(preexistingHandle);
+        }
+    }
 }

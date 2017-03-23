@@ -25,7 +25,6 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Enums;
 using Dapplo.Windows.Keyboard;
 using Dapplo.Windows.Keyboard.Native;
 using Xunit.Abstractions;
@@ -34,42 +33,44 @@ using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests
 {
-	public class KeyboardHookTests
-	{
-		public KeyboardHookTests(ITestOutputHelper testOutputHelper)
-		{
-			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-		}
+    public class KeyboardHookTests
+    {
+        public KeyboardHookTests(ITestOutputHelper testOutputHelper)
+        {
+            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
 
-		//[StaFact]
-		private async Task TestHandlingKeyAsync()
-		{
-			await KeyboardHook.KeyboardEvents.Where(args => args.IsWindows && args.IsShift && args.IsControl && args.IsAlt)
-				.Select(args =>
-				{
-					args.Handled = true;
-					return args;
-				}).FirstAsync();
-		}
+        //[StaFact]
+        private async Task TestHandlingKeyAsync()
+        {
+            await KeyboardHook.KeyboardEvents.Where(args => args.IsWindows && args.IsShift && args.IsControl && args.IsAlt)
+                .Select(args =>
+                {
+                    args.Handled = true;
+                    return args;
+                })
+                .FirstAsync();
+        }
 
-		//[StaFact]
-		private async Task TestMappingAsync()
-		{
-			await KeyboardHook.KeyboardEvents.FirstAsync(info => info.IsLeftShift && info.IsKeyDown);
-		}
+        //[StaFact]
+        private async Task TestMappingAsync()
+        {
+            await KeyboardHook.KeyboardEvents.FirstAsync(info => info.IsLeftShift && info.IsKeyDown);
+        }
 
-		//[StaFact]
-		private async Task TestSuppressVolumeAsync()
-		{
-			await KeyboardHook.KeyboardEvents.Where(args =>
-			{
-				if (args.Key != VirtualKeyCodes.VOLUME_UP)
-				{
-					return true;
-				}
-				args.Handled = true;
-				return false;
-			}).FirstAsync();
-		}
-	}
+        //[StaFact]
+        private async Task TestSuppressVolumeAsync()
+        {
+            await KeyboardHook.KeyboardEvents.Where(args =>
+                {
+                    if (args.Key != VirtualKeyCodes.VOLUME_UP)
+                    {
+                        return true;
+                    }
+                    args.Handled = true;
+                    return false;
+                })
+                .FirstAsync();
+        }
+    }
 }

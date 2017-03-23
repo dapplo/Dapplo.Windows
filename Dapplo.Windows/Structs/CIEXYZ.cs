@@ -27,40 +27,42 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Structs
 {
-	/// <summary>
-	/// CIE XYZ 1931 color space
-	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct CieXyz
-	{
-		/// <summary>
-		/// is a mix of cone response curves chosen to be orthogonal to luminance and non-negative
-		/// FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
-		/// </summary>
-		public uint ciexyzX;
-		/// <summary>
-		/// Luminance 
-		/// FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
-		/// </summary>
-		public uint ciexyzY;
-		/// <summary>
-		/// is somewhat equal to blue
-		/// FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
-		/// </summary>
-		public uint ciexyzZ;
+    /// <summary>
+    ///     CIE XYZ 1931 color space
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct CieXyz
+    {
+        /// <summary>
+        ///     is a mix of cone response curves chosen to be orthogonal to luminance and non-negative
+        ///     FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
+        /// </summary>
+        public uint ciexyzX;
 
-		/// <summary>
-		/// Factory for a CieXyz
-		/// </summary>
-		/// <param name="fxPt2Dot30">uint</param>
-		public static CieXyz Create(uint fxPt2Dot30)
-		{
-			return new CieXyz
-			{
-				ciexyzX = fxPt2Dot30,
-				ciexyzY = fxPt2Dot30,
-				ciexyzZ = fxPt2Dot30,
-			};
-		}
-	}
+        /// <summary>
+        ///     Luminance
+        ///     FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
+        /// </summary>
+        public uint ciexyzY;
+
+        /// <summary>
+        ///     is somewhat equal to blue
+        ///     FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
+        /// </summary>
+        public uint ciexyzZ;
+
+        /// <summary>
+        ///     Factory for a CieXyz
+        /// </summary>
+        /// <param name="fxPt2Dot30">uint</param>
+        public static CieXyz Create(uint fxPt2Dot30)
+        {
+            return new CieXyz
+            {
+                ciexyzX = fxPt2Dot30,
+                ciexyzY = fxPt2Dot30,
+                ciexyzZ = fxPt2Dot30
+            };
+        }
+    }
 }

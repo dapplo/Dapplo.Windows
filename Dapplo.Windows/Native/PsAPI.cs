@@ -30,29 +30,29 @@ using System.Text;
 
 namespace Dapplo.Windows.Native
 {
-	/// <summary>
-	///     Description of PsAPI.
-	/// </summary>
-	public class PsAPI
-	{
-		[DllImport("psapi")]
-		private static extern int EmptyWorkingSet(IntPtr hwProc);
+    /// <summary>
+    ///     Description of PsAPI.
+    /// </summary>
+    public class PsAPI
+    {
+        [DllImport("psapi")]
+        private static extern int EmptyWorkingSet(IntPtr hwProc);
 
-		/// <summary>
-		///     Make the process use less memory by emptying the working set
-		/// </summary>
-		public static void EmptyWorkingSet()
-		{
-			using (var currentProcess = Process.GetCurrentProcess())
-			{
-				EmptyWorkingSet(currentProcess.Handle);
-			}
-		}
+        /// <summary>
+        ///     Make the process use less memory by emptying the working set
+        /// </summary>
+        public static void EmptyWorkingSet()
+        {
+            using (var currentProcess = Process.GetCurrentProcess())
+            {
+                EmptyWorkingSet(currentProcess.Handle);
+            }
+        }
 
-		[DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
-		public static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, StringBuilder lpFilename, uint nSize);
+        [DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, StringBuilder lpFilename, uint nSize);
 
-		[DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
-		public static extern uint GetProcessImageFileName(IntPtr hProcess, StringBuilder lpImageFileName, uint nSize);
-	}
+        [DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern uint GetProcessImageFileName(IntPtr hProcess, StringBuilder lpImageFileName, uint nSize);
+    }
 }

@@ -29,47 +29,43 @@ using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Structs
 {
-	/// <summary>
-	/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648381(v=vs.85).aspx"></a>
-	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct CursorInfo
-	{
-		/// <summary>
-		/// Size of the struct
-		/// </summary>
-		private int _cbSize;
-
-		private readonly CursorInfoFlags _flags;
-		private readonly IntPtr _hCursor;
-		private readonly POINT _ptScreenPos;
+    /// <summary>
+    ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648381(v=vs.85).aspx"></a>
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct CursorInfo
+    {
+        /// <summary>
+        ///     Size of the struct
+        /// </summary>
+        private int _cbSize;
 
 
-		/// <summary>
-		/// The cursor state, as CursorInfoFlags
-		/// </summary>
-		public CursorInfoFlags Flags => _flags;
+        /// <summary>
+        ///     The cursor state, as CursorInfoFlags
+        /// </summary>
+        public CursorInfoFlags Flags { get; }
 
-		/// <summary>
-		/// Handle (IntPtr) to the Cursor
-		/// </summary>
-		public IntPtr CursorHandle => _hCursor;
+        /// <summary>
+        ///     Handle (IntPtr) to the Cursor
+        /// </summary>
+        public IntPtr CursorHandle { get; }
 
-		/// <summary>
-		/// A structure that receives the screen coordinates of the cursor.
-		/// </summary>
-		public POINT Location => _ptScreenPos;
+        /// <summary>
+        ///     A structure that receives the screen coordinates of the cursor.
+        /// </summary>
+        public POINT Location { get; }
 
-		/// <summary>
-		/// Factory for the structure
-		/// </summary>
-		public static CursorInfo Create()
-		{
-			var result = new CursorInfo
-			{
-				_cbSize = Marshal.SizeOf(typeof(CursorInfo))
-			};
-			return result;
-		}
-	}
+        /// <summary>
+        ///     Factory for the structure
+        /// </summary>
+        public static CursorInfo Create()
+        {
+            var result = new CursorInfo
+            {
+                _cbSize = Marshal.SizeOf(typeof(CursorInfo))
+            };
+            return result;
+        }
+    }
 }

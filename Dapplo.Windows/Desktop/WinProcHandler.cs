@@ -32,84 +32,86 @@ using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Desktop
 {
-	/// <summary>
-	///     This can be used to handle WinProc messages, for instance when there is no running winproc
-	/// </summary>
-	public class WinProcHandler
-	{
-		/// <summary>
-		/// To create a message-only window, specify HWndMessage as the parent of the window
-		/// </summary>
-		public static readonly IntPtr HwndMessage = new IntPtr(-3);
+    /// <summary>
+    ///     This can be used to handle WinProc messages, for instance when there is no running winproc
+    /// </summary>
+    public class WinProcHandler
+    {
+        /// <summary>
+        ///     To create a message-only window, specify HWndMessage as the parent of the window
+        /// </summary>
+        public static readonly IntPtr HwndMessage = new IntPtr(-3);
 
-		private static readonly LogSource Log = new LogSource();
-		/// <summary>
-		///     Hold the singeton
-		/// </summary>
-		private static readonly Lazy<WinProcHandler> Singleton = new Lazy<WinProcHandler>(() => new WinProcHandler());
+        private static readonly LogSource Log = new LogSource();
 
-		/// <summary>
-		///     Store hooks, so they can be removed
-		/// </summary>
-		private readonly IList<HwndSourceHook> _hooks = new List<HwndSourceHook>();
+        /// <summary>
+        ///     Hold the singeton
+        /// </summary>
+        private static readonly Lazy<WinProcHandler> Singleton = new Lazy<WinProcHandler>(() => new WinProcHandler());
 
-		/// <summary>
-		///     Special HwndSource which is only there for handling messages
-		/// </summary>
-		private readonly HwndSource _hwndSource = new HwndSource(new HwndSourceParameters {
-			ParentWindow = HwndMessage,
-			Width = 0,
-			Height = 0,
-			PositionX = 0,
-			PositionY = 0,
-			AcquireHwndFocusInMenuMode = false,
-			ExtendedWindowStyle = (int)ExtendedWindowStyleFlags.WS_NONE,
-			WindowStyle = (int)WindowStyleFlags.WS_OVERLAPPED,
-			WindowClassStyle = 0,
-			WindowName = "Dapplo.Windows"
-		});
+        /// <summary>
+        ///     Store hooks, so they can be removed
+        /// </summary>
+        private readonly IList<HwndSourceHook> _hooks = new List<HwndSourceHook>();
 
-		/// <summary>
-		///     Singleton instance of the WinProcHandler
-		/// </summary>
-		public static WinProcHandler Instance => Singleton.Value;
+        /// <summary>
+        ///     Special HwndSource which is only there for handling messages
+        /// </summary>
+        private readonly HwndSource _hwndSource = new HwndSource(new HwndSourceParameters
+        {
+            ParentWindow = HwndMessage,
+            Width = 0,
+            Height = 0,
+            PositionX = 0,
+            PositionY = 0,
+            AcquireHwndFocusInMenuMode = false,
+            ExtendedWindowStyle = (int) ExtendedWindowStyleFlags.WS_NONE,
+            WindowStyle = (int) WindowStyleFlags.WS_OVERLAPPED,
+            WindowClassStyle = 0,
+            WindowName = "Dapplo.Windows"
+        });
 
-		/// <summary>
-		/// The actual handle for the HwndSource
-		/// </summary>
-		public IntPtr Handle => _hwndSource.Handle;
+        /// <summary>
+        ///     The actual handle for the HwndSource
+        /// </summary>
+        public IntPtr Handle => _hwndSource.Handle;
 
-		/// <summary>
-		///     Add a hook to handle messages
-		/// </summary>
-		/// <param name="hook">HwndSourceHook</param>
-		public void AddHook(HwndSourceHook hook)
-		{
-			Log.Verbose().WriteLine("Adding a hook to handle messages.");
-			_hwndSource.AddHook(hook);
-			_hooks.Add(hook);
-		}
+        /// <summary>
+        ///     Singleton instance of the WinProcHandler
+        /// </summary>
+        public static WinProcHandler Instance => Singleton.Value;
 
-		/// <summary>
-		///     Unregister a hook
-		/// </summary>
-		/// <param name="hook">HwndSourceHook</param>
-		public void RemoveHook(HwndSourceHook hook)
-		{
-			Log.Verbose().WriteLine("Removing a hook to handle messages.");
-			_hwndSource.RemoveHook(hook);
-			_hooks.Remove(hook);
-		}
+        /// <summary>
+        ///     Add a hook to handle messages
+        /// </summary>
+        /// <param name="hook">HwndSourceHook</param>
+        public void AddHook(HwndSourceHook hook)
+        {
+            Log.Verbose().WriteLine("Adding a hook to handle messages.");
+            _hwndSource.AddHook(hook);
+            _hooks.Add(hook);
+        }
 
-		/// <summary>
-		///     Remove all current hooks
-		/// </summary>
-		public void RemoveHooks()
-		{
-			foreach (var hwndSourceHook in _hooks.ToList())
-			{
-				RemoveHook(hwndSourceHook);
-			}
-		}
-	}
+        /// <summary>
+        ///     Unregister a hook
+        /// </summary>
+        /// <param name="hook">HwndSourceHook</param>
+        public void RemoveHook(HwndSourceHook hook)
+        {
+            Log.Verbose().WriteLine("Removing a hook to handle messages.");
+            _hwndSource.RemoveHook(hook);
+            _hooks.Remove(hook);
+        }
+
+        /// <summary>
+        ///     Remove all current hooks
+        /// </summary>
+        public void RemoveHooks()
+        {
+            foreach (var hwndSourceHook in _hooks.ToList())
+            {
+                RemoveHook(hwndSourceHook);
+            }
+        }
+    }
 }

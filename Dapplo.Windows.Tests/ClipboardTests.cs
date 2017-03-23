@@ -21,47 +21,47 @@
 
 #region using
 
+using System;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Clipboard;
 using Xunit;
 using Xunit.Abstractions;
-using System;
 
 #endregion
 
 namespace Dapplo.Windows.Tests
 {
-	public class ClipboardTests
-	{
-		private static readonly LogSource Log = new LogSource();
+    public class ClipboardTests
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		public ClipboardTests(ITestOutputHelper testOutputHelper)
-		{
-			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-		}
+        public ClipboardTests(ITestOutputHelper testOutputHelper)
+        {
+            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
 
-		/// <summary>
-		///     Test monitoring the clipboard
-		/// </summary>
-		/// <returns></returns>
-		//[WpfFact]
-		private async Task TestClipboardMonitor()
-		{
-			bool hasNewContent = false;
-			var subscription = ClipboardMonitor.ClipboardUpdateEvents.Subscribe(args =>
-			{
-				Log.Debug().WriteLine("Detected change {0}", string.Join(",", args.Formats));
-				hasNewContent = true;
-			});
+        /// <summary>
+        ///     Test monitoring the clipboard
+        /// </summary>
+        /// <returns></returns>
+        //[WpfFact]
+        private async Task TestClipboardMonitor()
+        {
+            bool hasNewContent = false;
+            var subscription = ClipboardMonitor.ClipboardUpdateEvents.Subscribe(args =>
+            {
+                Log.Debug().WriteLine("Detected change {0}", string.Join(",", args.Formats));
+                hasNewContent = true;
+            });
 
-			System.Windows.Clipboard.SetText("Dapplo.Windows.Tests.ClipboardTests");
-			await Task.Delay(1000);
-			subscription.Dispose();
+            System.Windows.Clipboard.SetText("Dapplo.Windows.Tests.ClipboardTests");
+            await Task.Delay(1000);
+            subscription.Dispose();
 
-			// Doesn't work!!
-			Assert.True(hasNewContent);
-		}
-	}
+            // Doesn't work!!
+            Assert.True(hasNewContent);
+        }
+    }
 }

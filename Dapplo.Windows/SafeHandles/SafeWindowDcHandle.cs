@@ -32,58 +32,58 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Dapplo.Windows.SafeHandles
 {
-	/// <summary>
-	///     A WindowDC SafeHandle implementation
-	/// </summary>
-	public class SafeWindowDcHandle : SafeHandleZeroOrMinusOneIsInvalid
-	{
-		private readonly IntPtr _hWnd;
+    /// <summary>
+    ///     A WindowDC SafeHandle implementation
+    /// </summary>
+    public class SafeWindowDcHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+        private readonly IntPtr _hWnd;
 
-		/// <summary>
-		///     Default constructor is needed to support marshalling!!
-		/// </summary>
-		[SecurityCritical]
-		public SafeWindowDcHandle() : base(true)
-		{
-		}
+        /// <summary>
+        ///     Default constructor is needed to support marshalling!!
+        /// </summary>
+        [SecurityCritical]
+        public SafeWindowDcHandle() : base(true)
+        {
+        }
 
-		/// <summary>
-		///     Create a SafeWindowDcHandle for an existing handöe
-		/// </summary>
-		/// <param name="hWnd">IntPtr for the window</param>
-		/// <param name="existingDcHandle">IntPtr to the DC</param>
-		[SecurityCritical]
-		public SafeWindowDcHandle(IntPtr hWnd, IntPtr existingDcHandle) : base(true)
-		{
-			_hWnd = hWnd;
-			SetHandle(existingDcHandle);
-		}
+        /// <summary>
+        ///     Create a SafeWindowDcHandle for an existing handöe
+        /// </summary>
+        /// <param name="hWnd">IntPtr for the window</param>
+        /// <param name="existingDcHandle">IntPtr to the DC</param>
+        [SecurityCritical]
+        public SafeWindowDcHandle(IntPtr hWnd, IntPtr existingDcHandle) : base(true)
+        {
+            _hWnd = hWnd;
+            SetHandle(existingDcHandle);
+        }
 
-		/// <summary>
-		/// </summary>
-		/// <returns></returns>
-		public static SafeWindowDcHandle FromDesktop()
-		{
-			var hWndDesktop = User32.GetDesktopWindow();
-			var hDcDesktop = GetWindowDC(hWndDesktop);
-			return new SafeWindowDcHandle(hWndDesktop, hDcDesktop);
-		}
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        public static SafeWindowDcHandle FromDesktop()
+        {
+            var hWndDesktop = User32.GetDesktopWindow();
+            var hDcDesktop = GetWindowDC(hWndDesktop);
+            return new SafeWindowDcHandle(hWndDesktop, hDcDesktop);
+        }
 
-		[DllImport("user32", SetLastError = true)]
-		private static extern IntPtr GetWindowDC(IntPtr hWnd);
+        [DllImport("user32", SetLastError = true)]
+        private static extern IntPtr GetWindowDC(IntPtr hWnd);
 
-		[DllImport("user32", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		private static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDc);
+        [DllImport("user32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDc);
 
-		/// <summary>
-		///     ReleaseDC for the original Window
-		/// </summary>
-		/// <returns>true if this worked</returns>
-		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
-		protected override bool ReleaseHandle()
-		{
-			return ReleaseDC(_hWnd, handle);
-		}
-	}
+        /// <summary>
+        ///     ReleaseDC for the original Window
+        /// </summary>
+        /// <returns>true if this worked</returns>
+        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+        protected override bool ReleaseHandle()
+        {
+            return ReleaseDC(_hWnd, handle);
+        }
+    }
 }

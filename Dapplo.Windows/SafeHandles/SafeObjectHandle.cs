@@ -29,30 +29,30 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Dapplo.Windows.SafeHandles
 {
-	/// <summary>
-	///     Abstract class SafeObjectHandle which contains all handles that are cleaned with DeleteObject
-	/// </summary>
-	public abstract class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
-	{
-		/// <summary>
-		///     Create SafeObjectHandle
-		/// </summary>
-		/// <param name="ownsHandle">True if the class owns the handle</param>
-		protected SafeObjectHandle(bool ownsHandle) : base(ownsHandle)
-		{
-		}
+    /// <summary>
+    ///     Abstract class SafeObjectHandle which contains all handles that are cleaned with DeleteObject
+    /// </summary>
+    public abstract class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+        /// <summary>
+        ///     Create SafeObjectHandle
+        /// </summary>
+        /// <param name="ownsHandle">True if the class owns the handle</param>
+        protected SafeObjectHandle(bool ownsHandle) : base(ownsHandle)
+        {
+        }
 
-		[DllImport("gdi32", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		private static extern bool DeleteObject(IntPtr hObject);
+        [DllImport("gdi32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool DeleteObject(IntPtr hObject);
 
-		/// <summary>
-		///     Call DeleteObject
-		/// </summary>
-		/// <returns>true if this worked</returns>
-		protected override bool ReleaseHandle()
-		{
-			return DeleteObject(handle);
-		}
-	}
+        /// <summary>
+        ///     Call DeleteObject
+        /// </summary>
+        /// <returns>true if this worked</returns>
+        protected override bool ReleaseHandle()
+        {
+            return DeleteObject(handle);
+        }
+    }
 }

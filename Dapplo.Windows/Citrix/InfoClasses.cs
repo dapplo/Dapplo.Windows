@@ -21,122 +21,149 @@
 
 namespace Dapplo.Windows.Citrix
 {
-	/// <summary>
-	/// Type of information to be retrieved from the specified session via the WFQuerySessionInformation call.
-	/// </summary>
-	public enum InfoClasses
-	{
-		/// <summary>
-		/// WFVersion OSVERSIONINFO
-		/// </summary>
-		Version,
-		/// <summary>
-		/// WFInitialProgram NULL-terminated string
-		/// </summary>
-		InitialProgram,
-		/// <summary>
-		/// WFWorkingDirectory NULL-terminated string
-		/// </summary>
-		WorkingDirectory,
-		/// <summary>
-		/// WFOEMId NULL-terminated string
-		/// </summary>
-		OemId,
-		/// <summary>
-		/// WFSessionId ULONG = unsigned long
-		/// </summary>
-		SessionId,
-		/// <summary>
-		/// WFUserName NULL-terminated string
-		/// </summary>
-		UserName,
-		/// <summary>
-		/// WFWinStationName NULL-terminated string
-		/// </summary>
-		WinStationName,
-		/// <summary>
-		/// WFDomainName NULL-terminated string
-		/// </summary>
-		DomainName,
-		/// <summary>
-		/// WFConnectState INT
-		/// </summary>
-		ConnectState,
-		/// <summary>
-		/// WFClientBuildNumber USHORT
-		/// </summary>
-		ClientBuildNumber,
-		/// <summary>
-		/// WFClientName NULL-terminated string
-		/// </summary>
-		ClientName,
-		/// <summary>
-		/// WFClientDirectory NULL-terminated string
-		/// </summary>
-		ClientDirectory,
-		/// <summary>
-		/// WFClientProductId USHORT
-		/// </summary>
-		ClientProductId,
-		/// <summary>
-		/// WFClientHardwareId
-		/// </summary>
-		ClientHardwareId,
-		/// <summary>
-		/// WFClientAddress WF_CLIENT_ADDRESS
-		/// </summary>
-		ClientAddress,
-		/// <summary>
-		/// WFClientDisplay WF_CLIENT_DISPLAY
-		/// </summary>
-		ClientDisplay,
-		/// <summary>
-		/// WFClientCache WF_CLIENT_CACHE
-		/// </summary>
-		ClientCache,
-		/// <summary>
-		/// WFClientDrives WF_CLIENT_DRIVES
-		/// </summary>
-		ClientDrives,
-		/// <summary>
-		/// WFICABufferLength ULONG
-		/// </summary>
-		IcaBufferLength,
-		/// <summary>
-		/// WFLicenseEnabler
-		/// </summary>
-		LicenseEnabler,
-		/// <summary>
-		/// Reserved
-		/// </summary>
-		Reserved,
-		/// <summary>
-		/// WFApplicationName NULL-terminated string
-		/// </summary>
-		ApplicationName,
-		/// <summary>
-		/// WFVersionEx
-		/// </summary>
-		VersionEx,
-		/// <summary>
-		/// WFClientInfo WF_CLIENT_INFO
-		/// </summary>
-		ClientInfo,
-		/// <summary>
-		/// WFUserInfo WF_USER_INFO
-		/// </summary>
-		UserInfo,
-		/// <summary>
-		/// WFAppInfo WF_APP_INFO
-		/// </summary>
-		AppInfo,
-		/// <summary>
-		/// WFClientLatency WF_CLIENT_LATENCY
-		/// </summary>
-		ClientLatency,
-		/// <summary>
-		/// WFSessionTime WF_SESSION_TIME
-		/// </summary>
-		SessionTime
-	}
+    /// <summary>
+    ///     Type of information to be retrieved from the specified session via the WFQuerySessionInformation call.
+    /// </summary>
+    public enum InfoClasses
+    {
+        /// <summary>
+        ///     WFVersion OSVERSIONINFO
+        /// </summary>
+        Version,
+
+        /// <summary>
+        ///     WFInitialProgram NULL-terminated string
+        /// </summary>
+        InitialProgram,
+
+        /// <summary>
+        ///     WFWorkingDirectory NULL-terminated string
+        /// </summary>
+        WorkingDirectory,
+
+        /// <summary>
+        ///     WFOEMId NULL-terminated string
+        /// </summary>
+        OemId,
+
+        /// <summary>
+        ///     WFSessionId ULONG = unsigned long
+        /// </summary>
+        SessionId,
+
+        /// <summary>
+        ///     WFUserName NULL-terminated string
+        /// </summary>
+        UserName,
+
+        /// <summary>
+        ///     WFWinStationName NULL-terminated string
+        /// </summary>
+        WinStationName,
+
+        /// <summary>
+        ///     WFDomainName NULL-terminated string
+        /// </summary>
+        DomainName,
+
+        /// <summary>
+        ///     WFConnectState INT
+        /// </summary>
+        ConnectState,
+
+        /// <summary>
+        ///     WFClientBuildNumber USHORT
+        /// </summary>
+        ClientBuildNumber,
+
+        /// <summary>
+        ///     WFClientName NULL-terminated string
+        /// </summary>
+        ClientName,
+
+        /// <summary>
+        ///     WFClientDirectory NULL-terminated string
+        /// </summary>
+        ClientDirectory,
+
+        /// <summary>
+        ///     WFClientProductId USHORT
+        /// </summary>
+        ClientProductId,
+
+        /// <summary>
+        ///     WFClientHardwareId
+        /// </summary>
+        ClientHardwareId,
+
+        /// <summary>
+        ///     WFClientAddress WF_CLIENT_ADDRESS
+        /// </summary>
+        ClientAddress,
+
+        /// <summary>
+        ///     WFClientDisplay WF_CLIENT_DISPLAY
+        /// </summary>
+        ClientDisplay,
+
+        /// <summary>
+        ///     WFClientCache WF_CLIENT_CACHE
+        /// </summary>
+        ClientCache,
+
+        /// <summary>
+        ///     WFClientDrives WF_CLIENT_DRIVES
+        /// </summary>
+        ClientDrives,
+
+        /// <summary>
+        ///     WFICABufferLength ULONG
+        /// </summary>
+        IcaBufferLength,
+
+        /// <summary>
+        ///     WFLicenseEnabler
+        /// </summary>
+        LicenseEnabler,
+
+        /// <summary>
+        ///     Reserved
+        /// </summary>
+        Reserved,
+
+        /// <summary>
+        ///     WFApplicationName NULL-terminated string
+        /// </summary>
+        ApplicationName,
+
+        /// <summary>
+        ///     WFVersionEx
+        /// </summary>
+        VersionEx,
+
+        /// <summary>
+        ///     WFClientInfo WF_CLIENT_INFO
+        /// </summary>
+        ClientInfo,
+
+        /// <summary>
+        ///     WFUserInfo WF_USER_INFO
+        /// </summary>
+        UserInfo,
+
+        /// <summary>
+        ///     WFAppInfo WF_APP_INFO
+        /// </summary>
+        AppInfo,
+
+        /// <summary>
+        ///     WFClientLatency WF_CLIENT_LATENCY
+        /// </summary>
+        ClientLatency,
+
+        /// <summary>
+        ///     WFSessionTime WF_SESSION_TIME
+        /// </summary>
+        SessionTime
+    }
 }

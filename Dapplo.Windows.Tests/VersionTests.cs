@@ -21,12 +21,8 @@
 
 #region using
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
 using Xunit;

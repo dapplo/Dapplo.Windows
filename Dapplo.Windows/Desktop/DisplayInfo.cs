@@ -32,90 +32,90 @@ using Dapplo.Windows.Structs;
 
 namespace Dapplo.Windows.Desktop
 {
-	/// <summary>
-	///     The DisplayInfo class is like the Screen class, only not cached.
-	/// </summary>
-	public class DisplayInfo
-	{
-		/// <summary>
-		///     Screen bounds
-		/// </summary>
-		public RECT Bounds { get; set; }
+    /// <summary>
+    ///     The DisplayInfo class is like the Screen class, only not cached.
+    /// </summary>
+    public class DisplayInfo
+    {
+        /// <summary>
+        ///     Screen bounds
+        /// </summary>
+        public RECT Bounds { get; set; }
 
-		/// <summary>
-		///     Bounds as Rectangle
-		/// </summary>
-		public RECT BoundsRectangle { get; set; }
+        /// <summary>
+        ///     Bounds as Rectangle
+        /// </summary>
+        public RECT BoundsRectangle { get; set; }
 
-		/// <summary>
-		///     Device name
-		/// </summary>
-		public string DeviceName { get; set; }
+        /// <summary>
+        ///     Device name
+        /// </summary>
+        public string DeviceName { get; set; }
 
-		/// <summary>
-		///     Is this the primary monitor
-		/// </summary>
-		public bool IsPrimary { get; set; }
+        /// <summary>
+        ///     Is this the primary monitor
+        /// </summary>
+        public bool IsPrimary { get; set; }
 
-		/// <summary>
-		///     Height of  the screen
-		/// </summary>
-		public int ScreenHeight { get; set; }
+        /// <summary>
+        ///     Height of  the screen
+        /// </summary>
+        public int ScreenHeight { get; set; }
 
-		/// <summary>
-		///     Width of the screen
-		/// </summary>
-		public int ScreenWidth { get; set; }
+        /// <summary>
+        ///     Width of the screen
+        /// </summary>
+        public int ScreenWidth { get; set; }
 
-		/// <summary>
-		///     Desktop working area
-		/// </summary>
-		public RECT WorkingArea { get; set; }
+        /// <summary>
+        ///     Desktop working area
+        /// </summary>
+        public RECT WorkingArea { get; set; }
 
-		/// <summary>
-		///     Desktop working area as Rectangle
-		/// </summary>
-		public Rectangle WorkingAreaRectangle { get; set; }
+        /// <summary>
+        ///     Desktop working area as Rectangle
+        /// </summary>
+        public Rectangle WorkingAreaRectangle { get; set; }
 
-		/// <summary>
-		///     Get the bounds of the complete screen
-		/// </summary>
-		/// <returns></returns>
-		public static RECT GetAllScreenBounds()
-		{
-			int left = 0, top = 0, bottom = 0, right = 0;
-			foreach (var display in User32.AllDisplays())
-			{
-				left = Math.Min(left, display.Bounds.X);
-				top = Math.Min(top, display.Bounds.Y);
-				var screenAbsRight = display.Bounds.X + display.Bounds.Width;
-				var screenAbsBottom = display.Bounds.Y + display.Bounds.Height;
-				right = Math.Max(right, screenAbsRight);
-				bottom = Math.Max(bottom, screenAbsBottom);
-			}
-			return new RECT(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
-		}
+        /// <summary>
+        ///     Get the bounds of the complete screen
+        /// </summary>
+        /// <returns></returns>
+        public static RECT GetAllScreenBounds()
+        {
+            int left = 0, top = 0, bottom = 0, right = 0;
+            foreach (var display in User32.AllDisplays())
+            {
+                left = Math.Min(left, display.Bounds.X);
+                top = Math.Min(top, display.Bounds.Y);
+                var screenAbsRight = display.Bounds.X + display.Bounds.Width;
+                var screenAbsBottom = display.Bounds.Y + display.Bounds.Height;
+                right = Math.Max(right, screenAbsRight);
+                bottom = Math.Max(bottom, screenAbsBottom);
+            }
+            return new RECT(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
+        }
 
-		/// <summary>
-		///     Implementation like <a href="https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx">Screen.GetBounds</a>
-		/// </summary>
-		/// <param name="point"></param>
-		/// <returns></returns>
-		public static RECT GetBounds(POINT point)
-		{
-			DisplayInfo returnValue = null;
-			foreach (var display in User32.AllDisplays())
-			{
-				if (display.IsPrimary && returnValue == null)
-				{
-					returnValue = display;
-				}
-				if (display.Bounds.Contains(point))
-				{
-					returnValue = display;
-				}
-			}
-			return returnValue?.Bounds ?? Rect.Empty;
-		}
-	}
+        /// <summary>
+        ///     Implementation like <a href="https://msdn.microsoft.com/en-us/library/6d7ws9s4(v=vs.110).aspx">Screen.GetBounds</a>
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static RECT GetBounds(POINT point)
+        {
+            DisplayInfo returnValue = null;
+            foreach (var display in User32.AllDisplays())
+            {
+                if (display.IsPrimary && returnValue == null)
+                {
+                    returnValue = display;
+                }
+                if (display.Bounds.Contains(point))
+                {
+                    returnValue = display;
+                }
+            }
+            return returnValue?.Bounds ?? Rect.Empty;
+        }
+    }
 }

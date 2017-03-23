@@ -29,41 +29,39 @@ using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Structs
 {
-	/// <summary>
-	///     The structure for the TITLEBARINFOEX
-	///     See
-	///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969233(v=vs.85).aspx">TITLEBARINFOEX struct</a>
-	/// </summary>
-	[Serializable]
-	[StructLayout(LayoutKind.Sequential)]
-	public struct TitleBarInfoEx
-	{
-		/// <summary>
-		///     The size of the structure, in bytes.
-		///     The caller must set this member to sizeof(TITLEBARINFOEX).
-		/// </summary>
-		private uint _cbSize;
+    /// <summary>
+    ///     The structure for the TITLEBARINFOEX
+    ///     See
+    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969233(v=vs.85).aspx">TITLEBARINFOEX struct</a>
+    /// </summary>
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public struct TitleBarInfoEx
+    {
+        /// <summary>
+        ///     The size of the structure, in bytes.
+        ///     The caller must set this member to sizeof(TITLEBARINFOEX).
+        /// </summary>
+        private uint _cbSize;
 
-		private RECT _rcTitleBar;
+        private RECT _rcTitleBar;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
-		private ObjectStates[] _rgState;
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
-		private RECT[] _rgRect;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)] private ObjectStates[] _rgState;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)] private RECT[] _rgRect;
 
 
-		/// <summary>
-		///     Factory method for a default TitleBarInfoEx.
-		/// </summary>
-		public static TitleBarInfoEx Create()
-		{
-			return new TitleBarInfoEx
-			{
-				_cbSize = (uint) Marshal.SizeOf(typeof(TitleBarInfoEx)),
-				_rgState = new ObjectStates[6],
-				_rgRect = new RECT[6],
-				_rcTitleBar = RECT.Empty
-			};
-		}
-	}
+        /// <summary>
+        ///     Factory method for a default TitleBarInfoEx.
+        /// </summary>
+        public static TitleBarInfoEx Create()
+        {
+            return new TitleBarInfoEx
+            {
+                _cbSize = (uint) Marshal.SizeOf(typeof(TitleBarInfoEx)),
+                _rgState = new ObjectStates[6],
+                _rgRect = new RECT[6],
+                _rcTitleBar = RECT.Empty
+            };
+        }
+    }
 }
