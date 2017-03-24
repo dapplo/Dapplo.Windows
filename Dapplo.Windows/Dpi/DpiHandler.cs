@@ -272,7 +272,7 @@ namespace Dapplo.Windows.Dpi
         /// <returns>bool</returns>
         [DllImport("shcore", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool EnableNonClientDpiScaling(IntPtr hWnd);
+        public static extern bool EnableNonClientDpiScaling(IntPtr hWnd);
 
         //[DllImport("shcore")]
         //private static extern int SetProcessDpiAwareness(DpiAwareness value);
