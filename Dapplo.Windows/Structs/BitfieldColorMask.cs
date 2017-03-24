@@ -27,42 +27,58 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Structs
 {
-    /// <summary>
-    ///     Specify the color mask when the BITMAPINFOHEADER structure biCompression uses BI_BITFIELDS
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct BitfieldColorMask
-    {
-        /// <summary>
-        ///     Blue component of the mask
-        /// </summary>
-        public uint Blue { get; set; }
+	/// <summary>
+	/// Specify the color mask when the BITMAPINFOHEADER structure biCompression uses BI_BITFIELDS
+	/// </summary>
+	[StructLayout(LayoutKind.Sequential)]
+	public struct BitfieldColorMask
+	{
+		private uint _blue;
+		private uint _green;
+		private uint _red;
 
-        /// <summary>
-        ///     Green component of the mask
-        /// </summary>
-        public uint Green { get; set; }
+		/// <summary>
+		/// Blue component of the mask
+		/// </summary>
+		public uint Blue
+		{
+			get { return _blue; }
+			set { _blue = value; }
+		}
 
-        /// <summary>
-        ///     Red component of the mask
-        /// </summary>
-        public uint Red { get; set; }
+		/// <summary>
+		/// Green component of the mask
+		/// </summary>
+		public uint Green
+		{
+			get { return _green; }
+			set { _green = value; }
+		}
+
+		/// <summary>
+		/// Red component of the mask
+		/// </summary>
+		public uint Red
+		{
+			get { return _red; }
+			set { _red = value; }
+		}
 
 
-        /// <summary>
-        ///     Create with BitfieldColorMask defaults
-        /// </summary>
-        /// <param name="r">byte value for Red component of the mask</param>
-        /// <param name="g">byte value for Green component of the mask</param>
-        /// <param name="b">byte value for Blue component of the mask</param>
-        public static BitfieldColorMask Create(byte r = 255, byte g = 255, byte b = 255)
-        {
-            return new BitfieldColorMask
-            {
-                Red = (uint) r << 8,
-                Green = (uint) g << 16,
-                Blue = (uint) b << 24
-            };
-        }
-    }
+		/// <summary>
+		/// Create with BitfieldColorMask defaults
+		/// </summary>
+		/// <param name="r">byte value for Red component of the mask</param>
+		/// <param name="g">byte value for Green component of the mask</param>
+		/// <param name="b">byte value for Blue component of the mask</param>
+		public static BitfieldColorMask Create(byte r = 255, byte g = 255, byte b = 255)
+		{
+			return new BitfieldColorMask
+			{
+				Red = (uint) r << 8,
+				Green = (uint) g << 16,
+				Blue = (uint) b << 24
+			};
+		}
+	}
 }

@@ -29,96 +29,103 @@ using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Structs
 {
-    /// <summary>
-    ///     The structure for the WINDOWINFO
-    ///     See <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms632610.aspx">WINDOWINFO struct</a>
-    /// </summary>
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public struct WindowInfo
-    {
-        /// <summary>
-        ///     The size of the structure, in bytes. The caller must set this member to sizeof(WINDOWINFO).
-        /// </summary>
-        private uint _cbSize;
+	/// <summary>
+	///     The structure for the WINDOWINFO
+	///     See <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms632610.aspx">WINDOWINFO struct</a>
+	/// </summary>
+	[Serializable, StructLayout(LayoutKind.Sequential)]
+	public struct WindowInfo
+	{
+		/// <summary>
+		/// The size of the structure, in bytes. The caller must set this member to sizeof(WINDOWINFO).
+		/// </summary>
+		private uint _cbSize;
+		private RECT _rcWindow;
+		private readonly RECT _rcClient;
+		private readonly WindowStyleFlags _dwStyle;
+		private readonly ExtendedWindowStyleFlags _dwExStyle;
+		/// <summary>
+		/// The window status. If this member is WS_ACTIVECAPTION (0x0001), the window is active. Otherwise, this member is zero.
+		/// </summary>
+		private readonly uint _dwWindowStatus;
 
-        private RECT _rcWindow;
+		/// <summary>
+		/// The width of the window border, in pixels.
+		/// </summary>
+		private readonly uint _cxWindowBorders;
+		/// <summary>
+		/// The height of the window border, in pixels.
+		/// </summary>
+		private uint _cyWindowBorders;
 
-        /// <summary>
-        ///     The window status. If this member is WS_ACTIVECAPTION (0x0001), the window is active. Otherwise, this member is
-        ///     zero.
-        /// </summary>
-        private readonly uint _dwWindowStatus;
+		private ushort _atomWindowType;
+		private ushort _wCreatorVersion;
 
-        /// <summary>
-        ///     The width of the window border, in pixels.
-        /// </summary>
-        private readonly uint _cxWindowBorders;
+		/// <summary>
+		/// Test if the window is active
+		/// </summary>
+		public bool IsActive => _dwWindowStatus == 1;
 
-        /// <summary>
-        ///     The height of the window border, in pixels.
-        /// </summary>
-        private readonly uint _cyWindowBorders;
+		/// <summary>
+		/// The coordinates of the window.
+		/// </summary>
+		public RECT Bounds
+		{
+			get
+			{
+				return _rcWindow;
+			}
+			set
+			{
+				_rcWindow = value;
+			}
+		}
 
-        /// <summary>
-        ///     Test if the window is active
-        /// </summary>
-        public bool IsActive => _dwWindowStatus == 1;
+		/// <summary>
+		/// The coordinates of the client area.
+		/// </summary>
+		public RECT ClientBounds => _rcClient;
 
-        /// <summary>
-        ///     The coordinates of the window.
-        /// </summary>
-        public RECT Bounds
-        {
-            get { return _rcWindow; }
-            set { _rcWindow = value; }
-        }
+		/// <summary>
+		/// The window styles.
+		/// </summary>
+		public WindowStyleFlags Style => _dwStyle;
 
-        /// <summary>
-        ///     The coordinates of the client area.
-        /// </summary>
-        public RECT ClientBounds { get; }
+		/// <summary>
+		/// The extended window styles. 
+		/// </summary>
+		public ExtendedWindowStyleFlags ExtendedStyle => _dwExStyle;
 
-        /// <summary>
-        ///     The window styles.
-        /// </summary>
-        public WindowStyleFlags Style { get; }
+		/// <summary>
+		/// The size of the border
+		/// </summary>
+		public SIZE BorderSize => new SIZE((int) _cxWindowBorders,(int) _cyWindowBorders);
 
-        /// <summary>
-        ///     The extended window styles.
-        /// </summary>
-        public ExtendedWindowStyleFlags ExtendedStyle { get; }
+		/// <summary>
+		/// The Windows version of the application that created the window.
+		/// </summary>
+		public ushort CreatorVersion => _wCreatorVersion;
 
-        /// <summary>
-        ///     The size of the border
-        /// </summary>
-        public SIZE BorderSize => new SIZE((int) _cxWindowBorders, (int) _cyWindowBorders);
+		/// <summary>
+		/// The window class atom.
+		/// </summary>
+		public ushort AtomWindowType => _atomWindowType;
 
-        /// <summary>
-        ///     The Windows version of the application that created the window.
-        /// </summary>
-        public ushort CreatorVersion { get; }
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"{{IsActive: {IsActive}; Bounds: {Bounds}; ClientBounds: {ClientBounds}; Style: {Style}; ExtendedStyle: {ExtendedStyle}; BorderSize: {BorderSize};}}";
+		}
 
-        /// <summary>
-        ///     The window class atom.
-        /// </summary>
-        public ushort AtomWindowType { get; }
-
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            return $"{{IsActive: {IsActive}; Bounds: {Bounds}; ClientBounds: {ClientBounds}; Style: {Style}; ExtendedStyle: {ExtendedStyle}; BorderSize: {BorderSize};}}";
-        }
-
-        /// <summary>
-        ///     Factory method for a default WindowInfo.
-        /// </summary>
-        public static WindowInfo Create()
-        {
-            return new WindowInfo
-            {
-                _cbSize = (uint) Marshal.SizeOf(typeof(WindowInfo))
-            };
-        }
-    }
+		/// <summary>
+		///     Factory method for a default WindowInfo.
+		/// </summary>
+		public static WindowInfo Create()
+		{
+			return new WindowInfo
+			{
+				_cbSize = (uint) Marshal.SizeOf(typeof(WindowInfo))
+			};
+		}
+	}
 }

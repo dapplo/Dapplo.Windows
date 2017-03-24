@@ -101,10 +101,10 @@ namespace Dapplo.Windows.Mouse.Native
         private static POINT RemapLocation(POINT location)
         {
             var bounds = DisplayInfo.GetAllScreenBounds();
-	        if (bounds.Width * bounds.Height == 0)
-	        {
-		        return location;
-	        }
+            if (bounds.Width * bounds.Height == 0)
+            {
+                return location;
+            }
             return new POINT(location.X * (65535 / bounds.Width), location.Y * (65535 / bounds.Height));
         }
 
