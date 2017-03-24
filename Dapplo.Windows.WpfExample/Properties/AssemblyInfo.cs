@@ -32,11 +32,11 @@ using System.Windows;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("Dapplo.Windows.WpfExample")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("An example for WPF")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.Windows.WpfExample")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCopyright("Copyright © Dapplo 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

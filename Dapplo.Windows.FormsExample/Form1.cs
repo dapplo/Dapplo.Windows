@@ -34,21 +34,19 @@ using Dapplo.Windows.Dpi;
 
 namespace Dapplo.Windows.FormsExample
 {
-    public partial class Form1 : Form
+    public partial class Form1 : DpiAwareForm
     {
         private static readonly LogSource Log = new LogSource();
-        protected readonly DpiHandler FormDpiHandler;
         protected readonly BitmapScaleHandler<string> ScaleHandler;
 
         public Form1()
         {
             InitializeComponent();
-            // Add the Dapplo.Windows DPI change handler
-            FormDpiHandler = this.HandleFormDpiChanges();
-            ScaleHandler = BitmapScaleHandler.WithComponentResourceManager(FormDpiHandler, GetType(), (bitmap, dpi) => ScaleIconForDisplaying(bitmap, dpi));
+
+            ScaleHandler = BitmapScaleHandler.WithComponentResourceManager(DpiHandler, GetType(), (bitmap, dpi) => ScaleIconForDisplaying(bitmap, dpi));
 
             // This takes care or setting the size of the images in the context menu
-            FormDpiHandler.OnDpiChanged.Subscribe(dpi =>
+            DpiHandler.OnDpiChanged.Subscribe(dpi =>
             {
                 var width = DpiHandler.ScaleWithDpi(20, dpi);
                 var size = new Size(width, width);
@@ -79,6 +77,11 @@ namespace Dapplo.Windows.FormsExample
                 Log.Info().WriteLine("{0} - {1}", args.SystemParametersInfoAction, args.Area);
                 MessageBox.Show(this, $"{args.SystemParametersInfoAction} - {args.Area}", "Change!");
             });
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
         }
 
         /// <summary>

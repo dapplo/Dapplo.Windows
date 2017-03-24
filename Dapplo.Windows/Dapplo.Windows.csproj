@@ -83,6 +83,9 @@
     <Compile Include="Desktop\EnvironmentMonitor.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
     <Compile Include="Dpi\BitmapScaleHandler.cs" />
+    <Compile Include="Dpi\DpiAwareForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Dpi\DpiHandler.cs" />
     <Compile Include="Desktop\IInteropWindow.cs" />
     <Compile Include="Desktop\InteropWindowFactory.cs" />

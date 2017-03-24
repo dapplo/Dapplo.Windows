@@ -1,8 +1,5 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Interop;
+﻿using System.Windows;
 using Dapplo.Windows.Dpi;
-using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.WpfExample
 {
@@ -14,7 +11,7 @@ namespace Dapplo.Windows.WpfExample
         public MainWindow()
         {
             InitializeComponent();
-            this.HandleWpfDpiChanges();
+            this.AttachWindowDpiHandler();
         }
     }
 }

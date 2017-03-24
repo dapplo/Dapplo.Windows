@@ -22,7 +22,6 @@
 #region using
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
@@ -37,12 +36,8 @@ using Dapplo.Windows.Structs;
 namespace Dapplo.Windows.Dpi
 {
     /// <summary>
-    ///     This handles DPI changes
-    ///     see u.a.
-    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn469266(v=vs.85).aspx">
-    ///         Writing DPI-Aware Desktop
-    ///         and Win32 Applications
-    ///     </a>
+    ///     This handles DPI changes see u.a.
+    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn469266(v=vs.85).aspx">Writing DPI-Aware Desktop and Win32 Applications</a>
     /// </summary>
     public class DpiHandler : IDisposable
     {
@@ -58,9 +53,21 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         public DpiHandler()
         {
-            if (!IsDpiAware)
+            if (IsDpiAware)
+            {
+                // Nothing to do
+                return;
+            }
+            // Can we enable the DpiAwareness?
+            if (!WindowsVersion.IsWindows81OrLater)
             {
                 Log.Verbose().WriteLine("The DPI handler will only do one initial Dpi change event, on Window creation, when the DPI settings are different from the default.");
+                return;
+            }
+            // Try setting the DpiAwareness
+            if (!SetProcessDpiAwareness(DpiAwareness.PerMonitorAware).Succeeded())
+            {
+                Log.Warn().WriteLine("Couldn't enable Dpi Awareness.");
             }
         }
 
@@ -87,7 +94,7 @@ namespace Dapplo.Windows.Dpi
                     DpiAwareness dpiAwareness;
                     GetProcessDpiAwareness(process.Handle, out dpiAwareness);
                     Log.Verbose().WriteLine("Process {0} has a Dpi awareness {1}", process.ProcessName, dpiAwareness);
-                    return dpiAwareness == DpiAwareness.PerMonitorAware || dpiAwareness == DpiAwareness.SystemAware;
+                    return dpiAwareness != DpiAwareness.Unaware && dpiAwareness != DpiAwareness.Invalid;
                 }
             }
         }
@@ -152,12 +159,9 @@ namespace Dapplo.Windows.Dpi
             bool isDpiMessage = false;
             switch (windowsMessage)
             {
+                // Handle the WM_NCCREATE for Forms / controls, for WPF this is done differently
                 case WindowsMessages.WM_NCCREATE:
-                    if (!EnableNonClientDpiScaling(hwnd))
-                    {
-                        var error = Win32.GetLastErrorCode();
-                        Log.Verbose().WriteLine("Error enabling non client dpi scaling : {0}", Win32.GetMessage(error));
-                    }
+                    TryEnableNonClientDpiScaling(hwnd);
                     break;
                 // Handle the WM_CREATE, this is where we can get the DPI via system calls
                 case WindowsMessages.WM_CREATE:
@@ -243,6 +247,27 @@ namespace Dapplo.Windows.Dpi
             return width;
         }
 
+        /// <summary>
+        /// public wrapper for EnableNonClientDpiScaling, this also checks if the function is available.
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <returns>true if it worked</returns>
+        public static bool TryEnableNonClientDpiScaling(IntPtr hWnd)
+        {
+            // EnableNonClientDpiScaling is only available on Windows 10 and later
+            if (!WindowsVersion.IsWindows10OrLater)
+            {
+                return false;
+            }
+            if (EnableNonClientDpiScaling(hWnd))
+            {
+                return true;
+            }
+            var error = Win32.GetLastErrorCode();
+            Log.Verbose().WriteLine("Error enabling non client dpi scaling : {0}", Win32.GetMessage(error));
+            return false;
+        }
+
         #region DllImports
 
         [DllImport("shcore")]
@@ -272,10 +297,16 @@ namespace Dapplo.Windows.Dpi
         /// <returns>bool</returns>
         [DllImport("shcore", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool EnableNonClientDpiScaling(IntPtr hWnd);
+        private static extern bool EnableNonClientDpiScaling(IntPtr hWnd);
 
-        //[DllImport("shcore")]
-        //private static extern int SetProcessDpiAwareness(DpiAwareness value);
+        /// <summary>
+        /// Sets the current process to a specified dots per inch (dpi) awareness level. The DPI awareness levels are from the PROCESS_DPI_AWARENESS enumeration.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn302122(v=vs.85).aspx">SetProcessDpiAwareness function</a>
+        /// </summary>
+        /// <param name="dpiAwareness">DpiAwareness</param>
+        /// <returns>HResult</returns>
+        [DllImport("shcore")]
+        private static extern HResult SetProcessDpiAwareness(DpiAwareness dpiAwareness);
 
         //[DllImport("shcore")]
         //private static extern int GetDpiForSystem();
