@@ -31,11 +31,7 @@ namespace Dapplo.Windows.Structs
 {
     /// <summary>
     ///     See
-    ///     <a
-    ///         href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969500%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">
-    ///         DWM_BLURBEHIND
-    ///         structure
-    ///     </a>
+    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969500(v=vs.85).aspx">DWM_BLURBEHIND structure</a>
     ///     Specifies Desktop Window Manager (DWM) blur-behind properties.
     ///     Used by the DwmEnableBlurBehindWindow function.
     /// </summary>

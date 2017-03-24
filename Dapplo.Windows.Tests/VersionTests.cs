@@ -49,7 +49,7 @@ namespace Dapplo.Windows.Tests
         {
             var osVersionInfoEx = OsVersionInfoEx.Create();
             Assert.True(Kernel32.GetVersionEx(ref osVersionInfoEx));
-            Assert.Equal(6, osVersionInfoEx.MajorVersion);
+            Assert.True(osVersionInfoEx.MajorVersion >= 6);
         }
     }
 }

@@ -41,14 +41,50 @@ namespace Dapplo.Windows.Native
         /// </summary>
         public const uint ATTACHCONSOLE_ATTACHPARENTPROCESS = 0x0ffffffff;
 
+        /// <summary>
+        /// Allocates a new console for the calling process.
+        /// </summary>
+        /// <returns></returns>
         [DllImport("kernel32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool AllocConsole();
 
+        /// <summary>
+        /// Attaches the calling process to the console of the specified process.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms681944(v=vs.85).aspx">AllocConsole function</a>
+        /// </summary>
+        /// <param name="dwProcessId">The identifier of the process whose console is to be used. Or -1 to use the console of the parent of the current process.</param>
+        /// <returns></returns>
         [DllImport("kernel32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool AttachConsole(uint dwProcessId);
 
+        /// <summary>
+        /// Closes an open object handle.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx">CloseHandle function</a>
+        /// The CloseHandle function closes handles to the following win32 objects:
+        ///  * Access token
+        ///  * Communications device
+        ///  * Console input
+        ///  * Console screen buffer
+        ///  * Event
+        ///  * File
+        ///  * File mapping
+        ///  * I/O completion port
+        ///  * Job
+        ///  * Mailslot
+        ///  * Memory resource notification
+        ///  * Mutex
+        ///  * Named pipe
+        ///  * Pipe
+        ///  * Process
+        ///  * Semaphore
+        ///  * Thread
+        ///  * Transaction
+        ///  * Waitable timer
+        /// </summary>
+        /// <param name="hObject">A valid handle to an open object.</param>
+        /// <returns>true if it worked, use GetLastError if not</returns>
         [DllImport("kernel32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseHandle(IntPtr hObject);
@@ -57,6 +93,7 @@ namespace Dapplo.Windows.Native
         ///     Frees the loaded dynamic-link library (DLL) module and, if necessary, decrements its reference count.
         ///     When the reference count reaches zero, the module is unloaded from the address space of the calling process and the
         ///     handle is no longer valid.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms683152(v=vs.85).aspx">FreeLibrary function</a>
         /// </summary>
         /// <param name="module">IntPtr</param>
         /// <returns>true if it worked, false if an error occured</returns>
@@ -64,6 +101,15 @@ namespace Dapplo.Windows.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool FreeLibrary(IntPtr module);
 
+        /// <summary>
+        /// Retrieves a module handle for the specified module. The module must have been loaded by the calling process.
+        /// To avoid the race conditions described in the Remarks section, use the GetModuleHandleEx function.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms683199(v=vs.85).aspx">GetModuleHandle function</a>
+        /// </summary>
+        /// <param name="lpModuleName">The name of the loaded module (either a .dll or .exe file). If the file name extension is omitted, the default library extension .dll is appended. The file name string can include a trailing point character (.) to indicate that the module name has no extension. The string does not have to specify a path. When specifying a path, be sure to use backslashes (\), not forward slashes (/). The name is compared (case independently) to the names of modules currently mapped into the address space of the calling process.
+        /// If this parameter is NULL, GetModuleHandle returns a handle to the file used to create the calling process (.exe file).
+        /// The GetModuleHandle function does not retrieve handles for modules that were loaded using the LOAD_LIBRARY_AS_DATAFILE flag. For more information, see LoadLibraryEx.</param>
+        /// <returns>If the function succeeds, the return value is a handle to the specified module.</returns>
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr GetModuleHandle(string lpModuleName);
 
