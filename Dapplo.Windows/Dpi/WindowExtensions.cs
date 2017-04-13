@@ -48,19 +48,22 @@ namespace Dapplo.Windows.Dpi
             // The SourceInitialized event is actually called when this event happens.
             window.SourceInitialized += (sender, args) =>
             {
-                DpiHandler.TryEnableNonClientDpiScaling(windowInteropHelper.EnsureHandle());
+                DpiHandler.TryEnableNonClientDpiScaling(windowInteropHelper.Handle);
+
+                // Get the HwndSource for the window, this works very early in the process by calling EnsureHandle (which creates the handle)
+                var hwndSource = HwndSource.FromHwnd(windowInteropHelper.Handle);
+                if (hwndSource == null)
+                {
+                    throw new NotSupportedException("No HwndSource available, although EnsureHandle was called?");
+                }
+                hwndSource.AddHook(dpiHandler.HandleMessages);
+                dpiHandler.MessageHandler = hwndSource;
+                // Add the layout transform action
+                dpiHandler.OnDpiChanged.Subscribe(dpi => window.UpdateLayoutTransform(dpi / DpiHandler.DefaultScreenDpi));
+                // Apply scaling
+                window.UpdateLayoutTransform(DpiHandler.GetDpi(windowInteropHelper.Handle) / DpiHandler.DefaultScreenDpi);
             };
 
-            // Get the HwndSource for the window, this works very early in the process by calling EnsureHandle (which creates the handle)
-            var hwndSource = HwndSource.FromHwnd(windowInteropHelper.EnsureHandle());
-            if (hwndSource == null)
-            {
-                throw new NotSupportedException("No HwndSource available, although EnsureHandle was called?");
-            }
-            hwndSource.AddHook(dpiHandler.HandleMessages);
-            dpiHandler.MessageHandler = hwndSource;
-            // Add the layout transform action
-            dpiHandler.OnDpiChanged.Subscribe(dpi => window.UpdateLayoutTransform(dpi / DpiHandler.DefaultScreenDpi));
         }
 
         /// <summary>
@@ -70,10 +73,6 @@ namespace Dapplo.Windows.Dpi
         /// <returns>DpiHandler</returns>
         public static DpiHandler AttachWindowDpiHandler(this Window window)
         {
-            if (!DpiHandler.IsDpiAware)
-            {
-                return null;
-            }
             var dpiHandler = new DpiHandler();
             AttachWindowDpiHandler(window, dpiHandler);
 

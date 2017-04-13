@@ -38,11 +38,9 @@ namespace Dapplo.Windows.FormsExample
     {
         private static readonly LogSource Log = new LogSource();
         protected readonly BitmapScaleHandler<string> ScaleHandler;
-
         public Form1()
         {
             InitializeComponent();
-
             ScaleHandler = BitmapScaleHandler.WithComponentResourceManager(DpiHandler, GetType(), (bitmap, dpi) => ScaleIconForDisplaying(bitmap, dpi));
 
             // This takes care or setting the size of the images in the context menu

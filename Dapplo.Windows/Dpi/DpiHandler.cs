@@ -53,22 +53,7 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         public DpiHandler()
         {
-            if (IsDpiAware)
-            {
-                // Nothing to do
-                return;
-            }
-            // Can we enable the DpiAwareness?
-            if (!WindowsVersion.IsWindows81OrLater)
-            {
-                Log.Verbose().WriteLine("The DPI handler will only do one initial Dpi change event, on Window creation, when the DPI settings are different from the default.");
-                return;
-            }
-            // Try setting the DpiAwareness
-            if (!SetProcessDpiAwareness(DpiAwareness.PerMonitorAware).Succeeded())
-            {
-                Log.Warn().WriteLine("Couldn't enable Dpi Awareness.");
-            }
+            EnableDpiAwareness();
         }
 
         /// <summary>
@@ -76,6 +61,31 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         public double Dpi { get; private set; }
 
+        /// <summary>
+        /// Turn on the Dpi awareness
+        /// </summary>
+        /// <returns>bool if this is enabled</returns>
+        public static bool EnableDpiAwareness()
+        {
+            if (IsDpiAware)
+            {
+                // Nothing to do
+                return true;
+            }
+            // Can we enable the DpiAwareness?
+            if (!WindowsVersion.IsWindows81OrLater)
+            {
+                Log.Verbose().WriteLine("The DPI handler will only do one initial Dpi change event, on Window creation, when the DPI settings are different from the default.");
+                return false;
+            }
+            // Try setting the DpiAwareness
+            if (!SetProcessDpiAwareness(DpiAwareness.PerMonitorAware).Succeeded())
+            {
+                Log.Warn().WriteLine("Couldn't enable Dpi Awareness.");
+                return false;
+            }
+            return true;
+        }
         /// <summary>
         ///     Check if the process is DPI Aware, an DpiHandler doesn't make sense if not.
         /// </summary>
@@ -116,11 +126,13 @@ namespace Dapplo.Windows.Dpi
         /// <returns>dpi value</returns>
         public static int GetDpi(IntPtr hWnd)
         {
+            // Use the easiest method, but this only works for Windows 10
             if (WindowsVersion.IsWindows10OrLater)
             {
                 return GetDpiForWindow(hWnd);
             }
 
+            // Use the second easiest method, but this only works for Windows 8.1 or later
             if (WindowsVersion.IsWindows81OrLater)
             {
                 var hMonitor = User32.MonitorFromWindow(hWnd, MonitorFromFlags.DefaultToNearest);
@@ -259,7 +271,8 @@ namespace Dapplo.Windows.Dpi
             {
                 return false;
             }
-            if (EnableNonClientDpiScaling(hWnd))
+            var result = EnableNonClientDpiScaling(hWnd);
+            if (result.Succeeded())
             {
                 return true;
             }
@@ -295,9 +308,8 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         /// <param name="hWnd">IntPtr</param>
         /// <returns>bool</returns>
-        [DllImport("shcore", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool EnableNonClientDpiScaling(IntPtr hWnd);
+        [DllImport("user32", SetLastError = true)]
+        private static extern HResult EnableNonClientDpiScaling(IntPtr hWnd);
 
         /// <summary>
         /// Sets the current process to a specified dots per inch (dpi) awareness level. The DPI awareness levels are from the PROCESS_DPI_AWARENESS enumeration.

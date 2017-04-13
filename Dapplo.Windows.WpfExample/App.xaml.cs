@@ -22,6 +22,7 @@
 #region using
 
 using System.Windows;
+using Dapplo.Windows.Dpi;
 
 #endregion
 
@@ -32,5 +33,10 @@ namespace Dapplo.Windows.WpfExample
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            DpiHandler.EnableDpiAwareness();
+        }
     }
 }
