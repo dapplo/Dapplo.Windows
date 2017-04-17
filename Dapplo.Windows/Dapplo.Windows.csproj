@@ -70,12 +70,6 @@
     <Compile Include="App\AppQuery.cs" />
     <Compile Include="App\IAppVisibility.cs" />
     <Compile Include="App\MonitorAppVisibility.cs" />
-    <Compile Include="Citrix\ClientDisplay.cs" />
-    <Compile Include="Citrix\ClientAddress.cs" />
-    <Compile Include="Citrix\EventMask.cs" />
-    <Compile Include="Citrix\ConnectStates.cs" />
-    <Compile Include="Citrix\InfoClasses.cs" />
-    <Compile Include="Citrix\WinFrame.cs" />
     <Compile Include="Clipboard\ClipboardMonitor.cs" />
     <Compile Include="Clipboard\ClipboardUpdateEventArgs.cs" />
     <Compile Include="Clipboard\StandardClipboardFormats.cs" />
@@ -224,9 +218,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Citrix\QuerySessionStructs.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

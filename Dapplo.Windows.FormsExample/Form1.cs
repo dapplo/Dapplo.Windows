@@ -26,7 +26,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using Dapplo.Log;
-using Dapplo.Windows.Citrix;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Dpi;
 
@@ -54,21 +53,6 @@ namespace Dapplo.Windows.FormsExample
 
             ScaleHandler.AddTarget(somethingMenuItem, "somethingMenuItem.Image");
             ScaleHandler.AddTarget(something2MenuItem, "something2MenuItem.Image");
-
-            if (WinFrame.IsAvailabe)
-            {
-                try
-                {
-                    var clientDisplay = WinFrame.QuerySessionInformation<ClientDisplay>(InfoClasses.ClientDisplay);
-                    var clientName = WinFrame.QuerySessionInformation(InfoClasses.ClientName);
-                    MessageBox.Show($"Client {clientName} has {clientDisplay.ClientSize.Width}x{clientDisplay.ClientSize.Height} with {clientDisplay.ColorDepth} colors.",
-                        "Citrix detected");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Citrix error");
-                }
-            }
 
             EnvironmentMonitor.EnvironmentUpdateEvents.Subscribe(args =>
             {
