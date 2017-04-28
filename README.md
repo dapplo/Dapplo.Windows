@@ -18,6 +18,10 @@ The following functionality is available:
 * A lot of the native structs and enums
 ... more
 
+# Dapplo.WinMessages
+Has all the Windows Messages defined for some of the projects in the solution, so if someone uses part of the functionality not everything is included.
+
+# Dapplo.Clipboard
 In Dapplo.Clipboard specialized code for using the Windows clipboard is place.
 This is currently being developed and far from ready, it should provide a flexible and fluent API to use the Clipboard.
 Currently there is already a simplified monitor, using System.Reactive, build in which allows you to subscribe to changes:

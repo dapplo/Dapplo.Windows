@@ -56,7 +56,7 @@
     <Compile Include="StandardClipboardFormats.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapplo.WindowsMessages\Dapplo.WinMessages.csproj">
+    <ProjectReference Include="..\Dapplo.WinMessages\Dapplo.WinMessages.csproj">
       <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
       <Name>Dapplo.WinMessages</Name>
     </ProjectReference>
