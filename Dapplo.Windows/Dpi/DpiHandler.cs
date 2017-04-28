@@ -30,6 +30,7 @@ using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.SafeHandles;
 using Dapplo.Windows.Structs;
+using Dapplo.WinMessages;
 
 #endregion
 

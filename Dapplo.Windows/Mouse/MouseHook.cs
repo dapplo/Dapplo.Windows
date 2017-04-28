@@ -27,6 +27,7 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Mouse.Native;
+using Dapplo.WinMessages;
 
 #endregion
 

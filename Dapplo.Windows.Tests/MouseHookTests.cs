@@ -29,6 +29,7 @@ using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Mouse;
 using Xunit.Abstractions;
+using Dapplo.WinMessages;
 
 #endregion
 

@@ -24,13 +24,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Windows.Interop;
 using Dapplo.Log;
-using Dapplo.Windows.Enums;
 
 #endregion
 
-namespace Dapplo.Windows.Desktop
+namespace Dapplo.WinMessages
 {
     /// <summary>
     ///     This can be used to handle WinProc messages, for instance when there is no running winproc
@@ -65,8 +65,8 @@ namespace Dapplo.Windows.Desktop
             PositionX = 0,
             PositionY = 0,
             AcquireHwndFocusInMenuMode = false,
-            ExtendedWindowStyle = (int) ExtendedWindowStyleFlags.WS_NONE,
-            WindowStyle = (int) WindowStyleFlags.WS_OVERLAPPED,
+            ExtendedWindowStyle = 0, // ExtendedWindowStyleFlags.WS_NONE
+            WindowStyle = 0, // WindowStyleFlags.WS_OVERLAPPED
             WindowClassStyle = 0,
             WindowName = "Dapplo.Windows"
         });
@@ -82,21 +82,23 @@ namespace Dapplo.Windows.Desktop
         public static WinProcHandler Instance => Singleton.Value;
 
         /// <summary>
-        ///     Add a hook to handle messages
+        ///     Subscribe a hook to handle messages
         /// </summary>
         /// <param name="hook">HwndSourceHook</param>
-        public void AddHook(HwndSourceHook hook)
+        /// <returns>IDisposable which unsubscribes the hook when Dispose is called</returns>
+        public IDisposable Subscribe(HwndSourceHook hook)
         {
             Log.Verbose().WriteLine("Adding a hook to handle messages.");
             _hwndSource.AddHook(hook);
             _hooks.Add(hook);
+            return Disposable.Create(() => { Unsubscribe(hook); });
         }
 
         /// <summary>
-        ///     Unregister a hook
+        ///     Unsubscribe a hook
         /// </summary>
         /// <param name="hook">HwndSourceHook</param>
-        public void RemoveHook(HwndSourceHook hook)
+        private void Unsubscribe(HwndSourceHook hook)
         {
             Log.Verbose().WriteLine("Removing a hook to handle messages.");
             _hwndSource.RemoveHook(hook);
@@ -104,13 +106,13 @@ namespace Dapplo.Windows.Desktop
         }
 
         /// <summary>
-        ///     Remove all current hooks
+        ///     Unsubscribe all current hooks
         /// </summary>
-        public void RemoveHooks()
+        public void UnsubscribeAllHooks()
         {
             foreach (var hwndSourceHook in _hooks.ToList())
             {
-                RemoveHook(hwndSourceHook);
+                Unsubscribe(hwndSourceHook);
             }
         }
     }

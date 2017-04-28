@@ -117,6 +117,10 @@
       <Project>{8d836859-871a-446f-889f-1ac015e14738}</Project>
       <Name>Dapplo.Clipboard</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dapplo.WindowsMessages\Dapplo.WinMessages.csproj">
+      <Project>{DE471F22-E095-4B11-9702-8306D69B32CA}</Project>
+      <Name>Dapplo.WinMessages</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
       <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>
       <Name>Dapplo.Windows</Name>

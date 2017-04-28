@@ -207,14 +207,18 @@
     <Compile Include="Structs\WinEventInfo.cs" />
     <Compile Include="Desktop\WindowScroller.cs" />
     <Compile Include="Desktop\WinEventHook.cs" />
-    <Compile Include="Enums\WindowsMessages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsVersion.cs" />
-    <Compile Include="Desktop\WinProcHandler.cs" />
     <Compile Include="Dpi\WindowExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.WindowsMessages\Dapplo.WinMessages.csproj">
+      <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
+      <Name>Dapplo.WinMessages</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

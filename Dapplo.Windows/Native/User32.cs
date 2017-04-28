@@ -34,6 +34,7 @@ using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.SafeHandles;
 using Dapplo.Windows.Structs;
+using Dapplo.WinMessages;
 
 #endregion
 

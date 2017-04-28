@@ -22,11 +22,11 @@
 #region using
 
 using System;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using Dapplo.Windows.Enums;
+using Dapplo.WinMessages;
 
 #endregion
 
@@ -58,16 +58,16 @@ namespace Dapplo.Windows.Desktop
                     HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
                     {
                         var windowsMessage = (WindowsMessages) msg;
-                        if (windowsMessage == WindowsMessages.WM_SETTINGCHANGE)
+                        if (windowsMessage != WindowsMessages.WM_SETTINGCHANGE)
                         {
-                            var action = (SystemParametersInfoActions) wParam.ToInt32();
-                            var area = Marshal.PtrToStringAuto(lParam);
-                            observer.OnNext(EnvironmentChangedEventArgs.Create(action, area));
+                            return IntPtr.Zero;
                         }
+                        var action = (SystemParametersInfoActions) wParam.ToInt32();
+                        var area = Marshal.PtrToStringAuto(lParam);
+                        observer.OnNext(EnvironmentChangedEventArgs.Create(action, area));
                         return IntPtr.Zero;
                     };
-                    WinProcHandler.Instance.AddHook(winProcHandler);
-                    return Disposable.Create(() => { WinProcHandler.Instance.RemoveHook(winProcHandler); });
+                    return WinProcHandler.Instance.Subscribe(winProcHandler);
                 })
                 .Publish()
                 .RefCount();

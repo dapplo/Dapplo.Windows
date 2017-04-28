@@ -27,8 +27,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Enums;
+using Dapplo.WinMessages;
 
 #endregion
 
@@ -69,7 +68,7 @@ namespace Dapplo.Clipboard
 
                         return IntPtr.Zero;
                     };
-                    WinProcHandler.Instance.AddHook(winProcHandler);
+                    var hookSubscription = WinProcHandler.Instance.Subscribe(winProcHandler);
                     if (!AddClipboardFormatListener(WinProcHandler.Instance.Handle))
                     {
                         observer.OnError(new Win32Exception());
@@ -77,7 +76,7 @@ namespace Dapplo.Clipboard
                     return Disposable.Create(() =>
                     {
                         RemoveClipboardFormatListener(WinProcHandler.Instance.Handle);
-                        WinProcHandler.Instance.RemoveHook(winProcHandler);
+                        hookSubscription.Dispose();
                     });
                 })
                 .Publish()

@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
@@ -57,13 +58,13 @@ namespace Dapplo.Windows.Desktop
                     WinEventDelegate winEventDelegate = (eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime) => { observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime)); };
 
                     var hookPtr = SetWinEventHook(winEventStart, winEventEnd ?? winEventStart, IntPtr.Zero, winEventDelegate, process, thread, WinEventHookFlags.OutOfContext);
-                    // Store to keep a reference to it, otherwise it's GC'ed
-                    Delegates[hookPtr] = winEventDelegate;
                     if (hookPtr == IntPtr.Zero)
                     {
-                        observer.OnError(new Exception("Can't hook"));
+                        observer.OnError(new Win32Exception("Can't hook."));
                         return Disposable.Empty;
                     }
+                    // Store to keep a reference to it, otherwise it's GC'ed
+                    Delegates[hookPtr] = winEventDelegate;
 
                     return Disposable.Create(() =>
                     {
@@ -116,7 +117,7 @@ namespace Dapplo.Windows.Desktop
         /// </param>
         /// <param name="winEventHookFlags">WinEventHookFlags</param>
         /// <returns>IntPtr with the hook id</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport("user32")]
         private static extern IntPtr SetWinEventHook(WinEvents eventMin, WinEvents eventMax, IntPtr hmodWinEventProc, WinEventDelegate eventProc, int idProcess, int idThread, WinEventHookFlags winEventHookFlags);
 
         /// <summary>

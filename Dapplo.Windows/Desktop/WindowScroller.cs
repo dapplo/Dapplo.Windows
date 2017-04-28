@@ -27,6 +27,7 @@ using Dapplo.Windows.Enums;
 using Dapplo.Windows.Keyboard.Native;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
+using Dapplo.WinMessages;
 using Microsoft.Win32;
 
 #endregion
