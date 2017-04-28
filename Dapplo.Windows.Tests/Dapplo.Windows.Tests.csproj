@@ -113,6 +113,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Clipboard\Dapplo.Clipboard.csproj">
+      <Project>{8d836859-871a-446f-889f-1ac015e14738}</Project>
+      <Name>Dapplo.Clipboard</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
       <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>
       <Name>Dapplo.Windows</Name>

@@ -22,10 +22,12 @@
 #region using
 
 using System;
+using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Clipboard;
+using Dapplo.Clipboard;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -47,21 +49,35 @@ namespace Dapplo.Windows.Tests
         /// </summary>
         /// <returns></returns>
         //[WpfFact]
-        private async Task TestClipboardMonitor()
+        public async Task TestClipboardMonitor()
         {
+            const string testString = "Dapplo.Windows.Tests.ClipboardTests";
             bool hasNewContent = false;
-            var subscription = ClipboardMonitor.ClipboardUpdateEvents.Subscribe(args =>
+            var subscription = ClipboardMonitor.ClipboardUpdateEvents.Where(args => args.Formats.Contains("MyFormat")).Subscribe(args =>
             {
                 Log.Debug().WriteLine("Detected change {0}", string.Join(",", args.Formats));
                 hasNewContent = true;
             });
 
-            System.Windows.Clipboard.SetText("Dapplo.Windows.Tests.ClipboardTests");
+            ClipboardStore.Put(testString);
             await Task.Delay(1000);
             subscription.Dispose();
 
-            // Doesn't work!!
+            // Doesn't work on AppVeyor!!
             Assert.True(hasNewContent);
+        }
+
+        /// <summary>
+        ///     Test monitoring the clipboard
+        /// </summary>
+        /// <returns></returns>
+        //[WpfFact]
+        public async Task TestClipboardStore()
+        {
+            const string testString = "Dapplo.Windows.Tests.ClipboardTests";
+            ClipboardStore.Put(testString);
+            await Task.Delay(1000);
+            Assert.Equal(testString,ClipboardStore.GetText());
         }
     }
 }

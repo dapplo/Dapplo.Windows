@@ -27,15 +27,14 @@ using System.Linq;
 
 #endregion
 
-namespace Dapplo.Windows.Clipboard
+namespace Dapplo.Clipboard
 {
     /// <summary>
     ///     This event contains the information of clipboard changes
     /// </summary>
     public class ClipboardUpdateEventArgs : EventArgs
     {
-        private readonly IEnumerable<string> _clipboardFormats;
-        private IList<string> _clipboardFormatList;
+        private readonly Lazy<IList<string>> _clipboardFormatList;
 
         /// <summary>
         ///     Constructor for the EventArgs
@@ -43,22 +42,12 @@ namespace Dapplo.Windows.Clipboard
         /// <param name="clipboardFormats">IEnumerable of string</param>
         internal ClipboardUpdateEventArgs(IEnumerable<string> clipboardFormats)
         {
-            _clipboardFormats = clipboardFormats;
+            _clipboardFormatList = new Lazy<IList<string>>(clipboardFormats.ToList);
         }
 
         /// <summary>
         ///     The available formats on the clipboard
         /// </summary>
-        public IEnumerable<string> Formats
-        {
-            get
-            {
-                if (_clipboardFormatList == null)
-                {
-                    _clipboardFormatList = _clipboardFormats.ToList();
-                }
-                return _clipboardFormatList;
-            }
-        }
+        public IEnumerable<string> Formats => _clipboardFormatList.Value;
     }
 }

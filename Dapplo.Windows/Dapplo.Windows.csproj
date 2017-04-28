@@ -70,9 +70,6 @@
     <Compile Include="App\AppQuery.cs" />
     <Compile Include="App\IAppVisibility.cs" />
     <Compile Include="App\MonitorAppVisibility.cs" />
-    <Compile Include="Clipboard\ClipboardMonitor.cs" />
-    <Compile Include="Clipboard\ClipboardUpdateEventArgs.cs" />
-    <Compile Include="Clipboard\StandardClipboardFormats.cs" />
     <Compile Include="Desktop\EnvironmentChangedEventArgs.cs" />
     <Compile Include="Desktop\EnvironmentMonitor.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
