@@ -19,6 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Dapplo.Clipboard
@@ -35,11 +36,13 @@ namespace Dapplo.Clipboard
         ///     Text format. Each line ends with a carriage return/linefeed (CR-LF) combination.A null character signals the end of
         ///     the data.Use this format for ANSI text.
         /// </summary>
+        [Display(Name = "CF_TEXT")]
         Text = 1,
 
         /// <summary>
         ///     A handle to a bitmap (HBITMAP).
         /// </summary>
+        [Display(Name = "CF_BITMAP")]
         Bitmap = 2,
 
         /// <summary>
@@ -47,32 +50,38 @@ namespace Dapplo.Clipboard
         ///     by means of DDE, the application responsible for deleting hMem should also free the metafile referred to by the
         ///     CF_METAFILEPICT handle.
         /// </summary>
+        [Display(Name = "CF_METAFILEPICT")]
         MetafilePicture = 3,
 
         /// <summary>
         ///     Microsoft Symbolic Link (SYLK) format.
         /// </summary>
+        [Display(Name = "CF_SYLK")]
         SymbolicLink = 4,
 
         /// <summary>
         ///     Software Arts' Data Interchange Format.
         /// </summary>
+        [Display(Name = "CF_DIF")]
         DataInterchangeFormat = 5,
 
         /// <summary>
         ///     Tagged-image file format.
         /// </summary>
+        [Display(Name = "CF_TIFF")]
         Tiff = 6,
 
         /// <summary>
         ///     Text format containing characters in the OEM character set. Each line ends with a carriage return/linefeed (CR-LF)
         ///     combination. A null character signals the end of the data.
         /// </summary>
+        [Display(Name = "CF_OEMTEXT")]
         OemText = 7,
 
         /// <summary>
         ///     A memory object containing a BITMAPINFO structure followed by the bitmap bits.
         /// </summary>
+        [Display(Name = "CF_DIB")]
         DeviceIndependentBitmap = 8,
 
         /// <summary>
@@ -84,38 +93,45 @@ namespace Dapplo.Clipboard
         ///     When displaying clipboard data, the clipboard always uses as its current palette any object on the clipboard that
         ///     is in the CF_PALETTE format.
         /// </summary>
+        [Display(Name = "CF_PALETTE")]
         Palette = 9,
 
         /// <summary>
         ///     Data for the pen extensions to the Microsoft Windows for Pen Computing.
         /// </summary>
+        [Display(Name = "CF_PENDATA")]
         PenData = 10,
 
         /// <summary>
         ///     Represents audio data more complex than can be represented in a CF_WAVE standard wave format.
         /// </summary>
+        [Display(Name = "CF_RIFF")]
         Riff = 11,
 
         /// <summary>
         ///     Represents audio data in one of the standard wave formats, such as 11 kHz or 22 kHz PCM.
         /// </summary>
+        [Display(Name = "CF_WAVE")]
         Wave = 12,
 
         /// <summary>
         ///     Unicode text format.Each line ends with a carriage return/linefeed (CR-LF) combination. A null character signals
         ///     the end of the data.
         /// </summary>
+        [Display(Name = "CF_UNICODETEXT")]
         UnicodeText = 13,
 
         /// <summary>
         ///     A handle to an enhanced metafile (HENHMETAFILE).
         /// </summary>
+        [Display(Name = "CF_ENHMETAFILE")]
         EnhancedMetafile = 14,
 
         /// <summary>
         ///     A handle to type HDROP that identifies a list of files. An application can retrieve information about the files by
         ///     passing the handle to the DragQueryFile function.
         /// </summary>
+        [Display(Name = "CF_HDROP")]
         Drop = 15,
 
         /// <summary>
@@ -129,12 +145,14 @@ namespace Dapplo.Clipboard
         ///     The system uses the code page associated with CF_LOCALE to implicitly convert from CF_TEXT to CF_UNICODETEXT.
         ///     Therefore, the correct code page table is used for the conversion.
         /// </summary>
+        [Display(Name = "CF_LOCALE")]
         Locale = 16,
 
         /// <summary>
         ///     A memory object containing a BITMAPV5HEADER structure followed by the bitmap color space information and the bitmap
         ///     bits.
         /// </summary>
+        [Display(Name = "CF_DIBV5")]
         DeviceIndependentBitmapV5 = 17,
 
         /// <summary>
@@ -142,6 +160,7 @@ namespace Dapplo.Clipboard
         ///     WM_ASKCBFORMATNAME, WM_HSCROLLCLIPBOARD, WM_PAINTCLIPBOARD, WM_SIZECLIPBOARD, and WM_VSCROLLCLIPBOARD messages. The
         ///     hMem parameter must be NULL.
         /// </summary>
+        [Display(Name = "CF_OWNERDISPLAY")]
         OwnerDisplay = 0x0080,
 
         /// <summary>
@@ -149,6 +168,7 @@ namespace Dapplo.Clipboard
         ///     The hMem parameter must be a handle to data that can be displayed in text format in lieu of the privately formatted
         ///     data.
         /// </summary>
+        [Display(Name = "CF_DSPTEXT")]
         DisplayText = 0x0081,
 
         /// <summary>
@@ -156,6 +176,7 @@ namespace Dapplo.Clipboard
         ///     The hMem parameter must be a handle to data that can be displayed in bitmap format in lieu of the privately
         ///     formatted data.
         /// </summary>
+        [Display(Name = "CF_DSPBITMAP")]
         DisplayBitmap = 0x0082,
 
         /// <summary>
@@ -163,6 +184,7 @@ namespace Dapplo.Clipboard
         ///     The hMem parameter must be a handle to data that can be displayed in metafile-picture format in lieu of the
         ///     privately formatted data.
         /// </summary>
+        [Display(Name = "CF_DSPMETAFILEPICT")]
         DisplayMetafilePicture = 0x0083,
 
         /// <summary>
@@ -170,6 +192,7 @@ namespace Dapplo.Clipboard
         ///     The hMem parameter must be a handle to data that can be displayed in enhanced metafile format in lieu of the
         ///     privately formatted data.
         /// </summary>
+        [Display(Name = "CF_DSPENHMETAFILE")]
         DisplayEnhancedMetafile = 0x008E,
 
         /// <summary>

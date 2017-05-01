@@ -32,3 +32,13 @@ Currently there is already a simplified monitor, using System.Reactive, build in
 	});
 ```
 This allows you to create simple code which calls you logic if the needed format is available, dispose the subscription when you are ready.
+
+API:
+ClipboardMonitor should publish a ClipboardContents object for every clipboard event.
+The ClipboardContents object will get the formats and content at the first moment these are accessed.
+Need a way to specify the OpenClipboard / CloseClipboard at the rights moments.
+
+GetClipboardData should be used to get the contents, they should be converted to MemoryStreams?
+The information is stored/maintained, until the ClipboardContents object is disposed?
+This could be as soon as the next information is placed on the clipboard.
+

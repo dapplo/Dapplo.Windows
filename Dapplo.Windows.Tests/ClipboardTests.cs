@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -49,17 +50,48 @@ namespace Dapplo.Windows.Tests
         /// </summary>
         /// <returns></returns>
         //[WpfFact]
-        public async Task TestClipboardMonitor()
+        public async Task TestClipboardMonitor_Anything()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var subscription = ClipboardMonitor.OnPasted.Subscribe(clipboard =>
+            {
+                Log.Debug().WriteLine("Formats {0}", string.Join(",", clipboard.Formats));
+                Log.Debug().WriteLine("Owner {0}", clipboard.OwnerHandle);
+                Log.Debug().WriteLine("Sequence {0}", clipboard.Id);
+
+                var stream = clipboard["PNG"];
+                using (var fileStream = File.Create(@"D:\test.png"))
+                {
+                    stream.CopyTo(fileStream);
+                }
+                tcs.TrySetResult(true);
+            });
+
+            await tcs.Task;
+
+            subscription.Dispose();
+
+        }
+
+        /// <summary>
+        ///     Test monitoring the clipboard
+        /// </summary>
+        /// <returns></returns>
+        //[WpfFact]
+        public async Task TestClipboardMonitor_Text()
         {
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
             bool hasNewContent = false;
-            var subscription = ClipboardMonitor.ClipboardUpdateEvents.Where(args => args.Formats.Contains("MyFormat")).Subscribe(args =>
+            var subscription = ClipboardMonitor.OnPasted.Where(clipboard => clipboard.Formats.Contains("CF_TEXT")).Subscribe(clipboard =>
             {
-                Log.Debug().WriteLine("Detected change {0}", string.Join(",", args.Formats));
+                Log.Debug().WriteLine("Detected change {0}", string.Join(",", clipboard.Formats));
+                Log.Debug().WriteLine("Owner {0}", clipboard.OwnerHandle);
+                Log.Debug().WriteLine("Sequence {0}", clipboard.Id);
+
                 hasNewContent = true;
             });
 
-            ClipboardStore.Put(testString);
+            ClipboardNative.Put(testString);
             await Task.Delay(1000);
             subscription.Dispose();
 
@@ -75,9 +107,9 @@ namespace Dapplo.Windows.Tests
         public async Task TestClipboardStore()
         {
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
-            ClipboardStore.Put(testString);
+            ClipboardNative.Put(testString);
             await Task.Delay(1000);
-            Assert.Equal(testString,ClipboardStore.GetText());
+            Assert.Equal(testString,ClipboardNative.GetText());
         }
     }
 }

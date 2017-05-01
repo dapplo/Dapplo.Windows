@@ -21,103 +21,82 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reactive.Disposables;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Dapplo.Clipboard
 {
     /// <summary>
-    /// Provides access to the Windows clipboard
+    /// Content of the Clipboards
     /// </summary>
-    public static class ClipboardStore
+    public sealed class ClipboardContents : IDisposable
     {
+        // Used to identify every clipboard change
+        private static uint _globalSequenceNumber;
+
+        // Contents of the clipboard
+        private readonly IDictionary<string, Lazy<MemoryStream>> _contents = new Dictionary<string, Lazy<MemoryStream>>();
+
         /// <summary>
-        /// Creates a lock on the clipboard and free this when the returned object is disposed.
+        /// A unique ID, given as sequence.
+        /// If this number doesn't match, with the global counter, the clipboard content already changed.
         /// </summary>
-        /// <param name="hWnd">optional IntPtr to the window</param>
-        /// <returns>IDisposable</returns>
-        private static IDisposable LockClipboard(IntPtr hWnd = default(IntPtr))
+        public uint Id { get; }
+
+        /// <summary>
+        /// The handle of the window which owns the clipboard content
+        /// </summary>
+        public IntPtr OwnerHandle { get; }
+
+        /// <summary>
+        /// The formats in this clipboard contents
+        /// </summary>
+        public IEnumerable<string> Formats { get; }
+
+        /// <summary>
+        /// This initializes some properties
+        /// </summary>
+        public ClipboardContents(IntPtr hWnd)
         {
-            if (!OpenClipboard(hWnd))
+            Id = _globalSequenceNumber++;
+            // Try to get the real one.
+            var windowsSequenceNumber = GetClipboardSequenceNumber();
+            if (windowsSequenceNumber > 0)
             {
-                throw new Win32Exception();
+                Id = windowsSequenceNumber;
             }
-            return Disposable.Create(() => CloseClipboard());
+            OwnerHandle = GetClipboardOwner();
+
+            Formats = ClipboardNative.AvailableFormats(hWnd).ToList();
+
+            // Create Lazy for all available formats.
+            foreach (var format in Formats)
+            {
+                _contents[format] = new Lazy<MemoryStream>(() =>
+                {
+                    using (ClipboardNative.ClipboardLock.Lock(hWnd))
+                    {
+                        return ClipboardNative.GetContent(format);
+                    }
+                });
+            }
         }
 
         /// <summary>
-        /// Place string on the clipboard
+        /// Returns the content for a format
         /// </summary>
-        /// <param name="hWnd">IntPtr with the handle which wants to access the clipboard</param>
-        /// <param name="text">string to place on the clipboard</param>
-        public static void Put(string text, IntPtr hWnd = default(IntPtr))
-        {
-            var hText = IntPtr.Zero;
-            try
-            {
-                using (LockClipboard(hWnd))
-                {
-                    hText = Marshal.StringToHGlobalUni(text);
-                    SetClipboardData(StandardClipboardFormats.UnicodeText, hText);
-                }
-            }
-            finally
-            {
-                if (hText != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(hText);
-                }
-                CloseClipboard();
-            }
-        }
+        /// <param name="format"></param>
+        /// <returns>MemoryStream</returns>
+        public MemoryStream this[string format] => _contents[format].Value;
 
         /// <summary>
-        /// Place string on the clipboard
+        /// Dispose all content
         /// </summary>
-        /// <param name="hWnd">IntPtr with the handle which wants to access the clipboard</param>
-        /// <returns>string</returns>
-        public static string GetText(IntPtr hWnd = default(IntPtr))
+        public void Dispose()
         {
-            using (LockClipboard(hWnd))
-            {
-                var hText = GetClipboardData(StandardClipboardFormats.UnicodeText);
-                return Marshal.PtrToStringUni(hText);
-            }
-        }
-
-        /// <summary>
-        ///     Enumerate through all formats on the clipboard
-        /// </summary>
-        /// <param name="hWnd">IntPtr with the handle which wants to access the clipboard</param>
-        /// <returns>IEnumerable with strings defining the format</returns>
-        public static IEnumerable<string> AvailableFormats(IntPtr hWnd)
-        {
-            using (LockClipboard(hWnd))
-            {
-                uint clipboardId = 0;
-                var clipboardFormatName = new StringBuilder(256);
-                do
-                {
-                    clipboardId = EnumClipboardFormats(clipboardId);
-                    if (clipboardId == 0)
-                    {
-                        continue;
-                    }
-                    if (Enum.IsDefined(typeof(StandardClipboardFormats), clipboardId))
-                    {
-                        var clipboardFormat = (StandardClipboardFormats)clipboardId;
-                        yield return clipboardFormat.ToString();
-                    }
-                    else
-                    {
-                        clipboardFormatName.Length = 0;
-                        GetClipboardFormatName(clipboardId, clipboardFormatName, clipboardFormatName.Capacity);
-                        yield return clipboardFormatName.ToString();
-                    }
-                } while (clipboardId != 0);
-            }
+            
         }
 
         #region Native methods
@@ -150,6 +129,20 @@ namespace Dapplo.Clipboard
         private static extern IntPtr GetClipboardData(uint format);
 
         /// <summary>
+        /// Returns the hWnd of the owner of the clipboard content
+        /// </summary>
+        /// <returns>IntPtr with a hWnd</returns>
+        [DllImport("user32", SetLastError = true)]
+        private static extern IntPtr GetClipboardOwner();
+
+        /// <summary>
+        /// Retrieves the sequence number of the clipboard
+        /// </summary>
+        /// <returns>sequence number or 0 if this cannot be retrieved</returns>
+        [DllImport("user32", SetLastError = true)]
+        private static extern uint GetClipboardSequenceNumber();
+
+        /// <summary>
         /// Retrieves data from the clipboard in a specified format. The clipboard must have been opened previously.
         /// </summary>
         /// <param name="format">StandardClipboardFormats with the clipboard format.</param>
@@ -178,23 +171,6 @@ namespace Dapplo.Clipboard
         /// <returns></returns>
         [DllImport("user32", SetLastError = true)]
         private static extern IntPtr SetClipboardData(StandardClipboardFormats format, IntPtr memory);
-
-        /// <summary>
-        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649048(v=vs.85).aspx"></a>
-        ///     Opens the clipboard for examination and prevents other applications from modifying the clipboard content.
-        /// </summary>
-        /// <param name="hWndNewOwner">IntPtr with the hWnd of the new owner. If this parameter is NULL, the open clipboard is associated with the current task.</param>
-        /// <returns>true if the clipboard is opened</returns>
-        [DllImport("user32", SetLastError = true)]
-        private static extern bool OpenClipboard(IntPtr hWndNewOwner);
-
-        /// <summary>
-        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649048(v=vs.85).aspx"></a>
-        ///     Opens the clipboard for examination and prevents other applications from modifying the clipboard content.
-        /// </summary>
-        /// <returns>true if the clipboard is closed</returns>
-        [DllImport("user32", SetLastError = true)]
-        private static extern bool CloseClipboard();
 
         /// <summary>
         ///     See

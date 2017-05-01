@@ -46,15 +46,19 @@ namespace Dapplo.Clipboard
         /// <summary>
         ///     Used to store the observable
         /// </summary>
-        private readonly IObservable<ClipboardUpdateEventArgs> _clipboardObservable;
+        private readonly IObservable<ClipboardContents> _clipboardObservable;
+
+        // This maintains the sequence
+        private uint _previousSequence = uint.MaxValue;
 
         /// <summary>
         ///     Private constructor to create the observable
         /// </summary>
         private ClipboardMonitor()
         {
-            _clipboardObservable = Observable.Create<ClipboardUpdateEventArgs>(observer =>
+            _clipboardObservable = Observable.Create<ClipboardContents>(observer =>
                 {
+                    
                     // This handles the message
                     HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
                     {
@@ -63,8 +67,18 @@ namespace Dapplo.Clipboard
                         {
                             return IntPtr.Zero;
                         }
-                        var clipboardEvent = new ClipboardUpdateEventArgs(ClipboardStore.AvailableFormats(hwnd));
-                        observer.OnNext(clipboardEvent);
+                        var content = new ClipboardContents(hwnd);
+
+                        // Make sure we don't trigger multiple times, this happend while developing.
+                        if (_previousSequence != content.Id)
+                        {
+                            _previousSequence = content.Id;
+                            observer.OnNext(content);
+                        }
+                        else
+                        {
+                            content.Dispose();
+                        }
 
                         return IntPtr.Zero;
                     };
@@ -84,9 +98,9 @@ namespace Dapplo.Clipboard
         }
 
         /// <summary>
-        ///     The actual clipboard hook observable
+        ///     This observable publishes the current clipboard contents after every paste action.
         /// </summary>
-        public static IObservable<ClipboardUpdateEventArgs> ClipboardUpdateEvents => Singleton.Value._clipboardObservable;
+        public static IObservable<ClipboardContents> OnPasted => Singleton.Value._clipboardObservable;
 
         #region Native methods
 
