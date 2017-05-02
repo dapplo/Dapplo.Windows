@@ -12,6 +12,12 @@ var solutionFilePath = GetFiles("./**/*.sln").First();
 // Used to store the version, which is needed during the build and the packaging
 var version = EnvironmentVariable("APPVEYOR_BUILD_VERSION") ?? "1.0.0";
 
+// Check if we are in a pull request, publishing of packages and coverage should be skipped
+var isPullRequest = !string.IsNullOrEmpty(EnvironmentVariable("APPVEYOR_PULL_REQUEST_NUMBER"));
+
+// Check if the commit is marked as release
+var isRelease = (EnvironmentVariable("APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED")?? "").Contains("[release]");
+
 Task("Default")
     .IsDependentOn("Package");
 
@@ -20,6 +26,8 @@ Task("Publish")
     .IsDependentOn("Package")
     .WithCriteria(() => !BuildSystem.IsLocalBuild)
     .WithCriteria(() => !string.IsNullOrEmpty(nugetApiKey))
+    .WithCriteria(() => !isPullRequest)
+    .WithCriteria(() => isRelease)
     .Does(()=>
 {
     var settings = new NuGetPushSettings {
@@ -42,20 +50,16 @@ Task("Package")
         OutputDirectory = "./artifacts/",
         Verbosity = NuGetVerbosity.Detailed,
         Symbols = true,
+        IncludeReferencedProjects = true,
         Properties = new Dictionary<string, string>
         {
             { "Configuration", configuration }
         }
     };
 
-    var projectFilePaths = GetFiles("./**/*.csproj").Where(p => !p.FullPath.Contains("Test") && !p.FullPath.Contains("packages") &&!p.FullPath.Contains("tools"));
+    var projectFilePaths = GetFiles("./**/*.csproj").Where(p => !p.FullPath.Contains("Test") && !p.FullPath.Contains("Example") &&!p.FullPath.Contains("packages") &&!p.FullPath.Contains("tools"));
     foreach(var projectFilePath in projectFilePaths)
     {
-        var nuspecFilename = string.Format("{0}/{1}.nuspec", projectFilePath.GetDirectory(),projectFilePath.GetFilenameWithoutExtension());
-        TransformConfig(nuspecFilename, 
-            new TransformationCollection {
-                { "package/metadata/version", version }
-            });
         Information("Packaging: " + projectFilePath.FullPath);
 
         NuGetPack(projectFilePath.FullPath, settings);
@@ -66,7 +70,7 @@ Task("Package")
 Task("Documentation")
     .Does(() =>
 {
-    DocFx("./doc/docfx.json");
+    DocFxBuild("./doc/docfx.json");
 });
 
 // Run the XUnit tests via OpenCover, so be get an coverage.xml report
@@ -155,7 +159,7 @@ Task("AssemblyVersion")
             Copyright = assemblyInfo.Copyright,
             //CustomAttributes = assemblyInfo.CustomAttributes,
             Description = assemblyInfo.Description,
-            Guid = assemblyInfo.Guid,
+            //Guid = assemblyInfo.Guid,
             InternalsVisibleTo = assemblyInfo.InternalsVisibleTo,
             Product = assemblyInfo.Product,
             Title = assemblyInfo.Title,

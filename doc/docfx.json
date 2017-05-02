@@ -5,12 +5,13 @@
         {
 		  "src": "../src",
           "files": [
-            "Dapplo.*/project.json"
+            "**/*.csproj"
           ],
           "exclude": [
 			"**/bin/**",
 			"**/obj/**",
-			"**Tests/project.json",
+			"**Tests/*.csproj",
+			"**Example/*.csproj",
           ]
         }
       ],
