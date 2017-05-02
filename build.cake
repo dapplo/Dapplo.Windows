@@ -33,11 +33,11 @@ Task("Publish")
     .Does(()=>
 {
     var settings = new NuGetPushSettings {
-		Source = "https://api.nuget.org/v3/index.json",
+		Source = "https://www.nuget.org/api/v2/package",
         ApiKey = nugetApiKey
     };
 
-    var packages = GetFiles("./artifacts/*.nupkg");
+    var packages = GetFiles("./artifacts/*.nupkg").Where(p => !p.FullPath.Contains("symbols"));
     NuGetPush(packages, settings);
 });
 
