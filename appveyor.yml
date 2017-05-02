@@ -1,4 +1,4 @@
-version: 0.3.{build}
+version: 0.4.{build}
 skip_tags: true
 os: Visual Studio 2015
 configuration: Release
@@ -13,21 +13,13 @@ assembly_info:
   assembly_version: '{version}'
   assembly_file_version: '{version}'
   assembly_informational_version: '{version}'
-install:
-  - choco install gitlink -y
-before_build:
-  - nuget restore
-  - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:is_not_pr = "true"; }
-before_package:
-  - GitLink .\
-build:
-  project: Dapplo.Windows.sln
-  publish_nuget: true
-  publish_nuget_symbols: false
-  verbosity: minimal
+build_script:
+- ps: .\build.ps1
 artifacts:
-- path: '*.nupkg'
-  name: NuGet package
+- path: artifacts\**\*.nupkg
+- path: artifacts\**\site.zip
+- path: artifacts\*.xml
+- path: artifacts\*.html
 notifications:
 - provider: Email
   to:
