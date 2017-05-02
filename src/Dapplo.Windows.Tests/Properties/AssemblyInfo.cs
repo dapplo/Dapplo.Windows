@@ -32,7 +32,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.Windows.Tests")]
 [assembly: AssemblyCopyright("Copyright © Dapplo 2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Dapplo")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

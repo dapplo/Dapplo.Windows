@@ -9,7 +9,7 @@
 [assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.Dpi")]
 [assembly: AssemblyCopyright("Copyright © Dapplo 2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Dapplo")]
 [assembly: AssemblyCulture("")]
 
 // Version information for an assembly consists of the following four values:

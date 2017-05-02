@@ -36,7 +36,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("ING-DiBa AG")]
 [assembly: AssemblyProduct("Dapplo.Windows.FormsExample")]
 [assembly: AssemblyCopyright("Copyright © ING-DiBa AG 2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Dapplo")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

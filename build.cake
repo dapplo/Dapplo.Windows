@@ -10,7 +10,7 @@ var configuration = Argument("configuration", "release");
 var nugetApiKey = Argument("nugetApiKey", EnvironmentVariable("NuGetApiKey"));
 var solutionFilePath = GetFiles("./**/*.sln").First();
 // Used to store the version, which is needed during the build and the packaging
-var version = EnvironmentVariable("APPVEYOR_BUILD_VERSION", "1.0.0");
+var version = EnvironmentVariable("APPVEYOR_BUILD_VERSION") ?? "1.0.0";
 
 Task("Default")
     .IsDependentOn("Package");
@@ -54,7 +54,7 @@ Task("Package")
         var nuspecFilename = string.Format("{0}/{1}.nuspec", projectFilePath.GetDirectory(),projectFilePath.GetFilenameWithoutExtension());
         TransformConfig(nuspecFilename, 
             new TransformationCollection {
-                { "package/metadata/version", version.NuGetVersion }
+                { "package/metadata/version", version }
             });
         Information("Packaging: " + projectFilePath.FullPath);
 
@@ -148,12 +148,12 @@ Task("AssemblyVersion")
             InformationalVersion = version,
             FileVersion = version,
 
-            CLSCompliant = assemblyInfo.CLSCompliant,
+            CLSCompliant = assemblyInfo.ClsCompliant,
             Company = assemblyInfo.Company,
             ComVisible = assemblyInfo.ComVisible,
             Configuration = assemblyInfo.Configuration,
             Copyright = assemblyInfo.Copyright,
-            CustomAttributes = assemblyInfo.CustomAttributes,
+            //CustomAttributes = assemblyInfo.CustomAttributes,
             Description = assemblyInfo.Description,
             Guid = assemblyInfo.Guid,
             InternalsVisibleTo = assemblyInfo.InternalsVisibleTo,

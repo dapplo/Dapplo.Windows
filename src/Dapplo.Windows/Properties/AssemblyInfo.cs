@@ -31,12 +31,12 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("Dapplo.Windows")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Native windows supporting code.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.Windows")]
 [assembly: AssemblyCopyright("Copyright © Dapplo 2015-2016")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Dapplo")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
