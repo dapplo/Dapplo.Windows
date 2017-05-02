@@ -19,7 +19,7 @@ var isPullRequest = !string.IsNullOrEmpty(EnvironmentVariable("APPVEYOR_PULL_REQ
 var isRelease = (EnvironmentVariable("APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED")?? "").Contains("[release]");
 
 Task("Default")
-    .IsDependentOn("Package");
+    .IsDependentOn("Publish");
 
 // Publish the Artifact of the Package Task to the Nexus Pro
 Task("Publish")
@@ -73,6 +73,10 @@ Task("Documentation")
 {
     DocFxMetadata("./doc/docfx.json");
     DocFxBuild("./doc/docfx.json");
+
+	CreateDirectory("artifacts");
+	// Archive the generated site
+	ZipCompress("./doc/_site", "./artifacts/site.zip");
 });
 
 // Run the XUnit tests via OpenCover, so be get an coverage.xml report
