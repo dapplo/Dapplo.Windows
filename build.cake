@@ -1,9 +1,11 @@
 #tool "xunit.runner.console"
 #tool "OpenCover"
 #tool "docfx.console"
+#addin "SharpZipLib"
 #addin "MagicChunks"
 #addin "Cake.FileHelpers"
 #addin "Cake.DocFx"
+#addin "Cake.Compression"
 
 var target = Argument("target", "Build");
 var configuration = Argument("configuration", "release");
@@ -110,7 +112,19 @@ Task("Coverage")
         tool => {
             tool.XUnit2("./**/*.Tests.dll",
                 new XUnit2Settings {
-                    ShadowCopy = false
+					// Add AppVeyor output, this "should" take care of a report inside AppVeyor
+					ArgumentCustomization = args => {
+						if (!BuildSystem.IsLocalBuild) {
+							args.Append("-appveyor");
+						}
+						return args;
+					},
+                    ShadowCopy = false,
+					XmlReport = true,
+					HtmlReport = true,
+					ReportName = "Dapplo.Jira",
+					OutputDirectory = "./artifacts",
+					WorkingDirectory = "./src"
                 });
             },
         // The output path
