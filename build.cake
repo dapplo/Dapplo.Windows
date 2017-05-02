@@ -33,6 +33,7 @@ Task("Publish")
     .Does(()=>
 {
     var settings = new NuGetPushSettings {
+		Source = "https://api.nuget.org/v3/index.json",
         ApiKey = nugetApiKey
     };
 
