@@ -70,7 +70,8 @@ Task("Package")
 Task("Documentation")
     .Does(() =>
 {
-    DocFxBuild("./doc/docfx.json");
+    DocFxMetadata("./doc/docfx.json");
+	DocFxBuild("./doc/docfx.json");
 });
 
 // Run the XUnit tests via OpenCover, so be get an coverage.xml report
