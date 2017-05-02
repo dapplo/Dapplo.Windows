@@ -73,11 +73,6 @@
     <Compile Include="Desktop\EnvironmentChangedEventArgs.cs" />
     <Compile Include="Desktop\EnvironmentMonitor.cs" />
     <Compile Include="Desktop\DisplayInfo.cs" />
-    <Compile Include="Dpi\BitmapScaleHandler.cs" />
-    <Compile Include="Dpi\DpiAwareForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dpi\DpiHandler.cs" />
     <Compile Include="Desktop\IInteropWindow.cs" />
     <Compile Include="Desktop\InteropWindowFactory.cs" />
     <Compile Include="Desktop\InteropWindowQuery.cs" />
@@ -92,8 +87,6 @@
     <Compile Include="Enums\DwmBlurBehindFlags.cs" />
     <Compile Include="Enums\HResultExtensions.cs" />
     <Compile Include="Enums\MonitorDpiType.cs" />
-    <Compile Include="Dpi\FormsExtensions.cs" />
-    <Compile Include="Dpi\WinProcListener.cs" />
     <Compile Include="Enums\SystemParametersInfoBehaviors.cs" />
     <Compile Include="Enums\SystemParametersInfoActions.cs" />
     <Compile Include="Enums\TitleBarInfoIndexes.cs" />
@@ -209,7 +202,6 @@
     <Compile Include="Desktop\WinEventHook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsVersion.cs" />
-    <Compile Include="Dpi\WindowExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -220,6 +212,7 @@
       <Name>Dapplo.WinMessages</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

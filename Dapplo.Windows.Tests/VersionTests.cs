@@ -34,8 +34,6 @@ namespace Dapplo.Windows.Tests
 {
     public class VersionTests
     {
-        private static readonly LogSource Log = new LogSource();
-
         public VersionTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);

@@ -30,7 +30,7 @@ using System.Windows.Forms;
 
 #endregion
 
-namespace Dapplo.Windows.Dpi
+namespace Dapplo.Dpi
 {
     /// <summary>
     ///     Factory for the generic BitmapScaleHandler
@@ -67,7 +67,7 @@ namespace Dapplo.Windows.Dpi
     ///     This provides bitmaps scaled according to the current DPI.
     ///     If the DPI changes, it will reapply the bitmaps and dispose the old ones (if needed).
     /// </summary>
-    public class BitmapScaleHandler<TKey>
+    public sealed class BitmapScaleHandler<TKey> : IDisposable
     {
         private readonly IDictionary<TKey, Bitmap> _images = new Dictionary<TKey, Bitmap>();
         private bool _areWeDisposing;

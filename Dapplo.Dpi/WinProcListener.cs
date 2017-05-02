@@ -29,7 +29,7 @@ using System.Windows.Interop;
 
 #endregion
 
-namespace Dapplo.Windows.Dpi
+namespace Dapplo.Dpi
 {
     /// <summary>
     ///     This is a Listener for WinProc messages

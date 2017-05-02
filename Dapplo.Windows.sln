@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Clipboard", "Dapplo.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.WinMessages", "Dapplo.WinMessages\Dapplo.WinMessages.csproj", "{DE471F22-E095-4B11-9702-8306D69B32CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Dpi", "Dapplo.Dpi\Dapplo.Dpi.csproj", "{B8B5782D-EECD-4260-8BED-643EF8B8B6D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{DE471F22-E095-4B11-9702-8306D69B32CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE471F22-E095-4B11-9702-8306D69B32CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE471F22-E095-4B11-9702-8306D69B32CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8B5782D-EECD-4260-8BED-643EF8B8B6D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8B5782D-EECD-4260-8BED-643EF8B8B6D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8B5782D-EECD-4260-8BED-643EF8B8B6D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8B5782D-EECD-4260-8BED-643EF8B8B6D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

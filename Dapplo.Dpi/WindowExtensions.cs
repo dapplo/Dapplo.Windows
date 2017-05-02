@@ -28,7 +28,7 @@ using System.Windows.Media;
 
 #endregion
 
-namespace Dapplo.Windows.Dpi
+namespace Dapplo.Dpi
 {
     /// <summary>
     ///     Extensions for the WPF Window class

@@ -22,7 +22,7 @@
 #region using
 
 using System.Windows;
-using Dapplo.Windows.Dpi;
+using Dapplo.Dpi;
 
 #endregion
 

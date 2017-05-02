@@ -26,6 +26,7 @@ using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
+using Dapplo.Windows;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.SafeHandles;
@@ -34,13 +35,13 @@ using Dapplo.WinMessages;
 
 #endregion
 
-namespace Dapplo.Windows.Dpi
+namespace Dapplo.Dpi
 {
     /// <summary>
     ///     This handles DPI changes see u.a.
     ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn469266(v=vs.85).aspx">Writing DPI-Aware Desktop and Win32 Applications</a>
     /// </summary>
-    public class DpiHandler : IDisposable
+    public sealed class DpiHandler : IDisposable
     {
         /// <summary>
         ///     This is the default DPI for the screen
@@ -80,13 +81,14 @@ namespace Dapplo.Windows.Dpi
                 return false;
             }
             // Try setting the DpiAwareness
-            if (!SetProcessDpiAwareness(DpiAwareness.PerMonitorAware).Succeeded())
+            if (SetProcessDpiAwareness(DpiAwareness.PerMonitorAware).Succeeded())
             {
-                Log.Warn().WriteLine("Couldn't enable Dpi Awareness.");
-                return false;
+                return true;
             }
-            return true;
+            Log.Warn().WriteLine("Couldn't enable Dpi Awareness.");
+            return false;
         }
+
         /// <summary>
         ///     Check if the process is DPI Aware, an DpiHandler doesn't make sense if not.
         /// </summary>
