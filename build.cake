@@ -53,7 +53,8 @@ Task("Package")
         IncludeReferencedProjects = true,
         Properties = new Dictionary<string, string>
         {
-            { "Configuration", configuration }
+            { "Configuration", configuration },
+			{ "Platform", "AnyCPU" }
         }
     };
 
@@ -71,7 +72,7 @@ Task("Documentation")
     .Does(() =>
 {
     DocFxMetadata("./doc/docfx.json");
-	DocFxBuild("./doc/docfx.json");
+    DocFxBuild("./doc/docfx.json");
 });
 
 // Run the XUnit tests via OpenCover, so be get an coverage.xml report
