@@ -33,7 +33,7 @@ Task("Publish")
     .Does(()=>
 {
     var settings = new NuGetPushSettings {
-		Source = "https://www.nuget.org/api/v2/package",
+        Source = "https://www.nuget.org/api/v2/package",
         ApiKey = nugetApiKey
     };
 
@@ -57,7 +57,7 @@ Task("Package")
         Properties = new Dictionary<string, string>
         {
             { "Configuration", configuration },
-			{ "Platform", "AnyCPU" }
+            { "Platform", "AnyCPU" }
         }
     };
 
@@ -77,9 +77,9 @@ Task("Documentation")
     DocFxMetadata("./doc/docfx.json");
     DocFxBuild("./doc/docfx.json");
 
-	CreateDirectory("artifacts");
-	// Archive the generated site
-	ZipCompress("./doc/_site", "./artifacts/site.zip");
+    CreateDirectory("artifacts");
+    // Archive the generated site
+    ZipCompress("./doc/_site", "./artifacts/site.zip");
 });
 
 // Run the XUnit tests via OpenCover, so be get an coverage.xml report
@@ -94,6 +94,8 @@ Task("Coverage")
         // Forces error in build when tests fail
         ReturnTargetCodeOffset = 0
     };
+
+    var solutionName = solutionFilePath.GetDirectory().GetDirectoryName();
 
     var projectFiles = GetFiles("./**/*.csproj");
     foreach(var projectFile in projectFiles)
@@ -113,19 +115,19 @@ Task("Coverage")
         tool => {
             tool.XUnit2("./**/*.Tests.dll",
                 new XUnit2Settings {
-					// Add AppVeyor output, this "should" take care of a report inside AppVeyor
-					ArgumentCustomization = args => {
-						if (!BuildSystem.IsLocalBuild) {
-							args.Append("-appveyor");
-						}
-						return args;
-					},
+                    // Add AppVeyor output, this "should" take care of a report inside AppVeyor
+                    ArgumentCustomization = args => {
+                        if (!BuildSystem.IsLocalBuild) {
+                            args.Append("-appveyor");
+                        }
+                        return args;
+                    },
                     ShadowCopy = false,
-					XmlReport = true,
-					HtmlReport = true,
-					ReportName = "Dapplo.Jira",
-					OutputDirectory = "./artifacts",
-					WorkingDirectory = "./src"
+                    XmlReport = true,
+                    HtmlReport = true,
+                    ReportName = solutionName,
+                    OutputDirectory = "./artifacts",
+                    WorkingDirectory = "./src"
                 });
             },
         // The output path
