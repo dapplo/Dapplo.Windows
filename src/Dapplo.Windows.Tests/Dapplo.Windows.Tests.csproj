@@ -113,11 +113,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Clipboard\Dapplo.Windows.Clipboard.csproj">
+    <ProjectReference Include="..\Dapplo.Windows.Clipboard\Dapplo.Windows.Clipboard.csproj">
       <Project>{8d836859-871a-446f-889f-1ac015e14738}</Project>
       <Name>Dapplo.Windows.Clipboard</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Dapplo.WinMessages\Dapplo.Windows.Messages.csproj">
+    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{DE471F22-E095-4B11-9702-8306D69B32CA}</Project>
       <Name>Dapplo.Windows.Messages</Name>
     </ProjectReference>

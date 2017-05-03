@@ -80,7 +80,7 @@
       <Project>{8AA469BB-856A-4330-96CE-2BB75A014070}</Project>
       <Name>Dapplo.Windows</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Dapplo.WinMessages\Dapplo.Windows.Messages.csproj">
+    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
       <Name>Dapplo.Windows.Messages</Name>
     </ProjectReference>

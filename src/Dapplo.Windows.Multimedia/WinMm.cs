@@ -23,6 +23,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 #endregion
 
@@ -34,18 +35,77 @@ namespace Dapplo.Windows.Multimedia
     public static class WinMm
     {
         /// <summary>
+        /// Play a system sound
+        /// </summary>
+        /// <param name="systemSound">Value from the SystemSounds enum</param>
+        public static void PlaySystemSound(SystemSounds systemSound)
+        {
+            PlaySound(systemSound.ToString(), UIntPtr.Zero, SoundSettings.AliasId | SoundSettings.Async);
+        }
+
+        /// <summary>
+        /// Play a resource
+        /// </summary>
+        /// <param name="resource">Resource to play</param>
+        public static void Play(string resource)
+        {
+            PlaySound(resource, UIntPtr.Zero, SoundSettings.Resource | SoundSettings.Async);
+        }
+
+        /// <summary>
+        /// Play wave data
+        /// Note: The byte[] should be pinned into memory, and cannot be removed while playing!!
+        /// See <a href="https://blogs.msdn.microsoft.com/larryosterman/2009/02/19/playsoundxxx-snd_memory-snd_async-is-almost-always-a-bad-idea/">PlaySound(xxx, SND_MEMORY | SND_ASYNC) is almost always a bad idea.</a>
+        /// </summary>
+        /// <param name="soundBytes">Wave data to play to play</param>
+        public static void Play(byte[] soundBytes)
+        {
+            PlaySound(soundBytes, UIntPtr.Zero, SoundSettings.Memory | SoundSettings.Async);
+        }
+
+        /// <summary>
+        /// Stop playing
+        /// </summary>
+        public static void StopPlaying()
+        {
+            PlaySound((string)null, UIntPtr.Zero, SoundSettings.None);
+        }
+
+        /// <summary>
         ///     The PlaySound function plays a sound specified by the given file name, resource, or system event. (A system event may be associated with a sound in the registry or in the WIN.INI file.)
         /// </summary>
         /// <param name="soundBytes">byte array with the wave information</param>
         /// <param name="hmod">Handle to the executable file that contains the resource to be loaded. This parameter must be NULL unless SND_RESOURCE is specified in fdwSound.</param>
         /// <param name="fdwSound">Flags for playing the sound.</param>
         /// <returns>Returns TRUE if successful or FALSE otherwise.</returns>
-        [DllImport("winmm.dll", SetLastError = true)]
+        [DllImport("winmm", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool PlaySound(byte[] soundBytes, UIntPtr hmod, SoundSettings fdwSound);
+        private static extern bool PlaySound(byte[] soundBytes, UIntPtr hmod, SoundSettings fdwSound);
 
-        [DllImport("winmm.dll", SetLastError = true)]
+        /// <summary>
+        ///  The PlaySound function plays a sound specified by the given file name, resource, or system event. (A system event may be associated with a sound in the registry or in the WIN.INI file.)
+        /// </summary>
+        /// <param name="pszSound">A string that specifies the sound to play. The maximum length, including the null terminator, is 256 characters. If this parameter is NULL, any currently playing waveform sound is stopped.</param>
+        /// <param name="hmod">Handle to the executable file that contains the resource to be loaded. This parameter must be NULL unless SND_RESOURCE is specified in fdwSound.</param>
+        /// <param name="fdwSound">Flags for playing the sound.</param>
+        /// <returns>Returns TRUE if successful or FALSE otherwise.</returns>
+        [DllImport("winmm", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool PlaySound(IntPtr ptrToSound, UIntPtr hmod, SoundSettings fdwSound);
+        private static extern bool PlaySound(string pszSound, UIntPtr hmod, SoundSettings fdwSound);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command">Pointer to a null-terminated string that specifies an MCI command string. For a list, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd743572(v=vs.85).aspx">Multimedia Command Strings</a></param>
+        /// <param name="buffer">Pointer to a buffer that receives return information. If no return information is needed, this parameter can be NULL.</param>
+        /// <param name="bufferSize">Size, in characters, of the return buffer specified by the lpszReturnString parameter.</param>
+        /// <param name="hwndCallback">Handle to a callback window if the "notify" flag was specified in the command string.</param>
+        /// <returns>
+        /// Returns zero if successful or an error otherwise. The low-order word of the returned DWORD value contains the error return value. If the error is device-specific, the high-order word of the return value is the driver identifier; otherwise, the high-order word is zero.
+        /// For a list of possible error values, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd757153(v=vs.85).aspx">MCIERR Return Values</a>.
+        /// To retrieve a text description of return values, pass the return value to the <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd757158(v=vs.85).aspx">mciGetErrorString</a> function.
+        /// </returns>
+        [DllImport("winmm")]
+        private static extern int mciSendString(string command, StringBuilder buffer, int bufferSize, IntPtr hwndCallback);
     }
 }

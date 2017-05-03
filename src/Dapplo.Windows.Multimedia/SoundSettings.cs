@@ -34,9 +34,9 @@ namespace Dapplo.Windows.Multimedia
     public enum SoundSettings : uint
     {
         /// <summary>
-        ///     Synchronous playback of a sound event. PlaySound returns after the sound event completes.
+        ///     Default: Synchronous playback of a sound event. PlaySound returns after the sound event completes.
         /// </summary>
-        Sync = 0x0000,
+        None = 0x0000,
 
         /// <summary>
         ///     The sound is played asynchronously and PlaySound returns immediately after beginning the sound. To terminate an
@@ -51,10 +51,10 @@ namespace Dapplo.Windows.Multimedia
         NoDefault = 0x0002,
 
         /// <summary>
-        ///     A sound event's file is loaded in RAM. The parameter specified by pszSound must point to an image of a sound in
-        ///     memory.
+        /// The pszSound parameter points to a sound loaded in memory.
+        ///  see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd743679(v=vs.85).aspx">Playing WAVE Resources</a>
         /// </summary>
-        LoadToMemory = 0x0004,
+        Memory = 0x0004,
 
         /// <summary>
         ///     The sound plays repeatedly until PlaySound is called again with the pszSound parameter set to NULL. You must also
@@ -72,9 +72,13 @@ namespace Dapplo.Windows.Multimedia
         NoStop = 0x0010,
 
         /// <summary>
-        ///     If the driver is busy, return immediately without playing the sound.
+        ///     Not supported.
         /// </summary>
         NoWait = 0x00002000,
+        /// <summary>
+        ///     Not supported.
+        /// </summary>
+        Purge = 0x0040,
 
         /// <summary>
         ///     The pszSound parameter is a system-event alias in the registry or the WIN.INI file. Do not use with either
@@ -90,6 +94,25 @@ namespace Dapplo.Windows.Multimedia
         /// <summary>
         ///     The pszSound parameter is a file name.
         /// </summary>
-        Filename = 0x00020000
+        Filename = 0x00020000,
+
+        /// <summary>
+        /// The pszSound parameter is a resource identifier; hmod must identify the instance that contains the resource.
+        /// see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd743679(v=vs.85).aspx">Playing WAVE Resources</a>
+        /// </summary>
+        Resource = 0x00040004,
+
+        /// <summary>
+        /// If this flag is set, the function triggers a SoundSentry event when the sound is played.
+        /// SoundSentry is an accessibility feature that causes the computer to display a visual cue when a sound is played. If the user did not enable SoundSentry, the visual cue is not displayed.
+        /// </summary>
+        Sentry = 0x00080000,
+
+        /// <summary>
+        /// If this flag is set, the sound is assigned to the audio session for system notification sounds. The system volume-control program (SndVol) displays a volume slider that controls system notification sounds. Setting this flag puts the sound under the control of that volume slider
+        /// If this flag is not set, the sound is assigned to the default audio session for the application's process.
+        /// For more information, see the documentation for the Core Audio APIs.
+        /// </summary>
+        System = 0x00200000,
     }
 }
