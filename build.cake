@@ -168,7 +168,7 @@ Task("RestoreNuGetPackages")
 Task("AssemblyVersion")
     .Does(() =>
 {
-    foreach(var assemblyInfoFile in  GetFiles("./**/AssemblyInfo.cs")Where(p => p.FullPath.Contains(solutionName))) {
+    foreach(var assemblyInfoFile in  GetFiles("./**/AssemblyInfo.cs").Where(p => p.FullPath.Contains(solutionName))) {
         var assemblyInfo = ParseAssemblyInfo(assemblyInfoFile.FullPath);
         CreateAssemblyInfo(assemblyInfoFile.FullPath, new AssemblyInfoSettings {
             Version = version,
