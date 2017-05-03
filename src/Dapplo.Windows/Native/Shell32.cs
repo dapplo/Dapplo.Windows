@@ -163,7 +163,7 @@ namespace Dapplo.Windows.Native
                 // Copy (clone) the returned icon to a new object, thus allowing us to clean-up properly
                 var icon = (Icon) Icon.FromHandle(shfi.hIcon).Clone();
                 // Cleanup
-                User32.DestroyIcon(shfi.hIcon);
+                User32.User32.DestroyIcon(shfi.hIcon);
                 return icon;
             }
             return null;
@@ -203,7 +203,7 @@ namespace Dapplo.Windows.Native
             var icon = (Icon) Icon.FromHandle(shfi.hIcon).Clone();
 
             // Cleanup
-            User32.DestroyIcon(shfi.hIcon);
+            User32.User32.DestroyIcon(shfi.hIcon);
             return icon;
         }
 

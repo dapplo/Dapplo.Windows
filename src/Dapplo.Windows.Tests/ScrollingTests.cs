@@ -30,9 +30,10 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
-using Dapplo.Windows.Keyboard;
-using Dapplo.Windows.Keyboard.Native;
+using Dapplo.Windows.Input;
+using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Native;
+using Dapplo.Windows.User32.Enums;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -77,7 +78,7 @@ namespace Dapplo.Windows.Tests
                             .FirstOrDefault(interopWindow =>
                             {
                                 int processId;
-                                User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
+                                User32.User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
                                 return processId == process.Id;
                             });
                         Assert.NotNull(notepadWindow);
@@ -92,7 +93,7 @@ namespace Dapplo.Windows.Tests
 
                         Log.Info().WriteLine("Scrollbar info: {0}", scroller.ScrollBar.Value);
 
-                        User32.SetForegroundWindow(scroller.ScrollingWindow.Handle);
+                        User32.User32.SetForegroundWindow(scroller.ScrollingWindow.Handle);
                         await Task.Delay(1000);
                         // Just make sure the window is changed
                         InputGenerator.KeyPress(VirtualKeyCodes.NEXT, VirtualKeyCodes.DOWN);

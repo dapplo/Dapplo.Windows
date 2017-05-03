@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FDF2EF88-DC84-40BC-8C85-7B143DB9508B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Dapplo.Windows.User32</RootNamespace>
+    <AssemblyName>Dapplo.Windows.User32</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Dapplo.Windows.User32.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Dapplo.Windows.User32.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dapplo.Log, Version=1.0.29.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Log.1.0.29\lib\net45\Dapplo.Log.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Enums\ClassLongIndex.cs" />
+    <Compile Include="Enums\CursorInfoFlags.cs" />
+    <Compile Include="Enums\DesktopAccessRight.cs" />
+    <Compile Include="Enums\GetWindowCommands.cs" />
+    <Compile Include="Enums\MonitorFromFlags.cs" />
+    <Compile Include="Enums\ObjectIdentifiers.cs" />
+    <Compile Include="Enums\ObjectStates.cs" />
+    <Compile Include="Enums\PrintWindowFlags.cs" />
+    <Compile Include="Enums\RegionResults.cs" />
+    <Compile Include="Enums\ScrollBarCommands.cs" />
+    <Compile Include="Enums\ScrollBarStateIndexes.cs" />
+    <Compile Include="Enums\ScrollBarTypes.cs" />
+    <Compile Include="Enums\ScrollInfoMask.cs" />
+    <Compile Include="Enums\ScrollModes.cs" />
+    <Compile Include="Enums\SendMessageTimeoutFlags.cs" />
+    <Compile Include="Enums\ShowWindowCommands.cs" />
+    <Compile Include="Enums\ExtendedWindowStyleFlags.cs" />
+    <Compile Include="Enums\SysCommands.cs" />
+    <Compile Include="Enums\SystemMetric.cs" />
+    <Compile Include="Enums\SystemParametersInfoActions.cs" />
+    <Compile Include="Enums\SystemParametersInfoBehaviors.cs" />
+    <Compile Include="Enums\WindowPos.cs" />
+    <Compile Include="SafeHandles\SafeCurrentInputDesktopHandle.cs" />
+    <Compile Include="SafeHandles\SafeIconHandle.cs" />
+    <Compile Include="Structs\AnimationInfo.cs" />
+    <Compile Include="Structs\CursorInfo.cs" />
+    <Compile Include="Structs\DisplayInfo.cs" />
+    <Compile Include="Structs\IconInfo.cs" />
+    <Compile Include="Structs\MonitorInfoEx.cs" />
+    <Compile Include="Enums\MonitorInfoFlags.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Structs\ScrollBarInfo.cs" />
+    <Compile Include="Structs\ScrollInfo.cs" />
+    <Compile Include="Structs\TitleBarInfoEx.cs" />
+    <Compile Include="User32.cs" />
+    <Compile Include="Structs\WindowInfo.cs" />
+    <Compile Include="Enums\WindowLongIndex.cs" />
+    <Compile Include="Structs\WindowPlacement.cs" />
+    <Compile Include="Enums\windowPlacementFlags.cs" />
+    <Compile Include="Enums\WindowStyleFlags.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
+      <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
+      <Name>Dapplo.Windows.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
+      <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
+      <Name>Dapplo.Windows.Messages</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

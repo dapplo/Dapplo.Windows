@@ -28,6 +28,7 @@ using System.Drawing.Imaging;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
+using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
 

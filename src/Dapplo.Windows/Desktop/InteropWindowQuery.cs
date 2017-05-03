@@ -27,6 +27,7 @@ using System.Diagnostics;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Native;
+using Dapplo.Windows.User32.Enums;
 
 #endregion
 
@@ -48,7 +49,7 @@ namespace Dapplo.Windows.Desktop
         /// <returns>InteropWindow</returns>
         public static IInteropWindow GetActiveWindow()
         {
-            return InteropWindowFactory.CreateFor(User32.GetForegroundWindow());
+            return InteropWindowFactory.CreateFor(User32.User32.GetForegroundWindow());
         }
 
         /// <summary>
@@ -57,7 +58,7 @@ namespace Dapplo.Windows.Desktop
         /// <returns>InteropWindow for the desktop window</returns>
         public static IInteropWindow GetDesktopWindow()
         {
-            return InteropWindowFactory.CreateFor(User32.GetDesktopWindow());
+            return InteropWindowFactory.CreateFor(User32.User32.GetDesktopWindow());
         }
 
         /// <summary>
@@ -76,7 +77,7 @@ namespace Dapplo.Windows.Desktop
                     var handles = new List<IntPtr>();
                     try
                     {
-                        User32.EnumThreadWindows(thread.Id, (hWnd, lParam) =>
+                        User32.User32.EnumThreadWindows(thread.Id, (hWnd, lParam) =>
                         {
                             handles.Add(hWnd);
                             return true;
@@ -118,11 +119,11 @@ namespace Dapplo.Windows.Desktop
         public static IEnumerable<IInteropWindow> GetTopWindows(IInteropWindow parent = null)
         {
             // TODO: Guard against looping
-            var windowPtr = parent == null ? User32.GetTopWindow(IntPtr.Zero) : User32.GetWindow(parent.Handle, GetWindowCommands.GW_CHILD);
+            var windowPtr = parent == null ? User32.User32.GetTopWindow(IntPtr.Zero) : User32.User32.GetWindow(parent.Handle, GetWindowCommands.GW_CHILD);
             do
             {
                 yield return InteropWindowFactory.CreateFor(windowPtr);
-                windowPtr = User32.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
+                windowPtr = User32.User32.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
             } while (windowPtr != IntPtr.Zero);
         }
 

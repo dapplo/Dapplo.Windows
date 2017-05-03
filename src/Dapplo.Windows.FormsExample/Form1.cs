@@ -28,6 +28,7 @@ using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Dpi.Forms;
 
 #endregion
 

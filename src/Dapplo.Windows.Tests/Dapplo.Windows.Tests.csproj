@@ -117,9 +117,25 @@
       <Project>{8d836859-871a-446f-889f-1ac015e14738}</Project>
       <Name>Dapplo.Windows.Clipboard</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
+      <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
+      <Name>Dapplo.Windows.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.DesktopWindowsManager\Dapplo.Windows.DesktopWindowsManager.csproj">
+      <Project>{ef02637f-86a5-47f1-bb75-33e0ba3119cf}</Project>
+      <Name>Dapplo.Windows.DesktopWindowsManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Input\Dapplo.Windows.Input.csproj">
+      <Project>{171a9ff9-8abb-4e40-8c88-75157a899b71}</Project>
+      <Name>Dapplo.Windows.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{DE471F22-E095-4B11-9702-8306D69B32CA}</Project>
       <Name>Dapplo.Windows.Messages</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj">
+      <Project>{fdf2ef88-dc84-40bc-8c85-7b143db9508b}</Project>
+      <Name>Dapplo.Windows.User32</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
       <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>

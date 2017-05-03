@@ -22,7 +22,6 @@
 #region using
 
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 #endregion
 
@@ -31,23 +30,13 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("Dapplo.Windows.FormsExample")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A project for testing various stuff")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ING-DiBa AG")]
+[assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.Windows.FormsExample")]
-[assembly: AssemblyCopyright("Copyright © ING-DiBa AG 2017")]
+[assembly: AssemblyCopyright("Copyright © Dapplo 2017")]
 [assembly: AssemblyTrademark("Dapplo")]
 [assembly: AssemblyCulture("")]
-
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
-
-[assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-
-[assembly: Guid("5607cb5a-d4b8-4ef6-bc00-6878fe47c7d5")]
 
 // Version information for an assembly consists of the following four values:
 //

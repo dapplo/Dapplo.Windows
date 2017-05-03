@@ -29,6 +29,7 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
+using Dapplo.Windows.User32.Enums;
 
 #endregion
 

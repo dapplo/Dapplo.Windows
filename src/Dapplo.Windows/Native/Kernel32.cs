@@ -34,7 +34,7 @@ namespace Dapplo.Windows.Native
     /// <summary>
     ///     Kernel 32 functionality
     /// </summary>
-    public class Kernel32
+    public static class Kernel32
     {
         /// <summary>
         ///     default value if not specifing a process ID

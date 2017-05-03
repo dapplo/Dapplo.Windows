@@ -27,8 +27,8 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Input;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Mouse;
 using Xunit.Abstractions;
 
 #endregion

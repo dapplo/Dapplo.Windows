@@ -110,9 +110,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
+      <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
+      <Name>Dapplo.Windows.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj">
       <Project>{b8b5782d-eecd-4260-8bed-643ef8b8b6d0}</Project>
       <Name>Dapplo.Windows.Dpi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj">
+      <Project>{fdf2ef88-dc84-40bc-8c85-7b143db9508b}</Project>
+      <Name>Dapplo.Windows.User32</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
       <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>

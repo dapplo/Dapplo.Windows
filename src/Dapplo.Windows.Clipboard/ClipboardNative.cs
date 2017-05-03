@@ -91,6 +91,24 @@ namespace Dapplo.Windows.Clipboard
         }
 
         /// <summary>
+        /// Empties the clipboard, this assumes that a lock has already been retrieved.
+        /// </summary>
+        public static void Clear()
+        {
+            EmptyClipboard();
+        }
+
+        /// <summary>
+        /// Retrieves the current owner
+        /// </summary>
+        public static IntPtr CurrentOwner => GetClipboardOwner();
+
+        /// <summary>
+        /// Retrieves the current SequenceNumber
+        /// </summary>
+        public static uint SequenceNumber => GetClipboardSequenceNumber();
+
+        /// <summary>
         /// Place string on the clipboard, this assumes you already locked the clipboard
         /// </summary>
         /// <param name="text">string to place on the clipboard</param>
@@ -310,6 +328,20 @@ namespace Dapplo.Windows.Clipboard
         /// <returns></returns>
         [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int GetClipboardFormatName(uint format, [Out] StringBuilder lpszFormatName, int cchMaxCount);
+
+        /// <summary>
+        /// Returns the hWnd of the owner of the clipboard content
+        /// </summary>
+        /// <returns>IntPtr with a hWnd</returns>
+        [DllImport("user32", SetLastError = true)]
+        private static extern IntPtr GetClipboardOwner();
+
+        /// <summary>
+        /// Retrieves the sequence number of the clipboard
+        /// </summary>
+        /// <returns>sequence number or 0 if this cannot be retrieved</returns>
+        [DllImport("user32", SetLastError = true)]
+        private static extern uint GetClipboardSequenceNumber();
         #endregion
     }
 }

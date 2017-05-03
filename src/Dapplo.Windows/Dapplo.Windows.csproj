@@ -72,7 +72,6 @@
     <Compile Include="App\MonitorAppVisibility.cs" />
     <Compile Include="Desktop\EnvironmentChangedEventArgs.cs" />
     <Compile Include="Desktop\EnvironmentMonitor.cs" />
-    <Compile Include="Desktop\DisplayInfo.cs" />
     <Compile Include="Desktop\IInteropWindow.cs" />
     <Compile Include="Desktop\InteropWindowFactory.cs" />
     <Compile Include="Desktop\InteropWindowQuery.cs" />
@@ -81,136 +80,77 @@
     <Compile Include="Desktop\InteropWindowExtensions.cs" />
     <Compile Include="Enums\BitmapCompressionMethods.cs" />
     <Compile Include="Enums\ColorSpaceEnum.cs" />
-    <Compile Include="Enums\DpiAwareness.cs" />
-    <Compile Include="Enums\DpiAwarenessContext.cs" />
-    <Compile Include="Enums\DwmSetIconicLivePreviewFlags.cs" />
-    <Compile Include="Enums\DwmBlurBehindFlags.cs" />
-    <Compile Include="Enums\HResultExtensions.cs" />
-    <Compile Include="Enums\MonitorDpiType.cs" />
-    <Compile Include="Enums\SystemParametersInfoBehaviors.cs" />
-    <Compile Include="Enums\SystemParametersInfoActions.cs" />
     <Compile Include="Enums\TitleBarInfoIndexes.cs" />
-    <Compile Include="Mouse\Native\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\InteropWindowCacheFlags.cs" />
-    <Compile Include="Enums\MonitorFromFlags.cs" />
-    <Compile Include="Enums\DwmThumbnailPropertyFlags.cs" />
-    <Compile Include="Enums\PrintWindowFlags.cs" />
     <Compile Include="Enums\RasterOperations.cs" />
-    <Compile Include="Enums\ObjectStates.cs" />
-    <Compile Include="Enums\ScrollBarStateIndexes.cs" />
-    <Compile Include="Enums\ScrollBarCommands.cs" />
     <Compile Include="Enums\WindowsProducts.cs" />
     <Compile Include="Enums\WindowsProductTypes.cs" />
     <Compile Include="Enums\WindowsSuites.cs" />
-    <Compile Include="Extensions\RectExensions.cs" />
-    <Compile Include="InputGenerator.cs" />
-    <Compile Include="Keyboard\Native\ExtendedKeyFlags.cs" />
-    <Compile Include="Mouse\MouseHookEventArgs.cs" />
-    <Compile Include="Mouse\MouseHook.cs" />
-    <Compile Include="Keyboard\Native\KeyboardLowLevelHookStruct.cs" />
-    <Compile Include="Structs\AnimationInfo.cs" />
-    <Compile Include="Structs\HardwareInput.cs" />
-    <Compile Include="Structs\Input.cs" />
-    <Compile Include="Enums\InputTypes.cs" />
-    <Compile Include="Structs\InputUnion.cs" />
-    <Compile Include="Keyboard\Native\KeyboardInput.cs" />
-    <Compile Include="Keyboard\Native\KeyEventFlags.cs" />
-    <Compile Include="Mouse\Native\MouseEventFlags.cs" />
-    <Compile Include="Keyboard\Native\ScanCodes.cs" />
-    <Compile Include="Enums\ScrollInfoMask.cs" />
-    <Compile Include="Enums\CursorInfoFlags.cs" />
-    <Compile Include="Enums\DesktopAccessRight.cs" />
     <Compile Include="Enums\DeviceCaps.cs" />
-    <Compile Include="Enums\DwmWindowAttributes.cs" />
     <Compile Include="Enums\GdiPlusStatus.cs" />
-    <Compile Include="Enums\ExtendedWindowStyleFlags.cs" />
-    <Compile Include="Enums\GetWindowCommands.cs" />
     <Compile Include="Enums\GpUnit.cs" />
     <Compile Include="Enums\ProcessAccessFlags.cs" />
-    <Compile Include="Enums\RegionResults.cs" />
-    <Compile Include="Enums\ScrollBarTypes.cs" />
-    <Compile Include="Enums\SendMessageTimeoutFlags.cs" />
-    <Compile Include="Enums\ShowWindowCommands.cs" />
-    <Compile Include="Enums\SysCommands.cs" />
-    <Compile Include="Enums\SystemMetric.cs" />
     <Compile Include="Enums\ThreadAccess.cs" />
-    <Compile Include="Keyboard\Native\VirtualKeyCodes.cs" />
-    <Compile Include="Enums\WindowPlacementFlags.cs" />
-    <Compile Include="Enums\WindowStyleFlags.cs" />
-    <Compile Include="Keyboard\Hotkey.cs" />
-    <Compile Include="Keyboard\KeyboardHook.cs" />
-    <Compile Include="Keyboard\KeyboardHookEventArgs.cs" />
     <Compile Include="Native\Gdi32.cs" />
     <Compile Include="Native\GdiExtensions.cs" />
     <Compile Include="Native\GdiPlus.cs" />
     <Compile Include="Native\Kernel32.cs" />
     <Compile Include="Native\PsAPI.cs" />
     <Compile Include="Native\Shell32.cs" />
-    <Compile Include="Native\Win32.cs" />
     <Compile Include="SafeHandles\SafeCompatibleDcHandle.cs" />
-    <Compile Include="SafeHandles\SafeCurrentInputDesktopHandle.cs" />
     <Compile Include="SafeHandles\SafeDcHandle.cs" />
     <Compile Include="SafeHandles\SafeDeviceContextHandle.cs" />
     <Compile Include="SafeHandles\SafeDibSectionHandle.cs" />
     <Compile Include="SafeHandles\SafeHBitmapHandle.cs" />
-    <Compile Include="SafeHandles\SafeIconHandle.cs" />
     <Compile Include="SafeHandles\SafeObjectHandle.cs" />
     <Compile Include="SafeHandles\SafeRegionHandle.cs" />
     <Compile Include="SafeHandles\SafeSelectObjectHandle.cs" />
     <Compile Include="SafeHandles\SafeWindowDcHandle.cs" />
-    <Compile Include="Enums\ScrollModes.cs" />
     <Compile Include="Structs\BitfieldColorMask.cs" />
     <Compile Include="Structs\BitmapFileHeader.cs" />
     <Compile Include="Structs\BitmapInfoHeader.cs" />
     <Compile Include="Structs\BlurParams.cs" />
     <Compile Include="Structs\CieXyz.cs" />
     <Compile Include="Structs\CieXyzTripple.cs" />
-    <Compile Include="Structs\CursorInfo.cs" />
-    <Compile Include="Structs\DwmBlurBehind.cs" />
     <Compile Include="Interop\DisposableCom.cs" />
-    <Compile Include="Enums\ClassLongIndex.cs" />
-    <Compile Include="Native\Dwm.cs" />
-    <Compile Include="Structs\DwmThumbnailProperties.cs" />
-    <Compile Include="Enums\ObjectIdentifiers.cs" />
-    <Compile Include="Enums\HookTypes.cs" />
-    <Compile Include="Structs\IconInfo.cs" />
-    <Compile Include="Structs\MonitorInfoEx.cs" />
-    <Compile Include="Mouse\Native\MouseInput.cs" />
-    <Compile Include="Mouse\Native\MouseLowLevelHookStruct.cs" />
     <Compile Include="Structs\OsVersionInfoEx.cs" />
-    <Compile Include="Structs\POINT.cs" />
-    <Compile Include="Structs\RECTF.cs" />
-    <Compile Include="Structs\RECT.cs" />
-    <Compile Include="Enums\HResult.cs" />
-    <Compile Include="Structs\ScrollBarInfo.cs" />
-    <Compile Include="Structs\ScrollInfo.cs" />
-    <Compile Include="Structs\SIZE.cs" />
-    <Compile Include="Native\User32.cs" />
-    <Compile Include="Enums\MonitorInfoFlags.cs" />
-    <Compile Include="Enums\Win32Error.cs" />
-    <Compile Include="Structs\TitleBarInfoEx.cs" />
-    <Compile Include="Structs\WindowInfo.cs" />
-    <Compile Include="Enums\WindowLongIndex.cs" />
-    <Compile Include="Enums\WindowPos.cs" />
     <Compile Include="Enums\WinEvents.cs" />
     <Compile Include="Enums\WinEventHookFlags.cs" />
-    <Compile Include="Structs\WindowPlacement.cs" />
     <Compile Include="Structs\WinEventInfo.cs" />
     <Compile Include="Desktop\WindowScroller.cs" />
     <Compile Include="Desktop\WinEventHook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WindowsVersion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
+      <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
+      <Name>Dapplo.Windows.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.DesktopWindowsManager\Dapplo.Windows.DesktopWindowsManager.csproj">
+      <Project>{ef02637f-86a5-47f1-bb75-33e0ba3119cf}</Project>
+      <Name>Dapplo.Windows.DesktopWindowsManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Input\Dapplo.Windows.Input.csproj">
+      <Project>{171a9ff9-8abb-4e40-8c88-75157a899b71}</Project>
+      <Name>Dapplo.Windows.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
       <Name>Dapplo.Windows.Messages</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj">
+      <Project>{fdf2ef88-dc84-40bc-8c85-7b143db9508b}</Project>
+      <Name>Dapplo.Windows.User32</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+    <Folder Include="Keyboard\" />
+    <Folder Include="Mouse\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

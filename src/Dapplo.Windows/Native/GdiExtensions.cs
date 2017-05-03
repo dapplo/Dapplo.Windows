@@ -23,6 +23,7 @@
 
 using System.Drawing;
 using Dapplo.Windows.SafeHandles;
+using Dapplo.Windows.User32.SafeHandles;
 
 #endregion
 

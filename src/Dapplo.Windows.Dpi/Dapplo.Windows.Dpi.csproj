@@ -66,28 +66,40 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitmapScaleHandler.cs" />
-    <Compile Include="DpiAwareForm.cs">
+    <Compile Include="Forms\DpiAwareForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="DpiAwareness.cs" />
+    <Compile Include="DpiAwarenessContext.cs" />
     <Compile Include="DpiHandler.cs" />
-    <Compile Include="FormsExtensions.cs" />
+    <Compile Include="Enums\MonitorDpiType.cs" />
+    <Compile Include="Forms\FormsExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WindowExtensions.cs" />
+    <Compile Include="Wpf\WindowExtensions.cs" />
     <Compile Include="WinProcListener.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
-      <Project>{8AA469BB-856A-4330-96CE-2BB75A014070}</Project>
-      <Name>Dapplo.Windows</Name>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
+      <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
+      <Name>Dapplo.Windows.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
       <Name>Dapplo.Windows.Messages</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj">
+      <Project>{fdf2ef88-dc84-40bc-8c85-7b143db9508b}</Project>
+      <Name>Dapplo.Windows.User32</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
+      <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>
+      <Name>Dapplo.Windows</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

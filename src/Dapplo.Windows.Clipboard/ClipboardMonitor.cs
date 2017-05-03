@@ -70,14 +70,10 @@ namespace Dapplo.Windows.Clipboard
                         var content = new ClipboardContents(hwnd);
 
                         // Make sure we don't trigger multiple times, this happend while developing.
-                        if (_previousSequence != content.Id)
+                        if (content.Id > _previousSequence)
                         {
                             _previousSequence = content.Id;
                             observer.OnNext(content);
-                        }
-                        else
-                        {
-                            content.Dispose();
                         }
 
                         return IntPtr.Zero;

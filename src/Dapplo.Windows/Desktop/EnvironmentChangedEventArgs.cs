@@ -23,6 +23,7 @@
 
 using System;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.User32.Enums;
 
 #endregion
 

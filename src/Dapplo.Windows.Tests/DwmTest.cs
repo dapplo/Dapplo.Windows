@@ -23,6 +23,7 @@
 
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.DesktopWindowsManager;
 using Dapplo.Windows.Native;
 using Xunit;
 using Xunit.Abstractions;

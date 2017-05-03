@@ -23,12 +23,15 @@
 
 using System;
 using System.Collections.Generic;
+using Dapplo.Windows.Common;
+using Dapplo.Windows.Common.Extensions;
+using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
-using Dapplo.Windows.Extensions;
 using Dapplo.Windows.Interop;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
+using Dapplo.Windows.User32.Enums;
 
 #endregion
 
@@ -86,7 +89,7 @@ namespace Dapplo.Windows.App
                 {
                     return IntPtr.Zero;
                 }
-                return User32.FindWindow(ApplauncherClass, null);
+                return User32.User32.FindWindow(ApplauncherClass, null);
             }
         }
 
@@ -107,14 +110,14 @@ namespace Dapplo.Windows.App
                 {
                     yield break;
                 }
-                var nextHandle = User32.FindWindow(AppWindowsClass, null);
+                var nextHandle = User32.User32.FindWindow(AppWindowsClass, null);
                 while (nextHandle != IntPtr.Zero)
                 {
                     yield return InteropWindowFactory.CreateFor(nextHandle);
-                    nextHandle = User32.FindWindowEx(IntPtr.Zero, nextHandle, AppWindowsClass, null);
+                    nextHandle = User32.User32.FindWindowEx(IntPtr.Zero, nextHandle, AppWindowsClass, null);
                 }
                 // check for gutter
-                var gutterHandle = User32.FindWindow(GutterClass, null);
+                var gutterHandle = User32.User32.FindWindow(GutterClass, null);
                 if (gutterHandle != IntPtr.Zero)
                 {
                     yield return InteropWindowFactory.CreateFor(gutterHandle);
@@ -134,7 +137,7 @@ namespace Dapplo.Windows.App
                 return true;
             }
 
-            foreach (var screen in User32.AllDisplays())
+            foreach (var screen in User32.User32.AllDisplays())
             {
                 if (screen.Bounds.Contains(windowBounds))
                 {
@@ -143,7 +146,7 @@ namespace Dapplo.Windows.App
                         // Fullscreen, it's "visible" when AppVisibilityOnMonitor says yes
                         // Although it might be the other App, this is not "very" important
                         var rect = screen.Bounds;
-                        var monitor = User32.MonitorFromRect(ref rect, MonitorFromFlags.DefaultToNearest);
+                        var monitor = User32.User32.MonitorFromRect(ref rect, MonitorFromFlags.DefaultToNearest);
                         if (monitor != IntPtr.Zero)
                         {
                             var monitorAppVisibility = AppVisibility.ComObject.GetAppVisibilityOnMonitor(monitor);
@@ -174,7 +177,7 @@ namespace Dapplo.Windows.App
             {
                 return null;
             }
-            var appLauncher = User32.FindWindow(ApplauncherClass, null);
+            var appLauncher = User32.User32.FindWindow(ApplauncherClass, null);
             if (appLauncher != IntPtr.Zero)
             {
                 return InteropWindowFactory.CreateFor(appLauncher);

@@ -27,8 +27,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Keyboard.Native;
+using Dapplo.Windows.Input;
+using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.Structs;
 using Xunit;
@@ -40,7 +42,6 @@ namespace Dapplo.Windows.Tests
 {
     public class InputTests
     {
-        private static readonly LogSource Log = new LogSource();
 
         public InputTests(ITestOutputHelper testOutputHelper)
         {
@@ -67,7 +68,7 @@ namespace Dapplo.Windows.Tests
                     .Where(interopWindow =>
                     {
                         int processId;
-                        User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
+                        User32.User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
                         return processId == process.Id;
                     })
                     .FirstOrDefaultAsync();
