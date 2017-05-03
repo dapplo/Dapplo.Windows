@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
-        <id>Dapplo.Clipboard</id>
+        <id>Dapplo.Windows.Messages</id>
         <version>$version$</version>
-        <title>Dapplo.Clipboard</title>
+        <title>Dapplo.Windows.Messages</title>
         <authors>Robin Krom</authors>
         <owners>Dapplo</owners>
         <licenseUrl>https://en.wikipedia.org/wiki/GNU_General_Public_License</licenseUrl>
         <projectUrl>http://www.dapplo.net/blocks/Dapplo.Windows</projectUrl>
         <iconUrl>http://www.dapplo.net/favicon.ico</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Dapplo.Clipboard is a library for accessing the clipboard in a more modern way.</description>
-		<summary>Dapplo.Clipboard is a library for accessing the clipboard in a more modern way.</summary>
+        <description>Dapplo.Windows.Messages is a library with the Windows messages and a WinProc helper.</description>
+		<summary>Dapplo.Windows.Messages is a library with the Windows messages and a WinProc helper.</summary>
         <language>en-us</language>
 		<copyright>Dapplo</copyright>
-		<tags>windows native clipboard</tags>
+		<tags>windows messages</tags>
     </metadata>
 	<files>
 		<file src="bin\release\$id$.pdb" target="lib\net45" />

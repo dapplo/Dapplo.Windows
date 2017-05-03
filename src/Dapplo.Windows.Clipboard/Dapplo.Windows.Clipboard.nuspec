@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
-        <id>Dapplo.Dpi</id>
+        <id>Dapplo.Windows.Clipboard</id>
         <version>$version$</version>
-        <title>Dapplo.Dpi</title>
+        <title>Dapplo.Windows.Clipboard</title>
         <authors>Robin Krom</authors>
         <owners>Dapplo</owners>
         <licenseUrl>https://en.wikipedia.org/wiki/GNU_General_Public_License</licenseUrl>
         <projectUrl>http://www.dapplo.net/blocks/Dapplo.Windows</projectUrl>
         <iconUrl>http://www.dapplo.net/favicon.ico</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Dapplo.Dpi assists to make an application Dpi-Aware.</description>
-		<summary>Dapplo.Dpi assists to make an application Dpi-Aware.</summary>
+        <description>Dapplo.Windows.Clipboard is a library for accessing the clipboard in a more modern way.</description>
+		<summary>Dapplo.Windows.Clipboard is a library for accessing the clipboard in a more modern way.</summary>
         <language>en-us</language>
 		<copyright>Dapplo</copyright>
-		<tags>windows native dpi aware</tags>
+		<tags>windows native clipboard</tags>
     </metadata>
 	<files>
 		<file src="bin\release\$id$.pdb" target="lib\net45" />
