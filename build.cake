@@ -11,6 +11,8 @@ var target = Argument("target", "Build");
 var configuration = Argument("configuration", "release");
 var nugetApiKey = Argument("nugetApiKey", EnvironmentVariable("NuGetApiKey"));
 var solutionFilePath = GetFiles("./**/*.sln").First();
+var solutionName = solutionFilePath.GetDirectory().GetDirectoryName();
+
 // Used to store the version, which is needed during the build and the packaging
 var version = EnvironmentVariable("APPVEYOR_BUILD_VERSION") ?? "1.0.0";
 
@@ -95,8 +97,6 @@ Task("Coverage")
         ReturnTargetCodeOffset = 0
     };
 
-    var solutionName = solutionFilePath.GetDirectory().GetDirectoryName();
-
     var projectFiles = GetFiles("./**/*.csproj");
     foreach(var projectFile in projectFiles)
     {
@@ -168,7 +168,7 @@ Task("RestoreNuGetPackages")
 Task("AssemblyVersion")
     .Does(() =>
 {
-    foreach(var assemblyInfoFile in  GetFiles("./**/AssemblyInfo.cs")) {
+    foreach(var assemblyInfoFile in  GetFiles("./**/AssemblyInfo.cs")Where(p => p.FullPath.Contains(solutionName))) {
         var assemblyInfo = ParseAssemblyInfo(assemblyInfoFile.FullPath);
         CreateAssemblyInfo(assemblyInfoFile.FullPath, new AssemblyInfoSettings {
             Version = version,
