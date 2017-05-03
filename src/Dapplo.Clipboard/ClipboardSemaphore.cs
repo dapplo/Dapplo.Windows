@@ -26,12 +26,12 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dapplo.Clipboard
+namespace Dapplo.Windows.Clipboard
 {
     /// <summary>
     /// This can be used to get a lock to the clipboard, and free it again.
     /// </summary>
-    public class ClipboardSemaphore : IDisposable
+    internal sealed class ClipboardSemaphore : IDisposable
     {
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         // To detect redundant calls
@@ -71,7 +71,7 @@ namespace Dapplo.Clipboard
                     break;
                 }
                 retries--;
-                Thread.Sleep(retryInterval ?? TimeSpan.Zero);
+                Thread.Sleep(retryInterval ?? TimeSpan.FromMilliseconds(200));
             } while (retries >= 0);
 
             if (!isLocked)

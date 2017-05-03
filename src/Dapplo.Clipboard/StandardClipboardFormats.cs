@@ -22,7 +22,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Dapplo.Clipboard
+namespace Dapplo.Windows.Clipboard
 {
     /// <summary>
     ///     Standard Clipboard Formats

@@ -28,7 +28,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Clipboard;
+using Dapplo.Windows.Clipboard;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -53,7 +53,7 @@ namespace Dapplo.Windows.Tests
         public async Task TestClipboardMonitor_Anything()
         {
             var tcs = new TaskCompletionSource<bool>();
-            var subscription = ClipboardMonitor.OnPasted.Subscribe(clipboard =>
+            var subscription = ClipboardMonitor.OnUpdate.Subscribe(clipboard =>
             {
                 Log.Debug().WriteLine("Formats {0}", string.Join(",", clipboard.Formats));
                 Log.Debug().WriteLine("Owner {0}", clipboard.OwnerHandle);
@@ -82,7 +82,7 @@ namespace Dapplo.Windows.Tests
         {
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
             bool hasNewContent = false;
-            var subscription = ClipboardMonitor.OnPasted.Where(clipboard => clipboard.Formats.Contains("CF_TEXT")).Subscribe(clipboard =>
+            var subscription = ClipboardMonitor.OnUpdate.Where(clipboard => clipboard.Formats.Contains("CF_TEXT")).Subscribe(clipboard =>
             {
                 Log.Debug().WriteLine("Detected change {0}", string.Join(",", clipboard.Formats));
                 Log.Debug().WriteLine("Owner {0}", clipboard.OwnerHandle);
@@ -109,7 +109,7 @@ namespace Dapplo.Windows.Tests
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
             ClipboardNative.Put(testString);
             await Task.Delay(1000);
-            Assert.Equal(testString,ClipboardNative.GetText());
+            Assert.Equal(testString,ClipboardNative.GetAsString());
         }
     }
 }

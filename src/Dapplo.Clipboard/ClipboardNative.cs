@@ -28,15 +28,20 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Dapplo.Clipboard
+namespace Dapplo.Windows.Clipboard
 {
     /// <summary>
-    /// Provides access to the Windows clipboard
+    /// Provides low level access to the Windows clipboard
     /// </summary>
     public static class ClipboardNative
     {
         private const int SuccessError = 0;
+
+        // "Global" clipboard lock
+        private static readonly ClipboardSemaphore ClipboardLock = new ClipboardSemaphore();
 
         // Cache for all the known clipboard format names
         private static readonly IDictionary<uint, string> Id2Format = new Dictionary<uint, string>();
@@ -59,25 +64,49 @@ namespace Dapplo.Clipboard
         }
 
         /// <summary>
-        /// Global lock for the clipboard
+        /// Get a global lock to the clipboard
         /// </summary>
-        public static ClipboardSemaphore ClipboardLock { get; } = new ClipboardSemaphore();
+        /// <param name="hWnd">IntPtr with the windows handle</param>
+        /// <param name="retries">int with the amount of lock attempts are made</param>
+        /// <param name="retryInterval">Timespan between retries, default 200ms</param>
+        /// <param name="timeout">Timeout for getting the lock</param>
+        /// <returns>IDisposable, which will unlock when Dispose is called</returns>
+        public static IDisposable Lock(IntPtr hWnd = default(IntPtr), int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
+        {
+            return ClipboardLock.Lock(hWnd, retries, retryInterval, timeout);
+        }
+
 
         /// <summary>
-        /// Place string on the clipboard
+        /// Get a global lock to the clipboard
         /// </summary>
-        /// <param name="hWnd">IntPtr with the handle which wants to access the clipboard</param>
-        /// <param name="text">string to place on the clipboard</param>
-        public static void Put(string text, IntPtr hWnd = default(IntPtr))
+        /// <param name="hWnd">IntPtr with the windows handle</param>
+        /// <param name="retries">int with the amount of lock attempts are made</param>
+        /// <param name="retryInterval">Timespan between retries, default 200ms</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>IDisposable in a Task, which will unlock when Dispose is called</returns>
+        public static Task<IDisposable> LockAsync(IntPtr hWnd = default(IntPtr), int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            return ClipboardLock.LockAsync(hWnd, retries, retryInterval, cancellationToken);
+        }
+
+        /// <summary>
+        /// Place string on the clipboard, this assumes you already locked the clipboard
+        /// </summary>
+        /// <param name="text">string to place on the clipboard</param>
+        /// <param name="format">Optional format, default is CF_UNICODETEXT</param>
+        public static void Put(string text, string format = "CF_UNICODETEXT")
+        {
+            uint formatId;
+            if (!Format2Id.TryGetValue(format, out formatId))
+            {
+                throw new ArgumentException($"{format} is not a known format.", nameof(format));
+            }
             var hText = IntPtr.Zero;
             try
             {
-                using (ClipboardLock.Lock())
-                {
-                    hText = Marshal.StringToHGlobalUni(text);
-                    SetClipboardData(StandardClipboardFormats.UnicodeText, hText);
-                }
+                hText = Marshal.StringToHGlobalUni(text);
+                SetClipboardData(formatId, hText);
             }
             finally
             {
@@ -89,17 +118,19 @@ namespace Dapplo.Clipboard
         }
 
         /// <summary>
-        /// Place string on the clipboard
+        /// Get a string from the clipboard, this assumes you already locked the clipboard
         /// </summary>
-        /// <param name="hWnd">IntPtr with the handle which wants to access the clipboard</param>
+        /// <param name="format">Optional format, default is CF_UNICODETEXT</param>
         /// <returns>string</returns>
-        public static string GetText(IntPtr hWnd = default(IntPtr))
+        public static string GetAsString(string format = "CF_UNICODETEXT")
         {
-            using (ClipboardLock.Lock(hWnd))
+            uint formatId;
+            if (!Format2Id.TryGetValue(format, out formatId))
             {
-                var hText = GetClipboardData(StandardClipboardFormats.UnicodeText);
-                return Marshal.PtrToStringUni(hText);
+                throw new ArgumentException($"{format} is not a known format.", nameof(format));
             }
+            var hText = GetClipboardData(formatId);
+            return Marshal.PtrToStringUni(hText);
         }
 
         /// <summary>
@@ -108,7 +139,7 @@ namespace Dapplo.Clipboard
         /// </summary>
         /// <param name="format">the format to retrieve the content for</param>
         /// <returns>MemoryStream</returns>
-        public static MemoryStream GetContent(string format)
+        public static MemoryStream GetAsStream(string format)
         {
             uint formatId;
 
@@ -257,14 +288,6 @@ namespace Dapplo.Clipboard
         private static extern IntPtr GetClipboardData(uint format);
 
         /// <summary>
-        /// Retrieves data from the clipboard in a specified format. The clipboard must have been opened previously.
-        /// </summary>
-        /// <param name="format">StandardClipboardFormats with the clipboard format.</param>
-        /// <returns>IntPtr with a handle to the memory</returns>
-        [DllImport("user32", SetLastError = true)]
-        private static extern IntPtr GetClipboardData(StandardClipboardFormats format);
-
-        /// <summary>
         /// Places data on the clipboard in a specified clipboard format.
         /// The window must be the current clipboard owner, and the application must have called the OpenClipboard function.
         /// (When responding to the WM_RENDERFORMAT and WM_RENDERALLFORMATS messages, the clipboard owner must not call OpenClipboard before calling SetClipboardData.)
@@ -274,17 +297,6 @@ namespace Dapplo.Clipboard
         /// <returns></returns>
         [DllImport("user32", SetLastError = true)]
         private static extern IntPtr SetClipboardData(uint format, IntPtr memory);
-
-        /// <summary>
-        /// Places data on the clipboard in a specified clipboard format.
-        /// The window must be the current clipboard owner, and the application must have called the OpenClipboard function.
-        /// (When responding to the WM_RENDERFORMAT and WM_RENDERALLFORMATS messages, the clipboard owner must not call OpenClipboard before calling SetClipboardData.)
-        /// </summary>
-        /// <param name="format">StandardClipboardFormats can be used</param>
-        /// <param name="memory">IntPtr to the memory area</param>
-        /// <returns></returns>
-        [DllImport("user32", SetLastError = true)]
-        private static extern IntPtr SetClipboardData(StandardClipboardFormats format, IntPtr memory);
 
         /// <summary>
         ///     See

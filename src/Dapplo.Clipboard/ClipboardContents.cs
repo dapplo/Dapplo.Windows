@@ -26,7 +26,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Dapplo.Clipboard
+namespace Dapplo.Windows.Clipboard
 {
     /// <summary>
     /// Content of the Clipboards
@@ -34,7 +34,7 @@ namespace Dapplo.Clipboard
     public sealed class ClipboardContents : IDisposable
     {
         // Used to identify every clipboard change
-        private static uint _globalSequenceNumber;
+        private static uint _globalSequenceNumber = 0;
 
         // Contents of the clipboard
         private readonly IDictionary<string, Lazy<MemoryStream>> _contents = new Dictionary<string, Lazy<MemoryStream>>();
@@ -76,9 +76,9 @@ namespace Dapplo.Clipboard
             {
                 _contents[format] = new Lazy<MemoryStream>(() =>
                 {
-                    using (ClipboardNative.ClipboardLock.Lock(hWnd))
+                    using (ClipboardNative.Lock(hWnd))
                     {
-                        return ClipboardNative.GetContent(format);
+                        return ClipboardNative.GetAsStream(format);
                     }
                 });
             }

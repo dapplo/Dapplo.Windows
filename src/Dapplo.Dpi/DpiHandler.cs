@@ -26,16 +26,15 @@ using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
-using Dapplo.Windows;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Messages;
 using Dapplo.Windows.Native;
 using Dapplo.Windows.SafeHandles;
 using Dapplo.Windows.Structs;
-using Dapplo.WinMessages;
 
 #endregion
 
-namespace Dapplo.Dpi
+namespace Dapplo.Windows.Dpi
 {
     /// <summary>
     ///     This handles DPI changes see u.a.

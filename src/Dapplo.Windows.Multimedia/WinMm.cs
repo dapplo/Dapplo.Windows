@@ -23,30 +23,29 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Enums;
 
 #endregion
 
-namespace Dapplo.Windows.Native
+namespace Dapplo.Windows.Multimedia
 {
     /// <summary>
-    ///     Windows Media
+    ///     Windows Mulit-Media API
     /// </summary>
-    public class WinMM
+    public static class WinMm
     {
         /// <summary>
-        ///     Play a sound via WinMM
+        ///     The PlaySound function plays a sound specified by the given file name, resource, or system event. (A system event may be associated with a sound in the registry or in the WIN.INI file.)
         /// </summary>
         /// <param name="soundBytes">byte array with the wave information</param>
-        /// <param name="hmod"></param>
-        /// <param name="fdwSound"></param>
-        /// <returns></returns>
+        /// <param name="hmod">Handle to the executable file that contains the resource to be loaded. This parameter must be NULL unless SND_RESOURCE is specified in fdwSound.</param>
+        /// <param name="fdwSound">Flags for playing the sound.</param>
+        /// <returns>Returns TRUE if successful or FALSE otherwise.</returns>
         [DllImport("winmm.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool PlaySound(byte[] soundBytes, UIntPtr hmod, SoundFlags fdwSound);
+        public static extern bool PlaySound(byte[] soundBytes, UIntPtr hmod, SoundSettings fdwSound);
 
         [DllImport("winmm.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool PlaySound(IntPtr ptrToSound, UIntPtr hmod, SoundFlags fdwSound);
+        public static extern bool PlaySound(IntPtr ptrToSound, UIntPtr hmod, SoundSettings fdwSound);
     }
 }

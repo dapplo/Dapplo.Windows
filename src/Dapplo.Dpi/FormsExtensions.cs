@@ -25,7 +25,7 @@ using System.Windows.Forms;
 
 #endregion
 
-namespace Dapplo.Dpi
+namespace Dapplo.Windows.Dpi
 {
     /// <summary>
     ///     Extensions for Windows Form

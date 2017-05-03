@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using Dapplo.Dpi;
+using Dapplo.Windows.Dpi;
 
 namespace Dapplo.Windows.WpfExample
 {

@@ -30,7 +30,7 @@ using System.Windows.Forms;
 
 #endregion
 
-namespace Dapplo.Dpi
+namespace Dapplo.Windows.Dpi
 {
     /// <summary>
     ///     Factory for the generic BitmapScaleHandler

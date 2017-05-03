@@ -27,7 +27,7 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Windows.Desktop;
-using Dapplo.Dpi;
+using Dapplo.Windows.Dpi;
 
 #endregion
 

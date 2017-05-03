@@ -21,7 +21,7 @@
 
 using System.Windows.Forms;
 
-namespace Dapplo.Dpi
+namespace Dapplo.Windows.Dpi
 {
 	/// <summary>
 	/// This is a DPI-Aware Form, making DPI support very easy: just extend your Form from this

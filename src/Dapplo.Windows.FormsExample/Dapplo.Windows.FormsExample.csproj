@@ -110,9 +110,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Dpi\Dapplo.Dpi.csproj">
+    <ProjectReference Include="..\Dapplo.Dpi\Dapplo.Windows.Dpi.csproj">
       <Project>{b8b5782d-eecd-4260-8bed-643ef8b8b6d0}</Project>
-      <Name>Dapplo.Dpi</Name>
+      <Name>Dapplo.Windows.Dpi</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
       <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>

@@ -26,7 +26,7 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using Dapplo.Windows.Enums;
-using Dapplo.WinMessages;
+using Dapplo.Windows.Messages;
 
 #endregion
 

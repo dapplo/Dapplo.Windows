@@ -30,7 +30,7 @@ using Dapplo.Log;
 
 #endregion
 
-namespace Dapplo.WinMessages
+namespace Dapplo.Windows.Messages
 {
     /// <summary>
     ///     This can be used to handle WinProc messages, for instance when there is no running winproc

@@ -131,7 +131,6 @@
     <Compile Include="Enums\ScrollBarTypes.cs" />
     <Compile Include="Enums\SendMessageTimeoutFlags.cs" />
     <Compile Include="Enums\ShowWindowCommands.cs" />
-    <Compile Include="Enums\SoundFlags.cs" />
     <Compile Include="Enums\SysCommands.cs" />
     <Compile Include="Enums\SystemMetric.cs" />
     <Compile Include="Enums\ThreadAccess.cs" />
@@ -148,7 +147,6 @@
     <Compile Include="Native\PsAPI.cs" />
     <Compile Include="Native\Shell32.cs" />
     <Compile Include="Native\Win32.cs" />
-    <Compile Include="Native\WinMM.cs" />
     <Compile Include="SafeHandles\SafeCompatibleDcHandle.cs" />
     <Compile Include="SafeHandles\SafeCurrentInputDesktopHandle.cs" />
     <Compile Include="SafeHandles\SafeDcHandle.cs" />
@@ -207,9 +205,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapplo.WinMessages\Dapplo.WinMessages.csproj">
+    <ProjectReference Include="..\Dapplo.WinMessages\Dapplo.Windows.Messages.csproj">
       <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
-      <Name>Dapplo.WinMessages</Name>
+      <Name>Dapplo.Windows.Messages</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

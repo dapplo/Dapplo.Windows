@@ -27,11 +27,11 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
-using Dapplo.WinMessages;
+using Dapplo.Windows.Messages;
 
 #endregion
 
-namespace Dapplo.Clipboard
+namespace Dapplo.Windows.Clipboard
 {
     /// <summary>
     ///     A monitor for clipboard changes
@@ -100,7 +100,7 @@ namespace Dapplo.Clipboard
         /// <summary>
         ///     This observable publishes the current clipboard contents after every paste action.
         /// </summary>
-        public static IObservable<ClipboardContents> OnPasted => Singleton.Value._clipboardObservable;
+        public static IObservable<ClipboardContents> OnUpdate => Singleton.Value._clipboardObservable;
 
         #region Native methods
 

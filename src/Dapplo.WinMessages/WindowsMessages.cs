@@ -19,7 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.WinMessages
+namespace Dapplo.Windows.Messages
 {
     /// <summary>
     ///     All possible windows messages

@@ -22,8 +22,8 @@
 #region using
 
 using System;
+using Dapplo.Windows.Messages;
 using Dapplo.Windows.Structs;
-using Dapplo.WinMessages;
 
 #endregion
 
