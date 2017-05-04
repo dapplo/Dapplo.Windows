@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Dapplo.Windows.Com</id>
+        <version>$version$</version>
+        <title>Dapplo.Windows.Com</title>
+        <authors>Robin Krom</authors>
+        <owners>Dapplo</owners>
+        <licenseUrl>https://en.wikipedia.org/wiki/GNU_General_Public_License</licenseUrl>
+        <projectUrl>http://www.dapplo.net/blocks/Dapplo.Windows</projectUrl>
+        <iconUrl>http://www.dapplo.net/favicon.ico</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Dapplo.Windows.Com is a library which has com supporting code</description>
+		<summary>Dapplo.Windows.Com is a library which has com supporting code</summary>
+        <language>en-us</language>
+		<copyright>Dapplo</copyright>
+		<tags>windows com</tags>
+    </metadata>
+	<files>
+		<file src="bin\release\$id$.pdb" target="lib\net45" />
+		<file src="bin\release\$id$.xml" target="lib\net45" />
+		<file src="bin\release\$id$.dll" target="lib\net45" />
+	</files>
+</package>
