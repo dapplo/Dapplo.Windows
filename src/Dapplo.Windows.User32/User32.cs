@@ -289,11 +289,9 @@ namespace Dapplo.Windows.User32
         /// <returns></returns>
         public static long GetWindowLongWrapper(IntPtr hwnd, WindowLongIndex index)
         {
-            if (IntPtr.Size == 8)
-            {
-                return GetWindowLongPtr(hwnd, index).ToInt64();
-            }
-            return GetWindowLong(hwnd, index);
+            return IntPtr.Size == 8 ?
+                GetWindowLongPtr(hwnd, index).ToInt64() :
+                GetWindowLong(hwnd, index);
         }
 
         /// <summary>
@@ -589,10 +587,10 @@ namespace Dapplo.Windows.User32
         ///     with the bounding rectangle of a specified window.
         /// </summary>
         /// <param name="hwnd"></param>
-        /// <param name="monitorFromFlags">MonitorFromFlags</param>
+        /// <param name="monitorFrom">MonitorFromFlags</param>
         /// <returns>IntPtr for the monitor</returns>
         [DllImport("user32", SetLastError = true)]
-        public static extern IntPtr MonitorFromWindow(IntPtr hwnd, MonitorFromFlags monitorFromFlags);
+        public static extern IntPtr MonitorFromWindow(IntPtr hwnd, MonitorFrom monitorFrom);
 
         /// <summary>
         ///     The MonitorFromRect function retrieves a handle to the display monitor that has the largest area of intersection
@@ -601,10 +599,10 @@ namespace Dapplo.Windows.User32
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145063(v=vs.85).aspx">MonitorFromRect function</a>
         /// </summary>
         /// <param name="rect">A RECT structure that specifies the rectangle of interest in virtual-screen coordinates.</param>
-        /// <param name="monitorFromFlags">MonitorFromRectFlags</param>
+        /// <param name="monitorFrom">MonitorFromRectFlags</param>
         /// <returns>HMONITOR handle</returns>
         [DllImport("user32", SetLastError = true)]
-        public static extern IntPtr MonitorFromRect([In] ref RECT rect, MonitorFromFlags monitorFromFlags);
+        public static extern IntPtr MonitorFromRect([In] ref RECT rect, MonitorFrom monitorFrom);
 
         /// <summary>
         ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633516(v=vs.85).aspx">GetWindowInfo</a>

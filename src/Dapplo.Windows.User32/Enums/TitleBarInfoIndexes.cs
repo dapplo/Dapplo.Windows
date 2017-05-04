@@ -19,40 +19,41 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Text;
-
-#endregion
-
-namespace Dapplo.Windows.Native
+namespace Dapplo.Windows.User32.Enums
 {
     /// <summary>
-    ///     Description of PsAPI.
+    ///     The following are the title bar elements represented in the arrays.
     /// </summary>
-    public class PsAPI
+    public enum TitleBarInfoIndexes
     {
-        [DllImport("psapi")]
-        private static extern int EmptyWorkingSet(IntPtr hwProc);
+        /// <summary>
+        ///     Index for the titlebar
+        /// </summary>
+        TitleBar = 0,
 
         /// <summary>
-        ///     Make the process use less memory by emptying the working set
+        ///     Not used
         /// </summary>
-        public static void EmptyWorkingSet()
-        {
-            using (var currentProcess = Process.GetCurrentProcess())
-            {
-                EmptyWorkingSet(currentProcess.Handle);
-            }
-        }
+        Reserved = 1,
 
-        [DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, StringBuilder lpFilename, uint nSize);
+        /// <summary>
+        ///     Index for the minimize button
+        /// </summary>
+        MinimizeButton = 2,
 
-        [DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern uint GetProcessImageFileName(IntPtr hProcess, StringBuilder lpImageFileName, uint nSize);
+        /// <summary>
+        ///     Index for the maximize button
+        /// </summary>
+        MaximizeButton = 3,
+
+        /// <summary>
+        ///     Index for the help button
+        /// </summary>
+        HelpButton = 4,
+
+        /// <summary>
+        ///     Index for the close button
+        /// </summary>
+        CloseButton = 5
     }
 }

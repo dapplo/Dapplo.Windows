@@ -205,15 +205,23 @@ namespace Dapplo.Windows.DesktopWindowsManager
         public static extern bool DwmpStartOrStopFlip3D();
 
         /// <summary>
+        /// Retrieves the source size of the Desktop Window Manager (DWM) thumbnail.
         /// </summary>
-        /// <param name="thumb"></param>
-        /// <param name="size"></param>
-        /// <returns></returns>
+        /// <param name="hThumbnail">A handle to the thumbnail to retrieve the source window size from.</param>
+        /// <param name="size">a SIZE structure that, when this function returns successfully, receives the size of the source thumbnail.</param>
+        /// <returns>HResult</returns>
         [DllImport("dwmapi", SetLastError = true)]
-        public static extern int DwmQueryThumbnailSourceSize(IntPtr thumb, out SIZE size);
+        public static extern HResult DwmQueryThumbnailSourceSize(IntPtr hThumbnail, out SIZE size);
 
+        /// <summary>
+        /// Creates a Desktop Window Manager (DWM) thumbnail relationship between the destination and source windows.
+        /// </summary>
+        /// <param name="hwndDestination">The handle to the window that will use the DWM thumbnail. Setting the destination window handle to anything other than a top-level window type will result in a return value of E_INVALIDARG.</param>
+        /// <param name="hwndSource">The handle to the window to use as the thumbnail source. Setting the source window handle to anything other than a top-level window type will result in a return value of E_INVALIDARG.</param>
+        /// <param name="phThumbnailId">A pointer to a handle that, when this function returns successfully, represents the registration of the DWM thumbnail.</param>
+        /// <returns>HResult</returns>
         [DllImport("dwmapi", SetLastError = true)]
-        public static extern int DwmRegisterThumbnail(IntPtr dest, IntPtr src, out IntPtr thumb);
+        public static extern HResult DwmRegisterThumbnail(IntPtr hwndDestination, IntPtr hwndSource, out IntPtr phThumbnailId);
 
         /// <summary>
         ///     Sets a static, iconic bitmap to display a live preview (also known as a Peek preview) of a window or tab. The
@@ -258,11 +266,22 @@ namespace Dapplo.Windows.DesktopWindowsManager
         [DllImport("dwmapi", SetLastError = true)]
         public static extern HResult DwmSetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttributeToSet, IntPtr pvAttributeValue, uint cbAttribute);
 
+        /// <summary>
+        /// Removes a Desktop Window Manager (DWM) thumbnail relationship created by the DwmRegisterThumbnail function.
+        /// </summary>
+        /// <param name="hThumbnailId">The handle to the thumbnail relationship to be removed. Null or non-existent handles will result in a return value of E_INVALIDARG.</param>
+        /// <returns>HResult</returns>
         [DllImport("dwmapi", SetLastError = true)]
-        public static extern int DwmUnregisterThumbnail(IntPtr thumb);
+        public static extern HResult DwmUnregisterThumbnail(IntPtr hThumbnailId);
 
+        /// <summary>
+        /// Updates the properties for a Desktop Window Manager (DWM) thumbnail.
+        /// </summary>
+        /// <param name="hThumbnailId">IntPtr The handle to the DWM thumbnail to be updated. Null or invalid thumbnails, as well as thumbnails owned by other processes will result in a return value of E_INVALIDARG.</param>
+        /// <param name="props">A pointer to a DwmThumbnailProperties structure that contains the new thumbnail properties.</param>
+        /// <returns>HResult</returns>
         [DllImport("dwmapi", SetLastError = true)]
-        public static extern int DwmUpdateThumbnailProperties(IntPtr hThumb, ref DwmThumbnailProperties props);
+        public static extern HResult DwmUpdateThumbnailProperties(IntPtr hThumbnailId, ref DwmThumbnailProperties props);
 
         /// <summary>
         ///     Enable DWM composition
@@ -289,10 +308,32 @@ namespace Dapplo.Windows.DesktopWindowsManager
             return false;
         }
 
+        /// <summary>
+        /// Retrieves the shared surface of the specified hWnd, maybe https://github.com/notr1ch/DWMCapture can help on the usage.
+        /// http://undoc.airesoft.co.uk/user32.dll/DwmGetDxSharedSurface.php?
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="adapterLuid"></param>
+        /// <param name="one"></param>
+        /// <param name="two"></param>
+        /// <param name="pD3DFormat"></param>
+        /// <param name="pSharedHandle"></param>
+        /// <param name="unknown"></param>
+        /// <returns></returns>
         [PreserveSig]
         [DllImport("dwmapi", EntryPoint = "#100", SetLastError = true)]
         public static extern int GetSharedSurface(IntPtr hWnd, long adapterLuid, uint one, uint two, [In] [Out] ref uint pD3DFormat, [Out] out IntPtr pSharedHandle, ulong unknown);
 
+        /// <summary>
+        /// maybe https://github.com/notr1ch/DWMCapture can help on the usage.
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="one"></param>
+        /// <param name="two"></param>
+        /// <param name="three"></param>
+        /// <param name="hMonitor"></param>
+        /// <param name="unknown"></param>
+        /// <returns></returns>
         [PreserveSig]
         [DllImport("dwmapi", EntryPoint = "#101", SetLastError = true)]
         public static extern int UpdateWindowShared(IntPtr hWnd, int one, int two, int three, IntPtr hMonitor, IntPtr unknown);

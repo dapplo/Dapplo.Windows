@@ -19,41 +19,28 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.Windows.Enums
+#region using
+
+using System;
+
+#endregion
+
+namespace Dapplo.Windows.Kernel.Enums
 {
-    /// <summary>
-    ///     The following are the title bar elements represented in the arrays.
-    /// </summary>
-    public enum TitleBarInfoIndexes
+#pragma warning disable 1591
+
+    [Flags]
+    public enum ThreadAccess
     {
-        /// <summary>
-        ///     Index for the titlebar
-        /// </summary>
-        TitleBar = 0,
-
-        /// <summary>
-        ///     Not used
-        /// </summary>
-        Reserved = 1,
-
-        /// <summary>
-        ///     Index for the minimize button
-        /// </summary>
-        MinimizeButton = 2,
-
-        /// <summary>
-        ///     Index for the maximize button
-        /// </summary>
-        MaximizeButton = 3,
-
-        /// <summary>
-        ///     Index for the help button
-        /// </summary>
-        HelpButton = 4,
-
-        /// <summary>
-        ///     Index for the close button
-        /// </summary>
-        CloseButton = 5
+        TERMINATE = 0x0001,
+        SUSPEND_RESUME = 0x0002,
+        GET_CONTEXT = 0x0008,
+        SET_CONTEXT = 0x0010,
+        SET_INFORMATION = 0x0020,
+        QUERY_INFORMATION = 0x0040,
+        SET_THREAD_TOKEN = 0x0080,
+        IMPERSONATE = 0x0100,
+        DIRECT_IMPERSONATION = 0x0200
+#pragma warning restore 1591
     }
 }

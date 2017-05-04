@@ -24,12 +24,12 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Dapplo.Windows.Enums;
-using Dapplo.Windows.Structs;
+using Dapplo.Windows.Kernel.Enums;
+using Dapplo.Windows.Kernel.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Native
+namespace Dapplo.Windows.Kernel
 {
     /// <summary>
     ///     Kernel 32 functionality
@@ -117,19 +117,19 @@ namespace Dapplo.Windows.Native
         ///     Method to get the process path
         /// </summary>
         /// <param name="processid"></param>
-        /// <returns></returns>
+        /// <returns>string</returns>
         public static string GetProcessPath(int processid)
         {
             var pathBuffer = new StringBuilder(512);
             // Try the GetModuleFileName method first since it's the fastest. 
             // May return ACCESS_DENIED (due to VM_READ flag) if the process is not owned by the current user.
             // Will fail if we are compiled as x86 and we're trying to open a 64 bit process...not allowed.
-            var hprocess = OpenProcess(ProcessAccessFlags.QueryInformation | ProcessAccessFlags.VirtualMemoryRead, false, processid);
+            var hprocess = OpenProcess(ProcessAccessRights.QueryInformation | ProcessAccessRights.VirtualMemoryRead, false, processid);
             if (hprocess != IntPtr.Zero)
             {
                 try
                 {
-                    if (PsAPI.GetModuleFileNameEx(hprocess, IntPtr.Zero, pathBuffer, (uint) pathBuffer.Capacity) > 0)
+                    if (PsApi.GetModuleFileNameEx(hprocess, IntPtr.Zero, pathBuffer, (uint) pathBuffer.Capacity) > 0)
                     {
                         return pathBuffer.ToString();
                     }
@@ -140,7 +140,7 @@ namespace Dapplo.Windows.Native
                 }
             }
 
-            hprocess = OpenProcess(ProcessAccessFlags.QueryInformation, false, processid);
+            hprocess = OpenProcess(ProcessAccessRights.QueryInformation, false, processid);
             if (hprocess != IntPtr.Zero)
             {
                 try
@@ -153,17 +153,14 @@ namespace Dapplo.Windows.Native
                     }
 
                     // Try the GetProcessImageFileName method
-                    if (PsAPI.GetProcessImageFileName(hprocess, pathBuffer, (uint) pathBuffer.Capacity) > 0)
+                    if (PsApi.GetProcessImageFileName(hprocess, pathBuffer, (uint) pathBuffer.Capacity) > 0)
                     {
                         var dospath = pathBuffer.ToString();
                         foreach (var drive in Environment.GetLogicalDrives())
                         {
-                            if (QueryDosDevice(drive.TrimEnd('\\'), pathBuffer, (uint) pathBuffer.Capacity) > 0)
+                            if (QueryDosDevice(drive.TrimEnd('\\'), pathBuffer, (uint) pathBuffer.Capacity) > 0 && dospath.StartsWith(pathBuffer.ToString()))
                             {
-                                if (dospath.StartsWith(pathBuffer.ToString()))
-                                {
-                                    return drive + dospath.Remove(0, pathBuffer.Length);
-                                }
+                                return drive + dospath.Remove(0, pathBuffer.Length);
                             }
                         }
                     }
@@ -216,7 +213,7 @@ namespace Dapplo.Windows.Native
         public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)] string lpFileName);
 
         [DllImport("kernel32", SetLastError = true)]
-        public static extern IntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
+        public static extern IntPtr OpenProcess(ProcessAccessRights dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
 
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern uint QueryDosDevice(string lpDeviceName, StringBuilder lpTargetPath, uint uuchMax);

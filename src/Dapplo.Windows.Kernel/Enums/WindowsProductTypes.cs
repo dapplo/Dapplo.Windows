@@ -25,7 +25,7 @@ using System;
 
 #endregion
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Kernel.Enums
 {
     /// <summary>
     ///     Any additional information about the system. This member can be one of the following values.

@@ -26,7 +26,7 @@ using System.ComponentModel;
 
 #endregion
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Kernel.Enums
 {
     /// <summary>
     ///     A bit mask that identifies the product suites available on the system. This member can be a combination of the

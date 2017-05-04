@@ -128,6 +128,10 @@
       <Project>{171a9ff9-8abb-4e40-8c88-75157a899b71}</Project>
       <Name>Dapplo.Windows.Input</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Kernel\Dapplo.Windows.Kernel.csproj">
+      <Project>{61832675-c53b-4283-8c44-ef99fd26ad3b}</Project>
+      <Name>Dapplo.Windows.Kernel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{DE471F22-E095-4B11-9702-8306D69B32CA}</Project>
       <Name>Dapplo.Windows.Messages</Name>

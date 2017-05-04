@@ -142,7 +142,7 @@ namespace Dapplo.Windows.Dpi
             // Use the second easiest method, but this only works for Windows 8.1 or later
             if (WindowsVersion.IsWindows81OrLater)
             {
-                var hMonitor = User32.User32.MonitorFromWindow(hWnd, MonitorFromFlags.DefaultToNearest);
+                var hMonitor = User32.User32.MonitorFromWindow(hWnd, MonitorFrom.DefaultToNearest);
                 uint dpiX;
                 uint dpiY;
                 if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out dpiX, out dpiY))

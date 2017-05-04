@@ -47,7 +47,7 @@
     <Compile Include="Enums\CursorInfoFlags.cs" />
     <Compile Include="Enums\DesktopAccessRight.cs" />
     <Compile Include="Enums\GetWindowCommands.cs" />
-    <Compile Include="Enums\MonitorFromFlags.cs" />
+    <Compile Include="Enums\MonitorFrom.cs" />
     <Compile Include="Enums\ObjectIdentifiers.cs" />
     <Compile Include="Enums\ObjectStates.cs" />
     <Compile Include="Enums\PrintWindowFlags.cs" />
@@ -64,6 +64,7 @@
     <Compile Include="Enums\SystemMetric.cs" />
     <Compile Include="Enums\SystemParametersInfoActions.cs" />
     <Compile Include="Enums\SystemParametersInfoBehaviors.cs" />
+    <Compile Include="Enums\TitleBarInfoIndexes.cs" />
     <Compile Include="Enums\WindowPos.cs" />
     <Compile Include="SafeHandles\SafeCurrentInputDesktopHandle.cs" />
     <Compile Include="SafeHandles\SafeIconHandle.cs" />

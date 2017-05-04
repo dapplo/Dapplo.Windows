@@ -25,16 +25,13 @@ using System;
 
 #endregion
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Kernel.Enums
 {
     /// <summary>
-    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms684880(v=vs.85).aspx">
-    ///         Process Security and
-    ///         Access Rights
-    ///     </a>
+    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms684880(v=vs.85).aspx">Process Security and Access Rights</a>
     /// </summary>
     [Flags]
-    public enum ProcessAccessFlags : uint
+    public enum ProcessAccessRights : uint
     {
         /// <summary>
         ///     Combined value for access all

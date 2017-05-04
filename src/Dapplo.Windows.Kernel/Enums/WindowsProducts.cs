@@ -26,7 +26,7 @@ using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Kernel.Enums
 {
     /// <summary>
     ///     Windows Product types, returned by GetProductInfo

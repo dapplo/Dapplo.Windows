@@ -23,8 +23,8 @@
 
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.Structs;
+using Dapplo.Windows.Kernel;
+using Dapplo.Windows.Kernel.Structs;
 using Xunit;
 using Xunit.Abstractions;
 
