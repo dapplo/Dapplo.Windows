@@ -22,42 +22,37 @@
 #region using
 
 using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 #endregion
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Gdi.SafeHandles
 {
     /// <summary>
-    ///     Status result for GDI+ calls
+    ///     Abstract class SafeObjectHandle which contains all handles that are cleaned with DeleteObject
     /// </summary>
-    [Flags]
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public enum GdiPlusStatus
+    public abstract class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
-#pragma warning disable 1591
-        Ok = 0,
-        GenericError = 1,
-        InvalidParameter = 2,
-        OutOfMemory = 3,
-        ObjectBusy = 4,
-        InsufficientBuffer = 5,
-        NotImplemented = 6,
-        Win32Error = 7,
-        WrongState = 8,
-        Aborted = 9,
-        FileNotFound = 10,
-        ValueOverflow = 11,
-        AccessDenied = 12,
-        UnknownImageFormat = 13,
-        FontFamilyNotFound = 14,
-        FontStyleNotFound = 15,
-        NotTrueTypeFont = 16,
-        UnsupportedGdiplusVersion = 17,
-        GdiplusNotInitialized = 18,
-        PropertyNotFound = 19,
-        PropertyNotSupported = 20,
-        ProfileNotFound = 21
-#pragma warning restore 1591
+        /// <summary>
+        ///     Create SafeObjectHandle
+        /// </summary>
+        /// <param name="ownsHandle">True if the class owns the handle</param>
+        protected SafeObjectHandle(bool ownsHandle) : base(ownsHandle)
+        {
+        }
+
+        [DllImport("gdi32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool DeleteObject(IntPtr hObject);
+
+        /// <summary>
+        ///     Call DeleteObject
+        /// </summary>
+        /// <returns>true if this worked</returns>
+        protected override bool ReleaseHandle()
+        {
+            return DeleteObject(handle);
+        }
     }
 }

@@ -1152,9 +1152,8 @@ namespace Dapplo.Windows.User32.Enums
 
         /// <summary>
         ///     Turns the Sonar accessibility feature on or off. This feature briefly shows several concentric circles around the
-        ///     mouse pointer
-        ///     when the user presses and releases the CTRL key. The pvParam parameter specifies TRUE for on and FALSE for off. The
-        ///     default is off.
+        ///     mouse pointer when the user presses and releases the CTRL key. The pvParam parameter specifies TRUE for on and FALSE for off.
+        ///     The  default is off.
         ///     For more information, see About Mouse Input.
         ///     Windows 2000/NT, Windows 98/95:  This value is not supported.
         /// </summary>

@@ -56,12 +56,6 @@
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -83,6 +77,10 @@
       <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
       <Name>Dapplo.Windows.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Gdi\Dapplo.Windows.Gdi.csproj">
+      <Project>{e4a0ce9d-681c-44d0-85f5-4f677ec54658}</Project>
+      <Name>Dapplo.Windows.Gdi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
       <Name>Dapplo.Windows.Messages</Name>
@@ -90,10 +88,6 @@
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj">
       <Project>{fdf2ef88-dc84-40bc-8c85-7b143db9508b}</Project>
       <Name>Dapplo.Windows.User32</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
-      <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>
-      <Name>Dapplo.Windows</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -62,7 +62,6 @@
       <HintPath>..\packages\System.Reactive.Linq.3.1.1\lib\net45\System.Reactive.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -78,40 +77,16 @@
     <Compile Include="Desktop\WindowsEnumerator.cs" />
     <Compile Include="Desktop\InteropWindow.cs" />
     <Compile Include="Desktop\InteropWindowExtensions.cs" />
-    <Compile Include="Enums\BitmapCompressionMethods.cs" />
-    <Compile Include="Enums\ColorSpaceEnum.cs" />
     <Compile Include="Enums\TitleBarInfoIndexes.cs" />
     <Compile Include="Enums\InteropWindowCacheFlags.cs" />
-    <Compile Include="Enums\RasterOperations.cs" />
     <Compile Include="Enums\WindowsProducts.cs" />
     <Compile Include="Enums\WindowsProductTypes.cs" />
     <Compile Include="Enums\WindowsSuites.cs" />
-    <Compile Include="Enums\DeviceCaps.cs" />
-    <Compile Include="Enums\GdiPlusStatus.cs" />
-    <Compile Include="Enums\GpUnit.cs" />
     <Compile Include="Enums\ProcessAccessFlags.cs" />
     <Compile Include="Enums\ThreadAccess.cs" />
-    <Compile Include="Native\Gdi32.cs" />
-    <Compile Include="Native\GdiExtensions.cs" />
-    <Compile Include="Native\GdiPlus.cs" />
     <Compile Include="Native\Kernel32.cs" />
     <Compile Include="Native\PsAPI.cs" />
     <Compile Include="Native\Shell32.cs" />
-    <Compile Include="SafeHandles\SafeCompatibleDcHandle.cs" />
-    <Compile Include="SafeHandles\SafeDcHandle.cs" />
-    <Compile Include="SafeHandles\SafeDeviceContextHandle.cs" />
-    <Compile Include="SafeHandles\SafeDibSectionHandle.cs" />
-    <Compile Include="SafeHandles\SafeHBitmapHandle.cs" />
-    <Compile Include="SafeHandles\SafeObjectHandle.cs" />
-    <Compile Include="SafeHandles\SafeRegionHandle.cs" />
-    <Compile Include="SafeHandles\SafeSelectObjectHandle.cs" />
-    <Compile Include="SafeHandles\SafeWindowDcHandle.cs" />
-    <Compile Include="Structs\BitfieldColorMask.cs" />
-    <Compile Include="Structs\BitmapFileHeader.cs" />
-    <Compile Include="Structs\BitmapInfoHeader.cs" />
-    <Compile Include="Structs\BlurParams.cs" />
-    <Compile Include="Structs\CieXyz.cs" />
-    <Compile Include="Structs\CieXyzTripple.cs" />
     <Compile Include="Interop\DisposableCom.cs" />
     <Compile Include="Structs\OsVersionInfoEx.cs" />
     <Compile Include="Enums\WinEvents.cs" />
@@ -133,6 +108,10 @@
       <Project>{ef02637f-86a5-47f1-bb75-33e0ba3119cf}</Project>
       <Name>Dapplo.Windows.DesktopWindowsManager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Gdi\Dapplo.Windows.Gdi.csproj">
+      <Project>{e4a0ce9d-681c-44d0-85f5-4f677ec54658}</Project>
+      <Name>Dapplo.Windows.Gdi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Input\Dapplo.Windows.Input.csproj">
       <Project>{171a9ff9-8abb-4e40-8c88-75157a899b71}</Project>
       <Name>Dapplo.Windows.Input</Name>
@@ -146,11 +125,7 @@
       <Name>Dapplo.Windows.User32</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-    <Folder Include="Keyboard\" />
-    <Folder Include="Mouse\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -23,8 +23,9 @@
 
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Gdi;
+using Dapplo.Windows.Gdi.SafeHandles;
 using Dapplo.Windows.Native;
-using Dapplo.Windows.SafeHandles;
 using Xunit;
 using Xunit.Abstractions;
 

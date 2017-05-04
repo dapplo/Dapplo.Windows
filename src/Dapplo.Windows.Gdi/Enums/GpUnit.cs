@@ -19,50 +19,46 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-using System.Runtime.InteropServices;
-
-#endregion
-
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Gdi.Enums
 {
     /// <summary>
-    ///     Color representation using CIEXYZ color components
+    ///     GDI Plus unit description.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct CieXyzTripple
+    public enum GpUnit
     {
         /// <summary>
-        ///     A CIE XYZ 1931 color space for the red component
+        ///     World coordinate (non-physical unit).
         /// </summary>
-        public CieXyz CieXyzRed;
+        UnitWorld,
 
         /// <summary>
-        ///     A CIE XYZ 1931 color space for the green component
+        ///     Variable - for PageTransform only.
         /// </summary>
-        public CieXyz CieXyzGreen;
+        UnitDisplay,
 
         /// <summary>
-        ///     A CIE XYZ 1931 color space for the blue component
+        ///     Each unit is one device pixel.
         /// </summary>
-        public CieXyz CieXyzBlue;
+        UnitPixel,
 
         /// <summary>
-        ///     Factory method
+        ///     Each unit is a printer's point, or 1/72 inch.
         /// </summary>
-        /// <param name="red">CieXyz</param>
-        /// <param name="green">CieXyz</param>
-        /// <param name="blue">CieXyz</param>
-        /// <returns>CieXyzTripple</returns>
-        public static CieXyzTripple Create(CieXyz red, CieXyz green, CieXyz blue)
-        {
-            return new CieXyzTripple
-            {
-                CieXyzRed = red,
-                CieXyzGreen = green,
-                CieXyzBlue = blue
-            };
-        }
+        UnitPoint,
+
+        /// <summary>
+        ///     Each unit is 1 inch.
+        /// </summary>
+        UnitInch,
+
+        /// <summary>
+        ///     Each unit is 1/300 inch.
+        /// </summary>
+        UnitDocument,
+
+        /// <summary>
+        ///     Each unit is 1 millimeter.
+        /// </summary>
+        UnitMillimeter
     }
 }

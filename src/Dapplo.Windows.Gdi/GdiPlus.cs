@@ -29,12 +29,12 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Enums;
-using Dapplo.Windows.Structs;
+using Dapplo.Windows.Gdi.Enums;
+using Dapplo.Windows.Gdi.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Native
+namespace Dapplo.Windows.Gdi
 {
     /// <summary>
     ///     GDIplus Helpers

@@ -19,46 +19,49 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.Windows.Enums
+#region using
+
+using System;
+using System.Security;
+
+#endregion
+
+namespace Dapplo.Windows.Gdi.SafeHandles
 {
     /// <summary>
-    ///     GDI Plus unit description.
+    ///     A hRegion SafeHandle implementation
     /// </summary>
-    public enum GpUnit
+    public class SafeRegionHandle : SafeObjectHandle
     {
         /// <summary>
-        ///     World coordinate (non-physical unit).
+        ///     Default constructor is needed to support marshalling!!
         /// </summary>
-        UnitWorld,
+        [SecurityCritical]
+        public SafeRegionHandle() : base(true)
+        {
+        }
 
         /// <summary>
-        ///     Variable - for PageTransform only.
+        ///     Create a SafeRegionHandle from an existing handle
         /// </summary>
-        UnitDisplay,
+        /// <param name="preexistingHandle">IntPtr to region</param>
+        [SecurityCritical]
+        public SafeRegionHandle(IntPtr preexistingHandle) : base(true)
+        {
+            SetHandle(preexistingHandle);
+        }
 
         /// <summary>
-        ///     Each unit is one device pixel.
+        ///     Directly call Gdi32.CreateRectRgn
         /// </summary>
-        UnitPixel,
-
-        /// <summary>
-        ///     Each unit is a printer's point, or 1/72 inch.
-        /// </summary>
-        UnitPoint,
-
-        /// <summary>
-        ///     Each unit is 1 inch.
-        /// </summary>
-        UnitInch,
-
-        /// <summary>
-        ///     Each unit is 1/300 inch.
-        /// </summary>
-        UnitDocument,
-
-        /// <summary>
-        ///     Each unit is 1 millimeter.
-        /// </summary>
-        UnitMillimeter
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        /// <param name="right"></param>
+        /// <param name="bottom"></param>
+        /// <returns>SafeRegionHandle</returns>
+        public static SafeRegionHandle CreateRectRgn(int left, int top, int right, int bottom)
+        {
+            return Gdi32.CreateRectRgn(left, top, right, bottom);
+        }
     }
 }

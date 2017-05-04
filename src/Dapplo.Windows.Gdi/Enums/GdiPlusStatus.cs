@@ -22,33 +22,41 @@
 #region using
 
 using System;
-using System.Security;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
-namespace Dapplo.Windows.SafeHandles
+namespace Dapplo.Windows.Gdi.Enums
 {
     /// <summary>
-    ///     A DIB Section SafeHandle implementation
+    ///     Status result for GDI+ calls
     /// </summary>
-    public class SafeDibSectionHandle : SafeObjectHandle
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public enum GdiPlusStatus
     {
-        /// <summary>
-        ///     Default constructor is needed to support marshalling!!
-        /// </summary>
-        [SecurityCritical]
-        public SafeDibSectionHandle() : base(true)
-        {
-        }
-
-        /// <summary>
-        ///     Create a SafeDibSectionHandle for an existing DIB Section
-        /// </summary>
-        /// <param name="preexistingHandle"></param>
-        [SecurityCritical]
-        public SafeDibSectionHandle(IntPtr preexistingHandle) : base(true)
-        {
-            SetHandle(preexistingHandle);
-        }
+#pragma warning disable 1591
+        Ok = 0,
+        GenericError = 1,
+        InvalidParameter = 2,
+        OutOfMemory = 3,
+        ObjectBusy = 4,
+        InsufficientBuffer = 5,
+        NotImplemented = 6,
+        Win32Error = 7,
+        WrongState = 8,
+        Aborted = 9,
+        FileNotFound = 10,
+        ValueOverflow = 11,
+        AccessDenied = 12,
+        UnknownImageFormat = 13,
+        FontFamilyNotFound = 14,
+        FontStyleNotFound = 15,
+        NotTrueTypeFont = 16,
+        UnsupportedGdiplusVersion = 17,
+        GdiplusNotInitialized = 18,
+        PropertyNotFound = 19,
+        PropertyNotSupported = 20,
+        ProfileNotFound = 21
+#pragma warning restore 1591
     }
 }

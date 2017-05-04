@@ -25,7 +25,7 @@ using Microsoft.Win32.SafeHandles;
 
 #endregion
 
-namespace Dapplo.Windows.SafeHandles
+namespace Dapplo.Windows.Gdi.SafeHandles
 {
     /// <summary>
     ///     Base class for all Safe "DC" Handles

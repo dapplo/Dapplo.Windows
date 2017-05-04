@@ -21,35 +21,53 @@
 
 #region using
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 #endregion
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Gdi.Structs
 {
     /// <summary>
     ///     CIE XYZ 1931 color space
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
+    [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
+    [SuppressMessage("Sonar Code Smell", "S2292:Trivial properties should be auto-implemented", Justification = "Interop!")]
     public struct CieXyz
     {
+        private uint ciexyzX;
+        private uint ciexyzY;
+        private uint ciexyzZ;
+
         /// <summary>
         ///     is a mix of cone response curves chosen to be orthogonal to luminance and non-negative
         ///     FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
         /// </summary>
-        public uint ciexyzX;
+        public uint X
+        {
+            get { return ciexyzX; }
+            set { ciexyzX = value; }
+        }
 
         /// <summary>
         ///     Luminance
         ///     FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
         /// </summary>
-        public uint ciexyzY;
+        public uint Y
+        {
+            get { return ciexyzY; }
+            set { ciexyzY = value; }
+        }
 
         /// <summary>
         ///     is somewhat equal to blue
         ///     FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
         /// </summary>
-        public uint ciexyzZ;
+        public uint Z {
+            get { return ciexyzZ; }
+            set { ciexyzZ = value; }
+        }
 
         /// <summary>
         ///     Factory for a CieXyz

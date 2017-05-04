@@ -19,7 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.Windows.Enums
+namespace Dapplo.Windows.Gdi.Enums
 {
     /// <summary>
     ///     A raster-operation code. These codes define how the color data for the source rectangle is to be combined with the

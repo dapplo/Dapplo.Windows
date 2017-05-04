@@ -38,13 +38,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -84,10 +79,6 @@
     <ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj">
       <Project>{b8b5782d-eecd-4260-8bed-643ef8b8b6d0}</Project>
       <Name>Dapplo.Windows.Dpi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
-      <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>
-      <Name>Dapplo.Windows</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

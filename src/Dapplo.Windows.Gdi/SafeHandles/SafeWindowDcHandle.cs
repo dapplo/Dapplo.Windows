@@ -25,12 +25,11 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
-using Dapplo.Windows.Native;
 using Microsoft.Win32.SafeHandles;
 
 #endregion
 
-namespace Dapplo.Windows.SafeHandles
+namespace Dapplo.Windows.Gdi.SafeHandles
 {
     /// <summary>
     ///     A WindowDC SafeHandle implementation

@@ -31,11 +31,10 @@ using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Dpi.Enums;
-using Dapplo.Windows.Enums;
+using Dapplo.Windows.Gdi;
+using Dapplo.Windows.Gdi.Enums;
+using Dapplo.Windows.Gdi.SafeHandles;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.SafeHandles;
-using Dapplo.Windows.Structs;
 using Dapplo.Windows.User32.Enums;
 
 #endregion
@@ -209,13 +208,10 @@ namespace Dapplo.Windows.Dpi
                     break;
                 case WindowsMessages.WM_PAINT:
                     // This is a workaround for non DPI aware applications, these don't seem to get a WM_CREATE
-                    if (Math.Abs(Dpi) < double.Epsilon)
+                    if (Math.Abs(Dpi) < double.Epsilon && !IsDpiAware)
                     {
-                        if (!IsDpiAware)
-                        {
-                            isDpiMessage = true;
-                            currentDpi = GetDpi(hwnd);
-                        }
+                        isDpiMessage = true;
+                        currentDpi = GetDpi(hwnd);
                     }
                     break;
                 case WindowsMessages.WM_DESTROY:

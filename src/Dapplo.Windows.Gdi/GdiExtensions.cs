@@ -22,12 +22,12 @@
 #region using
 
 using System.Drawing;
-using Dapplo.Windows.SafeHandles;
+using Dapplo.Windows.Gdi.SafeHandles;
 using Dapplo.Windows.User32.SafeHandles;
 
 #endregion
 
-namespace Dapplo.Windows.Native
+namespace Dapplo.Windows.Gdi
 {
     /// <summary>
     ///     Some extensions for GDI stuff

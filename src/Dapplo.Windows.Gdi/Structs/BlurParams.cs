@@ -21,17 +21,19 @@
 
 #region using
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 #endregion
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Gdi.Structs
 {
     /// <summary>
     ///     Contains members that specify the nature of a Gaussian blur.
     /// </summary>
     /// <remarks>Cannot be pinned with GCHandle due to bool value.</remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [SuppressMessage("Sonar Code Smell", "S1450:Trivial properties should be auto-implementedPrivate fields only used as local variables in methods should become local variables", Justification = "Interop!")]
     public struct BlurParams
     {
         private float _radius;

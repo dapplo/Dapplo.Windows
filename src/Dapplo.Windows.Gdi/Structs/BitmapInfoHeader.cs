@@ -22,11 +22,11 @@
 #region using
 
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Enums;
+using Dapplo.Windows.Gdi.Enums;
 
 #endregion
 
-namespace Dapplo.Windows.Structs
+namespace Dapplo.Windows.Gdi.Structs
 {
     /// <summary>
     ///     See
@@ -35,18 +35,75 @@ namespace Dapplo.Windows.Structs
     [StructLayout(LayoutKind.Explicit)]
     public struct BitmapInfoHeader
     {
+        [FieldOffset(0)]
+        private uint _biSize;
+        [FieldOffset(4)]
+        private int _biWidth;
+        [FieldOffset(8)]
+        private int _biHeight;
+        [FieldOffset(12)]
+        private ushort _biPlanes;
+        [FieldOffset(14)]
+        private ushort _biBitCount;
+        [FieldOffset(16)]
+        private BitmapCompressionMethods _biCompression;
+        [FieldOffset(20)]
+        private uint _biSizeImage;
+        [FieldOffset(24)]
+        private int _biXPelsPerMeter;
+        [FieldOffset(28)]
+        private int _biYPelsPerMeter;
+        [FieldOffset(32)]
+        private uint _biClrUsed;
+        [FieldOffset(36)]
+        private uint _biClrImportant;
+        [FieldOffset(40)]
+        private uint _bV5RedMask;
+        [FieldOffset(44)]
+        private uint _bV5GreenMask;
+        [FieldOffset(48)]
+        private uint _bV5BlueMask;
+        [FieldOffset(52)]
+        private uint _bV5AlphaMask;
+        [FieldOffset(56)]
+        private ColorSpaceEnum _bV5CSType;
+        [FieldOffset(60)]
+        private CieXyzTripple _bV5Endpoints;
+        [FieldOffset(96)]
+        private uint _bV5GammaRed;
+        [FieldOffset(100)]
+        private uint _bV5GammaGreen;
+        [FieldOffset(104)]
+        private uint _bV5GammaBlue;
+        [FieldOffset(108)]
+        private ColorSpaceEnum _bV5Intent;
+        [FieldOffset(112)]
+        private uint _bV5ProfileData;
+        [FieldOffset(116)]
+        private uint _bV5ProfileSize;
+        [FieldOffset(120)]
+        private uint _bV5Reserved;
+
         /// <summary>
         ///     The number of bytes required by the structure.
         ///     Applications should use this member to determine which bitmap information header structure is being used.
         /// </summary>
-        [FieldOffset(0)] public uint biSize;
+        public uint Size {
+            get { return _biSize; }
+            set { _biSize = value; }
+        }
 
         /// <summary>
         ///     The width of the bitmap, in pixels.
         ///     If bV5Compression is BI_JPEG or BI_PNG, the bV5Width member specifies the width of the decompressed JPEG or PNG
         ///     image in pixels.
         /// </summary>
-        [FieldOffset(4)] public int biWidth;
+        public int Width
+        {
+            get { return _biWidth; }
+            set { _biWidth = value; }
+        }
+
 
         /// <summary>
         ///     The height of the bitmap, in pixels. If the value of bV5Height is positive, the bitmap is a bottom-up DIB and its
@@ -57,12 +114,20 @@ namespace Dapplo.Windows.Structs
         ///     If bV5Compression is BI_JPEG or BI_PNG, the bV5Height member specifies the height of the decompressed JPEG or PNG
         ///     image in pixels.
         /// </summary>
-        [FieldOffset(8)] public int biHeight;
+        public int Height
+        {
+            get { return _biHeight; }
+            set { _biHeight = value; }
+        }
 
         /// <summary>
         ///     The number of planes for the target device. This value must be set to 1.
         /// </summary>
-        [FieldOffset(12)] public ushort biPlanes;
+        public ushort Planes
+        {
+            get { return _biPlanes; }
+            set { _biPlanes = value; }
+        }
 
         /// <summary>
         ///     The number of bits that define each pixel and the maximum number of colors in the bitmap.
@@ -102,31 +167,51 @@ namespace Dapplo.Windows.Structs
         ///     masks that specify the red, green, and blue components of each pixel. Each DWORD in the bitmap array represents a
         ///     single pixel.
         /// </summary>
-        [FieldOffset(14)] public ushort biBitCount;
+        public ushort BitCount
+        {
+            get { return _biBitCount; }
+            set { _biBitCount = value; }
+        }
 
         /// <summary>
         ///     Specifies that the bitmap is not compressed.
         ///     The bV5RedMask, bV5GreenMask, and bV5BlueMask members specify the red, green, and blue components of each pixel.
         ///     This is valid when used with 16- and 32-bpp bitmaps.
         /// </summary>
-        [FieldOffset(16)] public BitmapCompressionMethods biCompression;
+        public BitmapCompressionMethods Compression
+        {
+            get { return _biCompression; }
+            set { _biCompression = value; }
+        }
 
         /// <summary>
         ///     The size, in bytes, of the image. This may be set to zero for BI_RGB bitmaps.
         ///     If bV5Compression is BI_JPEG or BI_PNG, bV5SizeImage is the size of the JPEG or PNG image buffer.
         /// </summary>
-        [FieldOffset(20)] public uint biSizeImage;
+        public uint SizeImage
+        {
+            get { return _biSizeImage; }
+            set { _biSizeImage = value; }
+        }
 
         /// <summary>
         ///     The horizontal resolution, in pixels-per-meter, of the target device for the bitmap. An application can use this
         ///     value to select a bitmap from a resource group that best matches the characteristics of the current device.
         /// </summary>
-        [FieldOffset(24)] public int biXPelsPerMeter;
+        public int XPelsPerMeter
+        {
+            get { return _biXPelsPerMeter; }
+            set { _biXPelsPerMeter = value; }
+        }
 
         /// <summary>
         ///     The vertical resolution, in pixels-per-meter, of the target device for the bitmap.
         /// </summary>
-        [FieldOffset(28)] public int biYPelsPerMeter;
+        public int YPelsPerMeter
+        {
+            get { return _biYPelsPerMeter; }
+            set { _biYPelsPerMeter = value; }
+        }
 
         /// <summary>
         ///     The number of color indexes in the color table that are actually used by the bitmap. If this value is zero, the
@@ -138,71 +223,122 @@ namespace Dapplo.Windows.Structs
         ///     equals 16 or 32, the optimal color palette starts immediately following the BITMAPV5HEADER. If bV5ClrUsed is
         ///     nonzero, the color table is used on palettized devices, and bV5ClrUsed specifies the number of entries.
         /// </summary>
-        [FieldOffset(32)] public uint biClrUsed;
+        public uint ColorsUsed
+        {
+            get { return _biClrUsed; }
+            set { _biClrUsed = value; }
+        }
 
         /// <summary>
         ///     The number of color indexes that are required for displaying the bitmap. If this value is zero, all colors are
         ///     required.
         /// </summary>
-        [FieldOffset(36)] public uint biClrImportant;
+        public uint ColorsImportant
+        {
+            get { return _biClrImportant; }
+            set { _biClrImportant = value; }
+        }
 
         /// <summary>
         ///     Color mask that specifies the red component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
         /// </summary>
-        [FieldOffset(40)] public uint bV5RedMask;
+        public uint RedMask
+        {
+            get { return _bV5RedMask; }
+            set { _bV5RedMask = value; }
+        }
+
 
         /// <summary>
         ///     Color mask that specifies the green component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
         /// </summary>
-        [FieldOffset(44)] public uint bV5GreenMask;
+        public uint GreenMask
+        {
+            get { return _bV5GreenMask; }
+            set { _bV5GreenMask = value; }
+        }
+
 
         /// <summary>
         ///     Color mask that specifies the blue component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
         /// </summary>
-        [FieldOffset(48)] public uint bV5BlueMask;
+        public uint BlueMask
+        {
+            get { return _bV5BlueMask; }
+            set { _bV5BlueMask = value; }
+        }
 
         /// <summary>
         ///     Color mask that specifies the alpha component of each pixel.
         /// </summary>
-        [FieldOffset(52)] public uint bV5AlphaMask;
+        public uint AlphaMask
+        {
+            get { return _bV5AlphaMask; }
+            set { _bV5AlphaMask = value; }
+        }
 
         /// <summary>
         ///     The color space of the DIB.
         ///     See also
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd372165(v=vs.85).aspx">LOGCOLORSPACE structure</a>
         /// </summary>
-        [FieldOffset(56)] public ColorSpaceEnum bV5CSType;
+        public ColorSpaceEnum ColorSpace
+        {
+            get { return _bV5CSType; }
+            set { _bV5CSType = value; }
+        }
 
         /// <summary>
         ///     A CIEXYZTRIPLE structure that specifies the x, y, and z coordinates of the three colors that correspond to the red,
         ///     green, and blue endpoints for the logical color space associated with the bitmap. This member is ignored unless the
         ///     bV5CSType member specifies LCS_CALIBRATED_RGB.
         /// </summary>
-        [FieldOffset(60)] public CieXyzTripple bV5Endpoints;
+        public CieXyzTripple Endpoints
+        {
+            get { return _bV5Endpoints; }
+            set { _bV5Endpoints = value; }
+        }
 
         /// <summary>
         ///     Toned response curve for red. Used if bV5CSType is set to LCS_CALIBRATED_RGB. Specify in unsigned fixed 16.16
         ///     format. The upper 16 bits are the unsigned integer value. The lower 16 bits are the fractional part.
         /// </summary>
-        [FieldOffset(96)] public uint bV5GammaRed;
+        public uint GammaRed
+        {
+            get { return _bV5GammaRed; }
+            set { _bV5GammaRed = value; }
+        }
+
 
         /// <summary>
         ///     Toned response curve for green. Used if bV5CSType is set to LCS_CALIBRATED_RGB. Specify in unsigned fixed 16.16
         ///     format. The upper 16 bits are the unsigned integer value. The lower 16 bits are the fractional part.
         /// </summary>
-        [FieldOffset(100)] public uint bV5GammaGreen;
+        public uint GammaGreen
+        {
+            get { return _bV5GammaGreen; }
+            set { _bV5GammaRed = value; }
+        }
 
         /// <summary>
         ///     Toned response curve for blue. Used if bV5CSType is set to LCS_CALIBRATED_RGB. Specify in unsigned fixed 16.16
         ///     format. The upper 16 bits are the unsigned integer value. The lower 16 bits are the fractional part.
         /// </summary>
-        [FieldOffset(104)] public uint bV5GammaBlue;
+        public uint GammaBlue
+        {
+            get { return _bV5GammaBlue; }
+            set { _bV5GammaBlue = value; }
+        }
 
         /// <summary>
         ///     Rendering intent for bitmap. This can be one of the following values:
         ///     LCS_GM_ABS_COLORIMETRIC, LCS_GM_BUSINESS, LCS_GM_GRAPHICS, LCS_GM_IMAGES
         /// </summary>
-        [FieldOffset(108)] public ColorSpaceEnum bV5Intent;
+        public ColorSpaceEnum Intent
+        {
+            get { return _bV5Intent; }
+            set { _bV5Intent = value; }
+        }
 
         /// <summary>
         ///     The offset, in bytes, from the beginning of the BITMAPV5HEADER structure to the start of the profile data. If the
@@ -211,17 +347,29 @@ namespace Dapplo.Windows.Structs
         ///     Windows character set (code page 1252). These profile members are ignored unless the bV5CSType member specifies
         ///     PROFILE_LINKED or PROFILE_EMBEDDED.
         /// </summary>
-        [FieldOffset(112)] public uint bV5ProfileData;
+        public uint ProfileData
+        {
+            get { return _bV5ProfileData; }
+            set { _bV5ProfileData = value; }
+        }
 
         /// <summary>
         ///     Size, in bytes, of embedded profile data.
         /// </summary>
-        [FieldOffset(116)] public uint bV5ProfileSize;
+        public uint ProfileSize
+        {
+            get { return _bV5ProfileSize; }
+            set { _bV5ProfileSize = value; }
+        }
 
         /// <summary>
         ///     This member has been reserved. Its value should be set to zero.
         /// </summary>
-        [FieldOffset(120)] public uint bV5Reserved;
+        public uint Reserved
+        {
+            get { return _bV5Reserved; }
+            set { _bV5Reserved = value; }
+        }
 
         /// <summary>
         ///     Constructor with values
@@ -234,38 +382,38 @@ namespace Dapplo.Windows.Structs
             return new BitmapInfoHeader
             {
                 // BITMAPINFOHEADER < DIBV5 is 40 bytes
-                biSize = (uint) Marshal.SizeOf(typeof(BitmapInfoHeader)),
+                _biSize = (uint) Marshal.SizeOf(typeof(BitmapInfoHeader)),
                 // Should allways be 1
-                biPlanes = 1,
-                biCompression = BitmapCompressionMethods.BI_RGB,
-                biWidth = width,
-                biHeight = height,
-                biBitCount = bpp,
-                biSizeImage = (uint) (width * height * (bpp >> 3)),
-                biXPelsPerMeter = 0,
-                biYPelsPerMeter = 0,
-                biClrUsed = 0,
-                biClrImportant = 0,
+                _biPlanes = 1,
+                _biCompression = BitmapCompressionMethods.BI_RGB,
+                _biWidth = width,
+                _biHeight = height,
+                _biBitCount = bpp,
+                _biSizeImage = (uint) (width * height * (bpp >> 3)),
+                _biXPelsPerMeter = 0,
+                _biYPelsPerMeter = 0,
+                _biClrUsed = 0,
+                _biClrImportant = 0,
 
                 // V5
-                bV5RedMask = (uint) 255 << 16,
-                bV5GreenMask = (uint) 255 << 8,
-                bV5BlueMask = 255,
-                bV5AlphaMask = (uint) 255 << 24,
-                bV5CSType = ColorSpaceEnum.LCS_sRGB,
-                bV5Endpoints = new CieXyzTripple
+                _bV5RedMask = (uint) 255 << 16,
+                _bV5GreenMask = (uint) 255 << 8,
+                _bV5BlueMask = 255,
+                _bV5AlphaMask = (uint) 255 << 24,
+                _bV5CSType = ColorSpaceEnum.LCS_sRGB,
+                _bV5Endpoints = new CieXyzTripple
                 {
-                    CieXyzBlue = CieXyz.Create(0),
-                    CieXyzGreen = CieXyz.Create(0),
-                    CieXyzRed = CieXyz.Create(0)
+                    Blue = CieXyz.Create(0),
+                    Green = CieXyz.Create(0),
+                    Red = CieXyz.Create(0)
                 },
-                bV5GammaRed = 0,
-                bV5GammaGreen = 0,
-                bV5GammaBlue = 0,
-                bV5Intent = ColorSpaceEnum.LCS_GM_IMAGES,
-                bV5ProfileData = 0,
-                bV5ProfileSize = 0,
-                bV5Reserved = 0
+                _bV5GammaRed = 0,
+                _bV5GammaGreen = 0,
+                _bV5GammaBlue = 0,
+                _bV5Intent = ColorSpaceEnum.LCS_GM_IMAGES,
+                _bV5ProfileData = 0,
+                _bV5ProfileSize = 0,
+                _bV5Reserved = 0
             };
         }
 
@@ -277,7 +425,7 @@ namespace Dapplo.Windows.Structs
             get
             {
                 var sizeOfBmi = (uint) Marshal.SizeOf(typeof(BitmapInfoHeader));
-                return biSize >= sizeOfBmi;
+                return _biSize >= sizeOfBmi;
             }
         }
 
@@ -288,12 +436,12 @@ namespace Dapplo.Windows.Structs
         {
             get
             {
-                if (biCompression == BitmapCompressionMethods.BI_BITFIELDS)
+                if (_biCompression == BitmapCompressionMethods.BI_BITFIELDS)
                 {
                     // Add 3x4 bytes for the bitfield color mask
-                    return biSize + 3 * 4;
+                    return _biSize + 3 * 4;
                 }
-                return biSize;
+                return _biSize;
             }
         }
     }

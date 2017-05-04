@@ -28,7 +28,7 @@ using Microsoft.Win32.SafeHandles;
 
 #endregion
 
-namespace Dapplo.Windows.SafeHandles
+namespace Dapplo.Windows.Gdi.SafeHandles
 {
     /// <summary>
     ///     A select object safehandle implementation

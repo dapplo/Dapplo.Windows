@@ -19,40 +19,43 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-using System;
-using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
-
-#endregion
-
-namespace Dapplo.Windows.SafeHandles
+namespace Dapplo.Windows.Gdi.Enums
 {
     /// <summary>
-    ///     Abstract class SafeObjectHandle which contains all handles that are cleaned with DeleteObject
+    ///     Type of compression used for the bitmap in the BitmapInfoHeader
     /// </summary>
-    public abstract class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
+    public enum BitmapCompressionMethods : uint
     {
         /// <summary>
-        ///     Create SafeObjectHandle
+        ///     No compression
         /// </summary>
-        /// <param name="ownsHandle">True if the class owns the handle</param>
-        protected SafeObjectHandle(bool ownsHandle) : base(ownsHandle)
-        {
-        }
-
-        [DllImport("gdi32", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool DeleteObject(IntPtr hObject);
+        BI_RGB = 0,
 
         /// <summary>
-        ///     Call DeleteObject
+        ///     RLE 8BPP
         /// </summary>
-        /// <returns>true if this worked</returns>
-        protected override bool ReleaseHandle()
-        {
-            return DeleteObject(handle);
-        }
+        BI_RLE8 = 1,
+
+        /// <summary>
+        ///     RLE 4BPP
+        /// </summary>
+        BI_RLE4 = 2,
+
+        /// <summary>
+        ///     Specifies that the bitmap is not compressed and that the color table consists of three DWORD color masks that
+        ///     specify the
+        ///     red, green, and blue components, respectively, of each pixel. This is valid when used with 16- and 32-bpp bitmaps.
+        /// </summary>
+        BI_BITFIELDS = 3,
+
+        /// <summary>
+        ///     Indicates that the image is a JPEG image.
+        /// </summary>
+        BI_JPEG = 4,
+
+        /// <summary>
+        ///     Indicates that the image is a PNG image.
+        /// </summary>
+        BI_PNG = 5
     }
 }

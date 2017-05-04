@@ -237,15 +237,6 @@ namespace Dapplo.Windows.User32
         }
 
         /// <summary>
-        ///     Helper method to cast the GetLastWin32Error result to a Win32Error
-        /// </summary>
-        /// <returns></returns>
-        private static Win32Error GetLastErrorCode()
-        {
-            return (Win32Error) Marshal.GetLastWin32Error();
-        }
-
-        /// <summary>
         ///     Retrieve the windows caption, also called Text
         /// </summary>
         /// <param name="hWnd">IntPtr for the window</param>

@@ -24,13 +24,13 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Enums;
-using Dapplo.Windows.SafeHandles;
-using Dapplo.Windows.Structs;
+using Dapplo.Windows.Gdi.Enums;
+using Dapplo.Windows.Gdi.SafeHandles;
+using Dapplo.Windows.Gdi.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Native
+namespace Dapplo.Windows.Gdi
 {
     /// <summary>
     ///     Gdi32 Helpers
