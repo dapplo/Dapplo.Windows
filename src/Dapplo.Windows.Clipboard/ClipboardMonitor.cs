@@ -49,7 +49,7 @@ namespace Dapplo.Windows.Clipboard
         private readonly IObservable<ClipboardContents> _clipboardObservable;
 
         // This maintains the sequence
-        private uint _previousSequence = uint.MaxValue;
+        private uint _previousSequence = uint.MinValue;
 
         /// <summary>
         ///     Private constructor to create the observable

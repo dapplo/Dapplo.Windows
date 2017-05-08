@@ -59,10 +59,13 @@ namespace Dapplo.Windows.Tests
                 Log.Debug().WriteLine("Owner {0}", clipboard.OwnerHandle);
                 Log.Debug().WriteLine("Sequence {0}", clipboard.Id);
 
-                var stream = clipboard["PNG"];
-                using (var fileStream = File.Create(@"D:\test.png"))
+                if (clipboard.Formats.Contains("PNG"))
                 {
-                    stream.CopyTo(fileStream);
+                    var stream = clipboard["PNG"];
+                    using (var fileStream = File.Create(@"D:\test.png"))
+                    {
+                        stream.CopyTo(fileStream);
+                    }
                 }
                 tcs.TrySetResult(true);
             });
