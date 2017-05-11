@@ -24,17 +24,17 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Dapplo.Windows.Kernel.Enums;
-using Dapplo.Windows.Kernel.Structs;
+using Dapplo.Windows.Kernel32.Enums;
+using Dapplo.Windows.Kernel32.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Kernel
+namespace Dapplo.Windows.Kernel32
 {
     /// <summary>
     ///     Kernel 32 functionality
     /// </summary>
-    public static class Kernel32
+    public static class Kernel32Api
     {
         /// <summary>
         ///     default value if not specifing a process ID

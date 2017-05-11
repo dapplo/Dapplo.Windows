@@ -26,7 +26,7 @@ using System.Security;
 
 #endregion
 
-namespace Dapplo.Windows.Gdi.SafeHandles
+namespace Dapplo.Windows.Gdi32.SafeHandles
 {
     /// <summary>
     ///     A hRegion SafeHandle implementation
@@ -61,7 +61,7 @@ namespace Dapplo.Windows.Gdi.SafeHandles
         /// <returns>SafeRegionHandle</returns>
         public static SafeRegionHandle CreateRectRgn(int left, int top, int right, int bottom)
         {
-            return Gdi32.CreateRectRgn(left, top, right, bottom);
+            return Gdi32Api.CreateRectRgn(left, top, right, bottom);
         }
     }
 }

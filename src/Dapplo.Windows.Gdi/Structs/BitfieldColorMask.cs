@@ -26,7 +26,7 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-namespace Dapplo.Windows.Gdi.Structs
+namespace Dapplo.Windows.Gdi32.Structs
 {
     /// <summary>
     /// Specify the color mask when the BITMAPINFOHEADER structure biCompression uses BI_BITFIELDS

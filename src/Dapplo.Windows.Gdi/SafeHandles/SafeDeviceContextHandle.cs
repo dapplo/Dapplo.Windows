@@ -28,7 +28,7 @@ using System.Security;
 
 #endregion
 
-namespace Dapplo.Windows.Gdi.SafeHandles
+namespace Dapplo.Windows.Gdi32.SafeHandles
 {
     /// <summary>
     ///     A DeviceContext SafeHandle implementation

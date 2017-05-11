@@ -26,7 +26,7 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-namespace Dapplo.Windows.Gdi.Structs
+namespace Dapplo.Windows.Gdi32.Structs
 {
     /// <summary>
     /// The BITMAPFILEHEADER structure contains information about the type, size, and layout of a file that contains a DIB.

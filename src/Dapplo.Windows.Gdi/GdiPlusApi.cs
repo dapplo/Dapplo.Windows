@@ -29,17 +29,17 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Gdi.Enums;
-using Dapplo.Windows.Gdi.Structs;
+using Dapplo.Windows.Gdi32.Enums;
+using Dapplo.Windows.Gdi32.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Gdi
+namespace Dapplo.Windows.Gdi32
 {
     /// <summary>
     ///     GDIplus Helpers
     /// </summary>
-    public static class GdiPlus
+    public static class GdiPlusApi
     {
         private static readonly LogSource Log = new LogSource();
         private static readonly Guid BlurEffectGuid = new Guid("{633C80A4-1843-482B-9EF2-BE2834C5FDD4}");

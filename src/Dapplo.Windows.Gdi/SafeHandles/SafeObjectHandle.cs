@@ -27,7 +27,7 @@ using Microsoft.Win32.SafeHandles;
 
 #endregion
 
-namespace Dapplo.Windows.Gdi.SafeHandles
+namespace Dapplo.Windows.Gdi32.SafeHandles
 {
     /// <summary>
     ///     Abstract class SafeObjectHandle which contains all handles that are cleaned with DeleteObject

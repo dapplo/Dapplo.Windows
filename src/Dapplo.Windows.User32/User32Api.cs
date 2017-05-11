@@ -45,7 +45,7 @@ namespace Dapplo.Windows.User32
     /// <summary>
     ///     Native wrappers for the User32 DLL
     /// </summary>
-    public static class User32
+    public static class User32Api
     {
         /// <summary>
         ///     Delegate description for the windows enumeration
@@ -316,9 +316,33 @@ namespace Dapplo.Windows.User32
 
         #region Native imports
 
+        /// <summary>
+        /// Determines the visibility state of the specified window.
+        /// </summary>
+        /// <param name="hWnd">A handle to the window to be tested.</param>
+        /// <returns>
+        /// If the specified window, its parent window, its parent's parent window, and so forth, have the WS_VISIBLE style, the return value is nonzero. Otherwise, the return value is zero.
+        /// Because the return value specifies whether the window has the WS_VISIBLE style, it may be nonzero even if the window is totally obscured by other windows.
+        /// 
+        /// Remarks:
+        /// The visibility state of a window is indicated by the WS_VISIBLE style bit. When WS_VISIBLE is set, the window is displayed and subsequent drawing into it is displayed as long as the window has the WS_VISIBLE style.
+        /// Any drawing to a window with the WS_VISIBLE style will not be displayed if the window is obscured by other windows or is clipped by its parent window.
+        /// </returns>
         [DllImport("user32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool IsWindowVisible(IntPtr hWnd);
+
+        /// <summary>
+        /// Determines whether the specified window handle identifies an existing window.
+        /// </summary>
+        /// <param name="hWnd">A handle to the window to be tested.</param>
+        /// <returns>
+        /// If the window handle identifies an existing window, the return value is true.
+        /// If the window handle does not identify an existing window, the return value is false.
+        /// </returns>
+        [DllImport("user32")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool IsWindow(IntPtr hWnd);
 
         [DllImport("user32", SetLastError = true)]
         public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int processId);

@@ -25,7 +25,7 @@ using System;
 
 #endregion
 
-namespace Dapplo.Windows.Kernel.Enums
+namespace Dapplo.Windows.Kernel32.Enums
 {
 #pragma warning disable 1591
 

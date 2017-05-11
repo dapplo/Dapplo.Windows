@@ -22,11 +22,11 @@
 #region using
 
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Gdi.Enums;
+using Dapplo.Windows.Gdi32.Enums;
 
 #endregion
 
-namespace Dapplo.Windows.Gdi.Structs
+namespace Dapplo.Windows.Gdi32.Structs
 {
     /// <summary>
     ///     See

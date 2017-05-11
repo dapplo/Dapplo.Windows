@@ -77,9 +77,9 @@
       <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
       <Name>Dapplo.Windows.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.Gdi\Dapplo.Windows.Gdi.csproj">
+    <ProjectReference Include="..\Dapplo.Windows.Gdi\Dapplo.Windows.Gdi32.csproj">
       <Project>{e4a0ce9d-681c-44d0-85f5-4f677ec54658}</Project>
-      <Name>Dapplo.Windows.Gdi</Name>
+      <Name>Dapplo.Windows.Gdi32</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>

@@ -69,7 +69,7 @@ namespace Dapplo.Windows.User32.SafeHandles
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         protected override bool ReleaseHandle()
         {
-            return User32.DestroyIcon(handle);
+            return User32Api.DestroyIcon(handle);
         }
     }
 }

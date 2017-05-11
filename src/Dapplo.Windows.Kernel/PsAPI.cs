@@ -28,7 +28,7 @@ using System.Text;
 
 #endregion
 
-namespace Dapplo.Windows.Kernel
+namespace Dapplo.Windows.Kernel32
 {
     /// <summary>
     ///     Description of PsAPI.

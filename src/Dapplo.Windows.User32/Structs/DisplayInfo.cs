@@ -83,7 +83,7 @@ namespace Dapplo.Windows.User32.Structs
         public static RECT GetAllScreenBounds()
         {
             int left = 0, top = 0, bottom = 0, right = 0;
-            foreach (var display in User32.AllDisplays())
+            foreach (var display in User32Api.AllDisplays())
             {
                 left = Math.Min(left, display.Bounds.X);
                 top = Math.Min(top, display.Bounds.Y);
@@ -103,7 +103,7 @@ namespace Dapplo.Windows.User32.Structs
         public static RECT GetBounds(POINT point)
         {
             DisplayInfo returnValue = null;
-            foreach (var display in User32.AllDisplays())
+            foreach (var display in User32Api.AllDisplays())
             {
                 if (display.IsPrimary && returnValue == null)
                 {

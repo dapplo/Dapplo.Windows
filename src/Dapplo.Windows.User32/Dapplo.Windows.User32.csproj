@@ -78,7 +78,7 @@
     <Compile Include="Structs\ScrollBarInfo.cs" />
     <Compile Include="Structs\ScrollInfo.cs" />
     <Compile Include="Structs\TitleBarInfoEx.cs" />
-    <Compile Include="User32.cs" />
+    <Compile Include="User32Api.cs" />
     <Compile Include="Structs\WindowInfo.cs" />
     <Compile Include="Enums\WindowLongIndex.cs" />
     <Compile Include="Structs\WindowPlacement.cs" />

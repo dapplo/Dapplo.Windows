@@ -23,8 +23,8 @@
 
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Gdi;
-using Dapplo.Windows.Gdi.SafeHandles;
+using Dapplo.Windows.Gdi32;
+using Dapplo.Windows.Gdi32.SafeHandles;
 using Dapplo.Windows.Native;
 using Xunit;
 using Xunit.Abstractions;
@@ -48,7 +48,7 @@ namespace Dapplo.Windows.Tests
                 Assert.False(desktopDcHandle.IsInvalid);
 
                 // create a device context we can copy to
-                using (var safeCompatibleDcHandle = Gdi32.CreateCompatibleDC(desktopDcHandle))
+                using (var safeCompatibleDcHandle = Gdi32Api.CreateCompatibleDC(desktopDcHandle))
                 {
                     Assert.False(safeCompatibleDcHandle.IsInvalid);
                 }

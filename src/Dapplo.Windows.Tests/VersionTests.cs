@@ -23,8 +23,8 @@
 
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Kernel;
-using Dapplo.Windows.Kernel.Structs;
+using Dapplo.Windows.Kernel32;
+using Dapplo.Windows.Kernel32.Structs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -46,7 +46,7 @@ namespace Dapplo.Windows.Tests
         public void TestOsVersionInfoEx()
         {
             var osVersionInfoEx = OsVersionInfoEx.Create();
-            Assert.True(Kernel32.GetVersionEx(ref osVersionInfoEx));
+            Assert.True(Kernel32Api.GetVersionEx(ref osVersionInfoEx));
             Assert.True(osVersionInfoEx.MajorVersion >= 6);
         }
     }

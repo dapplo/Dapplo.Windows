@@ -30,12 +30,11 @@ using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Enums;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.Structs;
 using Dapplo.Windows.DesktopWindowsManager;
-using Dapplo.Windows.Gdi;
+using Dapplo.Windows.Gdi32;
 using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
 
@@ -48,6 +47,19 @@ namespace Dapplo.Windows.Desktop
     /// </summary>
     public static class InteropWindowExtensions
     {
+
+        /// <summary>
+        /// Tests if the interopWindow still exists
+        /// </summary>
+        /// <param name="interopWindow">IInteropWindow</param>
+        /// <returns>True if it's still there.
+        /// Because window handles are recycled the handle could point to a different window!
+        /// </returns>
+        public static bool Exists(this IInteropWindow interopWindow)
+        {
+            return User32Api.IsWindow(interopWindow.Handle);
+        }
+
         /// <summary>
         ///     Fill ALL the information of the InteropWindow
         /// </summary>
@@ -126,7 +138,7 @@ namespace Dapplo.Windows.Desktop
         {
             if (interopWindow.Caption == null || forceUpdate)
             {
-                var caption = User32.User32.GetText(interopWindow.Handle);
+                var caption = User32Api.GetText(interopWindow.Handle);
                 interopWindow.Caption = caption;
             }
             return interopWindow.Caption;
@@ -165,7 +177,7 @@ namespace Dapplo.Windows.Desktop
         {
             if (interopWindow.Classname == null || forceUpdate)
             {
-                var className = User32.User32.GetClassname(interopWindow.Handle);
+                var className = User32Api.GetClassname(interopWindow.Handle);
                 interopWindow.Classname = className;
             }
             return interopWindow.Classname;
@@ -184,7 +196,7 @@ namespace Dapplo.Windows.Desktop
                 return interopWindow.Info.Value;
             }
             var windowInfo = WindowInfo.Create();
-            User32.User32.GetWindowInfo(interopWindow.Handle, ref windowInfo);
+            User32Api.GetWindowInfo(interopWindow.Handle, ref windowInfo);
 
             // Now correct the bounds, for Windows 10
             if (Dwm.IsDwmEnabled)
@@ -212,7 +224,8 @@ namespace Dapplo.Windows.Desktop
             {
                 return interopWindow.Parent.Value;
             }
-            var parent = User32.User32.GetParent(interopWindow.Handle);
+            // TODO: Invalidate ParentWindow if the value changed or is IntPtr.Zero?
+            var parent = User32Api.GetParent(interopWindow.Handle);
             interopWindow.Parent = parent;
             return interopWindow.Parent.Value;
         }
@@ -234,6 +247,7 @@ namespace Dapplo.Windows.Desktop
             {
                 interopWindow.ParentWindow = InteropWindowFactory.CreateFor(interopWindow.Parent.Value);
             }
+            // TODO: Invalidate ParentWindow if IntPtr.Zero?!
             return interopWindow.ParentWindow;
         }
 
@@ -250,7 +264,7 @@ namespace Dapplo.Windows.Desktop
                 return interopWindow.Placement.Value;
             }
             var placement = WindowPlacement.Create();
-            User32.User32.GetWindowPlacement(interopWindow.Handle, ref placement);
+            User32Api.GetWindowPlacement(interopWindow.Handle, ref placement);
             interopWindow.Placement = placement;
             return interopWindow.Placement.Value;
         }
@@ -268,7 +282,7 @@ namespace Dapplo.Windows.Desktop
                 return interopWindow.ProcessId.Value;
             }
             int processId;
-            User32.User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
+            User32Api.GetWindowThreadProcessId(interopWindow.Handle, out processId);
             interopWindow.ProcessId = processId;
             return interopWindow.ProcessId.Value;
         }
@@ -279,13 +293,13 @@ namespace Dapplo.Windows.Desktop
         /// <param name="interopWindow">InteropWindow</param>
         public static Region GetRegion(this IInteropWindow interopWindow)
         {
-            using (var region = Gdi32.CreateRectRgn(0, 0, 0, 0))
+            using (var region = Gdi32Api.CreateRectRgn(0, 0, 0, 0))
             {
                 if (region.IsInvalid)
                 {
                     return null;
                 }
-                var result = User32.User32.GetWindowRgn(interopWindow.Handle, region);
+                var result = User32Api.GetWindowRgn(interopWindow.Handle, region);
                 if (result != RegionResults.Error && result != RegionResults.NullRegion)
                 {
                     return Region.FromHrgn(region.DangerousGetHandle());
@@ -306,7 +320,7 @@ namespace Dapplo.Windows.Desktop
             {
                 return interopWindow.Text;
             }
-            var text = User32.User32.GetTextFromWindow(interopWindow.Handle);
+            var text = User32Api.GetTextFromWindow(interopWindow.Handle);
             interopWindow.Text = text;
             return interopWindow.Text;
         }
@@ -325,7 +339,7 @@ namespace Dapplo.Windows.Desktop
                 return null;
             }
             var initialScrollInfo = ScrollInfo.Create(ScrollInfoMask.All);
-            if (User32.User32.GetScrollInfo(interopWindow.Handle, scrollBarType, ref initialScrollInfo) && initialScrollInfo.Minimum != initialScrollInfo.Maximum)
+            if (User32Api.GetScrollInfo(interopWindow.Handle, scrollBarType, ref initialScrollInfo) && initialScrollInfo.Minimum != initialScrollInfo.Maximum)
             {
                 var windowScroller = new WindowScroller
                 {
@@ -338,7 +352,7 @@ namespace Dapplo.Windows.Desktop
                 interopWindow.CanScroll = true;
                 return windowScroller;
             }
-            if (User32.User32.GetScrollInfo(interopWindow.Handle, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.Minimum != initialScrollInfo.Maximum)
+            if (User32Api.GetScrollInfo(interopWindow.Handle, ScrollBarTypes.Control, ref initialScrollInfo) && initialScrollInfo.Minimum != initialScrollInfo.Maximum)
             {
                 var windowScroller = new WindowScroller
                 {
@@ -415,7 +429,7 @@ namespace Dapplo.Windows.Desktop
         {
             if (!interopWindow.IsMaximized.HasValue || forceUpdate)
             {
-                interopWindow.IsMaximized = User32.User32.IsZoomed(interopWindow.Handle);
+                interopWindow.IsMaximized = User32Api.IsZoomed(interopWindow.Handle);
             }
             return interopWindow.IsMaximized.Value;
         }
@@ -430,7 +444,7 @@ namespace Dapplo.Windows.Desktop
         {
             if (!interopWindow.IsMinimized.HasValue || forceUpdate)
             {
-                interopWindow.IsMinimized = User32.User32.IsIconic(interopWindow.Handle);
+                interopWindow.IsMinimized = User32Api.IsIconic(interopWindow.Handle);
             }
             return interopWindow.IsMinimized.Value;
         }
@@ -445,7 +459,7 @@ namespace Dapplo.Windows.Desktop
         {
             if (!interopWindow.IsVisible.HasValue || forceUpdate)
             {
-                interopWindow.IsVisible = User32.User32.IsWindowVisible(interopWindow.Handle);
+                interopWindow.IsVisible = User32Api.IsWindowVisible(interopWindow.Handle);
             }
             return interopWindow.IsVisible.Value;
         }
@@ -456,7 +470,7 @@ namespace Dapplo.Windows.Desktop
         /// <param name="interopWindow">InteropWindow</param>
         public static void Maximized(this IInteropWindow interopWindow)
         {
-            User32.User32.ShowWindow(interopWindow.Handle, ShowWindowCommands.Maximize);
+            User32Api.ShowWindow(interopWindow.Handle, ShowWindowCommands.Maximize);
             interopWindow.IsMaximized = true;
             interopWindow.IsMinimized = false;
         }
@@ -467,7 +481,7 @@ namespace Dapplo.Windows.Desktop
         /// <param name="interopWindow">InteropWindow</param>
         public static void Minimize(this IInteropWindow interopWindow)
         {
-            User32.User32.ShowWindow(interopWindow.Handle, ShowWindowCommands.Minimize);
+            User32Api.ShowWindow(interopWindow.Handle, ShowWindowCommands.Minimize);
             interopWindow.IsMinimized = true;
         }
 
@@ -477,7 +491,7 @@ namespace Dapplo.Windows.Desktop
         /// <param name="interopWindow">InteropWindow</param>
         public static void Restore(this IInteropWindow interopWindow)
         {
-            User32.User32.ShowWindow(interopWindow.Handle, ShowWindowCommands.Restore);
+            User32Api.ShowWindow(interopWindow.Handle, ShowWindowCommands.Restore);
             interopWindow.IsMinimized = false;
             interopWindow.IsMaximized = false;
         }
@@ -489,7 +503,7 @@ namespace Dapplo.Windows.Desktop
         /// <param name="extendedWindowStyleFlags">ExtendedWindowStyleFlags</param>
         public static void SetExtendedStyle(this IInteropWindow interopWindow, ExtendedWindowStyleFlags extendedWindowStyleFlags)
         {
-            User32.User32.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint) extendedWindowStyleFlags));
+            User32Api.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint) extendedWindowStyleFlags));
             interopWindow.Info = null;
         }
 
@@ -500,7 +514,7 @@ namespace Dapplo.Windows.Desktop
         /// <param name="placement">WindowPlacement</param>
         public static void SetPlacement(this IInteropWindow interopWindow, WindowPlacement placement)
         {
-            User32.User32.SetWindowPlacement(interopWindow.Handle, ref placement);
+            User32Api.SetWindowPlacement(interopWindow.Handle, ref placement);
             interopWindow.Placement = placement;
         }
 
@@ -511,7 +525,7 @@ namespace Dapplo.Windows.Desktop
         /// <param name="windowStyleFlags">WindowStyleFlags</param>
         public static void SetStyle(this IInteropWindow interopWindow, WindowStyleFlags windowStyleFlags)
         {
-            User32.User32.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint) windowStyleFlags));
+            User32Api.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint) windowStyleFlags));
             interopWindow.Info = null;
         }
 
@@ -542,8 +556,8 @@ namespace Dapplo.Windows.Desktop
                 InputGenerator.KeyPress(VirtualKeyCodes.MENU);
             }
             // Show window in forground.
-            User32.User32.BringWindowToTop(interopWindow.Handle);
-            User32.User32.SetForegroundWindow(interopWindow.Handle);
+            User32Api.BringWindowToTop(interopWindow.Handle);
+            User32Api.SetForegroundWindow(interopWindow.Handle);
         }
     }
 }

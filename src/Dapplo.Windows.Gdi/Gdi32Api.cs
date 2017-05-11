@@ -24,18 +24,18 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Gdi.Enums;
-using Dapplo.Windows.Gdi.SafeHandles;
-using Dapplo.Windows.Gdi.Structs;
+using Dapplo.Windows.Gdi32.Enums;
+using Dapplo.Windows.Gdi32.SafeHandles;
+using Dapplo.Windows.Gdi32.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Gdi
+namespace Dapplo.Windows.Gdi32
 {
     /// <summary>
     ///     Gdi32 Helpers
     /// </summary>
-    public static class Gdi32
+    public static class Gdi32Api
     {
         /// <summary>
         ///     The BitBlt function performs a bit-block transfer of the color data corresponding to a rectangle of pixels from the

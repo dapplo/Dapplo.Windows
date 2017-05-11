@@ -29,7 +29,7 @@ using Microsoft.Win32.SafeHandles;
 
 #endregion
 
-namespace Dapplo.Windows.Gdi.SafeHandles
+namespace Dapplo.Windows.Gdi32.SafeHandles
 {
     /// <summary>
     ///     A WindowDC SafeHandle implementation
@@ -63,7 +63,7 @@ namespace Dapplo.Windows.Gdi.SafeHandles
         /// <returns></returns>
         public static SafeWindowDcHandle FromDesktop()
         {
-            var hWndDesktop = User32.User32.GetDesktopWindow();
+            var hWndDesktop = User32.User32Api.GetDesktopWindow();
             var hDcDesktop = GetWindowDC(hWndDesktop);
             return new SafeWindowDcHandle(hWndDesktop, hDcDesktop);
         }

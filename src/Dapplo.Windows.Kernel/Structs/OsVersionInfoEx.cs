@@ -23,11 +23,11 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Kernel.Enums;
+using Dapplo.Windows.Kernel32.Enums;
 
 #endregion
 
-namespace Dapplo.Windows.Kernel.Structs
+namespace Dapplo.Windows.Kernel32.Structs
 {
     /// <summary>
     ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724833(v=vs.85).aspx">OSVERSIONINFOEX structure</a>

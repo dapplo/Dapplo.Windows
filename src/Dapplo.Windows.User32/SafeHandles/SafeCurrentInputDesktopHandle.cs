@@ -44,25 +44,25 @@ namespace Dapplo.Windows.User32.SafeHandles
         /// </summary>
         public SafeCurrentInputDesktopHandle() : base(true)
         {
-            var hDesktop = User32.OpenInputDesktop(0, true, DesktopAccessRight.GENERIC_ALL);
+            var hDesktop = User32Api.OpenInputDesktop(0, true, DesktopAccessRight.GENERIC_ALL);
             if (hDesktop != IntPtr.Zero)
             {
                 // Got desktop, store it as handle for the ReleaseHandle
                 SetHandle(hDesktop);
-                if (User32.SetThreadDesktop(hDesktop))
+                if (User32Api.SetThreadDesktop(hDesktop))
                 {
                     Log.Debug().WriteLine("Switched to desktop {0}", hDesktop);
                 }
                 else
                 {
                     Log.Warn().WriteLine("Couldn't switch to desktop {0}", hDesktop);
-                    Log.Error().WriteLine(User32.CreateWin32Exception("SetThreadDesktop"));
+                    Log.Error().WriteLine(User32Api.CreateWin32Exception("SetThreadDesktop"));
                 }
             }
             else
             {
                 Log.Warn().WriteLine("Couldn't get current desktop.");
-                Log.Error().WriteLine(User32.CreateWin32Exception("OpenInputDesktop"));
+                Log.Error().WriteLine(User32Api.CreateWin32Exception("OpenInputDesktop"));
             }
         }
 
@@ -73,7 +73,7 @@ namespace Dapplo.Windows.User32.SafeHandles
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         protected override bool ReleaseHandle()
         {
-            return User32.CloseDesktop(handle);
+            return User32Api.CloseDesktop(handle);
         }
     }
 }

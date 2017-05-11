@@ -78,7 +78,7 @@ namespace Dapplo.Windows.Tests
                             .FirstOrDefault(interopWindow =>
                             {
                                 int processId;
-                                User32.User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
+                                User32.User32Api.GetWindowThreadProcessId(interopWindow.Handle, out processId);
                                 return processId == process.Id;
                             });
                         Assert.NotNull(notepadWindow);
@@ -93,7 +93,7 @@ namespace Dapplo.Windows.Tests
 
                         Log.Info().WriteLine("Scrollbar info: {0}", scroller.ScrollBar.Value);
 
-                        User32.User32.SetForegroundWindow(scroller.ScrollingWindow.Handle);
+                        User32.User32Api.SetForegroundWindow(scroller.ScrollingWindow.Handle);
                         await Task.Delay(1000);
                         // Just make sure the window is changed
                         InputGenerator.KeyPress(VirtualKeyCodes.NEXT, VirtualKeyCodes.DOWN);

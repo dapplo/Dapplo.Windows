@@ -21,12 +21,11 @@
 
 #region using
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
-namespace Dapplo.Windows.Gdi.Enums
+namespace Dapplo.Windows.Gdi32.Enums
 {
     /// <summary>
     ///     Status result for GDI+ calls

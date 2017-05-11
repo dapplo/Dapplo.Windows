@@ -68,7 +68,7 @@ namespace Dapplo.Windows.Tests
                     .Where(interopWindow =>
                     {
                         int processId;
-                        User32.User32.GetWindowThreadProcessId(interopWindow.Handle, out processId);
+                        User32.User32Api.GetWindowThreadProcessId(interopWindow.Handle, out processId);
                         return processId == process.Id;
                     })
                     .FirstOrDefaultAsync();
