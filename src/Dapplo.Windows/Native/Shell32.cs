@@ -26,6 +26,7 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using Dapplo.Windows.User32;
 
 #endregion
 
@@ -163,7 +164,7 @@ namespace Dapplo.Windows.Native
                 // Copy (clone) the returned icon to a new object, thus allowing us to clean-up properly
                 var icon = (Icon) Icon.FromHandle(shfi.hIcon).Clone();
                 // Cleanup
-                User32.User32Api.DestroyIcon(shfi.hIcon);
+                User32Api.DestroyIcon(shfi.hIcon);
                 return icon;
             }
             return null;
@@ -203,7 +204,7 @@ namespace Dapplo.Windows.Native
             var icon = (Icon) Icon.FromHandle(shfi.hIcon).Clone();
 
             // Cleanup
-            User32.User32Api.DestroyIcon(shfi.hIcon);
+            User32Api.DestroyIcon(shfi.hIcon);
             return icon;
         }
 

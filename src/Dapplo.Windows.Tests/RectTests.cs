@@ -25,7 +25,6 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Structs;
 using Xunit;
 using Xunit.Abstractions;
 

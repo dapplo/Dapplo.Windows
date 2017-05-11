@@ -25,12 +25,10 @@ using System;
 using Dapplo.Log;
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Enums;
 using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.Structs;
+using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
 using Microsoft.Win32;
@@ -169,16 +167,16 @@ namespace Dapplo.Windows.Desktop
         {
             if (ShowChanges)
             {
-                User32.User32Api.SetScrollInfo(ScrollBarWindow.Handle, ScrollBarType, ref scrollInfo, true);
+                User32Api.SetScrollInfo(ScrollBarWindow.Handle, ScrollBarType, ref scrollInfo, true);
             }
             switch (ScrollBarType)
             {
                 case ScrollBarTypes.Horizontal:
-                    User32.User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_HSCROLL, 4 + 0x10000 * scrollInfo.Position, 0);
+                    User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_HSCROLL, 4 + 0x10000 * scrollInfo.Position, 0);
                     break;
                 case ScrollBarTypes.Vertical:
                 case ScrollBarTypes.Control:
-                    User32.User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_VSCROLL, (int) ((uint) ScrollBarCommands.SB_THUMBPOSITION + (scrollInfo.Position << 16)), 0);
+                    User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_VSCROLL, (int) ((uint) ScrollBarCommands.SB_THUMBPOSITION + (scrollInfo.Position << 16)), 0);
                     break;
             }
             return true;
@@ -237,7 +235,7 @@ namespace Dapplo.Windows.Desktop
         {
             scrollInfo = ScrollInfo.Create(ScrollInfoMask.All);
 
-            return User32.User32Api.GetScrollInfo(ScrollBarWindow.Handle, ScrollBarType, ref scrollInfo);
+            return User32Api.GetScrollInfo(ScrollBarWindow.Handle, ScrollBarType, ref scrollInfo);
         }
 
         /// <summary>
@@ -266,7 +264,7 @@ namespace Dapplo.Windows.Desktop
                     break;
             }
             var scrollbarInfo = ScrollBarInfo.Create();
-            var hasScrollbarInfo = User32.User32Api.GetScrollBarInfo(ScrollBarWindow.Handle, objectId, ref scrollbarInfo);
+            var hasScrollbarInfo = User32Api.GetScrollBarInfo(ScrollBarWindow.Handle, objectId, ref scrollbarInfo);
             if (!hasScrollbarInfo)
             {
                 var error = Win32.GetLastErrorCode();
@@ -380,10 +378,10 @@ namespace Dapplo.Windows.Desktop
             switch (ScrollBarType)
             {
                 case ScrollBarTypes.Horizontal:
-                    User32.User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_HSCROLL, scrollBarCommand, 0);
+                    User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_HSCROLL, scrollBarCommand, 0);
                     return true;
                 case ScrollBarTypes.Vertical:
-                    User32.User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_VSCROLL, scrollBarCommand, 0);
+                    User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_VSCROLL, scrollBarCommand, 0);
                     return true;
                 default:
                     return false;

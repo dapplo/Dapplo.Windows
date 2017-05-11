@@ -23,7 +23,7 @@
 
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Native;
+using Dapplo.Windows.User32;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -43,7 +43,7 @@ namespace Dapplo.Windows.Tests
         [Fact]
         public void TestAllDisplays()
         {
-            foreach (var display in User32.User32Api.AllDisplays())
+            foreach (var display in User32Api.AllDisplays())
             {
                 Log.Debug().WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
             }

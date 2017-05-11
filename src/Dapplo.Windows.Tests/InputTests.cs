@@ -31,8 +31,7 @@ using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
-using Dapplo.Windows.Native;
-using Dapplo.Windows.Structs;
+using Dapplo.Windows.User32;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -68,7 +67,7 @@ namespace Dapplo.Windows.Tests
                     .Where(interopWindow =>
                     {
                         int processId;
-                        User32.User32Api.GetWindowThreadProcessId(interopWindow.Handle, out processId);
+                        User32Api.GetWindowThreadProcessId(interopWindow.Handle, out processId);
                         return processId == process.Id;
                     })
                     .FirstOrDefaultAsync();

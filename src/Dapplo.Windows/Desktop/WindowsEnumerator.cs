@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapplo.Windows.Native;
+using Dapplo.Windows.User32;
 
 #endregion
 
@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Desktop
         public static IEnumerable<IInteropWindow> EnumerateWindows(IInteropWindow parent = null, Func<IInteropWindow, bool> wherePredicate = null, Func<IInteropWindow, bool> takeWhileFunc = null)
         {
             var result = new List<IInteropWindow>();
-            User32.User32Api.EnumChildWindows(parent?.Handle ?? IntPtr.Zero, (hwnd, param) =>
+            User32Api.EnumChildWindows(parent?.Handle ?? IntPtr.Zero, (hwnd, param) =>
             {
                 // check if we should continue
                 var windowInfo = InteropWindowFactory.CreateFor(hwnd);
@@ -74,7 +74,7 @@ namespace Dapplo.Windows.Desktop
                 var continueWithEnumeration = true;
                 Task.Run(() =>
                 {
-                    User32.User32Api.EnumChildWindows(hWndParent ?? IntPtr.Zero, (hwnd, param) =>
+                    User32Api.EnumChildWindows(hWndParent ?? IntPtr.Zero, (hwnd, param) =>
                     {
                         // check if we should continue
                         if (cancellationToken.IsCancellationRequested || !continueWithEnumeration)

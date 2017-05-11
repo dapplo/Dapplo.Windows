@@ -31,7 +31,6 @@ using System.Text;
 using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Windows.Common;
-using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.User32.Enums;

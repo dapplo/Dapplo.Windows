@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Dapplo.Windows.Enums;
-using Dapplo.Windows.Structs;
 using Dapplo.Windows.User32.Structs;
 
 #endregion

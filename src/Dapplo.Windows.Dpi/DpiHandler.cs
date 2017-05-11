@@ -35,6 +35,7 @@ using Dapplo.Windows.Gdi32;
 using Dapplo.Windows.Gdi32.Enums;
 using Dapplo.Windows.Gdi32.SafeHandles;
 using Dapplo.Windows.Messages;
+using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 
 #endregion
@@ -142,7 +143,7 @@ namespace Dapplo.Windows.Dpi
             // Use the second easiest method, but this only works for Windows 8.1 or later
             if (WindowsVersion.IsWindows81OrLater)
             {
-                var hMonitor = User32.User32Api.MonitorFromWindow(hWnd, MonitorFrom.DefaultToNearest);
+                var hMonitor = User32Api.MonitorFromWindow(hWnd, MonitorFrom.DefaultToNearest);
                 uint dpiX;
                 uint dpiY;
                 if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out dpiX, out dpiY))
@@ -195,7 +196,7 @@ namespace Dapplo.Windows.Dpi
                     // Retrieve the adviced location
                     var lprNewRect = (RECT) Marshal.PtrToStructure(lParam, typeof(RECT));
                     // Move the window to it's location, and resize
-                    User32.User32Api.SetWindowPos(hwnd,
+                    User32Api.SetWindowPos(hwnd,
                         IntPtr.Zero,
                         lprNewRect.Left,
                         lprNewRect.Top,

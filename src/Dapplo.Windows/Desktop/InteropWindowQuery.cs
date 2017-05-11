@@ -25,8 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Dapplo.Windows.App;
-using Dapplo.Windows.Enums;
-using Dapplo.Windows.Native;
+using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 
 #endregion
@@ -49,7 +48,7 @@ namespace Dapplo.Windows.Desktop
         /// <returns>InteropWindow</returns>
         public static IInteropWindow GetActiveWindow()
         {
-            return InteropWindowFactory.CreateFor(User32.User32Api.GetForegroundWindow());
+            return InteropWindowFactory.CreateFor(User32Api.GetForegroundWindow());
         }
 
         /// <summary>
@@ -58,7 +57,7 @@ namespace Dapplo.Windows.Desktop
         /// <returns>InteropWindow for the desktop window</returns>
         public static IInteropWindow GetDesktopWindow()
         {
-            return InteropWindowFactory.CreateFor(User32.User32Api.GetDesktopWindow());
+            return InteropWindowFactory.CreateFor(User32Api.GetDesktopWindow());
         }
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace Dapplo.Windows.Desktop
                     var handles = new List<IntPtr>();
                     try
                     {
-                        User32.User32Api.EnumThreadWindows(thread.Id, (hWnd, lParam) =>
+                        User32Api.EnumThreadWindows(thread.Id, (hWnd, lParam) =>
                         {
                             handles.Add(hWnd);
                             return true;
@@ -119,11 +118,11 @@ namespace Dapplo.Windows.Desktop
         public static IEnumerable<IInteropWindow> GetTopWindows(IInteropWindow parent = null)
         {
             // TODO: Guard against looping
-            var windowPtr = parent == null ? User32.User32Api.GetTopWindow(IntPtr.Zero) : User32.User32Api.GetWindow(parent.Handle, GetWindowCommands.GW_CHILD);
+            var windowPtr = parent == null ? User32Api.GetTopWindow(IntPtr.Zero) : User32Api.GetWindow(parent.Handle, GetWindowCommands.GW_CHILD);
             do
             {
                 yield return InteropWindowFactory.CreateFor(windowPtr);
-                windowPtr = User32.User32Api.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
+                windowPtr = User32Api.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
             } while (windowPtr != IntPtr.Zero);
         }
 

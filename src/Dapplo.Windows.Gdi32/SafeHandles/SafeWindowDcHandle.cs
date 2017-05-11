@@ -25,6 +25,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
+using Dapplo.Windows.User32;
 using Microsoft.Win32.SafeHandles;
 
 #endregion
@@ -63,7 +64,7 @@ namespace Dapplo.Windows.Gdi32.SafeHandles
         /// <returns></returns>
         public static SafeWindowDcHandle FromDesktop()
         {
-            var hWndDesktop = User32.User32Api.GetDesktopWindow();
+            var hWndDesktop = User32Api.GetDesktopWindow();
             var hDcDesktop = GetWindowDC(hWndDesktop);
             return new SafeWindowDcHandle(hWndDesktop, hDcDesktop);
         }
