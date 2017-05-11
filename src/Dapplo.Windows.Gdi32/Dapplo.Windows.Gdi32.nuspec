@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
-        <id>Dapplo.Windows.Kernel</id>
+        <id>$id$</id>
         <version>$version$</version>
-        <title>Dapplo.Windows.Kernel</title>
+        <title>$id$</title>
         <authors>Robin Krom</authors>
         <owners>Dapplo</owners>
         <licenseUrl>https://en.wikipedia.org/wiki/GNU_General_Public_License</licenseUrl>
         <projectUrl>http://www.dapplo.net/blocks/Dapplo.Windows</projectUrl>
         <iconUrl>http://www.dapplo.net/favicon.ico</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Dapplo.Windows.Kernel is a library to assist calling the kernel32 api</description>
-		<summary>Dapplo.Windows.Kernel is a library to assist calling the kernel32 api</summary>
+        <description>$id$ bringt Gdi32 and GdiPlus functionality.</description>
+		<summary>$id$ bringt Gdi32 and GdiPlus functionality.</summary>
         <language>en-us</language>
 		<copyright>Dapplo</copyright>
-		<tags>windows kernel32</tags>
+		<tags>windows native gdi</tags>
     </metadata>
 	<files>
 		<file src="bin\release\$id$.pdb" target="lib\net45" />

@@ -221,5 +221,45 @@ namespace Dapplo.Windows.Kernel32
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
+
+        /// <summary>
+        /// Allocates the specified number of bytes from the heap.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa366574(v=vs.85).aspx">GlobalAlloc function</a>
+        /// </summary>
+        /// <param name="globalMemorySettings">The memory allocation attributes. If zero is specified, the default is GMEM_FIXED. This parameter can be one or more of the following values, except for the incompatible combinations that are specifically noted.</param>
+        /// <param name="bytes">The number of bytes to allocate. If this parameter is zero and the uFlags parameter specifies GMEM_MOVEABLE, the function returns a handle to a memory object that is marked as discarded.</param>
+        /// <returns>
+        /// If the function succeeds, the return value is a handle to the newly allocated memory object.
+        /// If the function fails, the return value is NULL. To get extended error information, call GetLastError.
+        /// </returns>
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern IntPtr GlobalAlloc(GlobalMemorySettings globalMemorySettings, UIntPtr bytes);
+
+        /// <summary>
+        /// Locks a global memory object and returns a pointer to the first byte of the object's memory block.
+        /// </summary>
+        /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory blockk</param>
+        /// <returns>IntPtr to the first byte of the global memory block</returns>
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern IntPtr GlobalLock(IntPtr hMem);
+
+        /// <summary>
+        /// Decrements the lock count associated with a memory object that was allocated with GMEM_MOVEABLE. This function has no effect on memory objects allocated with GMEM_FIXED.
+        /// If the memory object is still locked after decrementing the lock count, the return value is a nonzero value. If the memory object is unlocked after decrementing the lock count, the function returns zero and GetLastError returns NO_ERROR.
+        /// If the function fails, the return value is zero and GetLastError returns a value other than NO_ERROR.
+        /// </summary>
+        /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory block</param>
+        /// <returns>bool if the unlock worked.</returns>
+        [DllImport("kernel32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GlobalUnlock(IntPtr hMem);
+
+        /// <summary>
+        /// Retrieves the current size of the specified global memory object, in bytes.
+        /// </summary>
+        /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory blockk</param>
+        /// <returns>int with the size</returns>
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern int GlobalSize(IntPtr hMem);
     }
 }

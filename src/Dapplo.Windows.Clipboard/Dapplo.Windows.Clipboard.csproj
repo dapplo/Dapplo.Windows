@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Dapplo.Windows.Clipboard.xml</DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Dapplo.Windows.Clipboard.xml</DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -58,6 +60,10 @@
     <Compile Include="StandardClipboardFormats.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj">
+      <Project>{61832675-C53B-4283-8C44-EF99FD26AD3B}</Project>
+      <Name>Dapplo.Windows.Kernel32</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
       <Name>Dapplo.Windows.Messages</Name>

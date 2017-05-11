@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\GlobalMemorySettings.cs" />
     <Compile Include="Enums\ProcessAccessRights.cs" />
     <Compile Include="Enums\ThreadAccess.cs" />
     <Compile Include="Enums\WindowsProducts.cs" />

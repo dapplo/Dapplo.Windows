@@ -25,6 +25,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
@@ -93,8 +94,11 @@ namespace Dapplo.Windows.Tests
 
                 hasNewContent = true;
             });
-
-            ClipboardNative.Put(testString);
+            using (ClipboardNative.Lock())
+            {
+                ClipboardNative.Clear();
+                ClipboardNative.SetAsString(testString);
+            }
             await Task.Delay(1000);
             subscription.Dispose();
 
@@ -106,13 +110,50 @@ namespace Dapplo.Windows.Tests
         ///     Test monitoring the clipboard
         /// </summary>
         /// <returns></returns>
-        //[WpfFact]
-        public async Task TestClipboardStore()
+        [WpfFact]
+        public async Task TestClipboardStore_String()
         {
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
-            ClipboardNative.Put(testString);
+            using (ClipboardNative.Lock())
+            {
+                ClipboardNative.Clear();
+                ClipboardNative.SetAsString(testString);
+            }
             await Task.Delay(1000);
-            Assert.Equal(testString,ClipboardNative.GetAsString());
+            using (ClipboardNative.Lock())
+            {
+                Assert.Equal(testString, ClipboardNative.GetAsString());
+            }
+        }
+
+        /// <summary>
+        ///     Test monitoring the clipboard
+        /// </summary>
+        /// <returns></returns>
+        [WpfFact]
+        public async Task TestClipboardStore_MemoryStream()
+        {
+            const string testString = "Dapplo.Windows.Tests.ClipboardTests";
+            var testStream = new MemoryStream();
+            var bytes = Encoding.Unicode.GetBytes(testString);
+            Assert.Equal(testString, Encoding.Unicode.GetString(bytes));
+            testStream.Write(bytes, 0, bytes.Length);
+
+            Assert.Equal(testString, Encoding.Unicode.GetString(testStream.GetBuffer(), 0, (int)testStream.Length));
+
+            MemoryStream resultStream;
+            using (ClipboardNative.Lock())
+            {
+                ClipboardNative.Clear();
+                ClipboardNative.SetAsStream("CF_UNICODETEXT", testStream);
+            }
+            await Task.Delay(1000);
+            using (ClipboardNative.Lock())
+            {
+                resultStream = ClipboardNative.GetAsStream("CF_UNICODETEXT");
+
+            }
+            Assert.Equal(testString, Encoding.Unicode.GetString(resultStream.GetBuffer(), 0, (int)resultStream.Length));
         }
     }
 }

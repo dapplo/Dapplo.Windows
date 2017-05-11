@@ -19,6 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using Dapplo.Windows.Kernel32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,6 +31,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapplo.Windows.Kernel32.Enums;
 
 namespace Dapplo.Windows.Clipboard
 {
@@ -113,7 +115,7 @@ namespace Dapplo.Windows.Clipboard
         /// </summary>
         /// <param name="text">string to place on the clipboard</param>
         /// <param name="format">Optional format, default is CF_UNICODETEXT</param>
-        public static void Put(string text, string format = "CF_UNICODETEXT")
+        public static void SetAsString(string text, string format = "CF_UNICODETEXT")
         {
             uint formatId;
             if (!Format2Id.TryGetValue(format, out formatId))
@@ -147,8 +149,21 @@ namespace Dapplo.Windows.Clipboard
             {
                 throw new ArgumentException($"{format} is not a known format.", nameof(format));
             }
-            var hText = GetClipboardData(formatId);
-            return Marshal.PtrToStringUni(hText);
+            var hGlobal = GetClipboardData(formatId);
+            var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
+            try
+            {
+                if (memoryPtr == IntPtr.Zero)
+                {
+                    throw new Win32Exception();
+                }
+                return Marshal.PtrToStringUni(memoryPtr);
+            }
+            finally
+            {
+                Kernel32Api.GlobalUnlock(hGlobal);
+            }
+            
         }
 
         /// <summary>
@@ -166,14 +181,14 @@ namespace Dapplo.Windows.Clipboard
                 throw new ArgumentException($"{format} is not a known format.", nameof(format));
             }
             var hGlobal = GetClipboardData(formatId);
-            var memoryPtr = GlobalLock(hGlobal);
+            var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
             try
             {
                 if (memoryPtr == IntPtr.Zero)
                 {
                     throw new Win32Exception();
                 }
-                var size = GlobalSize(hGlobal);
+                var size = Kernel32Api.GlobalSize(hGlobal);
                 var stream = new MemoryStream(size);
                 stream.SetLength(size);
                 // Fill the memory stream
@@ -182,8 +197,47 @@ namespace Dapplo.Windows.Clipboard
             }
             finally
             {
-                GlobalUnlock(hGlobal);
+                Kernel32Api.GlobalUnlock(hGlobal);
             }
+        }
+
+        /// <summary>
+        /// Set the content for the specified format.
+        /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
+        /// </summary>
+        /// <param name="format">the format to set the content for</param>
+        /// <param name="stream">MemoryStream with the content</param>
+        public static void SetAsStream(string format, MemoryStream stream)
+        {
+            uint formatId;
+
+            if (!Format2Id.TryGetValue(format, out formatId))
+            {
+                // TODO: Set format
+                throw new ArgumentException($"{format} is not a known format.", nameof(format));
+            }
+            var length = stream.Length;
+            var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Fixed, new UIntPtr((ulong)length));
+            if (hGlobal == IntPtr.Zero)
+            {
+                throw new Win32Exception();
+            }
+            var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
+            try
+            {
+                if (memoryPtr == IntPtr.Zero)
+                {
+                    throw new Win32Exception();
+                }
+                // Fill the global memory
+                Marshal.Copy(stream.GetBuffer(), 0, memoryPtr, (int)length);
+            }
+            finally
+            {
+                Kernel32Api.GlobalUnlock(hGlobal);
+            }
+            // Place the content on the clipboard
+            SetClipboardData(formatId, hGlobal);
         }
 
         /// <summary>
@@ -231,33 +285,6 @@ namespace Dapplo.Windows.Clipboard
         }
 
         #region Native methods
-
-        /// <summary>
-        /// Locks a global memory object and returns a pointer to the first byte of the object's memory block.
-        /// </summary>
-        /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory blockk</param>
-        /// <returns>IntPtr to the first byte of the global memory block</returns>
-        [DllImport("kernel32", SetLastError = true)]
-        private static extern IntPtr GlobalLock(IntPtr hMem);
-
-        /// <summary>
-        /// Decrements the lock count associated with a memory object that was allocated with GMEM_MOVEABLE. This function has no effect on memory objects allocated with GMEM_FIXED.
-        /// If the memory object is still locked after decrementing the lock count, the return value is a nonzero value. If the memory object is unlocked after decrementing the lock count, the function returns zero and GetLastError returns NO_ERROR.
-        /// If the function fails, the return value is zero and GetLastError returns a value other than NO_ERROR.
-        /// </summary>
-        /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory block</param>
-        /// <returns>bool if the unlock worked.</returns>
-        [DllImport("kernel32", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GlobalUnlock(IntPtr hMem);
-
-        /// <summary>
-        /// Retrieves the current size of the specified global memory object, in bytes.
-        /// </summary>
-        /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory blockk</param>
-        /// <returns>int with the size</returns>
-        [DllImport("kernel32", SetLastError = true)]
-        private static extern int GlobalSize(IntPtr hMem);
 
         /// <summary>
         ///     See
