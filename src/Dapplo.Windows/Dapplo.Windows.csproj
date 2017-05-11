@@ -99,7 +99,7 @@
       <Project>{ef02637f-86a5-47f1-bb75-33e0ba3119cf}</Project>
       <Name>Dapplo.Windows.DesktopWindowsManager</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.Gdi\Dapplo.Windows.Gdi32.csproj">
+    <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj">
       <Project>{e4a0ce9d-681c-44d0-85f5-4f677ec54658}</Project>
       <Name>Dapplo.Windows.Gdi32</Name>
     </ProjectReference>
