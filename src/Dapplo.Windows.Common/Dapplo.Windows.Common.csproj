@@ -38,6 +38,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\AdjacentTo.cs" />
     <Compile Include="Enums\HRESULT.cs" />
     <Compile Include="Enums\Win32Error.cs" />
     <Compile Include="Extensions\HResultExtensions.cs" />

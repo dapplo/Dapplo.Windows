@@ -23,6 +23,7 @@
 
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Xunit;
@@ -98,16 +99,16 @@ namespace Dapplo.Windows.Tests
             // left
             var rect1 = new RECT(new POINT(left, top), new SIZE(width, height));
             var rect2 = new RECT(new POINT(left - width, top), new SIZE(width, height));
-            Assert.True(rect1.IsAdjacent(rect2));
+            Assert.Equal(AdjacentTo.Left, rect1.IsAdjacent(rect2));
             // Right
             rect2 = new RECT(new POINT(left + width, top), new SIZE(width, height));
-            Assert.True(rect1.IsAdjacent(rect2));
+            Assert.Equal(AdjacentTo.Right, rect1.IsAdjacent(rect2));
             // Bottom
             rect2 = new RECT(new POINT(left, top + height), new SIZE(width, height));
-            Assert.True(rect1.IsAdjacent(rect2));
+            Assert.Equal(AdjacentTo.Bottom, rect1.IsAdjacent(rect2));
             // Top
             rect2 = new RECT(new POINT(left, top - height), new SIZE(width, height));
-            Assert.True(rect1.IsAdjacent(rect2));
+            Assert.Equal(AdjacentTo.Top, rect1.IsAdjacent(rect2));
         }
 
         [Fact]

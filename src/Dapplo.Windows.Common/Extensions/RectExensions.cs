@@ -21,6 +21,7 @@
 
 #region using
 
+using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
 
 #endregion
@@ -66,13 +67,14 @@ namespace Dapplo.Windows.Common.Extensions
         /// <returns>The rectangles overlap</returns>
         public static bool HasOverlap(this RECT rect1, RECT rect2)
         {
-            if (rect1.IsAdjacent(rect2))
+            if (rect1.IsAdjacent(rect2) != AdjacentTo.None)
             {
+                // If it's adjacent than there is no overlap?
                 return true;
             }
 
-            var leftOfRect1InsideRect2Width = IsBetween(rect1.X, rect2.X, rect2.X + rect2.Width);
-            var leftOfRect2InsideRect1Width = IsBetween(rect2.X, rect1.X, rect1.X + rect1.Width);
+            var leftOfRect1InsideRect2Width = IsBetween(rect1.X, rect2.Left, rect2.Right);
+            var leftOfRect2InsideRect1Width = IsBetween(rect2.X, rect1.Left, rect1.Right);
             var xOverlap = leftOfRect1InsideRect2Width || leftOfRect2InsideRect1Width;
 
             var topOfRect1InsideRect2Height = IsBetween(rect1.Y, rect2.Y, rect2.Y + rect2.Height);
@@ -90,26 +92,25 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">The first rectangle</param>
         /// <param name="rect2">The second rectangle</param>
         /// <returns>At least one rectangle is adjacent to the other rectangle</returns>
-        public static bool IsAdjacent(this RECT rect1, RECT rect2)
+        public static AdjacentTo IsAdjacent(this RECT rect1, RECT rect2)
         {
-            var overlapsWithRect2Left = rect1.Left.Equals(rect2.Left) || rect1.Right.Equals(rect2.Left);
-            var overlapsWithRect2Right = rect1.Left.Equals(rect2.Right) || rect1.Right.Equals(rect2.Right);
-
-            var overlapsWithRect2Top = rect1.Top.Equals(rect2.Top) || rect1.Bottom.Equals(rect2.Top);
-            var overlapsWithRect2Bottom = rect1.Top.Equals(rect2.Bottom) || rect1.Bottom.Equals(rect2.Bottom);
-
-            if (overlapsWithRect2Left || overlapsWithRect2Right)
+            if (rect1.Left.Equals(rect2.Right) && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect2.Top, rect1.Top, rect1.Bottom)))
             {
-                var isWithinYAxis = IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect1.Bottom, rect2.Top, rect2.Bottom);
-                return isWithinYAxis;
+                return AdjacentTo.Left;
             }
-
-            if (overlapsWithRect2Bottom || overlapsWithRect2Top)
+            if (rect1.Right.Equals(rect2.Left) && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect2.Top, rect1.Top, rect1.Bottom)))
             {
-                var isWithinXAxis = IsBetween(rect1.Left, rect2.Left, rect2.Right) || IsBetween(rect1.Right, rect2.Left, rect2.Right);
-                return isWithinXAxis;
+                return AdjacentTo.Right;
             }
-            return false;
+            if (rect1.Top.Equals(rect2.Bottom) && (IsBetween(rect1.Left, rect2.Left, rect2.Right) || IsBetween(rect2.Left, rect1.Left, rect1.Right)))
+            {
+                return AdjacentTo.Top;
+            }
+            if (rect1.Bottom.Equals(rect2.Top) && (IsBetween(rect1.Left, rect2.Left, rect2.Right) || IsBetween(rect2.Left, rect1.Left, rect1.Right)))
+            {
+                return AdjacentTo.Bottom;
+            }
+            return AdjacentTo.None;
         }
 
         /// <summary>
