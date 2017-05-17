@@ -40,7 +40,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <returns>true if it contains</returns>
         public static bool Contains(this RECT rect, POINT point)
         {
-            return point.X >= rect.Left && point.X <= rect.Right && point.Y >= rect.Top && point.Y <= rect.Bottom;
+            return IsBetween(point.X, rect.Left, rect.Right) && IsBetween(point.Y, rect.Top, rect.Bottom);
         }
 
         /// <summary>
@@ -51,13 +51,11 @@ namespace Dapplo.Windows.Common.Extensions
         /// <returns>True if small rectangle is entirely contained within the larger rectangle, false otherwise</returns>
         public static bool Contains(this RECT largerRectangle, RECT smallerRectangle)
         {
-            var topLeftCheck = largerRectangle.TopLeft.X <= smallerRectangle.TopLeft.X && largerRectangle.TopLeft.Y <= smallerRectangle.TopLeft.Y;
-            var bottomLeftCheck = largerRectangle.BottomLeft.X <= smallerRectangle.BottomLeft.X && largerRectangle.BottomLeft.Y >= smallerRectangle.BottomLeft.Y;
-
-            var topRightCheck = largerRectangle.TopRight.X >= smallerRectangle.TopRight.X && largerRectangle.TopRight.Y <= smallerRectangle.TopRight.Y;
-            var bottomRightCheck = largerRectangle.BottomRight.X >= smallerRectangle.BottomRight.X && largerRectangle.BottomRight.Y >= smallerRectangle.BottomRight.Y;
-
-            return topLeftCheck && bottomLeftCheck && topRightCheck && bottomRightCheck;
+            return
+                largerRectangle.Left <= smallerRectangle.Left &&
+                smallerRectangle.Right <= largerRectangle.Right &&
+                largerRectangle.Top <= smallerRectangle.Top &&
+                smallerRectangle.Bottom <= largerRectangle.Bottom;
         }
 
         /// <summary>
@@ -121,9 +119,9 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="min">lowest allowed value</param>
         /// <param name="max">highest allowed value</param>
         /// <returns>bool true if the value is between</returns>
-        private static bool IsBetween(double value, double min, double max)
+        private static bool IsBetween(int value, int min, int max)
         {
-            return value >= min && value <= max;
+            return value >= min && value < max;
         }
 
         /// <summary>

@@ -21,9 +21,12 @@
 
 #region using
 
+using System.Linq;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.User32;
+using Dapplo.Windows.User32.Structs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -47,6 +50,14 @@ namespace Dapplo.Windows.Tests
             {
                 Log.Debug().WriteLine("Index {0} - Primary {3} - Device {1} - Bounds: {2}", display.Index, display.DeviceName, display.Bounds, display.IsPrimary);
             }
+        }
+
+        [Fact]
+        public void TestGetBounds()
+        {
+            var displayInfo = User32Api.AllDisplays().First();
+            var displayBounds = DisplayInfo.GetBounds(displayInfo.Bounds.Location);
+            Assert.Equal(displayInfo.Bounds, displayBounds);
         }
     }
 }
