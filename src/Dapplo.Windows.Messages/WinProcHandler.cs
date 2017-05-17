@@ -37,11 +37,6 @@ namespace Dapplo.Windows.Messages
     /// </summary>
     public class WinProcHandler
     {
-        /// <summary>
-        ///     To create a message-only window, specify HWndMessage as the parent of the window
-        /// </summary>
-        public static readonly IntPtr HwndMessage = new IntPtr(-3);
-
         private static readonly LogSource Log = new LogSource();
 
         /// <summary>
@@ -55,11 +50,10 @@ namespace Dapplo.Windows.Messages
         private readonly IList<HwndSourceHook> _hooks = new List<HwndSourceHook>();
 
         /// <summary>
-        ///     Special HwndSource which is only there for handling messages
+        ///     Special HwndSource which is only there for handling messages, is top-level (no parent) to be able to handle ALL events
         /// </summary>
         private readonly HwndSource _hwndSource = new HwndSource(new HwndSourceParameters
         {
-            ParentWindow = HwndMessage,
             Width = 0,
             Height = 0,
             PositionX = 0,
@@ -68,7 +62,7 @@ namespace Dapplo.Windows.Messages
             ExtendedWindowStyle = 0, // ExtendedWindowStyleFlags.WS_NONE
             WindowStyle = 0, // WindowStyleFlags.WS_OVERLAPPED
             WindowClassStyle = 0,
-            WindowName = "Dapplo.Windows"
+            WindowName = "Dapplo.Windows.Messages.WinProcHandler"
         });
 
         /// <summary>
