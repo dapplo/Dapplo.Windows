@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.User32.Enums;
@@ -35,16 +36,16 @@ namespace Dapplo.Windows.User32.Structs
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
+    [SuppressMessage("Sonar Code Smell", "S1450:Private fields only used as local variables in methods should become local variables", Justification = "Interop!")]
     public struct WindowPlacement
     {
         /// <summary>
-        ///     The length of the structure, in bytes. Before calling the GetWindowPlacement or SetWindowPlacement functions, set
-        ///     this member to sizeof(WINDOWPLACEMENT).
+        ///     The length of the structure, in bytes. Before calling the GetWindowPlacement or SetWindowPlacement functions, set this member to sizeof(WINDOWPLACEMENT).
         ///     <para>
         ///         GetWindowPlacement and SetWindowPlacement fail if this member is not set correctly.
         ///     </para>
         /// </summary>
-        public int Length;
+        private int _cbSize;
 
         /// <summary>
         ///     Specifies flags that control the position of the minimized window and the method by which the window is restored.
@@ -78,7 +79,7 @@ namespace Dapplo.Windows.User32.Structs
         {
             return new WindowPlacement
             {
-                Length = Marshal.SizeOf(typeof(WindowPlacement))
+                _cbSize = Marshal.SizeOf(typeof(WindowPlacement))
             };
         }
     }

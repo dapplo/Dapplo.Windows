@@ -89,6 +89,7 @@
     <Compile Include="DisplayTest.cs" />
     <Compile Include="ClipboardTests.cs" />
     <Compile Include="RectTests.cs" />
+    <Compile Include="Shell32Tests.cs" />
     <Compile Include="VersionTests.cs" />
     <Compile Include="User32Tests.cs" />
     <Compile Include="DwmTest.cs" />
@@ -135,6 +136,10 @@
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{DE471F22-E095-4B11-9702-8306D69B32CA}</Project>
       <Name>Dapplo.Windows.Messages</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Shell32\Dapplo.Windows.Shell32.csproj">
+      <Project>{043b5bef-302e-4122-ade5-70b18a824633}</Project>
+      <Name>Dapplo.Windows.Shell32</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj">
       <Project>{fdf2ef88-dc84-40bc-8c85-7b143db9508b}</Project>

@@ -21,36 +21,36 @@
 
 #region using
 
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Dapplo.Log;
+using Dapplo.Log.XUnit;
+using Dapplo.Windows.Desktop;
+using Xunit;
+using Xunit.Abstractions;
+using Dapplo.Windows.Shell32;
 
 #endregion
 
-namespace Dapplo.Windows.User32.Structs
+namespace Dapplo.Windows.Tests
 {
-    /// <summary>
-    ///     Describes the animation effects associated with user actions. This structure is used with the SystemParametersInfo
-    ///     function when the SPI_GETANIMATION or SPI_SETANIMATION action value is specified.
-    /// </summary>
-    [SuppressMessage("Sonar Code Smell", "S1450:Private fields only used as local variables in methods should become local variables", Justification = "Interop!")]
-    [StructLayout(LayoutKind.Sequential)]
-    public struct AnimationInfo
+    public class Shell32Tests
     {
-        private uint _cbSize;
-        private int _iMinAnimate;
+        public Shell32Tests(ITestOutputHelper testOutputHelper)
+        {
+            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
 
         /// <summary>
-        ///     Factory method to create AnimationInfo
+        ///     Test AppBarr
         /// </summary>
-        /// <param name="enableAnimations"></param>
         /// <returns></returns>
-        public static AnimationInfo Create(bool enableAnimations = true)
+        //[Fact]
+        private void TestAppBar()
         {
-            return new AnimationInfo
-            {
-                _cbSize = (uint) Marshal.SizeOf(typeof(AnimationInfo)),
-                _iMinAnimate = enableAnimations ? 1 : 0
-            };
+            var appBarData = Shell32Api.TaskbarPosition;
+            Assert.False(appBarData.Bounds.IsEmpty);
         }
-    }
+   }
 }
