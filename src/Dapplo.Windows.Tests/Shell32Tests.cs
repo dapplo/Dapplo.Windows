@@ -30,6 +30,7 @@ using Dapplo.Windows.Desktop;
 using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Windows.Shell32;
+using Dapplo.Windows.Shell32.Enums;
 
 #endregion
 

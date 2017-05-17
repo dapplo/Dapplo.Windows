@@ -37,14 +37,14 @@ namespace Dapplo.Windows.User32.Structs
     public class DisplayInfo
     {
         /// <summary>
+        /// Index of the Display, as specified in the "control panel".
+        /// </summary>
+        public int? Index { get; set; }
+
+        /// <summary>
         ///     Screen bounds
         /// </summary>
         public RECT Bounds { get; set; }
-
-        /// <summary>
-        ///     Bounds as Rectangle
-        /// </summary>
-        public RECT BoundsRectangle { get; set; }
 
         /// <summary>
         ///     Device name
@@ -70,11 +70,6 @@ namespace Dapplo.Windows.User32.Structs
         ///     Desktop working area
         /// </summary>
         public RECT WorkingArea { get; set; }
-
-        /// <summary>
-        ///     Desktop working area as Rectangle
-        /// </summary>
-        public Rectangle WorkingAreaRectangle { get; set; }
 
         /// <summary>
         ///     Get the bounds of the complete screen

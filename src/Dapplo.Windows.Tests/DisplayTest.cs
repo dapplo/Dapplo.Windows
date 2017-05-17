@@ -45,7 +45,7 @@ namespace Dapplo.Windows.Tests
         {
             foreach (var display in User32Api.AllDisplays())
             {
-                Log.Debug().WriteLine("Device {0} - Bounds: {1}", display.DeviceName, display.Bounds.ToString());
+                Log.Debug().WriteLine("Index {0} - Primary {3} - Device {1} - Bounds: {2}", display.Index, display.DeviceName, display.Bounds, display.IsPrimary);
             }
         }
     }

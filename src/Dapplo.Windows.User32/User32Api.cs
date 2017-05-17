@@ -61,9 +61,10 @@ namespace Dapplo.Windows.User32
         ///     Returns the number of Displays using the Win32 functions
         /// </summary>
         /// <returns>collection of Display Info</returns>
-        public static IList<DisplayInfo> AllDisplays()
+        public static IEnumerable<DisplayInfo> AllDisplays()
         {
             var result = new List<DisplayInfo>();
+            int index = 1;
             EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr monitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr data) =>
             {
                 var monitorInfoEx = MonitorInfoEx.Create();
@@ -74,13 +75,12 @@ namespace Dapplo.Windows.User32
                 }
                 var displayInfo = new DisplayInfo
                 {
+                    Index = index++,
                     ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left),
                     ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
                     Bounds = monitorInfoEx.Monitor,
-                    BoundsRectangle = monitorInfoEx.Monitor,
                     WorkingArea = monitorInfoEx.WorkArea,
-                    WorkingAreaRectangle = monitorInfoEx.WorkArea,
-                    IsPrimary = (monitorInfoEx.Flags | MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary
+                    IsPrimary = (monitorInfoEx.Flags & MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary
                 };
                 result.Add(displayInfo);
                 return true;
