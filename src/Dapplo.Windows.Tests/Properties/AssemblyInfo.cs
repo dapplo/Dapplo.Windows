@@ -23,6 +23,7 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Xunit;
 
 #endregion
 
@@ -34,6 +35,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright © Dapplo 2017")]
 [assembly: AssemblyTrademark("Dapplo")]
 [assembly: AssemblyCulture("")]
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

@@ -25,6 +25,7 @@ using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Clipboard
 {
@@ -47,6 +48,12 @@ namespace Dapplo.Windows.Clipboard
         /// <returns></returns>
         public IDisposable Lock(IntPtr hWnd = default(IntPtr), int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
         {
+            if (hWnd == IntPtr.Zero)
+            {
+                // Take the default
+                hWnd = WinProcHandler.Instance.Handle;
+            }
+
             // If a timeout is passed, use this in the wait
             if (timeout.HasValue)
             {
@@ -95,6 +102,11 @@ namespace Dapplo.Windows.Clipboard
         /// <returns>Task with disposable</returns>
         public async Task<IDisposable> LockAsync(IntPtr hWnd = default(IntPtr), int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (hWnd == IntPtr.Zero)
+            {
+                // Take the default
+                hWnd = WinProcHandler.Instance.Handle;
+            }
             await _semaphoreSlim.WaitAsync(cancellationToken).ConfigureAwait(false);
             bool isLocked = false;
             do

@@ -217,7 +217,7 @@ namespace Dapplo.Windows.Clipboard
                 throw new ArgumentException($"{format} is not a known format.", nameof(format));
             }
             var length = stream.Length;
-            var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Fixed, new UIntPtr((ulong)length));
+            var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable , new UIntPtr((ulong)length));
             if (hGlobal == IntPtr.Zero)
             {
                 throw new Win32Exception();
