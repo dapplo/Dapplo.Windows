@@ -21,27 +21,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Dapplo.Windows.Clipboard
 {
     /// <summary>
-    /// Content of the Clipboards
+    /// Information about what the clipboard contained at the most recent clipboard update.
     /// </summary>
-    public sealed class ClipboardContents
+    public class ClipboardUpdateInformation
     {
-        // Used to identify every clipboard change
-        private static uint _globalSequenceNumber;
-
-        // Contents of the clipboard
-        private readonly IDictionary<string, Lazy<MemoryStream>> _contents = new Dictionary<string, Lazy<MemoryStream>>();
-
         /// <summary>
         /// A unique ID, given as sequence.
         /// If this number doesn't match, with the global counter, the clipboard content already changed.
         /// </summary>
-        public uint Id { get; }
+        public uint Id { get; } = ClipboardNative.SequenceNumber;
 
         /// <summary>
         /// Timestamp of the clipboard update event
@@ -51,47 +44,19 @@ namespace Dapplo.Windows.Clipboard
         /// <summary>
         /// The handle of the window which owns the clipboard content
         /// </summary>
-        public IntPtr OwnerHandle { get; }
+        public IntPtr OwnerHandle { get; } = ClipboardNative.CurrentOwner;
 
         /// <summary>
         /// The formats in this clipboard contents
         /// </summary>
-        public IEnumerable<string> Formats { get; }
+        public IEnumerable<string> Formats { get; } = ClipboardNative.AvailableFormats().ToList();
 
         /// <summary>
-        /// This initializes some properties
+        /// This class can only be instanciated when there is a clipboard lock, that is why the constructor is internal.
         /// </summary>
-        public ClipboardContents(IntPtr hWnd)
+        internal ClipboardUpdateInformation()
         {
-            Id = ++_globalSequenceNumber;
-            // Try to get the real one.
-            var windowsSequenceNumber = ClipboardNative.SequenceNumber;
-            if (windowsSequenceNumber > 0)
-            {
-                Id = windowsSequenceNumber;
-            }
-            OwnerHandle = ClipboardNative.CurrentOwner;
-
-            Formats = ClipboardNative.AvailableFormats(hWnd).ToList();
-
-            // Create Lazy for all available formats.
-            foreach (var format in Formats)
-            {
-                _contents[format] = new Lazy<MemoryStream>(() =>
-                {
-                    using (ClipboardNative.Lock(hWnd))
-                    {
-                        return ClipboardNative.GetAsStream(format);
-                    }
-                });
-            }
+            
         }
-
-        /// <summary>
-        /// Returns the content for a format
-        /// </summary>
-        /// <param name="format"></param>
-        /// <returns>MemoryStream</returns>
-        public MemoryStream this[string format] => _contents[format].Value;
     }
 }

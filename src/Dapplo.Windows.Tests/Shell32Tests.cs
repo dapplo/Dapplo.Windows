@@ -21,16 +21,11 @@
 
 #region using
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Desktop;
 using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Windows.Shell32;
-using Dapplo.Windows.Shell32.Enums;
 
 #endregion
 
@@ -47,7 +42,7 @@ namespace Dapplo.Windows.Tests
         ///     Test AppBarr
         /// </summary>
         /// <returns></returns>
-        //[Fact]
+        [Fact]
         private void TestAppBar()
         {
             var appBarData = Shell32Api.TaskbarPosition;

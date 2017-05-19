@@ -41,6 +41,8 @@ namespace Dapplo.Windows.Clipboard
     public static class ClipboardNative
     {
         private const int SuccessError = 0;
+        // Used to identify every clipboard change, if GetClipboardSequenceNumber doesn't work. 
+        private static uint _globalSequenceNumber = 1;
 
         // "Global" clipboard lock
         private static readonly ClipboardSemaphore ClipboardLock = new ClipboardSemaphore();
@@ -106,64 +108,44 @@ namespace Dapplo.Windows.Clipboard
         public static IntPtr CurrentOwner => GetClipboardOwner();
 
         /// <summary>
-        /// Retrieves the current SequenceNumber
+        /// Retrieves the current clipboard sequence number, either via GetClipboardSequenceNumber or internally
         /// </summary>
-        public static uint SequenceNumber => GetClipboardSequenceNumber();
-
-        /// <summary>
-        /// Place string on the clipboard, this assumes you already locked the clipboard
-        /// </summary>
-        /// <param name="text">string to place on the clipboard</param>
-        /// <param name="format">Optional format, default is CF_UNICODETEXT</param>
-        public static void SetAsString(string text, string format = "CF_UNICODETEXT")
+        public static uint SequenceNumber
         {
-            uint formatId;
-            if (!Format2Id.TryGetValue(format, out formatId))
+            get
             {
-                throw new ArgumentException($"{format} is not a known format.", nameof(format));
-            }
-            var hText = IntPtr.Zero;
-            try
-            {
-                hText = Marshal.StringToHGlobalUni(text);
-                SetClipboardData(formatId, hText);
-            }
-            finally
-            {
-                if (hText != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(hText);
-                }
+                _globalSequenceNumber++;
+                var sequenceNumber = GetClipboardSequenceNumber();
+                return sequenceNumber > 0 ? sequenceNumber : _globalSequenceNumber;
             }
         }
 
         /// <summary>
-        /// Get a string from the clipboard, this assumes you already locked the clipboard
+        /// Place string on the clipboard, this assumes you already locked the clipboard.
+        /// It always uses CF_UNICODETEXT, as all other formats are automatically generated from this by Windows.
         /// </summary>
-        /// <param name="format">Optional format, default is CF_UNICODETEXT</param>
-        /// <returns>string</returns>
-        public static string GetAsString(string format = "CF_UNICODETEXT")
+        /// <param name="text">string to place on the clipboard</param>
+        public static void SetAsString(string text)
         {
-            uint formatId;
-            if (!Format2Id.TryGetValue(format, out formatId))
+            var unicodeBytes = Encoding.Unicode.GetBytes(text + "\0");
+            using (var textStream = new MemoryStream())
             {
-                throw new ArgumentException($"{format} is not a known format.", nameof(format));
+                textStream.Write(unicodeBytes, 0, unicodeBytes.Length);
+                SetAsStream("CF_UNICODETEXT", textStream);
             }
-            var hGlobal = GetClipboardData(formatId);
-            var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
-            try
+        }
+
+        /// <summary>
+        /// Get a string from the clipboard, this assumes you already locked the clipboard.
+        /// This always takes the CF_UNICODETEXT format, as Windows automatically converts
+        /// </summary>
+        /// <returns>string</returns>
+        public static string GetAsString()
+        {
+            using (var textStream = GetAsStream("CF_UNICODETEXT"))
             {
-                if (memoryPtr == IntPtr.Zero)
-                {
-                    throw new Win32Exception();
-                }
-                return Marshal.PtrToStringUni(memoryPtr);
+                return Encoding.Unicode.GetString(textStream.GetBuffer(), 0, (int) textStream.Length).TrimEnd('\0');
             }
-            finally
-            {
-                Kernel32Api.GlobalUnlock(hGlobal);
-            }
-            
         }
 
         /// <summary>
@@ -178,7 +160,7 @@ namespace Dapplo.Windows.Clipboard
 
             if (!Format2Id.TryGetValue(format, out formatId))
             {
-                throw new ArgumentException($"{format} is not a known format.", nameof(format));
+                throw new ArgumentException($"{format} is not a known format, you might want to register it and call AvailableFormats afterwards.", nameof(format));
             }
             var hGlobal = GetClipboardData(formatId);
             var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
@@ -214,7 +196,7 @@ namespace Dapplo.Windows.Clipboard
             if (!Format2Id.TryGetValue(format, out formatId))
             {
                 // TODO: Set format
-                throw new ArgumentException($"{format} is not a known format.", nameof(format));
+                throw new ArgumentException($"{format} is not a known format, you might want to register it and call AvailableFormats afterwards.", nameof(format));
             }
             var length = stream.Length;
             var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable , new UIntPtr((ulong)length));
@@ -241,46 +223,42 @@ namespace Dapplo.Windows.Clipboard
         }
 
         /// <summary>
-        ///     Enumerate through all formats on the clipboard
+        ///     Enumerate through all formats on the clipboard, assumes the clipboard was already locked.
         /// </summary>
-        /// <param name="hWnd">IntPtr with the handle which wants to access the clipboard</param>
         /// <returns>IEnumerable with strings defining the format</returns>
-        public static IEnumerable<string> AvailableFormats(IntPtr hWnd = default(IntPtr))
+        public static IEnumerable<string> AvailableFormats()
         {
-            using (ClipboardLock.Lock(hWnd))
+            uint clipboardFormatId = 0;
+            var clipboardFormatName = new StringBuilder(256);
+            while (true)
             {
-                uint clipboardId = 0;
-                var clipboardFormatName = new StringBuilder(256);
-                while (true)
+                clipboardFormatId = EnumClipboardFormats(clipboardFormatId);
+                if (clipboardFormatId == 0)
                 {
-                    clipboardId = EnumClipboardFormats(clipboardId);
-                    if (clipboardId == 0)
+                    // If GetLastWin32Error return SuccessError, this is the end
+                    if (Marshal.GetLastWin32Error() == SuccessError)
                     {
-                        // If GetLastWin32Error return SuccessError, this is the end
-                        if (Marshal.GetLastWin32Error() == SuccessError)
-                        {
-                            yield break;
-                        }
-                        // GetLastWin32Error didn't return SuccessError, so throw exception
-                        throw new Win32Exception();
+                        yield break;
                     }
-                    string formatName;
-                    clipboardFormatName.Length = 0;
-                    if (Id2Format.TryGetValue(clipboardId, out formatName))
-                    {
-                        yield return formatName;
-                        continue;
-                    }
-                    if (GetClipboardFormatName(clipboardId, clipboardFormatName, clipboardFormatName.Capacity) <= 0)
-                    {
-                        // No name
-                        continue;
-                    }
-                    formatName = clipboardFormatName.ToString();
-                    Id2Format[clipboardId] = formatName;
-                    Format2Id[formatName] = clipboardId;
-                    yield return clipboardFormatName.ToString();
+                    // GetLastWin32Error didn't return SuccessError, so throw exception
+                    throw new Win32Exception();
                 }
+                string formatName;
+                clipboardFormatName.Length = 0;
+                if (Id2Format.TryGetValue(clipboardFormatId, out formatName))
+                {
+                    yield return formatName;
+                    continue;
+                }
+                if (GetClipboardFormatName(clipboardFormatId, clipboardFormatName, clipboardFormatName.Capacity) <= 0)
+                {
+                    // No name
+                    continue;
+                }
+                formatName = clipboardFormatName.ToString();
+                Id2Format[clipboardFormatId] = formatName;
+                Format2Id[formatName] = clipboardFormatId;
+                yield return clipboardFormatName.ToString();
             }
         }
 

@@ -25,6 +25,7 @@ using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapplo.Log;
 using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Clipboard
@@ -34,6 +35,7 @@ namespace Dapplo.Windows.Clipboard
     /// </summary>
     internal sealed class ClipboardSemaphore : IDisposable
     {
+        private static readonly LogSource Log = new LogSource();
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         // To detect redundant calls
         private bool _disposedValue;
@@ -51,6 +53,8 @@ namespace Dapplo.Windows.Clipboard
             if (hWnd == IntPtr.Zero)
             {
                 // Take the default
+                Log.Verbose().WriteLine("Taking windows handle {0} from the WinProcHandler", WinProcHandler.Instance.Handle);
+
                 hWnd = WinProcHandler.Instance.Handle;
             }
 

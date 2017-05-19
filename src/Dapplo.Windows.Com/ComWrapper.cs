@@ -454,23 +454,24 @@ namespace Dapplo.Windows.Com
         /// <summary>
         ///     A simple create instance, doesn't create a wrapper!!
         /// </summary>
+        /// <typeparam name="TCom">Type of the COM</typeparam>
         /// <returns>T</returns>
-        public static T CreateInstance<T>()
+        public static TCom CreateInstance<TCom>()
         {
-            var type = typeof(T);
+            var type = typeof(TCom);
             if (null == type)
             {
-                throw new ArgumentNullException(nameof(T));
+                throw new ArgumentNullException(nameof(TCom));
             }
             if (!type.IsInterface)
             {
-                throw new ArgumentException("The specified type must be an interface.", nameof(T));
+                throw new ArgumentException("The specified type must be an interface.", nameof(TCom));
             }
 
             var progIdAttribute = ComProgIdAttribute.GetAttribute(type);
             if (string.IsNullOrEmpty(progIdAttribute?.Value))
             {
-                throw new ArgumentException("The specified type must define a ComProgId attribute.", nameof(T));
+                throw new ArgumentException("The specified type must define a ComProgId attribute.", nameof(TCom));
             }
             var progId = progIdAttribute.Value;
             Type comType = null;
@@ -516,9 +517,9 @@ namespace Dapplo.Windows.Com
             }
             if (comObject != null)
             {
-                return (T) comObject;
+                return (TCom) comObject;
             }
-            return default(T);
+            return default(TCom);
         }
 
         /// <summary>

@@ -27,10 +27,11 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Interop;
 using Dapplo.Log;
-using Dapplo.Log.Loggers;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Clipboard;
+using Dapplo.Windows.Messages;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -44,17 +45,22 @@ namespace Dapplo.Windows.Tests
 
         public ClipboardTests(ITestOutputHelper testOutputHelper)
         {
-            //LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-            LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Verbose);
-
+            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+            HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
+            {
+                // We can use the GetClipboardFormatName to get the string for the windows message... weird but it works
+                Log.Verbose().WriteLine("WinProc {0}, {1}", hwnd, WindowsMessage.GetWindowsMessage((uint)msg));
+                return IntPtr.Zero;
+            };
+            WinProcHandler.Instance.Subscribe(winProcHandler);
         }
 
         /// <summary>
         ///     Test monitoring the clipboard
         /// </summary>
         /// <returns></returns>
-        [WpfFact]
-        public async Task TestClipboardMonitor_Anything()
+        //[WpfFact]
+        public async Task TestClipboardMonitor_WaitForCopy()
         {
             var tcs = new TaskCompletionSource<bool>();
             var subscription = ClipboardMonitor.OnUpdate.Subscribe(clipboard =>
@@ -65,10 +71,14 @@ namespace Dapplo.Windows.Tests
 
                 if (clipboard.Formats.Contains("PNG"))
                 {
-                    var stream = clipboard["PNG"];
-                    using (var fileStream = File.Create(@"D:\test.png"))
+                    using (ClipboardNative.Lock())
                     {
-                        stream.CopyTo(fileStream);
+                        var stream = ClipboardNative.GetAsStream("PNG");
+                        using (var fileStream = File.Create(@"D:\test.png"))
+                        {
+                            stream.CopyTo(fileStream);
+                        }
+                        
                     }
                 }
                 tcs.TrySetResult(true);
@@ -77,7 +87,6 @@ namespace Dapplo.Windows.Tests
             await tcs.Task;
 
             subscription.Dispose();
-
         }
 
         /// <summary>

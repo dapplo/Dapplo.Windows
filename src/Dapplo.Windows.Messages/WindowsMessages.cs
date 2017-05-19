@@ -24,7 +24,7 @@ namespace Dapplo.Windows.Messages
     /// <summary>
     ///     All possible windows messages
     /// </summary>
-    public enum WindowsMessages
+    public enum WindowsMessages : uint
     {
 #pragma warning disable 1591
         WM_NULL = 0x0000,
@@ -161,7 +161,17 @@ namespace Dapplo.Windows.Messages
         WM_NCACTIVATE = 0x0086,
         WM_GETDLGCODE = 0x0087,
         WM_SYNCPAINT = 0x0088,
+        WM_SYNCTASK = 0x0089,
+        WM_KLUDGEMINRECT = 0x008b,
+        WM_LPKDRAWSWITCHWND = 0x008c,
 
+        WM_UAHDESTROYWINDOW = 0x0090,
+        WM_UAHDRAWMENU = 0x0091,
+        WM_UAHDRAWMENUITEM = 0x0092,
+        WM_UAHINITMENU = 0x0093,
+        WM_UAHMEASUREMENUITEM = 0x0094,
+        WM_UAHNCPAINTMENUPOPUP = 0x0095,
+        WM_UAHUPDATE = 0x0096,
 
         WM_NCMOUSEMOVE = 0x00A0,
         WM_NCLBUTTONDOWN = 0x00A1,
@@ -176,6 +186,51 @@ namespace Dapplo.Windows.Messages
         WM_NCXBUTTONDOWN = 0x00AB,
         WM_NCXBUTTONUP = 0x00AC,
         WM_NCXBUTTONDBLCLK = 0x00AD,
+        WM_NCUAHDRAWCAPTION = 0x00ae,
+        WM_NCUAHDRAWFRAME = 0x00af,
+
+        // Edit controls
+        EM_GETSEL =0x00b0,
+        EM_SETSEL =0x00b1,
+        EM_GETRECT =0x00b2,
+        EM_SETRECT =0x00b3,
+        EM_SETRECTNP =0x00b4,
+        EM_SCROLL =0x00b5,
+        EM_LINESCROLL =0x00b6,
+        EM_SCROLLCARET =0x00b7,
+        EM_GETMODIFY =0x00b8,
+        EM_SETMODIFY =0x00b9,
+        EM_GETLINECOUNT =0x00ba,
+        EM_LINEINDEX =0x00bb,
+        EM_SETHANDLE =0x00bc,
+        EM_GETHANDLE =0x00bd,
+        EM_GETTHUMB =0x00be,
+        EM_LINELENGTH =0x00c1,
+        EM_REPLACESEL =0x00c2,
+        EM_SETFONT =0x00c3,
+        EM_GETLINE =0x00c4,
+        EM_LIMITTEXT =0x00c5,
+        EM_CANUNDO =0x00c6,
+        EM_UNDO =0x00c7,
+        EM_FMTLINES =0x00c8,
+        EM_LINEFROMCHAR =0x00c9,
+        EM_SETWORDBREAK =0x00ca,
+        EM_SETTABSTOPS =0x00cb,
+        EM_SETPASSWORDCHAR =0x00cc,
+        EM_EMPTYUNDOBUFFER =0x00cd,
+        EM_GETFIRSTVISIBLELINE =0x00ce,
+        EM_SETREADONLY =0x00cf,
+        EM_SETWORDBREAKPROC =0x00d0,
+        EM_GETWORDBREAKPROC =0x00d1,
+        EM_GETPASSWORDCHAR =0x00d2,
+        EM_SETMARGINS =0x00d3,
+        EM_GETMARGINS =0x00d4,
+        EM_GETLIMITTEXT =0x00d5,
+        EM_POSFROMCHAR =0x00d6,
+        EM_CHARFROMPOS =0x00d7,
+        EM_SETIMESTATUS =0x00d8,
+        EM_GETIMESTATUS =0x00d9,
+        EM_MSGMAX =0x00da,
 
         WM_INPUT_DEVICE_CHANGE = 0x00FE,
         WM_INPUT = 0x00FF,
@@ -225,6 +280,102 @@ namespace Dapplo.Windows.Messages
         WM_CTLCOLORDLG = 0x0136,
         WM_CTLCOLORSCROLLBAR = 0x0137,
         WM_CTLCOLORSTATIC = 0x0138,
+
+        // Combo Box
+        CB_GETEDITSEL = 0x00140,
+        CB_LIMITTEXT = 0x00141,
+        CB_SETEDITSEL = 0x00142,
+        CB_ADDSTRING = 0x00143,
+        CB_DELETESTRING = 0x00144,
+        CB_DIR = 0x00145,
+        CB_GETCOUNT = 0x00146,
+        CB_GETCURSEL = 0x00147,
+        CB_GETLBTEXT = 0x00148,
+        CB_GETLBTEXTLEN = 0x00149,
+        CB_INSERTSTRING = 0x0014a,
+        CB_RESETCONTENT = 0x0014b,
+        CB_FINDSTRING = 0x0014c,
+        CB_SELECTSTRING = 0x0014d,
+        CB_SETCURSEL = 0x0014e,
+        CB_SHOWDROPDOWN = 0x0014f,
+        CB_GETITEMDATA = 0x00150,
+        CB_SETITEMDATA = 0x00151,
+        CB_GETDROPPEDCONTROLRECT = 0x00152,
+        CB_SETITEMHEIGHT = 0x00153,
+        CB_GETITEMHEIGHT = 0x00154,
+        CB_SETEXTENDEDUI = 0x00155,
+        CB_GETEXTENDEDUI = 0x00156,
+        CB_GETDROPPEDSTATE = 0x00157,
+        CB_FINDSTRINGEXACT = 0x00158,
+        CB_SETLOCALE = 0x00159,
+        CB_GETLOCALE = 0x0015a,
+        CB_GETTOPINDEX = 0x0015b,
+        CB_SETTOPINDEX = 0x0015c,
+        CB_GETHORIZONTALEXTENT = 0x0015d,
+        CB_SETHORIZONTALEXTENT = 0x0015e,
+        CB_GETDROPPEDWIDTH = 0x0015f,
+        CB_SETDROPPEDWIDTH = 0x00160,
+        CB_INITSTORAGE = 0x00161,
+        CB_MSGMAX_OLD = 0x00162,
+        CB_MULTIPLEADDSTRING = 0x00163,
+        CB_GETCOMBOBOXINFO = 0x00164,
+        CB_MSGMAX = 0x00165,
+
+
+        LB_ADDSTRING = 0x00180,
+        LB_INSERTSTRING = 0x00181,
+        LB_DELETESTRING = 0x00182,
+        LB_SELITEMRANGEEX = 0x00183,
+        LB_RESETCONTENT = 0x00184,
+        LB_SETSEL = 0x00185,
+        LB_SETCURSEL = 0x00186,
+        LB_GETSEL = 0x00187,
+        LB_GETCURSEL = 0x00188,
+        LB_GETTEXT = 0x00189,
+        LB_GETTEXTLEN = 0x0018a,
+        LB_GETCOUNT = 0x0018b,
+        LB_SELECTSTRING = 0x0018c,
+        LB_DIR = 0x0018d,
+        LB_GETTOPINDEX = 0x0018e,
+        LB_FINDSTRING = 0x0018f,
+        LB_GETSELCOUNT = 0x00190,
+        LB_GETSELITEMS = 0x00191,
+        LB_SETTABSTOPS = 0x00192,
+        LB_GETHORIZONTALEXTENT = 0x00193,
+        LB_SETHORIZONTALEXTENT = 0x00194,
+        LB_SETCOLUMNWIDTH = 0x00195,
+        LB_ADDFILE = 0x00196,
+        LB_SETTOPINDEX = 0x00197,
+        LB_GETITEMRECT = 0x00198,
+        LB_GETITEMDATA = 0x00199,
+        LB_SETITEMDATA = 0x0019a,
+        LB_SELITEMRANGE = 0x0019b,
+        LB_SETANCHORINDEX = 0x0019c,
+        LB_GETANCHORINDEX = 0x0019d,
+        LB_SETCARETINDEX = 0x0019e,
+        LB_GETCARETINDEX = 0x0019f,
+        LB_SETITEMHEIGHT = 0x001a0,
+        LB_GETITEMHEIGHT = 0x001a1,
+        LB_FINDSTRINGEXACT = 0x001a2,
+        LBCB_CARETON = 0x001a3,
+        LBCB_CARETOFF = 0x001a4,
+        LB_SETLOCALE = 0x001a5,
+        LB_GETLOCALE = 0x001a6,
+        LB_SETCOUNT = 0x001a7,
+        LB_INITSTORAGE = 0x001a8,
+        LB_ITEMFROMPOINT = 0x001a9,
+        LB_INSERTSTRINGUPPER = 0x001aa,
+        LB_INSERTSTRINGLOWER = 0x001ab,
+        LB_ADDSTRINGUPPER = 0x001ac,
+        LB_ADDSTRINGLOWER = 0x001ad,
+        LBCB_STARTTRACK = 0x001ae,
+        LBCB_ENDTRACK = 0x001af,
+        LB_MSGMAX_OLD = 0x001b0,
+        LB_MULTIPLEADDSTRING = 0x001b1,
+        LB_GETLISTBOXINFO = 0x001b2,
+        LB_MSGMAX = 0x001b3,
+
+        MN_FIRST = 0x01e0,
         WM_GETHMENU = 0x01E1,
 
         WM_MOUSEFIRST = 0x0200,
@@ -275,6 +426,7 @@ namespace Dapplo.Windows.Messages
         WM_DROPFILES = 0x0233,
         WM_MDIREFRESHMENU = 0x0234,
 
+        WM_IME_REPORT = 0x0280,
         WM_IME_SETCONTEXT = 0x0281,
         WM_IME_NOTIFY = 0x0282,
         WM_IME_CONTROL = 0x0283,
@@ -293,6 +445,11 @@ namespace Dapplo.Windows.Messages
         WM_WTSSESSION_CHANGE = 0x02B1,
 
         WM_TABLET_FIRST = 0x02C0,
+        WM_POINTERDEVICEADDED = 0x02c8,
+        WM_POINTERDEVICEDELETED = 0x02c9,
+        WM_FLICK = 0x02cb,
+        WM_FLICKINTERNAL = 0x02cd,
+        WM_BRIGHTNESSCHANGED = 0x02ce,
         WM_TABLET_LAST = 0x02DF,
 
         /// <summary>
@@ -402,8 +559,15 @@ namespace Dapplo.Windows.Messages
 
         WM_QUERYNEWPALETTE = 0x030F,
         WM_PALETTEISCHANGING = 0x0310,
+
+
         WM_PALETTECHANGED = 0x0311,
         WM_HOTKEY = 0x0312,
+
+        WM_SYSMENU = 0x313,
+        WM_HOOKMSG = 0x314,
+        WM_EXITPROCESS = 0x315,
+        WM_WAKETHREAD = 0x316,
 
         /// <summary>
         /// The WM_PRINT message is sent to a window to request that it draw itself in the specified device context, most commonly in a printer device context.
@@ -426,6 +590,8 @@ namespace Dapplo.Windows.Messages
         WM_APPCOMMAND = 0x0319,
 
         WM_THEMECHANGED = 0x031A,
+        WM_UAHINIT = 0x031b,
+        WM_DESKTOPNOTIFY = 0x031c,
 
         /// <summary>
         /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649021.aspx">WM_CLIPBOARDUPDATE message</a>
@@ -437,8 +603,27 @@ namespace Dapplo.Windows.Messages
         WM_DWMCOLORIZATIONCOLORCHANGED = 0x0320,
         WM_DWMWINDOWMAXIMIZEDCHANGE = 0x0321,
 
-        WM_GETTITLEBARINFOEX = 0x033F,
+        WM_DWMEXILEFRAME= 0x0322,
+        WM_DWMSENDICONICTHUMBNAIL= 0x0323,
+        WM_MAGNIFICATION_STARTED= 0x0324,
+        WM_MAGNIFICATION_ENDED= 0x0325,
+        WM_DWMSENDICONICLIVEPREVIEWBITMAP= 0x0326,
+        WM_DWMTHUMBNAILSIZECHANGED= 0x0327,
+        WM_MAGNIFICATION_OUTPUT= 0x0328,
+        WM_BSDRDATA= 0x0329,
+        WM_DWMTRANSITIONSTATECHANGED= 0x032a,
+        WM_KEYBOARDCORRECTIONCALLOUT= 0x032c,
+        WM_KEYBOARDCORRECTIONACTION= 0x032d,
+        WM_UIACTION= 0x032e,
+        WM_ROUTED_UI_EVENT= 0x032f,
+        WM_MEASURECONTROL= 0x0330,
+        WM_GETACTIONTEXT= 0x0331,
+        WM_FORWARDKEYDOWN= 0x0333,
+        WM_FORWARDKEYUP= 0x0334,
 
+
+        WM_GETTITLEBARINFOEX = 0x033F,
+        WM_NOTIFYWOW = 0x0340,
         WM_HANDHELDFIRST = 0x0358,
         WM_HANDHELDLAST = 0x035F,
 
@@ -447,15 +632,60 @@ namespace Dapplo.Windows.Messages
 
         WM_PENWINFIRST = 0x0380,
         WM_PENWINLAST = 0x038F,
-        WM_USER = 0x0400,
-        WM_APP = 0x8000,
-        WM_REFLECT = WM_USER + 0x1C00,
-        WM_RASDIALEVENT = 0xCCCD,
 
+        /// <summary>
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd757352.aspx">MM_JOY1MOVE message</a>
+        /// </summary>
+        MM_JOY1MOVE = 0x03A0,
+        MM_JOY2MOVE = 0x03A1,
+        MM_JOY1ZMOVE = 0x03A2,
+        MM_JOY2ZMOVE = 0x03A3,
+        MM_JOY1BUTTONDOWN = 0x03B5,
+        MM_JOY2BUTTONDOWN = 0x03B6,
+        MM_JOY1BUTTONUP = 0x03B7,
+        MM_JOY2BUTTONUP = 0x03B8,
         /// <summary>
         /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd757358.aspx">MM_MCINOTIFY message</a>
         /// </summary>
-        MM_MCINOTIFY
+        MM_MCINOTIFY = 0x3B9,
+        MM_WOM_OPEN = 0x03BB,
+        MM_WOM_CLOSE = 0x03BC,
+        MM_WOM_DONE = 0x03BD,
+        MM_WIM_OPEN = 0x03BE,
+        MM_WIM_CLOSE = 0x03BF,
+        MM_WIM_DATA = 0x03C0,
+        MM_MIM_OPEN = 0x03C1,
+        MM_MIM_CLOSE = 0x03C2,
+        MM_MIM_DATA = 0x03C3,
+        MM_MIM_LONGDATA = 0x03C4,
+        MM_MIM_ERROR = 0x03C5,
+        MM_MIM_LONGERROR = 0x03C6,
+        MM_MOM_OPEN = 0x03C7,
+        MM_MOM_CLOSE = 0x03C8,
+        MM_MOM_DONE = 0x03C9,
+        MM_DRVM_OPEN = 0x03D0,
+        MM_DRVM_CLOSE = 0x03D1,
+        MM_DRVM_DATA = 0x03D2,
+        MM_DRVM_ERROR = 0x03D3,
+        MM_STREAM_OPEN = 0x3D4,
+        MM_STREAM_CLOSE = 0x3D5,
+        MM_STREAM_DONE = 0x3D6,
+        MM_STREAM_ERROR = 0x3D7,
+        MM_MOM_POSITIONCB = 0x03CA,
+        MM_MCISIGNAL = 0x03CB,
+        MM_MIM_MOREDATA = 0x03CC,
+        MM_MIXM_LINE_CHANGE = 0x03D0,
+        MM_MIXM_CONTROL_CHANGE = 0x03D1,
+
+        WM_USER = 0x0400,
+        WM_APP = 0x8000,
+        WM_REFLECT = WM_USER + 0x1C00,
+        /// <summary>
+        /// From this value to 
+        /// </summary>
+        WM_APPLICATION_STRING = 0xc000,
+        WM_RASDIALEVENT = 0xCCCD,
+
 #pragma warning restore 1591
     }
 }

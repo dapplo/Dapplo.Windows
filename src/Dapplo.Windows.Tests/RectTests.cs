@@ -38,8 +38,6 @@ namespace Dapplo.Windows.Tests
     /// </summary>
     public class RectTests
     {
-        private static readonly LogSource Log = new LogSource();
-
         public RectTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);

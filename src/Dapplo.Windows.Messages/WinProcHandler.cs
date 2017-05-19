@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Windows.Interop;
@@ -38,6 +39,8 @@ namespace Dapplo.Windows.Messages
     public class WinProcHandler
     {
         private static readonly LogSource Log = new LogSource();
+        private static readonly object Lock = new object();
+        private static HwndSource _hwndSource;
 
         /// <summary>
         ///     Hold the singeton
@@ -50,25 +53,52 @@ namespace Dapplo.Windows.Messages
         private readonly IList<HwndSourceHook> _hooks = new List<HwndSourceHook>();
 
         /// <summary>
-        ///     Special HwndSource which is only there for handling messages, is top-level (no parent) to be able to handle ALL events
+        ///     Special HwndSource which is only there for handling messages, is top-level (no parent) to be able to handle ALL windows messages
         /// </summary>
-        private readonly HwndSource _hwndSource = new HwndSource(new HwndSourceParameters
+        [SuppressMessage("Sonar Code Smell", "S2696:Instance members should not write to static fields", Justification = "Instance member needs access to the _hooks, this is checked!")]
+        private HwndSource MessageHandlerWindow
         {
-            Width = 0,
-            Height = 0,
-            PositionX = 0,
-            PositionY = 0,
-            AcquireHwndFocusInMenuMode = false,
-            ExtendedWindowStyle = 0, // ExtendedWindowStyleFlags.WS_NONE
-            WindowStyle = 0, // WindowStyleFlags.WS_OVERLAPPED
-            WindowClassStyle = 0,
-            WindowName = "Dapplo.Windows.Messages.WinProcHandler"
-        });
+            get
+            {
+                // Special code to make sure the _hwndSource is (re)created when it's not yet there or disposed
+                // For example in xunit tests when WpfFact is used, the _hwndSource is disposed.
+                if (_hwndSource != null && !_hwndSource.IsDisposed)
+                {
+                    return _hwndSource;
+                }
+                lock (Lock)
+                {
+                    if (_hwndSource != null && !_hwndSource.IsDisposed)
+                    {
+                        return _hwndSource;
+                    }
+                    // Create a new message window
+                    _hwndSource = CreateMessageWindow();
+                    // Hook automatic removing of all the hooks
+                    _hwndSource.AddHook((IntPtr hwnd, int msg, IntPtr param, IntPtr lParam, ref bool handled) =>
+                    {
+                        var windowsMessage = (WindowsMessages)msg;
+                        if (windowsMessage != WindowsMessages.WM_NCDESTROY)
+                        {
+                            return IntPtr.Zero;
+                        }
+                        Log.Verbose().WriteLine("Message window with handle {0} is destroyed, removing all hooks.", _hwndSource.Handle);
+                        // The hooks are no longer valid, either there is no _hwndSource or it was disposed.
+                        lock (Lock)
+                        {
+                            _hooks.Clear();
+                        }
+                        return IntPtr.Zero;
+                    });
+                }
+                return _hwndSource;
+            }
+        }
 
         /// <summary>
         ///     The actual handle for the HwndSource
         /// </summary>
-        public IntPtr Handle => _hwndSource.Handle;
+        public IntPtr Handle => MessageHandlerWindow.Handle;
 
         /// <summary>
         ///     Singleton instance of the WinProcHandler
@@ -82,9 +112,12 @@ namespace Dapplo.Windows.Messages
         /// <returns>IDisposable which unsubscribes the hook when Dispose is called</returns>
         public IDisposable Subscribe(HwndSourceHook hook)
         {
-            Log.Verbose().WriteLine("Adding a hook to handle messages.");
-            _hwndSource.AddHook(hook);
-            _hooks.Add(hook);
+            lock (Lock)
+            {
+                Log.Verbose().WriteLine("Adding a hook to handle messages.");
+                MessageHandlerWindow.AddHook(hook);
+                _hooks.Add(hook);
+            }
             return Disposable.Create(() => { Unsubscribe(hook); });
         }
 
@@ -94,9 +127,12 @@ namespace Dapplo.Windows.Messages
         /// <param name="hook">HwndSourceHook</param>
         private void Unsubscribe(HwndSourceHook hook)
         {
-            Log.Verbose().WriteLine("Removing a hook to handle messages.");
-            _hwndSource.RemoveHook(hook);
-            _hooks.Remove(hook);
+            lock (Lock)
+            {
+                Log.Verbose().WriteLine("Removing a hook to handle messages.");
+                MessageHandlerWindow.RemoveHook(hook);
+                _hooks.Remove(hook);
+            }
         }
 
         /// <summary>
@@ -108,6 +144,29 @@ namespace Dapplo.Windows.Messages
             {
                 Unsubscribe(hwndSourceHook);
             }
+        }
+
+        /// <summary>
+        /// Creates a HwndSource to catch windows message
+        /// </summary>
+        /// <param name="parent">IntPtr for the parent, this should usually not be set</param>
+        /// <param name="title">Title of the window, a default is already set</param>
+        /// <returns>HwndSource</returns>
+        public static HwndSource CreateMessageWindow(IntPtr parent = default(IntPtr), string title = "Dapplo.MessageHandlerWindow")
+        {
+            return new HwndSource(new HwndSourceParameters
+            {
+                ParentWindow = parent,
+                Width = 0,
+                Height = 0,
+                PositionX = 0,
+                PositionY = 0,
+                AcquireHwndFocusInMenuMode = false,
+                ExtendedWindowStyle = 0, // ExtendedWindowStyleFlags.WS_NONE
+                WindowStyle = 0, // WindowStyleFlags.WS_OVERLAPPED
+                WindowClassStyle = 0,
+                WindowName = title
+            });
         }
     }
 }

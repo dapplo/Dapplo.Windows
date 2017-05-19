@@ -46,7 +46,7 @@ namespace Dapplo.Windows.Clipboard
         /// <summary>
         ///     Used to store the observable
         /// </summary>
-        private readonly IObservable<ClipboardContents> _clipboardObservable;
+        private readonly IObservable<ClipboardUpdateInformation> _clipboardObservable;
 
         // This maintains the sequence
         private uint _previousSequence = uint.MinValue;
@@ -56,7 +56,7 @@ namespace Dapplo.Windows.Clipboard
         /// </summary>
         private ClipboardMonitor()
         {
-            _clipboardObservable = Observable.Create<ClipboardContents>(observer =>
+            _clipboardObservable = Observable.Create<ClipboardUpdateInformation>(observer =>
                 {
                     
                     // This handles the message
@@ -67,13 +67,17 @@ namespace Dapplo.Windows.Clipboard
                         {
                             return IntPtr.Zero;
                         }
-                        var content = new ClipboardContents(hwnd);
-
-                        // Make sure we don't trigger multiple times, this happend while developing.
-                        if (content.Id > _previousSequence)
+                        ClipboardUpdateInformation clipboardUpdateInformationInfo;
+                        using (ClipboardNative.Lock(hwnd))
                         {
-                            _previousSequence = content.Id;
-                            observer.OnNext(content);
+                            clipboardUpdateInformationInfo = new ClipboardUpdateInformation();
+                        }
+                        
+                        // Make sure we don't trigger multiple times, this happend while developing.
+                        if (clipboardUpdateInformationInfo.Id > _previousSequence)
+                        {
+                            _previousSequence = clipboardUpdateInformationInfo.Id;
+                            observer.OnNext(clipboardUpdateInformationInfo);
                         }
 
                         return IntPtr.Zero;
@@ -96,7 +100,7 @@ namespace Dapplo.Windows.Clipboard
         /// <summary>
         ///     This observable publishes the current clipboard contents after every paste action.
         /// </summary>
-        public static IObservable<ClipboardContents> OnUpdate => Singleton.Value._clipboardObservable;
+        public static IObservable<ClipboardUpdateInformation> OnUpdate => Singleton.Value._clipboardObservable;
 
         #region Native methods
 

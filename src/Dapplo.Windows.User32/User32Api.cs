@@ -788,9 +788,6 @@ namespace Dapplo.Windows.User32
         public static extern uint GetGuiResources(IntPtr hProcess, uint uiFlags);
 
         [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern uint RegisterWindowMessage(string lpString);
-
-        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out UIntPtr lpdwResult);
 
         [DllImport("user32", SetLastError = true)]
