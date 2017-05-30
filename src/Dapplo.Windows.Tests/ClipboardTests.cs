@@ -90,6 +90,33 @@ namespace Dapplo.Windows.Tests
         }
 
         /// <summary>
+        ///     Test registering a clipboard format for the clipboard
+        /// </summary>
+        [WpfFact]
+        public void TestClipboard_RegisterFormat()
+        {
+            string format = "DAPPLO.DOPY" + ClipboardNative.SequenceNumber;
+
+            // First test with something that fails
+            using (ClipboardNative.Lock())
+            {
+                ClipboardNative.Clear();
+                Assert.Throws<ArgumentException>(() => ClipboardNative.SetAsUnicodeString("Blub", format));
+            }
+
+            // Register the format
+            ClipboardNative.RegisterFormat(format);
+
+            // Now it should work!
+            using (ClipboardNative.Lock())
+            {
+                ClipboardNative.Clear();
+                ClipboardNative.SetAsUnicodeString("Blub", format);
+            }
+           
+        }
+
+        /// <summary>
         ///     Test monitoring the clipboard
         /// </summary>
         /// <returns></returns>

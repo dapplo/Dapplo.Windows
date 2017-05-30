@@ -99,13 +99,13 @@ namespace Dapplo.Windows.Clipboard
         /// </summary>
         public static void Clear()
         {
-            EmptyClipboard();
+            NativeMethods.EmptyClipboard();
         }
 
         /// <summary>
         /// Retrieves the current owner
         /// </summary>
-        public static IntPtr CurrentOwner => GetClipboardOwner();
+        public static IntPtr CurrentOwner => NativeMethods.GetClipboardOwner();
 
         /// <summary>
         /// Retrieves the current clipboard sequence number, either via GetClipboardSequenceNumber or internally
@@ -115,7 +115,7 @@ namespace Dapplo.Windows.Clipboard
             get
             {
                 _globalSequenceNumber++;
-                var sequenceNumber = GetClipboardSequenceNumber();
+                var sequenceNumber = NativeMethods.GetClipboardSequenceNumber();
                 return sequenceNumber > 0 ? sequenceNumber : _globalSequenceNumber;
             }
         }
@@ -173,7 +173,7 @@ namespace Dapplo.Windows.Clipboard
             {
                 throw new ArgumentException($"{format} is not a known format, you might want to register it and call AvailableFormats afterwards.", nameof(format));
             }
-            var hGlobal = GetClipboardData(formatId);
+            var hGlobal = NativeMethods.GetClipboardData(formatId);
             var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
             try
             {
@@ -230,7 +230,25 @@ namespace Dapplo.Windows.Clipboard
                 Kernel32Api.GlobalUnlock(hGlobal);
             }
             // Place the content on the clipboard
-            SetClipboardData(formatId, hGlobal);
+            NativeMethods.SetClipboardData(formatId, hGlobal);
+        }
+
+        /// <summary>
+        /// Register the clipboard format, so we can use it
+        /// </summary>
+        /// <param name="format">string with the format to register</param>
+        public static void RegisterFormat(string format)
+        {
+            if (Format2Id.ContainsKey(format))
+            {
+                // Format was already known
+                return;
+            }
+            var clipboardFormatId = NativeMethods.RegisterClipboardFormat(format);
+
+            // Make sure the format is known
+            Id2Format[clipboardFormatId] = format;
+            Format2Id[format] = clipboardFormatId;
         }
 
         /// <summary>
@@ -243,7 +261,7 @@ namespace Dapplo.Windows.Clipboard
             var clipboardFormatName = new StringBuilder(256);
             while (true)
             {
-                clipboardFormatId = EnumClipboardFormats(clipboardFormatId);
+                clipboardFormatId = NativeMethods.EnumClipboardFormats(clipboardFormatId);
                 if (clipboardFormatId == 0)
                 {
                     // If GetLastWin32Error return SuccessError, this is the end
@@ -261,7 +279,7 @@ namespace Dapplo.Windows.Clipboard
                     yield return formatName;
                     continue;
                 }
-                if (GetClipboardFormatName(clipboardFormatId, clipboardFormatName, clipboardFormatName.Capacity) <= 0)
+                if (NativeMethods.GetClipboardFormatName(clipboardFormatId, clipboardFormatName, clipboardFormatName.Capacity) <= 0)
                 {
                     // No name
                     continue;
@@ -275,89 +293,107 @@ namespace Dapplo.Windows.Clipboard
 
         #region Native methods
 
-        /// <summary>
-        ///     See
-        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649038(v=vs.85).aspx">EnumClipboardFormats function</a>
-        ///     Enumerates the data formats currently available on the clipboard.
-        ///     Clipboard data formats are stored in an ordered list. To perform an enumeration of clipboard data formats, you make
-        ///     a series of calls to the EnumClipboardFormats function. For each call, the format parameter specifies an available
-        ///     clipboard format, and the function returns the next available clipboard format.
-        /// </summary>
-        /// <param name="format">
-        ///     To start an enumeration of clipboard formats, set format to zero. When format is zero, the
-        ///     function retrieves the first available clipboard format. For subsequent calls during an enumeration, set format to
-        ///     the result of the previous EnumClipboardFormats call.
-        /// </param>
-        /// <returns>If the function succeeds, the return value is the clipboard format that follows the specified format, namely the next available clipboard format.
-        ///     If the function fails, the return value is zero. To get extended error information, call GetLastError. If the clipboard is not open, the function fails.
-        ///     If there are no more clipboard formats to enumerate, the return value is zero. In this case, the GetLastError function returns the value ERROR_SUCCESS.
-        ///     This lets you distinguish between function failure and the end of enumeration.
-        /// </returns>
-        [DllImport("user32", SetLastError = true)]
-        private static extern uint EnumClipboardFormats(uint format);
+        private static class NativeMethods
+        {
+            /// <summary>
+            ///     See
+            ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649038(v=vs.85).aspx">EnumClipboardFormats function</a>
+            ///     Enumerates the data formats currently available on the clipboard.
+            ///     Clipboard data formats are stored in an ordered list. To perform an enumeration of clipboard data formats, you make
+            ///     a series of calls to the EnumClipboardFormats function. For each call, the format parameter specifies an available
+            ///     clipboard format, and the function returns the next available clipboard format.
+            /// </summary>
+            /// <param name="format">
+            ///     To start an enumeration of clipboard formats, set format to zero. When format is zero, the
+            ///     function retrieves the first available clipboard format. For subsequent calls during an enumeration, set format to
+            ///     the result of the previous EnumClipboardFormats call.
+            /// </param>
+            /// <returns>If the function succeeds, the return value is the clipboard format that follows the specified format, namely the next available clipboard format.
+            ///     If the function fails, the return value is zero. To get extended error information, call GetLastError. If the clipboard is not open, the function fails.
+            ///     If there are no more clipboard formats to enumerate, the return value is zero. In this case, the GetLastError function returns the value ERROR_SUCCESS.
+            ///     This lets you distinguish between function failure and the end of enumeration.
+            /// </returns>
+            [DllImport("user32", SetLastError = true)]
+            internal static extern uint EnumClipboardFormats(uint format);
 
-        /// <summary>
-        /// Determines whether the clipboard contains data in the specified format.
-        /// </summary>
-        /// <param name="format">uint for the format</param>
-        /// <returns>bool</returns>
-        [DllImport("user32", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool IsClipboardFormatAvailable(uint format);
+            /// <summary>
+            /// Determines whether the clipboard contains data in the specified format.
+            /// </summary>
+            /// <param name="format">uint for the format</param>
+            /// <returns>bool</returns>
+            [DllImport("user32", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool IsClipboardFormatAvailable(uint format);
 
-        /// <summary>
-        /// Empties the clipboard and frees handles to data in the clipboard. The function then assigns ownership of the clipboard to the window that currently has the clipboard open.
-        /// </summary>
-        /// <returns>bool</returns>
-        [DllImport("user32", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool EmptyClipboard();
+            /// <summary>
+            /// Empties the clipboard and frees handles to data in the clipboard. The function then assigns ownership of the clipboard to the window that currently has the clipboard open.
+            /// </summary>
+            /// <returns>bool</returns>
+            [DllImport("user32", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool EmptyClipboard();
 
-        /// <summary>
-        /// Retrieves data from the clipboard in a specified format. The clipboard must have been opened previously.
-        /// </summary>
-        /// <param name="format">uint with the clipboard format.</param>
-        /// <returns>IntPtr with a handle to the memory</returns>
-        [DllImport("user32", SetLastError = true)]
-        private static extern IntPtr GetClipboardData(uint format);
+            /// <summary>
+            /// Retrieves data from the clipboard in a specified format. The clipboard must have been opened previously.
+            /// </summary>
+            /// <param name="format">uint with the clipboard format.</param>
+            /// <returns>IntPtr with a handle to the memory</returns>
+            [DllImport("user32", SetLastError = true)]
+            internal static extern IntPtr GetClipboardData(uint format);
 
-        /// <summary>
-        /// Places data on the clipboard in a specified clipboard format.
-        /// The window must be the current clipboard owner, and the application must have called the OpenClipboard function.
-        /// (When responding to the WM_RENDERFORMAT and WM_RENDERALLFORMATS messages, the clipboard owner must not call OpenClipboard before calling SetClipboardData.)
-        /// </summary>
-        /// <param name="format">uint</param>
-        /// <param name="memory">IntPtr to the memory area</param>
-        /// <returns></returns>
-        [DllImport("user32", SetLastError = true)]
-        private static extern IntPtr SetClipboardData(uint format, IntPtr memory);
+            /// <summary>
+            /// Places data on the clipboard in a specified clipboard format.
+            /// The window must be the current clipboard owner, and the application must have called the OpenClipboard function.
+            /// (When responding to the WM_RENDERFORMAT and WM_RENDERALLFORMATS messages, the clipboard owner must not call OpenClipboard before calling SetClipboardData.)
+            /// </summary>
+            /// <param name="format">uint</param>
+            /// <param name="memory">IntPtr to the memory area</param>
+            /// <returns></returns>
+            [DllImport("user32", SetLastError = true)]
+            internal static extern IntPtr SetClipboardData(uint format, IntPtr memory);
 
-        /// <summary>
-        ///     See
-        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649040(v=vs.85).aspx">GetClipboardFormatName function</a>
-        ///     Retrieves from the clipboard the name of the specified registered format.
-        ///     The function copies the name to the specified buffer.
-        /// </summary>
-        /// <param name="format">uint with the id of the format</param>
-        /// <param name="lpszFormatName">Name of the format</param>
-        /// <param name="cchMaxCount">Maximum size of the output</param>
-        /// <returns></returns>
-        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern int GetClipboardFormatName(uint format, [Out] StringBuilder lpszFormatName, int cchMaxCount);
+            /// <summary>
+            ///     See
+            ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649040(v=vs.85).aspx">GetClipboardFormatName function</a>
+            ///     Retrieves from the clipboard the name of the specified registered format.
+            ///     The function copies the name to the specified buffer.
+            /// </summary>
+            /// <param name="format">uint with the id of the format</param>
+            /// <param name="lpszFormatName">Name of the format</param>
+            /// <param name="cchMaxCount">Maximum size of the output</param>
+            /// <returns></returns>
+            [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetClipboardFormatName(uint format, [Out] StringBuilder lpszFormatName, int cchMaxCount);
 
-        /// <summary>
-        /// Returns the hWnd of the owner of the clipboard content
-        /// </summary>
-        /// <returns>IntPtr with a hWnd</returns>
-        [DllImport("user32", SetLastError = true)]
-        private static extern IntPtr GetClipboardOwner();
+            /// <summary>
+            /// Registers a new clipboard format. This format can then be used as a valid clipboard format.
+            /// 
+            /// If a registered format with the specified name already exists, a new format is not registered and the return value identifies the existing format. This enables more than one application to copy and paste data using the same registered clipboard format. Note that the format name comparison is case-insensitive.
+            /// Registered clipboard formats are identified by values in the range 0xC000 through 0xFFFF.
+            /// When registered clipboard formats are placed on or retrieved from the clipboard, they must be in the form of an HGLOBAL value.
+            /// </summary>
+            /// <param name="lpszFormat">The name of the new format.</param>
+            /// <returns>
+            /// If the function succeeds, the return value identifies the registered clipboard format.
+            /// If the function fails, the return value is zero. To get extended error information, call GetLastError.
+            /// </returns>
+            [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint RegisterClipboardFormat(string lpszFormat);
 
-        /// <summary>
-        /// Retrieves the sequence number of the clipboard
-        /// </summary>
-        /// <returns>sequence number or 0 if this cannot be retrieved</returns>
-        [DllImport("user32", SetLastError = true)]
-        private static extern uint GetClipboardSequenceNumber();
+            /// <summary>
+            /// Returns the hWnd of the owner of the clipboard content
+            /// </summary>
+            /// <returns>IntPtr with a hWnd</returns>
+            [DllImport("user32", SetLastError = true)]
+            internal static extern IntPtr GetClipboardOwner();
+
+            /// <summary>
+            /// Retrieves the sequence number of the clipboard
+            /// </summary>
+            /// <returns>sequence number or 0 if this cannot be retrieved</returns>
+            [DllImport("user32", SetLastError = true)]
+            internal static extern uint GetClipboardSequenceNumber();
+        }
         #endregion
     }
 }
