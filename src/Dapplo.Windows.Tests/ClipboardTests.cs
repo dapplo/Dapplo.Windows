@@ -109,7 +109,7 @@ namespace Dapplo.Windows.Tests
             using (ClipboardNative.Lock())
             {
                 ClipboardNative.Clear();
-                ClipboardNative.SetAsString(testString);
+                ClipboardNative.SetAsUnicodeString(testString);
             }
             await Task.Delay(1000);
             subscription.Dispose();
@@ -129,12 +129,12 @@ namespace Dapplo.Windows.Tests
             using (ClipboardNative.Lock())
             {
                 ClipboardNative.Clear();
-                ClipboardNative.SetAsString(testString);
+                ClipboardNative.SetAsUnicodeString(testString);
             }
             await Task.Delay(1000);
             using (ClipboardNative.Lock())
             {
-                Assert.Equal(testString, ClipboardNative.GetAsString());
+                Assert.Equal(testString, ClipboardNative.GetAsUnicodeString());
             }
         }
 

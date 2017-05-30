@@ -121,18 +121,29 @@ namespace Dapplo.Windows.Clipboard
         }
 
         /// <summary>
+        /// Place byte[] on the clipboard, this assumes you already locked the clipboard.
+        /// </summary>
+        /// <param name="bytes">bytes to place on the clipboard</param>
+        /// <param name="format">format to place the bytes under</param>
+        public static void SetAsBytes(byte[] bytes, string format)
+        {
+            using (var stream = new MemoryStream())
+            {
+                stream.Write(bytes, 0, bytes.Length);
+                SetAsStream(format, stream);
+            }
+        }
+
+        /// <summary>
         /// Place string on the clipboard, this assumes you already locked the clipboard.
-        /// It always uses CF_UNICODETEXT, as all other formats are automatically generated from this by Windows.
+        /// It uses CF_UNICODETEXT by default, as all other formats are automatically generated from this by Windows.
         /// </summary>
         /// <param name="text">string to place on the clipboard</param>
-        public static void SetAsString(string text)
+        /// <param name="format"></param>
+        public static void SetAsUnicodeString(string text, string format = "CF_UNICODETEXT")
         {
             var unicodeBytes = Encoding.Unicode.GetBytes(text + "\0");
-            using (var textStream = new MemoryStream())
-            {
-                textStream.Write(unicodeBytes, 0, unicodeBytes.Length);
-                SetAsStream("CF_UNICODETEXT", textStream);
-            }
+            SetAsBytes(unicodeBytes, format);
         }
 
         /// <summary>
@@ -140,9 +151,9 @@ namespace Dapplo.Windows.Clipboard
         /// This always takes the CF_UNICODETEXT format, as Windows automatically converts
         /// </summary>
         /// <returns>string</returns>
-        public static string GetAsString()
+        public static string GetAsUnicodeString(string format = "CF_UNICODETEXT")
         {
-            using (var textStream = GetAsStream("CF_UNICODETEXT"))
+            using (var textStream = GetAsStream(format))
             {
                 return Encoding.Unicode.GetString(textStream.GetBuffer(), 0, (int) textStream.Length).TrimEnd('\0');
             }
