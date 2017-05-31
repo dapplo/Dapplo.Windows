@@ -111,12 +111,10 @@ namespace Dapplo.Windows.Native
             var iconPath = new StringBuilder(1024);
             iconPath.Append(filePath);
 
-            var handle = ExtractAssociatedIcon(new HandleRef(null, IntPtr.Zero), iconPath, ref iconIndex);
-            if (handle == IntPtr.Zero)
+            using (var handle = ExtractAssociatedIcon(new HandleRef(null, IntPtr.Zero), iconPath, ref iconIndex))
             {
-                return null;
+                return handle.IsInvalid ? null : Icon.FromHandle(handle.DangerousGetHandle());
             }
-            return Icon.FromHandle(handle);
         }
 
         /// <summary>

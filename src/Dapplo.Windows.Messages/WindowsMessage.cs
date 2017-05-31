@@ -29,7 +29,6 @@ namespace Dapplo.Windows.Messages
     /// </summary>
     public static class WindowsMessage
     {
-
         /// <summary>
         /// This returns the name of a windows message, which was registered with RegisterWindowMessage 
         /// </summary>
@@ -49,6 +48,16 @@ namespace Dapplo.Windows.Messages
                 return null;
             }
             return clipboardFormatName.ToString();
+        }
+
+        /// <summary>
+        /// Register a windows message
+        /// </summary>
+        /// <param name="message">Windows message</param>
+        /// <returns>uint with the message ID</returns>
+        public static uint RegisterWindowsMessage(string message)
+        {
+            return RegisterWindowMessageW(message);
         }
 
         /// <summary>
@@ -73,6 +82,6 @@ namespace Dapplo.Windows.Messages
         /// If the function fails, the return value is zero. To get extended error information, call GetLastError.
         /// </returns>
         [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern uint RegisterWindowMessageW(string lpString);
+        private static extern uint RegisterWindowMessageW(string lpString);
     }
 }
