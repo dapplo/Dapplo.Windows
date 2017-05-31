@@ -53,6 +53,16 @@ namespace Dapplo.Windows.Multimedia
         }
 
         /// <summary>
+        /// Play a wav from memorySetLastError
+        /// </summary>
+        /// <param name="memoryPtr">Pointer to the wav file to play</param>
+        /// <param name="settings">SoundSettings</param>
+        public static void Play(IntPtr memoryPtr, SoundSettings settings)
+        {
+            PlaySound(memoryPtr, UIntPtr.Zero, settings);
+        }
+
+        /// <summary>
         /// Play wave data
         /// Note: The byte[] should be pinned into memory, and cannot be removed while playing!!
         /// See <a href="https://blogs.msdn.microsoft.com/larryosterman/2009/02/19/playsoundxxx-snd_memory-snd_async-is-almost-always-a-bad-idea/">PlaySound(xxx, SND_MEMORY | SND_ASYNC) is almost always a bad idea.</a>
@@ -92,6 +102,17 @@ namespace Dapplo.Windows.Multimedia
         [DllImport("winmm", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool PlaySound(string pszSound, UIntPtr hmod, SoundSettings fdwSound);
+
+        /// <summary>
+        ///  The PlaySound function plays a sound specified by the given file name, resource, or system event. (A system event may be associated with a sound in the registry or in the WIN.INI file.)
+        /// </summary>
+        /// <param name="memoryPtr">Pointer to memory where a wav file is stored</param>
+        /// <param name="hmod">Handle to the executable file that contains the resource to be loaded. This parameter must be NULL unless SND_RESOURCE is specified in fdwSound.</param>
+        /// <param name="fdwSound">Flags for playing the sound.</param>
+        /// <returns>Returns TRUE if successful or FALSE otherwise.</returns>
+        [DllImport("winmm", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool PlaySound(IntPtr memoryPtr, UIntPtr hmod, SoundSettings fdwSound);
 
         /// <summary>
         /// 

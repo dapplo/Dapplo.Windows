@@ -58,11 +58,10 @@ namespace Dapplo.Windows.Clipboard
         {
             _clipboardObservable = Observable.Create<ClipboardUpdateInformation>(observer =>
                 {
-                    
                     // This handles the message
                     HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
                     {
-                        var windowsMessage = (WindowsMessages) msg;
+                        var windowsMessage = (WindowsMessages)msg;
                         if (windowsMessage != WindowsMessages.WM_CLIPBOARDUPDATE)
                         {
                             return IntPtr.Zero;
@@ -72,7 +71,7 @@ namespace Dapplo.Windows.Clipboard
                         {
                             clipboardUpdateInformationInfo = new ClipboardUpdateInformation();
                         }
-                        
+
                         // Make sure we don't trigger multiple times, this happend while developing.
                         if (clipboardUpdateInformationInfo.Id > _previousSequence)
                         {

@@ -27,6 +27,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using Dapplo.Windows.User32;
+using Dapplo.Windows.User32.SafeHandles;
 
 #endregion
 
@@ -69,8 +70,15 @@ namespace Dapplo.Windows.Native
             Small = 1
         }
 
+        /// <summary>
+        /// Retrieves a handle to an indexed icon found in a file or an icon found in an associated executable file.
+        /// </summary>
+        /// <param name="hInst">A handle to the instance of the application calling the function.</param>
+        /// <param name="iconPath"></param>
+        /// <param name="iconIndex">The full path and file name of the file that contains the icon. The function extracts the icon handle from that file, or from an executable file associated with that file. If the icon handle is obtained from an executable file, the function stores the full path and file name of that executable in the string pointed to by lpIconPath.</param>
+        /// <returns></returns>
         [DllImport("shell32", CharSet = CharSet.Unicode)]
-        internal static extern IntPtr ExtractAssociatedIcon(HandleRef hInst, StringBuilder iconPath, ref int index);
+        private static extern SafeIconHandle ExtractAssociatedIcon(HandleRef hInst, StringBuilder iconPath, ref int iconIndex);
 
         /// <summary>
         ///     Returns an icon representation of an image contained in the specified file.
@@ -78,41 +86,37 @@ namespace Dapplo.Windows.Native
         ///     See: http://stackoverflow.com/questions/1842226/how-to-get-the-associated-icon-from-a-network-share-file
         /// </summary>
         /// <param name="filePath">The path to the file that contains an image.</param>
+        /// <param name="iconIndex">Index of the icon</param>
         /// <returns>The System.Drawing.Icon representation of the image contained in the specified file.</returns>
-        public static Icon ExtractAssociatedIcon(string filePath)
+        public static Icon ExtractAssociatedIcon(string filePath, int iconIndex = 0)
         {
-            var index = 0;
-
             Uri uri;
             if (filePath == null)
             {
-                throw new ArgumentException(string.Format("'{0}' is not valid for '{1}'", "null", "filePath"), "filePath");
+                throw new ArgumentNullException(nameof(filePath));
             }
-            try
-            {
-                uri = new Uri(filePath);
-            }
-            catch (UriFormatException)
+            if (!Uri.TryCreate(filePath, UriKind.Absolute, out uri))
             {
                 filePath = Path.GetFullPath(filePath);
                 uri = new Uri(filePath);
             }
-
-            if (uri.IsFile)
+            if (!uri.IsFile)
             {
-                if (File.Exists(filePath))
-                {
-                    var iconPath = new StringBuilder(1024);
-                    iconPath.Append(filePath);
-
-                    var handle = ExtractAssociatedIcon(new HandleRef(null, IntPtr.Zero), iconPath, ref index);
-                    if (handle != IntPtr.Zero)
-                    {
-                        return Icon.FromHandle(handle);
-                    }
-                }
+                return null;
             }
-            return null;
+            if (!File.Exists(filePath))
+            {
+                return null;
+            }
+            var iconPath = new StringBuilder(1024);
+            iconPath.Append(filePath);
+
+            var handle = ExtractAssociatedIcon(new HandleRef(null, IntPtr.Zero), iconPath, ref iconIndex);
+            if (handle == IntPtr.Zero)
+            {
+                return null;
+            }
+            return Icon.FromHandle(handle);
         }
 
         /// <summary>

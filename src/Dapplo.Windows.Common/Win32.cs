@@ -77,8 +77,8 @@ namespace Dapplo.Windows.Common
         /// <summary>
         ///     Change the last error
         /// </summary>
-        /// <param name="dwErrCode"></param>
+        /// <param name="dwErrCode">error code to change to</param>
         [DllImport("kernel32")]
-        private static extern void SetLastError(uint dwErrCode);
+        public static extern void SetLastError(uint dwErrCode);
     }
 }
