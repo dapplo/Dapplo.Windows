@@ -52,14 +52,19 @@ namespace Dapplo.Windows.Dpi
         ///     This is the default DPI for the screen
         /// </summary>
         public const double DefaultScreenDpi = 96d;
-
         private static readonly LogSource Log = new LogSource();
+
+        // Stores if the handler is runing via a listener
+        private bool _needsListenerWorkaround;
+        // Via this the dpi values are published
+        private readonly ISubject<double> _onDpiChanged = new Subject<double>();
 
         /// <summary>
         ///     Create a DpiHandler
         /// </summary>
-        public DpiHandler()
+        public DpiHandler(bool needsListenerWorkaround = false)
         {
+            _needsListenerWorkaround = needsListenerWorkaround;
             EnableDpiAwareness();
         }
 
@@ -125,7 +130,7 @@ namespace Dapplo.Windows.Dpi
         /// <summary>
         ///     This subject publishes whenever the dpi settings change
         /// </summary>
-        public ISubject<double> OnDpiChanged { get; } = new Subject<double>();
+        public IObservable<double> OnDpiChanged => _onDpiChanged;
 
         /// <summary>
         ///     Retrieve the DPI value for the supplied window handle
@@ -215,9 +220,19 @@ namespace Dapplo.Windows.Dpi
                         currentDpi = GetDpi(hwnd);
                     }
                     break;
+                case WindowsMessages.WM_SETICON:
+                    // This is a workaround for handling WinProc outside of the class
+                    if (_needsListenerWorkaround)
+                    {
+                        isDpiMessage = true;
+                        // disable workaround
+                        _needsListenerWorkaround = false;
+                        currentDpi = GetDpi(hwnd);
+                    }
+                    break;
                 case WindowsMessages.WM_DESTROY:
                     // If the window is destroyed, we complete the subject
-                    OnDpiChanged.OnCompleted();
+                    _onDpiChanged.OnCompleted();
                     break;
             }
             // Check if the DPI was changed, if so call the action (if any)
@@ -229,7 +244,7 @@ namespace Dapplo.Windows.Dpi
             {
                 Dpi = currentDpi;
                 Log.Verbose().WriteLine("Got new DPI {0}", currentDpi);
-                OnDpiChanged.OnNext(Dpi);
+                _onDpiChanged.OnNext(Dpi);
             }
             else
             {

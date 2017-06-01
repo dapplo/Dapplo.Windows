@@ -66,16 +66,25 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="FormWithAttachedDpiHandler.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="FormWithAttachedDpiHandler.Designer.cs">
+      <DependentUpon>FormWithAttachedDpiHandler.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormExtendsDpiAwareForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormExtendsDpiAwareForm.Designer.cs">
+      <DependentUpon>FormExtendsDpiAwareForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="FormWithAttachedDpiHandler.resx">
+      <DependentUpon>FormWithAttachedDpiHandler.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormExtendsDpiAwareForm.resx">
+      <DependentUpon>FormExtendsDpiAwareForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

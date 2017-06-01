@@ -34,7 +34,7 @@ namespace Dapplo.Windows.Dpi
     /// <summary>
     ///     This is a Listener for WinProc messages
     /// </summary>
-    public class WinProcListener : NativeWindow, IDisposable
+    public sealed class WinProcListener : NativeWindow, IDisposable
     {
         private readonly IList<HwndSourceHook> _hooks = new List<HwndSourceHook>();
 
@@ -71,8 +71,9 @@ namespace Dapplo.Windows.Dpi
         /// <param name="e">EventArgs</param>
         private void OnHandleCreated(object sender, EventArgs e)
         {
-            // Window is now created, assign handle to NativeWindow.
-            AssignHandle(((Control) sender).Handle);
+            var handle = ((Control) sender).Handle;
+            // control is now created, assign handle to NativeWindow.
+            AssignHandle(handle);
         }
 
         /// <summary>
@@ -98,21 +99,32 @@ namespace Dapplo.Windows.Dpi
 
         /// <inheritdoc />
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
-        protected override void WndProc(ref Message m)
+        protected override void WndProc(ref Message message)
+        {
+            bool handled = ProcessMessage(message);
+            if (!handled)
+            {
+                base.WndProc(ref message);
+            }
+        }
+
+        /// <summary>
+        /// Helper class to process the message
+        /// </summary>
+        /// <param name="message">Message</param>
+        /// <returns>bool if the message was handled</returns>
+        private bool ProcessMessage(Message message)
         {
             bool handled = false;
             foreach (var hwndSourceHook in _hooks)
             {
-                m.Result = hwndSourceHook.Invoke(m.HWnd, m.Msg, m.WParam, m.LParam, ref handled);
+                message.Result = hwndSourceHook.Invoke(message.HWnd, message.Msg, message.WParam, message.LParam, ref handled);
                 if (handled)
                 {
                     break;
                 }
             }
-            if (!handled)
-            {
-                base.WndProc(ref m);
-            }
+            return handled;
         }
     }
 }

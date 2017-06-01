@@ -41,7 +41,11 @@ namespace Dapplo.Windows.FormsExample
             LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Verbose);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            var form1 = new FormExtendsDpiAwareForm();
+            form1.Show();
+            var form2 = new FormWithAttachedDpiHandler();
+            form2.Show();
+            Application.Run();
         }
     }
 }

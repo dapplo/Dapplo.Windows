@@ -19,32 +19,34 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 
 namespace Dapplo.Windows.Dpi.Forms
 {
-	/// <summary>
-	/// This is a DPI-Aware Form, making DPI support very easy: just extend your Form from this
-	/// </summary>
-	public class DpiAwareForm : Form
-	{
-		/// <summary>
-		/// The DpiHandler used for this form
-		/// </summary>
-		protected DpiHandler DpiHandler { get; } = new DpiHandler();
+    /// <summary>
+    /// This is a DPI-Aware Form, making DPI support very easy: just extend your Form from this
+    /// </summary>
+    [SuppressMessage("Sonar Code Smell", "S110:Inheritance tree of classes should not be too deep", Justification = "This is what extending Form does...")]
+    public class DpiAwareForm : Form
+    {
+        /// <summary>
+        /// The DpiHandler used for this form
+        /// </summary>
+        protected DpiHandler DpiHandler { get; } = new DpiHandler();
 
-		/// <summary>
-		/// Override the WndProc to make sure the DpiHandler is informed of the WM_NCCREATE message
-		/// </summary>
-		/// <param name="m">Message</param>
-		protected override void WndProc(ref Message m)
-		{
-			bool handled = false;
-			DpiHandler.HandleMessages(m.HWnd, m.Msg, m.WParam, m.LParam, ref handled);
-			if (!handled)
-			{
-				base.WndProc(ref m);
-			}
-		}
-	}
+        /// <summary>
+        /// Override the WndProc to make sure the DpiHandler is informed of the WM_NCCREATE message
+        /// </summary>
+        /// <param name="m">Message</param>
+        protected override void WndProc(ref Message m)
+        {
+            bool handled = false;
+            DpiHandler.HandleMessages(m.HWnd, m.Msg, m.WParam, m.LParam, ref handled);
+            if (!handled)
+            {
+                base.WndProc(ref m);
+            }
+        }
+    }
 }

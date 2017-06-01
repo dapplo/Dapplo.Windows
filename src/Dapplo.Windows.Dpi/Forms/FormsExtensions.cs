@@ -34,14 +34,16 @@ namespace Dapplo.Windows.Dpi.Forms
     {
         /// <summary>
         ///     Handle DPI changes for the specified Control (Form, ContextMenu etc)
-        ///     Using this doesn't enable dpi scaling in the non client area, for this you will need to call:
-        ///     DpiHandler.TryEnableNonClientDpiScaling(this.Handle) from the WndProc in the WM_NCCREATE message
+        ///     Using this DOES NOT enable dpi scaling in the non client area, for this you will need to call:
+        ///     DpiHandler.TryEnableNonClientDpiScaling(this.Handle) from the WndProc in the WM_NCCREATE message.
+        ///     It's better to extend DpiAwareForm, which does this for you. 
         /// </summary>
         /// <param name="control">Control</param>
         /// <returns>DpiHandler</returns>
         public static DpiHandler AttachFormDpiHandler(this Control control)
         {
-            var dpiHandler = new DpiHandler();
+            // Create a DpiHandler which runs "outside" of the control (not via WinProc)
+            var dpiHandler = new DpiHandler(true);
             var listener = new WinProcListener(control);
             listener.AddHook(dpiHandler.HandleMessages);
             dpiHandler.MessageHandler = listener;
