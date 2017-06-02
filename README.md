@@ -3,7 +3,7 @@ This project contains code which adds Microsoft Windows specific functionality t
 
 THIS IS WORK IN PROGRESS!
 
-- Documentation can be found [here](http://www.dapplo.net/blocks/Dapplo.Windows) (soon)
+- Documentation can be found [here](http://www.dapplo.net/documentation/Dapplo.Windows)
 - Current build status: [![Build status](https://ci.appveyor.com/api/projects/status/n99jafhbbp74n2w7?svg=true)](https://ci.appveyor.com/project/dapplo/dapplo-windows)
 - NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.svg)](https://badge.fury.io/nu/Dapplo.Windows)
 - NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Clipboard.svg)](https://badge.fury.io/nu/Dapplo.Windows.Clipboard)
