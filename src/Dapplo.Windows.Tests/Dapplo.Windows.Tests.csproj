@@ -86,6 +86,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CitrixTests.cs" />
     <Compile Include="DisplayTest.cs" />
     <Compile Include="ClipboardTests.cs" />
     <Compile Include="RectTests.cs" />
@@ -109,6 +110,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Citrix\Dapplo.Windows.Citrix.csproj">
+      <Project>{E6A137AD-B848-41FD-A467-121FB20F3BB0}</Project>
+      <Name>Dapplo.Windows.Citrix</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Clipboard\Dapplo.Windows.Clipboard.csproj">
       <Project>{8d836859-871a-446f-889f-1ac015e14738}</Project>
       <Name>Dapplo.Windows.Clipboard</Name>

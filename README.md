@@ -1,14 +1,24 @@
 # Dapplo.Windows
-A dapplo building block for querying and modifying native windows
+This project contains code which adds Microsoft Windows specific functionality to your application
 
 THIS IS WORK IN PROGRESS!
 
 - Documentation can be found [here](http://www.dapplo.net/blocks/Dapplo.Windows) (soon)
 - Current build status: [![Build status](https://ci.appveyor.com/api/projects/status/n99jafhbbp74n2w7?svg=true)](https://ci.appveyor.com/project/dapplo/dapplo-windows)
 - NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.svg)](https://badge.fury.io/nu/Dapplo.Windows)
-- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Dpi.svg)](https://badge.fury.io/nu/Dapplo.Dpi)
-- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.WinMessage.svg)](https://badge.fury.io/nu/Dapplo.WinMessage)
-- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Clipboard)](https://badge.fury.io/nu/Dapplo.Clipboard)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Clipboard)](https://badge.fury.io/nu/Dapplo.Windows.Clipboard)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Citrix)](https://badge.fury.io/nu/Dapplo.Windows.Citrix)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Com)](https://badge.fury.io/nu/Dapplo.Windows.Com)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Common)](https://badge.fury.io/nu/Dapplo.Windows.Common)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.DesktopWindowsManager)](https://badge.fury.io/nu/Dapplo.Windows.DesktopWindowsManager)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Dpi.svg)](https://badge.fury.io/nu/Dapplo.Windows.Dpi)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Gdi32.svg)](https://badge.fury.io/nu/Dapplo.Windows.Gdi32)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Input.svg)](https://badge.fury.io/nu/Dapplo.Windows.Input)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Kernel32.svg)](https://badge.fury.io/nu/Dapplo.Windows.Kernel32)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Messages.svg)](https://badge.fury.io/nu/Dapplo.Windows.Messages)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Multimedia.svg)](https://badge.fury.io/nu/Dapplo.Windows.Multimedia)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Shell32.svg)](https://badge.fury.io/nu/Dapplo.Windows.Shell32)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.User32.svg)](https://badge.fury.io/nu/Dapplo.Windows.User32)
 
 This is actually code I wrote for Greenshot, and with this I am trying to place it into an external repository so it's easier to maintain.
 
@@ -20,13 +30,18 @@ The following functionality is available:
 * A lot of the native structs and enums
 ... more
 
-# Dapplo.WinMessages
+# Dapplo.Windows.Messages
 Has all the Windows Messages defined for some of the projects in the solution, so if someone uses part of the functionality not everything is included.
 
-# Dapplo.Dpi
-A library to add Dpi-Awareness to application
+# Dapplo.Windows.Citrix
+A library to add Citrix-Awareness to your application
+```
+if (WinFrame.IsAvailble) {
+	// Citrix specific code here
+}
+```
 
-# Dapplo.Clipboard
+# Dapplo.Windows.Clipboard
 In Dapplo.Clipboard specialized code for using the Windows clipboard is place.
 This is currently being developed and far from ready, it should provide a flexible and fluent API to use the Clipboard.
 Currently there is already a simplified monitor, using System.Reactive, build in which allows you to subscribe to changes:
@@ -47,3 +62,5 @@ GetClipboardData should be used to get the contents, they should be converted to
 The information is stored/maintained, until the ClipboardContents object is disposed?
 This could be as soon as the next information is placed on the clipboard.
 
+# Dapplo.Windows.Dpi
+A library to add Dpi-Awareness to your application
