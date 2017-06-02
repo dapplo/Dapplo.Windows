@@ -10,7 +10,7 @@ THIS IS WORK IN PROGRESS!
 - NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Citrix.svg)](https://badge.fury.io/nu/Dapplo.Windows.Citrix)
 - NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Com.svg)](https://badge.fury.io/nu/Dapplo.Windows.Com)
 - NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Common.svg)](https://badge.fury.io/nu/Dapplo.Windows.Common)
-- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.DesktopWindowsManager)](https://badge.fury.io/nu/Dapplo.Windows.DesktopWindowsManager)
+- NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.DesktopWindowsManager.svg)](https://badge.fury.io/nu/Dapplo.Windows.DesktopWindowsManager)
 - NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Dpi.svg)](https://badge.fury.io/nu/Dapplo.Windows.Dpi)
 - NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Gdi32.svg)](https://badge.fury.io/nu/Dapplo.Windows.Gdi32)
 - NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Windows.Input.svg)](https://badge.fury.io/nu/Dapplo.Windows.Input)
