@@ -71,13 +71,13 @@
     <Compile Include="App\MonitorAppVisibility.cs" />
     <Compile Include="Desktop\EnvironmentChangedEventArgs.cs" />
     <Compile Include="Desktop\EnvironmentMonitor.cs" />
-    <Compile Include="Desktop\IInteropWindow.cs" />
-    <Compile Include="Desktop\InteropWindowFactory.cs" />
-    <Compile Include="Desktop\InteropWindowQuery.cs" />
     <Compile Include="Desktop\WindowsEnumerator.cs" />
+    <Compile Include="Enums\InteropWindowCacheFlags.cs" />
+    <Compile Include="Desktop\IInteropWindow.cs" />
     <Compile Include="Desktop\InteropWindow.cs" />
     <Compile Include="Desktop\InteropWindowExtensions.cs" />
-    <Compile Include="Enums\InteropWindowCacheFlags.cs" />
+    <Compile Include="Desktop\InteropWindowFactory.cs" />
+    <Compile Include="Desktop\InteropWindowQuery.cs" />
     <Compile Include="Native\Shell32.cs" />
     <Compile Include="Interop\DisposableCom.cs" />
     <Compile Include="Enums\WinEvents.cs" />

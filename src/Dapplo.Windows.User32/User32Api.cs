@@ -186,56 +186,6 @@ namespace Dapplo.Windows.User32
         }
 
         /// <summary>
-        ///     Get the icon for a hWnd
-        /// </summary>
-        /// <param name="hWnd">IntPtr</param>
-        /// <param name="useLargeIcons">true to try to get a big icon first</param>
-        /// <returns>System.Drawing.Icon</returns>
-        public static Icon GetIcon(IntPtr hWnd, bool useLargeIcons = false)
-        {
-            var iconSmall = IntPtr.Zero;
-            var iconBig = new IntPtr(1);
-            var iconSmall2 = new IntPtr(2);
-
-            IntPtr iconHandle;
-            if (useLargeIcons)
-            {
-                iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero);
-                if (iconHandle == IntPtr.Zero)
-                {
-                    iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.IconHandle);
-                }
-            }
-            else
-            {
-                iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall2, IntPtr.Zero);
-            }
-            if (iconHandle == IntPtr.Zero)
-            {
-                iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall, IntPtr.Zero);
-            }
-            if (iconHandle == IntPtr.Zero)
-            {
-                iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.SmallIconHandle);
-            }
-            if (iconHandle == IntPtr.Zero)
-            {
-                iconHandle = SendMessage(hWnd, WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero);
-            }
-            if (iconHandle == IntPtr.Zero)
-            {
-                iconHandle = GetClassLongWrapper(hWnd, ClassLongIndex.IconHandle);
-            }
-
-            if (iconHandle == IntPtr.Zero)
-            {
-                return null;
-            }
-
-            return Icon.FromHandle(iconHandle);
-        }
-
-        /// <summary>
         ///     Retrieve the windows caption, also called Text
         /// </summary>
         /// <param name="hWnd">IntPtr for the window</param>

@@ -722,7 +722,7 @@ namespace Dapplo.Windows.Com
         #region Clean up
 
         /// <summary>
-        ///     If <see cref="Dispose" /> is not called, we need to make
+        ///     If <see cref="Dispose()" /> is not called, we need to make
         ///     sure that the COM object is still cleaned up.
         /// </summary>
         ~ComWrapper()
