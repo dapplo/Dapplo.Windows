@@ -30,22 +30,37 @@ namespace Dapplo.Windows.Dpi.Forms
     /// <summary>
     ///     Extensions for Windows Form
     /// </summary>
-    public static class FormsExtensions
+    public static class FormsDpiExtensions
     {
         /// <summary>
-        ///     Handle DPI changes for the specified Control (Form, ContextMenu etc)
+        ///     Handle DPI changes for the specified Form
         ///     Using this DOES NOT enable dpi scaling in the non client area, for this you will need to call:
         ///     DpiHandler.TryEnableNonClientDpiScaling(this.Handle) from the WndProc in the WM_NCCREATE message.
         ///     It's better to extend DpiAwareForm, which does this for you. 
         /// </summary>
-        /// <param name="control">Control</param>
+        /// <param name="form">Control</param>
         /// <returns>DpiHandler</returns>
-        public static DpiHandler AttachFormDpiHandler(this Control control)
+        public static DpiHandler AttachDpiHandler(this Form form)
         {
-            // Create a DpiHandler which runs "outside" of the control (not via WinProc)
+            // Create a DpiHandler which runs "outside" of the form (not via WinProc)
             var dpiHandler = new DpiHandler(true);
-            var listener = new WinProcListener(control);
-            listener.AddHook(dpiHandler.HandleMessages);
+            var listener = new WinProcListener(form);
+            listener.AddHook(dpiHandler.HandleWindowMessages);
+            dpiHandler.MessageHandler = listener;
+            return dpiHandler;
+        }
+
+        /// <summary>
+        ///     Handle DPI changes for the specified ContextMenuStrip
+        /// </summary>
+        /// <param name="contextMenuStrip">ContextMenuStrip</param>
+        /// <returns>DpiHandler</returns>
+        public static DpiHandler AttachDpiHandler(this ContextMenuStrip contextMenuStrip)
+        {
+            // Create a DpiHandler which runs "outside" of the contextMenu (not via WinProc)
+            var dpiHandler = new DpiHandler(true);
+            var listener = new WinProcListener(contextMenuStrip);
+            listener.AddHook(dpiHandler.HandleContextMenuMessages);
             dpiHandler.MessageHandler = listener;
             return dpiHandler;
         }

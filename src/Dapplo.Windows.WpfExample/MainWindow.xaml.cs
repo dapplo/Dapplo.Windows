@@ -11,7 +11,7 @@ namespace Dapplo.Windows.WpfExample
         public MainWindow()
         {
             InitializeComponent();
-            this.AttachWindowDpiHandler();
+            this.AttachDpiHandler();
         }
     }
 }

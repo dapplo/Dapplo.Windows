@@ -40,7 +40,7 @@ namespace Dapplo.Windows.Dpi.Wpf
         /// </summary>
         /// <param name="window">Windows</param>
         /// <param name="dpiHandler">DpiHandler</param>
-        private static void AttachWindowDpiHandler(Window window, DpiHandler dpiHandler)
+        private static void AttachDpiHandler(Window window, DpiHandler dpiHandler)
         {
             var windowInteropHelper = new WindowInteropHelper(window);
 
@@ -56,7 +56,7 @@ namespace Dapplo.Windows.Dpi.Wpf
                 {
                     throw new NotSupportedException("No HwndSource available, although EnsureHandle was called?");
                 }
-                hwndSource.AddHook(dpiHandler.HandleMessages);
+                hwndSource.AddHook(dpiHandler.HandleWindowMessages);
                 dpiHandler.MessageHandler = hwndSource;
                 // Add the layout transform action
                 dpiHandler.OnDpiChanged.Subscribe(dpi => window.UpdateLayoutTransform(dpi / DpiHandler.DefaultScreenDpi));
@@ -71,10 +71,10 @@ namespace Dapplo.Windows.Dpi.Wpf
         /// </summary>
         /// <param name="window">Window</param>
         /// <returns>DpiHandler</returns>
-        public static DpiHandler AttachWindowDpiHandler(this Window window)
+        public static DpiHandler AttachDpiHandler(this Window window)
         {
             var dpiHandler = new DpiHandler();
-            AttachWindowDpiHandler(window, dpiHandler);
+            AttachDpiHandler(window, dpiHandler);
 
             return dpiHandler;
         }

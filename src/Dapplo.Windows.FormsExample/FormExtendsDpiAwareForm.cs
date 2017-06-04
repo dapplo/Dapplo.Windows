@@ -38,9 +38,18 @@ namespace Dapplo.Windows.FormsExample
     {
         private static readonly LogSource Log = new LogSource();
         protected readonly BitmapScaleHandler<string> ScaleHandler;
+        private DpiHandler _contextMenuDpiHandler;
+
         public FormExtendsDpiAwareForm()
         {
             InitializeComponent();
+
+            _contextMenuDpiHandler = contextMenuStrip1.AttachDpiHandler();
+
+            _contextMenuDpiHandler.OnDpiChanged.Subscribe(dpi =>
+            {
+                Log.Info().WriteLine("ContextMenuStrip DPI: {0}", dpi);
+            });
             ScaleHandler = BitmapScaleHandler.WithComponentResourceManager(DpiHandler, GetType(), ScaleIconForDisplaying);
 
             ScaleHandler.AddTarget(somethingMenuItem, "somethingMenuItem.Image");
@@ -68,6 +77,11 @@ namespace Dapplo.Windows.FormsExample
                 graphics.DrawImage(bitmap, new Rectangle(0, 0, newSize, newSize), new Rectangle(0, 0, 16, 16), GraphicsUnit.Pixel);
             }
             return result;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            contextMenuStrip1.Show();
         }
     }
 }

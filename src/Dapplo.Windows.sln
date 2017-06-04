@@ -3,15 +3,33 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Messages", "Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj", "{DE471F22-E095-4B11-9702-8306D69B32CA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows", "Dapplo.Windows\Dapplo.Windows.csproj", "{8AA469BB-856A-4330-96CE-2BB75A014070}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Citrix", "Dapplo.Windows.Citrix\Dapplo.Windows.Citrix.csproj", "{E6A137AD-B848-41FD-A467-121FB20F3BB0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Clipboard", "Dapplo.Windows.Clipboard\Dapplo.Windows.Clipboard.csproj", "{8D836859-871A-446F-889F-1AC015E14738}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Com", "Dapplo.Windows.Com\Dapplo.Windows.Com.csproj", "{F8895DF4-FBBB-44A4-86FF-5FA70C965F5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Common", "Dapplo.Windows.Common\Dapplo.Windows.Common.csproj", "{41E9EE3A-ACEA-4532-87D7-0C09D95D9A4E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.DesktopWindowsManager", "Dapplo.Windows.DesktopWindowsManager\Dapplo.Windows.DesktopWindowsManager.csproj", "{EF02637F-86A5-47F1-BB75-33E0BA3119CF}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Dpi", "Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj", "{B8B5782D-EECD-4260-8BED-643EF8B8B6D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Gdi32", "Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj", "{E4A0CE9D-681C-44D0-85F5-4F677EC54658}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Input", "Dapplo.Windows.Input\Dapplo.Windows.Input.csproj", "{171A9FF9-8ABB-4E40-8C88-75157A899B71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Kernel32", "Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj", "{61832675-C53B-4283-8C44-EF99FD26AD3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Messages", "Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj", "{DE471F22-E095-4B11-9702-8306D69B32CA}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Multimedia", "Dapplo.Windows.Multimedia\Dapplo.Windows.Multimedia.csproj", "{9C4AF889-04F5-4BB4-8291-5DDDF46EB32C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Shell32", "Dapplo.Windows.Shell32\Dapplo.Windows.Shell32.csproj", "{043B5BEF-302E-4122-ADE5-70B18A824633}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.User32", "Dapplo.Windows.User32\Dapplo.Windows.User32.csproj", "{FDF2EF88-DC84-40BC-8C85-7B143DB9508B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Tests", "Dapplo.Windows.Tests\Dapplo.Windows.Tests.csproj", "{EB93507C-91DA-420D-B77D-9F9F006B62DE}"
 EndProject
@@ -19,28 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.FormsExample
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.WpfExample", "Dapplo.Windows.WpfExample\Dapplo.Windows.WpfExample.csproj", "{192695D4-18D3-42BF-BE52-D35D0C1A2B23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.DesktopWindowsManager", "Dapplo.Windows.DesktopWindowsManager\Dapplo.Windows.DesktopWindowsManager.csproj", "{EF02637F-86A5-47F1-BB75-33E0BA3119CF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Common", "Dapplo.Windows.Common\Dapplo.Windows.Common.csproj", "{41E9EE3A-ACEA-4532-87D7-0C09D95D9A4E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.User32", "Dapplo.Windows.User32\Dapplo.Windows.User32.csproj", "{FDF2EF88-DC84-40BC-8C85-7B143DB9508B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Input", "Dapplo.Windows.Input\Dapplo.Windows.Input.csproj", "{171A9FF9-8ABB-4E40-8C88-75157A899B71}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Gdi32", "Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj", "{E4A0CE9D-681C-44D0-85F5-4F677EC54658}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Kernel32", "Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj", "{61832675-C53B-4283-8C44-EF99FD26AD3B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CE6CF982-1BE3-42AD-81F0-0A3851736490}"
 	ProjectSection(SolutionItems) = preProject
 		..\build.cake = ..\build.cake
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Com", "Dapplo.Windows.Com\Dapplo.Windows.Com.csproj", "{F8895DF4-FBBB-44A4-86FF-5FA70C965F5F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Shell32", "Dapplo.Windows.Shell32\Dapplo.Windows.Shell32.csproj", "{043B5BEF-302E-4122-ADE5-70B18A824633}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Citrix", "Dapplo.Windows.Citrix\Dapplo.Windows.Citrix.csproj", "{E6A137AD-B848-41FD-A467-121FB20F3BB0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

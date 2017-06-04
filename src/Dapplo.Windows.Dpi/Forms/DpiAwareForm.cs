@@ -42,7 +42,7 @@ namespace Dapplo.Windows.Dpi.Forms
         protected override void WndProc(ref Message m)
         {
             bool handled = false;
-            DpiHandler.HandleMessages(m.HWnd, m.Msg, m.WParam, m.LParam, ref handled);
+            DpiHandler.HandleWindowMessages(m.HWnd, m.Msg, m.WParam, m.LParam, ref handled);
             if (!handled)
             {
                 base.WndProc(ref m);

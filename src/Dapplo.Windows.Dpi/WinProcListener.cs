@@ -41,11 +41,11 @@ namespace Dapplo.Windows.Dpi
         /// <summary>
         ///     Constructor for a window listener
         /// </summary>
-        /// <param name="parent">Control to listen to</param>
-        public WinProcListener(Control parent)
+        /// <param name="control">Control to listen to</param>
+        public WinProcListener(Control control)
         {
-            parent.HandleCreated += OnHandleCreated;
-            parent.HandleDestroyed += OnHandleDestroyed;
+            control.HandleCreated += OnHandleCreated;
+            control.HandleDestroyed += OnHandleDestroyed;
         }
 
         /// <inheritdoc />

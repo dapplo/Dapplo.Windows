@@ -67,7 +67,7 @@
     <Compile Include="DpiAwarenessContext.cs" />
     <Compile Include="DpiHandler.cs" />
     <Compile Include="Enums\MonitorDpiType.cs" />
-    <Compile Include="Forms\FormsExtensions.cs" />
+    <Compile Include="Forms\FormsDpiExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Wpf\WindowExtensions.cs" />
     <Compile Include="WinProcListener.cs" />

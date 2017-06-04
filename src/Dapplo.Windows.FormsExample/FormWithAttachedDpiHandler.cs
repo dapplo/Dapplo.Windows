@@ -42,7 +42,7 @@ namespace Dapplo.Windows.FormsExample
         private readonly IDisposable _dpiChangeSubscription;
         public FormWithAttachedDpiHandler()
         {
-            _dpiHandler = this.AttachFormDpiHandler();
+            _dpiHandler = this.AttachDpiHandler();
             InitializeComponent();
             ScaleHandler = BitmapScaleHandler.WithComponentResourceManager(_dpiHandler, GetType(), ScaleIconForDisplaying);
 
