@@ -59,7 +59,6 @@ namespace Dapplo.Windows.Tests
                 var iconBitmapSource = interopWindow.GetIcon<BitmapSource>();
                 Assert.NotNull(iconBitmapSource);
             }
-            Assert.True(apps.Count > 0);
         }
 
         /// <summary>

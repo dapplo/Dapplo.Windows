@@ -84,7 +84,7 @@ namespace Dapplo.Windows.Icons
             var possibleLogos = Directory.GetFiles(logoDirectory, Path.GetFileNameWithoutExtension(pathToLogo) + "*" + logoExtension);
 
             // Find the best matching logo, this could be one with a scale in it, or just the first
-            string finalLogoPath = possibleLogos.FirstOrDefault(logoFile => logoFile.EndsWith($"{scale}.{logoExtension}")) ?? possibleLogos.FirstOrDefault();
+            string finalLogoPath = possibleLogos.FirstOrDefault(logoFile => logoFile.EndsWith($".scale-{scale}.{logoExtension}")) ?? possibleLogos.FirstOrDefault();
 
             if (!File.Exists(finalLogoPath))
             {
