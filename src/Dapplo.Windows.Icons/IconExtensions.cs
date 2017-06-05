@@ -67,7 +67,7 @@ namespace Dapplo.Windows.Icons
         {
             if (window.IsApp())
             {
-                return IconHelper.GetModernAppLogo<TIcon>(window);
+                return IconHelper.GetAppLogo<TIcon>(window);
             }
             var iconSmall = IntPtr.Zero;
             var iconBig = new IntPtr(1);

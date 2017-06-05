@@ -86,6 +86,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppWindowTests.cs" />
     <Compile Include="CitrixTests.cs" />
     <Compile Include="DisplayTest.cs" />
     <Compile Include="ClipboardTests.cs" />
@@ -129,6 +130,10 @@
     <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj">
       <Project>{e4a0ce9d-681c-44d0-85f5-4f677ec54658}</Project>
       <Name>Dapplo.Windows.Gdi32</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Icons\Dapplo.Windows.Icons.csproj">
+      <Project>{ab2e5d4d-9028-4d9c-99e9-25cfda6e5aad}</Project>
+      <Name>Dapplo.Windows.Icons</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Input\Dapplo.Windows.Input.csproj">
       <Project>{171a9ff9-8abb-4e40-8c88-75157a899b71}</Project>

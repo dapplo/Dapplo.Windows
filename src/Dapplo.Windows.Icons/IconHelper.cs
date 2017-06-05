@@ -26,6 +26,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
+using Dapplo.Windows.App;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.User32;
 
@@ -41,11 +42,16 @@ namespace Dapplo.Windows.Icons
         /// </summary>
         /// <typeparam name="TBitmap"></typeparam>
         /// <param name="interopWindow">IInteropWindow</param>
-        /// <returns></returns>
-        public static TBitmap GetModernAppLogo<TBitmap>(IInteropWindow interopWindow) where TBitmap : class
+        /// <param name="scale">int with scale, 100 is default</param>
+        /// <returns>instance of TBitmap or null if nothing found</returns>
+        public static TBitmap GetAppLogo<TBitmap>(IInteropWindow interopWindow, int scale = 100) where TBitmap : class
         {
             // get folder where actual app resides
-            var exePath = GetModernAppProcessPath(interopWindow);
+            var exePath = GetAppProcessPath(interopWindow);
+            if (exePath == null)
+            {
+                return default(TBitmap);
+            }
             var dir = Path.GetDirectoryName(exePath);
             if (!Directory.Exists(dir))
             {
@@ -67,29 +73,39 @@ namespace Dapplo.Windows.Icons
                 var logoNamespace = XName.Get("Logo", ns);
                 pathToLogo = manifest.Root?.Element(propertiesNamespace)?.Element(logoNamespace)?.Value;
             }
-            // now here it is tricky again - there are several files that match logo, for example
-            // black, white, contrast white. Here we choose first, but you might do differently
-            string finalLogo = Directory.GetFiles(Path.Combine(dir, Path.GetDirectoryName(pathToLogo)), Path.GetFileNameWithoutExtension(pathToLogo) + "*" + Path.GetExtension(pathToLogo)).FirstOrDefault();
-            // serach for all files that match file name in Logo element but with any suffix (like "Logo.black.png, Logo.white.png etc)
-
-            if (!File.Exists(finalLogo))
+            var logoDirectoryName = Path.GetDirectoryName(pathToLogo);
+            if (logoDirectoryName == null)
             {
                 return default(TBitmap);
             }
-            using (var fs = File.OpenRead(finalLogo))
+            var logoDirectory = Path.Combine(dir, logoDirectoryName);
+
+            var logoExtension = Path.GetExtension(pathToLogo);
+            var possibleLogos = Directory.GetFiles(logoDirectory, Path.GetFileNameWithoutExtension(pathToLogo) + "*" + logoExtension);
+
+            // Find the best matching logo, this could be one with a scale in it, or just the first
+            string finalLogoPath = possibleLogos.FirstOrDefault(logoFile => logoFile.EndsWith($"{scale}.{logoExtension}")) ?? possibleLogos.FirstOrDefault();
+
+            if (!File.Exists(finalLogoPath))
             {
-                if (typeof(BitmapImage) == typeof(TBitmap))
+                return default(TBitmap);
+            }
+            using (var fileStream = File.OpenRead(finalLogoPath))
+            {
+                if (typeof(BitmapSource).IsAssignableFrom(typeof(TBitmap)))
                 {
                     var img = new BitmapImage();
                     img.BeginInit();
-                    img.StreamSource = fs;
+                    img.StreamSource = fileStream;
                     img.CacheOption = BitmapCacheOption.OnLoad;
                     img.EndInit();
                     return img as TBitmap;
-
                 }
                 if (typeof(Bitmap) == typeof(TBitmap)) {
-                    return Image.FromStream(fs) as TBitmap;
+                    using (var bitmap = Image.FromStream(fileStream))
+                    {
+                        return bitmap.Clone() as TBitmap;
+                    }
                 }
             }
             return default(TBitmap);
@@ -98,27 +114,24 @@ namespace Dapplo.Windows.Icons
         /// <summary>
         /// Get the path for the real modern app process belonging to the window
         /// </summary>
-        /// <param name="interopWindow"></param>
+        /// <param name="interopWindow">IInteropWindow</param>
         /// <returns></returns>
-        private static string GetModernAppProcessPath(IInteropWindow interopWindow)
+        private static string GetAppProcessPath(IInteropWindow interopWindow)
         {
             int pid;
             User32Api.GetWindowThreadProcessId(interopWindow.Handle, out pid);
-            // now this is a bit tricky. Modern apps are hosted inside ApplicationFrameHost process, so we need to find
-            // child window which does NOT belong to this process. This should be the process we need
-            foreach (var childHwnd in interopWindow.GetChildren())
+            if (string.Equals(interopWindow.GetClassname(), AppQuery.AppFrameWindowClass))
             {
-                int childPid = childHwnd.GetProcessId();
-                if (childPid == pid)
-                {
-                    continue;
-                }
-                // here we are
-                var childProc = Process.GetProcessById(childPid);
-                return childProc.MainModule.FileName;
+                pid = interopWindow.GetChildren().FirstOrDefault(window => string.Equals(AppQuery.AppWindowClass, window.GetClassname()))?.GetProcessId() ?? 0;
             }
-
-            throw new Exception("Cannot find a path to Modern App executable file");
+            if (pid <= 0)
+            {
+                return null;
+            }
+            using (var process = Process.GetProcessById(pid))
+            {
+                return process.MainModule.FileName;
+            }
         }
     }
 }

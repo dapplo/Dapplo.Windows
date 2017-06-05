@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
@@ -40,13 +41,19 @@ namespace Dapplo.Windows.App
     /// </summary>
     public static class AppQuery
     {
-        private const string W8AppWindowClass = "Windows.UI.Core.CoreWindow"; //Used for Windows 8(.1)
-        private const string W10AppWindowClass = "ApplicationFrameWindow"; // Windows 10 uses ApplicationFrameWindow
+        /// <summary>
+        /// Used for Windows 8(.1) and Windows 10 (but as child of "ApplicationFrameWindow")
+        /// </summary>
+        public const string AppWindowClass = "Windows.UI.Core.CoreWindow";
+        /// <summary>
+        /// Windows 10 uses ApplicationFrameWindow to host the App
+        /// </summary>
+        public const string AppFrameWindowClass = "ApplicationFrameWindow";
         private const string ApplauncherClass = "ImmersiveLauncher";
         private const string GutterClass = "ImmersiveGutter";
 
         // the window class for the App window, this depends on the windows version and will be set in the static initializer
-        private static readonly string AppWindowsClass;
+        private static readonly string AppWindowIdentifierClass;
 
         // For MonitorFromWindow
         private static readonly Guid CoClassGuidIAppVisibility = new Guid("7E5FE3D9-985F-4908-91F9-EE19F9FD1514");
@@ -57,7 +64,7 @@ namespace Dapplo.Windows.App
 
         static AppQuery()
         {
-            AppWindowsClass = WindowsVersion.IsWindows8 ? W8AppWindowClass : W10AppWindowClass;
+            AppWindowIdentifierClass = WindowsVersion.IsWindows8 ? AppWindowClass : AppFrameWindowClass;
             // No need to check for the IAppVisibility
             if (!WindowsVersion.IsWindows8OrLater)
             {
@@ -108,11 +115,24 @@ namespace Dapplo.Windows.App
                 {
                     yield break;
                 }
-                var nextHandle = User32Api.FindWindow(AppWindowsClass, null);
+                var nextHandle = User32Api.FindWindow(AppWindowIdentifierClass, null);
                 while (nextHandle != IntPtr.Zero)
                 {
-                    yield return InteropWindowFactory.CreateFor(nextHandle);
-                    nextHandle = User32Api.FindWindowEx(IntPtr.Zero, nextHandle, AppWindowsClass, null);
+                    IInteropWindow currentAppWindow = InteropWindowFactory.CreateFor(nextHandle);
+                    if (WindowsVersion.IsWindows8 || WindowsVersion.IsWindows81)
+                    {
+                        yield return currentAppWindow;
+                    }
+                    else
+                    {
+                        // Test for Windows 10 window
+                        currentAppWindow = currentAppWindow.GetChildren().FirstOrDefault(window => string.Equals(window.GetClassname(), AppWindowClass));
+                        if (currentAppWindow != null)
+                        {
+                            yield return currentAppWindow;
+                        }
+                    }
+                    nextHandle = User32Api.FindWindowEx(IntPtr.Zero, nextHandle, AppWindowIdentifierClass, null);
                 }
                 // check for gutter
                 var gutterHandle = User32Api.FindWindow(GutterClass, null);
@@ -189,7 +209,18 @@ namespace Dapplo.Windows.App
         /// </summary>
         public static bool IsApp(this IInteropWindow interopWindow)
         {
-            return AppWindowsClass.Equals(interopWindow.GetClassname());
+            // No Apps before 8, quick return!
+            if (!WindowsVersion.IsWindows8OrLater)
+            {
+                return false;
+            }
+            if (WindowsVersion.IsWindows81 || WindowsVersion.IsWindows8)
+            {
+                return AppWindowClass.Equals(interopWindow.GetClassname());
+            }
+
+            // Windows 10 and later
+            return AppWindowClass.Equals(interopWindow.GetClassname()) || interopWindow.GetChildren().Any(window => string.Equals(window.GetClassname(),AppWindowClass));
         }
 
         /// <summary>
@@ -222,7 +253,7 @@ namespace Dapplo.Windows.App
         /// </summary>
         public static bool IsWin10App(this IInteropWindow interopWindow)
         {
-            return W10AppWindowClass.Equals(interopWindow.GetClassname());
+            return AppFrameWindowClass.Equals(interopWindow.GetClassname());
         }
 
         /// <summary>
@@ -231,7 +262,7 @@ namespace Dapplo.Windows.App
         /// </summary>
         public static bool IsWin8App(this IInteropWindow interopWindow)
         {
-            return W8AppWindowClass.Equals(interopWindow.GetClassname());
+            return AppWindowClass.Equals(interopWindow.GetClassname());
         }
     }
 }
