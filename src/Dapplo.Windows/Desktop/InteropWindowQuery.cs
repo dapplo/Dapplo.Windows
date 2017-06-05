@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Dapplo.Windows.App;
-using Dapplo.Windows.Common;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 
@@ -164,6 +163,7 @@ namespace Dapplo.Windows.Desktop
             {
                 return false;
             }
+            // A Windows 10 App which runs in the background, has a HWnd but is not visible.
             if (interopWindow.IsBackgroundWin10App())
             {
                 return false;

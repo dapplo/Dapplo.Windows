@@ -65,6 +65,9 @@ namespace Dapplo.Windows.Desktop
         public IntPtr Handle { get; }
 
         /// <inheritdoc />
+        public bool HasZOrderedChildren { get; set; }
+
+        /// <inheritdoc />
         public WindowInfo? Info { get; set; }
 
         /// <inheritdoc />

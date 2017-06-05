@@ -152,10 +152,12 @@ namespace Dapplo.Windows.Desktop
         /// <returns>IEnumerable with InteropWindow</returns>
         public static IEnumerable<IInteropWindow> GetChildren(this IInteropWindow interopWindow, bool forceUpdate = false)
         {
-            if (interopWindow.HasChildren && !forceUpdate)
+            if (interopWindow.HasChildren && !interopWindow.HasZOrderedChildren && !forceUpdate)
             {
                 return interopWindow.Children;
             }
+            interopWindow.HasZOrderedChildren = false;
+
             var children = new List<IInteropWindow>();
             // Store it in the Children property
             interopWindow.Children = children;
@@ -378,10 +380,12 @@ namespace Dapplo.Windows.Desktop
         /// <returns>IEnumerable with InteropWindow</returns>
         public static IEnumerable<IInteropWindow> GetZOrderedChildren(this IInteropWindow interopWindow, bool forceUpdate = false)
         {
-            if (interopWindow.HasChildren && !forceUpdate)
+            if (interopWindow.HasChildren && interopWindow.HasZOrderedChildren && !forceUpdate)
             {
                 return interopWindow.Children;
             }
+            interopWindow.HasZOrderedChildren = true;
+
             var children = new List<IInteropWindow>();
             // Store it in the Children property
             interopWindow.Children = children;

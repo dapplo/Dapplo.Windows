@@ -68,7 +68,11 @@ namespace Dapplo.Windows.Tests
         [WpfFact]
         public void TestApp_TopLevel()
         {
-            Assert.False(InteropWindowQuery.GetTopLevelWindows().Any(window => window.IsApp()));
+            var topLevelWindows = InteropWindowQuery.GetTopLevelWindows().ToList();
+            Assert.False(topLevelWindows.Any(window => window.IsApp()));
+
+            var windowInfo = topLevelWindows.First().GetInfo();
+
         }
     }
 }

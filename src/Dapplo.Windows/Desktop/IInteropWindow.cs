@@ -62,6 +62,11 @@ namespace Dapplo.Windows.Desktop
         IntPtr Handle { get; }
 
         /// <summary>
+        /// Checks if the children are retrieved in a Z-Order
+        /// </summary>
+        bool HasZOrderedChildren { get; set; }
+
+        /// <summary>
         ///     Test if there are any children
         /// </summary>
         bool HasChildren { get; }
