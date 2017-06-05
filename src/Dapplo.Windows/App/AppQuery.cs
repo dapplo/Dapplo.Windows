@@ -119,18 +119,9 @@ namespace Dapplo.Windows.App
                 while (nextHandle != IntPtr.Zero)
                 {
                     IInteropWindow currentAppWindow = InteropWindowFactory.CreateFor(nextHandle);
-                    if (WindowsVersion.IsWindows8 || WindowsVersion.IsWindows81)
+                    if (currentAppWindow.IsApp())
                     {
                         yield return currentAppWindow;
-                    }
-                    else
-                    {
-                        // Test for Windows 10 window
-                        currentAppWindow = currentAppWindow.GetChildren().FirstOrDefault(window => string.Equals(window.GetClassname(), AppWindowClass));
-                        if (currentAppWindow != null)
-                        {
-                            yield return currentAppWindow;
-                        }
                     }
                     nextHandle = User32Api.FindWindowEx(IntPtr.Zero, nextHandle, AppWindowIdentifierClass, null);
                 }
@@ -214,13 +205,7 @@ namespace Dapplo.Windows.App
             {
                 return false;
             }
-            if (WindowsVersion.IsWindows81 || WindowsVersion.IsWindows8)
-            {
-                return AppWindowClass.Equals(interopWindow.GetClassname());
-            }
-
-            // Windows 10 and later
-            return AppWindowClass.Equals(interopWindow.GetClassname()) || interopWindow.GetChildren().Any(window => string.Equals(window.GetClassname(),AppWindowClass));
+            return interopWindow.IsWin8App() || interopWindow.IsWin10App();
         }
 
         /// <summary>
@@ -240,28 +225,39 @@ namespace Dapplo.Windows.App
         }
 
         /// <summary>
-        ///     Check if this window is the window of a metro app
+        ///     This checks if the window is a Windows 10 App
+        ///     For Windows 10 apps are hosted inside "ApplicationFrameWindow"
         /// </summary>
-        public static bool IsMetroApp(this IInteropWindow interopWindow)
+        public static bool IsWin10App(this IInteropWindow interopWindow)
         {
-            return interopWindow.IsAppLauncher() || interopWindow.IsWin8App();
+            if (!WindowsVersion.IsWindows10OrLater)
+            {
+                return false;
+            }
+            return AppWindowClass.Equals(interopWindow.GetClassname()) || interopWindow.GetChildren().Any(window => string.Equals(window.GetClassname(), AppWindowClass));
         }
 
         /// <summary>
         ///     This checks if the window is a Windows 10 App
         ///     For Windows 10 apps are hosted inside "ApplicationFrameWindow"
         /// </summary>
-        public static bool IsWin10App(this IInteropWindow interopWindow)
+        public static bool IsBackgroundWin10App(this IInteropWindow interopWindow)
         {
-            return AppFrameWindowClass.Equals(interopWindow.GetClassname());
+            if (!WindowsVersion.IsWindows10OrLater)
+            {
+                return false;
+            }
+            return AppFrameWindowClass.Equals(interopWindow.GetClassname()) && !interopWindow.GetChildren().Any(window => string.Equals(window.GetClassname(), AppWindowClass));
         }
-
         /// <summary>
-        ///     This checks if the window is a Windows 8 App
-        ///     For Windows 10 most normal code works, as it's hosted inside "ApplicationFrameWindow"
+        ///     This checks if the window is a Windows 8 App, not Win 10!
         /// </summary>
         public static bool IsWin8App(this IInteropWindow interopWindow)
         {
+            if (!WindowsVersion.IsWindows8 && !WindowsVersion.IsWindows81)
+            {
+                return false;
+            }
             return AppWindowClass.Equals(interopWindow.GetClassname());
         }
     }

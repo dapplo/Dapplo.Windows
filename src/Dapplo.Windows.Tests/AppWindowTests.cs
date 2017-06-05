@@ -59,6 +59,17 @@ namespace Dapplo.Windows.Tests
                 var iconBitmapSource = interopWindow.GetIcon<BitmapSource>();
                 Assert.NotNull(iconBitmapSource);
             }
+            Assert.True(apps.Count > 0);
+        }
+
+        /// <summary>
+        ///     Make sure GetTopLevelWindows doesn't return an App Window.
+        /// </summary>
+        /// <returns></returns>
+        [WpfFact]
+        public void TestApp_TopLevel()
+        {
+            Assert.False(InteropWindowQuery.GetTopLevelWindows().Any(window => window.IsApp()));
         }
     }
 }

@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Dapplo.Windows.App;
+using Dapplo.Windows.Common;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 
@@ -160,6 +161,10 @@ namespace Dapplo.Windows.Desktop
             }
             // Skip everything which is not rendered "normally"
             if (!interopWindow.IsWin8App() && exWindowStyle.HasFlag(ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP))
+            {
+                return false;
+            }
+            if (interopWindow.IsBackgroundWin10App())
             {
                 return false;
             }
