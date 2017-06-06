@@ -129,7 +129,7 @@ namespace Dapplo.Windows.Desktop
         /// <summary>
         /// Check the Classname of the IInteropWindow against a list of know classes which can be ignored.
         /// </summary>
-        /// <param name="interopWindow"></param>
+        /// <param name="interopWindow">IInteropWindow</param>
         /// <returns></returns>
         public static bool CanIgnoreClass(this IInteropWindow interopWindow)
         {
