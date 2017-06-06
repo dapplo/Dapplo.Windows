@@ -472,7 +472,7 @@ namespace Dapplo.Windows.Desktop
         ///     Maximize the window
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
-        public static void Maximized(this IInteropWindow interopWindow)
+        public static void Maximize(this IInteropWindow interopWindow)
         {
             User32Api.ShowWindow(interopWindow.Handle, ShowWindowCommands.Maximize);
             interopWindow.IsMaximized = true;
