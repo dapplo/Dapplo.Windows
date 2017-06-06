@@ -127,6 +127,16 @@ namespace Dapplo.Windows.Desktop
         }
 
         /// <summary>
+        /// Check the Classname of the IInteropWindow against a list of know classes which can be ignored.
+        /// </summary>
+        /// <param name="interopWindow"></param>
+        /// <returns></returns>
+        public static bool CanIgnoreClass(this IInteropWindow interopWindow)
+        {
+            return IgnoreClasses.Contains(interopWindow.GetClassname());
+        }
+
+        /// <summary>
         ///     Check if the window is a top level window.
         ///     This method will retrieve all information, and fill it to the interopWindow, it needs to make the decision.
         /// </summary>
@@ -135,7 +145,7 @@ namespace Dapplo.Windows.Desktop
         /// <returns>bool</returns>
         public static bool IsTopLevel(this IInteropWindow interopWindow, bool ignoreKnowClasses = true)
         {
-            if (ignoreKnowClasses && IgnoreClasses.Contains(interopWindow.GetClassname()))
+            if (ignoreKnowClasses && interopWindow.CanIgnoreClass())
             {
                 return false;
             }

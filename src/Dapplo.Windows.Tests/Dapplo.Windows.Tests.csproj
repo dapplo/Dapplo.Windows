@@ -86,6 +86,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InteropWindowTests.cs" />
     <Compile Include="AppWindowTests.cs" />
     <Compile Include="CitrixTests.cs" />
     <Compile Include="DisplayTest.cs" />

@@ -57,10 +57,10 @@ namespace Dapplo.Windows.User32.Structs
 		/// <summary>
 		/// The height of the window border, in pixels.
 		/// </summary>
-		private uint _cyWindowBorders;
+		private readonly uint _cyWindowBorders;
 
-		private ushort _atomWindowType;
-		private ushort _wCreatorVersion;
+		private readonly ushort _atomWindowType;
+		private readonly ushort _wCreatorVersion;
 
 		/// <summary>
 		/// Test if the window is active
@@ -68,13 +68,13 @@ namespace Dapplo.Windows.User32.Structs
 		public bool IsActive => _dwWindowStatus == 1;
 
 		/// <summary>
-		/// The coordinates of the window.
+		/// The coordinates of the window, or client if the Window is returned as empty.
 		/// </summary>
 		public RECT Bounds
 		{
 			get
 			{
-				return _rcWindow;
+			    return _rcWindow.IsEmpty ? _rcClient : _rcWindow;
 			}
 			set
 			{
