@@ -78,7 +78,6 @@
     <Compile Include="Desktop\InteropWindowExtensions.cs" />
     <Compile Include="Desktop\InteropWindowFactory.cs" />
     <Compile Include="Desktop\InteropWindowQuery.cs" />
-    <Compile Include="Native\Shell32.cs" />
     <Compile Include="Interop\DisposableCom.cs" />
     <Compile Include="Enums\WinEvents.cs" />
     <Compile Include="Enums\WinEventHookFlags.cs" />

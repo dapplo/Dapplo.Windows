@@ -24,6 +24,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using Dapplo.Windows.App;
@@ -133,5 +134,116 @@ namespace Dapplo.Windows.Icons
                 return process.MainModule.FileName;
             }
         }
+
+        /// <summary>
+        ///     See: http://msdn.microsoft.com/en-us/library/windows/desktop/ms648069%28v=vs.85%29.aspx
+        /// </summary>
+        /// <typeparam name="TIcon"></typeparam>
+        /// <param name="location">The file (EXE or DLL) to get the icon from</param>
+        /// <param name="index">Index of the icon</param>
+        /// <param name="useLargeIcon">true if the large icon is wanted</param>
+        /// <returns>Icon</returns>
+        public static TIcon ExtractAssociatedIcon<TIcon>(string location, int index, bool useLargeIcon = true) where TIcon : class
+        {
+            IntPtr large;
+            IntPtr small;
+            NativeInvokes.ExtractIconEx(location, index, out large, out small, 1);
+            TIcon returnIcon = null;
+            var isLarge = false;
+            var isSmall = false;
+            try
+            {
+                if (useLargeIcon && !IntPtr.Zero.Equals(large))
+                {
+                    returnIcon = IconHandleTo<TIcon>(large);
+                    isLarge = true;
+                }
+                else if (!IntPtr.Zero.Equals(small))
+                {
+                    returnIcon = IconHandleTo<TIcon>(small);
+                    isSmall = true;
+                }
+                else if (!IntPtr.Zero.Equals(large))
+                {
+                    returnIcon = IconHandleTo<TIcon>(large);
+                    isLarge = true;
+                }
+            }
+            finally
+            {
+                if (isLarge && !IntPtr.Zero.Equals(small))
+                {
+                    User32Api.DestroyIcon(small);
+                }
+                if (isSmall && !IntPtr.Zero.Equals(large))
+                {
+                    User32Api.DestroyIcon(large);
+                }
+            }
+            return returnIcon;
+        }
+
+        /// <summary>
+        ///     Get the number of icon in the file
+        /// </summary>
+        /// <param name="location">Location of the EXE or DLL</param>
+        /// <returns></returns>
+        public static int CountAssociatedIcons(string location)
+        {
+            IntPtr large;
+            IntPtr small;
+            return NativeInvokes.ExtractIconEx(location, -1, out large, out small, 0);
+        }
+
+        /// <summary>
+        /// Create a TIcon from the specified iconHandle
+        /// </summary>
+        /// <typeparam name="TIcon">Bitmap, Icon or BitmapSource</typeparam>
+        /// <param name="iconHandle">IntPtr</param>
+        /// <returns>TIcon</returns>
+        public static TIcon IconHandleTo<TIcon>(IntPtr iconHandle) where TIcon : class
+        {
+            if (iconHandle == IntPtr.Zero)
+            {
+                return default(TIcon);
+            }
+            if (typeof(TIcon) == typeof(Icon))
+            {
+                return Icon.FromHandle(iconHandle) as TIcon;
+            }
+            if (typeof(TIcon) == typeof(Bitmap))
+            {
+                using (var icon = Icon.FromHandle(iconHandle))
+                {
+                    return icon.ToBitmap() as TIcon;
+                }
+            }
+            if (typeof(TIcon) != typeof(BitmapSource))
+            {
+                return default(TIcon);
+            }
+            using (var icon = Icon.FromHandle(iconHandle))
+            {
+                return icon.ToImageSource() as TIcon;
+            }
+        }
+
+        private static class NativeInvokes
+        {
+
+            /// <summary>
+            ///     Get the Icon from a file
+            /// </summary>
+            /// <param name="sFile"></param>
+            /// <param name="iIndex"></param>
+            /// <param name="piLargeVersion"></param>
+            /// <param name="piSmallVersion"></param>
+            /// <param name="amountIcons"></param>
+            /// <returns></returns>
+            [DllImport("shell32", CharSet = CharSet.Unicode)]
+            internal static extern int ExtractIconEx(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
+
+        }
+
     }
 }

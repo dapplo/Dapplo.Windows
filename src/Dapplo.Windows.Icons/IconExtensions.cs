@@ -102,31 +102,7 @@ namespace Dapplo.Windows.Icons
             {
                 iconHandle = User32Api.GetClassLongWrapper(window.Handle, ClassLongIndex.IconHandle);
             }
-
-            if (iconHandle == IntPtr.Zero)
-            {
-                return null;
-            }
-            if (typeof(TIcon) == typeof(Icon))
-            {
-                return Icon.FromHandle(iconHandle) as TIcon;
-            }
-            if (typeof(TIcon) == typeof(Bitmap))
-            {
-                using (var icon = Icon.FromHandle(iconHandle))
-                {
-                    return icon.ToBitmap() as TIcon;
-                }
-
-            }
-            if (typeof(TIcon) == typeof(BitmapSource))
-            {
-                using (var icon = Icon.FromHandle(iconHandle))
-                {
-                    return icon.ToImageSource() as TIcon;
-                }
-            }
-            return default(TIcon);
+            return IconHelper.IconHandleTo<TIcon>(iconHandle);
         }
 
     }
