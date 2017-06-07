@@ -30,6 +30,7 @@ using System.Xml.Linq;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.User32;
+using System.Collections.Generic;
 
 namespace Dapplo.Windows.Icons
 {
@@ -136,6 +137,109 @@ namespace Dapplo.Windows.Icons
         }
 
         /// <summary>
+        ///     Write the images to the stream as icon.
+        ///     It's important that the images are not larger than 256x256.
+        /// </summary>
+        /// <param name="stream">Stream to write to</param>
+        /// <param name="images">List of images</param>
+        public static void WriteIcon(Stream stream, IList<Image> images)
+        {
+            var binaryWriter = new BinaryWriter(stream);
+            //
+            // ICONDIR structure
+            //
+            binaryWriter.Write((short)0); // reserved
+            binaryWriter.Write((short)1); // image type (icon)
+            binaryWriter.Write((short)images.Count); // number of images
+
+            IList<Size> imageSizes = new List<Size>();
+            IList<MemoryStream> encodedImages = new List<MemoryStream>();
+            foreach (var image in images)
+            {
+                var imageStream = new MemoryStream();
+                image.Save(imageStream, System.Drawing.Imaging.ImageFormat.Png);
+                imageSizes.Add(image.Size);
+
+                imageStream.Seek(0, SeekOrigin.Begin);
+                encodedImages.Add(imageStream);
+            }
+
+            //
+            // ICONDIRENTRY structure
+            //
+            const int iconDirSize = 6;
+            const int iconDirEntrySize = 16;
+
+            var offset = iconDirSize + images.Count * iconDirEntrySize;
+            for (var i = 0; i < images.Count; i++)
+            {
+                var imageSize = imageSizes[i];
+                // Write the width / height, 0 means 256
+                binaryWriter.Write(imageSize.Width == 256 ? (byte)0 : (byte)imageSize.Width);
+                binaryWriter.Write(imageSize.Height == 256 ? (byte)0 : (byte)imageSize.Height);
+                binaryWriter.Write((byte)0); // no pallete
+                binaryWriter.Write((byte)0); // reserved
+                binaryWriter.Write((short)0); // no color planes
+                binaryWriter.Write((short)32); // 32 bpp
+                binaryWriter.Write((int)encodedImages[i].Length); // image data length
+                binaryWriter.Write(offset);
+                offset += (int)encodedImages[i].Length;
+            }
+
+            binaryWriter.Flush();
+            //
+            // Write image data
+            //
+            foreach (var encodedImage in encodedImages)
+            {
+                encodedImage.WriteTo(stream);
+                encodedImage.Dispose();
+            }
+        }
+
+        /// <summary>
+        ///     Based on <a href="http://www.codeproject.com/KB/cs/IconExtractor.aspx">this</a>
+        ///     And a hint from <a href="http://www.codeproject.com/KB/cs/IconLib.aspx">this</a>
+        /// </summary>
+        /// <param name="iconStream">Stream with the icon information</param>
+        /// <returns>Bitmap with the Vista Icon (256x256)</returns>
+        public static Bitmap ExtractVistaIcon(this Stream iconStream)
+        {
+            const int sizeIconDir = 6;
+            const int sizeIconDirEntry = 16;
+            Bitmap bmpPngExtracted = null;
+            try
+            {
+                var srcBuf = new byte[iconStream.Length];
+                iconStream.Read(srcBuf, 0, (int)iconStream.Length);
+                int iCount = BitConverter.ToInt16(srcBuf, 4);
+                for (var iIndex = 0; iIndex < iCount; iIndex++)
+                {
+                    int iWidth = srcBuf[sizeIconDir + sizeIconDirEntry * iIndex];
+                    int iHeight = srcBuf[sizeIconDir + sizeIconDirEntry * iIndex + 1];
+                    if (iWidth != 0 || iHeight != 0)
+                    {
+                        continue;
+                    }
+                    var iImageSize = BitConverter.ToInt32(srcBuf, sizeIconDir + sizeIconDirEntry * iIndex + 8);
+                    var iImageOffset = BitConverter.ToInt32(srcBuf, sizeIconDir + sizeIconDirEntry * iIndex + 12);
+                    using (var destStream = new MemoryStream())
+                    {
+                        destStream.Write(srcBuf, iImageOffset, iImageSize);
+                        destStream.Seek(0, SeekOrigin.Begin);
+                        bmpPngExtracted = new Bitmap(destStream); // This is PNG! :)
+                    }
+                    break;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            return bmpPngExtracted;
+        }
+
+        /// <summary>
         ///     See: http://msdn.microsoft.com/en-us/library/windows/desktop/ms648069%28v=vs.85%29.aspx
         /// </summary>
         /// <typeparam name="TIcon"></typeparam>
@@ -149,33 +253,28 @@ namespace Dapplo.Windows.Icons
             IntPtr small;
             NativeInvokes.ExtractIconEx(location, index, out large, out small, 1);
             TIcon returnIcon = null;
-            var isLarge = false;
-            var isSmall = false;
             try
             {
                 if (useLargeIcon && !IntPtr.Zero.Equals(large))
                 {
                     returnIcon = IconHandleTo<TIcon>(large);
-                    isLarge = true;
                 }
                 else if (!IntPtr.Zero.Equals(small))
                 {
                     returnIcon = IconHandleTo<TIcon>(small);
-                    isSmall = true;
                 }
                 else if (!IntPtr.Zero.Equals(large))
                 {
                     returnIcon = IconHandleTo<TIcon>(large);
-                    isLarge = true;
                 }
             }
             finally
             {
-                if (isLarge && !IntPtr.Zero.Equals(small))
+                if (!IntPtr.Zero.Equals(small))
                 {
                     User32Api.DestroyIcon(small);
                 }
-                if (isSmall && !IntPtr.Zero.Equals(large))
+                if (!IntPtr.Zero.Equals(large))
                 {
                     User32Api.DestroyIcon(large);
                 }

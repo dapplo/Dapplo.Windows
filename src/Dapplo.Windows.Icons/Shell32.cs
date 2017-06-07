@@ -22,7 +22,6 @@
 #region using
 
 using System;
-using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -112,14 +111,14 @@ namespace Dapplo.Windows.Icons
             // Copy (clone) the returned icon to a new object, thus allowing us to clean-up properly
             try
             {
-                return IconHelper.IconHandleTo<TIcon>(shfi.hIcon);
+                return IconHelper.IconHandleTo<TIcon>(shfi.IconHandle);
             }
             finally
             {
-                if (shfi.hIcon != IntPtr.Zero)
+                if (shfi.IconHandle != IntPtr.Zero)
                 {
                     // Cleanup
-                    User32Api.DestroyIcon(shfi.hIcon);
+                    User32Api.DestroyIcon(shfi.IconHandle);
                 }
             }
         }
@@ -130,7 +129,7 @@ namespace Dapplo.Windows.Icons
         /// <param name="size">Specify large or small icons.</param>
         /// <param name="folderType">Specify open or closed FolderType.</param>
         /// <returns>System.Drawing.Icon</returns>
-        public static Icon GetFolderIcon(IconSize size, FolderType folderType)
+        public static TIcon GetFolderIcon<TIcon>(IconSize size, FolderType folderType) where TIcon : class
         {
             // Need to add size check, although errors generated at present!
             var flags = ShellGetFileInfoFlags.Icon | ShellGetFileInfoFlags.UseFileAttributes;
@@ -155,13 +154,29 @@ namespace Dapplo.Windows.Icons
 
             //Icon.FromHandle(shfi.hIcon);	// Load the icon from an HICON handle
             // Now clone the icon, so that it can be successfully stored in an ImageList
-            var icon = (Icon) Icon.FromHandle(shellFileInfo.hIcon).Clone();
-
-            // Cleanup
-            User32Api.DestroyIcon(shellFileInfo.hIcon);
-            return icon;
+            try
+            {
+                return IconHelper.IconHandleTo<TIcon>(shellFileInfo.IconHandle);
+            }
+            finally
+            {
+                if (shellFileInfo.IconHandle != IntPtr.Zero)
+                {
+                    // Cleanup
+                    User32Api.DestroyIcon(shellFileInfo.IconHandle);
+                }
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pszPath"></param>
+        /// <param name="dwFileAttributes"></param>
+        /// <param name="psfi"></param>
+        /// <param name="cbFileInfo"></param>
+        /// <param name="uFlags"></param>
+        /// <returns></returns>
         [DllImport("shell32", CharSet = CharSet.Unicode)]
         private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref ShellFileInfo psfi, uint cbFileInfo, ShellGetFileInfoFlags uFlags);
 
