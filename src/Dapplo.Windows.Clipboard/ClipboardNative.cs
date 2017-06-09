@@ -80,7 +80,6 @@ namespace Dapplo.Windows.Clipboard
             return ClipboardLock.Lock(hWnd, retries, retryInterval, timeout);
         }
 
-
         /// <summary>
         /// Get a global lock to the clipboard
         /// </summary>
@@ -171,7 +170,7 @@ namespace Dapplo.Windows.Clipboard
 
             if (!Format2Id.TryGetValue(format, out formatId))
             {
-                throw new ArgumentException($"{format} is not a known format, you might want to register it and call AvailableFormats afterwards.", nameof(format));
+                formatId = RegisterFormat(format);
             }
             var hGlobal = NativeMethods.GetClipboardData(formatId);
             var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
@@ -206,8 +205,7 @@ namespace Dapplo.Windows.Clipboard
 
             if (!Format2Id.TryGetValue(format, out formatId))
             {
-                // TODO: Set format
-                throw new ArgumentException($"{format} is not a known format, you might want to register it and call AvailableFormats afterwards.", nameof(format));
+                formatId = RegisterFormat(format);
             }
             var length = stream.Length;
             var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable , new UIntPtr((ulong)length));
@@ -237,18 +235,23 @@ namespace Dapplo.Windows.Clipboard
         /// Register the clipboard format, so we can use it
         /// </summary>
         /// <param name="format">string with the format to register</param>
-        public static void RegisterFormat(string format)
+        /// <returns>uint for the format</returns>
+        public static uint RegisterFormat(string format)
         {
-            if (Format2Id.ContainsKey(format))
+            uint clipboardFormatId;
+
+            if (Format2Id.TryGetValue(format, out clipboardFormatId))
             {
                 // Format was already known
-                return;
+                return clipboardFormatId;
             }
-            var clipboardFormatId = NativeMethods.RegisterClipboardFormat(format);
+            clipboardFormatId = NativeMethods.RegisterClipboardFormat(format);
 
             // Make sure the format is known
             Id2Format[clipboardFormatId] = format;
             Format2Id[format] = clipboardFormatId;
+
+            return clipboardFormatId;
         }
 
         /// <summary>
