@@ -97,23 +97,19 @@ namespace Dapplo.Windows.Tests
         {
             string format = "DAPPLO.DOPY" + ClipboardNative.SequenceNumber;
 
-            // First test with something that fails
-            using (ClipboardNative.Lock())
-            {
-                ClipboardNative.Clear();
-                Assert.Throws<ArgumentException>(() => ClipboardNative.SetAsUnicodeString("Blub", format));
-            }
-
             // Register the format
-            ClipboardNative.RegisterFormat(format);
+            var id1 = ClipboardNative.RegisterFormat(format);
+            // Register the format again
+            var id2 = ClipboardNative.RegisterFormat(format);
 
-            // Now it should work!
+            Assert.Equal(id1, id2);
+
+            // Make sure it works
             using (ClipboardNative.Lock())
             {
                 ClipboardNative.Clear();
                 ClipboardNative.SetAsUnicodeString("Blub", format);
             }
-           
         }
 
         /// <summary>
