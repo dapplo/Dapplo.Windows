@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
 using Dapplo.Windows.Citrix.Enums;
@@ -67,6 +68,15 @@ namespace Dapplo.Windows.Citrix
         public static string GetClientIpAddress()
         {
             return QuerySessionInformation<ClientAddress>(InfoClasses.ClientAddress).IpAddress;
+        }
+
+        /// <summary>
+        ///     Retrieve the name of the client PC
+        /// </summary>
+        /// <returns>string with the hostname of the client</returns>
+        public static string GetClientName()
+        {
+            return QuerySessionInformation(InfoClasses.ClientName);
         }
 
         /// <summary>
@@ -120,6 +130,22 @@ namespace Dapplo.Windows.Citrix
                 WFFreeMemory(addr);
             }
         }
+
+        /// <summary>
+        /// This function waits for an event (ICA session create/delete/connect, user logon/loff, and so on) before it returns.
+        /// </summary>
+        /// <param name="eventMask">EventMask with event to wait for</param>
+        /// <returns>EventMask with the events that happened</returns>
+        public static EventMask WaitSystemEvent(EventMask eventMask)
+        {
+            EventMask result;
+            if (WFWaitSystemEvent(CurrentServer, eventMask, out result))
+            {
+                return result;
+            }
+            throw new Win32Exception();
+        }
+
 
         /// <summary>
         ///     Retrieve a string value from the WFQuerySessionInformation
@@ -178,9 +204,10 @@ namespace Dapplo.Windows.Citrix
         /// </param>
         /// <param name="eventMask">EventMask mask</param>
         /// <param name="pEventFlags">EventMask as result</param>
-        /// <returns>long</returns>
+        /// <returns>bool</returns>
         [DllImport("WFAPI")]
-        private static extern long WFWaitSystemEvent(IntPtr hServer, EventMask eventMask, out EventMask pEventFlags);
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool WFWaitSystemEvent(IntPtr hServer, EventMask eventMask, out EventMask pEventFlags);
 
         #endregion
     }

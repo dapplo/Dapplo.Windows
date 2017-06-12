@@ -27,7 +27,7 @@ namespace Dapplo.Windows.Citrix.Enums
     public enum InfoClasses
     {
         /// <summary>
-        ///     WFVersion OSVERSIONINFO
+        ///     WFVersion returns OSVERSIONINFO
         /// </summary>
         Version,
 
