@@ -22,54 +22,34 @@
 #region using
 
 using System.Runtime.InteropServices;
+using Dapplo.Windows.Common.Structs;
 
 #endregion
 
 namespace Dapplo.Windows.Citrix.Structs
 {
     /// <summary>
-    ///     This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.ClientInfo
+    ///     This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.ClientLatency
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct ClientInfo
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ClientLatency
     {
-        [MarshalAs(UnmanagedType.LPWStr)]
-        private readonly string _name;
-        [MarshalAs(UnmanagedType.LPWStr)]
-        private readonly string _directory;
-        private readonly int _buildNumber;
-        private readonly int _productId;
-        private readonly int _hardwareId;
-        private readonly ClientAddress _address;
+        private readonly uint _avarage;
+        private readonly uint _last;
+        private readonly uint _derivation;
 
         /// <summary>
-        ///     Return the client's name
+        ///     Return the client's avarage latency
         /// </summary>
-        public string Name => _name;
+        public uint Avarage => _avarage;
+        /// <summary>
+        ///     Return the client's last latency
+        /// </summary>
+        public uint Last => _last;
 
         /// <summary>
-        ///     Return the client's directory
+        ///     Return the client's latency derivation
         /// </summary>
-        public string Directory => _directory;
-
-        /// <summary>
-        ///     Return the client's BuildNumber
-        /// </summary>
-        public int BuildNumber => _buildNumber;
-
-        /// <summary>
-        ///     Return the client's product ID
-        /// </summary>
-        public int ProductId => _productId;
-
-        /// <summary>
-        ///     Return the client's hardware ID
-        /// </summary>
-        public int HardwareId => _hardwareId;
-
-        /// <summary>
-        ///     Return the client's address
-        /// </summary>
-        public ClientAddress Address => _address;
+        public uint Derivation => _derivation;
     }
 }

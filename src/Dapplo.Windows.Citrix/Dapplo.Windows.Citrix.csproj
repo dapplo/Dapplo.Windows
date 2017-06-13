@@ -45,6 +45,7 @@
     <Compile Include="Enums\InfoClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Structs\ClientAddress.cs" />
+    <Compile Include="Structs\ClientLatency.cs" />
     <Compile Include="Structs\OsVersionInfo.cs" />
     <Compile Include="Structs\SessionTime.cs" />
     <Compile Include="Structs\AppInfo.cs" />
