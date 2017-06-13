@@ -22,148 +22,153 @@
 namespace Dapplo.Windows.Citrix.Enums
 {
     /// <summary>
-    ///     Type of information to be retrieved from the specified session via the WFQuerySessionInformation call.
+    ///     Type of information to be retrieved from the specified session via the WFQuerySessionInformation(W) call.
     /// </summary>
     public enum InfoClasses
     {
         /// <summary>
-        ///     WFVersion returns OSVERSIONINFO
+        ///     WFVersion to get OSVERSIONINFO
         /// </summary>
-        Version,
+        Version = 0,
 
         /// <summary>
         ///     WFInitialProgram NULL-terminated string
         /// </summary>
-        InitialProgram,
+        InitialProgram = 1,
 
         /// <summary>
         ///     WFWorkingDirectory NULL-terminated string
         /// </summary>
-        WorkingDirectory,
+        WorkingDirectory = 2,
 
         /// <summary>
         ///     WFOEMId NULL-terminated string
         /// </summary>
-        OemId,
+        OemId = 3,
 
         /// <summary>
         ///     WFSessionId ULONG = unsigned long
         /// </summary>
-        SessionId,
+        SessionId = 4,
 
         /// <summary>
         ///     WFUserName NULL-terminated string
         /// </summary>
-        UserName,
+        UserName = 5,
 
         /// <summary>
         ///     WFWinStationName NULL-terminated string
         /// </summary>
-        WinStationName,
+        WinStationName = 6,
 
         /// <summary>
         ///     WFDomainName NULL-terminated string
         /// </summary>
-        DomainName,
+        DomainName = 7,
 
         /// <summary>
         ///     WFConnectState INT
         /// </summary>
-        ConnectState,
+        ConnectState = 8,
 
         /// <summary>
         ///     WFClientBuildNumber USHORT
         /// </summary>
-        ClientBuildNumber,
+        ClientBuildNumber = 9,
 
         /// <summary>
         ///     WFClientName NULL-terminated string
         /// </summary>
-        ClientName,
+        ClientName = 10,
 
         /// <summary>
         ///     WFClientDirectory NULL-terminated string
         /// </summary>
-        ClientDirectory,
+        ClientDirectory = 11,
 
         /// <summary>
-        ///     WFClientProductId USHORT
+        ///     WFClientProductId to get USHORT
         /// </summary>
-        ClientProductId,
+        ClientProductId = 12,
 
         /// <summary>
         ///     WFClientHardwareId
         /// </summary>
-        ClientHardwareId,
+        ClientHardwareId = 13,
 
         /// <summary>
-        ///     WFClientAddress WF_CLIENT_ADDRESS
+        ///     WFClientAddress to get WF_CLIENT_ADDRESS
         /// </summary>
-        ClientAddress,
+        ClientAddress = 14,
 
         /// <summary>
-        ///     WFClientDisplay WF_CLIENT_DISPLAY
+        ///     WFClientDisplay to get WF_CLIENT_DISPLAY
         /// </summary>
-        ClientDisplay,
+        ClientDisplay = 15,
 
         /// <summary>
-        ///     WFClientCache WF_CLIENT_CACHE
+        ///     WFClientCache to get WF_CLIENT_CACHE
         /// </summary>
-        ClientCache,
+        ClientCache = 16,
 
         /// <summary>
-        ///     WFClientDrives WF_CLIENT_DRIVES
+        ///     WFClientDrives to get WF_CLIENT_DRIVES
         /// </summary>
-        ClientDrives,
+        ClientDrives = 17,
 
         /// <summary>
-        ///     WFICABufferLength ULONG
+        ///     WFICABufferLength to get ULONG
         /// </summary>
-        IcaBufferLength,
+        IcaBufferLength = 18,
 
         /// <summary>
         ///     WFLicenseEnabler
         /// </summary>
-        LicenseEnabler,
+        LicenseEnabler = 19,
 
         /// <summary>
         ///     Reserved
         /// </summary>
-        Reserved,
+        Reserved = 20,
 
         /// <summary>
         ///     WFApplicationName NULL-terminated string
         /// </summary>
-        ApplicationName,
+        ApplicationName = 21,
 
         /// <summary>
         ///     WFVersionEx
         /// </summary>
-        VersionEx,
+        VersionEx = 22,
 
         /// <summary>
-        ///     WFClientInfo WF_CLIENT_INFO
+        ///     WFClientInfo to get WF_CLIENT_INFO
         /// </summary>
-        ClientInfo,
+        ClientInfo = 23,
 
         /// <summary>
-        ///     WFUserInfo WF_USER_INFO
+        ///     WFUserInfo to get WF_USER_INFO
         /// </summary>
-        UserInfo,
+        UserInfo = 24,
 
         /// <summary>
-        ///     WFAppInfo WF_APP_INFO
+        ///     WFAppInfo to get WF_APP_INFO
         /// </summary>
-        AppInfo,
+        AppInfo = 25,
 
         /// <summary>
-        ///     WFClientLatency WF_CLIENT_LATENCY
+        ///     WFClientLatency to get WF_CLIENT_LATENCY
         /// </summary>
-        ClientLatency,
+        ClientLatency = 26,
 
         /// <summary>
-        ///     WFSessionTime WF_SESSION_TIME
+        ///     WFSessionTime to get WF_SESSION_TIME
         /// </summary>
-        SessionTime
+        SessionTime = 27,
+
+        /// <summary>
+        /// WFLicensingModel
+        /// </summary>
+        LicensingModel = 28
     }
 }

@@ -172,8 +172,8 @@ namespace Dapplo.Windows.Citrix
         #region DllImports
 
         /// <summary>
-        ///     See
-        ///     <a href="https://www.citrix.com/content/dam/citrix/en_us/documents/downloads/sdk/wf-api-sdk-guide.pdf">WFQuerySessionInformation Documentation</a>
+        ///     See <a href="https://www.citrix.com/content/dam/citrix/en_us/documents/downloads/sdk/wf-api-sdk-guide.pdf">WFQuerySessionInformation Documentation</a>
+        ///     Important is that we always use the Unicode version: WFQuerySessionInformationW
         /// </summary>
         /// <param name="hServer">
         ///     A handle to a server. Use the WFOpenServer() function to obtain a handle for a particular server,

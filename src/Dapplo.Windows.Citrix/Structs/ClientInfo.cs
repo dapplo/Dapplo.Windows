@@ -30,13 +30,18 @@ namespace Dapplo.Windows.Citrix.Structs
     /// <summary>
     ///     This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.ClientInfo
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct ClientInfo
     {
+        [MarshalAs(UnmanagedType.LPWStr)]
         private readonly string _name;
+        [MarshalAs(UnmanagedType.LPWStr)]
         private readonly string _directory;
+        [MarshalAs(UnmanagedType.LPWStr)]
         private readonly string _buildNumber;
+        [MarshalAs(UnmanagedType.LPWStr)]
         private readonly string _productId;
+        [MarshalAs(UnmanagedType.LPWStr)]
         private readonly string _hardwareId;
         private readonly ClientAddress _address;
 

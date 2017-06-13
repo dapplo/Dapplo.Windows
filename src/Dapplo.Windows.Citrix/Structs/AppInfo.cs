@@ -30,11 +30,14 @@ namespace Dapplo.Windows.Citrix.Structs
     /// <summary>
     ///     This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.AppInfo
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct AppInfo
     {
+        [MarshalAs(UnmanagedType.LPWStr)]
         private readonly string _initialProgram;
+        [MarshalAs(UnmanagedType.LPWStr)]
         private readonly string _workingDirectory;
+        [MarshalAs(UnmanagedType.LPWStr)]
         private readonly string _applicationName;
 
         /// <summary>
