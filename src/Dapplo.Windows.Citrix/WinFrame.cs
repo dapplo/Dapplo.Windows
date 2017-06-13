@@ -118,11 +118,6 @@ namespace Dapplo.Windows.Citrix
             }
             try
             {
-                var expectedSize = Marshal.SizeOf(expectedType);
-                if (expectedSize != returned)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(infoClass), $"The size of struct {expectedType} is {expectedSize}, returned was {returned}");
-                }
                 return (T)Marshal.PtrToStructure(addr, expectedType);
             }
             finally
