@@ -83,6 +83,13 @@ namespace Dapplo.Windows.Kernel32.Enums
         /// </summary>
         QueryInformation = 0x00000400,
 
+
+        /// <summary>
+        ///     Required to retrieve certain information about a process (see GetExitCodeProcess, GetPriorityClass, IsProcessInJob, QueryFullProcessImageName). A handle that has the PROCESS_QUERY_INFORMATION access right is automatically granted PROCESS_QUERY_LIMITED_INFORMATION.
+        ///     Windows Server 2003 and Windows XP:  This access right is not supported.
+        /// </summary>
+        QueryLimitedInformation = 0x00000400,
+
         /// <summary>
         ///     The right to use the object for synchronization.
         ///     This enables a thread to wait until the object is in the signaled state.

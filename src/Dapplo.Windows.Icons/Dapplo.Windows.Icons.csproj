@@ -65,6 +65,10 @@
       <Project>{e4a0ce9d-681c-44d0-85f5-4f677ec54658}</Project>
       <Name>Dapplo.Windows.Gdi32</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj">
+      <Project>{61832675-c53b-4283-8c44-ef99fd26ad3b}</Project>
+      <Name>Dapplo.Windows.Kernel32</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
       <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
       <Name>Dapplo.Windows.Messages</Name>

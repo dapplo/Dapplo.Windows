@@ -173,7 +173,7 @@ namespace Dapplo.Windows.Kernel32
                 }
             }
 
-            return string.Empty;
+            return null;
         }
 
         /// <summary>
