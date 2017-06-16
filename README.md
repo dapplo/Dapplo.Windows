@@ -46,7 +46,7 @@ In Dapplo.Clipboard specialized code for using the Windows clipboard is place.
 This is currently being developed and far from ready, it should provide a flexible and fluent API to use the Clipboard.
 Currently there is already a simplified monitor, using System.Reactive, build in which allows you to subscribe to changes:
 ```
-	var clipboardSubscription = ClipboardMonitor.ClipboardUpdateEvents.Where(args => args.Formats.Contains("MyFormat")).Subscribe(args =>
+	var clipboardSubscription = ClipboardMonitor.OnUpdate.SubscribeOn( < ui SynchronizationContext> ).Where(args => args.Formats.Contains("MyFormat")).Subscribe(args =>
 	{
 		Debug.WriteLine("Detected my format between these possible formats: {0}", string.Join(",", args.Formats));
 	});
