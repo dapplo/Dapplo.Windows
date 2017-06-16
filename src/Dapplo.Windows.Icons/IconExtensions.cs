@@ -20,6 +20,7 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
+using System.Diagnostics;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.Messages;
@@ -101,6 +102,13 @@ namespace Dapplo.Windows.Icons
             if (iconHandle == IntPtr.Zero)
             {
                 iconHandle = User32Api.GetClassLongWrapper(window.Handle, ClassLongIndex.IconHandle);
+            }
+            if (iconHandle == IntPtr.Zero)
+            {
+                using (var process = Process.GetProcessById(window.GetProcessId()))
+                {
+                    return IconHelper.ExtractAssociatedIcon<TIcon>(process.MainModule.FileName);
+                }
             }
             return IconHelper.IconHandleTo<TIcon>(iconHandle);
         }

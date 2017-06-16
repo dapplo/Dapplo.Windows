@@ -247,7 +247,7 @@ namespace Dapplo.Windows.Icons
         /// <param name="index">Index of the icon</param>
         /// <param name="useLargeIcon">true if the large icon is wanted</param>
         /// <returns>Icon</returns>
-        public static TIcon ExtractAssociatedIcon<TIcon>(string location, int index, bool useLargeIcon = true) where TIcon : class
+        public static TIcon ExtractAssociatedIcon<TIcon>(string location, int index = 0, bool useLargeIcon = true) where TIcon : class
         {
             IntPtr large;
             IntPtr small;
