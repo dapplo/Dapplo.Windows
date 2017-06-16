@@ -66,11 +66,7 @@ namespace Dapplo.Windows.Clipboard
                         {
                             return IntPtr.Zero;
                         }
-                        ClipboardUpdateInformation clipboardUpdateInformationInfo;
-                        using (ClipboardNative.Lock(hwnd))
-                        {
-                            clipboardUpdateInformationInfo = new ClipboardUpdateInformation();
-                        }
+                        var clipboardUpdateInformationInfo = ClipboardUpdateInformation.Create(hwnd);
 
                         // Make sure we don't trigger multiple times, this happend while developing.
                         if (clipboardUpdateInformationInfo.Id > _previousSequence)
@@ -92,7 +88,8 @@ namespace Dapplo.Windows.Clipboard
                         hookSubscription.Dispose();
                     });
                 })
-                .Publish()
+                // Make sure there is always a value produced when connecting
+                .Publish(ClipboardUpdateInformation.Create())
                 .RefCount();
         }
 

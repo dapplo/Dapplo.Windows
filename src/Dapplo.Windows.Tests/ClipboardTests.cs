@@ -121,7 +121,7 @@ namespace Dapplo.Windows.Tests
         {
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
             bool hasNewContent = false;
-            var subscription = ClipboardMonitor.OnUpdate.Where(clipboard => clipboard.Formats.Contains("CF_TEXT")).Subscribe(clipboard =>
+            var subscription = ClipboardMonitor.OnUpdate.Where(clipboard => clipboard.Formats.Contains("TEST_FORMAT")).Subscribe(clipboard =>
             {
                 Log.Debug().WriteLine("Detected change {0}", string.Join(",", clipboard.Formats));
                 Log.Debug().WriteLine("Owner {0}", clipboard.OwnerHandle);
@@ -132,7 +132,7 @@ namespace Dapplo.Windows.Tests
             using (ClipboardNative.Lock())
             {
                 ClipboardNative.Clear();
-                ClipboardNative.SetAsUnicodeString(testString);
+                ClipboardNative.SetAsUnicodeString(testString, "TEST_FORMAT");
             }
             await Task.Delay(1000);
             subscription.Dispose();

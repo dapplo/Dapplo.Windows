@@ -36,6 +36,8 @@ namespace Dapplo.Windows.Kernel32
     /// </summary>
     public static class Kernel32Api
     {
+        private static DateTimeOffset? _systemStartup;
+
         /// <summary>
         ///     default value if not specifing a process ID
         /// </summary>
@@ -261,5 +263,27 @@ namespace Dapplo.Windows.Kernel32
         /// <returns>int with the size</returns>
         [DllImport("kernel32", SetLastError = true)]
         public static extern int GlobalSize(IntPtr hMem);
+
+        /// <summary>
+        /// Retrieves the number of milliseconds that have elapsed since the system was started.
+        /// </summary>
+        /// <returns>ulong with the ticks</returns>
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern ulong GetTickCount64();
+
+        /// <summary>
+        /// Returns a DateTimeOffset which specifies when the system started
+        /// </summary>
+        public static DateTimeOffset SystemStartup
+        {
+            get
+            {
+                if (!_systemStartup.HasValue)
+                {
+                    _systemStartup = DateTimeOffset.Now.Subtract(TimeSpan.FromMilliseconds(GetTickCount64()));
+                }
+                return _systemStartup.Value;
+            }
+        } 
     }
 }

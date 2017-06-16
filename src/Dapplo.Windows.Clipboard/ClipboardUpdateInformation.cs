@@ -22,6 +22,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Clipboard
 {
@@ -31,13 +32,12 @@ namespace Dapplo.Windows.Clipboard
     public class ClipboardUpdateInformation
     {
         /// <summary>
-        /// A unique ID, given as sequence.
-        /// If this number doesn't match, with the global counter, the clipboard content already changed.
+        /// Sequence-number of the clipboard, starts at 0 when the Windows session starts
         /// </summary>
         public uint Id { get; } = ClipboardNative.SequenceNumber;
 
         /// <summary>
-        /// Timestamp of the clipboard update event
+        /// Timestamp of the clipboard update event, this value will not be correct for the first event
         /// </summary>
         public DateTimeOffset Timestamp { get; } = DateTimeOffset.Now;
 
@@ -52,11 +52,28 @@ namespace Dapplo.Windows.Clipboard
         public IEnumerable<string> Formats { get; } = ClipboardNative.AvailableFormats().ToList();
 
         /// <summary>
-        /// This class can only be instanciated when there is a clipboard lock, that is why the constructor is internal.
+        /// This class can only be instanciated when there is a clipboard lock, that is why the constructor is private.
         /// </summary>
-        internal ClipboardUpdateInformation()
+        private ClipboardUpdateInformation()
         {
             
+        }
+
+        /// <summary>
+        /// Factory method
+        /// </summary>
+        /// <param name="hWnd">IntPtr, optional, with the hWnd for the clipboard lock</param>
+        /// <returns>ClipboardUpdateInformation</returns>
+        public static ClipboardUpdateInformation Create(IntPtr hWnd = default(IntPtr))
+        {
+            if (hWnd == IntPtr.Zero)
+            {
+                hWnd = WinProcHandler.Instance.Handle;
+            }
+            using (ClipboardNative.Lock(hWnd))
+            {
+                return new ClipboardUpdateInformation();
+            }
         }
     }
 }

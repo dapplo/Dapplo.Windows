@@ -41,8 +41,6 @@ namespace Dapplo.Windows.Clipboard
     public static class ClipboardNative
     {
         private const int SuccessError = 0;
-        // Used to identify every clipboard change, if GetClipboardSequenceNumber doesn't work. 
-        private static uint _globalSequenceNumber = 1;
 
         // "Global" clipboard lock
         private static readonly ClipboardSemaphore ClipboardLock = new ClipboardSemaphore();
@@ -107,17 +105,10 @@ namespace Dapplo.Windows.Clipboard
         public static IntPtr CurrentOwner => NativeMethods.GetClipboardOwner();
 
         /// <summary>
-        /// Retrieves the current clipboard sequence number, either via GetClipboardSequenceNumber or internally
+        /// Retrieves the current clipboard sequence number via GetClipboardSequenceNumber
+        /// This returns 0 if there is no WINSTA_ACCESSCLIPBOARD
         /// </summary>
-        public static uint SequenceNumber
-        {
-            get
-            {
-                _globalSequenceNumber++;
-                var sequenceNumber = NativeMethods.GetClipboardSequenceNumber();
-                return sequenceNumber > 0 ? sequenceNumber : _globalSequenceNumber;
-            }
-        }
+        public static uint SequenceNumber => NativeMethods.GetClipboardSequenceNumber();
 
         /// <summary>
         /// Place byte[] on the clipboard, this assumes you already locked the clipboard.
