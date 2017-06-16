@@ -82,6 +82,12 @@ namespace Dapplo.Windows.Clipboard
                     {
                         observer.OnError(new Win32Exception());
                     }
+                    else
+                    {
+                        // Make sure the current contents are always published
+                        observer.OnNext(ClipboardUpdateInformation.Create());
+                    }
+
                     return Disposable.Create(() =>
                     {
                         RemoveClipboardFormatListener(WinProcHandler.Instance.Handle);
@@ -89,12 +95,13 @@ namespace Dapplo.Windows.Clipboard
                     });
                 })
                 // Make sure there is always a value produced when connecting
-                .Publish(ClipboardUpdateInformation.Create())
+                .Publish()
                 .RefCount();
         }
 
         /// <summary>
         ///     This observable publishes the current clipboard contents after every paste action.
+        ///     Best to use SubscribeOn with the UI SynchronizationContext.
         /// </summary>
         public static IObservable<ClipboardUpdateInformation> OnUpdate => Singleton.Value._clipboardObservable;
 
