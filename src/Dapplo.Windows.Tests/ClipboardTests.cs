@@ -161,6 +161,21 @@ namespace Dapplo.Windows.Tests
             }
         }
 
+
+        /// <summary>
+        ///     Test if the clipboard contains files
+        /// </summary>
+        /// <returns></returns>
+        //[WpfFact]
+        public void TestClipboard_Filenames()
+        {
+            using (ClipboardNative.Lock())
+            {
+                var filenames = ClipboardNative.GetFilenames().ToList();
+                Assert.True(filenames.Any());
+            }
+        }
+
         /// <summary>
         ///     Test monitoring the clipboard
         /// </summary>

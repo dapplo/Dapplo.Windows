@@ -150,6 +150,27 @@ namespace Dapplo.Windows.Clipboard
         }
 
         /// <summary>
+        /// Get a list of filenames on the clipboard
+        /// </summary>
+        /// <returns>IEnumerable of string</returns>
+        public static IEnumerable<string> GetFilenames()
+        {
+            var hDrop = NativeMethods.GetClipboardData((uint)StandardClipboardFormats.Drop);
+            var files = NativeMethods.DragQueryFile(hDrop, uint.MaxValue, null, 0);
+            if (files == 0)
+            {
+                yield break;
+            }
+
+            for (uint i = 0; i < files; i++)
+            {
+                var filename = new StringBuilder(260);
+                NativeMethods.DragQueryFile(hDrop, i, filename, filename.Capacity);
+                yield return filename.ToString();
+            }
+        }
+
+        /// <summary>
         /// Retrieve the content for the specified format.
         /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
         /// </summary>
@@ -387,6 +408,22 @@ namespace Dapplo.Windows.Clipboard
             /// <returns>sequence number or 0 if this cannot be retrieved</returns>
             [DllImport("user32", SetLastError = true)]
             internal static extern uint GetClipboardSequenceNumber();
+
+            /// <summary>
+            /// Retrieves the names of dropped files that result from a successful drag-and-drop operation.
+            /// </summary>
+            /// <param name="hDrop">Identifier of the structure that contains the file names of the dropped files.</param>
+            /// <param name="iFile">Index of the file to query. If the value of this parameter is 0xFFFFFFFF, DragQueryFile returns a count of the files dropped. If the value of this parameter is between zero and the total number of files dropped, DragQueryFile copies the file name with the corresponding value to the buffer pointed to by the lpszFile parameter.</param>
+            /// <param name="lpszFile">The address of a buffer that receives the file name of a dropped file when the function returns. This file name is a null-terminated string. If this parameter is NULL, DragQueryFile returns the required size, in characters, of this buffer.</param>
+            /// <param name="cch">The size, in characters, of the lpszFile buffer.</param>
+            /// <returns>
+            /// A nonzero value indicates a successful call.
+            /// When the function copies a file name to the buffer, the return value is a count of the characters copied, not including the terminating null character.
+            /// If the index value is 0xFFFFFFFF, the return value is a count of the dropped files. Note that the index variable itself returns unchanged, and therefore remains 0xFFFFFFFF.
+            /// If the index value is between zero and the total number of dropped files, and the lpszFile buffer address is NULL, the return value is the required size, in characters, of the buffer, not including the terminating null character.
+            /// </returns>
+            [DllImport("shell32")]
+            internal static extern uint DragQueryFile(IntPtr hDrop, uint iFile, [Out] StringBuilder lpszFile, int cch);
         }
         #endregion
     }
