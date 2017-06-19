@@ -54,7 +54,7 @@ Task("Package")
     {
         OutputDirectory = "./artifacts/",
         Verbosity = NuGetVerbosity.Detailed,
-        Symbols = true,
+        Symbols = false,
         IncludeReferencedProjects = true,
         Properties = new Dictionary<string, string>
         {
