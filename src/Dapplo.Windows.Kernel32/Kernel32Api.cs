@@ -220,6 +220,21 @@ namespace Dapplo.Windows.Kernel32
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern uint QueryDosDevice(string lpDeviceName, StringBuilder lpTargetPath, uint uuchMax);
 
+        /// <summary>
+        /// Retrieves the full name of the executable image for the specified process.
+        /// </summary>
+        /// <param name="hProcess">A handle to the process. This handle must be created with the PROCESS_QUERY_INFORMATION or PROCESS_QUERY_LIMITED_INFORMATION access right. For more information, see Process Security and Access Rights.</param>
+        /// <param name="dwFlags">
+        /// This parameter can be one of the following values:
+        ///     0 - The name should use the Win32 path format.
+        /// PROCESS_NAME_NATIVE 0x00000001 - The name should use the native system path format.
+        /// </param>
+        /// <param name="lpExeName">The path to the executable image. If the function succeeds, this string is null-terminated.</param>
+        /// <param name="lpdwSize">On input, specifies the size of the lpExeName buffer, in characters. On success, receives the number of characters written to the buffer, not including the null-terminating character.</param>
+        /// <returns>
+        /// If the function succeeds, the return value is nonzero.
+        /// If the function fails, the return value is zero. To get extended error information, call GetLastError.
+        /// </returns>
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
