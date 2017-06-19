@@ -20,6 +20,7 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
+using System.Diagnostics;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.Messages;
@@ -71,17 +72,32 @@ namespace Dapplo.Windows.Icons
             {
                 return IconHelper.GetAppLogo<TIcon>(window);
             }
-            var icon = GetIconFromWindow<TIcon>(window);
+            var icon = GetIconFromWindow<TIcon>(window, useLargeIcons);
             if (icon != null)
             {
                 return icon;
             }
             var processId = window.GetProcessId();
-            // Try to get the icon from the process file itself
+            // Try to get the icon from the process file itself, if we can query the path
             var processPath = Kernel32Api.GetProcessPath(processId);
             if (processPath != null)
             {
-                return IconHelper.ExtractAssociatedIcon<TIcon>(processPath);
+                return IconHelper.ExtractAssociatedIcon<TIcon>(processPath, useLargeIcon: useLargeIcons);
+            }
+            // Look at the windows of the other similar named processes
+            using (var process = Process.GetProcessById(processId))
+            {
+                var processName = process.ProcessName;
+                foreach (var possibleParentProcess in Process.GetProcessesByName(processName))
+                {
+                    var parentProcessWindow = InteropWindowFactory.CreateFor(possibleParentProcess.MainWindowHandle);
+                    icon = GetIconFromWindow<TIcon>(parentProcessWindow, useLargeIcons);
+                    if (icon != null)
+                    {
+                        return icon;
+                    }
+                    possibleParentProcess.Dispose();
+                }
             }
             // Try to find another window, which belongs to the same process, and get the icon from there
             foreach(var otherWindow in InteropWindowQuery.GetTopWindows().Where(interopWindow => interopWindow.GetProcessId() == processId))
@@ -90,7 +106,7 @@ namespace Dapplo.Windows.Icons
                 {
                     continue;
                 }
-                icon = GetIconFromWindow<TIcon>(otherWindow);
+                icon = GetIconFromWindow<TIcon>(otherWindow, useLargeIcons);
                 if (icon != null)
                 {
                     return icon;
