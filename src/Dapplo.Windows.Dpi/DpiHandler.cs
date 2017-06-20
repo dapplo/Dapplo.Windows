@@ -59,6 +59,9 @@ namespace Dapplo.Windows.Dpi
         // Via this the dpi values are published
         private readonly ISubject<double> _onDpiChanged = new Subject<double>();
 
+        // Via this the dpi values are published in details
+        private readonly ISubject<DpiChangeInfo> _onDpiChangeInfo = new Subject<DpiChangeInfo>();
+
         /// <summary>
         ///     Create a DpiHandler
         /// </summary>
@@ -127,8 +130,14 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         internal IDisposable MessageHandler { get; set; }
 
+
         /// <summary>
-        ///     This subject publishes whenever the dpi settings change
+        ///     This subject publishes whenever the dpi settings are changed
+        /// </summary>
+        public IObservable<DpiChangeInfo> OnDpiChangeInfo => _onDpiChangeInfo;
+
+        /// <summary>
+        ///     This subject publishes whenever the dpi settings are changed
         /// </summary>
         public IObservable<double> OnDpiChanged => _onDpiChanged;
 
@@ -242,9 +251,13 @@ namespace Dapplo.Windows.Dpi
             }
             if (!IsEqual(Dpi, currentDpi))
             {
+                var beforeDpi = Dpi;
+                Log.Verbose().WriteLine("Changing DPI from {0} to {1}", beforeDpi, currentDpi);
+                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Before, beforeDpi, currentDpi));
                 Dpi = currentDpi;
-                Log.Verbose().WriteLine("Got new DPI {0}", currentDpi);
                 _onDpiChanged.OnNext(Dpi);
+                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Change, beforeDpi, currentDpi));
+                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.After, beforeDpi, currentDpi));
             }
             else
             {
@@ -293,9 +306,13 @@ namespace Dapplo.Windows.Dpi
             }
             if (!IsEqual(Dpi, currentDpi))
             {
+                var beforeDpi = Dpi;
+                Log.Verbose().WriteLine("Changing DPI from {0} to {1}", beforeDpi, currentDpi);
+                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Before, beforeDpi, currentDpi));
                 Dpi = currentDpi;
-                Log.Verbose().WriteLine("Got new DPI {0}", currentDpi);
                 _onDpiChanged.OnNext(Dpi);
+                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Change, beforeDpi, currentDpi));
+                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.After, beforeDpi, currentDpi));
             }
             else
             {

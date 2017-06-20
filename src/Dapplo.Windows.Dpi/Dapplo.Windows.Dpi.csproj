@@ -60,6 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitmapScaleHandler.cs" />
+    <Compile Include="DpiChangeInfo.cs" />
+    <Compile Include="Enums\DpiChangeEventTypes.cs" />
     <Compile Include="Forms\DpiAwareForm.cs">
       <SubType>Form</SubType>
     </Compile>

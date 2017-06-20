@@ -19,28 +19,40 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
+using Dapplo.Windows.Dpi.Enums;
 
-using System;
-using System.Windows;
-
-#endregion
-
-namespace Dapplo.Windows.Desktop
+namespace Dapplo.Windows.Dpi
 {
     /// <summary>
-    ///     Factory for InteropWindows
+    /// Stores information about a DPI change
     /// </summary>
-    public static class InteropWindowFactory
+    public class DpiChangeInfo
     {
         /// <summary>
-        ///     Factory method to create a InteropWindow for the supplied handle
+        /// Specifies the type of change:
         /// </summary>
-        /// <param name="handle">IntPtr</param>
-        /// <returns>InteropWindow</returns>
-        public static InteropWindow CreateFor(IntPtr handle)
+        public DpiChangeEventTypes DpiChangeEventType { get; }
+        /// <summary>
+        /// The current DPI, from before the change
+        /// </summary>
+        public double CurrentDpi { get; }
+
+        /// <summary>
+        /// The new DPI
+        /// </summary>
+        public double NewDpi { get; }
+
+        /// <summary>
+        /// Creates a DpiChangeInfo
+        /// </summary>
+        /// <param name="dpiChangeEventType">DpiChangeEventTypes</param>
+        /// <param name="currentDpi">double</param>
+        /// <param name="newDpi">double</param>
+        public DpiChangeInfo(DpiChangeEventTypes dpiChangeEventType, double currentDpi, double newDpi)
         {
-            return new InteropWindow(handle);
+            DpiChangeEventType = dpiChangeEventType;
+            CurrentDpi = currentDpi;
+            NewDpi = newDpi;
         }
     }
 }

@@ -19,28 +19,24 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-using System;
-using System.Windows;
-
-#endregion
-
-namespace Dapplo.Windows.Desktop
+namespace Dapplo.Windows.Dpi.Enums
 {
     /// <summary>
-    ///     Factory for InteropWindows
+    /// Helps to seperate initialization and cleanup
     /// </summary>
-    public static class InteropWindowFactory
+    public enum DpiChangeEventTypes
     {
         /// <summary>
-        ///     Factory method to create a InteropWindow for the supplied handle
+        /// The change is coming, used to initialize certain stuff
         /// </summary>
-        /// <param name="handle">IntPtr</param>
-        /// <returns>InteropWindow</returns>
-        public static InteropWindow CreateFor(IntPtr handle)
-        {
-            return new InteropWindow(handle);
-        }
+        Before,
+        /// <summary>
+        /// The change itself
+        /// </summary>
+        Change,
+        /// <summary>
+        /// The value was changed, used to cleanup
+        /// </summary>
+        After
     }
 }
