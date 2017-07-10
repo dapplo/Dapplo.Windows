@@ -38,6 +38,7 @@ A library to add Citrix-Awareness to your application
 ```
 if (WinFrame.IsAvailble) {
 	// Citrix specific code here
+	var clientHostname = WinFrame.QuerySessionInformation(InfoClasses.ClientName);
 }
 ```
 
