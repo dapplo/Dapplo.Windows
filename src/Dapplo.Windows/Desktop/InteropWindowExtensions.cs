@@ -537,11 +537,16 @@ namespace Dapplo.Windows.Desktop
         ///     Set the window as foreground window
         /// </summary>
         /// <param name="interopWindow">The window to bring to the foreground</param>
-        /// <param name="workaround">bool with true to use a trick to really bring the window to the foreground</param>
+        /// <param name="workaround">bool with true to use a trick (press Alt) to really bring the window to the foreground</param>
         public static async Task ToForegroundAsync(this IInteropWindow interopWindow, bool workaround = true)
         {
             // Nothing we can do if it's not visible!
             if (!interopWindow.IsVisible())
+            {
+                return;
+            }
+            // Window is already the foreground window
+            if (User32Api.GetForegroundWindow() == interopWindow.Handle)
             {
                 return;
             }
@@ -553,11 +558,12 @@ namespace Dapplo.Windows.Desktop
                     await Task.Delay(50).ConfigureAwait(false);
                 }
             }
+
             // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms633539(v=vs.85).aspx
             if (workaround)
             {
-                // Simulate an "ALT" key press.
-                InputGenerator.KeyPress(VirtualKeyCodes.MENU);
+                // Simulate an "ALT" key press, make it double to remove menu activation
+                InputGenerator.KeyPress(VirtualKeyCodes.MENU, VirtualKeyCodes.MENU);
             }
             // Show window in forground.
             User32Api.BringWindowToTop(interopWindow.Handle);
