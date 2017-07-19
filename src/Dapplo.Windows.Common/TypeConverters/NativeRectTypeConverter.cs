@@ -46,8 +46,7 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            var nativeRectStringValue = value as string;
-            if (nativeRectStringValue != null)
+            if (value is string nativeRectStringValue)
             {
                 string[] xywh = nativeRectStringValue.Split(',');
                 int x, y, w, h;
@@ -66,9 +65,8 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string) && value is NativeRect)
+            if (destinationType == typeof(string) && value is NativeRect nativeRect)
             {
-                var nativeRect = (NativeRect) value;
                 return $"{nativeRect.Left},{nativeRect.Top},{nativeRect.Right},{nativeRect.Bottom}";
             }
             return base.ConvertTo(context, culture, value, destinationType);

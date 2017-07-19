@@ -46,10 +46,9 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            var nativeRectFloatStringValue = value as string;
-            if (nativeRectFloatStringValue != null)
+            if (value is string nativeRectFStringValue)
             {
-                string[] xywh = nativeRectFloatStringValue.Split(',');
+                string[] xywh = nativeRectFStringValue.Split(',');
                 float x, y, w, h;
                 if (xywh.Length == 4 &&
                     float.TryParse(xywh[0], NumberStyles.Number, CultureInfo.InvariantCulture, out x) &&
@@ -66,14 +65,13 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string) && value is NativeRectFloat)
+            if (destinationType == typeof(string) && value is NativeRectFloat nativeRectF)
             {
-                var nativeRectFloat = (NativeRectFloat)value;
                 return string.Format("{0},{1},{2},{3}",
-                    nativeRectFloat.Left.ToString(CultureInfo.InvariantCulture),
-                    nativeRectFloat.Top.ToString(CultureInfo.InvariantCulture),
-                    nativeRectFloat.Right.ToString(CultureInfo.InvariantCulture),
-                    nativeRectFloat.Bottom.ToString(CultureInfo.InvariantCulture));
+                    nativeRectF.Left.ToString(CultureInfo.InvariantCulture),
+                    nativeRectF.Top.ToString(CultureInfo.InvariantCulture),
+                    nativeRectF.Right.ToString(CultureInfo.InvariantCulture),
+                    nativeRectF.Bottom.ToString(CultureInfo.InvariantCulture));
             }
             return base.ConvertTo(context, culture, value, destinationType);
         }
