@@ -46,7 +46,8 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value is string nativeRectStringValue)
+            var nativeRectStringValue = value as string;
+            if (nativeRectStringValue != null)
             {
                 string[] xywh = nativeRectStringValue.Split(',');
                 int x, y, w, h;

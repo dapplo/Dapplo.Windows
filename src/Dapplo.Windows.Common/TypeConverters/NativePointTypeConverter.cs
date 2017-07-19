@@ -46,7 +46,8 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value is string pointStringValue)
+            var pointStringValue = value as string;
+            if (pointStringValue != null)
             {
                 string[] xy = pointStringValue.Split(',');
                 int x, y;

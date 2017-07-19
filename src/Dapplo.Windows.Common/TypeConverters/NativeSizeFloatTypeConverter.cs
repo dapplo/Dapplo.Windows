@@ -46,9 +46,10 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value is string sizeStringValue)
+            var sizeFloatStringValue = value as string;
+            if (sizeFloatStringValue != null)
             {
-                string[] hw = sizeStringValue.Split(',');
+                string[] hw = sizeFloatStringValue.Split(',');
                 float h, w;
                 if (hw.Length == 2 &&
                     float.TryParse(hw[0], NumberStyles.Number, CultureInfo.InvariantCulture, out h) &&
