@@ -46,7 +46,8 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value is string sizeStringValue)
+            var sizeStringValue = value as string;
+            if (sizeStringValue != null)
             {
                 string[] hw = sizeStringValue.Split(',');
                 int h, w;
