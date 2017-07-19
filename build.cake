@@ -146,7 +146,7 @@ Task("Build")
 {
     var settings = new MSBuildSettings {
         Verbosity = Verbosity.Minimal,
-        ToolVersion = MSBuildToolVersion.VS2015,
+        ToolVersion = MSBuildToolVersion.VS2017,
         Configuration = configuration,
         PlatformTarget = PlatformTarget.MSIL
     };
