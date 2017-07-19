@@ -78,11 +78,12 @@
     <Compile Include="Structs\ScrollBarInfo.cs" />
     <Compile Include="Structs\ScrollInfo.cs" />
     <Compile Include="Structs\TitleBarInfoEx.cs" />
+    <Compile Include="TypeConverters\WindowPlacementTypeConverter.cs" />
     <Compile Include="User32Api.cs" />
     <Compile Include="Structs\WindowInfo.cs" />
     <Compile Include="Enums\WindowLongIndex.cs" />
     <Compile Include="Structs\WindowPlacement.cs" />
-    <Compile Include="Enums\windowPlacementFlags.cs" />
+    <Compile Include="Enums\WindowPlacementFlags.cs" />
     <Compile Include="Enums\WindowStyleFlags.cs" />
   </ItemGroup>
   <ItemGroup>

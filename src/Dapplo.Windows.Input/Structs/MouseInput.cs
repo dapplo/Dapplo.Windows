@@ -97,16 +97,16 @@ namespace Dapplo.Windows.Input.Structs
         /// <summary>
         ///     The coordinates need to be mapped from 0-65535 where 0 is left and 65535 is right
         /// </summary>
-        /// <param name="location">POINT</param>
-        /// <returns>POINT</returns>
-        private static POINT RemapLocation(POINT location)
+        /// <param name="location">NativePoint</param>
+        /// <returns>NativePoint</returns>
+        private static NativePoint RemapLocation(NativePoint location)
         {
             var bounds = DisplayInfo.GetAllScreenBounds();
             if (bounds.Width * bounds.Height == 0)
             {
                 return location;
             }
-            return new POINT(location.X * (65535 / bounds.Width), location.Y * (65535 / bounds.Height));
+            return new NativePoint(location.X * (65535 / bounds.Width), location.Y * (65535 / bounds.Height));
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="location">Location of the event</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>MouseInput</returns>
-        public static MouseInput MoveMouseWheel(int wheelDelta, POINT? location = null, uint timestamp = 0)
+        public static MouseInput MoveMouseWheel(int wheelDelta, NativePoint? location = null, uint timestamp = 0)
         {
             if (location.HasValue)
             {
@@ -139,7 +139,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="location">Where is the click located</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>MouseInput</returns>
-        public static MouseInput MouseMove(POINT location, uint timestamp = 0)
+        public static MouseInput MouseMove(NativePoint location, uint timestamp = 0)
         {
             location = RemapLocation(location);
             var bounds = DisplayInfo.GetAllScreenBounds();
@@ -159,7 +159,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="location">Where is the click located</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>MouseInput</returns>
-        public static MouseInput MouseDown(MouseButtons mouseButtons, POINT? location = null, uint timestamp = 0)
+        public static MouseInput MouseDown(MouseButtons mouseButtons, NativePoint? location = null, uint timestamp = 0)
         {
             if (location.HasValue)
             {
@@ -207,7 +207,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="location">Where is the click located</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>MouseInput</returns>
-        public static MouseInput MouseUp(MouseButtons mouseButtons, POINT? location = null, uint timestamp = 0)
+        public static MouseInput MouseUp(MouseButtons mouseButtons, NativePoint? location = null, uint timestamp = 0)
         {
             if (location.HasValue)
             {

@@ -22,7 +22,6 @@
 #region using
 
 using System;
-using System.Drawing;
 using System.Windows;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
@@ -44,7 +43,7 @@ namespace Dapplo.Windows.User32.Structs
         /// <summary>
         ///     Screen bounds
         /// </summary>
-        public RECT Bounds { get; set; }
+        public NativeRect Bounds { get; set; }
 
         /// <summary>
         ///     Device name
@@ -69,13 +68,13 @@ namespace Dapplo.Windows.User32.Structs
         /// <summary>
         ///     Desktop working area
         /// </summary>
-        public RECT WorkingArea { get; set; }
+        public NativeRect WorkingArea { get; set; }
 
         /// <summary>
         ///     Get the bounds of the complete screen
         /// </summary>
         /// <returns></returns>
-        public static RECT GetAllScreenBounds()
+        public static NativeRect GetAllScreenBounds()
         {
             int left = 0, top = 0, bottom = 0, right = 0;
             foreach (var display in User32Api.AllDisplays())
@@ -87,7 +86,7 @@ namespace Dapplo.Windows.User32.Structs
                 right = Math.Max(right, screenAbsRight);
                 bottom = Math.Max(bottom, screenAbsBottom);
             }
-            return new RECT(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
+            return new NativeRect(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
         }
 
         /// <summary>
@@ -95,7 +94,7 @@ namespace Dapplo.Windows.User32.Structs
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        public static RECT GetBounds(POINT point)
+        public static NativeRect GetBounds(NativePoint point)
         {
             DisplayInfo returnValue = null;
             foreach (var display in User32Api.AllDisplays())

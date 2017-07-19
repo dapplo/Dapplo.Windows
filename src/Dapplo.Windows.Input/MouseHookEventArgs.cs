@@ -43,7 +43,7 @@ namespace Dapplo.Windows.Input
         /// <summary>
         ///     The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
         /// </summary>
-        public POINT Point { get; set; }
+        public NativePoint Point { get; set; }
 
         /// <summary>
         ///     The mouse message

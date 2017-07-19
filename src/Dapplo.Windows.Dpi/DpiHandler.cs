@@ -208,7 +208,7 @@ namespace Dapplo.Windows.Dpi
                     isDpiMessage = true;
                     Log.Verbose().WriteLine("Processing {0} event, resizing / positioning window {1}", windowsMessage, hwnd);
                     // Retrieve the adviced location
-                    var lprNewRect = (RECT) Marshal.PtrToStructure(lParam, typeof(RECT));
+                    var lprNewRect = (NativeRect) Marshal.PtrToStructure(lParam, typeof(NativeRect));
                     // Move the window to it's location, and resize
                     User32Api.SetWindowPos(hwnd,
                         IntPtr.Zero,
@@ -373,7 +373,7 @@ namespace Dapplo.Windows.Dpi
         [DllImport("shcore")]
         private static extern int GetProcessDpiAwareness(IntPtr processHandle, out DpiAwareness value);
 
-        [DllImport("user32")]
+        [DllImport(User32Api.User32)]
         private static extern int GetDpiForWindow(IntPtr hWnd);
 
         /// <summary>
@@ -395,7 +395,7 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         /// <param name="hWnd">IntPtr</param>
         /// <returns>bool</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32Api.User32, SetLastError = true)]
         private static extern HResult EnableNonClientDpiScaling(IntPtr hWnd);
 
         /// <summary>

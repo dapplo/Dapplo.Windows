@@ -22,10 +22,11 @@
 #region using
 
 using System;
-using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.User32.Enums;
+using Dapplo.Windows.User32.TypeConverters;
 
 #endregion
 
@@ -36,7 +37,7 @@ namespace Dapplo.Windows.User32.Structs
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
-    [SuppressMessage("Sonar Code Smell", "S1450:Private fields only used as local variables in methods should become local variables", Justification = "Interop!")]
+    [TypeConverter(typeof(WindowPlacementTypeConverter))]
     public struct WindowPlacement
     {
         /// <summary>
@@ -46,31 +47,56 @@ namespace Dapplo.Windows.User32.Structs
         ///     </para>
         /// </summary>
         private int _cbSize;
+        private WindowPlacementFlags _flags;
+        private ShowWindowCommands _showCmd;
+        private NativePoint _minPosition;
+        private NativePoint _maxPosition;
+        private NativeRect _normalPosition;
 
         /// <summary>
         ///     Specifies flags that control the position of the minimized window and the method by which the window is restored.
         /// </summary>
-        public WindowPlacementFlags Flags;
+        public WindowPlacementFlags Flags
+        {
+            get { return _flags; }
+            set { _flags = value; }
+        }
 
         /// <summary>
         ///     The current show state of the window.
         /// </summary>
-        public ShowWindowCommands ShowCmd;
+        public ShowWindowCommands ShowCmd
+        {
+            get { return _showCmd; }
+            set { _showCmd = value; }
+        }
 
         /// <summary>
         ///     The coordinates of the window's upper-left corner when the window is minimized.
         /// </summary>
-        public POINT MinPosition;
+        public NativePoint MinPosition
+        {
+            get { return _minPosition; }
+            set { _minPosition = value; }
+        }
 
         /// <summary>
         ///     The coordinates of the window's upper-left corner when the window is maximized.
         /// </summary>
-        public POINT MaxPosition;
+        public NativePoint MaxPosition
+        {
+            get { return _maxPosition; }
+            set { _maxPosition = value; }
+        }
 
         /// <summary>
         ///     The window's coordinates when the window is in the restored position.
         /// </summary>
-        public RECT NormalPosition;
+        public NativeRect NormalPosition
+        {
+            get { return _normalPosition; }
+            set { _normalPosition = value; }
+        }
 
         /// <summary>
         ///     Gets the default (empty) value.
@@ -81,6 +107,12 @@ namespace Dapplo.Windows.User32.Structs
             {
                 _cbSize = Marshal.SizeOf(typeof(WindowPlacement))
             };
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"{{Flags: {Flags}; ShowCmd: {ShowCmd}; MinPosition: {MinPosition}; MaxPosition: {MaxPosition}; NormalPosition: {NormalPosition}}}";
         }
     }
 }

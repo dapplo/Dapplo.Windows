@@ -41,8 +41,8 @@ namespace Dapplo.Windows.User32.Structs
 		/// The size of the structure, in bytes. The caller must set this member to sizeof(WINDOWINFO).
 		/// </summary>
 		private uint _cbSize;
-		private RECT _rcWindow;
-		private readonly RECT _rcClient;
+		private NativeRect _rcWindow;
+		private readonly NativeRect _rcClient;
 		private readonly WindowStyleFlags _dwStyle;
 		private readonly ExtendedWindowStyleFlags _dwExStyle;
 		/// <summary>
@@ -70,7 +70,7 @@ namespace Dapplo.Windows.User32.Structs
 		/// <summary>
 		/// The coordinates of the window, or client if the Window is returned as empty.
 		/// </summary>
-		public RECT Bounds
+		public NativeRect Bounds
 		{
 			get
 			{
@@ -85,7 +85,7 @@ namespace Dapplo.Windows.User32.Structs
 		/// <summary>
 		/// The coordinates of the client area.
 		/// </summary>
-		public RECT ClientBounds => _rcClient;
+		public NativeRect ClientBounds => _rcClient;
 
 		/// <summary>
 		/// The window styles.
@@ -100,7 +100,7 @@ namespace Dapplo.Windows.User32.Structs
 		/// <summary>
 		/// The size of the border
 		/// </summary>
-		public SIZE BorderSize => new SIZE((int) _cxWindowBorders,(int) _cyWindowBorders);
+		public NativeSize BorderSize => new NativeSize((int) _cxWindowBorders,(int) _cyWindowBorders);
 
 		/// <summary>
 		/// The Windows version of the application that created the window.

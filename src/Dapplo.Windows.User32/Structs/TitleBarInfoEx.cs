@@ -47,18 +47,18 @@ namespace Dapplo.Windows.User32.Structs
         /// </summary>
         private uint _cbSize;
 
-        private RECT _rcTitleBar;
+        private NativeRect _rcTitleBar;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
         private ObjectStates[] _rgState;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
-        private RECT[] _rgRect;
+        private NativeRect[] _rgRect;
 
         /// <summary>
         /// The coordinates of the title bar. These coordinates include all title-bar elements except the window menu.
         /// </summary>
-        public RECT Bounds => _rcTitleBar;
+        public NativeRect Bounds => _rcTitleBar;
 
         /// <summary>
         /// Returns the ObjectState of the specified element
@@ -72,7 +72,7 @@ namespace Dapplo.Windows.User32.Structs
         /// </summary>
         /// <param name="titleBarInfoIndex">TitleBarInfoIndexes used to specify the element</param>
         /// <returns>RECT</returns>
-        public RECT ElementBounds(TitleBarInfoIndexes titleBarInfoIndex) => _rgRect[(int)titleBarInfoIndex];
+        public NativeRect ElementBounds(TitleBarInfoIndexes titleBarInfoIndex) => _rgRect[(int)titleBarInfoIndex];
 
         /// <summary>
         ///     Factory method for a default TitleBarInfoEx.
@@ -83,8 +83,8 @@ namespace Dapplo.Windows.User32.Structs
             {
                 _cbSize = (uint) Marshal.SizeOf(typeof(TitleBarInfoEx)),
                 _rgState = new ObjectStates[6],
-                _rgRect = new RECT[6],
-                _rcTitleBar = RECT.Empty
+                _rgRect = new NativeRect[6],
+                _rcTitleBar = NativeRect.Empty
             };
         }
     }

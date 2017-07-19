@@ -139,7 +139,7 @@ namespace Dapplo.Windows.App
         /// </summary>
         /// <param name="windowBounds"></param>
         /// <returns>true if an app, covering the supplied rect, is visisble</returns>
-        public static bool AppVisible(RECT windowBounds)
+        public static bool AppVisible(NativeRect windowBounds)
         {
             if (AppVisibility == null)
             {

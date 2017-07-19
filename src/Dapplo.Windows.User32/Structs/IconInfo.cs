@@ -63,11 +63,11 @@ namespace Dapplo.Windows.User32.Structs
 		/// If this structure defines an icon, the hot spot is always in the center of the icon,
 		/// and this member is ignored.
 		/// </summary>
-		public POINT Hotspot
+		public NativePoint Hotspot
 		{
 			get
 			{
-				return new POINT(_xHotspot, _yHotspot);
+				return new NativePoint(_xHotspot, _yHotspot);
 			}
 			set
 			{

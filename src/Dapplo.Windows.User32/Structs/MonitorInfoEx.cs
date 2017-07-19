@@ -52,8 +52,8 @@ namespace Dapplo.Windows.User32.Structs
         /// </summary>
         private int _cbSize;
 
-        private readonly RECT _monitor;
-        private readonly RECT _workArea;
+        private readonly NativeRect _monitor;
+        private readonly NativeRect _workArea;
         private readonly MonitorInfoFlags _flags;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)] private string _deviceName;
 
@@ -62,7 +62,7 @@ namespace Dapplo.Windows.User32.Structs
         ///     Note that if the monitor is not the primary display monitor, some of the rectangle's coordinates may be negative
         ///     values.
         /// </summary>
-        public RECT Monitor => _monitor;
+        public NativeRect Monitor => _monitor;
 
         /// <summary>
         ///     A RECT structure that specifies the work area rectangle of the display monitor that can be used by applications,
@@ -71,7 +71,7 @@ namespace Dapplo.Windows.User32.Structs
         ///     Note that if the monitor is not the primary display monitor, some of the rectangle's coordinates may be negative
         ///     values.
         /// </summary>
-        public RECT WorkArea => _workArea;
+        public NativeRect WorkArea => _workArea;
 
         /// <summary>
         ///     The attributes of the display monitor.

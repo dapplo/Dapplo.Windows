@@ -69,10 +69,10 @@ namespace Dapplo.Windows.Gdi32.SafeHandles
             return new SafeWindowDcHandle(hWndDesktop, hDcDesktop);
         }
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32Api.User32, SetLastError = true)]
         private static extern IntPtr GetWindowDC(IntPtr hWnd);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32Api.User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDc);
 

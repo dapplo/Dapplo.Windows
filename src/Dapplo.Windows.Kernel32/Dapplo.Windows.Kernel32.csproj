@@ -47,6 +47,7 @@
     <Compile Include="Enums\ThreadAccess.cs" />
     <Compile Include="Enums\WindowsProducts.cs" />
     <Compile Include="Enums\WindowsProductTypes.cs" />
+    <Compile Include="Enums\DefaultDllDirectories.cs" />
     <Compile Include="Enums\WindowsSuites.cs" />
     <Compile Include="Kernel32Api.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

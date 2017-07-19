@@ -43,12 +43,12 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <summary>
         ///     The area in the destination window where the thumbnail will be rendered.
         /// </summary>
-        private RECT _rcDestination;
+        private NativeRect _rcDestination;
 
         /// <summary>
         ///     The region of the source window to use as the thumbnail. By default, the entire window is used as the thumbnail.
         /// </summary>
-        private RECT _rcSource;
+        private NativeRect _rcSource;
 
         /// <summary>
         ///     The opacity with which to render the thumbnail. 0 is fully transparent while 255 is fully opaque. The default value
@@ -69,7 +69,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <summary>
         ///     Property for the destination, setting this also changes the dwFlags
         /// </summary>
-        public RECT Destination
+        public NativeRect Destination
         {
             get { return _rcDestination; }
             set
@@ -82,7 +82,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <summary>
         ///     Property for the source, setting this also changes the dwFlags
         /// </summary>
-        public RECT Source
+        public NativeRect Source
         {
             get { return _rcSource; }
             set

@@ -34,12 +34,12 @@ namespace Dapplo.Windows.Common.Extensions
     public static class RectExensions
     {
         /// <summary>
-        ///     Test if this RECT contains the specified POINT
+        ///     Test if this RECT contains the specified NativePoint
         /// </summary>
         /// <param name="rect"></param>
-        /// <param name="point">POINT</param>
+        /// <param name="point">NativePoint</param>
         /// <returns>true if it contains</returns>
-        public static bool Contains(this RECT rect, POINT point)
+        public static bool Contains(this NativeRect rect, NativePoint point)
         {
             return IsBetween(point.X, rect.Left, rect.Right) && IsBetween(point.Y, rect.Top, rect.Bottom);
         }
@@ -50,7 +50,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="largerRectangle">The larger rectangle</param>
         /// <param name="smallerRectangle">The smaller rectangle</param>
         /// <returns>True if small rectangle is entirely contained within the larger rectangle, false otherwise</returns>
-        public static bool Contains(this RECT largerRectangle, RECT smallerRectangle)
+        public static bool Contains(this NativeRect largerRectangle, NativeRect smallerRectangle)
         {
             return
                 largerRectangle.Left <= smallerRectangle.Left &&
@@ -65,7 +65,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">The first rectangle</param>
         /// <param name="rect2">The second rectangle</param>
         /// <returns>The rectangles overlap</returns>
-        public static bool HasOverlap(this RECT rect1, RECT rect2)
+        public static bool HasOverlap(this NativeRect rect1, NativeRect rect2)
         {
             if (rect1.IsAdjacent(rect2) != AdjacentTo.None)
             {
@@ -92,7 +92,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">The first rectangle</param>
         /// <param name="rect2">The second rectangle</param>
         /// <returns>At least one rectangle is adjacent to the other rectangle</returns>
-        public static AdjacentTo IsAdjacent(this RECT rect1, RECT rect2)
+        public static AdjacentTo IsAdjacent(this NativeRect rect1, NativeRect rect2)
         {
             if (rect1.Left.Equals(rect2.Right) && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect2.Top, rect1.Top, rect1.Bottom)))
             {
@@ -131,7 +131,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">RECT to test if it's docked</param>
         /// <param name="rect2">RECT rect to be docked to</param>
         /// <returns>bool with true if they are docked</returns>
-        public static bool IsDockedToLeftOf(this RECT rect1, RECT rect2)
+        public static bool IsDockedToLeftOf(this NativeRect rect1, NativeRect rect2)
         {
             // Test if the right is one pixel to the left, and if top or bottom is within the rect2 height.
             return rect1.Right == rect2.Left - 1 && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect1.Bottom, rect2.Top, rect2.Bottom));
@@ -143,7 +143,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">RECT to test if it's docked</param>
         /// <param name="rect2">RECT rect to be docked to</param>
         /// <returns>bool with true if they are docked</returns>
-        public static bool IsDockedToRightOf(this RECT rect1, RECT rect2)
+        public static bool IsDockedToRightOf(this NativeRect rect1, NativeRect rect2)
         {
             // Test if the right is one pixel to the left, and if top or bottom is within the rect2 height.
             return rect1.Left == rect2.Right + 1 && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect1.Bottom, rect2.Top, rect2.Bottom));

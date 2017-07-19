@@ -43,7 +43,7 @@ namespace Dapplo.Windows.User32.Structs
 
 		private readonly CursorInfoFlags _flags;
 		private readonly IntPtr _hCursor;
-		private readonly POINT _ptScreenPos;
+		private readonly NativePoint _ptScreenPos;
 
 
 		/// <summary>
@@ -59,7 +59,7 @@ namespace Dapplo.Windows.User32.Structs
 		/// <summary>
 		/// A structure that receives the screen coordinates of the cursor.
 		/// </summary>
-		public POINT Location => _ptScreenPos;
+		public NativePoint Location => _ptScreenPos;
 
 		/// <summary>
 		/// Factory for the structure

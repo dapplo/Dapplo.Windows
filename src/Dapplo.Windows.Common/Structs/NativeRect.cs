@@ -22,20 +22,25 @@
 #region using
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
 
 namespace Dapplo.Windows.Common.Structs
 {
     /// <summary>
+    ///     NativeRect represents the native RECT structure for calling native methods.
     ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd162897.aspx">RECT struct</a>
+    ///     It has conversions from and to System.Drawing.Rectangle or System.Windows.Rect
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
-    public struct RECT
+    [TypeConverter(typeof(NativeRectTypeConverter))]
+    public struct NativeRect
     {
         private int _left;
         private int _top;
@@ -49,7 +54,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <param name="top">int</param>
         /// <param name="right">int</param>
         /// <param name="bottom">int</param>
-        public RECT(int left, int top, int right, int bottom)
+        public NativeRect(int left, int top, int right, int bottom)
         {
             _left = left;
             _top = top;
@@ -60,9 +65,9 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         ///     Constructor from location and size
         /// </summary>
-        /// <param name="location">POINT</param>
-        /// <param name="size">SIZE</param>
-        public RECT(POINT location, SIZE size)
+        /// <param name="location">NativePoint</param>
+        /// <param name="size">NativeSize</param>
+        public NativeRect(NativePoint location, NativeSize size)
         {
             _left = location.X;
             _top = location.Y;
@@ -75,8 +80,8 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="left">int</param>
         /// <param name="top">int</param>
-        /// <param name="size">SIZE</param>
-        public RECT(int left, int top, SIZE size) : this(new POINT(left, top), size)
+        /// <param name="size">NativeSize</param>
+        public NativeRect(int left, int top, NativeSize size) : this(new NativePoint(left, top), size)
         {
         }
 
@@ -155,39 +160,39 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         ///     Location (for this RECT
         /// </summary>
-        public POINT Location => new POINT(Left, Top);
+        public NativePoint Location => new NativePoint(Left, Top);
 
         /// <summary>
         ///     Size for this RECT
         /// </summary>
-        public SIZE Size => new SIZE(Width, Height);
+        public NativeSize Size => new NativeSize(Width, Height);
 
         /// <summary>
         ///     Coordinates of the bottom left
         /// </summary>
-        public POINT BottomLeft => new POINT(X, Y + Height);
+        public NativePoint BottomLeft => new NativePoint(X, Y + Height);
 
         /// <summary>
         ///     Coordinates of the top left
         /// </summary>
-        public POINT TopLeft => new POINT(X, Y);
+        public NativePoint TopLeft => new NativePoint(X, Y);
 
         /// <summary>
         ///     Coordinates of the bottom right
         /// </summary>
-        public POINT BottomRight => new POINT(X + Width, Y + Height);
+        public NativePoint BottomRight => new NativePoint(X + Width, Y + Height);
 
         /// <summary>
         ///     Coordinates of the top right
         /// </summary>
-        public POINT TopRight => new POINT(X + Width, Y);
+        public NativePoint TopRight => new NativePoint(X + Width, Y);
 
         /// <summary>
         ///     Cast RECT to Rect
         /// </summary>
         /// <param name="rectangle">RECT</param>
         /// <returns>Rect</returns>
-        public static implicit operator Rect(RECT rectangle)
+        public static implicit operator Rect(NativeRect rectangle)
         {
             return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
         }
@@ -197,9 +202,9 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="rectangle">Rect</param>
         /// <returns>RECT</returns>
-        public static implicit operator RECT(Rect rectangle)
+        public static implicit operator NativeRect(Rect rectangle)
         {
-            return new RECT((int) rectangle.Left, (int) rectangle.Top, (int) rectangle.Right, (int) rectangle.Bottom);
+            return new NativeRect((int) rectangle.Left, (int) rectangle.Top, (int) rectangle.Right, (int) rectangle.Bottom);
         }
 
         /// <summary>
@@ -207,7 +212,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="rectangle">RECT</param>
         /// <returns>Rectangle</returns>
-        public static implicit operator Rectangle(RECT rectangle)
+        public static implicit operator Rectangle(NativeRect rectangle)
         {
             return new Rectangle(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
         }
@@ -217,9 +222,9 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="rectangle"></param>
         /// <returns>RECT</returns>
-        public static implicit operator RECT(Rectangle rectangle)
+        public static implicit operator NativeRect(Rectangle rectangle)
         {
-            return new RECT(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+            return new NativeRect(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
         }
 
         /// <summary>
@@ -228,7 +233,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <param name="rectangle1">RECT</param>
         /// <param name="rectangle2">RECT</param>
         /// <returns>bool true if they are equal</returns>
-        public static bool operator ==(RECT rectangle1, RECT rectangle2)
+        public static bool operator ==(NativeRect rectangle1, NativeRect rectangle2)
         {
             return rectangle1.Equals(rectangle2);
         }
@@ -239,7 +244,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <param name="rectangle1"></param>
         /// <param name="rectangle2"></param>
         /// <returns>bool</returns>
-        public static bool operator !=(RECT rectangle1, RECT rectangle2)
+        public static bool operator !=(NativeRect rectangle1, NativeRect rectangle2)
         {
             return !rectangle1.Equals(rectangle2);
         }
@@ -261,7 +266,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="rectangle"></param>
         /// <returns>bool</returns>
-        public bool Equals(RECT rectangle)
+        public bool Equals(NativeRect rectangle)
         {
             return rectangle.Left == _left && rectangle.Top == _top && rectangle.Right == _right && rectangle.Bottom == _bottom;
         }
@@ -275,31 +280,31 @@ namespace Dapplo.Windows.Common.Structs
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (obj is RECT)
+            if (obj is NativeRect)
             {
-                return Equals((RECT) obj);
+                return Equals((NativeRect) obj);
             }
             if (obj is Rect)
             {
-                RECT rect = (Rect) obj;
+                NativeRect rect = (Rect) obj;
                 return Equals(rect);
             }
             if (obj is Rectangle)
             {
-                RECT rect = (Rectangle) obj;
+                NativeRect rect = (Rectangle) obj;
                 return Equals(rect);
             }
             return false;
         }
 
         /// <summary>
-        ///     Empty RECT
+        ///     Empty NativeRect
         /// </summary>
-        public static RECT Empty => new RECT();
+        public static NativeRect Empty { get; } = new NativeRect();
 
         /// <summary>
         ///     SizeOf for this struct
         /// </summary>
-        public static int SizeOf => Marshal.SizeOf(typeof(RECT));
+        public static int SizeOf => Marshal.SizeOf(typeof(NativeRect));
     }
 }

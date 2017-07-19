@@ -22,19 +22,23 @@
 #region using
 
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
 
 namespace Dapplo.Windows.Common.Structs
 {
     /// <summary>
-    ///     POINT structure for calling native methods
+    ///     NativePoint represents the native POINT structure for calling native methods.
+    ///     It has conversions from and to System.Drawing.Point or System.Windows.Point
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
-    public struct POINT
+    [TypeConverter(typeof(NativePointTypeConverter))]
+    public struct NativePoint
     {
         private int _x;
         private int _y;
@@ -62,46 +66,46 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="x">int</param>
         /// <param name="y">int</param>
-        public POINT(int x, int y)
+        public NativePoint(int x, int y)
         {
             _x = x;
             _y = y;
         }
 
         /// <summary>
-        ///     Implicit cast from POINT to Point
+        ///     Implicit cast from NativePoint to Point
         /// </summary>
-        /// <param name="point">POINT</param>
-        public static implicit operator Point(POINT point)
+        /// <param name="point">NativePoint</param>
+        public static implicit operator Point(NativePoint point)
         {
             return new Point(point.X, point.Y);
         }
 
         /// <summary>
-        ///     Implicit cast from POINT to System.Drawing.Point
+        ///     Implicit cast from NativePoint to System.Drawing.Point
         /// </summary>
-        /// <param name="point">POINT</param>
-        public static implicit operator System.Drawing.Point(POINT point)
+        /// <param name="point">NativePoint</param>
+        public static implicit operator System.Drawing.Point(NativePoint point)
         {
             return new System.Drawing.Point(point.X, point.Y);
         }
 
         /// <summary>
-        ///     Implicit cast from Point to POINT
+        ///     Implicit cast from Point to NativePoint
         /// </summary>
         /// <param name="point">Point</param>
-        public static implicit operator POINT(Point point)
+        public static implicit operator NativePoint(Point point)
         {
-            return new POINT((int) point.X, (int) point.Y);
+            return new NativePoint((int) point.X, (int) point.Y);
         }
 
         /// <summary>
-        ///     Implicit cast from System.Drawing.Point to POINT
+        ///     Implicit cast from System.Drawing.Point to NativePoint
         /// </summary>
         /// <param name="point">System.Drawing.Point</param>
-        public static implicit operator POINT(System.Drawing.Point point)
+        public static implicit operator NativePoint(System.Drawing.Point point)
         {
-            return new POINT(point.X, point.Y);
+            return new NativePoint(point.X, point.Y);
         }
 
         /// <inheritdoc />
@@ -109,5 +113,10 @@ namespace Dapplo.Windows.Common.Structs
         {
             return X + "," + Y;
         }
+
+        /// <summary>
+        ///     Empty NativePoint
+        /// </summary>
+        public static NativePoint Empty { get; } = new NativePoint();
     }
 }

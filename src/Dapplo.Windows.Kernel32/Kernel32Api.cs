@@ -44,6 +44,60 @@ namespace Dapplo.Windows.Kernel32
         public const uint ATTACHCONSOLE_ATTACHPARENTPROCESS = 0x0ffffffff;
 
         /// <summary>
+        /// A helper method to prevent Dll Hijacking, this drastically reduces the DLL search paths!!!!!
+        /// </summary>
+        /// <param name="allowDllDirectory">An optional single directory where additional  DLL searches are made</param>
+        public static void PreventDllHijacking(string allowDllDirectory = "")
+        {
+            SetDllDirectory(allowDllDirectory);
+            if (string.IsNullOrWhiteSpace(allowDllDirectory))
+            {
+                SetDefaultDllDirectories(DefaultDllDirectories.SearchSystem32Directory);
+            }
+            else
+            {
+                SetDefaultDllDirectories(DefaultDllDirectories.SearchSystem32Directory | DefaultDllDirectories.SearchUserDirectories);
+            }
+        }
+
+        /// <summary>
+        /// Specifies a default set of directories to search when the calling process loads a DLL. This search path is used when LoadLibraryEx is called with no LOAD_LIBRARY_SEARCH flags.
+        ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/hh310515(v=vs.85).aspx">SetDefaultDllDirectories function</a>
+        /// </summary>
+        /// <param name="directoryFlags">DefaultDllDirectories with the directories to search. This parameter can be any combination of the following values.</param>
+        /// <returns>
+        /// If the function succeeds, the return value is nonzero.
+        /// If the function fails, the return value is zero. To get extended error information, call GetLastError.
+        /// </returns>
+        /// <remarks>
+        /// The DLL search path is the set of directories that are searched for a DLL when a full path is not specified in a LoadLibrary or LoadLibraryEx function call, or when a full path to the DLL is specified but the system must search for dependent DLLs. For more information about the standard DLL search path, see Dynamic-Link Library Search Order.
+        /// The standard DLL search path contains directories that can be vulnerable to a DLL pre-loading attack. An application can use the SetDefaultDllDirectories function to specify a default DLL search path for the process that eliminates the most vulnerable directories and limits the other directories that are searched. The process DLL search path applies only to the calling process and persists for the life of the process.
+        /// If the DirectoryFlags parameter specifies more than one flag, the directories are searched in the following order:
+        /// The directory that contains the DLL (LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR). This directory is searched only for dependencies of the DLL being loaded.
+        /// The application directory (LOAD_LIBRARY_SEARCH_APPLICATION_DIR).
+        /// Paths explicitly added to the application search path with the AddDllDirectory function (LOAD_LIBRARY_SEARCH_USER_DIRS) or the SetDllDirectory function. If more than one path has been added, the order in which the paths are searched is unspecified.
+        /// The System directory (LOAD_LIBRARY_SEARCH_SYSTEM32).
+        /// If SetDefaultDllDirectories does not specify LOAD_LIBRARY_SEARCH_USER_DIRS, directories specified with the AddDllDirectory function are used only for LoadLibraryEx function calls that specify LOAD_LIBRARY_SEARCH_USER_DIRS.
+        /// It is not possible to revert to the standard DLL search path or remove any directory specified with SetDefaultDllDirectories from the search path. However, the process DLL search path can be overridden by calling LoadLibraryEx with one or more LOAD_LIBRARY_SEARCH flags, and directories added with AddDllDirectory can be removed by calling RemoveDllDirectory.
+        /// Windows 7, Windows Server 2008 R2, Windows Vista and Windows Server 2008:  To call this function in an application, use the GetProcAddress function to retrieve its address from Kernel32.dll. KB2533623 must be installed on the target platform.
+        /// </remarks>
+        [DllImport("kernel32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetDefaultDllDirectories(DefaultDllDirectories directoryFlags);
+
+        /// <summary>
+        /// Adds a directory to the search path used to locate DLLs for the application.
+        /// </summary>
+        /// <param name="lpPathName">The directory to be added to the search path. If this parameter is an empty string (""), the call removes the current directory from the default DLL search order. If this parameter is NULL, the function restores the default search order.</param>
+        /// <returns>
+        /// If the function succeeds, the return value is nonzero.
+        /// If the function fails, the return value is zero. To get extended error information, call GetLastError.
+        /// </returns>
+        [DllImport("kernel32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetDllDirectory(string lpPathName);
+
+        /// <summary>
         /// Allocates a new console for the calling process.
         /// </summary>
         /// <returns></returns>

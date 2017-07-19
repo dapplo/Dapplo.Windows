@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -47,6 +46,11 @@ namespace Dapplo.Windows.User32
     public static class User32Api
     {
         /// <summary>
+        /// The DLL Name for the User32 library
+        /// </summary>
+        public const string User32 = "user32";
+
+        /// <summary>
         ///     Delegate description for the windows enumeration
         /// </summary>
         /// <param name="hwnd"></param>
@@ -65,7 +69,7 @@ namespace Dapplo.Windows.User32
         {
             var result = new List<DisplayInfo>();
             int index = 1;
-            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr monitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr data) =>
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr monitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr data) =>
             {
                 var monitorInfoEx = MonitorInfoEx.Create();
                 var success = GetMonitorInfo(monitor, ref monitorInfoEx);
@@ -135,16 +139,16 @@ namespace Dapplo.Windows.User32
         ///     Retrieves the cursor location safely, accounting for DPI settings in Vista/Windows 7.
         /// </summary>
         /// <returns>
-        ///     POINT with cursor location, relative to the origin of the monitor setup
+        ///     NativePoint with cursor location, relative to the origin of the monitor setup
         ///     (i.e. negative coordinates arepossible in multiscreen setups)
         /// </returns>
-        public static POINT GetCursorLocation()
+        public static NativePoint GetCursorLocation()
         {
             if (Environment.OSVersion.Version.Major >= 6 && _canCallGetPhysicalCursorPos)
             {
                 try
                 {
-                    POINT cursorLocation;
+                    NativePoint cursorLocation;
                     if (GetPhysicalCursorPos(out cursorLocation))
                     {
                         return cursorLocation;
@@ -158,7 +162,7 @@ namespace Dapplo.Windows.User32
                     _canCallGetPhysicalCursorPos = false;
                 }
             }
-            return new POINT(Cursor.Position.X, Cursor.Position.Y);
+            return new NativePoint(Cursor.Position.X, Cursor.Position.Y);
         }
 
         /// <summary>
@@ -261,7 +265,7 @@ namespace Dapplo.Windows.User32
             }
         }
 
-        private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
+        private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr dwData);
 
         #region Native imports
 
@@ -277,7 +281,7 @@ namespace Dapplo.Windows.User32
         /// The visibility state of a window is indicated by the WS_VISIBLE style bit. When WS_VISIBLE is set, the window is displayed and subsequent drawing into it is displayed as long as the window has the WS_VISIBLE style.
         /// Any drawing to a window with the WS_VISIBLE style will not be displayed if the window is obscured by other windows or is clipped by its parent window.
         /// </returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool IsWindowVisible(IntPtr hWnd);
 
@@ -289,11 +293,18 @@ namespace Dapplo.Windows.User32
         /// If the window handle identifies an existing window, the return value is true.
         /// If the window handle does not identify an existing window, the return value is false.
         /// </returns>
-        [DllImport("user32")]
+        [DllImport(User32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool IsWindow(IntPtr hWnd);
 
-        [DllImport("user32", SetLastError = true)]
+        /// <summary>
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633522(v=vs.85).aspx">GetWindowThreadProcessId function</a>
+        /// Retrieves the identifier of the thread that created the specified window and, optionally, the identifier of the process that created the window.
+        /// </summary>
+        /// <param name="hWnd">A handle to the window.</param>
+        /// <param name="processId">A pointer to a variable that receives the process identifier. If this parameter is not NULL, GetWindowThreadProcessId copies the identifier of the process to the variable; otherwise, it does not.</param>
+        /// <returns>The return value is the identifier of the thread that created the window.</returns>
+        [DllImport(User32, SetLastError = true)]
         public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int processId);
 
         /// <summary>
@@ -306,7 +317,7 @@ namespace Dapplo.Windows.User32
         ///     If the window is a child window, the return value is a handle to the parent window. If the window is a top-level
         ///     window with the WS_POPUP style, the return value is a handle to the owner window.
         /// </returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetParent(IntPtr hWnd);
 
         /// <summary>
@@ -320,7 +331,7 @@ namespace Dapplo.Windows.User32
         ///     If the function succeeds, the return value is a handle to the previous parent window.
         ///     If the function fails, the return value is NULL. To get extended error information, call GetLastError.
         /// </returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
         /// <summary>
@@ -337,7 +348,7 @@ namespace Dapplo.Windows.User32
         ///     handle is to be retrieved. See GetWindowCommands
         /// </param>
         /// <returns></returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommands getWindowCommand);
 
         /// <summary>
@@ -355,7 +366,7 @@ namespace Dapplo.Windows.User32
         ///     In subsequent calls, this parameter can be one of the following values.
         /// </param>
         /// <returns>bool</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern bool ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);
 
         /// <summary>
@@ -365,13 +376,22 @@ namespace Dapplo.Windows.User32
         /// <param name="lpString">StringBuilder which is marshalled as buffer</param>
         /// <param name="capacity">size of the buffer</param>
         /// <returns>int with the size of the caption</returns>
-        [DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int capacity);
 
-        [DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
+        /// <summary>
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633521.aspx">GetWindowTextLength  function</a>
+        /// Retrieves the length, in characters, of the specified window's title bar text (if the window has a title bar). If the specified window is a control, the function retrieves the length of the text within the control. However, GetWindowTextLength cannot retrieve the length of the text of an edit control in another application.
+        /// </summary>
+        /// <param name="hWnd">A handle to the window or control.</param>
+        /// <returns>
+        /// If the function succeeds, the return value is the length, in characters, of the text. Under certain conditions, this value may actually be greater than the length of the text. For more information, see the following Remarks section.
+        /// If the window has no text, the return value is zero. To get extended error information, call GetLastError.
+        /// </returns>
+        [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern int GetWindowTextLength(IntPtr hWnd);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern uint GetSysColor(int nIndex);
 
         /// <summary>
@@ -379,18 +399,18 @@ namespace Dapplo.Windows.User32
         /// </summary>
         /// <param name="hWnd">IntPtr specifying the hWnd</param>
         /// <returns>true if the call was successfull</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool BringWindowToTop(IntPtr hWnd);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetForegroundWindow();
 
         /// <summary>
         ///     Get the hWnd of the Desktop window
         /// </summary>
         /// <returns>IntPtr</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetDesktopWindow();
 
         /// <summary>
@@ -398,7 +418,7 @@ namespace Dapplo.Windows.User32
         /// </summary>
         /// <param name="hWnd">IntPtr with the handle to the window</param>
         /// <returns>bool</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
 
@@ -416,7 +436,7 @@ namespace Dapplo.Windows.User32
         ///     value is NULL.
         ///     To get extended error information, call GetLastError.
         /// </returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr SetFocus(IntPtr hWnd);
 
         /// <summary>
@@ -425,7 +445,7 @@ namespace Dapplo.Windows.User32
         /// <param name="hWnd">IntPtr</param>
         /// <param name="windowPlacement">WindowPlacement</param>
         /// <returns>true if success</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetWindowPlacement(IntPtr hWnd, ref WindowPlacement windowPlacement);
 
@@ -435,7 +455,7 @@ namespace Dapplo.Windows.User32
         /// <param name="hWnd">IntPtr</param>
         /// <param name="windowPlacement">WindowPlacement</param>
         /// <returns>true if the call was sucessfull</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WindowPlacement windowPlacement);
 
@@ -444,7 +464,7 @@ namespace Dapplo.Windows.User32
         /// </summary>
         /// <param name="hWnd">IntPtr for the hWnd</param>
         /// <returns>true if minimized</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool IsIconic(IntPtr hWnd);
 
@@ -453,7 +473,7 @@ namespace Dapplo.Windows.User32
         /// </summary>
         /// <param name="hwnd">IntPtr for the hWnd</param>
         /// <returns>true if maximized</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool IsZoomed(IntPtr hwnd);
 
@@ -464,13 +484,13 @@ namespace Dapplo.Windows.User32
         /// <param name="className">StringBuilder to place the classname into</param>
         /// <param name="nMaxCount">max size for the string builder length</param>
         /// <returns>nr of characters returned</returns>
-        [DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern int GetClassName(IntPtr hWnd, StringBuilder className, int nMaxCount);
 
-        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern IntPtr GetClassLong(IntPtr hWnd, ClassLongIndex index);
 
-        [DllImport("user32", SetLastError = true, EntryPoint = "GetClassLongPtr")]
+        [DllImport(User32, SetLastError = true, EntryPoint = "GetClassLongPtr")]
         private static extern IntPtr GetClassLongPtr(IntPtr hWnd, ClassLongIndex index);
 
         /// <summary>
@@ -481,11 +501,11 @@ namespace Dapplo.Windows.User32
         /// <param name="hDc">IntPtr</param>
         /// <param name="printWindowFlags">PrintWindowFlags</param>
         /// <returns>bool</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool PrintWindow(IntPtr hwnd, IntPtr hDc, PrintWindowFlags printWindowFlags);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, SysCommands sysCommand, IntPtr lParam);
 
         /// <summary>
@@ -496,10 +516,10 @@ namespace Dapplo.Windows.User32
         /// <param name="scrollBarCommand">ScrollBarCommands</param>
         /// <param name="lParam"></param>
         /// <returns>0</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern int SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, ScrollBarCommands scrollBarCommand, int lParam);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, IntPtr lParam);
 
         /// <summary>
@@ -510,7 +530,7 @@ namespace Dapplo.Windows.User32
         /// <param name="wParam">int</param>
         /// <param name="lParam">int</param>
         /// <returns></returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, int lParam);
 
         /// <summary>
@@ -532,22 +552,22 @@ namespace Dapplo.Windows.User32
         /// <param name="wParam">int with the capacity of the string builder</param>
         /// <param name="lParam">StringBuilder</param>
         /// <returns></returns>
-        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, StringBuilder lParam);
 
-        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
-        [DllImport("user32", SetLastError = true, EntryPoint = "GetWindowLong")]
+        [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLong")]
         private static extern int GetWindowLong(IntPtr hwnd, WindowLongIndex index);
 
-        [DllImport("user32", SetLastError = true, EntryPoint = "GetWindowLongPtr")]
+        [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLongPtr")]
         private static extern IntPtr GetWindowLongPtr(IntPtr hwnd, WindowLongIndex nIndex);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         private static extern int SetWindowLong(IntPtr hWnd, WindowLongIndex index, int styleFlags);
 
-        [DllImport("user32", SetLastError = true, EntryPoint = "SetWindowLongPtr")]
+        [DllImport(User32, SetLastError = true, EntryPoint = "SetWindowLongPtr")]
         private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, WindowLongIndex index, IntPtr styleFlags);
 
         /// <summary>
@@ -562,7 +582,7 @@ namespace Dapplo.Windows.User32
         /// <param name="hwnd"></param>
         /// <param name="monitorFrom">MonitorFromFlags</param>
         /// <returns>IntPtr for the monitor</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr MonitorFromWindow(IntPtr hwnd, MonitorFrom monitorFrom);
 
         /// <summary>
@@ -574,8 +594,8 @@ namespace Dapplo.Windows.User32
         /// <param name="rect">A RECT structure that specifies the rectangle of interest in virtual-screen coordinates.</param>
         /// <param name="monitorFrom">MonitorFromRectFlags</param>
         /// <returns>HMONITOR handle</returns>
-        [DllImport("user32", SetLastError = true)]
-        public static extern IntPtr MonitorFromRect([In] ref RECT rect, MonitorFrom monitorFrom);
+        [DllImport(User32, SetLastError = true)]
+        public static extern IntPtr MonitorFromRect([In] ref NativeRect rect, MonitorFrom monitorFrom);
 
         /// <summary>
         ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633516(v=vs.85).aspx">GetWindowInfo</a>
@@ -584,7 +604,7 @@ namespace Dapplo.Windows.User32
         /// <param name="hwnd">IntPtr</param>
         /// <param name="windowInfo">WindowInfo (use WindowInfo.Create)</param>
         /// <returns>bool if false than get the last error</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetWindowInfo(IntPtr hwnd, ref WindowInfo windowInfo);
 
@@ -594,7 +614,7 @@ namespace Dapplo.Windows.User32
         /// <param name="enumFunc">EnumWindowsProc</param>
         /// <param name="param">An application-defined value to be passed to the callback function.</param>
         /// <returns>true if success</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool EnumWindows(EnumWindowsProc enumFunc, IntPtr param);
 
@@ -613,7 +633,7 @@ namespace Dapplo.Windows.User32
         /// <param name="enumFunc">EnumWindowsProc</param>
         /// <param name="param">An application-defined value to be passed to the callback function.</param>
         /// <returns></returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern bool EnumThreadWindows(int threadId, EnumWindowsProc enumFunc, IntPtr param);
 
         /// <summary>
@@ -623,7 +643,7 @@ namespace Dapplo.Windows.User32
         /// <param name="enumFunc">EnumWindowsProc</param>
         /// <param name="param">An application-defined value to be passed to the callback function.</param>
         /// <returns>true if success</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool EnumChildWindows(IntPtr hWndParent, EnumWindowsProc enumFunc, IntPtr param);
 
@@ -635,7 +655,7 @@ namespace Dapplo.Windows.User32
         /// <param name="scrollBar">ScrollBarTypes</param>
         /// <param name="scrollInfo">ScrollInfo ref</param>
         /// <returns>bool if it worked</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo);
 
@@ -648,7 +668,7 @@ namespace Dapplo.Windows.User32
         /// <param name="scrollInfo">ScrollInfo ref</param>
         /// <param name="redraw">bool to specify if a redraw should be made</param>
         /// <returns>bool if it worked</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo, bool redraw);
 
@@ -664,7 +684,7 @@ namespace Dapplo.Windows.User32
         ///     If the function succeeds, the return value is nonzero.
         ///     If the function fails, the return value is zero. To get extended error information, call GetLastError.
         /// </returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ShowScrollBar(IntPtr hwnd, ScrollBarTypes scrollBar, [MarshalAs(UnmanagedType.Bool)] bool show);
 
@@ -684,7 +704,7 @@ namespace Dapplo.Windows.User32
         /// </param>
         /// <param name="scrollBarInfo">ScrollBarInfo ref</param>
         /// <returns>bool</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetScrollBarInfo(IntPtr hwnd, ObjectIdentifiers idObject, ref ScrollBarInfo scrollBarInfo);
 
@@ -695,37 +715,37 @@ namespace Dapplo.Windows.User32
         /// <param name="hWnd">IntPtr</param>
         /// <param name="hRgn">SafeHandle</param>
         /// <returns>RegionResults</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern RegionResults GetWindowRgn(IntPtr hWnd, SafeHandle hRgn);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, WindowPos uFlags);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetTopWindow(IntPtr hWnd);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetDC(IntPtr hwnd);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetClipboardOwner();
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr SetClipboardViewer(IntPtr hWndNewViewer);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ChangeClipboardChain(IntPtr hWndRemove, IntPtr hWndNewNext);
 
-        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
-        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
 
         /// uiFlags: 0 - Count of GDI objects
@@ -734,18 +754,18 @@ namespace Dapplo.Windows.User32
         /// - Win32 USER objects:
         /// - 	WIN32 resources (accelerator tables, bitmap resources, dialog box templates, font resources, menu resources, raw data resources, string table entries, message table entries, cursors/icons)
         /// - Other USER objects (windows, menus)
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern uint GetGuiResources(IntPtr hProcess, uint uiFlags);
 
-        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out UIntPtr lpdwResult);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetPhysicalCursorPos(out POINT cursorLocation);
+        private static extern bool GetPhysicalCursorPos(out NativePoint cursorLocation);
 
-        [DllImport("user32", SetLastError = true)]
-        public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, ref POINT lpPoints, [MarshalAs(UnmanagedType.U4)] int cPoints);
+        [DllImport(User32, SetLastError = true)]
+        public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, ref NativePoint lpPoints, [MarshalAs(UnmanagedType.U4)] int cPoints);
 
         /// <summary>
         ///     See
@@ -753,7 +773,7 @@ namespace Dapplo.Windows.User32
         /// </summary>
         /// <param name="index">SystemMetric</param>
         /// <returns>int</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern int GetSystemMetrics(SystemMetric index);
 
         /// <summary>
@@ -761,10 +781,10 @@ namespace Dapplo.Windows.User32
         /// </summary>
         /// <param name="hIcon">IntPtr</param>
         /// <returns>SafeIconHandle</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern SafeIconHandle CopyIcon(IntPtr hIcon);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DestroyIcon(IntPtr hIcon);
 
@@ -775,38 +795,38 @@ namespace Dapplo.Windows.User32
         /// </summary>
         /// <param name="cursorInfo">a CURSORINFO structure</param>
         /// <returns>bool</returns>
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetCursorInfo(out CursorInfo cursorInfo);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern bool GetIconInfo(SafeIconHandle iconHandle, out IconInfo iconInfo);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr SetCapture(IntPtr hWnd);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ReleaseCapture();
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         internal static extern IntPtr OpenInputDesktop(uint dwFlags, [MarshalAs(UnmanagedType.Bool)] bool fInherit, DesktopAccessRight dwDesiredAccess);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool SetThreadDesktop(IntPtr hDesktop);
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CloseDesktop(IntPtr hDesktop);
 
-        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
 
-        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
 
@@ -848,7 +868,7 @@ namespace Dapplo.Windows.User32
         /// <param name="pvParam">string</param>
         /// <param name="fWinIni">SystemParametersInfoBehaviors</param>
         /// <returns>bool</returns>
-        [DllImport("user32", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport(User32, CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, string pvParam, SystemParametersInfoBehaviors fWinIni);
 

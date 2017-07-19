@@ -30,19 +30,19 @@ using System.Windows;
 namespace Dapplo.Windows.Common.Structs
 {
     /// <summary>
-    ///     This structure should be used everywhere where native methods need a size struct.
+    ///     This structure should be used everywhere where native methods need a size-f struct.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
-    public struct SIZE
+    public struct NativeSizeFloat
     {
-        private int _width;
-        private int _height;
+        private float _width;
+        private float _height;
 
         /// <summary>
         ///     The Width of the size struct
         /// </summary>
-        public int Width
+        public float Width
         {
             get { return _width; }
             set { _width = value; }
@@ -51,7 +51,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         ///     The Width of the size struct
         /// </summary>
-        public int Height
+        public float Height
         {
             get { return _height; }
             set { _height = value; }
@@ -60,13 +60,13 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         ///     Returns an empty size
         /// </summary>
-        public static SIZE Empty => new SIZE(0, 0);
+        public static NativeSizeFloat Empty { get; } = new NativeSizeFloat(0, 0);
 
         /// <summary>
         ///     Constructor from S.W.Size
         /// </summary>
         /// <param name="size"></param>
-        public SIZE(Size size)
+        public NativeSizeFloat(Size size)
             : this((int) size.Width, (int) size.Height)
         {
         }
@@ -75,16 +75,16 @@ namespace Dapplo.Windows.Common.Structs
         ///     Constructor from S.D.Size
         /// </summary>
         /// <param name="size"></param>
-        public SIZE(System.Drawing.Size size) : this(size.Width, size.Height)
+        public NativeSizeFloat(System.Drawing.Size size) : this(size.Width, size.Height)
         {
         }
 
         /// <summary>
         ///     Size contructor
         /// </summary>
-        /// <param name="width">int</param>
-        /// <param name="height">int</param>
-        public SIZE(int width, int height)
+        /// <param name="width">float</param>
+        /// <param name="height">float</param>
+        public NativeSizeFloat(float width, float height)
         {
             _width = width;
             _height = height;
@@ -97,39 +97,39 @@ namespace Dapplo.Windows.Common.Structs
         public bool IsEmpty => _width * _height == 0;
 
         /// <summary>
-        ///     Implicit cast from SIZE to Size
+        ///     Implicit cast from NativeSizeFloat to Size
         /// </summary>
-        /// <param name="size">SIZE</param>
-        public static implicit operator Size(SIZE size)
+        /// <param name="size">NativeSize</param>
+        public static implicit operator Size(NativeSizeFloat size)
         {
             return new Size(size.Width, size.Height);
         }
 
         /// <summary>
-        ///     Implicit cast from Size to SIZE
+        ///     Implicit cast from Size to NativeSizeFloat
         /// </summary>
         /// <param name="size">Size</param>
-        public static implicit operator SIZE(Size size)
+        public static implicit operator NativeSizeFloat(Size size)
         {
-            return new SIZE((int) size.Width, (int) size.Height);
+            return new NativeSizeFloat((float)size.Width, (float)size.Height);
         }
 
         /// <summary>
-        ///     Implicit cast from SIZE to System.Drawing.Size
+        ///     Implicit cast from NativeSize to System.Drawing.Size
         /// </summary>
-        /// <param name="size">SIZE</param>
-        public static implicit operator System.Drawing.Size(SIZE size)
+        /// <param name="size">NativeSizeFloat</param>
+        public static implicit operator System.Drawing.Size(NativeSizeFloat size)
         {
-            return new System.Drawing.Size(size.Width, size.Height);
+            return new System.Drawing.Size((int)size.Width, (int)size.Height);
         }
 
         /// <summary>
-        ///     Implicit cast from System.Drawing.Size to SIZE
+        ///     Implicit cast from System.Drawing.Size to NativeSizeFloat
         /// </summary>
         /// <param name="size">System.Drawing.Size</param>
-        public static implicit operator SIZE(System.Drawing.Size size)
+        public static implicit operator NativeSizeFloat(System.Drawing.Size size)
         {
-            return new SIZE(size.Width, size.Height);
+            return new NativeSizeFloat(size.Width, size.Height);
         }
 
         /// <inheritdoc />

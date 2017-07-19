@@ -22,11 +22,15 @@
 #region using
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.User32.Enums;
+using Dapplo.Windows.User32.Structs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -84,6 +88,32 @@ namespace Dapplo.Windows.Tests
                 break;
             }
             Assert.True(foundWindow);
+        }
+
+
+        /// <summary>
+        ///     Test WindowPlacement_TypeConverter
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        private void TestWindowPlacement_TypeConverter()
+        {
+            var windowPlacement = WindowPlacement.Create();
+            windowPlacement.MinPosition = new NativePoint(10, 10);
+            windowPlacement.MaxPosition = new NativePoint(100, 100);
+            windowPlacement.NormalPosition = new NativeRect(100, 100, 200, 200);
+            windowPlacement.ShowCmd = ShowWindowCommands.Normal;
+
+            var typeConverter = TypeDescriptor.GetConverter(typeof(WindowPlacement));
+            Assert.NotNull(typeConverter);
+            var stringRepresentation = typeConverter.ConvertToInvariantString(windowPlacement);
+            Assert.Equal("Normal|10,10|100,100|100,100,200,200", stringRepresentation);
+            var windowPlacementResult = (WindowPlacement?)typeConverter.ConvertFromInvariantString(stringRepresentation);
+            Assert.True(windowPlacementResult.HasValue);
+            if (windowPlacementResult.HasValue)
+            {
+                Assert.Equal(windowPlacement, windowPlacementResult.Value);
+            }
         }
     }
 }

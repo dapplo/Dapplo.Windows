@@ -160,7 +160,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         ///     parameter.
         /// </returns>
         [DllImport("dwmapi", SetLastError = true)]
-        public static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttribute, out RECT lpRect, int size);
+        public static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttribute, out NativeRect lpRect, int size);
 
         /// <summary>
         ///     See
@@ -208,10 +208,10 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// Retrieves the source size of the Desktop Window Manager (DWM) thumbnail.
         /// </summary>
         /// <param name="hThumbnail">A handle to the thumbnail to retrieve the source window size from.</param>
-        /// <param name="size">a SIZE structure that, when this function returns successfully, receives the size of the source thumbnail.</param>
+        /// <param name="size">a NativeSize structure that, when this function returns successfully, receives the size of the source thumbnail.</param>
         /// <returns>HResult</returns>
         [DllImport("dwmapi", SetLastError = true)]
-        public static extern HResult DwmQueryThumbnailSourceSize(IntPtr hThumbnail, out SIZE size);
+        public static extern HResult DwmQueryThumbnailSourceSize(IntPtr hThumbnail, out NativeSize size);
 
         /// <summary>
         /// Creates a Desktop Window Manager (DWM) thumbnail relationship between the destination and source windows.
@@ -242,7 +242,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="setIconicLivePreviewFlags">The display options for the live preview.</param>
         /// <returns>HResult</returns>
         [DllImport("dwmapi", SetLastError = true)]
-        internal static extern HResult DwmSetIconicLivePreviewBitmap(IntPtr hwnd, IntPtr hbitmap, ref POINT ptClient, DwmSetIconicLivePreviewFlags setIconicLivePreviewFlags);
+        internal static extern HResult DwmSetIconicLivePreviewBitmap(IntPtr hwnd, IntPtr hbitmap, ref NativePoint ptClient, DwmSetIconicLivePreviewFlags setIconicLivePreviewFlags);
 
         /// <summary>
         ///     Sets the value of non-client rendering attributes for a window.
@@ -297,14 +297,14 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="hWnd">IntPtr</param>
         /// <param name="rectangle">out RECT</param>
         /// <returns>bool true if it worked</returns>
-        public static bool GetExtendedFrameBounds(IntPtr hWnd, out RECT rectangle)
+        public static bool GetExtendedFrameBounds(IntPtr hWnd, out NativeRect rectangle)
         {
-            var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.DWMWA_EXTENDED_FRAME_BOUNDS, out rectangle, RECT.SizeOf);
+            var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.DWMWA_EXTENDED_FRAME_BOUNDS, out rectangle, NativeRect.SizeOf);
             if (result.Succeeded())
             {
                 return true;
             }
-            rectangle = RECT.Empty;
+            rectangle = NativeRect.Empty;
             return false;
         }
 

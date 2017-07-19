@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Shell32.Structs
         private uint _uCallbackMessage;
         private AppBarEdges _uEdge;
 
-        private RECT _rc;
+        private NativeRect _rc;
         private int _lParam;
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Dapplo.Windows.Shell32.Structs
         /// ABM_GETTASKBARPOS, ABM_QUERYPOS, ABM_SETPOS: The bounding rectangle, in screen coordinates, of an appbar or the Windows taskbar.
         /// ABM_GETAUTOHIDEBAREX, ABM_SETAUTOHIDEBAREX: The monitor on which the operation is being performed. This information can be retrieved through the GetMonitorInfo function.
         /// </summary>
-        public RECT Bounds
+        public NativeRect Bounds
         {
             get { return _rc; }
             set { _rc = value; }

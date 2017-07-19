@@ -41,7 +41,7 @@ namespace Dapplo.Windows.Citrix.Structs
         /// <summary>
         ///     Return the client's display size
         /// </summary>
-        public SIZE ClientSize => new SIZE((int)_horizontalResolution, (int)_verticalResolution);
+        public NativeSize ClientSize => new NativeSize((int)_horizontalResolution, (int)_verticalResolution);
 
         /// <summary>
         ///     Returns the number of colors the client can display

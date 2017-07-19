@@ -22,20 +22,26 @@
 #region using
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
 
 namespace Dapplo.Windows.Common.Structs
 {
     /// <summary>
+    ///     NativeRect represents the native RECTF structure for calling native methods.
     ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms534497(v=vs.85).aspx">RectF class</a>
+    ///     It has conversions from and to System.Drawing.RectangleF or System.Windows.Rect
+    /// 
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
-    public struct RECTF
+    [TypeConverter(typeof(NativeRectFloatTypeConverter))]
+    public struct NativeRectFloat
     {
         private float _x;
         private float _y;
@@ -43,18 +49,32 @@ namespace Dapplo.Windows.Common.Structs
         private float _height;
 
         /// <summary>
-        ///     Constructor from x,y,width,height
+        ///     Constructor from left, top, right, bottom
+        /// </summary>
+        /// <param name="left">float</param>
+        /// <param name="top">float</param>
+        /// <param name="right">float</param>
+        /// <param name="bottom">float</param>
+        public NativeRectFloat(float left, float top, float right, float bottom)
+        {
+            _x = left;
+            _y = top;
+            _width = right - left;
+            _height = bottom - top;
+        }
+
+        /// <summary>
+        ///     Constructor from x,y, (width,height)
         /// </summary>
         /// <param name="x">int</param>
         /// <param name="y">int</param>
-        /// <param name="width">int</param>
-        /// <param name="height">int</param>
-        public RECTF(float x, float y, float width, float height)
+        /// <param name="nativeSizeFloat">NativeSizeFloat</param>
+        public NativeRectFloat(float x, float y, NativeSizeFloat nativeSizeFloat)
         {
             _x = x;
             _y = y;
-            _width = width;
-            _height = height;
+            _width = nativeSizeFloat.Width;
+            _height = nativeSizeFloat.Height;
         }
 
         /// <summary>
@@ -112,7 +132,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Heigh of the RECT
+        ///     Heigh of the NativeRectFloat
         /// </summary>
         public float Height
         {
@@ -121,7 +141,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Width of the RECT
+        ///     Width of the NativeRectFloat
         /// </summary>
         public float Width
         {
@@ -130,11 +150,11 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Location for this RECT
+        ///     Location for this NativeRectFloat
         /// </summary>
-        public POINT Location
+        public NativePoint Location
         {
-            get { return new POINT((int) Left, (int) Top); }
+            get { return new NativePoint((int) Left, (int) Top); }
             set
             {
                 _x = value.X;
@@ -143,11 +163,11 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Size for this RECT
+        ///     Size for this NativeRectFloat
         /// </summary>
-        public SIZE Size
+        public NativeSize Size
         {
-            get { return new SIZE((int) Width, (int) Height); }
+            get { return new NativeSize((int) Width, (int) Height); }
             set
             {
                 _width = value.Width + _x;
@@ -156,72 +176,72 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Cast RECTF to Rect
+        ///     Cast NativeRectFloat to Rect
         /// </summary>
-        /// <param name="rectangle">RECT</param>
+        /// <param name="rectangle">NativeRectFloat</param>
         /// <returns>Rect</returns>
-        public static implicit operator Rect(RECTF rectangle)
+        public static implicit operator Rect(NativeRectFloat rectangle)
         {
             return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
         }
 
         /// <summary>
-        ///     Cast Rect to RECTF
+        ///     Cast Rect to NativeRectFloat
         /// </summary>
         /// <param name="rectangle">Rect</param>
-        /// <returns>RECTF</returns>
-        public static implicit operator RECTF(Rect rectangle)
+        /// <returns>NativeRectFloat</returns>
+        public static implicit operator NativeRectFloat(Rect rectangle)
         {
-            return new RECTF((int) rectangle.Left, (int) rectangle.Top, (int) rectangle.Right, (int) rectangle.Bottom);
+            return new NativeRectFloat((int) rectangle.Left, (int) rectangle.Top, (int) rectangle.Right, (int) rectangle.Bottom);
         }
 
         /// <summary>
-        ///     Cast RECTF to RectangleF
+        ///     Cast NativeRectFloat to RectangleF
         /// </summary>
-        /// <param name="rectangle">RECT</param>
-        /// <returns>Rectangle</returns>
-        public static implicit operator RectangleF(RECTF rectangle)
+        /// <param name="rectangle">NativeRectFloat</param>
+        /// <returns>RectangleF</returns>
+        public static implicit operator RectangleF(NativeRectFloat rectangle)
         {
             return new RectangleF(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
         }
 
         /// <summary>
-        ///     Cast RECTF to Rectangle
+        ///     Cast NativeRectFloat to Rectangle
         /// </summary>
-        /// <param name="rectangle">RECT</param>
+        /// <param name="rectangle">NativeRectFloat</param>
         /// <returns>Rectangle</returns>
-        public static implicit operator Rectangle(RECTF rectangle)
+        public static implicit operator Rectangle(NativeRectFloat rectangle)
         {
             return new Rectangle((int) rectangle.X, (int) rectangle.Y, (int) rectangle.Width, (int) rectangle.Height);
         }
 
         /// <summary>
-        ///     Cast RectangleF to RECTF
+        ///     Cast RectangleF to NativeRectFloat
         /// </summary>
         /// <param name="rectangle">RectangleF</param>
-        /// <returns>RECTF</returns>
-        public static implicit operator RECTF(RectangleF rectangle)
+        /// <returns>NativeRectFloat</returns>
+        public static implicit operator NativeRectFloat(RectangleF rectangle)
         {
-            return new RECTF(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
         }
 
         /// <summary>
-        ///     Cast Rectangle to RECTF
+        ///     Cast Rectangle to NativeRectFloat
         /// </summary>
         /// <param name="rectangle">Rectangle</param>
-        /// <returns>RECTF</returns>
-        public static implicit operator RECTF(Rectangle rectangle)
+        /// <returns>NativeRectFloat</returns>
+        public static implicit operator NativeRectFloat(Rectangle rectangle)
         {
-            return new RECTF(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
         }
 
         /// <summary>
-        ///     Equals for RECTF
+        ///     Equals for NativeRectFloat
         /// </summary>
-        /// <param name="rectangle1">RECTF</param>
-        /// <param name="rectangle2">RECTF</param>
+        /// <param name="rectangle1">NativeRectFloat</param>
+        /// <param name="rectangle2">NativeRectFloat</param>
         /// <returns>bool true if they are equal</returns>
-        public static bool operator ==(RECTF rectangle1, RECTF rectangle2)
+        public static bool operator ==(NativeRectFloat rectangle1, NativeRectFloat rectangle2)
         {
             return rectangle1.Equals(rectangle2);
         }
@@ -229,10 +249,10 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         ///     Not is operator
         /// </summary>
-        /// <param name="rectangle1">RECTF</param>
-        /// <param name="rectangle2">RECTF</param>
+        /// <param name="rectangle1">NativeRectFloat</param>
+        /// <param name="rectangle2">NativeRectFloat</param>
         /// <returns>bool</returns>
-        public static bool operator !=(RECTF rectangle1, RECTF rectangle2)
+        public static bool operator !=(NativeRectFloat rectangle1, NativeRectFloat rectangle2)
         {
             return !rectangle1.Equals(rectangle2);
         }
@@ -252,9 +272,9 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         ///     Equalss
         /// </summary>
-        /// <param name="rectangle"></param>
+        /// <param name="rectangle">NativeRectFloat</param>
         /// <returns>bool</returns>
-        public bool Equals(RECTF rectangle)
+        public bool Equals(NativeRectFloat rectangle)
         {
             return Math.Abs(rectangle._x - _x) < float.Epsilon
                    && Math.Abs(rectangle._y - _y) < float.Epsilon
@@ -263,7 +283,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Checks if this RECT is empty
+        ///     Checks if this NativeRectFloat is empty
         /// </summary>
         /// <returns>true when empty</returns>
         public bool IsEmpty => Math.Abs(_width * _height) < float.Epsilon;
@@ -271,36 +291,36 @@ namespace Dapplo.Windows.Common.Structs
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (obj is RECTF)
+            if (obj is NativeRectFloat)
             {
-                return Equals((RECTF) obj);
+                return Equals((NativeRectFloat) obj);
             }
             if (obj is Rect)
             {
-                RECTF rect = (Rect) obj;
+                NativeRectFloat rect = (Rect) obj;
                 return Equals(rect);
             }
             if (obj is RectangleF)
             {
-                RECTF rect = (RectangleF) obj;
+                NativeRectFloat rect = (RectangleF) obj;
                 return Equals(rect);
             }
             return false;
         }
 
         /// <summary>
-        ///     Test if this RECT contains the specified POINT
+        ///     Test if this NativeRectFloat contains the specified NativePoint
         /// </summary>
-        /// <param name="point">POINT</param>
+        /// <param name="point">NativePoint</param>
         /// <returns>true if it contains</returns>
-        public bool Contains(POINT point)
+        public bool Contains(NativePoint point)
         {
             return point.X >= Left && point.X <= Right && point.Y >= Top && point.Y <= Bottom;
         }
 
         /// <summary>
-        ///     Empty RECT
+        ///     Empty NativeRectFloat
         /// </summary>
-        public static RECTF Empty => new RECTF();
+        public static NativeRectFloat Empty { get; } = new NativeRectFloat();
     }
 }

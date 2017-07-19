@@ -203,7 +203,7 @@ namespace Dapplo.Windows.Desktop
             // Now correct the bounds, for Windows 10
             if (Dwm.IsDwmEnabled)
             {
-                RECT extendedFrameBounds;
+                NativeRect extendedFrameBounds;
                 bool gotFrameBounds = Dwm.GetExtendedFrameBounds(interopWindow.Handle, out extendedFrameBounds);
                 if (gotFrameBounds && (interopWindow.IsApp() || WindowsVersion.IsWindows10OrLater && !interopWindow.IsMaximized()))
                 {
@@ -404,7 +404,7 @@ namespace Dapplo.Windows.Desktop
         /// <param name="window2">IInteropWindow</param>
         /// <param name="retrieveBoundsFunc">Function which returns the bounds for the IInteropWindow</param>
         /// <returns>bool true if docked</returns>
-        public static bool IsDockedToLeftOf(this IInteropWindow window1, IInteropWindow window2, Func<IInteropWindow, RECT> retrieveBoundsFunc = null)
+        public static bool IsDockedToLeftOf(this IInteropWindow window1, IInteropWindow window2, Func<IInteropWindow, NativeRect> retrieveBoundsFunc = null)
         {
             retrieveBoundsFunc = retrieveBoundsFunc ?? (window => window.GetInfo().Bounds);
             return retrieveBoundsFunc(window1).IsDockedToLeftOf(retrieveBoundsFunc(window2));
@@ -417,7 +417,7 @@ namespace Dapplo.Windows.Desktop
         /// <param name="window2">IInteropWindow</param>
         /// <param name="retrieveBoundsFunc">Function which returns the bounds for the IInteropWindow</param>
         /// <returns>bool true if docked</returns>
-        public static bool IsDockedToRightOf(this IInteropWindow window1, IInteropWindow window2, Func<IInteropWindow, RECT> retrieveBoundsFunc = null)
+        public static bool IsDockedToRightOf(this IInteropWindow window1, IInteropWindow window2, Func<IInteropWindow, NativeRect> retrieveBoundsFunc = null)
         {
             retrieveBoundsFunc = retrieveBoundsFunc ?? (window => window.GetInfo().Bounds);
             return retrieveBoundsFunc(window1).IsDockedToRightOf(retrieveBoundsFunc(window2));

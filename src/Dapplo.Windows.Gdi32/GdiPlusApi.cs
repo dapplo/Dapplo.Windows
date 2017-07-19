@@ -106,7 +106,7 @@ namespace Dapplo.Windows.Gdi32
                 var hBitmap = GetNativeImage(destinationBitmap);
 
                 // Create a RECT from the Rectangle
-                RECT rec = area;
+                NativeRect rec = area;
                 // Apply the effect to the bitmap in the specified area
                 status = GdipBitmapApplyEffect(hBitmap, hEffect, ref rec, false, IntPtr.Zero, 0);
                 if (status != GdiPlusStatus.Ok)
@@ -199,9 +199,9 @@ namespace Dapplo.Windows.Gdi32
                 var hAttributes = GetNativeImageAttributes(imageAttributes);
 
                 // Create a RECT from the Rectangle
-                RECTF sourceRecf = source;
+                NativeRectFloat sourceRectangleF = source;
                 // Apply the effect to the bitmap in the specified area
-                status = GdipDrawImageFX(hGraphics, hBitmap, ref sourceRecf, hMatrix, hEffect, hAttributes, GpUnit.UnitPixel);
+                status = GdipDrawImageFX(hGraphics, hBitmap, ref sourceRectangleF, hMatrix, hEffect, hAttributes, GpUnit.UnitPixel);
                 if (status != GdiPlusStatus.Ok)
                 {
                     Log.Error().WriteLine("Couldn't draw image: {0}", status);
@@ -245,7 +245,7 @@ namespace Dapplo.Windows.Gdi32
         }
 
         [DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
-        private static extern GdiPlusStatus GdipBitmapApplyEffect(IntPtr bitmap, IntPtr effect, ref RECT rectOfInterest, [MarshalAs(UnmanagedType.Bool)] bool useAuxData, IntPtr auxData, int auxDataSize);
+        private static extern GdiPlusStatus GdipBitmapApplyEffect(IntPtr bitmap, IntPtr effect, ref NativeRect rectOfInterest, [MarshalAs(UnmanagedType.Bool)] bool useAuxData, IntPtr auxData, int auxDataSize);
 
         [DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
         private static extern GdiPlusStatus GdipCreateEffect(Guid guid, out IntPtr effect);
@@ -254,7 +254,7 @@ namespace Dapplo.Windows.Gdi32
         private static extern GdiPlusStatus GdipDeleteEffect(IntPtr effect);
 
         [DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
-        private static extern GdiPlusStatus GdipDrawImageFX(IntPtr graphics, IntPtr bitmap, ref RECTF source, IntPtr matrix, IntPtr effect, IntPtr imageAttributes, GpUnit srcUnit);
+        private static extern GdiPlusStatus GdipDrawImageFX(IntPtr graphics, IntPtr bitmap, ref NativeRectFloat source, IntPtr matrix, IntPtr effect, IntPtr imageAttributes, GpUnit srcUnit);
 
         [DllImport("gdiplus.dll", SetLastError = true, ExactSpelling = true)]
         private static extern GdiPlusStatus GdipSetEffectParameters(IntPtr effect, IntPtr parameters, uint size);

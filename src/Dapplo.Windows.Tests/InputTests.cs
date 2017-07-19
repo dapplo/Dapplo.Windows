@@ -90,9 +90,9 @@ namespace Dapplo.Windows.Tests
         [Fact]
         private void TestMouseInput()
         {
-            InputGenerator.MoveMouse(new POINT(10, 10));
+            InputGenerator.MoveMouse(new NativePoint(10, 10));
             Thread.Sleep(1000);
-            InputGenerator.MoveMouse(new POINT(100, 100));
+            InputGenerator.MoveMouse(new NativePoint(100, 100));
             Thread.Sleep(1000);
         }
     }

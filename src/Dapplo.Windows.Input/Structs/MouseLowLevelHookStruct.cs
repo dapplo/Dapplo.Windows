@@ -40,7 +40,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <summary>
         ///     The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
         /// </summary>
-        public POINT pt;
+        public NativePoint pt;
 
         /// <summary>
         ///     If the message is WM_MOUSEWHEEL, the high-order word of this member is the wheel delta.

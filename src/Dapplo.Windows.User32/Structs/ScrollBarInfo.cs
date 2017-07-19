@@ -42,7 +42,7 @@ namespace Dapplo.Windows.User32.Structs
 		/// </summary>
 		private uint _cbSize;
 
-		private RECT _rcScrollBar;
+		private NativeRect _rcScrollBar;
 		private int _dxyLineButton;
 		private int _thumbBottom;
 		private int _thumbTop;
@@ -53,7 +53,7 @@ namespace Dapplo.Windows.User32.Structs
 		/// <summary>
 		///     Coordinates of the scroll bar as specified in a RECT structure.
 		/// </summary>
-		public RECT Bounds => _rcScrollBar;
+		public NativeRect Bounds => _rcScrollBar;
 
 		/// <summary>
 		///     Height or width of the thumb.
@@ -92,7 +92,7 @@ namespace Dapplo.Windows.User32.Structs
 			{
 				_cbSize = (uint)Marshal.SizeOf(typeof(ScrollBarInfo)),
 				_states = new ObjectStates[6],
-				_rcScrollBar = new RECT(),
+				_rcScrollBar = new NativeRect(),
 				_dxyLineButton = 0,
 				_thumbBottom = 0,
 				_thumbTop = 0,

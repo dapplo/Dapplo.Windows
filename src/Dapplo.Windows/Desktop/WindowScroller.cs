@@ -314,7 +314,7 @@ namespace Dapplo.Windows.Desktop
                     break;
                 case ScrollModes.MouseWheel:
                     var bounds = ScrollingWindow.GetInfo().Bounds;
-                    var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+                    var middlePoint = new NativePoint(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
                     result = InputGenerator.MoveMouseWheel(-WheelDelta, middlePoint) == 1;
                     break;
             }
@@ -351,7 +351,7 @@ namespace Dapplo.Windows.Desktop
                     break;
                 case ScrollModes.MouseWheel:
                     var bounds = ScrollingWindow.GetInfo().Bounds;
-                    var middlePoint = new POINT(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+                    var middlePoint = new NativePoint(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
                     result = InputGenerator.MoveMouseWheel(WheelDelta, middlePoint) == 1;
                     break;
             }

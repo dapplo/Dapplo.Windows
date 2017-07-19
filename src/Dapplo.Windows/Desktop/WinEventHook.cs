@@ -29,6 +29,7 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
+using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 
 #endregion
@@ -88,7 +89,7 @@ namespace Dapplo.Windows.Desktop
 
         #region native code
 
-        [DllImport("user32", SetLastError = true)]
+        [DllImport(User32Api.User32, SetLastError = true)]
         private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
         /// <summary>
@@ -118,7 +119,7 @@ namespace Dapplo.Windows.Desktop
         /// </param>
         /// <param name="winEventHookFlags">WinEventHookFlags</param>
         /// <returns>IntPtr with the hook id</returns>
-        [DllImport("user32")]
+        [DllImport(User32Api.User32)]
         private static extern IntPtr SetWinEventHook(WinEvents eventMin, WinEvents eventMax, IntPtr hmodWinEventProc, WinEventDelegate eventProc, int idProcess, int idThread, WinEventHookFlags winEventHookFlags);
 
         /// <summary>
