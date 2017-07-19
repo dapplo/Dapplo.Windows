@@ -64,8 +64,9 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string) && value is NativeSize nativeSize)
+            if (destinationType == typeof(string) && value is NativeSize)
             {
+                var nativeSize = (NativeSize)value;
                 return $"{nativeSize.Height},{nativeSize.Width}";
             }
             return base.ConvertTo(context, culture, value, destinationType);

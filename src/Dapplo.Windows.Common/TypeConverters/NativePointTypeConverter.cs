@@ -64,8 +64,9 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string) && value is NativePoint nativePoint)
+            if (destinationType == typeof(string) && value is NativePoint)
             {
+                var nativePoint = (NativePoint)value;
                 return $"{nativePoint.X},{nativePoint.Y}";
             }
             return base.ConvertTo(context, culture, value, destinationType);

@@ -66,8 +66,9 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string) && value is NativeRect nativeRect)
+            if (destinationType == typeof(string) && value is NativeRect)
             {
+                var nativeRect = (NativeRect) value;
                 return $"{nativeRect.Left},{nativeRect.Top},{nativeRect.Right},{nativeRect.Bottom}";
             }
             return base.ConvertTo(context, culture, value, destinationType);

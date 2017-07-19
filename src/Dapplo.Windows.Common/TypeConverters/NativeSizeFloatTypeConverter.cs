@@ -64,8 +64,9 @@ namespace Dapplo.Windows.Common.TypeConverters
         /// <inheritdoc />
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string) && value is NativeSizeFloat nativeSizeFloat)
+            if (destinationType == typeof(string) && value is NativeSizeFloat)
             {
+                var nativeSizeFloat = (NativeSizeFloat)value;
                 return string.Format("{0},{1}",
                     nativeSizeFloat.Width.ToString(CultureInfo.InvariantCulture),
                     nativeSizeFloat.Height.ToString(CultureInfo.InvariantCulture));
