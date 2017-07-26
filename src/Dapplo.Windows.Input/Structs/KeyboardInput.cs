@@ -32,38 +32,64 @@ namespace Dapplo.Windows.Input.Structs
     /// <summary>
     ///     This struct contains information about a simulated keyboard event.
     ///     See
-    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646271(v=vs.85).aspx">KEYBDINPUT structure</a>
+    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646271.aspx">KEYBDINPUT structure</a>
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct KeyboardInput
     {
+        private VirtualKeyCodes _wVk;
+        private ScanCodes _wScan;
+        private KeyEventFlags _dwFlags;
+        private int _time;
+        private UIntPtr _dwExtraInfo;
+
         /// <summary>
         ///     A virtual-key code. The code must be a value in the range 1 to 254.
         ///     If the dwFlags member specifies KEYEVENTF_UNICODE, wVk must be 0.
         /// </summary>
-        public VirtualKeyCodes VirtualKeyCode;
+        public VirtualKeyCodes VirtualKeyCode
+        {
+            get { return _wVk; }
+            set { _wVk = value; }
+        }
 
         /// <summary>
         ///     A hardware scan code for the key. If KeyEventFlags specifies Unicode, ScanCode specifies a Unicode character which
         ///     is to be sent to the foreground application.
         /// </summary>
-        public ScanCodes ScanCode;
+        public ScanCodes ScanCode
+        {
+            get { return _wScan; }
+            set { _wScan = value; }
+        }
 
         /// <summary>
         ///     Specifies various aspects of a keystroke. This member can be certain combinations of the following values.
         /// </summary>
-        public KeyEventFlags KeyEventFlags;
+        public KeyEventFlags KeyEventFlags
+        {
+            get { return _dwFlags; }
+            set { _dwFlags = value; }
+        }
 
         /// <summary>
         ///     The time stamp for the event, in milliseconds. If this parameter is zero, the system will provide its own time
         ///     stamp.
         /// </summary>
-        public int Timestamp;
+        public int Timestamp
+        {
+            get { return _time; }
+            set { _time = value; }
+        }
 
         /// <summary>
         ///     An additional value associated with the keystroke. Use the GetMessageExtraInfo function to obtain this information.
         /// </summary>
-        public UIntPtr dwExtraInfo;
+        public UIntPtr ExtraInfo
+        {
+            get { return _dwExtraInfo; }
+            set { _dwExtraInfo = value; }
+        }
 
         /// <summary>
         ///     Create a KeyboardInput for a key press (up / down)

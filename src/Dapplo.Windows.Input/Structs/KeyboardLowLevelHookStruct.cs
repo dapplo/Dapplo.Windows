@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
 
@@ -31,19 +32,36 @@ namespace Dapplo.Windows.Input.Structs
 {
     /// <summary>
     ///     Contains information about a low-level keyboard input event.
+    /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644967(v=vs.85).aspx">KBDLLHOOKSTRUCT structure</a>
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
+    [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
+    [SuppressMessage("ReSharper", "ArrangeAccessorOwnerBody")]
     public struct KeyboardLowLevelHookStruct
     {
+        private VirtualKeyCodes _vkCode;
+        private ScanCodes _scanCode;
+        private ExtendedKeyFlags _flags;
+        private uint _time;
+        private UIntPtr _dwExtraInfo;
+
         /// <summary>
         ///     A virtual-key code. The code must be a value in the range 1 to 254.
         /// </summary>
-        public VirtualKeyCodes VirtualKeyCode;
+        public VirtualKeyCodes VirtualKeyCode
+        {
+            get { return _vkCode; }
+            set { _vkCode = value; }
+        }
 
         /// <summary>
         ///     A hardware scan code for the key.
         /// </summary>
-        public ScanCodes ScanCode;
+        public ScanCodes ScanCode
+        {
+            get { return _scanCode; }
+            set { _scanCode = value; }
+        }
 
         /// <summary>
         ///     The extended-key flag, event-injected flags, context code, and transition-state flag.
@@ -52,16 +70,28 @@ namespace Dapplo.Windows.Input.Structs
         ///     If it was, then testing LLKHF_LOWER_IL_INJECTED (bit 1) will tell you whether or not the event
         ///     was injected from a process running at lower integrity level.
         /// </summary>
-        public ExtendedKeyFlags Flags;
+        public ExtendedKeyFlags Flags
+        {
+            get { return _flags; }
+            set { _flags = value; }
+        }
 
         /// <summary>
         ///     The time stamp for this message, equivalent to what GetMessageTime would return for this message.
         /// </summary>
-        public uint TimeStamp;
+        public uint TimeStamp
+        {
+            get { return _time; }
+            set { _time = value; }
+        }
 
         /// <summary>
         ///     Additional information associated with the message.
         /// </summary>
-        public UIntPtr dwExtraInfo;
+        public UIntPtr ExtraInfo
+        {
+            get { return _dwExtraInfo; }
+            set { _dwExtraInfo = value; }
+        }
     }
 }

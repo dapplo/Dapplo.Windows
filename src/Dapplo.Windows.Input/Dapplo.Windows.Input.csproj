@@ -54,7 +54,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\HookTypes.cs" />
+    <Compile Include="Enums\RawInputDeviceFlags.cs" />
     <Compile Include="Enums\InputTypes.cs" />
+    <Compile Include="Enums\RawInputDeviceInfoCommands.cs" />
+    <Compile Include="Enums\RawInputDeviceTypes.cs" />
+    <Compile Include="Enums\RawInputDevices.cs" />
     <Compile Include="Enums\VirtualKeyCodes.cs" />
     <Compile Include="Hotkey.cs" />
     <Compile Include="InputGenerator.cs" />
@@ -66,6 +70,13 @@
     <Compile Include="MouseHookEventArgs.cs" />
     <Compile Include="Enums\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\MouseEventFlags.cs" />
+    <Compile Include="RawInput.cs" />
+    <Compile Include="Structs\RawInputDeviceInfo.cs" />
+    <Compile Include="Structs\RawInputDeviceInfoHID.cs" />
+    <Compile Include="Structs\RawInputDeviceInfoKeyboard.cs" />
+    <Compile Include="Structs\RawInputDeviceInfoMouse.cs" />
+    <Compile Include="Structs\RawInputDeviceList.cs" />
+    <Compile Include="Structs\RawInputDevice.cs" />
     <Compile Include="Structs\MouseInput.cs" />
     <Compile Include="Structs\MouseLowLevelHookStruct.cs" />
     <Compile Include="Structs\KeyboardInput.cs" />
