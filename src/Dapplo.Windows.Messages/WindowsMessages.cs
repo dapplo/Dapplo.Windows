@@ -232,7 +232,29 @@ namespace Dapplo.Windows.Messages
         EM_GETIMESTATUS =0x00d9,
         EM_MSGMAX =0x00da,
 
+        /// <summary>
+        /// Sent to the window that registered to receive raw input.
+        /// A window receives this message through its WindowProc function.
+        /// wParam - This parameter can be one of the following values:
+        /// GIDC_ARRIVAL (1) : A new device has been added to the system.
+        /// GIDC_REMOVAL (2) : A device has been removed from the system.
+        /// lParam - The handle to the raw input device. Call GetRawInputDeviceInfo to get more information regarding the device.
+        /// Return value
+        /// If an application processes this message, it should return zero.
+        /// </summary>
         WM_INPUT_DEVICE_CHANGE = 0x00FE,
+
+        /// <summary>
+        /// Sent to the window that is getting raw input.
+        /// Raw input is available only when the application calls RegisterRawInputDevices with valid device specifications
+        /// A window receives this message through its WindowProc function.
+        /// wParam - The input code. This parameter can be one of the following values:
+        /// RIM_INPUT (0) - Input occurred while the application was in the foreground. The application must call DefWindowProc so the system can perform cleanup.
+        /// RIM_INPUTSINK (1) - Input occurred while the application was not in the foreground. The application must call DefWindowProc so the system can perform the cleanup.
+        /// lParam - A handle to the RAWINPUT structure that contains the raw input from the device.
+        /// Return value
+        /// If an application processes this message, it should return zero.
+        /// </summary>
         WM_INPUT = 0x00FF,
 
         WM_KEYFIRST = 0x0100,

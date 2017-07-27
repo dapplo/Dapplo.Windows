@@ -1,4 +1,4 @@
-//  Dapplo - building blocks for desktop applications
+﻿//  Dapplo - building blocks for desktop applications
 //  Copyright (C) 2016-2017 Dapplo
 // 
 //  For more information see: http://dapplo.net/
@@ -19,43 +19,34 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.Input.Structs;
 
-#endregion
-
-namespace Dapplo.Windows.Input.Structs
+namespace Dapplo.Windows.Input
 {
     /// <summary>
-    /// Contains information about a raw input device.
-    /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms645568.aspx">RAWINPUTDEVICELIST structure</a>
+    /// Desribes a RawInput device
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-	[SuppressMessage("ReSharper", "ConvertToAutoProperty")]
-	[SuppressMessage("ReSharper", "ArrangeAccessorOwnerBody")]
-    public struct RawInputDeviceList
+    public class RawInputDeviceInformation
     {
-        private readonly IntPtr _hDevice;
-        private readonly RawInputDeviceTypes _dwType;
+        /// <summary>
+        /// The handle to the raw input device
+        /// </summary>
+        public IntPtr Handle { get; internal set; }
 
         /// <summary>
-        /// A handle to the raw input device.
+        /// The cryptic device name
         /// </summary>
-        public IntPtr Handle
-        {
-            get { return _hDevice; }
-        }
+        public string DeviceName { get; internal set; }
 
         /// <summary>
-        /// The type of device
+        /// A name which can be used to display to a user
         /// </summary>
-        public RawInputDeviceTypes RawInputDeviceType
-        {
-            get { return _dwType; }
-        }
-   }
+        public string DisplayName { get; internal set; }
+
+        /// <summary>
+        /// The actual device information
+        /// </summary>
+        public RawInputDeviceInfo DeviceInfo { get; internal set; }
+    }
 }

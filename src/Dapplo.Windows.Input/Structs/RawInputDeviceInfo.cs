@@ -41,47 +41,20 @@ namespace Dapplo.Windows.Input.Structs
     public struct RawInputDeviceInfo
     {
         [FieldOffset(0)]
-        private int _cbSize;
+        private readonly int _cbSize;
         [FieldOffset(4)]
-        private RawInputDeviceTypes _dwType;
+        private readonly RawInputDeviceTypes _dwType;
         [FieldOffset(8)]
-        private RawInputDeviceInfoMouse _mouse;
+        private readonly RawInputDeviceInfoMouse _mouse;
         [FieldOffset(8)]
-        private RawInputDeviceInfoKeyboard _keyboard;
+        private readonly RawInputDeviceInfoKeyboard _keyboard;
         [FieldOffset(8)]
-        private RawInputDeviceInfoHID _hid;
+        private readonly RawInputDeviceInfoHID _hid;
 
         /// <summary>
-        /// Factory which uses the RawInputDeviceTypes to create the structure
+        /// The type RawInput device
         /// </summary>
-        /// <param name="rawInputDeviceType">RawInputDeviceTypes</param>
-        /// <returns>RawInputDeviceInfo</returns>
-        public static RawInputDeviceInfo CreateFor(RawInputDeviceTypes rawInputDeviceType)
-        {
-            RawInputDeviceInfo result = new RawInputDeviceInfo
-            {
-                _cbSize = Marshal.SizeOf(typeof(RawInputDeviceInfo)),
-                _dwType = rawInputDeviceType
-            };
-            switch (rawInputDeviceType)
-            {
-                case RawInputDeviceTypes.Mouse:
-                    result._mouse = new RawInputDeviceInfoMouse();
-                    break;
-                case RawInputDeviceTypes.HID:
-                    result._hid = new RawInputDeviceInfoHID();
-                    break;
-                case RawInputDeviceTypes.Keyboard:
-                    result._keyboard = new RawInputDeviceInfoKeyboard();
-                    break;
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Size of the structure
-        /// </summary>
-        public uint Size => (uint) _cbSize;
+        public RawInputDeviceTypes Type => _dwType;
 
         /// <summary>
         /// Information on the mouse device

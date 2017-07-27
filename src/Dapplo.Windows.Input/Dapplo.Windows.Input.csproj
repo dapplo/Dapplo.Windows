@@ -71,6 +71,7 @@
     <Compile Include="Enums\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\MouseEventFlags.cs" />
     <Compile Include="RawInput.cs" />
+    <Compile Include="RawInputDeviceInformation.cs" />
     <Compile Include="Structs\RawInputDeviceInfo.cs" />
     <Compile Include="Structs\RawInputDeviceInfoHID.cs" />
     <Compile Include="Structs\RawInputDeviceInfoKeyboard.cs" />

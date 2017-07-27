@@ -26,7 +26,6 @@ using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 using System.Collections.Generic;
 using System.Linq;
-using Dapplo.Log;
 using Microsoft.Win32;
 
 namespace Dapplo.Windows.Input
@@ -36,8 +35,6 @@ namespace Dapplo.Windows.Input
     /// </summary>
     public static class RawInput
     {
-        private static readonly LogSource Log = new LogSource();
-
         /// <summary>
         /// Register the specified window to receive raw input, coming from the specified device
         /// </summary>
@@ -116,13 +113,91 @@ namespace Dapplo.Windows.Input
                 throw new Win32Exception();
             }
         }
+
+        /// <summary>
+        /// Retrieve RawInputDeviceInformation on the by the handle specified RawInput device
+        /// This is used when calling GetAllDevices, but can also be called when getting a WM_INPUT_DEVICE_CHANGE message
+        /// </summary>
+        /// <param name="handle">IntPtr handle to the raw input device</param>
+        /// <returns>RawInputDeviceInformation</returns>
+        public static RawInputDeviceInformation GetDeviceInformation(IntPtr handle)
+        {
+            var result = new RawInputDeviceInformation
+            {
+                Handle = handle
+            };
+            uint pcbSize = 0;
+            uint returnValue = GetRawInputDeviceInfo(handle, RawInputDeviceInfoCommands.DeviceName, IntPtr.Zero, ref pcbSize);
+            if (returnValue == uint.MaxValue)
+            {
+                throw new Win32Exception("Calling GetRawInputDeviceInfo");
+            }
+            if (pcbSize > 0)
+            {
+                // Allocate the characters * 2 (Unicode!!)
+                var deviceNamePtr = Marshal.AllocHGlobal((int)pcbSize * 2);
+                try
+                {
+                    returnValue = GetRawInputDeviceInfo(handle, RawInputDeviceInfoCommands.DeviceName, deviceNamePtr, ref pcbSize);
+                    if (returnValue == uint.MaxValue)
+                    {
+                        throw new Win32Exception("Calling GetRawInputDeviceInfo");
+                    }
+                    result.DeviceName = Marshal.PtrToStringUni(deviceNamePtr);
+
+                    // Use the devicename to find information in the registry
+                    if (result.DeviceName != null)
+                    {
+                        string[] split = result.DeviceName.Substring(4).Split('#');
+                        string classCode = split[0];
+                        string subclassCode = split[1];
+                        string protocolCode = split[2];
+                        using (var registryKey = Registry.LocalMachine.OpenSubKey($@"System\CurrentControlSet\Enum\{classCode}\{subclassCode}\{protocolCode}"))
+                        {
+                            var deviceDescription = (string)registryKey?.GetValue("DeviceDesc");
+                            var startOfDisplayName = deviceDescription?.LastIndexOf(";", StringComparison.Ordinal);
+                            if (startOfDisplayName >= 0)
+                            {
+                                result.DisplayName = deviceDescription.Substring(startOfDisplayName.Value +1);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(deviceNamePtr);
+                }
+            }
+
+            returnValue = GetRawInputDeviceInfo(handle, RawInputDeviceInfoCommands.DeviceInfo, IntPtr.Zero, ref pcbSize);
+            if (returnValue == uint.MaxValue)
+            {
+                throw new Win32Exception("Calling GetRawInputDeviceInfo");
+            }
+            var deviceInfoPtr = Marshal.AllocHGlobal((int)pcbSize);
+            try
+            {
+                returnValue = GetRawInputDeviceInfo(handle, RawInputDeviceInfoCommands.DeviceInfo, deviceInfoPtr, ref pcbSize);
+                if (returnValue == uint.MaxValue)
+                {
+                    throw new Win32Exception("Calling GetRawInputDeviceInfo");
+                }
+                result.DeviceInfo = (RawInputDeviceInfo)Marshal.PtrToStructure(deviceInfoPtr, typeof(RawInputDeviceInfo));
+                return result;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(deviceInfoPtr);
+            }
+        }
+
         /// <summary>
         /// A convenient function for getting all raw input devices.
         /// This method will get all devices, including virtual devices-
         /// For remote desktop and any other device driver that's registered as such a device.
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<RawInputDeviceInfo> GetAllDevices()
+        public static IEnumerable<RawInputDeviceInformation> GetAllDevices()
         {
             uint deviceCount = 0;
             uint dwSize = (uint)Marshal.SizeOf(typeof(RawInputDeviceList));
@@ -132,7 +207,7 @@ namespace Dapplo.Windows.Input
             uint retValue = GetRawInputDeviceList(null, ref deviceCount, dwSize);
 
             // If anything but zero is returned, the call failed, so return a null list
-            if (0 != retValue)
+            if (0 != retValue || deviceCount <= 0)
             {
                 yield break;
             }
@@ -146,68 +221,7 @@ namespace Dapplo.Windows.Input
             }
             foreach (var rawInputDeviceList in deviceList)
             {
-                uint pcbSize = 0;
-                uint returnValue = GetRawInputDeviceInfo(rawInputDeviceList.Device, RawInputDeviceInfoCommands.DeviceName, IntPtr.Zero, ref pcbSize);
-                if (returnValue == uint.MaxValue)
-                {
-                    throw new Win32Exception("Exception when calling GetRawInputDeviceInfo");
-                }
-                if (pcbSize > 0)
-                {
-                    // Allocate the characters * 2 (Unicode!!)
-                    var deviceNamePtr = Marshal.AllocHGlobal((int)pcbSize*2);
-                    try
-                    {
-                        returnValue = GetRawInputDeviceInfo(rawInputDeviceList.Device, RawInputDeviceInfoCommands.DeviceName, deviceNamePtr, ref pcbSize);
-                        if (returnValue == uint.MaxValue)
-                        {
-                            throw new Win32Exception("Exception when calling GetRawInputDeviceInfo");
-                        }
-                        string deviceName = Marshal.PtrToStringUni(deviceNamePtr);
-                        if (deviceName != null)
-                        {
-                            Log.Debug().WriteLine("Retrieving information on {0} with name {1}", rawInputDeviceList.RawInputDeviceType, deviceName);
-
-                            string[] split = deviceName.Substring(4).Split('#');
-                            string classCode = split[0];
-                            string subclassCode = split[1];
-                            string protocolCode = split[2];
-                            using (var registryKey = Registry.LocalMachine.OpenSubKey($@"System\CurrentControlSet\Enum\{classCode}\{subclassCode}\{protocolCode}"))
-                            {
-                                var deviceDescription = (string)registryKey?.GetValue("DeviceDesc");
-                                if (deviceDescription != null)
-                                {
-                                    Log.Debug().WriteLine("{0} has Device Description {1}", rawInputDeviceList.RawInputDeviceType, deviceDescription);
-                                }
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        Marshal.FreeHGlobal(deviceNamePtr);
-                    }
-                }
-
-                returnValue = GetRawInputDeviceInfo(rawInputDeviceList.Device, RawInputDeviceInfoCommands.DeviceInfo, IntPtr.Zero, ref pcbSize);
-                if (returnValue == uint.MaxValue)
-                {
-                    throw new Win32Exception("Exception when calling GetRawInputDeviceInfo");
-                }
-                var deviceInfoPtr = Marshal.AllocHGlobal((int)pcbSize);
-                try
-                {
-                    returnValue = GetRawInputDeviceInfo(rawInputDeviceList.Device, RawInputDeviceInfoCommands.DeviceInfo, deviceInfoPtr, ref pcbSize);
-                    if (returnValue == uint.MaxValue)
-                    {
-                        throw new Win32Exception("Exception when calling GetRawInputDeviceInfo");
-                    }
-                    var deviceInfo = (RawInputDeviceInfo)Marshal.PtrToStructure(deviceInfoPtr, typeof(RawInputDeviceInfo));
-                    yield return deviceInfo;
-                }
-                finally
-                {
-                    Marshal.FreeHGlobal(deviceInfoPtr);
-                }
+                yield return GetDeviceInformation(rawInputDeviceList.Handle);
             }
         }
 

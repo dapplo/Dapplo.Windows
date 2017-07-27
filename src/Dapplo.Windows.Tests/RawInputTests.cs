@@ -21,9 +21,11 @@
 
 #region using
 
+using System.Linq;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Input;
+using Dapplo.Windows.Input.Enums;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -33,6 +35,7 @@ namespace Dapplo.Windows.Tests
 {
     public class RawInputTests
     {
+        private static readonly LogSource Log = new LogSource();
         public RawInputTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
@@ -45,8 +48,18 @@ namespace Dapplo.Windows.Tests
         public void Test_RawInput_AllDevices()
         {
             bool foundOneDevice = false;
-            foreach (var rawInputDeviceInfo in RawInput.GetAllDevices())
+            foreach (var rawInputDeviceInfo in RawInput.GetAllDevices().OrderBy(information => information.DeviceInfo.Type).ThenBy(information => information.DisplayName))
             {
+                Log.Info().WriteLine("RawInput Device {0} with name {1}", rawInputDeviceInfo.DeviceInfo.Type, rawInputDeviceInfo.DisplayName);
+                switch (rawInputDeviceInfo.DeviceInfo.Type)
+                {
+                    case RawInputDeviceTypes.Keyboard:
+                        var keyboardInfo = rawInputDeviceInfo.DeviceInfo.Keyboard;
+                        Log.Info().WriteLine("Keyboard is of type {0} and subtype {1} and in mode {2}.", keyboardInfo.Type, keyboardInfo.SubType, keyboardInfo.KeyboardMode);
+                        Log.Info().WriteLine("Keyboard with {0} key, of which {1} function keys and it has {2} LEDs.", keyboardInfo.NumberOfKeysTotal, keyboardInfo.NumberOfFunctionKeys, keyboardInfo.NumberOfIndicators);
+                        break;
+                }
+
                 foundOneDevice = true;
             }
             Assert.True(foundOneDevice);
