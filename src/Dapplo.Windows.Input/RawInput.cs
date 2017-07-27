@@ -26,6 +26,9 @@ using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Windows.Interop;
+using Dapplo.Windows.Messages;
 using Microsoft.Win32;
 
 namespace Dapplo.Windows.Input
@@ -35,6 +38,50 @@ namespace Dapplo.Windows.Input
     /// </summary>
     public static class RawInput
     {
+
+        /// <summary>
+        ///     Private constructor to create the observable
+        /// </summary>
+        public static IObservable<RawInputDeviceChangeEventArgs> MonitorRawInputDeviceChanges(params RawInputDevices[] devices)
+        {
+            var deviceCache = new Dictionary<IntPtr, RawInputDeviceInformation>();
+
+            return Observable.Create<RawInputDeviceChangeEventArgs>(observer =>
+                {
+                    // This handles the message
+                    HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
+                    {
+                        var windowsMessage = (WindowsMessages)msg;
+                        if (windowsMessage != WindowsMessages.WM_INPUT_DEVICE_CHANGE)
+                        {
+                            return IntPtr.Zero;
+                        }
+                        bool isNew = wParam.ToInt64() == 1;
+                        IntPtr deviceHandle = lParam;
+                        // Add to cache
+                        if (isNew)
+                        {
+                            deviceCache[deviceHandle] = GetDeviceInformation(deviceHandle);
+                        }
+                        observer.OnNext(new RawInputDeviceChangeEventArgs
+                        {
+                            Added = isNew,
+                            DeviceInformation = deviceCache[deviceHandle]
+                        });
+                        // Remove from cache
+                        if (!isNew)
+                        {
+                            deviceCache.Remove(deviceHandle);
+                        }
+                        return IntPtr.Zero;
+                    };
+                    RegisterRawInput(WinProcHandler.Instance.Handle, RawInputDeviceFlags.DeviceNotify, devices);
+                    return WinProcHandler.Instance.Subscribe(winProcHandler);
+                })
+                .Publish()
+                .RefCount();
+        }
+
         /// <summary>
         /// Register the specified window to receive raw input, coming from the specified device
         /// </summary>

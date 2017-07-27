@@ -36,6 +36,7 @@
       <HintPath>..\packages\Dapplo.Log.1.0.29\lib\net45\Dapplo.Log.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
@@ -67,6 +68,7 @@
     <Compile Include="Enums\ExtendedKeyFlags.cs" />
     <Compile Include="MapVkType.cs" />
     <Compile Include="MouseHook.cs" />
+    <Compile Include="RawInputDeviceChangeEventArgs.cs" />
     <Compile Include="MouseHookEventArgs.cs" />
     <Compile Include="Enums\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\MouseEventFlags.cs" />

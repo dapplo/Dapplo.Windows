@@ -22,6 +22,8 @@
 #region using
 
 using System.Linq;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Input;
@@ -63,6 +65,14 @@ namespace Dapplo.Windows.Tests
                 foundOneDevice = true;
             }
             Assert.True(foundOneDevice);
+        }
+
+        //[WpfFact]
+        public async Task Test_RawInput_MonitorChanges_KeyboardRemoved()
+        {
+            var device = await RawInput.MonitorRawInputDeviceChanges(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
+            Assert.False(device.Added);
+            Assert.Equal(RawInputDeviceTypes.Keyboard, device.DeviceInformation.DeviceInfo.Type);
         }
     }
 }
