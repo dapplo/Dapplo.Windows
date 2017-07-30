@@ -25,9 +25,10 @@ using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Windows.Interop;
+using System.Reactive.Subjects;
 using Dapplo.Windows.Messages;
 using Microsoft.Win32;
 
@@ -36,47 +37,72 @@ namespace Dapplo.Windows.Input
     /// <summary>
     /// Functionality to use the RawInput API
     /// </summary>
-    public static class RawInput
+    public static class RawInputApi
     {
+        private static readonly Dictionary<IntPtr, RawInputDeviceInformation> DeviceCache = new Dictionary<IntPtr, RawInputDeviceInformation>();
+        private static readonly ISubject<RawInputDeviceChangeEventArgs> DeviceChangeSubject = new Subject<RawInputDeviceChangeEventArgs>();
+
+        /// <summary>
+        /// An observable which can be subscribed to be informed of device changes.
+        /// </summary>
+        public static IObservable<RawInputDeviceChangeEventArgs> DeviceChanges => DeviceChangeSubject;
+
+        /// <summary>
+        /// The raw-input devices currently in the system
+        /// </summary>
+        public static IReadOnlyDictionary<IntPtr, RawInputDeviceInformation> Devices { get; } = new ReadOnlyDictionary<IntPtr, RawInputDeviceInformation>(DeviceCache);
+
+        /// <summary>
+        /// A local function which handles the RawInput messages
+        /// </summary>
+        /// <param name="hwnd">IntPtr</param>
+        /// <param name="msg">int</param>
+        /// <param name="wParam">IntPtr</param>
+        /// <param name="lParam">IntPtr</param>
+        /// <param name="handled">ref bool</param>
+        /// <returns>IntPtr</returns>
+        private static IntPtr HandleRawInputMessages(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            var windowsMessage = (WindowsMessages)msg;
+
+            switch (windowsMessage)
+            {
+                case WindowsMessages.WM_INPUT_DEVICE_CHANGE:
+                    bool isNew = wParam.ToInt64() == 1;
+                    IntPtr deviceHandle = lParam;
+                    // Add to cache
+                    if (isNew)
+                    {
+                        DeviceCache[deviceHandle] = GetDeviceInformation(deviceHandle);
+                    }
+                    DeviceChangeSubject.OnNext(new RawInputDeviceChangeEventArgs
+                    {
+                        Added = isNew,
+                        DeviceInformation = DeviceCache[deviceHandle]
+                    });
+                    // Remove from cache
+                    if (!isNew)
+                    {
+                        DeviceCache.Remove(deviceHandle);
+                    }
+                    break;
+                case WindowsMessages.WM_INPUT:
+                    break;
+            }
+            return IntPtr.Zero;
+        }
+
 
         /// <summary>
         ///     Private constructor to create the observable
         /// </summary>
         public static IObservable<RawInputDeviceChangeEventArgs> MonitorRawInputDeviceChanges(params RawInputDevices[] devices)
         {
-            var deviceCache = new Dictionary<IntPtr, RawInputDeviceInformation>();
-
             return Observable.Create<RawInputDeviceChangeEventArgs>(observer =>
                 {
-                    // This handles the message
-                    HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
-                    {
-                        var windowsMessage = (WindowsMessages)msg;
-                        if (windowsMessage != WindowsMessages.WM_INPUT_DEVICE_CHANGE)
-                        {
-                            return IntPtr.Zero;
-                        }
-                        bool isNew = wParam.ToInt64() == 1;
-                        IntPtr deviceHandle = lParam;
-                        // Add to cache
-                        if (isNew)
-                        {
-                            deviceCache[deviceHandle] = GetDeviceInformation(deviceHandle);
-                        }
-                        observer.OnNext(new RawInputDeviceChangeEventArgs
-                        {
-                            Added = isNew,
-                            DeviceInformation = deviceCache[deviceHandle]
-                        });
-                        // Remove from cache
-                        if (!isNew)
-                        {
-                            deviceCache.Remove(deviceHandle);
-                        }
-                        return IntPtr.Zero;
-                    };
                     RegisterRawInput(WinProcHandler.Instance.Handle, RawInputDeviceFlags.DeviceNotify, devices);
-                    return WinProcHandler.Instance.Subscribe(winProcHandler);
+                    return WinProcHandler.Instance.Subscribe(HandleRawInputMessages);
+
                 })
                 .Publish()
                 .RefCount();
@@ -105,21 +131,21 @@ namespace Dapplo.Windows.Input
             switch (device)
             {
                 case RawInputDevices.Pointer:
-                    return CreateRawInputDevice(hWnd, 0x01, 0x01, flags);
+                    return CreateRawInputDevice(hWnd, HidUsagesGeneric.Pointer, flags);
                 case RawInputDevices.Mouse:
-                    return CreateRawInputDevice(hWnd, 0x01, 0x02, flags);
+                    return CreateRawInputDevice(hWnd, HidUsagesGeneric.Mouse, flags);
                 case RawInputDevices.Joystick:
-                    return CreateRawInputDevice(hWnd, 0x01, 0x04, flags);
+                    return CreateRawInputDevice(hWnd, HidUsagesGeneric.Joystick, flags);
                 case RawInputDevices.GamePad:
-                    return CreateRawInputDevice(hWnd, 0x01, 0x05, flags);
+                    return CreateRawInputDevice(hWnd, HidUsagesGeneric.Gamepad, flags);
                 case RawInputDevices.Keyboard:
-                    return CreateRawInputDevice(hWnd, 0x01, 0x06, flags);
+                    return CreateRawInputDevice(hWnd, HidUsagesGeneric.Keyboard, flags);
                 case RawInputDevices.Keypad:
-                    return CreateRawInputDevice(hWnd, 0x01, 0x07, flags);
+                    return CreateRawInputDevice(hWnd, HidUsagesGeneric.Keypad, flags);
                 case RawInputDevices.SystemControl:
-                    return CreateRawInputDevice(hWnd, 0x01, 0x80, flags);
+                    return CreateRawInputDevice(hWnd, HidUsagesGeneric.SystemControl, flags);
                 case RawInputDevices.ConsumerAudioControl:
-                    return CreateRawInputDevice(hWnd, 0xc0, 0x01, flags);
+                    return CreateRawInputDevice(hWnd, HidUsagesConsumer.ConsumerControl, flags);
                 default:
                     throw new NotSupportedException($"Unknown RawInputDevices: {device}");
             }
@@ -129,18 +155,35 @@ namespace Dapplo.Windows.Input
         /// Create RawInputDevice, to use with RegisterRawInput
         /// </summary>
         /// <param name="hWnd">IntPtr with the window handle which handles the messages</param>
-        /// <param name="usagePage">Top level collection Usage page for the raw input device.</param>
-        /// <param name="usage">Top level collection Usage for the raw input device.</param>
+        /// <param name="usage">Generic Usage for the raw input device.</param>
         /// <param name="flags">RawInputDeviceFlags</param>
         /// <returns>RawInputDevice filleds</returns>
-        public static RawInputDevice CreateRawInputDevice(IntPtr hWnd, ushort usagePage, ushort usage, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink)
+        public static RawInputDevice CreateRawInputDevice(IntPtr hWnd, HidUsagesGeneric usage, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink)
         {
             return new RawInputDevice
             {
                 TargetHwnd = hWnd,
                 Flags = flags,
-                UsagePage = usagePage,
-                Usage = usage
+                UsagePage = HidUsagePages.Generic,
+                Usage = (ushort)usage
+            };
+        }
+
+        /// <summary>
+        /// Create RawInputDevice, to use with RegisterRawInput
+        /// </summary>
+        /// <param name="hWnd">IntPtr with the window handle which handles the messages</param>
+        /// <param name="usage">Consumer Usage for the raw input device.</param>
+        /// <param name="flags">RawInputDeviceFlags</param>
+        /// <returns>RawInputDevice filleds</returns>
+        public static RawInputDevice CreateRawInputDevice(IntPtr hWnd, HidUsagesConsumer usage, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink)
+        {
+            return new RawInputDevice
+            {
+                TargetHwnd = hWnd,
+                Flags = flags,
+                UsagePage = HidUsagePages.Consumer,
+                Usage = (ushort)usage
             };
         }
 
@@ -282,6 +325,19 @@ namespace Dapplo.Windows.Input
         [DllImport("user32")]
         private static extern bool RegisterRawInputDevices([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] RawInputDevice[] pRawInputDevices, int uiNumDevices, int cbSize);
 
+        /// <summary>
+        /// GetRawInputData function
+        /// Retrieves the raw input from the specified device.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms645596.aspx">GetRawInputData function</a>
+        /// </summary>
+        /// <param name="hRawInput">IntPtr to a RawInput struct</param>
+        /// <param name="uiCommand">RawInputDataCommands</param>
+        /// <param name="pData"></param>
+        /// <param name="pcbSize">int</param>
+        /// <param name="cbSizeHeader">int</param>
+        /// <returns></returns>
+        [DllImport("user32")]
+        public static extern int GetRawInputData(IntPtr hRawInput, RawInputDataCommands uiCommand, out RawInput pData, ref int pcbSize, int cbSizeHeader);
         #endregion
     }
 }

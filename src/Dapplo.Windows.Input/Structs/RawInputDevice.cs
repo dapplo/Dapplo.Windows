@@ -44,7 +44,7 @@ namespace Dapplo.Windows.Input.Structs
     [SuppressMessage("ReSharper", "ArrangeAccessorOwnerBody")]
     public struct RawInputDevice
     {
-        private ushort _usUsagePage;
+        private HidUsagePages _usUsagePage;
         private ushort _usUsage;
         private RawInputDeviceFlags _dwFlags;
         private IntPtr _hwndTarget;
@@ -52,7 +52,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <summary>
         /// Top level collection Usage page for the raw input device.
         /// </summary>
-        public ushort UsagePage
+        public HidUsagePages UsagePage
         {
             get { return _usUsagePage; }
             set { _usUsagePage = value; }

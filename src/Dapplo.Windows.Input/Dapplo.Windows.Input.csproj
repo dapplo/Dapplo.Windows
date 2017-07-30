@@ -54,10 +54,15 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\HidUsagesConsumer.cs" />
+    <Compile Include="Enums\HidUsagesGeneric.cs" />
+    <Compile Include="Enums\HidUsagePages.cs" />
     <Compile Include="Enums\HookTypes.cs" />
+    <Compile Include="Enums\MouseStates.cs" />
     <Compile Include="Enums\RawInputDeviceFlags.cs" />
     <Compile Include="Enums\InputTypes.cs" />
     <Compile Include="Enums\RawInputDeviceInfoCommands.cs" />
+    <Compile Include="Enums\RawInputDataCommands.cs" />
     <Compile Include="Enums\RawInputDeviceTypes.cs" />
     <Compile Include="Enums\RawInputDevices.cs" />
     <Compile Include="Enums\VirtualKeyCodes.cs" />
@@ -72,8 +77,14 @@
     <Compile Include="MouseHookEventArgs.cs" />
     <Compile Include="Enums\ExtendedMouseFlags.cs" />
     <Compile Include="Enums\MouseEventFlags.cs" />
-    <Compile Include="RawInput.cs" />
+    <Compile Include="RawInputApi.cs" />
     <Compile Include="RawInputDeviceInformation.cs" />
+    <Compile Include="Structs\RawHID.cs" />
+    <Compile Include="Structs\RawKeyboard.cs" />
+    <Compile Include="Structs\RawMouse.cs" />
+    <Compile Include="Structs\RawDevice.cs" />
+    <Compile Include="Structs\RawInput.cs" />
+    <Compile Include="Structs\RawInputHeader.cs" />
     <Compile Include="Structs\RawInputDeviceInfo.cs" />
     <Compile Include="Structs\RawInputDeviceInfoHID.cs" />
     <Compile Include="Structs\RawInputDeviceInfoKeyboard.cs" />

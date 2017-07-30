@@ -50,7 +50,7 @@ namespace Dapplo.Windows.Tests
         public void Test_RawInput_AllDevices()
         {
             bool foundOneDevice = false;
-            foreach (var rawInputDeviceInfo in RawInput.GetAllDevices().OrderBy(information => information.DeviceInfo.Type).ThenBy(information => information.DisplayName))
+            foreach (var rawInputDeviceInfo in RawInputApi.GetAllDevices().OrderBy(information => information.DeviceInfo.Type).ThenBy(information => information.DisplayName))
             {
                 Log.Info().WriteLine("RawInput Device {0} with name {1}", rawInputDeviceInfo.DeviceInfo.Type, rawInputDeviceInfo.DisplayName);
                 switch (rawInputDeviceInfo.DeviceInfo.Type)
@@ -70,7 +70,7 @@ namespace Dapplo.Windows.Tests
         //[WpfFact]
         public async Task Test_RawInput_MonitorChanges_KeyboardRemoved()
         {
-            var device = await RawInput.MonitorRawInputDeviceChanges(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
+            var device = await RawInputApi.MonitorRawInputDeviceChanges(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
             Assert.False(device.Added);
             Assert.Equal(RawInputDeviceTypes.Keyboard, device.DeviceInformation.DeviceInfo.Type);
         }
