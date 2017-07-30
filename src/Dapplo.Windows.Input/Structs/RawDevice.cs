@@ -36,9 +36,9 @@ namespace Dapplo.Windows.Input.Structs
     [SuppressMessage("ReSharper", "ArrangeAccessorOwnerBody")]
     public struct RawDevice
     {
-        [FieldOffset(0)] private RawMouse _mouse;
-        [FieldOffset(0)] private RawKeyboard _keyboard;
-        [FieldOffset(0)] private RawHID _hid;
+        [FieldOffset(0)] private readonly RawMouse _mouse;
+        [FieldOffset(0)] private readonly RawKeyboard _keyboard;
+        [FieldOffset(0)] private readonly RawHID _hid;
 
         /// <summary>
         /// Information on the mouse
@@ -46,7 +46,6 @@ namespace Dapplo.Windows.Input.Structs
         public RawMouse Mouse
         {
             get { return _mouse; }
-            set { _mouse = value; }
         }
 
         /// <summary>
@@ -55,7 +54,6 @@ namespace Dapplo.Windows.Input.Structs
         public RawKeyboard Keyboard
         {
             get { return _keyboard; }
-            set { _keyboard = value; }
         }
 
         /// <summary>
@@ -65,7 +63,6 @@ namespace Dapplo.Windows.Input.Structs
         public RawHID HID
         {
             get { return _hid; }
-            set { _hid = value; }
         }
     }
 }

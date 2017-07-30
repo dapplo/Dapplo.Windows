@@ -58,6 +58,7 @@
     <Compile Include="Enums\HidUsagesGeneric.cs" />
     <Compile Include="Enums\HidUsagePages.cs" />
     <Compile Include="Enums\HookTypes.cs" />
+    <Compile Include="Enums\MouseButtonStates.cs" />
     <Compile Include="Enums\MouseStates.cs" />
     <Compile Include="Enums\RawInputDeviceFlags.cs" />
     <Compile Include="Enums\InputTypes.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Enums\RawInputDataCommands.cs" />
     <Compile Include="Enums\RawInputDeviceTypes.cs" />
     <Compile Include="Enums\RawInputDevices.cs" />
+    <Compile Include="Enums\RawKeyboardFlags.cs" />
     <Compile Include="Enums\VirtualKeyCodes.cs" />
     <Compile Include="Hotkey.cs" />
     <Compile Include="InputGenerator.cs" />

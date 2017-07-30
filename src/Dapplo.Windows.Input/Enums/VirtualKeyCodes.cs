@@ -25,9 +25,9 @@ namespace Dapplo.Windows.Input.Enums
     ///     Symbolic constant names, hexadecimal values, and mouse or keyboard equivalents for the virtual-key codes used by
     ///     the system.
     ///     The codes are listed in numeric order.
-    ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731(v=vs.85).aspx">Virtual-Key Codes</a>
+    ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731.aspx">Virtual-Key Codes</a>
     /// </summary>
-    public enum VirtualKeyCodes : short
+    public enum VirtualKeyCodes : ushort
     {
         /// <summary>
         ///     Not a key

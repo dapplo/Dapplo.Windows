@@ -19,68 +19,44 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System;
+
 namespace Dapplo.Windows.Input.Enums
 {
     /// <summary>
-    /// This is used for mapping a device to Usage Page and Usage, to register for RawInput
+    /// Enumeration containing flags for raw keyboard input.
     /// </summary>
-    public enum RawInputDevices
+    [Flags]
+    public enum RawKeyboardFlags : ushort
     {
         /// <summary>
-        /// Pointer
-        /// UsagePage: 0x01
-        /// Usage:  0x01
-        /// Hardware ID: HID_DEVICE_SYSTEM_MOUSE
+        /// The key is down.
         /// </summary>
-        Pointer,
+        Make = 0,
         /// <summary>
-        /// Mouse
-        /// UsagePage: 0x01
-        /// Usage: 0x02
-        /// Hardware ID: HID_DEVICE_SYSTEM_MOUSE
+        /// The key is up.
         /// </summary>
-        Mouse,
+        Break = 1,
         /// <summary>
-        /// Pointer
-        /// UsagePage: 0x01
-        /// Usage: 0x04
-        /// Hardware ID: HID_DEVICE_SYSTEM_GAME
+        /// The scan code has the E0 prefix.
         /// </summary>
-        Joystick,
+        E0 = 2,
         /// <summary>
-        /// Pointer
-        /// UsagePage: 0x01
-        /// Usage: 0x05
-        /// Hardware ID: HID_DEVICE_SYSTEM_GAME
+        /// The scan code has the E1 prefix.
         /// </summary>
-        GamePad,
+        E1 = 4,
         /// <summary>
-        /// Pointer
-        /// UsagePage: 0x01
-        /// Usage:  0x06
-        /// Hardware ID: HID_DEVICE_SYSTEM_KEYBOARD
+        /// No clue
         /// </summary>
-        Keyboard,
+        // ReSharper disable once InconsistentNaming
+        TerminalServerSetLED = 8,
         /// <summary>
-        /// Pointer
-        /// UsagePage: 0x01
-        /// Usage: 0x07
-        /// Hardware ID: HID_DEVICE_SYSTEM_KEYBOARD
+        /// No clue
         /// </summary>
-        Keypad,
+        TerminalServerShadow = 0x10,
         /// <summary>
-        /// Pointer
-        /// UsagePage: 0x01
-        /// Usage: 0x80
-        /// Hardware ID: HID_DEVICE_SYSTEM_CONTROL
+        /// No clue
         /// </summary>
-        SystemControl,
-        /// <summary>
-        /// Pointer
-        /// UsagePage: 0x0C
-        /// Usage: 0x01
-        /// Hardware ID: HID_DEVICE_SYSTEM_CONSUMER
-        /// </summary>
-        ConsumerAudioControl
+        TerminalServerVkPacket = 0x20
     }
 }

@@ -38,15 +38,15 @@ namespace Dapplo.Windows.Input.Structs
     [SuppressMessage("ReSharper", "ArrangeAccessorOwnerBody")]
     public struct RawMouse
     {
-        [FieldOffset(0)] private MouseStates _usFlags;
+        [FieldOffset(0)] private readonly MouseStates _usFlags;
         // reserved
-        [FieldOffset(4)] private uint _ulButtons;
-        [FieldOffset(4)] private ushort _usButtonFlags;
-        [FieldOffset(6)] private ushort _usButtonData;
-        [FieldOffset(8)] private uint _ulRawButtons;
-        [FieldOffset(12)] private int _lLastX;
-        [FieldOffset(16)] private int _lLastY;
-        [FieldOffset(20)] private uint _ulExtraInformation;
+        [FieldOffset(4)] private readonly uint _ulButtons;
+        [FieldOffset(4)] private readonly MouseButtonStates _usButtonFlags;
+        [FieldOffset(6)] private readonly short _usButtonData;
+        [FieldOffset(8)] private readonly uint _ulRawButtons;
+        [FieldOffset(12)] private readonly int _lLastX;
+        [FieldOffset(16)] private readonly int _lLastY;
+        [FieldOffset(20)] private readonly uint _ulExtraInformation;
 
         /// <summary>
         /// The mouse state.
@@ -54,7 +54,40 @@ namespace Dapplo.Windows.Input.Structs
         public MouseStates State
         {
             get { return _usFlags; }
-            set { _usFlags = value; }
+        }
+
+        /// <summary>
+        /// The button state
+        /// </summary>
+        public MouseButtonStates ButtonState
+        {
+            get { return _usButtonFlags; }
+        }
+
+        /// <summary>
+        /// If usButtonFlags is RI_MOUSE_WHEEL, this member is a signed value that specifies the wheel delta.
+        /// </summary>
+        public short WheelData
+        {
+            get { return _usButtonData; }
+        }
+
+        /// <summary>
+        /// The motion in the X direction.
+        /// This is signed relative motion or absolute motion, depending on the value of usFlags.
+        /// </summary>
+        public int X
+        {
+            get { return _lLastX; }
+        }
+
+        /// <summary>
+        /// The motion in the Y direction.
+        /// This is signed relative motion or absolute motion, depending on the value of usFlags.
+        /// </summary>
+        public int Y
+        {
+            get { return _lLastY; }
         }
     }
 }

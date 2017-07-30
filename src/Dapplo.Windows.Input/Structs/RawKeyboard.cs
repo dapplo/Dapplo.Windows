@@ -23,6 +23,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.Messages;
 
 #endregion
 
@@ -38,23 +40,47 @@ namespace Dapplo.Windows.Input.Structs
     public struct RawKeyboard
     {
         // Scan code from the key depression
-        private readonly ushort Makecode;
+        private readonly ushort _makecode;
         // One or more of RI_KEY_MAKE, RI_KEY_BREAK, RI_KEY_E0, RI_KEY_E1
-        private readonly ushort Flags;
-        // Always 0   
-        private readonly ushort Reserved;
+        private readonly RawKeyboardFlags _flags;
+        // Always 0
+        private readonly ushort _reserved;
         // Virtual Key Code
-        private readonly ushort VKey;
+        private readonly VirtualKeyCodes _vkey;
         // Corresponding Windows message for exmaple (WM_KEYDOWN, WM_SYASKEYDOWN etc)
-        private readonly uint Message;
+        private readonly WindowsMessages _message;
         // The device-specific addition information for the event (seems to always be zero for keyboards)
-        private readonly uint ExtraInformation;
+        private readonly uint _extraInformation;
+
+        /// <summary>
+        /// The virtual key code
+        /// </summary>
+        public VirtualKeyCodes VirtualKey
+        {
+            get { return _vkey; }
+        }
+
+        /// <summary>
+        /// Scan code flags
+        /// </summary>
+        public RawKeyboardFlags Flags
+        {
+            get { return _flags; }
+        }
+
+        /// <summary>
+        /// The scan code
+        /// </summary>
+        public ushort ScanCode
+        {
+            get { return _makecode; }
+        }
 
         /// <inheritdoc />
         public override string ToString()
         {
             return string.Format("Rawkeyboard\n Makecode: {0}\n Makecode(hex) : {0:X}\n Flags: {1}\n Reserved: {2}\n VKeyName: {3}\n Message: {4}\n ExtraInformation {5}\n",
-                Makecode, Flags, Reserved, VKey, Message, ExtraInformation);
+                ScanCode, Flags, _reserved, _vkey, _message, _extraInformation);
         }
     }
 }
