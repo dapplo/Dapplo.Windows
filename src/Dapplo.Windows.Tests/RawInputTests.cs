@@ -21,6 +21,7 @@
 
 #region using
 
+using System;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -68,11 +69,34 @@ namespace Dapplo.Windows.Tests
         }
 
         //[WpfFact]
-        public async Task Test_RawInput_MonitorChanges_KeyboardRemoved()
+        public async Task Test_RawInput_DeviceChanges_KeyboardRemoved()
         {
-            var device = await RawInputApi.MonitorRawInputDeviceChanges(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
+            var device = await RawInputMonitor.MonitorRawInputDeviceChanges(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
             Assert.False(device.Added);
             Assert.Equal(RawInputDeviceTypes.Keyboard, device.DeviceInformation.DeviceInfo.Type);
+        }
+
+        //[WpfFact]
+        public async Task Test_RawInput_Left()
+        {
+            var rawInputObservable = RawInputMonitor.MonitorRawInput(RawInputDevices.Keyboard);
+
+            using (rawInputObservable.Subscribe(ri =>
+            {
+                if (ri.RawInput.Device.Keyboard.Flags == RawKeyboardFlags.Break)
+                {
+                    Log.Debug().WriteLine("Key down {0}", ri.RawInput.Device.Keyboard.VirtualKey);
+                }
+                if (ri.RawInput.Device.Keyboard.Flags == RawKeyboardFlags.Break)
+                {
+                    Log.Debug().WriteLine("Key up {0}", ri.RawInput.Device.Keyboard.VirtualKey);
+                }
+            }))
+            {
+                var device = await rawInputObservable.FirstAsync(args => args.RawInput.Device.Keyboard.VirtualKey == VirtualKeyCodes.LEFT);
+                Assert.Equal(RawInputDeviceTypes.Keyboard, device.RawInput.Header.Type);
+            }
+
         }
     }
 }

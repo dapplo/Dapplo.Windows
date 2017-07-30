@@ -391,8 +391,18 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern int GetWindowTextLength(IntPtr hWnd);
 
+        /// <summary>
+        /// Retrieves the current color of the specified display element.
+        /// Display elements are the parts of a window and the display that appear on the system display screen.
+        /// </summary>
+        /// <param name="nIndex">SysColorIndexes with the display element whose color is to be retrieved.</param>
+        /// <returns>
+        /// The function returns the red, green, blue (RGB) color value of the given element.
+        /// If the nIndex parameter is out of range, the return value is zero.
+        /// Because zero is also a valid RGB value, you cannot use GetSysColor to determine whether a system color is supported by the current platform.Instead, use the GetSysColorBrush function, which returns NULL if the color is not supported.
+        /// </returns>
         [DllImport(User32, SetLastError = true)]
-        public static extern uint GetSysColor(int nIndex);
+        public static extern uint GetSysColor(SysColorIndexes nIndex);
 
         /// <summary>
         ///     Bring the specified window to the front

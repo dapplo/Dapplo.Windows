@@ -75,6 +75,8 @@
     <Compile Include="Enums\ExtendedKeyFlags.cs" />
     <Compile Include="MapVkType.cs" />
     <Compile Include="MouseHook.cs" />
+    <Compile Include="RawInputMonitor.cs" />
+    <Compile Include="RawInputEventArgs.cs" />
     <Compile Include="RawInputDeviceChangeEventArgs.cs" />
     <Compile Include="MouseHookEventArgs.cs" />
     <Compile Include="Enums\ExtendedMouseFlags.cs" />

@@ -60,6 +60,7 @@
     <Compile Include="Enums\SendMessageTimeoutFlags.cs" />
     <Compile Include="Enums\ShowWindowCommands.cs" />
     <Compile Include="Enums\ExtendedWindowStyleFlags.cs" />
+    <Compile Include="Enums\SysColorIndexes.cs" />
     <Compile Include="Enums\SysCommands.cs" />
     <Compile Include="Enums\SystemMetric.cs" />
     <Compile Include="Enums\SystemParametersInfoActions.cs" />

@@ -21,6 +21,7 @@
 
 #region using
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -43,12 +44,16 @@ namespace Dapplo.Windows.Input.Structs
         // The number of HID inputs in bRawData.
         private readonly uint _dwCount;
         // The raw input data, as an array of bytes.
-        private readonly byte _bRawData;
+        private readonly IntPtr _bRawData;
 
-        /// <inheritdoc />
-        public override string ToString()
+        /// <summary>
+        /// Returns the raw input data, as an array of bytes.
+        /// </summary>
+        public byte[] GetData()
         {
-            return $"Rawhib\n dwSizeHid : {_dwSizeHid}\n dwCount : {_dwCount}\n bRawData : {_bRawData}\n";
+            var data = new byte[_dwSizeHid * _dwCount];
+            Marshal.Copy(_bRawData, data, 0, data.Length);
+            return data;
         }
     }
 }

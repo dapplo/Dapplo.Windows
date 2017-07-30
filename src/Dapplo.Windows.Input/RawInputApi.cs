@@ -25,11 +25,7 @@ using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using Dapplo.Windows.Messages;
 using Microsoft.Win32;
 
 namespace Dapplo.Windows.Input
@@ -39,75 +35,6 @@ namespace Dapplo.Windows.Input
     /// </summary>
     public static class RawInputApi
     {
-        private static readonly Dictionary<IntPtr, RawInputDeviceInformation> DeviceCache = new Dictionary<IntPtr, RawInputDeviceInformation>();
-        private static readonly ISubject<RawInputDeviceChangeEventArgs> DeviceChangeSubject = new Subject<RawInputDeviceChangeEventArgs>();
-
-        /// <summary>
-        /// An observable which can be subscribed to be informed of device changes.
-        /// </summary>
-        public static IObservable<RawInputDeviceChangeEventArgs> DeviceChanges => DeviceChangeSubject;
-
-        /// <summary>
-        /// The raw-input devices currently in the system
-        /// </summary>
-        public static IReadOnlyDictionary<IntPtr, RawInputDeviceInformation> Devices { get; } = new ReadOnlyDictionary<IntPtr, RawInputDeviceInformation>(DeviceCache);
-
-        /// <summary>
-        /// A local function which handles the RawInput messages
-        /// </summary>
-        /// <param name="hwnd">IntPtr</param>
-        /// <param name="msg">int</param>
-        /// <param name="wParam">IntPtr</param>
-        /// <param name="lParam">IntPtr</param>
-        /// <param name="handled">ref bool</param>
-        /// <returns>IntPtr</returns>
-        private static IntPtr HandleRawInputMessages(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            var windowsMessage = (WindowsMessages)msg;
-
-            switch (windowsMessage)
-            {
-                case WindowsMessages.WM_INPUT_DEVICE_CHANGE:
-                    bool isNew = wParam.ToInt64() == 1;
-                    IntPtr deviceHandle = lParam;
-                    // Add to cache
-                    if (isNew)
-                    {
-                        DeviceCache[deviceHandle] = GetDeviceInformation(deviceHandle);
-                    }
-                    DeviceChangeSubject.OnNext(new RawInputDeviceChangeEventArgs
-                    {
-                        Added = isNew,
-                        DeviceInformation = DeviceCache[deviceHandle]
-                    });
-                    // Remove from cache
-                    if (!isNew)
-                    {
-                        DeviceCache.Remove(deviceHandle);
-                    }
-                    break;
-                case WindowsMessages.WM_INPUT:
-                    break;
-            }
-            return IntPtr.Zero;
-        }
-
-
-        /// <summary>
-        ///     Private constructor to create the observable
-        /// </summary>
-        public static IObservable<RawInputDeviceChangeEventArgs> MonitorRawInputDeviceChanges(params RawInputDevices[] devices)
-        {
-            return Observable.Create<RawInputDeviceChangeEventArgs>(observer =>
-                {
-                    RegisterRawInput(WinProcHandler.Instance.Handle, RawInputDeviceFlags.DeviceNotify, devices);
-                    return WinProcHandler.Instance.Subscribe(HandleRawInputMessages);
-
-                })
-                .Publish()
-                .RefCount();
-        }
-
         /// <summary>
         /// Register the specified window to receive raw input, coming from the specified device
         /// </summary>

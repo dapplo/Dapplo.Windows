@@ -114,7 +114,13 @@ namespace Dapplo.Windows.Messages
         {
             lock (Lock)
             {
+                if (_hooks.Contains(hook))
+                {
+                    Log.Verbose().WriteLine("Ignoring duplicate hook.");
+                    return Disposable.Empty;
+                }
                 Log.Verbose().WriteLine("Adding a hook to handle messages.");
+
                 MessageHandlerWindow.AddHook(hook);
                 _hooks.Add(hook);
             }
