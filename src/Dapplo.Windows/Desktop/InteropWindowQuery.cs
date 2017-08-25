@@ -137,6 +137,57 @@ namespace Dapplo.Windows.Desktop
         }
 
         /// <summary>
+        /// Is the specified window a visible popup
+        /// </summary>
+        /// <param name="interopWindow">IInteropWindow</param>
+        /// <param name="ignoreKnowClasses">true (default) to ignore some known internal windows classes</param>
+        /// <returns>true if the IInteropWindow is a popup</returns>
+        public static bool IsPopup(this IInteropWindow interopWindow, bool ignoreKnowClasses = true)
+        {
+            if (ignoreKnowClasses && interopWindow.CanIgnoreClass())
+            {
+                return false;
+            }
+
+            // Windows without size
+            if (interopWindow.GetInfo().Bounds.IsEmpty)
+            {
+                return false;
+            }
+
+            // Windows without parent
+            if (interopWindow.GetParent() != IntPtr.Zero)
+            {
+                return false;
+            }
+
+            // Get the info for the style & extended style
+            var windowInfo = interopWindow.GetInfo();
+            var windowStyle = windowInfo.Style;
+            if (!windowStyle.HasFlag(WindowStyleFlags.WS_POPUP))
+            {
+                return false;
+            }
+            var exWindowStyle = windowInfo.ExtendedStyle;
+            // Skip everything which is not rendered "normally"
+            if (!interopWindow.IsWin8App() && exWindowStyle.HasFlag(ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP))
+            {
+                return false;
+            }
+            // A Windows 10 App which runs in the background, has a HWnd but is not visible.
+            if (interopWindow.IsBackgroundWin10App())
+            {
+                return false;
+            }
+            // Skip preview windows, like the one from Firefox
+            if (!interopWindow.GetInfo().Style.HasFlag(WindowStyleFlags.WS_VISIBLE))
+            {
+                return false;
+            }
+            return !interopWindow.IsMinimized();
+        }
+
+        /// <summary>
         ///     Check if the window is a top level window.
         ///     This method will retrieve all information, and fill it to the interopWindow, it needs to make the decision.
         /// </summary>
@@ -149,6 +200,7 @@ namespace Dapplo.Windows.Desktop
             {
                 return false;
             }
+
             // Ignore windows without title
             if (interopWindow.GetCaption().Length == 0)
             {

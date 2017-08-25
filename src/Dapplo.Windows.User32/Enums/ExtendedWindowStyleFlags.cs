@@ -29,7 +29,7 @@ namespace Dapplo.Windows.User32.Enums
 {
     /// <summary>
     ///     See
-    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ff700543(v=vs.85).aspx">Extended Window Styles</a>
+    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ff700543.aspx">Extended Window Styles</a>
     /// </summary>
     [Flags]
     public enum ExtendedWindowStyleFlags : uint
