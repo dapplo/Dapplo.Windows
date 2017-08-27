@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Threading.Tasks;
 using Dapplo.Windows.App;
@@ -37,6 +38,9 @@ using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
+using System.Drawing.Imaging;
+using Dapplo.Log;
+using Dapplo.Windows.Extensions;
 
 #endregion
 
@@ -47,6 +51,7 @@ namespace Dapplo.Windows.Desktop
     /// </summary>
     public static class InteropWindowExtensions
     {
+        private static readonly LogSource Log = new LogSource();
 
         /// <summary>
         /// Tests if the interopWindow still exists
@@ -569,5 +574,70 @@ namespace Dapplo.Windows.Desktop
             User32Api.BringWindowToTop(interopWindow.Handle);
             User32Api.SetForegroundWindow(interopWindow.Handle);
         }
+
+
+        /// <summary>
+        /// Return an Image representing the Window!
+        /// As GDI+ draws it, it will be without Aero borders!
+        /// </summary>
+        public static TBitmap PrintWindow<TBitmap>(this IInteropWindow interopWindow) where TBitmap : class
+        {
+            var windowRect = interopWindow.GetInfo().Bounds;
+            // Start the capture
+            Exception exceptionOccured = null;
+            Bitmap printWindowBitmap;
+            using (var region = interopWindow.GetRegion())
+            {
+                var pixelFormat = PixelFormat.Format24bppRgb;
+                // Only use 32 bpp ARGB when the window has a region
+                if (region != null)
+                {
+                    pixelFormat = PixelFormat.Format32bppArgb;
+                }
+                printWindowBitmap = new Bitmap(windowRect.Width, windowRect.Height, pixelFormat);
+                using (var graphics = Graphics.FromImage(printWindowBitmap))
+                {
+                    using (var graphicsDc = graphics.GetSafeDeviceContext())
+                    {
+                        bool printSucceeded = User32Api.PrintWindow(interopWindow.Handle, graphicsDc.DangerousGetHandle(), 0x0);
+                        if (!printSucceeded)
+                        {
+                            // something went wrong, most likely a "0x80004005" (Acess Denied) when using UAC
+                            exceptionOccured = new Win32Exception();
+                        }
+                    }
+
+                    // Apply the region "transparency"
+                    if (region != null && !region.IsEmpty(graphics))
+                    {
+                        graphics.ExcludeClip(region);
+                        graphics.Clear(Color.Transparent);
+                    }
+
+                    graphics.Flush();
+                }
+            }
+
+            // Return null if error
+            if (exceptionOccured != null)
+            {
+                Log.Error().WriteLine("Error calling print window: {0}", exceptionOccured.Message);
+                printWindowBitmap.Dispose();
+                return default(TBitmap);
+            }
+            if (typeof(TBitmap).IsAssignableFrom(typeof(Bitmap)))
+            {
+                return printWindowBitmap as TBitmap;
+            }
+            try
+            {
+                return printWindowBitmap.ToBitmapSource() as TBitmap;
+            }
+            finally
+            {
+                printWindowBitmap.Dispose();
+            }
+        }
+
     }
 }

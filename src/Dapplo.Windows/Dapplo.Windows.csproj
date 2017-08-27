@@ -79,6 +79,7 @@
     <Compile Include="Desktop\InteropWindowExtensions.cs" />
     <Compile Include="Desktop\InteropWindowFactory.cs" />
     <Compile Include="Desktop\InteropWindowQuery.cs" />
+    <Compile Include="Extensions\BtmapExtensions.cs" />
     <Compile Include="Extensions\FormsExtensions.cs" />
     <Compile Include="Extensions\WindowsExtensions.cs" />
     <Compile Include="Interop\DisposableCom.cs" />

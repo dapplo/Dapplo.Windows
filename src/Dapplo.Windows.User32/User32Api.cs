@@ -413,6 +413,10 @@ namespace Dapplo.Windows.User32
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool BringWindowToTop(IntPtr hWnd);
 
+        /// <summary>
+        /// Retrieves the hWnd for the window which is currently the foreground window
+        /// </summary>
+        /// <returns>IntPtr</returns>
         [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetForegroundWindow();
 

@@ -45,7 +45,7 @@
     <Compile Include="Structs\NativePoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Structs\NativeRect.cs" />
-    <Compile Include="Extensions\RectExensions.cs" />
+    <Compile Include="Extensions\NativeRectExensions.cs" />
     <Compile Include="Structs\NativeRectFloat.cs" />
     <Compile Include="Structs\NativeSizeFloat.cs" />
     <Compile Include="Structs\NativeSize.cs" />

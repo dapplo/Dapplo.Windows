@@ -31,7 +31,7 @@ namespace Dapplo.Windows.Common.Extensions
     /// <summary>
     ///     Helper method for the RECT struct
     /// </summary>
-    public static class RectExensions
+    public static class NativeRectExensions
     {
         /// <summary>
         ///     Test if this RECT contains the specified NativePoint
@@ -147,6 +147,43 @@ namespace Dapplo.Windows.Common.Extensions
         {
             // Test if the right is one pixel to the left, and if top or bottom is within the rect2 height.
             return rect1.Left == rect2.Right + 1 && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect1.Bottom, rect2.Top, rect2.Bottom));
+        }
+
+        /// <summary>
+        /// Creates a new NativeRect which is the union of rect1 and rect2
+        /// </summary>
+        /// <param name="rect1">NativeRect</param>
+        /// <param name="rect2">NativeRect</param>
+        /// <returns>NativeRect which is the intersection of rect1 and rect2</returns>
+        public static NativeRect Union(this NativeRect rect1, NativeRect rect2)
+        {
+            // TODO: Replace logic with own code
+            return System.Drawing.Rectangle.Union(rect1, rect2);
+        }
+
+        /// <summary>
+        /// Creates a new NativeRect which is the intersection of rect1 and rect2
+        /// </summary>
+        /// <param name="rect1">NativeRect</param>
+        /// <param name="rect2">NativeRect</param>
+        /// <returns>NativeRect which is the intersection of rect1 and rect2</returns>
+        public static NativeRect Intersect(this NativeRect rect1, NativeRect rect2)
+        {
+            // TODO: Replace logic with own code
+            return System.Drawing.Rectangle.Intersect(rect1, rect2);
+        }
+
+        /// <summary>
+        /// Creates a new NativeRect which is rect but inflated with the specified width and height
+        /// </summary>
+        /// <param name="rect">NativeRect</param>
+        /// <param name="width">int</param>
+        /// <param name="height">int</param>
+        /// <returns>NativeRect</returns>
+        public static NativeRect Intersect(this NativeRect rect, int width, int height)
+        {
+            // TODO: Replace logic with own code
+            return System.Drawing.Rectangle.Inflate(rect, width, height);
         }
     }
 }
