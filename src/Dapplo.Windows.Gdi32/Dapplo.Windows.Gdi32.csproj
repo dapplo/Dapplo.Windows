@@ -41,6 +41,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\DibColors.cs" />
     <Compile Include="Enums\BitmapCompressionMethods.cs" />
     <Compile Include="Enums\ColorSpaceEnum.cs" />
     <Compile Include="Enums\DeviceCaps.cs" />
