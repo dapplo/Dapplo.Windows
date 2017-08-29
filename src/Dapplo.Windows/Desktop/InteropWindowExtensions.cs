@@ -603,6 +603,17 @@ namespace Dapplo.Windows.Desktop
         }
 
         /// <summary>
+        /// Get all the other windows belonging to the process which owns the specified window
+        /// </summary>
+        /// <param name="windowToLinkTo">IInteropWindow</param>
+        /// <returns>IEnumerable of IInteropWindow</returns>
+        public static IEnumerable<IInteropWindow> GetLinkedWindows(this IInteropWindow windowToLinkTo)
+        {
+            int processIdSelectedWindow = windowToLinkTo.GetProcessId();
+            return InteropWindowQuery.GetTopLevelWindows().Where(window => window.Handle != windowToLinkTo.Handle && window.GetProcessId() == processIdSelectedWindow);
+        }
+
+        /// <summary>
         ///     Get a location where this window would be visible
         ///     * if none is found return false, formLocation = the original location
         ///     * if something is found, return true and formLocation = new location
