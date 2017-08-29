@@ -39,6 +39,7 @@ using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
 using System.Drawing.Imaging;
+using System.Linq;
 using Dapplo.Log;
 using Dapplo.Windows.Extensions;
 
@@ -602,6 +603,56 @@ namespace Dapplo.Windows.Desktop
         }
 
         /// <summary>
+        ///     Get a location where this window would be visible
+        ///     * if none is found return false, formLocation = the original location
+        ///     * if something is found, return true and formLocation = new location
+        /// </summary>
+        /// <param name="interopWindow">IInteropWindow, the window to find a location for</param>
+        /// <param name="formLocation">NativePoint with the location where the window will fit</param>
+        /// <returns>true if a location if found, and the formLocation is also set</returns>
+        public static bool GetVisibleLocation(this IInteropWindow interopWindow, out NativePoint formLocation)
+        {
+            bool doesWindowFit = false;
+            var windowRectangle = interopWindow.GetInfo().Bounds;
+            // assume own location
+            formLocation = windowRectangle.Location;
+            var primaryDisplay = User32Api.AllDisplays().First(x => x.IsPrimary);
+            using (var workingArea = new Region(primaryDisplay.Bounds))
+            {
+                // Create a region with the screens working area
+                foreach (var display in User32Api.AllDisplays())
+                {
+                    if (!display.IsPrimary)
+                    {
+                        workingArea.Union(display.Bounds);
+                    }
+                }
+
+                // If the formLocation is not inside the visible area
+                if (!workingArea.AreRectangleCornersVisisble(windowRectangle))
+                {
+                    // If none found we find the biggest screen
+                    foreach (var display in User32Api.AllDisplays())
+                    {
+                        var newWindowRectangle = new Rectangle(display.WorkingArea.Location, windowRectangle.Size);
+                        if (!workingArea.AreRectangleCornersVisisble(newWindowRectangle))
+                        {
+                            continue;
+                        }
+                        formLocation = display.Bounds.Location;
+                        doesWindowFit = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    doesWindowFit = true;
+                }
+            }
+            return doesWindowFit;
+        }
+
+        /// <summary>
         /// Return an Image representing the Window!
         /// As GDI+ draws it, it will be without Aero borders!
         /// </summary>
@@ -663,6 +714,5 @@ namespace Dapplo.Windows.Desktop
                 printWindowBitmap.Dispose();
             }
         }
-
     }
 }
