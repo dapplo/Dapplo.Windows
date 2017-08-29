@@ -22,6 +22,7 @@
 #region using
 
 using System.Drawing;
+using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Gdi32.SafeHandles;
 using Dapplo.Windows.User32.SafeHandles;
 
@@ -41,7 +42,7 @@ namespace Dapplo.Windows.Gdi32
         /// <param name="region"></param>
         /// <param name="rectangle"></param>
         /// <returns></returns>
-        public static bool AreRectangleCornersVisisble(this Region region, Rectangle rectangle)
+        public static bool AreRectangleCornersVisisble(this Region region, NativeRect rectangle)
         {
             var topLeft = new Point(rectangle.X, rectangle.Y);
             var topRight = new Point(rectangle.X + rectangle.Width, rectangle.Y);

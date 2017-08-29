@@ -24,6 +24,7 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Gdi32.Enums;
 using Dapplo.Windows.Gdi32.SafeHandles;
 using Dapplo.Windows.Gdi32.Structs;
@@ -66,7 +67,7 @@ namespace Dapplo.Windows.Gdi32
         /// <param name="source">Rectangle</param>
         /// <param name="destination">Point</param>
         /// <param name="rasterOperations">RasterOperations</param>
-        public static void BitBlt(this Graphics target, Bitmap sourceBitmap, Rectangle source, Point destination, RasterOperations rasterOperations)
+        public static void BitBlt(this Graphics target, Bitmap sourceBitmap, Rectangle source, NativePoint destination, RasterOperations rasterOperations)
         {
             using (var targetDc = target.GetSafeDeviceContext())
             using (var safeCompatibleDcHandle = CreateCompatibleDC(targetDc))

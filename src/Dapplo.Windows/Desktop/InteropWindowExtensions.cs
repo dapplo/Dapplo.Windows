@@ -70,6 +70,7 @@ namespace Dapplo.Windows.Desktop
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
         /// <param name="cacheFlags">InteropWindowCacheFlags to specify which information is retrieved and what not</param>
+        /// <returns>IInteropWindow for fluent calls</returns>
         public static IInteropWindow Fill(this IInteropWindow interopWindow, InteropWindowCacheFlags cacheFlags = InteropWindowCacheFlags.CacheAll)
         {
             if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children) && cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
@@ -477,32 +478,38 @@ namespace Dapplo.Windows.Desktop
         ///     Maximize the window
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
-        public static void Maximize(this IInteropWindow interopWindow)
+        /// <returns>IInteropWindow for fluent calls</returns>
+        public static IInteropWindow Maximize(this IInteropWindow interopWindow)
         {
             User32Api.ShowWindow(interopWindow.Handle, ShowWindowCommands.Maximize);
             interopWindow.IsMaximized = true;
             interopWindow.IsMinimized = false;
+            return interopWindow;
         }
 
         /// <summary>
         ///     Minimize the Window
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
-        public static void Minimize(this IInteropWindow interopWindow)
+        /// <returns>IInteropWindow for fluent calls</returns>
+        public static IInteropWindow Minimize(this IInteropWindow interopWindow)
         {
             User32Api.ShowWindow(interopWindow.Handle, ShowWindowCommands.Minimize);
             interopWindow.IsMinimized = true;
+            return interopWindow;
         }
 
         /// <summary>
         ///     Restore (Un-Minimize/Maximize) the Window
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
-        public static void Restore(this IInteropWindow interopWindow)
+        /// <returns>IInteropWindow for fluent calls</returns>
+        public static IInteropWindow Restore(this IInteropWindow interopWindow)
         {
             User32Api.ShowWindow(interopWindow.Handle, ShowWindowCommands.Restore);
             interopWindow.IsMinimized = false;
             interopWindow.IsMaximized = false;
+            return interopWindow;
         }
 
         /// <summary>
@@ -510,21 +517,12 @@ namespace Dapplo.Windows.Desktop
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
         /// <param name="extendedWindowStyleFlags">ExtendedWindowStyleFlags</param>
-        public static void SetExtendedStyle(this IInteropWindow interopWindow, ExtendedWindowStyleFlags extendedWindowStyleFlags)
+        /// <returns>IInteropWindow for fluent calls</returns>
+        public static IInteropWindow SetExtendedStyle(this IInteropWindow interopWindow, ExtendedWindowStyleFlags extendedWindowStyleFlags)
         {
             User32Api.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint) extendedWindowStyleFlags));
             interopWindow.Info = null;
-        }
-
-        /// <summary>
-        ///     Set the WindowPlacement
-        /// </summary>
-        /// <param name="interopWindow">InteropWindow</param>
-        /// <param name="placement">WindowPlacement</param>
-        public static void SetPlacement(this IInteropWindow interopWindow, WindowPlacement placement)
-        {
-            User32Api.SetWindowPlacement(interopWindow.Handle, ref placement);
-            interopWindow.Placement = placement;
+            return interopWindow;
         }
 
         /// <summary>
@@ -532,10 +530,25 @@ namespace Dapplo.Windows.Desktop
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
         /// <param name="windowStyleFlags">WindowStyleFlags</param>
-        public static void SetStyle(this IInteropWindow interopWindow, WindowStyleFlags windowStyleFlags)
+        /// <returns>IInteropWindow for fluent calls</returns>
+        public static IInteropWindow SetStyle(this IInteropWindow interopWindow, WindowStyleFlags windowStyleFlags)
         {
-            User32Api.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint) windowStyleFlags));
+            User32Api.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint)windowStyleFlags));
             interopWindow.Info = null;
+            return interopWindow;
+        }
+
+        /// <summary>
+        ///     Set the WindowPlacement
+        /// </summary>
+        /// <param name="interopWindow">InteropWindow</param>
+        /// <param name="placement">WindowPlacement</param>
+        /// <returns>IInteropWindow for fluent calls</returns>
+        public static IInteropWindow SetPlacement(this IInteropWindow interopWindow, WindowPlacement placement)
+        {
+            User32Api.SetWindowPlacement(interopWindow.Handle, ref placement);
+            interopWindow.Placement = placement;
+            return interopWindow;
         }
 
         /// <summary>
@@ -575,6 +588,18 @@ namespace Dapplo.Windows.Desktop
             User32Api.SetForegroundWindow(interopWindow.Handle);
         }
 
+        /// <summary>
+        /// Move the specified window to a new location
+        /// </summary>
+        /// <param name="interopWindow">IInteropWindow</param>
+        /// <param name="location">NativePoin with the offset</param>
+        /// <returns>IInteropWindow for fluent calls</returns>
+        public static IInteropWindow MoveTo(this IInteropWindow interopWindow, NativePoint location)
+        {
+            User32Api.SetWindowPos(interopWindow.Handle, IntPtr.Zero, location.X, location.Y, 0, 0, WindowPos.SWP_NOSIZE | WindowPos.SWP_SHOWWINDOW | WindowPos.SWP_NOACTIVATE | WindowPos.SWP_NOZORDER);
+            interopWindow.Info = null;
+            return interopWindow;
+        }
 
         /// <summary>
         /// Return an Image representing the Window!
@@ -599,7 +624,7 @@ namespace Dapplo.Windows.Desktop
                 {
                     using (var graphicsDc = graphics.GetSafeDeviceContext())
                     {
-                        bool printSucceeded = User32Api.PrintWindow(interopWindow.Handle, graphicsDc.DangerousGetHandle(), 0x0);
+                        bool printSucceeded = User32Api.PrintWindow(interopWindow.Handle, graphicsDc.DangerousGetHandle(), PrintWindowFlags.PW_COMPLETE);
                         if (!printSucceeded)
                         {
                             // something went wrong, most likely a "0x80004005" (Acess Denied) when using UAC
