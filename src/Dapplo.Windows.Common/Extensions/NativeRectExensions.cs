@@ -21,6 +21,7 @@
 
 #region using
 
+using System.Drawing;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
 
@@ -158,7 +159,7 @@ namespace Dapplo.Windows.Common.Extensions
         public static NativeRect Union(this NativeRect rect1, NativeRect rect2)
         {
             // TODO: Replace logic with own code
-            return System.Drawing.Rectangle.Union(rect1, rect2);
+            return Rectangle.Union(rect1, rect2);
         }
 
         /// <summary>
@@ -170,7 +171,7 @@ namespace Dapplo.Windows.Common.Extensions
         public static NativeRect Intersect(this NativeRect rect1, NativeRect rect2)
         {
             // TODO: Replace logic with own code
-            return System.Drawing.Rectangle.Intersect(rect1, rect2);
+            return Rectangle.Intersect(rect1, rect2);
         }
 
         /// <summary>
@@ -180,10 +181,47 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="width">int</param>
         /// <param name="height">int</param>
         /// <returns>NativeRect</returns>
-        public static NativeRect Intersect(this NativeRect rect, int width, int height)
+        public static NativeRect Inflate(this NativeRect rect, int width, int height)
         {
             // TODO: Replace logic with own code
-            return System.Drawing.Rectangle.Inflate(rect, width, height);
+            return Rectangle.Inflate(rect, width, height);
+        }
+
+        /// <summary>
+        /// Test if the current rectangle intersects with the specified.
+        /// </summary>
+        /// <param name="rect1">NativeRect</param>
+        /// <param name="rect2">NativeRect</param>
+        /// <returns>bool</returns>
+        public static bool IntersectsWith(this NativeRect rect1, NativeRect rect2)
+        {
+            return rect2.X < rect1.X + rect1.Width &&
+                   rect1.X < rect2.X + rect2.Width &&
+                   rect2.Y < rect1.Y + rect1.Height &&
+                   rect1.Y < rect2.Y + rect2.Height;
+        }
+
+        /// <summary>
+        /// Create a new rectangle by offsetting the specified one
+        /// </summary>
+        /// <param name="rect">NativeRect</param>
+        /// <param name="offset">NativePoint</param>
+        /// <returns>NativeRect</returns>
+        public static NativeRect Offset(this NativeRect rect, NativePoint offset)
+        {
+            return new NativeRect(rect.Location.Offset(offset), rect.Size);
+        }
+
+        /// <summary>
+        /// Create a new rectangle by offsetting the specified one
+        /// </summary>
+        /// <param name="rect">NativeRect</param>
+        /// <param name="offsetX">int</param>
+        /// <param name="offsetY">int</param>
+        /// <returns>NativeRect</returns>
+        public static NativeRect Offset(this NativeRect rect, int offsetX, int offsetY)
+        {
+            return new NativeRect(rect.Location.Offset(offsetX, offsetY), rect.Size);
         }
     }
 }
