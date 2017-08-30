@@ -61,15 +61,13 @@ namespace Dapplo.Windows.Desktop
         }
 
         /// <summary>
-        ///     Find windows belonging to the same process (thread) as the supplied window.
+        ///     Find windows belonging to the same process (thread) as the process ID.
         /// </summary>
-        /// <param name="windowToLinkTo">InteropWindow</param>
+        /// <param name="processId">int with process Id</param>
         /// <returns>IEnumerable with InteropWindow</returns>
-        public static IEnumerable<IInteropWindow> GetLinkedWindows(this IInteropWindow windowToLinkTo)
+        public static IEnumerable<IInteropWindow> GetWindowsForProcess(int processId)
         {
-            var processIdSelectedWindow = windowToLinkTo.GetProcessId();
-
-            using (var process = Process.GetProcessById(processIdSelectedWindow))
+            using (var process = Process.GetProcessById(processId))
             {
                 foreach (ProcessThread thread in process.Threads)
                 {
