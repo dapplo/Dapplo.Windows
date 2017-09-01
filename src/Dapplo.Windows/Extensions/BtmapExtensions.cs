@@ -50,5 +50,20 @@ namespace Dapplo.Windows.Extensions
                 return Imaging.CreateBitmapSourceFromHBitmap(hBitmap.DangerousGetHandle(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             }
         }
+
+        /// <summary>
+        ///     Convert a Image (Bitmap) to a BitmapSource
+        /// </summary>
+        /// <param name="image">Image</param>
+        /// <returns>BitmapSource</returns>
+        public static BitmapSource ToBitmapSource(this Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+            var bitmap = image as Bitmap;
+            return bitmap.ToBitmapSource();
+        }
     }
 }

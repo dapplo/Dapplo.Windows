@@ -46,7 +46,7 @@ namespace Dapplo.Windows.Icons
         /// </summary>
         /// <param name="icon"></param>
         /// <returns></returns>
-        public static BitmapSource ToImageSource(this Icon icon)
+        public static BitmapSource ToBitmapSource(this Icon icon)
         {
             var bitmap = icon.ToBitmap();
             using (var hBitmapHandle = new SafeHBitmapHandle(bitmap.GetHbitmap()))

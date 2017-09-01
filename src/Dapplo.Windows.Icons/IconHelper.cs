@@ -323,7 +323,7 @@ namespace Dapplo.Windows.Icons
             }
             using (var icon = Icon.FromHandle(iconHandle))
             {
-                return icon.ToImageSource() as TIcon;
+                return icon.ToBitmapSource() as TIcon;
             }
         }
 
