@@ -278,7 +278,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="width">float</param>
         /// <param name="height">float</param>
         /// <returns>NativeRectFloat</returns>
-        public static NativeRect Resize(this NativeRectFloat rect, float? width = null, float? height = null)
+        public static NativeRectFloat Resize(this NativeRectFloat rect, float? width = null, float? height = null)
         {
             return rect.Resize(new NativeSizeFloat(width ?? rect.Width, height ?? rect.Height));
         }

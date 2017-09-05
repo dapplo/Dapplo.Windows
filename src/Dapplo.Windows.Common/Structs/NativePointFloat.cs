@@ -183,6 +183,7 @@ namespace Dapplo.Windows.Common.Structs
             x = X;
             y = Y;
         }
+
         /// <summary>
         ///     Empty NativePointFloat
         /// </summary>

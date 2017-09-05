@@ -118,6 +118,15 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        ///     Implicit cast from NativeSize to System.Drawing.SizeF
+        /// </summary>
+        /// <param name="size">NativeSizeFloat</param>
+        public static implicit operator System.Drawing.SizeF(NativeSizeFloat size)
+        {
+            return new System.Drawing.SizeF(size.Width, size.Height);
+        }
+
+        /// <summary>
         ///     Implicit cast from System.Drawing.Size to NativeSizeFloat
         /// </summary>
         /// <param name="size">System.Drawing.Size</param>
@@ -131,6 +140,15 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="size">NativeSize</param>
         public static implicit operator NativeSizeFloat(NativeSize size)
+        {
+            return new NativeSizeFloat(size.Width, size.Height);
+        }
+
+        /// <summary>
+        ///     Implicit cast from System.Drawing.SizeF to NativeSizeFloat
+        /// </summary>
+        /// <param name="size">System.Drawing.Size</param>
+        public static implicit operator NativeSizeFloat(System.Drawing.SizeF size)
         {
             return new NativeSizeFloat(size.Width, size.Height);
         }

@@ -160,7 +160,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         ///     Size for this NativeRectFloat
         /// </summary>
-        public NativeSize Size => new NativeSize((int) Width, (int) Height);
+        public NativeSizeFloat Size => new NativeSizeFloat(Width, Height);
 
         /// <summary>
         ///     Cast NativeRectFloat to Rect
