@@ -133,6 +133,15 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        /// Implicit cast from NativePointFloat to NativePoint
+        /// </summary>
+        /// <param name="nativePointFloat">NativePointFloat</param>
+        public static implicit operator NativePoint(NativePointFloat nativePointFloat)
+        {
+            return new NativePoint((int)nativePointFloat.X, (int)nativePointFloat.Y);
+        }
+
+        /// <summary>
         /// Equal
         /// </summary>
         /// <param name="point1">NativePoint</param>
@@ -152,6 +161,16 @@ namespace Dapplo.Windows.Common.Structs
         public static bool operator !=(NativePoint point1, NativePoint point2)
         {
             return !(point1 == point2);
+        }
+
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (_x * 397) ^ _y;
+            }
         }
 
         /// <inheritdoc />
@@ -175,16 +194,15 @@ namespace Dapplo.Windows.Common.Structs
                    Y == other.Y;
         }
 
-        /// <inheritdoc />
-        public override int GetHashCode()
+        /// <summary>
+        /// Decontructor for tuples
+        /// </summary>
+        /// <param name="x">int</param>
+        /// <param name="y">int</param>
+        public void Deconstruct(out int x, out int y)
         {
-            var hashCode = 367829482;
-            hashCode = hashCode * -1521134295 + base.GetHashCode();
-            hashCode = hashCode * -1521134295 + _x.GetHashCode();
-            hashCode = hashCode * -1521134295 + _y.GetHashCode();
-            hashCode = hashCode * -1521134295 + X.GetHashCode();
-            hashCode = hashCode * -1521134295 + Y.GetHashCode();
-            return hashCode;
+            x = X;
+            y = Y;
         }
 
         /// <summary>

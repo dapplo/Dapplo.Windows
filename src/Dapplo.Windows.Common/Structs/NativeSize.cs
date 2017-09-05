@@ -176,13 +176,24 @@ namespace Dapplo.Windows.Common.Structs
                    _height == other._height;
         }
 
+        /// <summary>
+        /// Decontructor for tuples
+        /// </summary>
+        /// <param name="width">int</param>
+        /// <param name="height">int</param>
+        public void Deconstruct(out int width, out int height)
+        {
+            width = Width;
+            height = Height;
+        }
+
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            var hashCode = -607065473;
-            hashCode = hashCode * -1521134295 + _width.GetHashCode();
-            hashCode = hashCode * -1521134295 + _height.GetHashCode();
-            return hashCode;
+            unchecked
+            {
+                return (_width * 397) ^ _height;
+            }
         }
     }
 }

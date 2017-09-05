@@ -28,31 +28,31 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Common.Extensions
 {
     /// <summary>
-    ///     Helper method for the NativePoint struct
+    ///     Helper method for the NativePointFloat struct
     /// </summary>
-    public static class NativePointExensions
+    public static class NativePointFloatExensions
     {
         /// <summary>
-        /// Create a new NativePoint, from the supplied one, using the specified offset
+        /// Create a new NativePointFloat, from the supplied one, using the specified offset
         /// </summary>
-        /// <param name="point">NativePoint</param>
-        /// <param name="offset">NativePoint</param>
-        /// <returns>NativePoint</returns>
-        public static NativePoint Offset(this NativePoint point, NativePoint offset)
+        /// <param name="point">NativePointFloat</param>
+        /// <param name="offsetX">float</param>
+        /// <param name="offsetY">float</param>
+        /// <returns>NativePointFloat</returns>
+        public static NativePointFloat Offset(this NativePointFloat point, float offsetX, float offsetY)
         {
-            return new NativePoint(point.X + offset.X, point.Y + offset.Y);
+            return new NativePointFloat(point.X + offsetX, point.Y + offsetY);
         }
 
         /// <summary>
-        /// Create a new NativePoint, from the supplied one, using the specified offset
+        /// Create a new NativePointFloat, from the supplied one, using the specified offset
         /// </summary>
-        /// <param name="point">NativePoint</param>
-        /// <param name="offsetX">int</param>
-        /// <param name="offsetY">int</param>
-        /// <returns>NativePoint</returns>
-        public static NativePoint Offset(this NativePoint point, int offsetX, int offsetY)
+        /// <param name="point">NativePointFloat</param>
+        /// <param name="offset">NativePointFloat</param>
+        /// <returns>NativePointFloat</returns>
+        public static NativePointFloat Offset(this NativePointFloat point, NativePointFloat offset)
         {
-            return new NativePoint(point.X + offsetX, point.Y + offsetY);
+            return new NativePointFloat(point.X + offset.X, point.Y + offset.Y);
         }
     }
 }

@@ -158,12 +158,6 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return $"{{Width: {_width}; Height: {_height};}}";
-        }
-
-        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is NativeSizeFloat && Equals((NativeSizeFloat)obj);
@@ -179,10 +173,27 @@ namespace Dapplo.Windows.Common.Structs
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            var hashCode = -607065473;
-            hashCode = hashCode * -1521134295 + _width.GetHashCode();
-            hashCode = hashCode * -1521134295 + _height.GetHashCode();
-            return hashCode;
+            unchecked
+            {
+                return (_width.GetHashCode() * 397) ^ _height.GetHashCode();
+            }
+        }
+
+        /// <summary>
+        /// Decontructor for tuples
+        /// </summary>
+        /// <param name="width">float</param>
+        /// <param name="height">float</param>
+        public void Deconstruct(out float width, out float height)
+        {
+            width = Width;
+            height = Height;
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"{{Width: {_width}; Height: {_height};}}";
         }
     }
 }

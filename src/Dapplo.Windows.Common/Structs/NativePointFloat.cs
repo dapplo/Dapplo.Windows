@@ -174,6 +174,16 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        /// Decontructor for tuples
+        /// </summary>
+        /// <param name="x">float</param>
+        /// <param name="y">float</param>
+        public void Deconstruct(out float x, out float y)
+        {
+            x = X;
+            y = Y;
+        }
+        /// <summary>
         ///     Empty NativePointFloat
         /// </summary>
         public static NativePointFloat Empty { get; } = new NativePointFloat();

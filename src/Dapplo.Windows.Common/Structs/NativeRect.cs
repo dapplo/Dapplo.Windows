@@ -23,6 +23,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -40,12 +41,13 @@ namespace Dapplo.Windows.Common.Structs
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
     [TypeConverter(typeof(NativeRectTypeConverter))]
+    [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
     public struct NativeRect : IEquatable<NativeRect>
     {
-        private int _left;
-        private int _top;
-        private int _right;
-        private int _bottom;
+        private readonly int _left;
+        private readonly int _top;
+        private readonly int _right;
+        private readonly int _bottom;
 
         /// <summary>
         ///     Constructor from left, right, top, bottom
@@ -88,87 +90,47 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         ///     X value
         /// </summary>
-        public int X
-        {
-            get => _left;
-            set => _left = value;
-        }
+        public int X => _left;
 
         /// <summary>
         ///     X location of the NativeRect
         /// </summary>
-        public int Y
-        {
-            get => _top;
-            set => _top = value;
-        }
+        public int Y => _top;
 
         /// <summary>
         ///     Left value of the NativeRect
         /// </summary>
-        public int Left
-        {
-            get => _left;
-            set => _left = value;
-        }
+        public int Left => _left;
 
         /// <summary>
         ///     Top of the NativeRect
         /// </summary>
-        public int Top
-        {
-            get => _top;
-            set => _top = value;
-        }
+        public int Top => _top;
 
         /// <summary>
         ///     Right of the NativeRect
         /// </summary>
-        public int Right
-        {
-            get => _right;
-            set => _right = value;
-        }
+        public int Right => _right;
 
         /// <summary>
         ///     Bottom of the NativeRect
         /// </summary>
-        public int Bottom
-        {
-            get => _bottom;
-            set => _bottom = value;
-        }
+        public int Bottom => _bottom;
 
         /// <summary>
         ///     Heigh of the NativeRect
         /// </summary>
-        public int Height
-        {
-            get => unchecked(_bottom - _top);
-            set => _bottom = unchecked(value - _top);
-        }
+        public int Height => unchecked(_bottom - _top);
 
         /// <summary>
         ///     Width of the NativeRect
         /// </summary>
-        public int Width
-        {
-            get => unchecked(_right - _left);
-            set => _right = unchecked(value + _left);
-        }
+        public int Width => unchecked(_right - _left);
 
         /// <summary>
         ///     Location of this NativeRect
         /// </summary>
-        public NativePoint Location
-        {
-            get => new NativePoint(Left, Top);
-            set
-            {
-                Left = value.X;
-                Top = value.Y;
-            }
-        }
+        public NativePoint Location => new NativePoint(Left, Top);
 
         /// <summary>
         ///     Size for this NativeRect
@@ -320,6 +282,17 @@ namespace Dapplo.Windows.Common.Structs
                 hashCode = (hashCode * 397) ^ _bottom;
                 return hashCode;
             }
+        }
+
+        /// <summary>
+        /// Decontructor for tuples
+        /// </summary>
+        /// <param name="location">NativePoint</param>
+        /// <param name="size">NativeSize</param>
+        public void Deconstruct(out NativePoint location, out NativeSize size)
+        {
+            location = Location;
+            size = Size;
         }
 
         /// <summary>

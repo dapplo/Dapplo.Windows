@@ -42,7 +42,9 @@
     <Compile Include="Enums\HRESULT.cs" />
     <Compile Include="Enums\Win32Error.cs" />
     <Compile Include="Extensions\HResultExtensions.cs" />
+    <Compile Include="Extensions\NativePointFloatExensions.cs" />
     <Compile Include="Extensions\NativePointExensions.cs" />
+    <Compile Include="Extensions\NativeRectFloatExensions.cs" />
     <Compile Include="Structs\NativePointFloat.cs" />
     <Compile Include="Structs\NativePoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

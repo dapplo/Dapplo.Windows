@@ -21,6 +21,7 @@
 
 #region using
 
+using System;
 using System.Drawing;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
@@ -30,40 +31,40 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Common.Extensions
 {
     /// <summary>
-    ///     Helper method for the NativeRect struct
+    ///     Helper method for the NativeRectFloat struct
     /// </summary>
-    public static class NativeRectExensions
+    public static class NativeRectFloatExensions
     {
         /// <summary>
-        ///     Test if this NativeRect contains the specified NativePoint
+        ///     Test if this NativeRectFloat contains the specified NativePointFloat
         /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="point">NativePoint</param>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="point">NativePointFloat</param>
         /// <returns>true if it contains</returns>
-        public static bool Contains(this NativeRect rect, NativePoint point)
+        public static bool Contains(this NativeRectFloat rect, NativePointFloat point)
         {
             return IsBetween(point.X, rect.Left, rect.Right) && IsBetween(point.Y, rect.Top, rect.Bottom);
         }
 
         /// <summary>
-        ///     Test if this NativeRect contains the specified coordinates
+        ///     Test if this NativeRectFloat contains the specified coordinates
         /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="x">int</param>
-        /// <param name="y">int</param>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="x">float</param>
+        /// <param name="y">float</param>
         /// <returns>true if it contains</returns>
-        public static bool Contains(this NativeRect rect, int x, int y)
+        public static bool Contains(this NativeRectFloat rect, float x, float y)
         {
             return IsBetween(x, rect.Left, rect.Right) && IsBetween(y, rect.Top, rect.Bottom);
         }
 
         /// <summary>
-        ///     True if small NativeRect is entirely contained within the larger NativeRect
+        ///     True if small NativeRectFloat is entirely contained within the larger NativeRectFloat
         /// </summary>
-        /// <param name="largerRectangle">NativeRect, the larger rectangle</param>
-        /// <param name="smallerRectangle">NativeRect, the smaller rectangle</param>
-        /// <returns>True if small NativeRect is entirely contained within the larger NativeRect, false otherwise</returns>
-        public static bool Contains(this NativeRect largerRectangle, NativeRect smallerRectangle)
+        /// <param name="largerRectangle">NativeRectFloat, the larger rectangle</param>
+        /// <param name="smallerRectangle">NativeRectFloat, the smaller rectangle</param>
+        /// <returns>True if small rectangle is entirely contained within the larger rectangle, false otherwise</returns>
+        public static bool Contains(this NativeRectFloat largerRectangle, NativeRectFloat smallerRectangle)
         {
             return
                 largerRectangle.Left <= smallerRectangle.Left &&
@@ -78,7 +79,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">The first rectangle</param>
         /// <param name="rect2">The second rectangle</param>
         /// <returns>The rectangles overlap</returns>
-        public static bool HasOverlap(this NativeRect rect1, NativeRect rect2)
+        public static bool HasOverlap(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             if (rect1.IsAdjacent(rect2) != AdjacentTo.None)
             {
@@ -105,7 +106,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">The first rectangle</param>
         /// <param name="rect2">The second rectangle</param>
         /// <returns>At least one rectangle is adjacent to the other rectangle</returns>
-        public static AdjacentTo IsAdjacent(this NativeRect rect1, NativeRect rect2)
+        public static AdjacentTo IsAdjacent(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             if (rect1.Left.Equals(rect2.Right) && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect2.Top, rect1.Top, rect1.Bottom)))
             {
@@ -133,79 +134,79 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="min">lowest allowed value</param>
         /// <param name="max">highest allowed value</param>
         /// <returns>bool true if the value is between</returns>
-        private static bool IsBetween(int value, int min, int max)
+        private static bool IsBetween(float value, float min, float max)
         {
             return value >= min && value < max;
         }
 
         /// <summary>
-        ///     Test if a NativeRect is docked to the left of another NativeRect
+        ///     Test if a NativeRectFloat is docked to the left of another NativeRectFloat
         /// </summary>
-        /// <param name="rect1">NativeRect to test if it's docked</param>
-        /// <param name="rect2">NativeRect rect to be docked to</param>
+        /// <param name="rect1">NativeRectFloat to test if it's docked</param>
+        /// <param name="rect2">NativeRectFloat rect to be docked to</param>
         /// <returns>bool with true if they are docked</returns>
-        public static bool IsDockedToLeftOf(this NativeRect rect1, NativeRect rect2)
+        public static bool IsDockedToLeftOf(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             // Test if the right is one pixel to the left, and if top or bottom is within the rect2 height.
-            return rect1.Right == rect2.Left - 1 && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect1.Bottom, rect2.Top, rect2.Bottom));
+            return Math.Abs(rect1.Right - (rect2.Left - 1)) < float.Epsilon && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect1.Bottom, rect2.Top, rect2.Bottom));
         }
 
         /// <summary>
-        ///     Test if a NativeRect is docked to the right of another NativeRect
+        ///     Test if a NativeRectFloat is docked to the right of another NativeRectFloat
         /// </summary>
-        /// <param name="rect1">NativeRect to test if it's docked</param>
-        /// <param name="rect2">NativeRect rect to be docked to</param>
+        /// <param name="rect1">NativeRectFloat to test if it's docked</param>
+        /// <param name="rect2">NativeRectFloat rect to be docked to</param>
         /// <returns>bool with true if they are docked</returns>
-        public static bool IsDockedToRightOf(this NativeRect rect1, NativeRect rect2)
+        public static bool IsDockedToRightOf(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             // Test if the right is one pixel to the left, and if top or bottom is within the rect2 height.
-            return rect1.Left == rect2.Right + 1 && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect1.Bottom, rect2.Top, rect2.Bottom));
+            return Math.Abs(rect1.Left - (rect2.Right + 1)) < float.Epsilon && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect1.Bottom, rect2.Top, rect2.Bottom));
         }
 
         /// <summary>
-        /// Creates a new NativeRect which is the union of rect1 and rect2
+        /// Creates a new NativeRectFloat which is the union of rect1 and rect2
         /// </summary>
-        /// <param name="rect1">NativeRect</param>
-        /// <param name="rect2">NativeRect</param>
-        /// <returns>NativeRect which is the intersection of rect1 and rect2</returns>
-        public static NativeRect Union(this NativeRect rect1, NativeRect rect2)
+        /// <param name="rect1">NativeRectFloat</param>
+        /// <param name="rect2">NativeRectFloat</param>
+        /// <returns>NativeRectFloat which is the union of rect1 and rect2</returns>
+        public static NativeRectFloat Union(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             // TODO: Replace logic with own code
-            return Rectangle.Union(rect1, rect2);
+            return RectangleF.Union(rect1, rect2);
         }
 
         /// <summary>
         /// Creates a new NativeRect which is the intersection of rect1 and rect2
         /// </summary>
-        /// <param name="rect1">NativeRect</param>
-        /// <param name="rect2">NativeRect</param>
-        /// <returns>NativeRect which is the intersection of rect1 and rect2</returns>
-        public static NativeRect Intersect(this NativeRect rect1, NativeRect rect2)
+        /// <param name="rect1">NativeRectFloat</param>
+        /// <param name="rect2">NativeRectFloat</param>
+        /// <returns>NativeRectFloat which is the intersection of rect1 and rect2</returns>
+        public static NativeRectFloat Intersect(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             // TODO: Replace logic with own code
-            return Rectangle.Intersect(rect1, rect2);
+            return RectangleF.Intersect(rect1, rect2);
         }
 
         /// <summary>
-        /// Creates a new NativeRect which is rect but inflated with the specified width and height
+        /// Creates a new NativeRectFloat which is rect but inflated with the specified width and height
         /// </summary>
-        /// <param name="rect">NativeRect</param>
+        /// <param name="rect">NativeRectFloat</param>
         /// <param name="width">int</param>
         /// <param name="height">int</param>
-        /// <returns>NativeRect</returns>
-        public static NativeRect Inflate(this NativeRect rect, int width, int height)
+        /// <returns>NativeRectFloat</returns>
+        public static NativeRectFloat Inflate(this NativeRectFloat rect, int width, int height)
         {
             // TODO: Replace logic with own code
-            return Rectangle.Inflate(rect, width, height);
+            return RectangleF.Inflate(rect, width, height);
         }
 
         /// <summary>
-        /// Test if the current rectangle intersects with the specified.
+        /// Test if the current NativeRectFloat intersects with the specified.
         /// </summary>
-        /// <param name="rect1">NativeRect</param>
-        /// <param name="rect2">NativeRect</param>
+        /// <param name="rect1">NativeRectFloat</param>
+        /// <param name="rect2">NativeRectFloat</param>
         /// <returns>bool</returns>
-        public static bool IntersectsWith(this NativeRect rect1, NativeRect rect2)
+        public static bool IntersectsWith(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             return rect2.X < rect1.X + rect1.Width &&
                    rect1.X < rect2.X + rect2.Width &&
@@ -216,70 +217,71 @@ namespace Dapplo.Windows.Common.Extensions
         /// <summary>
         /// Create a new NativeRect by offsetting the specified one
         /// </summary>
-        /// <param name="rect">NativeRect</param>
-        /// <param name="offset">NativePoint</param>
-        /// <returns>NativeRect</returns>
-        public static NativeRect Offset(this NativeRect rect, NativePoint offset)
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="offset">NativePointFloat</param>
+        /// <returns>NativeRectFloat</returns>
+        public static NativeRectFloat Offset(this NativeRectFloat rect, NativePointFloat offset)
         {
-            return new NativeRect(rect.Location.Offset(offset), rect.Size);
+            return new NativeRectFloat(rect.Location.Offset(offset), rect.Size);
         }
 
         /// <summary>
-        /// Create a new NativeRect by offsetting the specified one
+        /// Create a new NativeRectFloat by offsetting the specified one
         /// </summary>
-        /// <param name="rect">NativeRect</param>
+        /// <param name="rect">NativeRectFloat</param>
         /// <param name="offsetX">int</param>
         /// <param name="offsetY">int</param>
-        /// <returns>NativeRect</returns>
-        public static NativeRect Offset(this NativeRect rect, int offsetX, int offsetY)
+        /// <returns>NativeRectFloat</returns>
+        public static NativeRectFloat Offset(this NativeRectFloat rect, int offsetX, int offsetY)
         {
-            return rect.Offset(new NativePoint(offsetX, offsetY));
+            return new NativeRectFloat(rect.Location.Offset(offsetX, offsetY), rect.Size);
         }
 
         /// <summary>
-        /// Create a new NativeRect from the specified one, but on a different location
+        /// Create a new NativeRectFloat from the specified one, but on a different location
         /// </summary>
-        /// <param name="rect">NativeRect</param>
-        /// <param name="location">NativePoint</param>
-        /// <returns>NativeRect</returns>
-        public static NativeRect MoveTo(this NativeRect rect, NativePoint location)
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="location">NativePointFloat</param>
+        /// <returns>NativeRectFloat</returns>
+        public static NativeRectFloat MoveTo(this NativeRectFloat rect, NativePointFloat location)
         {
-            return new NativeRect(location, rect.Size);
+            return new NativeRectFloat(location, rect.Size);
         }
 
         /// <summary>
-        /// Create a new NativeRect from the specified one, but on a different location
+        /// Create a new NativeRectFloat from the specified one, but on a different location
         /// </summary>
-        /// <param name="rect">NativeRect</param>
+        /// <param name="rect">NativeRectFloat</param>
         /// <param name="x">int</param>
         /// <param name="y">int</param>
-        /// <returns>NativeRect</returns>
-        public static NativeRect MoveTo(this NativeRect rect, int x, int y)
+        /// <returns>NativeRectFloat</returns>
+        public static NativeRectFloat MoveTo(this NativeRectFloat rect, float x, float y)
         {
-            return rect.MoveTo(new NativePoint(x,y));
+            return new NativeRectFloat(new NativePointFloat(x,y), rect.Size);
+        }
+
+
+        /// <summary>
+        /// Create a new NativeRectFloat from the specified one, but with a different size
+        /// </summary>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="size">NativeSizeFloat</param>
+        /// <returns>NativeRectFloat</returns>
+        public static NativeRectFloat Resize(this NativeRectFloat rect, NativeSizeFloat size)
+        {
+            return new NativeRectFloat(rect.Location, size);
         }
 
         /// <summary>
-        /// Create a new NativeRect from the specified one, but with a different size
+        /// Create a new NativeRectFloat from the specified one, but with a different size
         /// </summary>
-        /// <param name="rect">NativeRect</param>
-        /// <param name="size">NativeSize</param>
-        /// <returns>NativeRect</returns>
-        public static NativeRect Resize(this NativeRect rect, NativeSize size)
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="width">float</param>
+        /// <param name="height">float</param>
+        /// <returns>NativeRectFloat</returns>
+        public static NativeRect Resize(this NativeRectFloat rect, float width, float height)
         {
-            return new NativeRect(rect.Location, size);
-        }
-
-        /// <summary>
-        /// Create a new NativeRect from the specified one, but with a different size
-        /// </summary>
-        /// <param name="rect">NativeRect</param>
-        /// <param name="width">int</param>
-        /// <param name="height">int</param>
-        /// <returns>NativeRect</returns>
-        public static NativeRect Resize(this NativeRect rect, int width, int height)
-        {
-            return rect.Resize(new NativeSize(width, height));
+            return rect.Resize(new NativeSizeFloat(width, height));
         }
     }
 }

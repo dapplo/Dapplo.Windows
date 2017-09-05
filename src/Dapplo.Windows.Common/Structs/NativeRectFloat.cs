@@ -133,6 +133,26 @@ namespace Dapplo.Windows.Common.Structs
         public float Width => _width;
 
         /// <summary>
+        ///     Coordinates of the bottom left
+        /// </summary>
+        public NativePointFloat BottomLeft => new NativePointFloat(X, Y + Height);
+
+        /// <summary>
+        ///     Coordinates of the top left
+        /// </summary>
+        public NativePointFloat TopLeft => new NativePointFloat(X, Y);
+
+        /// <summary>
+        ///     Coordinates of the bottom right
+        /// </summary>
+        public NativePointFloat BottomRight => new NativePointFloat(X + Width, Y + Height);
+
+        /// <summary>
+        ///     Coordinates of the top right
+        /// </summary>
+        public NativePointFloat TopRight => new NativePointFloat(X + Width, Y);
+
+        /// <summary>
         ///     Location for this NativeRectFloat
         /// </summary>
         public NativePointFloat Location => new NativePointFloat(Left, Top);
@@ -275,6 +295,7 @@ namespace Dapplo.Windows.Common.Structs
             unchecked
             {
                 var hashCode = _x.GetHashCode();
+                hashCode = (hashCode * 397) ^ _x.GetHashCode();
                 hashCode = (hashCode * 397) ^ _y.GetHashCode();
                 hashCode = (hashCode * 397) ^ _width.GetHashCode();
                 hashCode = (hashCode * 397) ^ _height.GetHashCode();
@@ -290,6 +311,17 @@ namespace Dapplo.Windows.Common.Structs
         public bool Contains(NativePoint point)
         {
             return point.X >= Left && point.X <= Right && point.Y >= Top && point.Y <= Bottom;
+        }
+
+        /// <summary>
+        /// Decontructor for tuples
+        /// </summary>
+        /// <param name="location">NativePointFloat</param>
+        /// <param name="size">NativeSizeFloat</param>
+        public void Deconstruct(out NativePointFloat location, out NativeSizeFloat size)
+        {
+            location = Location;
+            size = Size;
         }
 
         /// <summary>
