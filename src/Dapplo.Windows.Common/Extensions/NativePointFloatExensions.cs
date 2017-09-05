@@ -38,7 +38,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePointFloat</param>
         /// <param name="x">float</param>
         /// <returns>NativePointFloat</returns>
-        public static NativePointFloat X(this NativePointFloat point, float x)
+        public static NativePointFloat SetX(this NativePointFloat point, float x)
         {
             return new NativePointFloat(x, point.Y);
         }
@@ -49,7 +49,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePointFloat</param>
         /// <param name="y">float</param>
         /// <returns>NativePointFloat</returns>
-        public static NativePointFloat Y(this NativePointFloat point, float y)
+        public static NativePointFloat SetY(this NativePointFloat point, float y)
         {
             return new NativePointFloat(point.X, y);
         }
