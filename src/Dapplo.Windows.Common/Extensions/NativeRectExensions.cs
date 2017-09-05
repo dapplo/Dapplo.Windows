@@ -202,7 +202,7 @@ namespace Dapplo.Windows.Common.Extensions
         }
 
         /// <summary>
-        /// Create a new rectangle by offsetting the specified one
+        /// Create a new NativeRect by offsetting the specified one
         /// </summary>
         /// <param name="rect">NativeRect</param>
         /// <param name="offset">NativePoint</param>
@@ -213,7 +213,7 @@ namespace Dapplo.Windows.Common.Extensions
         }
 
         /// <summary>
-        /// Create a new rectangle by offsetting the specified one
+        /// Create a new NativeRect by offsetting the specified one
         /// </summary>
         /// <param name="rect">NativeRect</param>
         /// <param name="offsetX">int</param>
@@ -222,6 +222,30 @@ namespace Dapplo.Windows.Common.Extensions
         public static NativeRect Offset(this NativeRect rect, int offsetX, int offsetY)
         {
             return new NativeRect(rect.Location.Offset(offsetX, offsetY), rect.Size);
+        }
+
+
+        /// <summary>
+        /// Create a new NativeRectFloat by offsetting the specified one
+        /// </summary>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="offset">NativeRectFloat</param>
+        /// <returns>NativeRectFloat</returns>
+        public static NativeRectFloat Offset(this NativeRectFloat rect, NativePointFloat offset)
+        {
+            return new NativeRectFloat(rect.Location.Offset(offset), rect.Size);
+        }
+
+        /// <summary>
+        /// Create a new NativeRectFloat by offsetting the specified one
+        /// </summary>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="offsetX">float</param>
+        /// <param name="offsetY">float</param>
+        /// <returns>NativeRectFloat</returns>
+        public static NativeRectFloat Offset(this NativeRectFloat rect, float offsetX, float offsetY)
+        {
+            return new NativeRectFloat(rect.Location.Offset(offsetX, offsetY), rect.Size);
         }
     }
 }

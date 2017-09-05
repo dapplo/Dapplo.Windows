@@ -23,6 +23,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -41,12 +42,13 @@ namespace Dapplo.Windows.Common.Structs
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
     [TypeConverter(typeof(NativeRectFloatTypeConverter))]
-    public struct NativeRectFloat
+    [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
+    public struct NativeRectFloat : IEquatable<NativeRectFloat>
     {
-        private float _x;
-        private float _y;
-        private float _width;
-        private float _height;
+        private readonly float _x;
+        private readonly float _y;
+        private readonly float _width;
+        private readonly float _height;
 
         /// <summary>
         ///     Constructor from left, top, right, bottom
@@ -78,102 +80,67 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        ///     Constructor from location, size
+        /// </summary>
+        /// <param name="location">NativePoint</param>
+        /// <param name="nativeSizeFloat">NativeSizeFloat</param>
+        public NativeRectFloat(NativePointFloat location, NativeSizeFloat nativeSizeFloat)
+        {
+            _x = location.X;
+            _y = location.Y;
+            _width = nativeSizeFloat.Width;
+            _height = nativeSizeFloat.Height;
+        }
+
+        /// <summary>
         ///     X value
         /// </summary>
-        public float X
-        {
-            get { return _x; }
-            set { _x = value; }
-        }
+        public float X => _x;
 
         /// <summary>
         ///     X location of the rectangle
         /// </summary>
-        public float Y
-        {
-            get { return _y; }
-            set { _y = value; }
-        }
+        public float Y => _y;
 
         /// <summary>
         ///     Left value of the rectangle
         /// </summary>
-        public float Left
-        {
-            get { return _x; }
-            set { _x = value; }
-        }
+        public float Left => _x;
 
         /// <summary>
         ///     Top of the rectangle
         /// </summary>
-        public float Top
-        {
-            get { return _y; }
-            set { _y = value; }
-        }
+        public float Top => _y;
 
         /// <summary>
         ///     Right of the rectangle
         /// </summary>
-        public float Right
-        {
-            get { return _x + _width; }
-            set { _width = value - _x; }
-        }
+        public float Right => _x + _width;
 
         /// <summary>
         ///     Bottom of the rectangle
         /// </summary>
-        public float Bottom
-        {
-            get { return _y + _height; }
-            set { _height = value - _y; }
-        }
+        public float Bottom => _y + _height;
 
         /// <summary>
         ///     Heigh of the NativeRectFloat
         /// </summary>
-        public float Height
-        {
-            get { return _height; }
-            set { _height = value; }
-        }
+        public float Height => _height;
 
         /// <summary>
         ///     Width of the NativeRectFloat
         /// </summary>
-        public float Width
-        {
-            get { return _width; }
-            set { _width = value; }
-        }
+        public float Width => _width;
 
         /// <summary>
         ///     Location for this NativeRectFloat
         /// </summary>
-        public NativePoint Location
-        {
-            get { return new NativePoint((int) Left, (int) Top); }
-            set
-            {
-                _x = value.X;
-                _y = value.Y;
-            }
-        }
+        public NativePointFloat Location => new NativePointFloat(Left, Top);
 
         /// <summary>
         ///     Size for this NativeRectFloat
         /// </summary>
-        public NativeSize Size
-        {
-            get { return new NativeSize((int) Width, (int) Height); }
-            set
-            {
-                _width = value.Width + _x;
-                _height = value.Height + _y;
-            }
-        }
+        public NativeSize Size => new NativeSize((int) Width, (int) Height);
 
         /// <summary>
         ///     Cast NativeRectFloat to Rect
@@ -263,14 +230,8 @@ namespace Dapplo.Windows.Common.Structs
             return "{Left: " + _x + "; " + "Top: " + _y + "; Right: " + _width + "; Bottom: " + _height + "}";
         }
 
-        /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return ToString().GetHashCode();
-        }
-
         /// <summary>
-        ///     Equalss
+        ///     Equals
         /// </summary>
         /// <param name="rectangle">NativeRectFloat</param>
         /// <returns>bool</returns>
@@ -306,6 +267,19 @@ namespace Dapplo.Windows.Common.Structs
                 return Equals(rect);
             }
             return false;
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = _x.GetHashCode();
+                hashCode = (hashCode * 397) ^ _y.GetHashCode();
+                hashCode = (hashCode * 397) ^ _width.GetHashCode();
+                hashCode = (hashCode * 397) ^ _height.GetHashCode();
+                return hashCode;
+            }
         }
 
         /// <summary>

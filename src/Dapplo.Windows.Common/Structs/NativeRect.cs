@@ -40,7 +40,7 @@ namespace Dapplo.Windows.Common.Structs
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
     [TypeConverter(typeof(NativeRectTypeConverter))]
-    public struct NativeRect
+    public struct NativeRect : IEquatable<NativeRect>
     {
         private int _left;
         private int _top;
@@ -90,80 +90,88 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         public int X
         {
-            get { return _left; }
-            set { _left = value; }
+            get => _left;
+            set => _left = value;
         }
 
         /// <summary>
-        ///     X location of the rectangle
+        ///     X location of the NativeRect
         /// </summary>
         public int Y
         {
-            get { return _top; }
-            set { _top = value; }
+            get => _top;
+            set => _top = value;
         }
 
         /// <summary>
-        ///     Left value of the rectangle
+        ///     Left value of the NativeRect
         /// </summary>
         public int Left
         {
-            get { return _left; }
-            set { _left = value; }
+            get => _left;
+            set => _left = value;
         }
 
         /// <summary>
-        ///     Top of the rectangle
+        ///     Top of the NativeRect
         /// </summary>
         public int Top
         {
-            get { return _top; }
-            set { _top = value; }
+            get => _top;
+            set => _top = value;
         }
 
         /// <summary>
-        ///     Right of the rectangle
+        ///     Right of the NativeRect
         /// </summary>
         public int Right
         {
-            get { return _right; }
-            set { _right = value; }
+            get => _right;
+            set => _right = value;
         }
 
         /// <summary>
-        ///     Bottom of the rectangle
+        ///     Bottom of the NativeRect
         /// </summary>
         public int Bottom
         {
-            get { return _bottom; }
-            set { _bottom = value; }
+            get => _bottom;
+            set => _bottom = value;
         }
 
         /// <summary>
-        ///     Heigh of the RECT
+        ///     Heigh of the NativeRect
         /// </summary>
         public int Height
         {
-            get { return unchecked(_bottom - _top); }
-            set { _bottom = unchecked(value - _top); }
+            get => unchecked(_bottom - _top);
+            set => _bottom = unchecked(value - _top);
         }
 
         /// <summary>
-        ///     Width of the RECT
+        ///     Width of the NativeRect
         /// </summary>
         public int Width
         {
-            get { return unchecked(_right - _left); }
-            set { _right = unchecked(value + _left); }
+            get => unchecked(_right - _left);
+            set => _right = unchecked(value + _left);
         }
 
         /// <summary>
-        ///     Location (for this RECT
+        ///     Location of this NativeRect
         /// </summary>
-        public NativePoint Location => new NativePoint(Left, Top);
+        public NativePoint Location
+        {
+            get => new NativePoint(Left, Top);
+            set
+            {
+                Left = value.X;
+                Top = value.Y;
+            }
+        }
 
         /// <summary>
-        ///     Size for this RECT
+        ///     Size for this NativeRect
         /// </summary>
         public NativeSize Size => new NativeSize(Width, Height);
 
@@ -228,6 +236,16 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        ///     Cast NativeRectFloat to NativeRect
+        /// </summary>
+        /// <param name="rectangle">NativeRectFloat</param>
+        /// <returns>NativeRect</returns>
+        public static implicit operator NativeRect(NativeRectFloat rectangle)
+        {
+            return new NativeRect((int) rectangle.Left, (int)rectangle.Top, (int)rectangle.Right, (int)rectangle.Bottom);
+        }
+
+        /// <summary>
         ///     Equals for RECT
         /// </summary>
         /// <param name="rectangle1">RECT</param>
@@ -253,12 +271,6 @@ namespace Dapplo.Windows.Common.Structs
         public override string ToString()
         {
             return $"{{Left: {_left}; Top: {_top}; Right: {_right}; Bottom: {_bottom};}}";
-        }
-
-        /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return ToString().GetHashCode();
         }
 
         /// <summary>
@@ -295,6 +307,19 @@ namespace Dapplo.Windows.Common.Structs
                 return Equals(rect);
             }
             return false;
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = _left;
+                hashCode = (hashCode * 397) ^ _top;
+                hashCode = (hashCode * 397) ^ _right;
+                hashCode = (hashCode * 397) ^ _bottom;
+                return hashCode;
+            }
         }
 
         /// <summary>

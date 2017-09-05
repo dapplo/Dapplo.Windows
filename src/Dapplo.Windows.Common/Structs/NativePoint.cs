@@ -23,6 +23,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Dapplo.Windows.Common.TypeConverters;
@@ -38,28 +39,21 @@ namespace Dapplo.Windows.Common.Structs
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
     [TypeConverter(typeof(NativePointTypeConverter))]
-    public struct NativePoint
+    [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
+    public struct NativePoint : IEquatable<NativePoint>
     {
-        private int _x;
-        private int _y;
+        private readonly int _x;
+        private readonly int _y;
 
         /// <summary>
         ///     The X coordinate
         /// </summary>
-        public int X
-        {
-            get { return _x; }
-            set { _x = value; }
-        }
+        public int X => _x;
 
         /// <summary>
         ///     The Y coordinate
         /// </summary>
-        public int Y
-        {
-            get { return _y; }
-            set { _y = value; }
-        }
+        public int Y => _y;
 
         /// <summary>
         ///     Constructor with x and y coordinates
@@ -70,6 +64,27 @@ namespace Dapplo.Windows.Common.Structs
         {
             _x = x;
             _y = y;
+        }
+
+        /// <summary>
+        /// Create a new NativePoint of this with the specified offset
+        /// </summary>
+        /// <param name="x">int with x offset</param>
+        /// <param name="y">int with y offset</param>
+        /// <returns>NativePoint</returns>
+        public NativePoint Offset(int x, int y)
+        {
+            return new NativePoint(X + x, Y + y);
+        }
+
+        /// <summary>
+        /// Create a new NativePoint of this with the specified offset
+        /// </summary>
+        /// <param name="point">NativePoint</param>
+        /// <returns>NativePoint</returns>
+        public NativePoint Offset(NativePoint point)
+        {
+            return new NativePoint(X + point.X, Y + point.Y);
         }
 
         /// <summary>
@@ -108,10 +123,68 @@ namespace Dapplo.Windows.Common.Structs
             return new NativePoint(point.X, point.Y);
         }
 
+        /// <summary>
+        ///     Implicit cast from System.Drawing.PointF to NativePoint
+        /// </summary>
+        /// <param name="point">System.Drawing.PointF</param>
+        public static implicit operator NativePoint(System.Drawing.PointF point)
+        {
+            return new NativePoint((int) point.X, (int) point.Y);
+        }
+
+        /// <summary>
+        /// Equal
+        /// </summary>
+        /// <param name="point1">NativePoint</param>
+        /// <param name="point2">NativePoint</param>
+        /// <returns>rue if equal</returns>
+        public static bool operator ==(NativePoint point1, NativePoint point2)
+        {
+            return point1.Equals(point2);
+        }
+
+        /// <summary>
+        /// Not equal
+        /// </summary>
+        /// <param name="point1">NativePoint</param>
+        /// <param name="point2">NativePoint</param>
+        /// <returns>false if the values are equal</returns>
+        public static bool operator !=(NativePoint point1, NativePoint point2)
+        {
+            return !(point1 == point2);
+        }
+
         /// <inheritdoc />
         public override string ToString()
         {
             return X + "," + Y;
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            return obj is NativePoint && Equals((NativePoint)obj);
+        }
+
+        /// <inheritdoc />
+        public bool Equals(NativePoint other)
+        {
+            return _x == other._x &&
+                   _y == other._y &&
+                   X == other.X &&
+                   Y == other.Y;
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            var hashCode = 367829482;
+            hashCode = hashCode * -1521134295 + base.GetHashCode();
+            hashCode = hashCode * -1521134295 + _x.GetHashCode();
+            hashCode = hashCode * -1521134295 + _y.GetHashCode();
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
+            return hashCode;
         }
 
         /// <summary>

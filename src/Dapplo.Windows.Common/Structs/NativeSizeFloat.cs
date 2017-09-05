@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -34,28 +35,21 @@ namespace Dapplo.Windows.Common.Structs
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
-    public struct NativeSizeFloat
+    [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
+    public struct NativeSizeFloat : IEquatable<NativeSizeFloat>
     {
-        private float _width;
-        private float _height;
+        private readonly float _width;
+        private readonly float _height;
 
         /// <summary>
         ///     The Width of the size struct
         /// </summary>
-        public float Width
-        {
-            get { return _width; }
-            set { _width = value; }
-        }
+        public float Width => _width;
 
         /// <summary>
         ///     The Width of the size struct
         /// </summary>
-        public float Height
-        {
-            get { return _height; }
-            set { _height = value; }
-        }
+        public float Height => _height;
 
         /// <summary>
         ///     Returns an empty size
@@ -67,7 +61,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="size"></param>
         public NativeSizeFloat(Size size)
-            : this((int) size.Width, (int) size.Height)
+            : this((float) size.Width, (float) size.Height)
         {
         }
 
@@ -94,7 +88,7 @@ namespace Dapplo.Windows.Common.Structs
         ///     Checks if the width * height are 0
         /// </summary>
         /// <returns>true if the size is empty</returns>
-        public bool IsEmpty => _width * _height == 0;
+        public bool IsEmpty => Math.Abs(_width * _height) < float.Epsilon;
 
         /// <summary>
         ///     Implicit cast from NativeSizeFloat to Size
@@ -132,10 +126,63 @@ namespace Dapplo.Windows.Common.Structs
             return new NativeSizeFloat(size.Width, size.Height);
         }
 
+        /// <summary>
+        ///     Implicit cast from NativeSize to NativeSizeFloat
+        /// </summary>
+        /// <param name="size">NativeSize</param>
+        public static implicit operator NativeSizeFloat(NativeSize size)
+        {
+            return new NativeSizeFloat(size.Width, size.Height);
+        }
+
+        /// <summary>
+        /// Equals operator
+        /// </summary>
+        /// <param name="float1">NativeSizeFloat</param>
+        /// <param name="float2">NativeSizeFloat</param>
+        /// <returns>bool</returns>
+        public static bool operator ==(NativeSizeFloat float1, NativeSizeFloat float2)
+        {
+            return float1.Equals(float2);
+        }
+
+        /// <summary>
+        /// Not equals operator
+        /// </summary>
+        /// <param name="float1">NativeSizeFloat</param>
+        /// <param name="float2">NativeSizeFloat</param>
+        /// <returns>bool</returns>
+        public static bool operator !=(NativeSizeFloat float1, NativeSizeFloat float2)
+        {
+            return !(float1 == float2);
+        }
+
         /// <inheritdoc />
         public override string ToString()
         {
             return $"{{Width: {_width}; Height: {_height};}}";
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            return obj is NativeSizeFloat && Equals((NativeSizeFloat)obj);
+        }
+
+        /// <inheritdoc />
+        public bool Equals(NativeSizeFloat other)
+        {
+            return Math.Abs(_width - other._width) < float.Epsilon &&
+                   Math.Abs(_height - other._height) < float.Epsilon;
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            var hashCode = -607065473;
+            hashCode = hashCode * -1521134295 + _width.GetHashCode();
+            hashCode = hashCode * -1521134295 + _height.GetHashCode();
+            return hashCode;
         }
     }
 }

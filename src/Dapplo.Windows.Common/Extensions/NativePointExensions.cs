@@ -54,5 +54,28 @@ namespace Dapplo.Windows.Common.Extensions
         {
             return new NativePoint(point.X + offsetX, point.Y + offsetY);
         }
+
+        /// <summary>
+        /// Create a new NativePointFloat, from the supplied one, using the specified offset
+        /// </summary>
+        /// <param name="point">NativePointFloat</param>
+        /// <param name="offsetX">float</param>
+        /// <param name="offsetY">float</param>
+        /// <returns>NativePointFloat</returns>
+        public static NativePointFloat Offset(this NativePointFloat point, float offsetX, float offsetY)
+        {
+            return new NativePointFloat(point.X + offsetX, point.Y + offsetY);
+        }
+
+        /// <summary>
+        /// Create a new NativePointFloat, from the supplied one, using the specified offset
+        /// </summary>
+        /// <param name="point">NativePointFloat</param>
+        /// <param name="offset">NativePointFloat</param>
+        /// <returns>NativePointFloat</returns>
+        public static NativePointFloat Offset(this NativePointFloat point, NativePointFloat offset)
+        {
+            return new NativePointFloat(point.X + offset.X, point.Y + offset.Y);
+        }
     }
 }

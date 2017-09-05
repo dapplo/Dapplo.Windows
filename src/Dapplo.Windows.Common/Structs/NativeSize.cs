@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -34,28 +35,21 @@ namespace Dapplo.Windows.Common.Structs
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
-    public struct NativeSize
+    [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
+    public struct NativeSize : IEquatable<NativeSize>
     {
-        private int _width;
-        private int _height;
+        private readonly int _width;
+        private readonly int _height;
 
         /// <summary>
         ///     The Width of the size struct
         /// </summary>
-        public int Width
-        {
-            get { return _width; }
-            set { _width = value; }
-        }
+        public int Width => _width;
 
         /// <summary>
         ///     The Width of the size struct
         /// </summary>
-        public int Height
-        {
-            get { return _height; }
-            set { _height = value; }
-        }
+        public int Height => _height;
 
         /// <summary>
         ///     Returns an empty size
@@ -132,10 +126,63 @@ namespace Dapplo.Windows.Common.Structs
             return new NativeSize(size.Width, size.Height);
         }
 
+        /// <summary>
+        ///     Implicit cast from NativeSize to NativeSizeFloat
+        /// </summary>
+        /// <param name="size">NativeSizeFloat</param>
+        public static implicit operator NativeSize(NativeSizeFloat size)
+        {
+            return new NativeSize((int)size.Width, (int)size.Height);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="size1"></param>
+        /// <param name="size2"></param>
+        /// <returns></returns>
+        public static bool operator ==(NativeSize size1, NativeSize size2)
+        {
+            return size1.Equals(size2);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="size1"></param>
+        /// <param name="size2"></param>
+        /// <returns></returns>
+        public static bool operator !=(NativeSize size1, NativeSize size2)
+        {
+            return !(size1 == size2);
+        }
+
         /// <inheritdoc />
         public override string ToString()
         {
             return $"{{Width: {_width}; Height: {_height};}}";
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            return obj is NativeSize && Equals((NativeSize)obj);
+        }
+
+        /// <inheritdoc />
+        public bool Equals(NativeSize other)
+        {
+            return _width == other._width &&
+                   _height == other._height;
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            var hashCode = -607065473;
+            hashCode = hashCode * -1521134295 + _width.GetHashCode();
+            hashCode = hashCode * -1521134295 + _height.GetHashCode();
+            return hashCode;
         }
     }
 }
