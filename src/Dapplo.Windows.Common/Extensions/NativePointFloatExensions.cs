@@ -33,15 +33,37 @@ namespace Dapplo.Windows.Common.Extensions
     public static class NativePointFloatExensions
     {
         /// <summary>
+        /// Create a new NativePointFloat, from the supplied one, using the specified X coordinate
+        /// </summary>
+        /// <param name="point">NativePointFloat</param>
+        /// <param name="x">float</param>
+        /// <returns>NativePointFloat</returns>
+        public static NativePointFloat X(this NativePointFloat point, float x)
+        {
+            return new NativePointFloat(x, point.Y);
+        }
+
+        /// <summary>
+        /// Create a new NativePointFloat, from the supplied one, using the specified Y coordinate
+        /// </summary>
+        /// <param name="point">NativePointFloat</param>
+        /// <param name="y">float</param>
+        /// <returns>NativePointFloat</returns>
+        public static NativePointFloat Y(this NativePointFloat point, float y)
+        {
+            return new NativePointFloat(point.X, y);
+        }
+
+        /// <summary>
         /// Create a new NativePointFloat, from the supplied one, using the specified offset
         /// </summary>
         /// <param name="point">NativePointFloat</param>
         /// <param name="offsetX">float</param>
         /// <param name="offsetY">float</param>
         /// <returns>NativePointFloat</returns>
-        public static NativePointFloat Offset(this NativePointFloat point, float offsetX, float offsetY)
+        public static NativePointFloat Offset(this NativePointFloat point, float? offsetX = null, float? offsetY = null)
         {
-            return new NativePointFloat(point.X + offsetX, point.Y + offsetY);
+            return new NativePointFloat(point.X + offsetX ?? 0, point.Y + offsetY ?? 0);
         }
 
         /// <summary>

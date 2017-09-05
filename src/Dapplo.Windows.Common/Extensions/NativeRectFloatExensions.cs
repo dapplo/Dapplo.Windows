@@ -229,10 +229,10 @@ namespace Dapplo.Windows.Common.Extensions
         /// Create a new NativeRectFloat by offsetting the specified one
         /// </summary>
         /// <param name="rect">NativeRectFloat</param>
-        /// <param name="offsetX">int</param>
-        /// <param name="offsetY">int</param>
+        /// <param name="offsetX">float</param>
+        /// <param name="offsetY">float</param>
         /// <returns>NativeRectFloat</returns>
-        public static NativeRectFloat Offset(this NativeRectFloat rect, int offsetX, int offsetY)
+        public static NativeRectFloat Offset(this NativeRectFloat rect, float? offsetX = null, float? offsetY = null)
         {
             return new NativeRectFloat(rect.Location.Offset(offsetX, offsetY), rect.Size);
         }
@@ -255,11 +255,10 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="x">int</param>
         /// <param name="y">int</param>
         /// <returns>NativeRectFloat</returns>
-        public static NativeRectFloat MoveTo(this NativeRectFloat rect, float x, float y)
+        public static NativeRectFloat MoveTo(this NativeRectFloat rect, float? x = null, float? y = null)
         {
-            return new NativeRectFloat(new NativePointFloat(x,y), rect.Size);
+            return new NativeRectFloat(new NativePointFloat(x ?? rect.X,y ?? rect.Y), rect.Size);
         }
-
 
         /// <summary>
         /// Create a new NativeRectFloat from the specified one, but with a different size
@@ -279,9 +278,9 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="width">float</param>
         /// <param name="height">float</param>
         /// <returns>NativeRectFloat</returns>
-        public static NativeRect Resize(this NativeRectFloat rect, float width, float height)
+        public static NativeRect Resize(this NativeRectFloat rect, float? width = null, float? height = null)
         {
-            return rect.Resize(new NativeSizeFloat(width, height));
+            return rect.Resize(new NativeSizeFloat(width ?? rect.Width, height ?? rect.Height));
         }
     }
 }

@@ -231,9 +231,9 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="offsetX">int</param>
         /// <param name="offsetY">int</param>
         /// <returns>NativeRect</returns>
-        public static NativeRect Offset(this NativeRect rect, int offsetX, int offsetY)
+        public static NativeRect Offset(this NativeRect rect, int? offsetX = null, int? offsetY = null)
         {
-            return rect.Offset(new NativePoint(offsetX, offsetY));
+            return rect.Offset(new NativePoint(offsetX ?? 0, offsetY ?? 0));
         }
 
         /// <summary>
@@ -254,9 +254,9 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="x">int</param>
         /// <param name="y">int</param>
         /// <returns>NativeRect</returns>
-        public static NativeRect MoveTo(this NativeRect rect, int x, int y)
+        public static NativeRect MoveTo(this NativeRect rect, int? x = null, int? y = null)
         {
-            return rect.MoveTo(new NativePoint(x,y));
+            return rect.MoveTo(new NativePoint(x ?? rect.X,y ?? rect.Y));
         }
 
         /// <summary>
@@ -277,9 +277,9 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="width">int</param>
         /// <param name="height">int</param>
         /// <returns>NativeRect</returns>
-        public static NativeRect Resize(this NativeRect rect, int width, int height)
+        public static NativeRect Resize(this NativeRect rect, int? width = null, int? height = null)
         {
-            return rect.Resize(new NativeSize(width, height));
+            return rect.Resize(new NativeSize(width ?? rect.Width, height ?? rect.Height));
         }
     }
 }
