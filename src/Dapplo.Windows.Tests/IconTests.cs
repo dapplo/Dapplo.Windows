@@ -50,15 +50,28 @@ namespace Dapplo.Windows.Tests
         }
 
         /// <summary>
-        ///     Test getting an Icon for the active window
+        ///     Test getting an Icon for a top level window
         /// </summary>
         [WpfFact]
         public void TestIcon_GetIcon()
         {
-            var window = InteropWindowQuery.GetActiveWindow();
+            // TODO: what window do we use for AppVeyor?
+            var window = InteropWindowQuery.GetTopLevelWindows().First();
             var icon = window.GetIcon<BitmapSource>();
 
             Assert.NotNull(icon);
+        }
+
+        /// <summary>
+        ///     Test getting an Icon for the desktop, which doesn't have one
+        /// </summary>
+        [WpfFact]
+        public void TestIcon_GetIcon_Null()
+        {
+            var window = InteropWindowQuery.GetDesktopWindow();
+            var icon = window.GetIcon<BitmapSource>();
+
+            Assert.Null(icon);
         }
     }
 }
