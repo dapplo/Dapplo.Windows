@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -55,11 +56,21 @@ namespace Dapplo.Windows.Tests
         [WpfFact]
         public void TestIcon_GetIcon()
         {
-            // TODO: what window do we use for AppVeyor?
-            var window = InteropWindowQuery.GetTopLevelWindows().First();
-            var icon = window.GetIcon<BitmapSource>();
+            // Start a process to test against
+            using (var process = Process.Start("notepad.exe"))
+            {
+                // Make sure it's started
+                Assert.NotNull(process);
+                // Wait until the process started it's message pump (listening for input)
+                process.WaitForInputIdle();
 
-            Assert.NotNull(icon);
+                var window = InteropWindowQuery.GetTopLevelWindows().First();
+                var icon = window.GetIcon<BitmapSource>();
+                Assert.NotNull(icon);
+
+                // Kill the process
+                process.Kill();
+            }
         }
 
         /// <summary>
