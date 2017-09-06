@@ -100,15 +100,6 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Implicit cast from Size to NativeSize
-        /// </summary>
-        /// <param name="size">Size</param>
-        public static implicit operator NativeSize(Size size)
-        {
-            return new NativeSize((int) size.Width, (int) size.Height);
-        }
-
-        /// <summary>
         ///     Implicit cast from NativeSize to System.Drawing.Size
         /// </summary>
         /// <param name="size">NativeSize</param>
@@ -124,15 +115,6 @@ namespace Dapplo.Windows.Common.Structs
         public static implicit operator NativeSize(System.Drawing.Size size)
         {
             return new NativeSize(size.Width, size.Height);
-        }
-
-        /// <summary>
-        ///     Implicit cast from NativeSize to NativeSizeFloat
-        /// </summary>
-        /// <param name="size">NativeSizeFloat</param>
-        public static implicit operator NativeSize(NativeSizeFloat size)
-        {
-            return new NativeSize((int)size.Width, (int)size.Height);
         }
 
         /// <summary>
@@ -166,7 +148,16 @@ namespace Dapplo.Windows.Common.Structs
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is NativeSize && Equals((NativeSize)obj);
+            if (obj is NativeSize)
+            {
+                return Equals((NativeSize)obj);
+            }
+            if (obj is System.Drawing.Size)
+            {
+                NativeSize rect = (System.Drawing.Size)obj;
+                return Equals(rect);
+            }
+            return false;
         }
 
         /// <inheritdoc />

@@ -282,5 +282,30 @@ namespace Dapplo.Windows.Common.Extensions
         {
             return rect.Resize(new NativeSizeFloat(width ?? rect.Width, height ?? rect.Height));
         }
+
+        /// <summary>
+        /// Create a NativeRect, using rounded values, from the specified NativeRectFloat
+        /// </summary>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <returns>NativeRect</returns>
+        public static NativeRect Round(this NativeRectFloat rect)
+        {
+            return new NativeRect((int)Math.Round(rect.X), (int)Math.Round(rect.Y), (int)Math.Round(rect.Width), (int)Math.Round(rect.Height));
+        }
+
+        /// <summary>
+        /// Transform the specified NativeRectFloat
+        /// </summary>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="matrix">Matrix</param>
+        /// <returns>NativeRectFloat</returns>
+        public static NativeRectFloat Transform(this NativeRectFloat rect, System.Windows.Media.Matrix matrix)
+        {
+            System.Windows.Point[] myPointArray = { rect.TopLeft, rect.BottomRight };
+            matrix.Transform(myPointArray);
+            NativePointFloat topLeft = myPointArray[0];
+            NativePointFloat bottomRight = myPointArray[1];
+            return new NativeRectFloat(topLeft, bottomRight);
+        }
     }
 }

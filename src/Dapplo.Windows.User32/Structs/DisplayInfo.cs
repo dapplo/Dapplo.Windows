@@ -108,7 +108,7 @@ namespace Dapplo.Windows.User32.Structs
                     returnValue = display;
                 }
             }
-            return returnValue?.Bounds ?? Rect.Empty;
+            return returnValue?.Bounds ?? NativeRect.Empty;
         }
     }
 }

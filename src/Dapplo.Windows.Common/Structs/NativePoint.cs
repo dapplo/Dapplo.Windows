@@ -106,15 +106,6 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Implicit cast from Point to NativePoint
-        /// </summary>
-        /// <param name="point">Point</param>
-        public static implicit operator NativePoint(Point point)
-        {
-            return new NativePoint((int) point.X, (int) point.Y);
-        }
-
-        /// <summary>
         ///     Implicit cast from System.Drawing.Point to NativePoint
         /// </summary>
         /// <param name="point">System.Drawing.Point</param>
@@ -163,7 +154,6 @@ namespace Dapplo.Windows.Common.Structs
             return !(point1 == point2);
         }
 
-
         /// <inheritdoc />
         public override int GetHashCode()
         {
@@ -182,7 +172,16 @@ namespace Dapplo.Windows.Common.Structs
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is NativePoint && Equals((NativePoint)obj);
+            if (obj is NativePoint)
+            {
+                return Equals((NativePoint)obj);
+            }
+            if (obj is System.Drawing.Point)
+            {
+                NativePoint rect = (System.Drawing.Point)obj;
+                return Equals(rect);
+            }
+            return false;
         }
 
         /// <inheritdoc />

@@ -80,6 +80,15 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        ///     Constructor from top-left, bottom right
+        /// </summary>
+        /// <param name="topLeft">NativePointFloat</param>
+        /// <param name="bottomRight">NativePointFloat</param>
+        public NativeRectFloat(NativePointFloat topLeft, NativePointFloat bottomRight) : this(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y)
+        {
+        }
+
+        /// <summary>
         ///     Constructor from location, size
         /// </summary>
         /// <param name="location">NativePoint</param>
@@ -163,13 +172,13 @@ namespace Dapplo.Windows.Common.Structs
         public NativeSizeFloat Size => new NativeSizeFloat(Width, Height);
 
         /// <summary>
-        ///     Cast NativeRectFloat to Rect
+        ///     Cast NativeRect to NativeRectFloat
         /// </summary>
-        /// <param name="rectangle">NativeRectFloat</param>
-        /// <returns>Rect</returns>
-        public static implicit operator Rect(NativeRectFloat rectangle)
+        /// <param name="rectangle">NativeRect</param>
+        /// <returns>NativeRectFloat</returns>
+        public static implicit operator NativeRectFloat(NativeRect rectangle)
         {
-            return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
+            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
         }
 
         /// <summary>
@@ -179,27 +188,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <returns>NativeRectFloat</returns>
         public static implicit operator NativeRectFloat(Rect rectangle)
         {
-            return new NativeRectFloat((int) rectangle.Left, (int) rectangle.Top, (int) rectangle.Right, (int) rectangle.Bottom);
-        }
-
-        /// <summary>
-        ///     Cast NativeRectFloat to RectangleF
-        /// </summary>
-        /// <param name="rectangle">NativeRectFloat</param>
-        /// <returns>RectangleF</returns>
-        public static implicit operator RectangleF(NativeRectFloat rectangle)
-        {
-            return new RectangleF(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
-        }
-
-        /// <summary>
-        ///     Cast NativeRectFloat to Rectangle
-        /// </summary>
-        /// <param name="rectangle">NativeRectFloat</param>
-        /// <returns>Rectangle</returns>
-        public static implicit operator Rectangle(NativeRectFloat rectangle)
-        {
-            return new Rectangle((int) rectangle.X, (int) rectangle.Y, (int) rectangle.Width, (int) rectangle.Height);
+            return new NativeRectFloat((int)rectangle.Left, (int)rectangle.Top, (int)rectangle.Right, (int)rectangle.Bottom);
         }
 
         /// <summary>
@@ -220,6 +209,36 @@ namespace Dapplo.Windows.Common.Structs
         public static implicit operator NativeRectFloat(Rectangle rectangle)
         {
             return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+        }
+
+        /// <summary>
+        ///     Cast NativeRectFloat to Rect
+        /// </summary>
+        /// <param name="rectangle">NativeRectFloat</param>
+        /// <returns>Rect</returns>
+        public static implicit operator Rect(NativeRectFloat rectangle)
+        {
+            return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
+        }
+
+        /// <summary>
+        ///     Cast NativeRectFloat to RectangleF
+        /// </summary>
+        /// <param name="rectangle">NativeRectFloat</param>
+        /// <returns>RectangleF</returns>
+        public static implicit operator RectangleF(NativeRectFloat rectangle)
+        {
+            return new RectangleF(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
+        }
+
+        /// <summary>
+        ///     Cast NativeRectFloat to Rectangle
+        /// </summary>
+        /// <param name="rectangle">NativeRectFloat</param>
+        /// <returns>Rectangle</returns>
+        public static implicit operator Rectangle(NativeRectFloat rectangle)
+        {
+            return new Rectangle((int) rectangle.X, (int) rectangle.Y, (int) rectangle.Width, (int) rectangle.Height);
         }
 
         /// <summary>

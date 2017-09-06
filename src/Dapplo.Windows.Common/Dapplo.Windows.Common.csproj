@@ -44,6 +44,7 @@
     <Compile Include="Extensions\HResultExtensions.cs" />
     <Compile Include="Extensions\NativePointFloatExensions.cs" />
     <Compile Include="Extensions\NativePointExensions.cs" />
+    <Compile Include="Extensions\NativeSizeFloatExensions.cs" />
     <Compile Include="Extensions\NativeRectFloatExensions.cs" />
     <Compile Include="Structs\NativePointFloat.cs" />
     <Compile Include="Structs\NativePoint.cs" />

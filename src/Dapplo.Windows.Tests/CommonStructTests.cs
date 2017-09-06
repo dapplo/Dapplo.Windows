@@ -21,16 +21,11 @@
 
 #region using
 
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.User32.Enums;
-using Dapplo.Windows.User32.Structs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -40,11 +35,42 @@ namespace Dapplo.Windows.Tests
 {
     public class CommonStructTests
     {
-        private static readonly LogSource Log = new LogSource();
-
         public CommonStructTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
+
+        /// <summary>
+        ///     Test NativeRect Properties
+        /// </summary>
+        [Fact]
+        private void Test_NativeRect_Properties()
+        {
+            const int left = 100;
+            const int top = 200;
+            const int width = 110;
+            const int right = left + width;
+            const int height = 120;
+            const int bottom = top + height;
+
+            var nativeRect = new NativeRect(left, top, new NativeSize(width, height));
+            Assert.Equal(left, nativeRect.X);
+            Assert.Equal(top, nativeRect.Y);
+            Assert.Equal(left, nativeRect.Left);
+            Assert.Equal(top, nativeRect.Top);
+
+            Assert.Equal(width, nativeRect.Width);
+            Assert.Equal(height, nativeRect.Height);
+
+            Assert.Equal(right, nativeRect.Right);
+            Assert.Equal(bottom, nativeRect.Bottom);
+
+            Assert.Equal(new NativePoint(left, top), nativeRect.TopLeft);
+            Assert.Equal(new NativePoint(left, bottom), nativeRect.BottomLeft);
+            Assert.Equal(new NativePoint(right, top), nativeRect.TopRight);
+            Assert.Equal(new NativePoint(right, bottom), nativeRect.BottomRight);
+
+            Assert.Equal(new NativeSize(width, height), nativeRect.Size);
         }
 
         /// <summary>
@@ -105,6 +131,21 @@ namespace Dapplo.Windows.Tests
             {
                 Assert.Equal(nativeRect, nativePointResult.Value);
             }
+        }
+
+        /// <summary>
+        ///     Test NativeRect Transform
+        /// </summary>
+        [Fact]
+        private void Test_NativeRect_Transform()
+        {
+            const int offsetX = 20;
+            const int offsetY = 30;
+            var nativeRectBefore = new NativeRect(0,0,new NativeSize(200, 60));
+            var nativeRectAfter = new NativeRect(offsetX, offsetY, new NativeSize(60, 200));
+            var myMatrix = new System.Windows.Media.Matrix(0, 1, 1, 0, offsetX, offsetY);
+
+            Assert.Equal(nativeRectAfter, nativeRectBefore.Transform(myMatrix));
         }
     }
 }

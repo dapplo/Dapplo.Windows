@@ -178,7 +178,21 @@ namespace Dapplo.Windows.Common.Structs
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is NativeSizeFloat && Equals((NativeSizeFloat)obj);
+            if (obj is NativeSizeFloat)
+            {
+                return Equals((NativeSizeFloat)obj);
+            }
+            if (obj is Size)
+            {
+                NativeSizeFloat rect = (Size)obj;
+                return Equals(rect);
+            }
+            if (obj is System.Drawing.Size)
+            {
+                NativeSizeFloat rect = (System.Drawing.Size)obj;
+                return Equals(rect);
+            }
+            return false;
         }
 
         /// <inheritdoc />

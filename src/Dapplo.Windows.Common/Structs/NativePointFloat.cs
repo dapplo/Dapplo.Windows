@@ -94,6 +94,15 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        ///     Implicit cast from NativePoint to NativePointFloat
+        /// </summary>
+        /// <param name="point">NativePoint</param>
+        public static implicit operator NativePointFloat(NativePoint point)
+        {
+            return new NativePointFloat(point.X, point.Y);
+        }
+
+        /// <summary>
         ///     Implicit cast from Point to NativePointFloat
         /// </summary>
         /// <param name="point">Point</param>
@@ -123,7 +132,26 @@ namespace Dapplo.Windows.Common.Structs
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is NativePointFloat && Equals((NativePointFloat)obj);
+            if (obj is NativePointFloat)
+            {
+                return Equals((NativePointFloat)obj);
+            }
+            if (obj is System.Drawing.Point)
+            {
+                NativePointFloat rect = (System.Drawing.Point)obj;
+                return Equals(rect);
+            }
+            if (obj is NativePoint)
+            {
+                NativePointFloat rect = (NativePoint)obj;
+                return Equals(rect);
+            }
+            if (obj is Point)
+            {
+                NativePointFloat rect = (Point)obj;
+                return Equals(rect);
+            }
+            return false;
         }
 
         /// <inheritdoc />

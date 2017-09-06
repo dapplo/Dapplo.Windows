@@ -78,6 +78,15 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        ///     Constructor from topLeft and bottomRight
+        /// </summary>
+        /// <param name="topLeft">NativePoint</param>
+        /// <param name="bottomRight">NativePoint</param>
+        public NativeRect(NativePoint topLeft, NativePoint bottomRight) : this(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y)
+        {
+        }
+
+        /// <summary>
         ///     Constructor from left, right and size
         /// </summary>
         /// <param name="left">int</param>
@@ -158,9 +167,9 @@ namespace Dapplo.Windows.Common.Structs
         public NativePoint TopRight => new NativePoint(X + Width, Y);
 
         /// <summary>
-        ///     Cast RECT to Rect
+        ///     Cast NativeRect to Rect
         /// </summary>
-        /// <param name="rectangle">RECT</param>
+        /// <param name="rectangle">NativeRect</param>
         /// <returns>Rect</returns>
         public static implicit operator Rect(NativeRect rectangle)
         {
@@ -168,19 +177,9 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Cast Rect to RECT
+        ///     Cast NativeRect to Rectangle
         /// </summary>
-        /// <param name="rectangle">Rect</param>
-        /// <returns>RECT</returns>
-        public static implicit operator NativeRect(Rect rectangle)
-        {
-            return new NativeRect((int) rectangle.Left, (int) rectangle.Top, (int) rectangle.Right, (int) rectangle.Bottom);
-        }
-
-        /// <summary>
-        ///     Cast RECT to Rectangle
-        /// </summary>
-        /// <param name="rectangle">RECT</param>
+        /// <param name="rectangle">NativeRect</param>
         /// <returns>Rectangle</returns>
         public static implicit operator Rectangle(NativeRect rectangle)
         {
@@ -188,30 +187,20 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Cast Rectangle to RECT
+        ///     Cast Rectangle to NativeRect
         /// </summary>
-        /// <param name="rectangle"></param>
-        /// <returns>RECT</returns>
+        /// <param name="rectangle">Rectangle</param>
+        /// <returns>NativeRect</returns>
         public static implicit operator NativeRect(Rectangle rectangle)
         {
             return new NativeRect(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
         }
 
         /// <summary>
-        ///     Cast NativeRectFloat to NativeRect
+        ///     Equals for NativeRect
         /// </summary>
-        /// <param name="rectangle">NativeRectFloat</param>
-        /// <returns>NativeRect</returns>
-        public static implicit operator NativeRect(NativeRectFloat rectangle)
-        {
-            return new NativeRect((int) rectangle.Left, (int)rectangle.Top, (int)rectangle.Right, (int)rectangle.Bottom);
-        }
-
-        /// <summary>
-        ///     Equals for RECT
-        /// </summary>
-        /// <param name="rectangle1">RECT</param>
-        /// <param name="rectangle2">RECT</param>
+        /// <param name="rectangle1">NativeRect</param>
+        /// <param name="rectangle2">NativeRect</param>
         /// <returns>bool true if they are equal</returns>
         public static bool operator ==(NativeRect rectangle1, NativeRect rectangle2)
         {
@@ -236,9 +225,9 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Equalss
+        ///     Equals
         /// </summary>
-        /// <param name="rectangle"></param>
+        /// <param name="rectangle">NativeRect</param>
         /// <returns>bool</returns>
         public bool Equals(NativeRect rectangle)
         {
@@ -246,7 +235,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Checks if this RECT is empty
+        ///     Checks if this NativeRect is empty
         /// </summary>
         /// <returns>true when empty</returns>
         public bool IsEmpty => Width * Height == 0;
@@ -257,11 +246,6 @@ namespace Dapplo.Windows.Common.Structs
             if (obj is NativeRect)
             {
                 return Equals((NativeRect) obj);
-            }
-            if (obj is Rect)
-            {
-                NativeRect rect = (Rect) obj;
-                return Equals(rect);
             }
             if (obj is Rectangle)
             {

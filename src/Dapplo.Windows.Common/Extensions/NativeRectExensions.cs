@@ -21,7 +21,6 @@
 
 #region using
 
-using System.Drawing;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
 
@@ -171,7 +170,7 @@ namespace Dapplo.Windows.Common.Extensions
         public static NativeRect Union(this NativeRect rect1, NativeRect rect2)
         {
             // TODO: Replace logic with own code
-            return Rectangle.Union(rect1, rect2);
+            return System.Drawing.Rectangle.Union(rect1, rect2);
         }
 
         /// <summary>
@@ -183,7 +182,7 @@ namespace Dapplo.Windows.Common.Extensions
         public static NativeRect Intersect(this NativeRect rect1, NativeRect rect2)
         {
             // TODO: Replace logic with own code
-            return Rectangle.Intersect(rect1, rect2);
+            return System.Drawing.Rectangle.Intersect(rect1, rect2);
         }
 
         /// <summary>
@@ -196,7 +195,7 @@ namespace Dapplo.Windows.Common.Extensions
         public static NativeRect Inflate(this NativeRect rect, int width, int height)
         {
             // TODO: Replace logic with own code
-            return Rectangle.Inflate(rect, width, height);
+            return System.Drawing.Rectangle.Inflate(rect, width, height);
         }
 
         /// <summary>
@@ -280,6 +279,21 @@ namespace Dapplo.Windows.Common.Extensions
         public static NativeRect Resize(this NativeRect rect, int? width = null, int? height = null)
         {
             return rect.Resize(new NativeSize(width ?? rect.Width, height ?? rect.Height));
+        }
+
+        /// <summary>
+        /// Transform the specified NativeRect
+        /// </summary>
+        /// <param name="rect">NativeRect</param>
+        /// <param name="matrix">Matrix</param>
+        /// <returns>NativeRect</returns>
+        public static NativeRect Transform(this NativeRect rect, System.Windows.Media.Matrix matrix)
+        {
+            System.Windows.Point[] myPointArray = {rect.TopLeft, rect.BottomRight};
+            matrix.Transform(myPointArray);
+            NativePointFloat topLeft = myPointArray[0];
+            NativePointFloat bottomRight = myPointArray[1];
+            return new NativeRect(topLeft, bottomRight);
         }
     }
 }

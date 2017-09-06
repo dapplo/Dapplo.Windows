@@ -22,6 +22,7 @@
 #region using
 
 using Dapplo.Windows.Common.Structs;
+using System;
 
 #endregion
 
@@ -38,7 +39,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePointFloat</param>
         /// <param name="x">float</param>
         /// <returns>NativePointFloat</returns>
-        public static NativePointFloat SetX(this NativePointFloat point, float x)
+        public static NativePointFloat ChangeX(this NativePointFloat point, float x)
         {
             return new NativePointFloat(x, point.Y);
         }
@@ -49,7 +50,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePointFloat</param>
         /// <param name="y">float</param>
         /// <returns>NativePointFloat</returns>
-        public static NativePointFloat SetY(this NativePointFloat point, float y)
+        public static NativePointFloat ChangeY(this NativePointFloat point, float y)
         {
             return new NativePointFloat(point.X, y);
         }
@@ -75,6 +76,16 @@ namespace Dapplo.Windows.Common.Extensions
         public static NativePointFloat Offset(this NativePointFloat point, NativePointFloat offset)
         {
             return new NativePointFloat(point.X + offset.X, point.Y + offset.Y);
+        }
+
+        /// <summary>
+        /// Create a NativePoint, using rounded values, from the specified NativePointFloat
+        /// </summary>
+        /// <param name="point">NativePointFloat</param>
+        /// <returns>NativePoint</returns>
+        public static NativePoint Round(this NativePointFloat point)
+        {
+            return new NativePoint((int)Math.Round(point.X), (int)Math.Round(point.Y));
         }
     }
 }

@@ -38,7 +38,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePoint</param>
         /// <param name="x">int</param>
         /// <returns>NativePoint</returns>
-        public static NativePoint SetX(this NativePoint point, int x)
+        public static NativePoint ChangeX(this NativePoint point, int x)
         {
             return new NativePoint(x, point.Y);
         }
@@ -49,7 +49,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePoint</param>
         /// <param name="y">int</param>
         /// <returns>NativePoint</returns>
-        public static NativePoint SetY(this NativePoint point, int y)
+        public static NativePoint ChangeY(this NativePoint point, int y)
         {
             return new NativePoint(point.X, y);
         }
