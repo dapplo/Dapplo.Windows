@@ -177,6 +177,16 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        ///     Cast NativeRect to RectangleF
+        /// </summary>
+        /// <param name="rectangle">NativeRect</param>
+        /// <returns>RectangleF</returns>
+        public static implicit operator RectangleF(NativeRect rectangle)
+        {
+            return new RectangleF(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
+        }
+
+        /// <summary>
         ///     Cast NativeRect to Rectangle
         /// </summary>
         /// <param name="rectangle">NativeRect</param>
