@@ -21,7 +21,6 @@
 
 #region using
 
-using System;
 using System.Diagnostics.Contracts;
 using Dapplo.Windows.Common.Structs;
 
@@ -30,43 +29,32 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Common.Extensions
 {
     /// <summary>
-    ///     Helper method for the NativeSizeFloatExensions struct
+    ///     Helper method for the NativeSizeExensions struct
     /// </summary>
-    public static class NativeSizeFloatExensions
+    public static class NativeSizeExensions
     {
         /// <summary>
-        /// Create a new NativeSizeFloat, from the supplied one, using the specified width
+        /// Create a new NativeSize, from the supplied one, using the specified width
         /// </summary>
-        /// <param name="size">NativeSizeFloat</param>
-        /// <param name="width">float</param>
-        /// <returns>NativeSizeFloat</returns>
-        [Pure]
-        public static NativeSizeFloat ChangeWidth(this NativeSizeFloat size, float width)
-        {
-            return new NativeSizeFloat(width, size.Height);
-        }
-
-        /// <summary>
-        /// Create a new NativeSizeFloat, from the supplied one, using the specified height
-        /// </summary>
-        /// <param name="size">NativeSizeFloat</param>
-        /// <param name="height">float</param>
-        /// <returns>NativeSizeFloat</returns>
-        [Pure]
-        public static NativeSizeFloat ChangeHeight(this NativeSizeFloat size, float height)
-        {
-            return new NativeSizeFloat(size.Width, height);
-        }
-
-        /// <summary>
-        /// Create a NativeSize, using rounded values, from the specified NativeSizeFloat
-        /// </summary>
-        /// <param name="size">NativeSizeFloat</param>
+        /// <param name="size">NativeSize</param>
+        /// <param name="width">int</param>
         /// <returns>NativeSize</returns>
         [Pure]
-        public static NativeSize Round(this NativeSizeFloat size)
+        public static NativeSize ChangeWidth(this NativeSize size, int width)
         {
-            return new NativeSize((int)Math.Round(size.Width), (int)Math.Round(size.Height));
+            return new NativeSize(width, size.Height);
+        }
+
+        /// <summary>
+        /// Create a new NativeSize, from the supplied one, using the specified height
+        /// </summary>
+        /// <param name="size">NativeSize</param>
+        /// <param name="height">int</param>
+        /// <returns>NativeSize</returns>
+        [Pure]
+        public static NativeSize ChangeHeight(this NativeSize size, int height)
+        {
+            return new NativeSize(size.Width, height);
         }
     }
 }

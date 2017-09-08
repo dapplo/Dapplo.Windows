@@ -26,6 +26,7 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
+using System.Drawing;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -86,6 +87,54 @@ namespace Dapplo.Windows.Tests
         }
 
         [Fact]
+        public void NativeRectCasts()
+        {
+            var nativeRect = new NativeRect(new NativePoint(10, 20), new NativeSize(100, 200));
+            Rectangle rectangle = nativeRect;
+            Assert.Equal(nativeRect, (NativeRect)rectangle);
+            Assert.Equal(rectangle, (Rectangle)nativeRect);
+        }
+        [Fact]
+        public void NativeRectExtensions()
+        {
+            var nativeRect = new NativeRect(new NativePoint(10, 20), new NativeSize(100, 200));
+            Rectangle rectangle = nativeRect;
+
+            var rectangleWithXyOffset = rectangle;
+            rectangleWithXyOffset.Offset(10,10);
+            Assert.Equal(rectangleWithXyOffset, (Rectangle)nativeRect.Offset(10,10));
+
+            var rectangleWithChangedSize = rectangle;
+            rectangleWithChangedSize.Size = new Size(50, 50);
+            Assert.Equal(rectangleWithChangedSize, (Rectangle)nativeRect.Resize(50, 50));
+
+            var pointOffset = new Point(10,10);
+            var rectangleWithPointOffset = rectangle;
+            rectangleWithPointOffset.Offset(pointOffset);
+            Assert.Equal(rectangleWithPointOffset, (Rectangle)nativeRect.Offset(pointOffset));
+
+            var rectangleInflated = rectangle;
+            rectangleInflated.Inflate(10, 10);
+            Assert.Equal(rectangleInflated, (Rectangle)nativeRect.Inflate(10, 10));
+
+            var rectangleChangedX = rectangle;
+            rectangleChangedX.X = 110;
+            Assert.Equal(rectangleChangedX, (Rectangle)nativeRect.ChangeX(110));
+
+            var rectangleChangedY = rectangle;
+            rectangleChangedY.Y = 110;
+            Assert.Equal(rectangleChangedY, (Rectangle)nativeRect.ChangeY(110));
+
+            var rectangleChangedWidth = rectangle;
+            rectangleChangedWidth.Width = 110;
+            Assert.Equal(rectangleChangedWidth, (Rectangle)nativeRect.ChangeWidth(110));
+
+            var rectangleChangedHeight = rectangle;
+            rectangleChangedHeight.Height = 110;
+            Assert.Equal(rectangleChangedHeight, (Rectangle)nativeRect.ChangeHeight(110));
+        }
+
+        [Fact]
         public void IsAdjacent()
         {
             const int width = 100;
@@ -127,6 +176,44 @@ namespace Dapplo.Windows.Tests
             rect2 = new NativeRect(new NativePoint(left + width + 1, top), new NativeSize(width, height));
             Assert.True(rect2.IsDockedToRightOf(rect1));
             Assert.False(rect2.IsDockedToLeftOf(rect1));
+        }
+
+        [Fact]
+        public void Normalize()
+        {
+            const int width = -100;
+            const int height = -100;
+
+            const int left = 200;
+            const int top = 200;
+
+            // left
+            var unnormalized = new NativeRect(new NativePoint(left, top), new NativeSize(width, height));
+            Rectangle normalized = new Rectangle(100, 100, 100, 100);
+            Assert.Equal(normalized, (Rectangle)unnormalized.Normalize());
+        }
+
+        [Fact]
+        public void Intersect()
+        {
+            var rect1 = new NativeRect(100, 100, new NativeSize(100, 100));
+            var rect2 = new NativeRect(90, 90, new NativeSize(20, 20));
+            var rect3 = rect1.Intersect(rect2);
+
+            Assert.True(rect1.IntersectsWith(rect2));
+            var expected = new NativeRect(100, 100, new NativeSize(10, 10));
+            Assert.Equal(expected, rect3);
+        }
+
+        [Fact]
+        public void Union()
+        {
+            var rect1 = new NativeRect(100, 100, new NativeSize(100, 100));
+            var rect2 = new NativeRect(90, 90, new NativeSize(20, 20));
+            var rect3 = rect1.Union(rect2);
+
+            var expected = new NativeRect(90, 90, new NativeSize(110, 110));
+            Assert.Equal(expected, rect3);
         }
     }
 }

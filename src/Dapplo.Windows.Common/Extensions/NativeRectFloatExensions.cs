@@ -37,6 +37,54 @@ namespace Dapplo.Windows.Common.Extensions
     public static class NativeRectFloatExensions
     {
         /// <summary>
+        /// Create a new NativeRectFloat, from the supplied one, using the specified X coordinate
+        /// </summary>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="x">float</param>
+        /// <returns>NativeRectFloat</returns>
+        [Pure]
+        public static NativeRectFloat ChangeX(this NativeRectFloat rect, float x)
+        {
+            return new NativeRectFloat(rect.Location.ChangeX(x), rect.Size);
+        }
+
+        /// <summary>
+        /// Create a new NativeRectFloat, from the supplied one, using the specified Y coordinate
+        /// </summary>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="y">float</param>
+        /// <returns>NativeRectFloat</returns>
+        [Pure]
+        public static NativeRectFloat ChangeY(this NativeRectFloat rect, float y)
+        {
+            return new NativeRectFloat(rect.Location.ChangeY(y), rect.Size);
+        }
+
+        /// <summary>
+        /// Create a new NativeRectFloat, from the supplied one, using the specified width
+        /// </summary>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="width">float</param>
+        /// <returns>NativeRectFloat</returns>
+        [Pure]
+        public static NativeRectFloat ChangeWidth(this NativeRectFloat rect, float width)
+        {
+            return new NativeRectFloat(rect.Location, rect.Size.ChangeWidth(width));
+        }
+
+        /// <summary>
+        /// Create a new NativeRectFloat, from the supplied one, using the specified height
+        /// </summary>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <param name="height">float</param>
+        /// <returns>NativeRectFloat</returns>
+        [Pure]
+        public static NativeRectFloat ChangeHeight(this NativeRectFloat rect, float height)
+        {
+            return new NativeRectFloat(rect.Location, rect.Size.ChangeHeight(height));
+        }
+
+        /// <summary>
         ///     Test if this NativeRectFloat contains the specified NativePointFloat
         /// </summary>
         /// <param name="rect">NativeRectFloat</param>
@@ -328,5 +376,33 @@ namespace Dapplo.Windows.Common.Extensions
             NativePointFloat bottomRight = myPointArray[1];
             return new NativeRectFloat(topLeft, bottomRight);
         }
+
+
+        /// <summary>
+        /// Normalize the NativeRectFloat by making a negative width and or height absolute
+        /// </summary>
+        /// <param name="rect">NativeRectFloat</param>
+        /// <returns>NativeRectFloat</returns>
+        [Pure]
+        public static NativeRectFloat Normalize(this NativeRectFloat rect)
+        {
+            float x = rect.X;
+            float y = rect.Y;
+            float width = rect.Width;
+            float height = rect.Height;
+
+            if (width < 0)
+            {
+                x += width;
+                width = Math.Abs(width);
+            }
+            if (height < 0)
+            {
+                y += height;
+                height = Math.Abs(height);
+            }
+            return new NativeRectFloat(x, y, new NativeSizeFloat(width, height));
+        }
+
     }
 }

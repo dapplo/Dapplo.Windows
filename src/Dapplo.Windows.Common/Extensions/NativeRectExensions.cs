@@ -21,6 +21,7 @@
 
 #region using
 
+using System;
 using System.Diagnostics.Contracts;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
@@ -34,6 +35,55 @@ namespace Dapplo.Windows.Common.Extensions
     /// </summary>
     public static class NativeRectExensions
     {
+        /// <summary>
+        /// Create a new NativeRect, from the supplied one, using the specified X coordinate
+        /// </summary>
+        /// <param name="rect">NativeRect</param>
+        /// <param name="x">int</param>
+        /// <returns>NativeRect</returns>
+        [Pure]
+        public static NativeRect ChangeX(this NativeRect rect, int x)
+        {
+            return new NativeRect(rect.Location.ChangeX(x), rect.Size);
+        }
+
+        /// <summary>
+        /// Create a new NativeRect, from the supplied one, using the specified Y coordinate
+        /// </summary>
+        /// <param name="rect">NativeRect</param>
+        /// <param name="y">int</param>
+        /// <returns>NativeRect</returns>
+        [Pure]
+        public static NativeRect ChangeY(this NativeRect rect, int y)
+        {
+            return new NativeRect(rect.Location.ChangeY(y), rect.Size);
+        }
+
+        /// <summary>
+        /// Create a new NativeRect, from the supplied one, using the specified width
+        /// </summary>
+        /// <param name="rect">NativeRect</param>
+        /// <param name="width">int</param>
+        /// <returns>NativeRect</returns>
+        [Pure]
+        public static NativeRect ChangeWidth(this NativeRect rect, int width)
+        {
+            return new NativeRect(rect.Location, rect.Size.ChangeWidth(width));
+        }
+
+        /// <summary>
+        /// Create a new NativeRect, from the supplied one, using the specified height
+        /// </summary>
+        /// <param name="rect">NativeRect</param>
+        /// <param name="height">int</param>
+        /// <returns>NativeRect</returns>
+        [Pure]
+        public static NativeRect ChangeHeight(this NativeRect rect, int height)
+        {
+            return new NativeRect(rect.Location, rect.Size.ChangeHeight(height));
+        }
+
+
         /// <summary>
         ///     Test if this NativeRect contains the specified NativePoint
         /// </summary>
@@ -314,6 +364,32 @@ namespace Dapplo.Windows.Common.Extensions
             NativePointFloat topLeft = myPointArray[0];
             NativePointFloat bottomRight = myPointArray[1];
             return new NativeRect(topLeft, bottomRight);
+        }
+
+        /// <summary>
+        /// Normalize the NativeRect by making a negative width and or height absolute
+        /// </summary>
+        /// <param name="rect">NativeRect</param>
+        /// <returns>NativeRect</returns>
+        [Pure]
+        public static NativeRect Normalize(this NativeRect rect)
+        {
+            int x = rect.X;
+            int y = rect.Y;
+            int width = rect.Width;
+            int height = rect.Height;
+
+            if (width < 0)
+            {
+                x += width;
+                width = Math.Abs(width);
+            }
+            if (height < 0)
+            {
+                y += height;
+                height = Math.Abs(height);
+            }
+            return new NativeRect(x,y, new NativeSize(width,height));
         }
     }
 }
