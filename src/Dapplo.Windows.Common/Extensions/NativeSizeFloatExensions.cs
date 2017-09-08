@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics.Contracts;
 using Dapplo.Windows.Common.Structs;
 
 #endregion
@@ -38,6 +39,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// </summary>
         /// <param name="size">NativeSizeFloat</param>
         /// <returns>NativeSize</returns>
+        [Pure]
         public static NativeSize Round(this NativeSizeFloat size)
         {
             return new NativeSize((int)Math.Round(size.Width), (int)Math.Round(size.Height));

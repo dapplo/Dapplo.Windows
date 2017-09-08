@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics.Contracts;
 using System.Drawing;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
@@ -41,6 +42,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect">NativeRectFloat</param>
         /// <param name="point">NativePointFloat</param>
         /// <returns>true if it contains</returns>
+        [Pure]
         public static bool Contains(this NativeRectFloat rect, NativePointFloat point)
         {
             return IsBetween(point.X, rect.Left, rect.Right) && IsBetween(point.Y, rect.Top, rect.Bottom);
@@ -53,6 +55,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="x">float</param>
         /// <param name="y">float</param>
         /// <returns>true if it contains</returns>
+        [Pure]
         public static bool Contains(this NativeRectFloat rect, float x, float y)
         {
             return IsBetween(x, rect.Left, rect.Right) && IsBetween(y, rect.Top, rect.Bottom);
@@ -64,6 +67,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="largerRectangle">NativeRectFloat, the larger rectangle</param>
         /// <param name="smallerRectangle">NativeRectFloat, the smaller rectangle</param>
         /// <returns>True if small rectangle is entirely contained within the larger rectangle, false otherwise</returns>
+        [Pure]
         public static bool Contains(this NativeRectFloat largerRectangle, NativeRectFloat smallerRectangle)
         {
             return
@@ -79,6 +83,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">The first rectangle</param>
         /// <param name="rect2">The second rectangle</param>
         /// <returns>The rectangles overlap</returns>
+        [Pure]
         public static bool HasOverlap(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             if (rect1.IsAdjacent(rect2) != AdjacentTo.None)
@@ -106,6 +111,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">The first rectangle</param>
         /// <param name="rect2">The second rectangle</param>
         /// <returns>At least one rectangle is adjacent to the other rectangle</returns>
+        [Pure]
         public static AdjacentTo IsAdjacent(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             if (rect1.Left.Equals(rect2.Right) && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect2.Top, rect1.Top, rect1.Bottom)))
@@ -134,6 +140,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="min">lowest allowed value</param>
         /// <param name="max">highest allowed value</param>
         /// <returns>bool true if the value is between</returns>
+        [Pure]
         private static bool IsBetween(float value, float min, float max)
         {
             return value >= min && value < max;
@@ -145,6 +152,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">NativeRectFloat to test if it's docked</param>
         /// <param name="rect2">NativeRectFloat rect to be docked to</param>
         /// <returns>bool with true if they are docked</returns>
+        [Pure]
         public static bool IsDockedToLeftOf(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             // Test if the right is one pixel to the left, and if top or bottom is within the rect2 height.
@@ -157,6 +165,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">NativeRectFloat to test if it's docked</param>
         /// <param name="rect2">NativeRectFloat rect to be docked to</param>
         /// <returns>bool with true if they are docked</returns>
+        [Pure]
         public static bool IsDockedToRightOf(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             // Test if the right is one pixel to the left, and if top or bottom is within the rect2 height.
@@ -169,6 +178,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">NativeRectFloat</param>
         /// <param name="rect2">NativeRectFloat</param>
         /// <returns>NativeRectFloat which is the union of rect1 and rect2</returns>
+        [Pure]
         public static NativeRectFloat Union(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             // TODO: Replace logic with own code
@@ -181,6 +191,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">NativeRectFloat</param>
         /// <param name="rect2">NativeRectFloat</param>
         /// <returns>NativeRectFloat which is the intersection of rect1 and rect2</returns>
+        [Pure]
         public static NativeRectFloat Intersect(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             // TODO: Replace logic with own code
@@ -194,6 +205,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="width">int</param>
         /// <param name="height">int</param>
         /// <returns>NativeRectFloat</returns>
+        [Pure]
         public static NativeRectFloat Inflate(this NativeRectFloat rect, int width, int height)
         {
             // TODO: Replace logic with own code
@@ -206,6 +218,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect1">NativeRectFloat</param>
         /// <param name="rect2">NativeRectFloat</param>
         /// <returns>bool</returns>
+        [Pure]
         public static bool IntersectsWith(this NativeRectFloat rect1, NativeRectFloat rect2)
         {
             return rect2.X < rect1.X + rect1.Width &&
@@ -220,6 +233,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect">NativeRectFloat</param>
         /// <param name="offset">NativePointFloat</param>
         /// <returns>NativeRectFloat</returns>
+        [Pure]
         public static NativeRectFloat Offset(this NativeRectFloat rect, NativePointFloat offset)
         {
             return new NativeRectFloat(rect.Location.Offset(offset), rect.Size);
@@ -232,6 +246,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="offsetX">float</param>
         /// <param name="offsetY">float</param>
         /// <returns>NativeRectFloat</returns>
+        [Pure]
         public static NativeRectFloat Offset(this NativeRectFloat rect, float? offsetX = null, float? offsetY = null)
         {
             return new NativeRectFloat(rect.Location.Offset(offsetX, offsetY), rect.Size);
@@ -243,6 +258,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect">NativeRectFloat</param>
         /// <param name="location">NativePointFloat</param>
         /// <returns>NativeRectFloat</returns>
+        [Pure]
         public static NativeRectFloat MoveTo(this NativeRectFloat rect, NativePointFloat location)
         {
             return new NativeRectFloat(location, rect.Size);
@@ -255,6 +271,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="x">int</param>
         /// <param name="y">int</param>
         /// <returns>NativeRectFloat</returns>
+        [Pure]
         public static NativeRectFloat MoveTo(this NativeRectFloat rect, float? x = null, float? y = null)
         {
             return new NativeRectFloat(new NativePointFloat(x ?? rect.X,y ?? rect.Y), rect.Size);
@@ -266,6 +283,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect">NativeRectFloat</param>
         /// <param name="size">NativeSizeFloat</param>
         /// <returns>NativeRectFloat</returns>
+        [Pure]
         public static NativeRectFloat Resize(this NativeRectFloat rect, NativeSizeFloat size)
         {
             return new NativeRectFloat(rect.Location, size);
@@ -278,6 +296,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="width">float</param>
         /// <param name="height">float</param>
         /// <returns>NativeRectFloat</returns>
+        [Pure]
         public static NativeRectFloat Resize(this NativeRectFloat rect, float? width = null, float? height = null)
         {
             return rect.Resize(new NativeSizeFloat(width ?? rect.Width, height ?? rect.Height));
@@ -288,6 +307,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// </summary>
         /// <param name="rect">NativeRectFloat</param>
         /// <returns>NativeRect</returns>
+        [Pure]
         public static NativeRect Round(this NativeRectFloat rect)
         {
             return new NativeRect((int)Math.Round(rect.X), (int)Math.Round(rect.Y), (int)Math.Round(rect.Width), (int)Math.Round(rect.Height));
@@ -299,6 +319,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="rect">NativeRectFloat</param>
         /// <param name="matrix">Matrix</param>
         /// <returns>NativeRectFloat</returns>
+        [Pure]
         public static NativeRectFloat Transform(this NativeRectFloat rect, System.Windows.Media.Matrix matrix)
         {
             System.Windows.Point[] myPointArray = { rect.TopLeft, rect.BottomRight };

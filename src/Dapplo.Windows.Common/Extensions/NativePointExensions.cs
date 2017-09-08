@@ -21,6 +21,7 @@
 
 #region using
 
+using System.Diagnostics.Contracts;
 using Dapplo.Windows.Common.Structs;
 
 #endregion
@@ -38,6 +39,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePoint</param>
         /// <param name="x">int</param>
         /// <returns>NativePoint</returns>
+        [Pure]
         public static NativePoint ChangeX(this NativePoint point, int x)
         {
             return new NativePoint(x, point.Y);
@@ -49,6 +51,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePoint</param>
         /// <param name="y">int</param>
         /// <returns>NativePoint</returns>
+        [Pure]
         public static NativePoint ChangeY(this NativePoint point, int y)
         {
             return new NativePoint(point.X, y);
@@ -60,6 +63,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePoint</param>
         /// <param name="offset">NativePoint</param>
         /// <returns>NativePoint</returns>
+        [Pure]
         public static NativePoint Offset(this NativePoint point, NativePoint offset)
         {
             return new NativePoint(point.X + offset.X, point.Y + offset.Y);
@@ -72,6 +76,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="offsetX">int</param>
         /// <param name="offsetY">int</param>
         /// <returns>NativePoint</returns>
+        [Pure]
         public static NativePoint Offset(this NativePoint point, int? offsetX = null, int? offsetY = null)
         {
             return new NativePoint(point.X + offsetX ?? 0, point.Y + offsetY ?? 0);

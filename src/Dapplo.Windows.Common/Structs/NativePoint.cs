@@ -67,27 +67,6 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        /// Create a new NativePoint of this with the specified offset
-        /// </summary>
-        /// <param name="x">int with x offset</param>
-        /// <param name="y">int with y offset</param>
-        /// <returns>NativePoint</returns>
-        public NativePoint Offset(int x, int y)
-        {
-            return new NativePoint(X + x, Y + y);
-        }
-
-        /// <summary>
-        /// Create a new NativePoint of this with the specified offset
-        /// </summary>
-        /// <param name="point">NativePoint</param>
-        /// <returns>NativePoint</returns>
-        public NativePoint Offset(NativePoint point)
-        {
-            return new NativePoint(X + point.X, Y + point.Y);
-        }
-
-        /// <summary>
         ///     Implicit cast from NativePoint to Point
         /// </summary>
         /// <param name="point">NativePoint</param>

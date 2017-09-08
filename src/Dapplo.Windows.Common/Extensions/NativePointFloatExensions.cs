@@ -23,6 +23,7 @@
 
 using Dapplo.Windows.Common.Structs;
 using System;
+using System.Diagnostics.Contracts;
 
 #endregion
 
@@ -39,6 +40,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePointFloat</param>
         /// <param name="x">float</param>
         /// <returns>NativePointFloat</returns>
+        [Pure]
         public static NativePointFloat ChangeX(this NativePointFloat point, float x)
         {
             return new NativePointFloat(x, point.Y);
@@ -50,6 +52,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePointFloat</param>
         /// <param name="y">float</param>
         /// <returns>NativePointFloat</returns>
+        [Pure]
         public static NativePointFloat ChangeY(this NativePointFloat point, float y)
         {
             return new NativePointFloat(point.X, y);
@@ -62,6 +65,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="offsetX">float</param>
         /// <param name="offsetY">float</param>
         /// <returns>NativePointFloat</returns>
+        [Pure]
         public static NativePointFloat Offset(this NativePointFloat point, float? offsetX = null, float? offsetY = null)
         {
             return new NativePointFloat(point.X + offsetX ?? 0, point.Y + offsetY ?? 0);
@@ -73,6 +77,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// <param name="point">NativePointFloat</param>
         /// <param name="offset">NativePointFloat</param>
         /// <returns>NativePointFloat</returns>
+        [Pure]
         public static NativePointFloat Offset(this NativePointFloat point, NativePointFloat offset)
         {
             return new NativePointFloat(point.X + offset.X, point.Y + offset.Y);
@@ -83,6 +88,7 @@ namespace Dapplo.Windows.Common.Extensions
         /// </summary>
         /// <param name="point">NativePointFloat</param>
         /// <returns>NativePoint</returns>
+        [Pure]
         public static NativePoint Round(this NativePointFloat point)
         {
             return new NativePoint((int)Math.Round(point.X), (int)Math.Round(point.Y));
