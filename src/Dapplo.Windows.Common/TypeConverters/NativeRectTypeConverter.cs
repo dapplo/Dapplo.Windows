@@ -67,7 +67,7 @@ namespace Dapplo.Windows.Common.TypeConverters
         {
             if (destinationType == typeof(string) && value is NativeRect nativeRect)
             {
-                return $"{nativeRect.Left},{nativeRect.Top},{nativeRect.Right},{nativeRect.Bottom}";
+                return $"{nativeRect.Left},{nativeRect.Top},{nativeRect.Width},{nativeRect.Height}";
             }
             return base.ConvertTo(context, culture, value, destinationType);
         }

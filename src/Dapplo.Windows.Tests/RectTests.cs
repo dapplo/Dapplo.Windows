@@ -64,12 +64,12 @@ namespace Dapplo.Windows.Tests
             var rect = new NativeRect(10, 20, 100, 200);
             Assert.Equal(10, rect.Left);
             Assert.Equal(20, rect.Top);
-            Assert.Equal(100, rect.Right);
-            Assert.Equal(200, rect.Bottom);
-            Assert.Equal(100 - 10, rect.Width);
-            Assert.Equal(200 - 20, rect.Height);
+            Assert.Equal(110, rect.Right);
+            Assert.Equal(220, rect.Bottom);
+            Assert.Equal(100, rect.Width);
+            Assert.Equal(200, rect.Height);
             Assert.Equal(new NativePoint(10, 20), rect.Location);
-            Assert.Equal(new NativeSize(100 - 10, 200 - 20), rect.Size);
+            Assert.Equal(new NativeSize(100, 200), rect.Size);
         }
 
         [Fact]

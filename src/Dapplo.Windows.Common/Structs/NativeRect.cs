@@ -54,14 +54,14 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="left">int</param>
         /// <param name="top">int</param>
-        /// <param name="right">int</param>
-        /// <param name="bottom">int</param>
-        public NativeRect(int left, int top, int right, int bottom)
+        /// <param name="width">int</param>
+        /// <param name="height">int</param>
+        public NativeRect(int left, int top, int width, int height)
         {
             _left = left;
             _top = top;
-            _right = right;
-            _bottom = bottom;
+            _right = left + width;
+            _bottom = top + height;
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="topLeft">NativePoint</param>
         /// <param name="bottomRight">NativePoint</param>
-        public NativeRect(NativePoint topLeft, NativePoint bottomRight) : this(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y)
+        public NativeRect(NativePoint topLeft, NativePoint bottomRight) : this(topLeft.X, topLeft.Y, bottomRight.X - topLeft.X, bottomRight.Y - topLeft.Y)
         {
         }
 
@@ -203,7 +203,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <returns>NativeRect</returns>
         public static implicit operator NativeRect(Rectangle rectangle)
         {
-            return new NativeRect(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+            return new NativeRect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
         }
 
         /// <summary>

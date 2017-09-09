@@ -51,18 +51,18 @@ namespace Dapplo.Windows.Common.Structs
         private readonly float _height;
 
         /// <summary>
-        ///     Constructor from left, top, right, bottom
+        ///     Constructor from left, top, width, height
         /// </summary>
         /// <param name="left">float</param>
         /// <param name="top">float</param>
-        /// <param name="right">float</param>
-        /// <param name="bottom">float</param>
-        public NativeRectFloat(float left, float top, float right, float bottom)
+        /// <param name="width">float</param>
+        /// <param name="height">float</param>
+        public NativeRectFloat(float left, float top, float width, float height)
         {
             _x = left;
             _y = top;
-            _width = right - left;
-            _height = bottom - top;
+            _width = width;
+            _height = height;
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="topLeft">NativePointFloat</param>
         /// <param name="bottomRight">NativePointFloat</param>
-        public NativeRectFloat(NativePointFloat topLeft, NativePointFloat bottomRight) : this(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y)
+        public NativeRectFloat(NativePointFloat topLeft, NativePointFloat bottomRight) : this(topLeft.X, topLeft.Y, bottomRight.X - topLeft.X, bottomRight.Y - topLeft.Y)
         {
         }
 

@@ -70,8 +70,8 @@ namespace Dapplo.Windows.Common.TypeConverters
                 return string.Format("{0},{1},{2},{3}",
                     nativeRectF.Left.ToString(CultureInfo.InvariantCulture),
                     nativeRectF.Top.ToString(CultureInfo.InvariantCulture),
-                    nativeRectF.Right.ToString(CultureInfo.InvariantCulture),
-                    nativeRectF.Bottom.ToString(CultureInfo.InvariantCulture));
+                    nativeRectF.Width.ToString(CultureInfo.InvariantCulture),
+                    nativeRectF.Height.ToString(CultureInfo.InvariantCulture));
             }
             return base.ConvertTo(context, culture, value, destinationType);
         }
