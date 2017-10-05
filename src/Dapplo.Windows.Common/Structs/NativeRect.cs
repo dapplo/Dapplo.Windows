@@ -237,11 +237,11 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         ///     Equals
         /// </summary>
-        /// <param name="rectangle">NativeRect</param>
+        /// <param name="other">NativeRect</param>
         /// <returns>bool</returns>
-        public bool Equals(NativeRect rectangle)
+        public bool Equals(NativeRect other)
         {
-            return rectangle.Left == _left && rectangle.Top == _top && rectangle.Right == _right && rectangle.Bottom == _bottom;
+            return other.Left == _left && other.Top == _top && other.Right == _right && other.Bottom == _bottom;
         }
 
         /// <summary>

@@ -265,6 +265,26 @@ namespace Dapplo.Windows.User32
             }
         }
 
+        /// <summary>
+        /// Try to send a WindowsMessage, this will return if the target didn't responde in the specified timeout (300ms by default)
+        /// </summary>
+        /// <param name="hWnd">IntPtr window handle</param>
+        /// <param name="message">WindowsMessages</param>
+        /// <param name="wParam">IntPtr</param>
+        /// <param name="lParam">IntPtr</param>
+        /// <param name="result">out IntPtr</param>
+        /// <param name="timeout">uint with optional number of milliseconds, default is 300</param>
+        /// <returns>bool true if the SendMessage worked</returns>
+        public static bool TrySendMessage(IntPtr hWnd, WindowsMessages message, IntPtr wParam, out IntPtr result, IntPtr lParam = default(IntPtr), uint timeout = 300)
+        {
+            var isSuccess = SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung |SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
+            if (!isSuccess)
+            {
+                result = IntPtr.Zero;
+            }
+            return isSuccess;
+        }
+
         private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr dwData);
 
         #region Native imports
@@ -519,11 +539,19 @@ namespace Dapplo.Windows.User32
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool PrintWindow(IntPtr hwnd, IntPtr hDc, PrintWindowFlags printWindowFlags);
 
+        /// <summary>
+        ///     Used for the WM_VSCROLL and WM_HSCROLL windows messages
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="windowsMessage">WindowsMessages</param>
+        /// <param name="sysCommand">SysCommands</param>
+        /// <param name="lParam">IntPtr</param>
+        /// <returns>IntPtr</returns>
         [DllImport(User32, SetLastError = true)]
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, SysCommands sysCommand, IntPtr lParam);
 
         /// <summary>
-        ///     Used for WM_VSCROLL and WM_HSCROLL
+        ///     Used for the WM_VSCROLL and WM_HSCROLL windows messages
         /// </summary>
         /// <param name="hWnd">IntPtr</param>
         /// <param name="windowsMessage">WindowsMessages</param>
@@ -533,6 +561,14 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, SetLastError = true)]
         public static extern int SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, ScrollBarCommands scrollBarCommand, int lParam);
 
+        /// <summary>
+        ///  Used for calls where the arguments are IntPtr
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="windowsMessage">WindowsMessages</param>
+        /// <param name="wParam">IntPtr</param>
+        /// <param name="lParam">IntPtr</param>
+        /// <returns>IntPtr</returns>
         [DllImport(User32, SetLastError = true)]
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, IntPtr lParam);
 
@@ -569,6 +605,14 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, StringBuilder lParam);
 
+        /// <summary>
+        ///     Used for WM_SETTEXT or another message where a string needs to be send
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="windowsMessage">WindowsMessages</param>
+        /// <param name="wParam">IntPtr</param>
+        /// <param name="lParam">string</param>
+        /// <returns>IntPtr, The return value specifies the result of the message processing; it depends on the message sent.</returns>
         [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
@@ -681,10 +725,10 @@ namespace Dapplo.Windows.User32
         /// <param name="scrollBar">ScrollBarTypes</param>
         /// <param name="scrollInfo">ScrollInfo ref</param>
         /// <param name="redraw">bool to specify if a redraw should be made</param>
-        /// <returns>bool if it worked</returns>
+        /// <returns>int with the current position of the scroll box</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo, bool redraw);
+        public static extern int SetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo, bool redraw);
 
         /// <summary>
         ///     See
@@ -732,33 +776,86 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, SetLastError = true)]
         public static extern RegionResults GetWindowRgn(IntPtr hWnd, SafeHandle hRgn);
 
+        /// <summary>
+        /// Changes the size, position, and Z order of a child, pop-up, or top-level window. These windows are ordered according to their appearance on the screen. The topmost window receives the highest rank and is the first window in the Z order.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633545(v=vs.85).aspx">SetWindowPos</a>
+        /// </summary>
+        /// <param name="hWnd">IntPtr, a handle to the window.</param>
+        /// <param name="hWndInsertAfter">IntPtr, a handle to the window to precede the positioned window in the Z order. This parameter must be a window handle or one of the following values. (see link)</param>
+        /// <param name="x">int</param>
+        /// <param name="y">int</param>
+        /// <param name="cx">int</param>
+        /// <param name="cy">int</param>
+        /// <param name="uFlags">WindowPos</param>
+        /// <returns>bool</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, WindowPos uFlags);
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, WindowPos uFlags);
 
+        /// <summary>
+        /// Examines the Z order of the child windows associated with the specified parent window and retrieves a handle to the child window at the top of the Z order.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633514(v=vs.85).aspx">GetTopWindow</a>
+        /// </summary>
+        /// <param name="hWnd">A handle to the parent window whose child windows are to be examined. If this parameter is NULL, the function returns a handle to the window at the top of the Z order.</param>
+        /// <returns>If the function succeeds, the return value is a handle to the child window at the top of the Z order. If the specified window has no child windows, the return value is NULL. To get extended error information, use the GetLastError function.</returns>
         [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetTopWindow(IntPtr hWnd);
 
+        /// <summary>
+        /// The GetDC function retrieves a handle to a device context (DC) for the client area of a specified window or for the entire screen. You can use the returned handle in subsequent GDI functions to draw in the DC. The device context is an opaque data structure, whose values are used internally by GDI.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd144871(v=vs.85).aspx">GetDC function</a>
+        /// </summary>
+        /// <param name="hwnd">A handle to the window whose DC is to be retrieved. If this value is NULL, GetDC retrieves the DC for the entire screen.</param>
+        /// <returns>f the function succeeds, the return value is a handle to the DC for the specified window's client area.</returns>
         [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetDC(IntPtr hwnd);
 
+        /// <summary>
+        /// The ReleaseDC function releases a device context (DC), freeing it for use by other applications. The effect of the ReleaseDC function depends on the type of DC. It frees only common and window DCs. It has no effect on class or private DCs.
+        /// </summary>
+        /// <param name="hWnd">IntPtr A handle to the window whose DC is to be released.</param>
+        /// <param name="hDC">IntPtr A handle to the DC to be released.</param>
+        /// <returns>The return value indicates whether the DC was released.</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
-        [DllImport(User32, SetLastError = true)]
-        public static extern IntPtr GetClipboardOwner();
-
-        [DllImport(User32, SetLastError = true)]
-        public static extern IntPtr SetClipboardViewer(IntPtr hWndNewViewer);
-
-        [DllImport(User32, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ChangeClipboardChain(IntPtr hWndRemove, IntPtr hWndNewNext);
-
+        /// <summary>
+        /// Retrieves a handle to the top-level window whose class name and window name match the specified strings. This function does not search child windows. This function does not perform a case-sensitive search.
+        /// To search child windows, beginning with a specified child window, use the FindWindowEx function.
+        /// </summary>
+        /// <param name="lpClassName">string</param>
+        /// <param name="lpWindowName">string</param>
+        /// <returns>If the function succeeds, the return value is a handle to the window that has the specified class name and window name.</returns>
         [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
+        /// <summary>
+        /// Retrieves a handle to a window whose class name and window name match the specified strings. The function searches child windows, beginning with the one following the specified child window. This function does not perform a case-sensitive search.
+        /// </summary>
+        /// <param name="hwndParent">
+        /// IntPtr, A handle to the parent window whose child windows are to be searched.
+        /// If hwndParent is NULL, the function uses the desktop window as the parent window. The function searches among windows that are child windows of the desktop.
+        /// If hwndParent is HWND_MESSAGE, the function searches all message-only windows.
+        /// </param>
+        /// <param name="hwndChildAfter">
+        /// IntPtr, a handle to a child window. The search begins with the next child window in the Z order. The child window must be a direct child window of hwndParent, not just a descendant window.
+        /// If hwndChildAfter is NULL, the search begins with the first child window of hwndParent.
+        /// Note that if both hwndParent and hwndChildAfter are NULL, the function searches all top-level and message-only windows.
+        /// </param>
+        /// <param name="lpszClass">
+        /// The class name or a class atom created by a previous call to the RegisterClass or RegisterClassEx function. The atom must be placed in the low-order word of lpszClass; the high-order word must be zero.
+        /// If lpszClass is a string, it specifies the window class name. The class name can be any name registered with RegisterClass or RegisterClassEx, or any of the predefined control-class names, or it can be MAKEINTATOM(0x8000). In this latter case, 0x8000 is the atom for a menu class. For more information, see the Remarks section of this topic.
+        /// </param>
+        /// <param name="lpszWindow">The window name (the window's title). If this parameter is NULL, all window names match.</param>
+        /// <remarks>If the lpszWindow parameter is not NULL, FindWindowEx calls the GetWindowText function to retrieve the window name for comparison. For a description of a potential problem that can arise, see the Remarks section of GetWindowText.
+        /// An application can call this function in the following way.
+        /// FindWindowEx( NULL, NULL, MAKEINTATOM(0x8000), NULL );
+        /// Note that 0x8000 is the atom for a menu class. When an application calls this function, the function checks whether a context menu is being displayed that the application created.</remarks>
+        /// <returns>
+        /// If the function succeeds, the return value is a handle to the window that has the specified class and window names.
+        /// If the function fails, the return value is NULL. To get extended error information, call GetLastError.
+        /// </returns>
         [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
 
@@ -771,15 +868,36 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, SetLastError = true)]
         public static extern uint GetGuiResources(IntPtr hProcess, uint uiFlags);
 
+        /// <summary>
+        /// Sends the specified message to one or more windows, depending on the specified fuFlags this can handle issues with hanging message loops.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644952(v=vs.85).aspx">SendMessageTimeout function</a>
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="msg">WindowsMessages</param>
+        /// <param name="wParam">IntPtr</param>
+        /// <param name="lParam">IntPtr</param>
+        /// <param name="fuFlags">SendMessageTimeoutFlags</param>
+        /// <param name="uTimeout">uint The duration of the time-out period, in milliseconds. If the message is a broadcast message, each window can use the full time-out period. For example, if you specify a five second time-out period and there are three top-level windows that fail to process the message, you could have up to a 15 second delay.</param>
+        /// <param name="lpdwResult">UIntPtr The result of the message processing. The value of this parameter depends on the message that is specified.</param>
+        /// <returns>bool false if timeout true if the sendmessage returned</returns>
         [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out UIntPtr lpdwResult);
+        public static extern bool SendMessageTimeout(IntPtr hWnd, WindowsMessages msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out IntPtr lpdwResult);
 
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool GetPhysicalCursorPos(out NativePoint cursorLocation);
 
+        /// <summary>
+        /// The MapWindowPoints function converts (maps) a set of points from a coordinate space relative to one window to a coordinate space relative to another window.
+        /// </summary>
+        /// <param name="hwndFrom">IntPtr window handle for the from window</param>
+        /// <param name="hwndTo">IntPtr window handle for the to window</param>
+        /// <param name="lpPoints">A pointer to an array of POINT structures that contain the set of points to be converted. The points are in device units. This parameter can also point to a RECT structure, in which case the cPoints parameter should be set to 2.</param>
+        /// <param name="cPoints">The number of POINT structures in the array pointed to by the lpPoints parameter.</param>
+        /// <returns>If the function succeeds, the low-order word of the return value is the number of pixels added to the horizontal coordinate of each source point in order to compute the horizontal coordinate of each destination point. (In addition to that, if precisely one of hWndFrom and hWndTo is mirrored, then each resulting horizontal coordinate is multiplied by -1.) The high-order word is the number of pixels added to the vertical coordinate of each source point in order to compute the vertical coordinate of each destination point.
+        /// If the function fails, the return value is zero. Call SetLastError prior to calling this method to differentiate an error return value from a legitimate "0" return value.</returns>
         [DllImport(User32, SetLastError = true)]
-        public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, ref NativePoint lpPoints, [MarshalAs(UnmanagedType.U4)] int cPoints);
+        public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, [In, Out] ref NativePoint lpPoints, [MarshalAs(UnmanagedType.U4)] int cPoints);
 
         /// <summary>
         ///     See
@@ -798,6 +916,12 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, SetLastError = true)]
         public static extern SafeIconHandle CopyIcon(IntPtr hIcon);
 
+        /// <summary>
+        /// Destroys an icon and frees any memory the icon occupied.
+        /// </summary>
+        /// <remarks>It is only necessary to call DestroyIcon for icons and cursors created with the following functions: CreateIconFromResourceEx (if called without the LR_SHARED flag), CreateIconIndirect, and CopyIcon. Do not use this function to destroy a shared icon. A shared icon is valid as long as the module from which it was loaded remains in memory. The following functions obtain a shared icon.</remarks>
+        /// <param name="hIcon">A handle to the icon to be destroyed. The icon must not be in use.</param>
+        /// <returns>bool true if the destroy succeeded</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DestroyIcon(IntPtr hIcon);
@@ -813,18 +937,41 @@ namespace Dapplo.Windows.User32
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetCursorInfo(out CursorInfo cursorInfo);
 
+        /// <summary>
+        /// Retrieves information about the specified icon or cursor.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648070(v=vs.85).aspx">GetIconInfo function</a>
+        /// This also describes to get more info on standard icons and cursors
+        /// </summary>
+        /// <param name="iconHandle">A handle to the icon or cursor.</param>
+        /// <param name="iconInfo">A pointer to an ICONINFO structure. The function fills in the structure's members.</param>
+        /// <returns>bool true if the function succeeds, the return value is in the IconInfo structure.</returns>
         [DllImport(User32, SetLastError = true)]
         public static extern bool GetIconInfo(SafeIconHandle iconHandle, out IconInfo iconInfo);
 
+        /// <summary>
+        /// Sets the mouse capture to the specified window belonging to the current thread.SetCapture captures mouse input either when the mouse is over the capturing window, or when the mouse button was pressed while the mouse was over the capturing window and the button is still down. Only one window at a time can capture the mouse.
+        /// If the mouse cursor is over a window created by another thread, the system will direct mouse input to the specified window only if a mouse button is down.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646262(v=vs.85).aspx">SetCapture function</a>
+        /// </summary>
+        /// <param name="hWnd">A handle to the window in the current thread that is to capture the mouse.</param>
+        /// <remarks>
+        /// Only the foreground window can capture the mouse. When a background window attempts to do so, the window receives messages only for mouse events that occur when the cursor hot spot is within the visible portion of the window. Also, even if the foreground window has captured the mouse, the user can still click another window, bringing it to the foreground.
+        /// When the window no longer requires all mouse input, the thread that created the window should call the ReleaseCapture function to release the mouse.
+        /// This function cannot be used to capture mouse input meant for another process.
+        /// When the mouse is captured, menu hotkeys and other keyboard accelerators do not work.
+        /// </remarks>
+        /// <returns>The return value is a handle to the window that had previously captured the mouse. If there is no such window, the return value is NULL.</returns>
         [DllImport(User32, SetLastError = true)]
         public static extern IntPtr SetCapture(IntPtr hWnd);
 
+        /// <summary>
+        /// Releases the mouse capture from a window in the current thread and restores normal mouse input processing. A window that has captured the mouse receives all mouse input, regardless of the position of the cursor, except when a mouse button is clicked while the cursor hot spot is in the window of another thread.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646261(v=vs.85).aspx">ReleaseCapture function</a>
+        /// </summary>
+        /// <returns>bool if it worked</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ReleaseCapture();
-
-        [DllImport(User32, SetLastError = true)]
-        public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
 
         [DllImport(User32, SetLastError = true)]
         internal static extern IntPtr OpenInputDesktop(uint dwFlags, [MarshalAs(UnmanagedType.Bool)] bool fInherit, DesktopAccessRight dwDesiredAccess);

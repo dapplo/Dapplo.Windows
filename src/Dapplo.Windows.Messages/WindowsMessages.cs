@@ -19,14 +19,19 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Diagnostics.CodeAnalysis;
+#pragma warning disable 1591
+
 namespace Dapplo.Windows.Messages
 {
     /// <summary>
     ///     All possible windows messages
+    /// See also <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644927(v=vs.85).aspx#system_defined">here</a>
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum WindowsMessages : uint
     {
-#pragma warning disable 1591
         WM_NULL = 0x0000,
         /// <summary>
         /// Sent when an application requests that a window be created by calling the CreateWindowEx or CreateWindow function. (The message is sent before the function returns.) The window procedure of the new window receives this message after the window is created, but before the window becomes visible.
@@ -707,7 +712,6 @@ namespace Dapplo.Windows.Messages
         /// </summary>
         WM_APPLICATION_STRING = 0xc000,
         WM_RASDIALEVENT = 0xCCCD,
-
-#pragma warning restore 1591
+        
     }
 }

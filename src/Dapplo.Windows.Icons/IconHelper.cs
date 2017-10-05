@@ -88,7 +88,7 @@ namespace Dapplo.Windows.Icons
             // Find the best matching logo, this could be one with a scale in it, or just the first
             string finalLogoPath = possibleLogos.FirstOrDefault(logoFile => logoFile.EndsWith($".scale-{scale}.{logoExtension}")) ?? possibleLogos.FirstOrDefault();
 
-            if (!File.Exists(finalLogoPath))
+            if (finalLogoPath == null || !File.Exists(finalLogoPath))
             {
                 return default(TBitmap);
             }
@@ -103,14 +103,15 @@ namespace Dapplo.Windows.Icons
                     img.EndInit();
                     return img as TBitmap;
                 }
-                if (typeof(Bitmap) == typeof(TBitmap)) {
-                    using (var bitmap = Image.FromStream(fileStream))
-                    {
-                        return bitmap.Clone() as TBitmap;
-                    }
+                if (typeof(Bitmap) != typeof(TBitmap))
+                {
+                    return default(TBitmap);
+                }
+                using (var bitmap = Image.FromStream(fileStream))
+                {
+                    return bitmap.Clone() as TBitmap;
                 }
             }
-            return default(TBitmap);
         }
 
         /// <summary>
@@ -141,17 +142,12 @@ namespace Dapplo.Windows.Icons
         ///     It's important that the images are not larger than 256x256.
         /// </summary>
         /// <param name="stream">Stream to write to</param>
-        /// <param name="images">List of images</param>
-        public static void WriteIcon(Stream stream, IList<Image> images)
+        /// <param name="images">IEnumerable with images</param>
+        public static void WriteIcon(Stream stream, IEnumerable<Image> images)
         {
             var binaryWriter = new BinaryWriter(stream);
-            //
-            // ICONDIR structure
-            //
-            binaryWriter.Write((short)0); // reserved
-            binaryWriter.Write((short)1); // image type (icon)
-            binaryWriter.Write((short)images.Count); // number of images
 
+            short imageCount = 0;
             IList<Size> imageSizes = new List<Size>();
             IList<MemoryStream> encodedImages = new List<MemoryStream>();
             foreach (var image in images)
@@ -162,7 +158,14 @@ namespace Dapplo.Windows.Icons
 
                 imageStream.Seek(0, SeekOrigin.Begin);
                 encodedImages.Add(imageStream);
+                imageCount++;
             }
+            //
+            // ICONDIR structure
+            //
+            binaryWriter.Write((short)0); // reserved
+            binaryWriter.Write((short)1); // image type (icon)
+            binaryWriter.Write(imageCount); // number of images
 
             //
             // ICONDIRENTRY structure
@@ -170,8 +173,8 @@ namespace Dapplo.Windows.Icons
             const int iconDirSize = 6;
             const int iconDirEntrySize = 16;
 
-            var offset = iconDirSize + images.Count * iconDirEntrySize;
-            for (var i = 0; i < images.Count; i++)
+            var offset = iconDirSize + imageCount * iconDirEntrySize;
+            for (var i = 0; i < imageCount; i++)
             {
                 var imageSize = imageSizes[i];
                 // Write the width / height, 0 means 256

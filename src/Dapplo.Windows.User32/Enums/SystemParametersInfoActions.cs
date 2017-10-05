@@ -257,7 +257,6 @@ namespace Dapplo.Windows.User32.Enums
         /// </summary>
         SPI_SETFASTTASKSWITCH = 0x0024,
 
-        //#if(WINVER >= 0x0400)
         /// <summary>
         ///     Sets dragging of full windows either on or off. The uiParam parameter specifies TRUE for on, or FALSE for off.
         ///     Windows 95:  This flag is supported only if Windows Plus! is installed. See SPI_GETWINDOWSEXTENSION.
@@ -704,7 +703,6 @@ namespace Dapplo.Windows.User32.Enums
         /// </summary>
         SPI_SETACCESSTIMEOUT = 0x003D,
 
-        //#if(WINVER >= 0x0400)
         /// <summary>
         ///     Windows Me/98/95:  Retrieves information about the SerialKeys accessibility feature. The pvParam parameter must
         ///     point
@@ -741,7 +739,6 @@ namespace Dapplo.Windows.User32.Enums
         /// </summary>
         SPI_SETSOUNDSENTRY = 0x0041,
 
-        //#if(_WIN32_WINNT >= 0x0400)
         /// <summary>
         ///     Determines whether the snap-to-default-button feature is enabled. If enabled, the mouse cursor automatically moves
         ///     to the default button, such as OK or Apply, of a dialog box. The pvParam parameter must point to a BOOL variable
@@ -760,9 +757,7 @@ namespace Dapplo.Windows.User32.Enums
         ///     Windows 95:  Not supported.
         /// </summary>
         SPI_SETSNAPTODEFBUTTON = 0x0060,
-        //#endif /* _WIN32_WINNT >= 0x0400 */
 
-        //#if (_WIN32_WINNT >= 0x0400) || (_WIN32_WINDOWS > 0x0400)
         /// <summary>
         ///     Retrieves the width, in pixels, of the rectangle within which the mouse pointer has to stay for TrackMouseEvent
         ///     to generate a WM_MOUSEHOVER message. The pvParam parameter must point to a UINT variable that receives the width.
@@ -856,9 +851,7 @@ namespace Dapplo.Windows.User32.Enums
         ///     Windows NT, Windows 95:  This value is not supported.
         /// </summary>
         SPI_SETSHOWIMEUI = 0x006F,
-        //#endif
 
-        //#if(WINVER >= 0x0500)
         /// <summary>
         ///     Retrieves the current mouse speed. The mouse speed determines how far the pointer will move based on the distance
         ///     the mouse moves.
@@ -895,9 +888,7 @@ namespace Dapplo.Windows.User32.Enums
         ///     Windows NT, Windows Me/98/95:  This value is not supported.
         /// </summary>
         SPI_GETDESKWALLPAPER = 0x0073,
-        //#endif /* WINVER >= 0x0500 */
 
-        //#if(WINVER >= 0x0500)
         /// <summary>
         ///     Determines whether active window tracking (activating the window the mouse is on) is on or off. The pvParam
         ///     parameter must point
@@ -1141,7 +1132,6 @@ namespace Dapplo.Windows.User32.Enums
         /// </summary>
         SPI_SETCURSORSHADOW = 0x101B,
 
-        //#if(_WIN32_WINNT >= 0x0501)
         /// <summary>
         ///     Retrieves the state of the Mouse Sonar feature. The pvParam parameter must point to a BOOL variable that receives
         ///     TRUE
@@ -1322,7 +1312,6 @@ namespace Dapplo.Windows.User32.Enums
         /// </summary>
         SPI_SETCARETWIDTH = 0x2007,
 
-        //#if(_WIN32_WINNT >= 0x0501)
         /// <summary>
         ///     Retrieves the time delay before the primary mouse button is locked. The pvParam parameter must point to DWORD that
         ///     receives

@@ -28,11 +28,7 @@ using System;
 namespace Dapplo.Windows.User32.Enums
 {
     /// <summary>
-    ///     See
-    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644952(v=vs.85).aspx">
-    ///         SendMessageTimeout
-    ///         function
-    ///     </a>
+    ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644952(v=vs.85).aspx">SendMessageTimeout function</a>
     /// </summary>
     [Flags]
     public enum SendMessageTimeoutFlags : uint

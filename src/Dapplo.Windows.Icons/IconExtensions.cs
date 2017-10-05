@@ -133,38 +133,26 @@ namespace Dapplo.Windows.Icons
             IntPtr iconHandle;
             if (useLargeIcons)
             {
-                iconHandle = User32Api.SendMessage(window.Handle, WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero);
-                if (iconHandle == IntPtr.Zero)
+                if (!User32Api.TrySendMessage(window.Handle, WindowsMessages.WM_GETICON, iconBig, out iconHandle))
                 {
                     iconHandle = User32Api.GetClassLongWrapper(window.Handle, ClassLongIndex.IconHandle);
                 }
             }
-            else
-            {
-                iconHandle = User32Api.SendMessage(window.Handle, WindowsMessages.WM_GETICON, iconSmall2, IntPtr.Zero);
-            }
-            if (iconHandle == IntPtr.Zero)
-            {
-                iconHandle = User32Api.SendMessage(window.Handle, WindowsMessages.WM_GETICON, iconSmall, IntPtr.Zero);
-            }
-            if (iconHandle == IntPtr.Zero)
+            else if (!User32Api.TrySendMessage(window.Handle, WindowsMessages.WM_GETICON, iconSmall2, out iconHandle))
             {
                 iconHandle = User32Api.GetClassLongWrapper(window.Handle, ClassLongIndex.SmallIconHandle);
             }
-            if (iconHandle == IntPtr.Zero)
+
+            if (iconHandle == IntPtr.Zero && !User32Api.TrySendMessage(window.Handle, WindowsMessages.WM_GETICON, iconSmall, out iconHandle))
             {
-                iconHandle = User32Api.SendMessage(window.Handle, WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero);
+                iconHandle = User32Api.GetClassLongWrapper(window.Handle, ClassLongIndex.SmallIconHandle);
             }
-            if (iconHandle == IntPtr.Zero)
+
+            if (iconHandle == IntPtr.Zero && !User32Api.TrySendMessage(window.Handle, WindowsMessages.WM_GETICON, iconBig, out iconHandle))
             {
                 iconHandle = User32Api.GetClassLongWrapper(window.Handle, ClassLongIndex.IconHandle);
             }
-            if (iconHandle != IntPtr.Zero)
-            {
-                return IconHelper.IconHandleTo<TIcon>(iconHandle);
-            }
-            // Nothing found
-            return default(TIcon);
+            return IconHelper.IconHandleTo<TIcon>(iconHandle);
         }
     }
 }

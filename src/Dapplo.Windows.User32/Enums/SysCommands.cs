@@ -22,8 +22,8 @@
 namespace Dapplo.Windows.User32.Enums
 {
     /// <summary>
-    ///     A window receives this message when the user chooses a command from the Window menu (formerly known as the system
-    ///     or control menu)
+    ///     A window receives this message when the user chooses a command from the Window menu
+    ///    (formerly known as the system or control menu)
     ///     or when the user chooses the maximize button, minimize button, restore button, or close button.
     /// </summary>
     public enum SysCommands

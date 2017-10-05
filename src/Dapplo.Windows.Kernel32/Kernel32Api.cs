@@ -268,11 +268,30 @@ namespace Dapplo.Windows.Kernel32
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "LoadLibraryW")]
         public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)] string lpFileName);
 
+        /// <summary>
+        /// Opens an existing local process object.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms684320(v=vs.85).aspx">OpenProcess function</a>
+        /// </summary>
+        /// <param name="dwDesiredAccess">ProcessAccessRights</param>
+        /// <param name="bInheritHandle">If this value is TRUE, processes created by this process will inherit the handle. Otherwise, the processes do not inherit this handle.</param>
+        /// <param name="dwProcessId">The identifier of the local process to be opened.
+        /// If the specified process is the System Process (0x00000000), the function fails and the last error code is ERROR_INVALID_PARAMETER. If the specified process is the Idle process or one of the CSRSS processes, this function fails and the last error code is ERROR_ACCESS_DENIED because their access restrictions prevent user-level code from opening them.</param>
+        /// <returns>If the function succeeds, the return value is an open handle to the specified process.</returns>
         [DllImport("kernel32", SetLastError = true)]
         public static extern IntPtr OpenProcess(ProcessAccessRights dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
 
+        /// <summary>
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365461(v=vs.85).aspx">QueryDosDevice function</a>
+        /// </summary>
+        /// <param name="lpDeviceName">An MS-DOS device name string specifying the target of the query. The device name cannot have a trailing backslash; for example, use "C:", not "C:\".
+        /// This parameter can be NULL. In that case, the QueryDosDevice function will store a list of all existing MS-DOS device names into the buffer pointed to by lpTargetPath.</param>
+        /// <param name="lpTargetPath">A pointer to a buffer that will receive the result of the query. The function fills this buffer with one or more null-terminated strings. The final null-terminated string is followed by an additional NULL.
+        /// If lpDeviceName is non-NULL, the function retrieves information about the particular MS-DOS device specified by lpDeviceName. The first null-terminated string stored into the buffer is the current mapping for the device. The other null-terminated strings represent undeleted prior mappings for the device.
+        /// If lpDeviceName is NULL, the function retrieves a list of all existing MS-DOS device names. Each null-terminated string stored into the buffer is the name of an existing MS-DOS device, for example, \Device\HarddiskVolume1 or \Device\Floppy0.</param>
+        /// <param name="uuchMax">The maximum number of TCHARs that can be stored into the buffer pointed to by lpTargetPath.</param>
+        /// <returns>If the function succeeds, the return value is the number of TCHARs stored into the buffer pointed to by lpTargetPath.</returns>
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern uint QueryDosDevice(string lpDeviceName, StringBuilder lpTargetPath, uint uuchMax);
+        public static extern uint QueryDosDevice(string lpDeviceName, [Out] StringBuilder lpTargetPath, uint uuchMax);
 
         /// <summary>
         /// Retrieves the full name of the executable image for the specified process.
