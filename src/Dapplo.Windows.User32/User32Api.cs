@@ -144,23 +144,23 @@ namespace Dapplo.Windows.User32
         /// </returns>
         public static NativePoint GetCursorLocation()
         {
-            if (Environment.OSVersion.Version.Major >= 6 && _canCallGetPhysicalCursorPos)
+            if (Environment.OSVersion.Version.Major < 6 || !_canCallGetPhysicalCursorPos)
             {
-                try
+                return new NativePoint(Cursor.Position.X, Cursor.Position.Y);
+            }
+            try
+            {
+                if (GetPhysicalCursorPos(out var cursorLocation))
                 {
-                    NativePoint cursorLocation;
-                    if (GetPhysicalCursorPos(out cursorLocation))
-                    {
-                        return cursorLocation;
-                    }
-                    var error = Win32.GetLastErrorCode();
-                    Log.Error().WriteLine("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
+                    return cursorLocation;
                 }
-                catch (Exception ex)
-                {
-                    Log.Error().WriteLine(ex, "Exception retrieving PhysicalCursorPos, no longer calling this. Cause :");
-                    _canCallGetPhysicalCursorPos = false;
-                }
+                var error = Win32.GetLastErrorCode();
+                Log.Error().WriteLine("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
+            }
+            catch (Exception ex)
+            {
+                Log.Error().WriteLine(ex, "Exception retrieving PhysicalCursorPos, no longer calling this. Cause :");
+                _canCallGetPhysicalCursorPos = false;
             }
             return new NativePoint(Cursor.Position.X, Cursor.Position.Y);
         }
@@ -285,6 +285,45 @@ namespace Dapplo.Windows.User32
             return isSuccess;
         }
 
+        /// <summary>
+        /// Try to send a WindowsMessage, this will return if the target didn't responde in the specified timeout (300ms by default)
+        /// </summary>
+        /// <param name="hWnd">IntPtr window handle</param>
+        /// <param name="message">uint</param>
+        /// <param name="wParam">IntPtr</param>
+        /// <param name="lParam">IntPtr</param>
+        /// <param name="result">out IntPtr</param>
+        /// <param name="timeout">uint with optional number of milliseconds, default is 300</param>
+        /// <returns>bool true if the SendMessage worked</returns>
+        public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, out IntPtr result, IntPtr lParam = default(IntPtr), uint timeout = 300)
+        {
+            var isSuccess = SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung | SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
+            if (!isSuccess)
+            {
+                result = IntPtr.Zero;
+            }
+            return isSuccess;
+        }
+
+        /// <summary>
+        /// Try to send a WindowsMessage, this will return if the target didn't responde in the specified timeout (300ms by default)
+        /// </summary>
+        /// <param name="hWnd">IntPtr window handle</param>
+        /// <param name="message">uint</param>
+        /// <param name="wParam">IntPtr</param>
+        /// <param name="lParam">IntPtr</param>
+        /// <param name="result">out UIntPtr</param>
+        /// <param name="timeout">uint with optional number of milliseconds, default is 300</param>
+        /// <returns>bool true if the SendMessage worked</returns>
+        public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, out UIntPtr result, IntPtr lParam = default(IntPtr), uint timeout = 300)
+        {
+            var isSuccess = SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung | SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
+            if (!isSuccess)
+            {
+                result = UIntPtr.Zero;
+            }
+            return isSuccess;
+        }
         private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr dwData);
 
         #region Native imports
@@ -814,11 +853,11 @@ namespace Dapplo.Windows.User32
         /// The ReleaseDC function releases a device context (DC), freeing it for use by other applications. The effect of the ReleaseDC function depends on the type of DC. It frees only common and window DCs. It has no effect on class or private DCs.
         /// </summary>
         /// <param name="hWnd">IntPtr A handle to the window whose DC is to be released.</param>
-        /// <param name="hDC">IntPtr A handle to the DC to be released.</param>
+        /// <param name="hDc">IntPtr A handle to the DC to be released.</param>
         /// <returns>The return value indicates whether the DC was released.</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
+        public static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDc);
 
         /// <summary>
         /// Retrieves a handle to the top-level window whose class name and window name match the specified strings. This function does not search child windows. This function does not perform a case-sensitive search.
@@ -882,6 +921,36 @@ namespace Dapplo.Windows.User32
         /// <returns>bool false if timeout true if the sendmessage returned</returns>
         [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool SendMessageTimeout(IntPtr hWnd, WindowsMessages msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out IntPtr lpdwResult);
+
+        /// <summary>
+        /// Sends the specified message to one or more windows, depending on the specified fuFlags this can handle issues with hanging message loops.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644952(v=vs.85).aspx">SendMessageTimeout function</a>
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="msg">uint</param>
+        /// <param name="wParam">IntPtr</param>
+        /// <param name="lParam">IntPtr</param>
+        /// <param name="fuFlags">SendMessageTimeoutFlags</param>
+        /// <param name="uTimeout">uint The duration of the time-out period, in milliseconds. If the message is a broadcast message, each window can use the full time-out period. For example, if you specify a five second time-out period and there are three top-level windows that fail to process the message, you could have up to a 15 second delay.</param>
+        /// <param name="lpdwResult">IntPtr The result of the message processing. The value of this parameter depends on the message that is specified.</param>
+        /// <returns>bool false if timeout true if the sendmessage returned</returns>
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern bool SendMessageTimeout(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out IntPtr lpdwResult);
+
+        /// <summary>
+        /// Sends the specified message to one or more windows, depending on the specified fuFlags this can handle issues with hanging message loops.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644952(v=vs.85).aspx">SendMessageTimeout function</a>
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="msg">uint</param>
+        /// <param name="wParam">IntPtr</param>
+        /// <param name="lParam">IntPtr</param>
+        /// <param name="fuFlags">SendMessageTimeoutFlags</param>
+        /// <param name="uTimeout">uint The duration of the time-out period, in milliseconds. If the message is a broadcast message, each window can use the full time-out period. For example, if you specify a five second time-out period and there are three top-level windows that fail to process the message, you could have up to a 15 second delay.</param>
+        /// <param name="lpdwResult">UIntPtr The result of the message processing. The value of this parameter depends on the message that is specified.</param>
+        /// <returns>bool false if timeout true if the sendmessage returned</returns>
+        [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern bool SendMessageTimeout(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out UIntPtr lpdwResult);
 
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -972,6 +1041,14 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ReleaseCapture();
+
+        /// <summary>
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648062(v=vs.85).aspx">CreateIconIndirect function</a>
+        /// </summary>
+        /// <param name="icon">IconInfo</param>
+        /// <returns>IntPtr with the icon handle</returns>
+        [DllImport(User32, SetLastError = true)]
+        public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
 
         [DllImport(User32, SetLastError = true)]
         internal static extern IntPtr OpenInputDesktop(uint dwFlags, [MarshalAs(UnmanagedType.Bool)] bool fInherit, DesktopAccessRight dwDesiredAccess);

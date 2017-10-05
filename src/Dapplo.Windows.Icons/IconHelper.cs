@@ -121,8 +121,7 @@ namespace Dapplo.Windows.Icons
         /// <returns></returns>
         private static string GetAppProcessPath(IInteropWindow interopWindow)
         {
-            int pid;
-            User32Api.GetWindowThreadProcessId(interopWindow.Handle, out pid);
+            User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var pid);
             if (string.Equals(interopWindow.GetClassname(), AppQuery.AppFrameWindowClass))
             {
                 pid = interopWindow.GetChildren().FirstOrDefault(window => string.Equals(AppQuery.AppWindowClass, window.GetClassname()))?.GetProcessId() ?? 0;
@@ -252,9 +251,7 @@ namespace Dapplo.Windows.Icons
         /// <returns>Icon</returns>
         public static TIcon ExtractAssociatedIcon<TIcon>(string location, int index = 0, bool useLargeIcon = true) where TIcon : class
         {
-            IntPtr large;
-            IntPtr small;
-            NativeInvokes.ExtractIconEx(location, index, out large, out small, 1);
+            NativeInvokes.ExtractIconEx(location, index, out var large, out var small, 1);
             TIcon returnIcon = null;
             try
             {
@@ -289,12 +286,10 @@ namespace Dapplo.Windows.Icons
         ///     Get the number of icon in the file
         /// </summary>
         /// <param name="location">Location of the EXE or DLL</param>
-        /// <returns></returns>
+        /// <returns>int with the number of icons in the file</returns>
         public static int CountAssociatedIcons(string location)
         {
-            IntPtr large;
-            IntPtr small;
-            return NativeInvokes.ExtractIconEx(location, -1, out large, out small, 0);
+            return NativeInvokes.ExtractIconEx(location, -1, out var large, out _, 0);
         }
 
         /// <summary>

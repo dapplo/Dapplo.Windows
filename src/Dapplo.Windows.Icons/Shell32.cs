@@ -53,8 +53,7 @@ namespace Dapplo.Windows.Icons
             {
                 throw new ArgumentNullException(nameof(filePath));
             }
-            Uri uri;
-            if (!Uri.TryCreate(filePath, UriKind.Absolute, out uri))
+            if (!Uri.TryCreate(filePath, UriKind.Absolute, out var uri))
             {
                 filePath = Path.GetFullPath(filePath);
                 uri = new Uri(filePath);
