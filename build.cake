@@ -2,7 +2,6 @@
 #tool "OpenCover"
 #tool "docfx.console"
 #addin "SharpZipLib"
-#addin "MagicChunks"
 #addin "Cake.FileHelpers"
 #addin "Cake.DocFx"
 #addin "Cake.Compression"
