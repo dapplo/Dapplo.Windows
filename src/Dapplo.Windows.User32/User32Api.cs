@@ -766,7 +766,6 @@ namespace Dapplo.Windows.User32
         /// <param name="redraw">bool to specify if a redraw should be made</param>
         /// <returns>int with the current position of the scroll box</returns>
         [DllImport(User32, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern int SetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo, bool redraw);
 
         /// <summary>
