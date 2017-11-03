@@ -197,26 +197,39 @@ namespace Dapplo.Windows.Desktop
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
         /// <param name="forceUpdate">set to true to make sure the value is updated</param>
+        /// <param name="cropToParent">set to true to have the bounds cropped to the parent(s)</param>
         /// <returns>WindowInfo</returns>
-        public static WindowInfo GetInfo(this IInteropWindow interopWindow, bool forceUpdate = false)
+        public static WindowInfo GetInfo(this IInteropWindow interopWindow, bool forceUpdate = false, bool cropToParent = true)
         {
             if (interopWindow.Info.HasValue && !forceUpdate)
             {
                 return interopWindow.Info.Value;
             }
+
             var windowInfo = WindowInfo.Create();
             User32Api.GetWindowInfo(interopWindow.Handle, ref windowInfo);
 
             // Now correct the bounds, for Windows 10
             if (Dwm.IsDwmEnabled)
             {
-                NativeRect extendedFrameBounds;
-                bool gotFrameBounds = Dwm.GetExtendedFrameBounds(interopWindow.Handle, out extendedFrameBounds);
+                bool gotFrameBounds = Dwm.GetExtendedFrameBounds(interopWindow.Handle, out var extendedFrameBounds);
                 if (gotFrameBounds && (interopWindow.IsApp() || WindowsVersion.IsWindows10OrLater && !interopWindow.IsMaximized()))
                 {
                     windowInfo.Bounds = extendedFrameBounds;
                 }
             }
+
+            if (cropToParent)
+            {
+                var parentWindow = interopWindow.GetParentWindow();
+                if (interopWindow.HasParent)
+                {
+                    var parentInfo = parentWindow.GetInfo(forceUpdate);
+                    windowInfo.Bounds = windowInfo.Bounds.Intersect(parentInfo.Bounds);
+                    windowInfo.ClientBounds = windowInfo.ClientBounds.Intersect(parentInfo.ClientBounds);
+                }
+            }
+
             interopWindow.Info = windowInfo;
             return interopWindow.Info.Value;
         }

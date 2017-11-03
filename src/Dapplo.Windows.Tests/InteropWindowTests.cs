@@ -22,15 +22,11 @@
 #region using
 
 using System.Linq;
-using System.Windows.Media.Imaging;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.App;
 using Xunit;
 using Xunit.Abstractions;
-using Dapplo.Windows.Citrix;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Icons;
 
 #endregion
 

@@ -42,7 +42,7 @@ namespace Dapplo.Windows.User32.Structs
 		/// </summary>
 		private uint _cbSize;
 		private NativeRect _rcWindow;
-		private readonly NativeRect _rcClient;
+		private NativeRect _rcClient;
 		private readonly WindowStyleFlags _dwStyle;
 		private readonly ExtendedWindowStyleFlags _dwExStyle;
 		/// <summary>
@@ -72,20 +72,18 @@ namespace Dapplo.Windows.User32.Structs
 		/// </summary>
 		public NativeRect Bounds
 		{
-			get
-			{
-			    return _rcWindow.IsEmpty ? _rcClient : _rcWindow;
-			}
-			set
-			{
-				_rcWindow = value;
-			}
+			get => _rcWindow.IsEmpty ? _rcClient : _rcWindow;
+		    set => _rcWindow = value;
 		}
 
-		/// <summary>
-		/// The coordinates of the client area.
-		/// </summary>
-		public NativeRect ClientBounds => _rcClient;
+	    /// <summary>
+	    /// The coordinates of the client area.
+	    /// </summary>
+	    public NativeRect ClientBounds
+	    {
+	        get => _rcClient;
+	        set => _rcClient = value;
+	    }
 
 		/// <summary>
 		/// The window styles.
