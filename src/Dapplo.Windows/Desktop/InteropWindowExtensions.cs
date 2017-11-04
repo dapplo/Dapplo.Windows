@@ -209,9 +209,10 @@ namespace Dapplo.Windows.Desktop
             var windowInfo = WindowInfo.Create();
             User32Api.GetWindowInfo(interopWindow.Handle, ref windowInfo);
 
-            // Now correct the bounds, for Windows 10
+            // Now correct the bounds, for Windows 8+
             if (Dwm.IsDwmEnabled)
             {
+                // This only works for top level windows, otherwise a access denied is returned
                 bool gotFrameBounds = Dwm.GetExtendedFrameBounds(interopWindow.Handle, out var extendedFrameBounds);
                 if (gotFrameBounds && (interopWindow.IsApp() || WindowsVersion.IsWindows10OrLater && !interopWindow.IsMaximized()))
                 {

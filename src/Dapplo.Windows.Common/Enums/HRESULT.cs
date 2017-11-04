@@ -29,7 +29,7 @@ namespace Dapplo.Windows.Common.Enums
     ///     The HRESULT represents Windows error codes
     ///     See <a href="https://en.wikipedia.org/wiki/HRESULT">wikipedia</a>
     /// </summary>
-    public enum HResult : long
+    public enum HResult : int
     {
 #pragma warning disable 1591
         S_OK = 0,

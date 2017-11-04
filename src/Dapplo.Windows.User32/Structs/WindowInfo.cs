@@ -72,18 +72,18 @@ namespace Dapplo.Windows.User32.Structs
 		/// </summary>
 		public NativeRect Bounds
 		{
-			get => _rcWindow.IsEmpty ? _rcClient : _rcWindow;
-		    set => _rcWindow = value;
+			get => _rcWindow;
+			set => _rcWindow = value;
 		}
 
-	    /// <summary>
-	    /// The coordinates of the client area.
-	    /// </summary>
-	    public NativeRect ClientBounds
-	    {
-	        get => _rcClient;
-	        set => _rcClient = value;
-	    }
+		/// <summary>
+		/// The coordinates of the client area.
+		/// </summary>
+		public NativeRect ClientBounds
+		{
+			get => _rcClient;
+			set => _rcClient = value;
+		}
 
 		/// <summary>
 		/// The window styles.

@@ -55,5 +55,18 @@ namespace Dapplo.Windows.Tests
             var info = clock.GetInfo();
             Assert.True(info.ClientBounds.Width * info.ClientBounds.Height > 0);
         }
+
+        //[Fact]
+        public void Test_GetInfo_WithParentCrop()
+        {
+
+            var testHandle = 0x000806a6;
+            var testWindow = InteropWindowFactory.CreateFor(testHandle);
+	        var ws = testWindow.GetWindowScroller();
+	        var info1 = ws.ScrollingWindow.GetInfo();
+	        Assert.True(info1.Bounds.Width < 1920);
+			var info2 = testWindow.GetInfo();
+            Assert.True(info2.Bounds.Width < 1920);
+        }
     }
 }

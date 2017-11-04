@@ -50,8 +50,8 @@ namespace Dapplo.Windows.Common.Extensions
         /// <returns>bool</returns>
         public static bool Succeeded(this HResult hResult)
         {
-            return hResult >= 0;
-        }
+            return hResult >= HResult.S_OK;
+		}
 
         /// <summary>
         ///     Throw an exception on Failure

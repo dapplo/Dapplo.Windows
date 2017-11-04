@@ -33,6 +33,17 @@ namespace Dapplo.Windows.Desktop
     /// </summary>
     public static class InteropWindowFactory
     {
+
+        /// <summary>
+        ///     Factory method to create a InteropWindow for the supplied handle
+        /// </summary>
+        /// <param name="handle">int</param>
+        /// <returns>InteropWindow</returns>
+        public static InteropWindow CreateFor(int handle)
+        {
+            return CreateFor(new IntPtr(handle));
+        }
+
         /// <summary>
         ///     Factory method to create a InteropWindow for the supplied handle
         /// </summary>
