@@ -49,10 +49,17 @@
     <Compile Include="Enums\WindowsProductTypes.cs" />
     <Compile Include="Enums\DefaultDllDirectories.cs" />
     <Compile Include="Enums\WindowsSuites.cs" />
+    <Compile Include="PackageInfo.cs" />
     <Compile Include="Kernel32Api.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PsApi.cs" />
     <Compile Include="Structs\OsVersionInfoEx.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
+      <Project>{41E9EE3A-ACEA-4532-87D7-0C09D95D9A4E}</Project>
+      <Name>Dapplo.Windows.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

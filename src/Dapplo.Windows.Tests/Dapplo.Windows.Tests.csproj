@@ -95,6 +95,7 @@
     <Compile Include="Shell32Tests.cs" />
     <Compile Include="CommonStructTests.cs" />
     <Compile Include="RawInputTests.cs" />
+    <Compile Include="Kernel32Tests.cs" />
     <Compile Include="VersionTests.cs" />
     <Compile Include="User32Tests.cs" />
     <Compile Include="DwmTest.cs" />
