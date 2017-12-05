@@ -121,7 +121,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
       <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>
-      <Name>Dapplo.Windows</Name>
+      <Name>ScaleWithDpi</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

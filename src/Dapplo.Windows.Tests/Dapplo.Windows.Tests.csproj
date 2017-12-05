@@ -85,6 +85,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DpiTests.cs" />
     <Compile Include="IconTests.cs" />
     <Compile Include="InteropWindowTests.cs" />
     <Compile Include="AppWindowTests.cs" />
@@ -131,6 +132,10 @@
       <Project>{ef02637f-86a5-47f1-bb75-33e0ba3119cf}</Project>
       <Name>Dapplo.Windows.DesktopWindowsManager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj">
+      <Project>{B8B5782D-EECD-4260-8BED-643EF8B8B6D0}</Project>
+      <Name>Dapplo.Windows.Dpi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj">
       <Project>{e4a0ce9d-681c-44d0-85f5-4f677ec54658}</Project>
       <Name>Dapplo.Windows.Gdi32</Name>
@@ -161,7 +166,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
       <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>
-      <Name>Dapplo.Windows</Name>
+      <Name>ScaleWithDpi</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

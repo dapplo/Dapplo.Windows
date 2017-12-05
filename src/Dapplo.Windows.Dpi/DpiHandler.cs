@@ -117,8 +117,7 @@ namespace Dapplo.Windows.Dpi
                 }
                 using (var process = Process.GetCurrentProcess())
                 {
-                    DpiAwareness dpiAwareness;
-                    GetProcessDpiAwareness(process.Handle, out dpiAwareness);
+                    GetProcessDpiAwareness(process.Handle, out var dpiAwareness);
                     Log.Verbose().WriteLine("Process {0} has a Dpi awareness {1}", process.ProcessName, dpiAwareness);
                     return dpiAwareness != DpiAwareness.Unaware && dpiAwareness != DpiAwareness.Invalid;
                 }
@@ -158,9 +157,8 @@ namespace Dapplo.Windows.Dpi
             if (WindowsVersion.IsWindows81OrLater)
             {
                 var hMonitor = User32Api.MonitorFromWindow(hWnd, MonitorFrom.DefaultToNearest);
-                uint dpiX;
-                uint dpiY;
-                if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out dpiX, out dpiY))
+                // ReSharper disable once UnusedVariable
+                if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY))
                 {
                     return (int) dpiX;
                 }
@@ -342,7 +340,7 @@ namespace Dapplo.Windows.Dpi
         public static int ScaleWithDpi(int baseWidth, double dpi)
         {
             var scaleFactor = dpi / DefaultScreenDpi;
-            var width = (int) (baseWidth + (scaleFactor - 1) * 4 * baseWidth);
+            var width = (int) (scaleFactor * baseWidth);
             return width;
         }
 
