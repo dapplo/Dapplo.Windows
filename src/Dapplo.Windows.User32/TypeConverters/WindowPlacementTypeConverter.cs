@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -34,8 +34,8 @@ namespace Dapplo.Windows.User32.TypeConverters
     /// </summary>
     public class WindowPlacementTypeConverter : TypeConverter
     {
-        private NativePointTypeConverter _nativePointTypeConverter = TypeDescriptor.GetConverter(typeof(NativePoint)) as NativePointTypeConverter;
-        private NativeRectTypeConverter _nativeRectTypeConverter = TypeDescriptor.GetConverter(typeof(NativeRect)) as NativeRectTypeConverter;
+        private readonly NativePointTypeConverter _nativePointTypeConverter = TypeDescriptor.GetConverter(typeof(NativePoint)) as NativePointTypeConverter;
+        private readonly NativeRectTypeConverter _nativeRectTypeConverter = TypeDescriptor.GetConverter(typeof(NativeRect)) as NativeRectTypeConverter;
 
 
         /// <inheritdoc />
@@ -56,8 +56,7 @@ namespace Dapplo.Windows.User32.TypeConverters
             if (value is string windowPlacementString)
             {
                 string[] cmdMinMaxNormal = windowPlacementString.Split('|');
-                ShowWindowCommands showCommand;
-                if (cmdMinMaxNormal.Length == 4 && Enum.TryParse(cmdMinMaxNormal[0], true, out showCommand))
+                if (cmdMinMaxNormal.Length == 4 && Enum.TryParse(cmdMinMaxNormal[0], true, out ShowWindowCommands showCommand))
                 {
                     var windowPlacement = WindowPlacement.Create();
                     windowPlacement.ShowCmd = showCommand;
@@ -76,11 +75,7 @@ namespace Dapplo.Windows.User32.TypeConverters
         {
             if (destinationType == typeof(string) && value is WindowPlacement windowPlacement)
             {
-                return string.Format("{0}|{1}|{2}|{3}",
-                    windowPlacement.ShowCmd,
-                    _nativePointTypeConverter.ConvertToInvariantString(windowPlacement.MinPosition),
-                    _nativePointTypeConverter.ConvertToInvariantString(windowPlacement.MaxPosition),
-                    _nativeRectTypeConverter.ConvertToInvariantString(windowPlacement.NormalPosition));
+                return $"{windowPlacement.ShowCmd}|{_nativePointTypeConverter.ConvertToInvariantString(windowPlacement.MinPosition)}|{_nativePointTypeConverter.ConvertToInvariantString(windowPlacement.MaxPosition)}|{_nativeRectTypeConverter.ConvertToInvariantString(windowPlacement.NormalPosition)}";
             }
             return base.ConvertTo(context, culture, value, destinationType);
         }

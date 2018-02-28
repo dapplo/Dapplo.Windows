@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -58,7 +58,7 @@ namespace Dapplo.Windows.Clipboard
             foreach (var enumValue in typeof(StandardClipboardFormats).GetEnumValues())
             {
                 uint id = (uint) enumValue;
-                var displayAttribute = enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault()?.GetCustomAttributes<DisplayAttribute>()?.FirstOrDefault();
+                var displayAttribute = enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault()?.GetCustomAttributes<DisplayAttribute>().FirstOrDefault();
                 var formatName = displayAttribute != null ? displayAttribute.Name : enumValue.ToString();
                 Format2Id[formatName] = id;
                 Id2Format[id] = formatName;
@@ -178,9 +178,7 @@ namespace Dapplo.Windows.Clipboard
         /// <returns>MemoryStream</returns>
         public static MemoryStream GetAsStream(string format)
         {
-            uint formatId;
-
-            if (!Format2Id.TryGetValue(format, out formatId))
+            if (!Format2Id.TryGetValue(format, out var formatId))
             {
                 formatId = RegisterFormat(format);
             }
@@ -213,9 +211,7 @@ namespace Dapplo.Windows.Clipboard
         /// <param name="stream">MemoryStream with the content</param>
         public static void SetAsStream(string format, MemoryStream stream)
         {
-            uint formatId;
-
-            if (!Format2Id.TryGetValue(format, out formatId))
+            if (!Format2Id.TryGetValue(format, out var formatId))
             {
                 formatId = RegisterFormat(format);
             }
@@ -250,9 +246,7 @@ namespace Dapplo.Windows.Clipboard
         /// <returns>uint for the format</returns>
         public static uint RegisterFormat(string format)
         {
-            uint clipboardFormatId;
-
-            if (Format2Id.TryGetValue(format, out clipboardFormatId))
+            if (Format2Id.TryGetValue(format, out var clipboardFormatId))
             {
                 // Format was already known
                 return clipboardFormatId;
@@ -287,9 +281,9 @@ namespace Dapplo.Windows.Clipboard
                     // GetLastWin32Error didn't return SuccessError, so throw exception
                     throw new Win32Exception();
                 }
-                string formatName;
+
                 clipboardFormatName.Length = 0;
-                if (Id2Format.TryGetValue(clipboardFormatId, out formatName))
+                if (Id2Format.TryGetValue(clipboardFormatId, out var formatName))
                 {
                     yield return formatName;
                     continue;

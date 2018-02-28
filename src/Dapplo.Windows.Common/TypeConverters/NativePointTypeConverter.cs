@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -21,6 +21,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using Dapplo.Windows.Common.Structs;
 
@@ -32,27 +33,29 @@ namespace Dapplo.Windows.Common.TypeConverters
     public class NativePointTypeConverter : TypeConverter
     {
         /// <inheritdoc />
+        [Pure]
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
         }
 
         /// <inheritdoc />
+        [Pure]
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
         }
 
         /// <inheritdoc />
+        [Pure]
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is string pointStringValue)
             {
                 string[] xy = pointStringValue.Split(',');
-                int x, y;
                 if (xy.Length == 2 &&
-                    int.TryParse(xy[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out x) &&
-                    int.TryParse(xy[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out y))
+                    int.TryParse(xy[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var x) &&
+                    int.TryParse(xy[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var y))
                 {
                     return new NativePoint(x, y);
                 }
@@ -61,6 +64,7 @@ namespace Dapplo.Windows.Common.TypeConverters
         }
 
         /// <inheritdoc />
+        [Pure]
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             if (destinationType == typeof(string) && value is NativePoint nativePoint)

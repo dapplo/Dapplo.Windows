@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -50,7 +50,7 @@ namespace Dapplo.Windows.Desktop
         /// <inheritdoc />
         public bool Equals(IInteropWindow other)
         {
-            if (ReferenceEquals(null, other))
+            if (other is null)
             {
                 return false;
             }
@@ -206,25 +206,41 @@ namespace Dapplo.Windows.Desktop
             return Handle.GetHashCode();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Operator == overload
+        /// </summary>
+        /// <param name="left">InteropWindow</param>
+        /// <param name="right">InteropWindow</param>
+        /// <returns>bool</returns>
         public static bool operator ==(InteropWindow left, InteropWindow right)
         {
             return Equals(left, right);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Create (cast) a InteropWindow from an IntPtr
+        /// </summary>
+        /// <param name="handle">IntPtr</param>
         public static implicit operator InteropWindow(IntPtr handle)
         {
             return InteropWindowFactory.CreateFor(handle);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Cast the InteropWindow to it's handle
+        /// </summary>
+        /// <param name="interopWindow">InteropWindow</param>
         public static implicit operator IntPtr(InteropWindow interopWindow)
         {
             return interopWindow.Handle;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// operator != overload
+        /// </summary>
+        /// <param name="left">InteropWindow</param>
+        /// <param name="right">InteropWindow</param>
+        /// <returns>bool</returns>
         public static bool operator !=(InteropWindow left, InteropWindow right)
         {
             return !Equals(left, right);

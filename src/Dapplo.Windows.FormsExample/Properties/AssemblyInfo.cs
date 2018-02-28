@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -34,7 +34,7 @@ using System.Reflection;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.Windows.FormsExample")]
-[assembly: AssemblyCopyright("Copyright © Dapplo 2017")]
+[assembly: AssemblyCopyright("Copyright © Dapplo 2017-2018")]
 [assembly: AssemblyTrademark("Dapplo")]
 [assembly: AssemblyCulture("")]
 

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -197,34 +197,36 @@ namespace Dapplo.Windows.Kernel32
             }
 
             hprocess = OpenProcess(ProcessAccessRights.QueryInformation, false, processid);
-            if (hprocess != IntPtr.Zero)
+            if (hprocess == IntPtr.Zero)
             {
-                try
-                {
-                    // Try this method for Vista or higher operating systems
-                    var size = (uint) pathBuffer.Capacity;
-                    if (Environment.OSVersion.Version.Major >= 6 && QueryFullProcessImageName(hprocess, 0, pathBuffer, ref size) && size > 0)
-                    {
-                        return pathBuffer.ToString();
-                    }
+                return null;
+            }
 
-                    // Try the GetProcessImageFileName method
-                    if (PsApi.GetProcessImageFileName(hprocess, pathBuffer, (uint) pathBuffer.Capacity) > 0)
+            try
+            {
+                // Try this method for Vista or higher operating systems
+                var size = (uint) pathBuffer.Capacity;
+                if (Environment.OSVersion.Version.Major >= 6 && QueryFullProcessImageName(hprocess, 0, pathBuffer, ref size) && size > 0)
+                {
+                    return pathBuffer.ToString();
+                }
+
+                // Try the GetProcessImageFileName method
+                if (PsApi.GetProcessImageFileName(hprocess, pathBuffer, (uint) pathBuffer.Capacity) > 0)
+                {
+                    var dospath = pathBuffer.ToString();
+                    foreach (var drive in Environment.GetLogicalDrives())
                     {
-                        var dospath = pathBuffer.ToString();
-                        foreach (var drive in Environment.GetLogicalDrives())
+                        if (QueryDosDevice(drive.TrimEnd('\\'), pathBuffer, (uint) pathBuffer.Capacity) > 0 && dospath.StartsWith(pathBuffer.ToString()))
                         {
-                            if (QueryDosDevice(drive.TrimEnd('\\'), pathBuffer, (uint) pathBuffer.Capacity) > 0 && dospath.StartsWith(pathBuffer.ToString()))
-                            {
-                                return drive + dospath.Remove(0, pathBuffer.Length);
-                            }
+                            return drive + dospath.Remove(0, pathBuffer.Length);
                         }
                     }
                 }
-                finally
-                {
-                    CloseHandle(hprocess);
-                }
+            }
+            finally
+            {
+                CloseHandle(hprocess);
             }
 
             return null;

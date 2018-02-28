@@ -1,5 +1,6 @@
-﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+﻿#region Copyright (C) 2016-2018 Dapplo
+//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -18,12 +19,14 @@
 // 
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
+#endregion
 
 #region using
 
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Dapplo.Windows.Common.TypeConverters;
@@ -130,31 +133,26 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
         public override bool Equals(object obj)
         {
-            if (obj is NativePointFloat)
+            switch (obj)
             {
-                return Equals((NativePointFloat)obj);
+                case NativePointFloat nativePointFloat:
+                    return Equals(nativePointFloat);
+                case System.Drawing.Point drawingPoint:
+                    return Equals(drawingPoint);
+                case NativePoint nativePoint:
+                    return Equals(nativePoint);
+                case Point point:
+                    return Equals(point);
             }
-            if (obj is System.Drawing.Point)
-            {
-                NativePointFloat rect = (System.Drawing.Point)obj;
-                return Equals(rect);
-            }
-            if (obj is NativePoint)
-            {
-                NativePointFloat rect = (NativePoint)obj;
-                return Equals(rect);
-            }
-            if (obj is Point)
-            {
-                NativePointFloat rect = (Point)obj;
-                return Equals(rect);
-            }
+
             return false;
         }
 
         /// <inheritdoc />
+        [Pure]
         public override int GetHashCode()
         {
             unchecked
@@ -168,6 +166,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="other">NativePointFloat</param>
         /// <returns>bool true if the values are equal</returns>
+        [Pure]
         public bool Equals(NativePointFloat other)
         {
             return Math.Abs(X - other.X) < float.Epsilon && Math.Abs(Y - other.Y) < float.Epsilon;
@@ -196,6 +195,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
         public override string ToString()
         {
             return X + "," + Y;
@@ -206,6 +206,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="x">float</param>
         /// <param name="y">float</param>
+        [Pure]
         public void Deconstruct(out float x, out float y)
         {
             x = X;

@@ -42,8 +42,8 @@ namespace Dapplo.Windows.Com
         /// </summary>
         public string TypeName
         {
-            get { throw new NotSupportedException(); }
-            set { throw new NotSupportedException(); }
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
         }
 
         [DllImport("ole32.dll")]
@@ -64,8 +64,7 @@ namespace Dapplo.Windows.Com
         /// </returns>
         public override IMessage Invoke(IMessage myMessage)
         {
-            var callMessage = myMessage as IMethodCallMessage;
-            if (null == callMessage)
+            if (!(myMessage is IMethodCallMessage callMessage))
             {
                 Log.Debug().WriteLine("Message type not implemented: {0}", myMessage.GetType());
                 return null;
@@ -115,8 +114,7 @@ namespace Dapplo.Windows.Com
                 var removeHandler = methodName.StartsWith("remove_");
                 methodName = methodName.Substring(removeHandler ? 7 : 4);
                 // TODO: Something is missing here
-                var handler = callMessage.InArgs[0] as Delegate;
-                if (null == handler)
+                if (!(callMessage.InArgs[0] is Delegate handler))
                 {
                     return new ReturnMessage(new ArgumentNullException(nameof(handler)), callMessage);
                 }
@@ -297,8 +295,7 @@ namespace Dapplo.Windows.Com
                         byValType = GetByValType(parameter.ParameterType);
                         if (typeof(decimal) == byValType)
                         {
-                            var currencyWrapper = arg as CurrencyWrapper;
-                            if (currencyWrapper != null)
+                            if (arg is CurrencyWrapper currencyWrapper)
                             {
                                 arg = currencyWrapper.WrappedObject;
                             }
@@ -749,30 +746,32 @@ namespace Dapplo.Windows.Com
         /// </param>
         private void Dispose(bool disposing)
         {
-            if (null != _comObject)
+            if (null == _comObject)
             {
-                Log.Debug().WriteLine("Disposing {0}", _interceptType);
-                if (Marshal.IsComObject(_comObject))
+                return;
+            }
+
+            Log.Debug().WriteLine("Disposing {0}", _interceptType);
+            if (Marshal.IsComObject(_comObject))
+            {
+                try
                 {
-                    try
+                    int count;
+                    do
                     {
-                        int count;
-                        do
-                        {
-                            count = Marshal.ReleaseComObject(_comObject);
-                            Log.Debug().WriteLine("RCW count for {0} now is {1}", _interceptType, count);
-                        } while (count > 0);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Warn().WriteLine("Problem releasing COM object {0}", _comType);
-                        Log.Warn().WriteLine(ex, "Error: ");
-                    }
+                        count = Marshal.ReleaseComObject(_comObject);
+                        Log.Debug().WriteLine("RCW count for {0} now is {1}", _interceptType, count);
+                    } while (count > 0);
                 }
-                else
+                catch (Exception ex)
                 {
-                    Log.Warn().WriteLine("{0} is not a COM object", _comType);
+                    Log.Warn().WriteLine("Problem releasing COM object {0}", _comType);
+                    Log.Warn().WriteLine(ex, "Error: ");
                 }
+            }
+            else
+            {
+                Log.Warn().WriteLine("{0} is not a COM object", _comType);
             }
         }
 
@@ -805,24 +804,16 @@ namespace Dapplo.Windows.Com
         /// <summary>
         ///     Compares this object to another.
         /// </summary>
-        /// <param name="value">
-        ///     The value to compare to.
-        /// </param>
-        /// <returns>
-        ///     <see langword="true" /> if the objects are equal.
-        /// </returns>
-        public override bool Equals(object value)
+        /// <param name="obj">The value to compare to.</param>
+        /// <returns><see langword="true" /> if the objects are equal.</returns>
+        public override bool Equals(object obj)
         {
-            if (null != value && RemotingServices.IsTransparentProxy(value))
+            if (null != obj && RemotingServices.IsTransparentProxy(obj) && RemotingServices.GetRealProxy(obj) is ComWrapper wrapper)
             {
-                var wrapper = RemotingServices.GetRealProxy(value) as ComWrapper;
-                if (null != wrapper)
-                {
-                    return _comObject == wrapper._comObject;
-                }
+                return _comObject == wrapper._comObject;
             }
 
-            return base.Equals(value);
+            return base.Equals(obj);
         }
 
         /// <summary>

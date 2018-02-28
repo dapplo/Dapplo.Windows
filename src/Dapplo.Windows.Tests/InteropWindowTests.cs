@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -60,7 +60,7 @@ namespace Dapplo.Windows.Tests
         public void Test_GetInfo_WithParentCrop()
         {
 
-            var testHandle = 0x000806a6;
+            const int testHandle = 0x000806a6;
             var testWindow = InteropWindowFactory.CreateFor(testHandle);
 	        var ws = testWindow.GetWindowScroller();
 	        var info1 = ws.ScrollingWindow.GetInfo();

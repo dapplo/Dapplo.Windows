@@ -9,7 +9,7 @@
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.Windows.DesktopWindowsManager")]
-[assembly: AssemblyCopyright("Copyright © Dapplo 2017")]
+[assembly: AssemblyCopyright("Copyright © Dapplo 2017-2018")]
 [assembly: AssemblyTrademark("Dapplo")]
 [assembly: AssemblyCulture("")]
 

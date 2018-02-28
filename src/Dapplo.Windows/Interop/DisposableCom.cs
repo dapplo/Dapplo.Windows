@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -53,11 +53,12 @@ namespace Dapplo.Windows.Interop
         /// <returns>IDisposableCom of type T</returns>
         public static IDisposableCom<T> Create<T>(T comObject)
         {
-            if (!Equals(comObject, default(T)))
+            if (Equals(comObject, default(T)))
             {
-                return new DisposableComImplementation<T>(comObject);
+                return null;
             }
-            return null;
+
+            return new DisposableComImplementation<T>(comObject);
         }
     }
 

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Dapplo.Windows.Icons")]
-[assembly: AssemblyCopyright("Copyright © Dapplo 2017")]
+[assembly: AssemblyCopyright("Copyright © Dapplo 2017-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

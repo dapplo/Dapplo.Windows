@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -24,7 +24,6 @@
 using System;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Interop;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.User32.Enums;
 
@@ -55,19 +54,21 @@ namespace Dapplo.Windows.Desktop
             _environmentObservable = Observable.Create<EnvironmentChangedEventArgs>(observer =>
                 {
                     // This handles the message
-                    HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
+                    IntPtr WinProcSettingsChangeHandler(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                     {
                         var windowsMessage = (WindowsMessages) msg;
                         if (windowsMessage != WindowsMessages.WM_SETTINGCHANGE)
                         {
                             return IntPtr.Zero;
                         }
+
                         var action = (SystemParametersInfoActions) wParam.ToInt32();
                         var area = Marshal.PtrToStringAuto(lParam);
                         observer.OnNext(EnvironmentChangedEventArgs.Create(action, area));
                         return IntPtr.Zero;
-                    };
-                    return WinProcHandler.Instance.Subscribe(winProcHandler);
+                    }
+
+                    return WinProcHandler.Instance.Subscribe(WinProcSettingsChangeHandler);
                 })
                 .Publish()
                 .RefCount();

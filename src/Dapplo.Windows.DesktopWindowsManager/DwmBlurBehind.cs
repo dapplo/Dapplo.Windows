@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -53,7 +53,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         public bool Enable
         {
-            get { return _fEnable; }
+            get => _fEnable;
             set
             {
                 _fEnable = value;
@@ -67,7 +67,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         public IntPtr BlurRegion
         {
-            get { return _hRgnBlur; }
+            get => _hRgnBlur;
             set
             {
                 _hRgnBlur = value;
@@ -81,7 +81,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         public bool TransitionOnMaximized
         {
-            get { return _fTransitionOnMaximized; }
+            get => _fTransitionOnMaximized;
             set
             {
                 _fTransitionOnMaximized = value;

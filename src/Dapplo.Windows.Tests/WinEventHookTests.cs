@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -84,7 +84,7 @@ namespace Dapplo.Windows.Tests
                 }
                 finally
                 {
-                    process.Kill();
+                    process?.Kill();
                     winEventObservable.Dispose();
                 }
             }

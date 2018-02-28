@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -108,16 +108,17 @@ namespace Dapplo.Windows.Input
                     break;
             }
             scanCode |= 0x200;
-            if (GetKeyNameText(scanCode << 16, keyName, 100) != 0)
+            if (GetKeyNameText(scanCode << 16, keyName, 100) == 0)
             {
-                var visibleName = keyName.ToString();
-                if (visibleName.Length > 1)
-                {
-                    visibleName = visibleName.Substring(0, 1) + visibleName.Substring(1).ToLower();
-                }
-                return visibleName;
+                return givenKey.ToString();
             }
-            return givenKey.ToString();
+
+            var visibleName = keyName.ToString();
+            if (visibleName.Length > 1)
+            {
+                visibleName = visibleName.Substring(0, 1) + visibleName.Substring(1).ToLower();
+            }
+            return visibleName;
         }
 
         /// <summary>
@@ -158,25 +159,27 @@ namespace Dapplo.Windows.Input
         /// <returns>Keys</returns>
         public static Keys HotkeyModifiersFromString(string modifiersString)
         {
-            var modifiers = Keys.None;
-            if (!string.IsNullOrEmpty(modifiersString))
+            if (string.IsNullOrEmpty(modifiersString))
             {
-                if (modifiersString.ToLower().Contains("alt"))
-                {
-                    modifiers |= Keys.Alt;
-                }
-                if (modifiersString.ToLower().Contains("ctrl"))
-                {
-                    modifiers |= Keys.Control;
-                }
-                if (modifiersString.ToLower().Contains("shift"))
-                {
-                    modifiers |= Keys.Shift;
-                }
-                if (modifiersString.ToLower().Contains("win"))
-                {
-                    modifiers |= Keys.LWin;
-                }
+                return Keys.None;
+            }
+
+            var modifiers = Keys.None;
+            if (modifiersString.ToLower().Contains("alt"))
+            {
+                modifiers |= Keys.Alt;
+            }
+            if (modifiersString.ToLower().Contains("ctrl"))
+            {
+                modifiers |= Keys.Control;
+            }
+            if (modifiersString.ToLower().Contains("shift"))
+            {
+                modifiers |= Keys.Shift;
+            }
+            if (modifiersString.ToLower().Contains("win"))
+            {
+                modifiers |= Keys.LWin;
             }
             return modifiers;
         }

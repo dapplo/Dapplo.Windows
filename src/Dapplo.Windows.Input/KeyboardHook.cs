@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -181,12 +181,7 @@ namespace Dapplo.Windows.Input
 
             // Do we need this??
             //http://msdn.microsoft.com/en-us/library/windows/desktop/ms646286(v=vs.85).aspx
-            if (!keyEventArgs.IsAlt && wParam == (IntPtr) WmSyskeydown)
-            {
-                keyEventArgs.IsLeftAlt = true;
-                keyEventArgs.IsSystemKey = true;
-            }
-            else if (!keyEventArgs.IsAlt && wParam == (IntPtr) WmSyskeyup)
+            if (!keyEventArgs.IsAlt && (wParam == (IntPtr) WmSyskeydown || wParam == (IntPtr)WmSyskeyup))
             {
                 keyEventArgs.IsLeftAlt = true;
                 keyEventArgs.IsSystemKey = true;
@@ -233,10 +228,7 @@ namespace Dapplo.Windows.Input
         #region Native
 
         private const int WmKeydown = 256;
-
-        //private const int WmKeyup = 257;
         private const int WmSyskeyup = 261;
-
         private const int WmSyskeydown = 260;
 
         /// <summary>

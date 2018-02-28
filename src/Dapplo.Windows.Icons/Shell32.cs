@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -151,7 +151,6 @@ namespace Dapplo.Windows.Icons
             var shellFileInfo = new ShellFileInfo();
             SHGetFileInfo(null, FILE_ATTRIBUTE_DIRECTORY, ref shellFileInfo, (uint) Marshal.SizeOf(shellFileInfo), flags);
 
-            //Icon.FromHandle(shfi.hIcon);	// Load the icon from an HICON handle
             // Now clone the icon, so that it can be successfully stored in an ImageList
             try
             {
@@ -170,12 +169,12 @@ namespace Dapplo.Windows.Icons
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="pszPath"></param>
-        /// <param name="dwFileAttributes"></param>
-        /// <param name="psfi"></param>
-        /// <param name="cbFileInfo"></param>
-        /// <param name="uFlags"></param>
-        /// <returns></returns>
+        /// <param name="pszPath">string</param>
+        /// <param name="dwFileAttributes">uint</param>
+        /// <param name="psfi">ref to ShellFileInfo</param>
+        /// <param name="cbFileInfo">uint</param>
+        /// <param name="uFlags">ShellGetFileInfoFlags</param>
+        /// <returns>IntPtr</returns>
         [DllImport("shell32", CharSet = CharSet.Unicode)]
         private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref ShellFileInfo psfi, uint cbFileInfo, ShellGetFileInfoFlags uFlags);
 
@@ -183,9 +182,9 @@ namespace Dapplo.Windows.Icons
         /// Retrieves a handle to an indexed icon found in a file or an icon found in an associated executable file.
         /// </summary>
         /// <param name="hInst">A handle to the instance of the application calling the function.</param>
-        /// <param name="iconPath"></param>
+        /// <param name="iconPath">StringBuilder</param>
         /// <param name="iconIndex">The full path and file name of the file that contains the icon. The function extracts the icon handle from that file, or from an executable file associated with that file. If the icon handle is obtained from an executable file, the function stores the full path and file name of that executable in the string pointed to by lpIconPath.</param>
-        /// <returns></returns>
+        /// <returns>SafeIconHandle</returns>
         [DllImport("shell32", CharSet = CharSet.Unicode)]
         private static extern SafeIconHandle ExtractAssociatedIcon(HandleRef hInst, StringBuilder iconPath, ref int iconIndex);
 

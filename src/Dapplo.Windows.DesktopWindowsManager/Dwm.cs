@@ -1,5 +1,6 @@
-﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+﻿#region Copyright (C) 2016-2018 Dapplo
+//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -18,6 +19,7 @@
 // 
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
+#endregion
 
 #region using
 
@@ -94,8 +96,8 @@ namespace Dapplo.Windows.DesktopWindowsManager
                 {
                     return false;
                 }
-                bool dwmEnabled;
-                DwmIsCompositionEnabled(out dwmEnabled);
+
+                DwmIsCompositionEnabled(out var dwmEnabled);
                 return dwmEnabled;
             }
         }

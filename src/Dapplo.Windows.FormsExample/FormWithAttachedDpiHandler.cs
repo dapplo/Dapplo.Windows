@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -34,12 +34,16 @@ using Dapplo.Windows.Dpi.Forms;
 
 namespace Dapplo.Windows.FormsExample
 {
+    /// <summary>
+    /// This extends the form with extra DPI aware capabilities
+    /// </summary>
     public partial class FormWithAttachedDpiHandler : Form
     {
         private static readonly LogSource Log = new LogSource();
         protected readonly BitmapScaleHandler<string> ScaleHandler;
         private readonly DpiHandler _dpiHandler;
         private readonly IDisposable _dpiChangeSubscription;
+
         public FormWithAttachedDpiHandler()
         {
             _dpiHandler = this.AttachDpiHandler();

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Dapplo.Windows.App;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
@@ -99,13 +100,7 @@ namespace Dapplo.Windows.Desktop
         /// <returns>IEnumerable with all the top level windows</returns>
         public static IEnumerable<IInteropWindow> GetTopLevelWindows(bool ignoreKnownClasses = true)
         {
-            foreach (var possibleTopLevel in GetTopWindows())
-            {
-                if (possibleTopLevel.IsTopLevel(ignoreKnownClasses))
-                {
-                    yield return possibleTopLevel;
-                }
-            }
+            return GetTopWindows().Where(possibleTopLevel => possibleTopLevel.IsTopLevel(ignoreKnownClasses));
         }
 
         /// <summary>

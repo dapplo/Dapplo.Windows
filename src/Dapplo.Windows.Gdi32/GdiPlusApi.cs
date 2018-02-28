@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -109,14 +109,14 @@ namespace Dapplo.Windows.Gdi32
                 NativeRect rec = area;
                 // Apply the effect to the bitmap in the specified area
                 status = GdipBitmapApplyEffect(hBitmap, hEffect, ref rec, false, IntPtr.Zero, 0);
-                if (status != GdiPlusStatus.Ok)
+                if (status == GdiPlusStatus.Ok)
                 {
-                    Log.Error().WriteLine("Couldn't apply effect: {0}", status);
-                    return false;
+                    // Everything worked, return true
+                    return true;
                 }
 
-                // Everything worked, return true
-                return true;
+                Log.Error().WriteLine("Couldn't apply effect: {0}", status);
+                return false;
             }
             catch (Exception ex)
             {
@@ -202,14 +202,14 @@ namespace Dapplo.Windows.Gdi32
                 NativeRectFloat sourceRectangleF = source;
                 // Apply the effect to the bitmap in the specified area
                 status = GdipDrawImageFX(hGraphics, hBitmap, ref sourceRectangleF, hMatrix, hEffect, hAttributes, GpUnit.UnitPixel);
-                if (status != GdiPlusStatus.Ok)
+                if (status == GdiPlusStatus.Ok)
                 {
-                    Log.Error().WriteLine("Couldn't draw image: {0}", status);
-                    return false;
+                    // Everything worked, return true
+                    return true;
                 }
 
-                // Everything worked, return true
-                return true;
+                Log.Error().WriteLine("Couldn't draw image: {0}", status);
+                return false;
             }
             catch (Exception ex)
             {
@@ -276,7 +276,7 @@ namespace Dapplo.Windows.Gdi32
         /// <summary>
         ///     Get the nativeImage field from the bitmap
         /// </summary>
-        /// <param name="bitmap"></param>
+        /// <param name="bitmap">Bitmap</param>
         /// <returns>IntPtr</returns>
         private static IntPtr GetNativeImage(Bitmap bitmap)
         {
@@ -290,7 +290,7 @@ namespace Dapplo.Windows.Gdi32
         /// <summary>
         ///     Get the nativeImageAttributes field from the ImageAttributes
         /// </summary>
-        /// <param name="imageAttributes"></param>
+        /// <param name="imageAttributes">ImageAttributes</param>
         /// <returns>IntPtr</returns>
         private static IntPtr GetNativeImageAttributes(ImageAttributes imageAttributes)
         {
@@ -304,7 +304,7 @@ namespace Dapplo.Windows.Gdi32
         /// <summary>
         ///     Get the nativeMatrix field from the matrix
         /// </summary>
-        /// <param name="matrix"></param>
+        /// <param name="matrix">Matrix</param>
         /// <returns>IntPtr</returns>
         private static IntPtr GetNativeMatrix(Matrix matrix)
         {
@@ -320,7 +320,7 @@ namespace Dapplo.Windows.Gdi32
         ///     This accounts for the "bug" I reported here:
         ///     http://social.technet.microsoft.com/Forums/en/w8itprogeneral/thread/99ddbe9d-556d-475a-8bab-84e25aa13a2c
         /// </summary>
-        /// <param name="radius"></param>
+        /// <param name="radius">int</param>
         /// <returns>false if blur is not possible</returns>
         public static bool IsBlurPossible(int radius)
         {

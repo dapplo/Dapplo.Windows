@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -49,10 +49,9 @@ namespace Dapplo.Windows.Common.TypeConverters
             if (value is string sizeStringValue)
             {
                 string[] hw = sizeStringValue.Split(',');
-                float h, w;
                 if (hw.Length == 2 &&
-                    float.TryParse(hw[0], NumberStyles.Number, CultureInfo.InvariantCulture, out h) &&
-                    float.TryParse(hw[1], NumberStyles.Number, CultureInfo.InvariantCulture, out w))
+                    float.TryParse(hw[0], NumberStyles.Number, CultureInfo.InvariantCulture, out var h) &&
+                    float.TryParse(hw[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var w))
                 {
                     return new NativeSizeFloat(h, w);
                 }
@@ -65,9 +64,7 @@ namespace Dapplo.Windows.Common.TypeConverters
         {
             if (destinationType == typeof(string) && value is NativeSizeFloat nativeSizeFloat)
             {
-                return string.Format("{0},{1}",
-                    nativeSizeFloat.Width.ToString(CultureInfo.InvariantCulture),
-                    nativeSizeFloat.Height.ToString(CultureInfo.InvariantCulture));
+                return $"{nativeSizeFloat.Width.ToString(CultureInfo.InvariantCulture)},{nativeSizeFloat.Height.ToString(CultureInfo.InvariantCulture)}";
             }
             return base.ConvertTo(context, culture, value, destinationType);
         }

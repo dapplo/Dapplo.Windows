@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -49,10 +49,9 @@ namespace Dapplo.Windows.Common.TypeConverters
             if (value is string sizeStringValue)
             {
                 string[] hw = sizeStringValue.Split(',');
-                int h, w;
                 if (hw.Length == 2 &&
-                    int.TryParse(hw[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out h) &&
-                    int.TryParse(hw[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out w))
+                    int.TryParse(hw[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var h) &&
+                    int.TryParse(hw[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var w))
                 {
                     return new NativeSize(h, w);
                 }

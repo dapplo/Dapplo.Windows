@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -71,7 +71,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         public NativeRect Destination
         {
-            get { return _rcDestination; }
+            get => _rcDestination;
             set
             {
                 _dwFlags |= DwmThumbnailPropertyFlags.Destination;
@@ -84,7 +84,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         public NativeRect Source
         {
-            get { return _rcSource; }
+            get => _rcSource;
             set
             {
                 _dwFlags |= DwmThumbnailPropertyFlags.Source;
@@ -97,7 +97,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         public byte Opacity
         {
-            get { return _opacity; }
+            get => _opacity;
             set
             {
                 _dwFlags |= DwmThumbnailPropertyFlags.Opacity;
@@ -110,7 +110,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         public bool Visible
         {
-            get { return _fVisible; }
+            get => _fVisible;
             set
             {
                 _dwFlags |= DwmThumbnailPropertyFlags.Visible;
@@ -123,7 +123,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         public bool SourceClientAreaOnly
         {
-            get { return _fSourceClientAreaOnly; }
+            get => _fSourceClientAreaOnly;
             set
             {
                 _dwFlags |= DwmThumbnailPropertyFlags.SourceClientAreaOnly;

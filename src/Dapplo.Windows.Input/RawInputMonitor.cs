@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -94,11 +94,10 @@ namespace Dapplo.Windows.Input
                     }
                     break;
                 case WindowsMessages.WM_INPUT:
-                    RawInput rawInput;
                     int outSize;
                     int size = Marshal.SizeOf(typeof(RawInput));
 
-                    outSize = RawInputApi.GetRawInputData(lParam, RawInputDataCommands.Input, out rawInput, ref size, Marshal.SizeOf(typeof(RawInputHeader)));
+                    outSize = RawInputApi.GetRawInputData(lParam, RawInputDataCommands.Input, out var rawInput, ref size, Marshal.SizeOf(typeof(RawInputHeader)));
                     if (outSize != -1)
                     {
                         RawInputSubject.OnNext(new RawInputEventArgs

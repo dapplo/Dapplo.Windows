@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -38,7 +38,7 @@ namespace Dapplo.Windows.FormsExample
     {
         private static readonly LogSource Log = new LogSource();
         protected readonly BitmapScaleHandler<string> ScaleHandler;
-        private DpiHandler _contextMenuDpiHandler;
+        private readonly DpiHandler _contextMenuDpiHandler;
 
         public FormExtendsDpiAwareForm()
         {
@@ -64,9 +64,9 @@ namespace Dapplo.Windows.FormsExample
 
         /// <summary>
         /// </summary>
-        /// <param name="bitmap"></param>
-        /// <param name="dpi"></param>
-        /// <returns></returns>
+        /// <param name="bitmap">Bitmap</param>
+        /// <param name="dpi">double</param>
+        /// <returns>Bitmap</returns>
         private Bitmap ScaleIconForDisplaying(Bitmap bitmap, double dpi)
         {
             var newSize = DpiHandler.ScaleWithDpi(16, dpi);

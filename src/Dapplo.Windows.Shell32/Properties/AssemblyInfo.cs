@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.Windows.Shell32")]
-[assembly: AssemblyCopyright("Copyright © Dapplo 2017")]
+[assembly: AssemblyCopyright("Copyright © Dapplo 2017-2018")]
 [assembly: AssemblyTrademark("Dapplo")]
 [assembly: AssemblyCulture("")]
 

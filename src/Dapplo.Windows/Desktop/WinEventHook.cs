@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -57,16 +57,19 @@ namespace Dapplo.Windows.Desktop
         {
             return Observable.Create<WinEventInfo>(observer =>
                 {
-                    WinEventDelegate winEventDelegate = (eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime) => { observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime)); };
+                    void WinEventHookDelegate(IntPtr eventHook, WinEvents winEvent, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime)
+                    {
+                        observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime));
+                    }
 
-                    var hookPtr = SetWinEventHook(winEventStart, winEventEnd ?? winEventStart, IntPtr.Zero, winEventDelegate, process, thread, WinEventHookFlags.OutOfContext);
+                    var hookPtr = SetWinEventHook(winEventStart, winEventEnd ?? winEventStart, IntPtr.Zero, WinEventHookDelegate, process, thread, WinEventHookFlags.OutOfContext);
                     if (hookPtr == IntPtr.Zero)
                     {
                         observer.OnError(new Win32Exception("Can't hook."));
                         return Disposable.Empty;
                     }
                     // Store to keep a reference to it, otherwise it's GC'ed
-                    Delegates[hookPtr] = winEventDelegate;
+                    Delegates[hookPtr] = WinEventHookDelegate;
 
                     return Disposable.Create(() =>
                     {

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -54,7 +54,7 @@ namespace Dapplo.Windows.Tests
         //[Fact]
         private void TestDetectChanges()
         {
-            var foundWindow = false;
+            bool foundWindow;
             IList<IInteropWindow> initialWindows = InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()).ToList();
 
             while (true)

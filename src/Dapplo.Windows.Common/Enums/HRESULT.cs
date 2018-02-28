@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -29,7 +29,7 @@ namespace Dapplo.Windows.Common.Enums
     ///     The HRESULT represents Windows error codes
     ///     See <a href="https://en.wikipedia.org/wiki/HRESULT">wikipedia</a>
     /// </summary>
-    public enum HResult : int
+    public enum HResult
     {
 #pragma warning disable 1591
         S_OK = 0,

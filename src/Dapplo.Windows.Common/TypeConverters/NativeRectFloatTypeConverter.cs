@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -49,12 +49,11 @@ namespace Dapplo.Windows.Common.TypeConverters
             if (value is string nativeRectFStringValue)
             {
                 string[] xywh = nativeRectFStringValue.Split(',');
-                float x, y, w, h;
                 if (xywh.Length == 4 &&
-                    float.TryParse(xywh[0], NumberStyles.Number, CultureInfo.InvariantCulture, out x) &&
-                    float.TryParse(xywh[1], NumberStyles.Number, CultureInfo.InvariantCulture, out y) &&
-                    float.TryParse(xywh[2], NumberStyles.Number, CultureInfo.InvariantCulture, out w) &&
-                    float.TryParse(xywh[3], NumberStyles.Number, CultureInfo.InvariantCulture, out h))
+                    float.TryParse(xywh[0], NumberStyles.Number, CultureInfo.InvariantCulture, out var x) &&
+                    float.TryParse(xywh[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var y) &&
+                    float.TryParse(xywh[2], NumberStyles.Number, CultureInfo.InvariantCulture, out var w) &&
+                    float.TryParse(xywh[3], NumberStyles.Number, CultureInfo.InvariantCulture, out var h))
                 {
                     return new NativeRectFloat(x, y, w, h);
                 }
@@ -67,11 +66,7 @@ namespace Dapplo.Windows.Common.TypeConverters
         {
             if (destinationType == typeof(string) && value is NativeRectFloat nativeRectF)
             {
-                return string.Format("{0},{1},{2},{3}",
-                    nativeRectF.Left.ToString(CultureInfo.InvariantCulture),
-                    nativeRectF.Top.ToString(CultureInfo.InvariantCulture),
-                    nativeRectF.Width.ToString(CultureInfo.InvariantCulture),
-                    nativeRectF.Height.ToString(CultureInfo.InvariantCulture));
+                return $"{nativeRectF.Left.ToString(CultureInfo.InvariantCulture)},{nativeRectF.Top.ToString(CultureInfo.InvariantCulture)},{nativeRectF.Width.ToString(CultureInfo.InvariantCulture)},{nativeRectF.Height.ToString(CultureInfo.InvariantCulture)}";
             }
             return base.ConvertTo(context, culture, value, destinationType);
         }

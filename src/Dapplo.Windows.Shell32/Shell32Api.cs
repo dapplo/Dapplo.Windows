@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -20,9 +20,7 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Shell32.Enums;
 using Dapplo.Windows.Shell32.Structs;
 

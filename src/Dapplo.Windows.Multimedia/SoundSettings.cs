@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -113,6 +113,6 @@ namespace Dapplo.Windows.Multimedia
         /// If this flag is not set, the sound is assigned to the default audio session for the application's process.
         /// For more information, see the documentation for the Core Audio APIs.
         /// </summary>
-        System = 0x00200000,
+        System = 0x00200000
     }
 }

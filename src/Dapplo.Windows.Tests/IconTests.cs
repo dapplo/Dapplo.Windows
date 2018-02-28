@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -21,21 +21,13 @@
 
 #region using
 
-using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Clipboard;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Icons;
-using Dapplo.Windows.Messages;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -42,7 +42,7 @@ namespace Dapplo.Windows.Icons
         /// <summary>
         /// Helper method to get the app logo from the mandest
         /// </summary>
-        /// <typeparam name="TBitmap"></typeparam>
+        /// <typeparam name="TBitmap">Type for the Bitmap, i.e. BitmapSource or Bitmap</typeparam>
         /// <param name="interopWindow">IInteropWindow</param>
         /// <param name="scale">int with scale, 100 is default</param>
         /// <returns>instance of TBitmap or null if nothing found</returns>
@@ -118,7 +118,7 @@ namespace Dapplo.Windows.Icons
         /// Get the path for the real modern app process belonging to the window
         /// </summary>
         /// <param name="interopWindow">IInteropWindow</param>
-        /// <returns></returns>
+        /// <returns>string</returns>
         private static string GetAppProcessPath(IInteropWindow interopWindow)
         {
             User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var pid);
@@ -289,7 +289,7 @@ namespace Dapplo.Windows.Icons
         /// <returns>int with the number of icons in the file</returns>
         public static int CountAssociatedIcons(string location)
         {
-            return NativeInvokes.ExtractIconEx(location, -1, out var large, out _, 0);
+            return NativeInvokes.ExtractIconEx(location, -1, out _, out _, 0);
         }
 
         /// <summary>

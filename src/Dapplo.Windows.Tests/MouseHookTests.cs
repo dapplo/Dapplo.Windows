@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -49,6 +49,7 @@ namespace Dapplo.Windows.Tests
         private async Task Test_LeftMouseDownAsync()
         {
             // This takes care of having a WinProc handler, to make sure the messages arrive
+            // ReSharper disable once UnusedVariable
             var winProcHandler = WinProcHandler.Instance;
             await MouseHook.MouseEvents.Where(args => args.WindowsMessage == WindowsMessages.WM_LBUTTONDOWN).FirstAsync();
         }

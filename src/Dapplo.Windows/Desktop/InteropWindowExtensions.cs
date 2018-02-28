@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -304,8 +304,8 @@ namespace Dapplo.Windows.Desktop
             {
                 return interopWindow.ProcessId.Value;
             }
-            int processId;
-            User32Api.GetWindowThreadProcessId(interopWindow.Handle, out processId);
+
+            User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var processId);
             interopWindow.ProcessId = processId;
             return interopWindow.ProcessId.Value;
         }

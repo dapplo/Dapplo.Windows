@@ -1,5 +1,6 @@
-﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+﻿#region Copyright (C) 2016-2018 Dapplo
+//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -18,12 +19,14 @@
 // 
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
+#endregion
 
 #region using
 
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Dapplo.Windows.Common.TypeConverters;
@@ -134,6 +137,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
         public override int GetHashCode()
         {
             unchecked
@@ -143,27 +147,29 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
         public override string ToString()
         {
             return X + "," + Y;
         }
 
         /// <inheritdoc />
+        [Pure]
         public override bool Equals(object obj)
         {
-            if (obj is NativePoint)
+            switch (obj)
             {
-                return Equals((NativePoint)obj);
+                case NativePoint point:
+                    return Equals(point);
+                case System.Drawing.Point drawingPoint:
+                    return Equals(drawingPoint);
             }
-            if (obj is System.Drawing.Point)
-            {
-                NativePoint rect = (System.Drawing.Point)obj;
-                return Equals(rect);
-            }
+
             return false;
         }
 
         /// <inheritdoc />
+        [Pure]
         public bool Equals(NativePoint other)
         {
             return _x == other._x &&

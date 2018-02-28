@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -26,7 +26,6 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Interop;
 using Dapplo.Windows.Messages;
 
 #endregion
@@ -59,13 +58,14 @@ namespace Dapplo.Windows.Clipboard
             _clipboardObservable = Observable.Create<ClipboardUpdateInformation>(observer =>
                 {
                     // This handles the message
-                    HwndSourceHook winProcHandler = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
+                    IntPtr WinProcClipboardMessageHandler(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                     {
-                        var windowsMessage = (WindowsMessages)msg;
+                        var windowsMessage = (WindowsMessages) msg;
                         if (windowsMessage != WindowsMessages.WM_CLIPBOARDUPDATE)
                         {
                             return IntPtr.Zero;
                         }
+
                         var clipboardUpdateInformationInfo = ClipboardUpdateInformation.Create(hwnd);
 
                         // Make sure we don't trigger multiple times, this happend while developing.
@@ -76,8 +76,9 @@ namespace Dapplo.Windows.Clipboard
                         }
 
                         return IntPtr.Zero;
-                    };
-                    var hookSubscription = WinProcHandler.Instance.Subscribe(winProcHandler);
+                    }
+
+                    var hookSubscription = WinProcHandler.Instance.Subscribe(WinProcClipboardMessageHandler);
                     if (!AddClipboardFormatListener(WinProcHandler.Instance.Handle))
                     {
                         observer.OnError(new Win32Exception());

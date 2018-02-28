@@ -1,5 +1,6 @@
-﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+﻿#region Copyright (C) 2016-2018 Dapplo
+//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2016-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -18,12 +19,14 @@
 // 
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
+#endregion
 
 #region using
 
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -229,6 +232,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
         public override string ToString()
         {
             return $"{{Left: {_left}; Top: {_top}; Right: {_right}; Bottom: {_bottom};}}";
@@ -239,6 +243,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="other">NativeRect</param>
         /// <returns>bool</returns>
+        [Pure]
         public bool Equals(NativeRect other)
         {
             return other.Left == _left && other.Top == _top && other.Right == _right && other.Bottom == _bottom;
@@ -251,21 +256,23 @@ namespace Dapplo.Windows.Common.Structs
         public bool IsEmpty => Width * Height == 0;
 
         /// <inheritdoc />
+        [Pure]
         public override bool Equals(object obj)
         {
-            if (obj is NativeRect)
+            switch (obj)
             {
-                return Equals((NativeRect) obj);
+                case NativeRect nativeRect:
+                    return Equals(nativeRect);
+                case Rectangle rectangle:
+                    NativeRect rect = rectangle;
+                    return Equals(rect);
             }
-            if (obj is Rectangle)
-            {
-                NativeRect rect = (Rectangle) obj;
-                return Equals(rect);
-            }
+
             return false;
         }
 
         /// <inheritdoc />
+        [Pure]
         public override int GetHashCode()
         {
             unchecked
@@ -283,6 +290,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="location">NativePoint</param>
         /// <param name="size">NativeSize</param>
+        [Pure]
         public void Deconstruct(out NativePoint location, out NativeSize size)
         {
             location = Location;

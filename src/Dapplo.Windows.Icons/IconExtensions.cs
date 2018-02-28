@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -44,8 +44,8 @@ namespace Dapplo.Windows.Icons
         /// <summary>
         /// Convert an Icon to an ImageSource
         /// </summary>
-        /// <param name="icon"></param>
-        /// <returns></returns>
+        /// <param name="icon">Icon</param>
+        /// <returns>BitmapSource</returns>
         public static BitmapSource ToBitmapSource(this Icon icon)
         {
             var bitmap = icon.ToBitmap();

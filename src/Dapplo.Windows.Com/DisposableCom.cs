@@ -42,7 +42,7 @@ namespace Dapplo.Windows.Com
     /// <typeparam name="T"></typeparam>
     internal sealed class DisposableComImplementation<T> : IDisposableCom<T>
     {
-        private bool _disposed = false;
+        private bool _disposed;
 
         public DisposableComImplementation(T obj)
         {

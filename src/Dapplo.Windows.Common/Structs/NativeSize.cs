@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -148,15 +148,14 @@ namespace Dapplo.Windows.Common.Structs
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (obj is NativeSize)
+            switch (obj)
             {
-                return Equals((NativeSize)obj);
+                case NativeSize size:
+                    return Equals(size);
+                case System.Drawing.Size size1:
+                    return Equals(size1);
             }
-            if (obj is System.Drawing.Size)
-            {
-                NativeSize rect = (System.Drawing.Size)obj;
-                return Equals(rect);
-            }
+
             return false;
         }
 

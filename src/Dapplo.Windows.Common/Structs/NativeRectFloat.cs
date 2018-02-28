@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -291,20 +291,16 @@ namespace Dapplo.Windows.Common.Structs
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (obj is NativeRectFloat)
+            switch (obj)
             {
-                return Equals((NativeRectFloat) obj);
+                case NativeRectFloat f:
+                    return Equals(f);
+                case Rect rect1:
+                    return Equals(rect1);
+                case RectangleF rectangleF:
+                    return Equals(rectangleF);
             }
-            if (obj is Rect)
-            {
-                NativeRectFloat rect = (Rect) obj;
-                return Equals(rect);
-            }
-            if (obj is RectangleF)
-            {
-                NativeRectFloat rect = (RectangleF) obj;
-                return Equals(rect);
-            }
+
             return false;
         }
 

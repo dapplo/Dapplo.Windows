@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -49,12 +49,11 @@ namespace Dapplo.Windows.Common.TypeConverters
             if (value is string nativeRectStringValue)
             {
                 string[] xywh = nativeRectStringValue.Split(',');
-                int x, y, w, h;
                 if (xywh.Length == 4 &&
-                    int.TryParse(xywh[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out x) &&
-                    int.TryParse(xywh[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out y) &&
-                    int.TryParse(xywh[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out w) &&
-                    int.TryParse(xywh[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out h))
+                    int.TryParse(xywh[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var x) &&
+                    int.TryParse(xywh[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var y) &&
+                    int.TryParse(xywh[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var w) &&
+                    int.TryParse(xywh[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out var h))
                 {
                     return new NativeRect(x, y, w, h);
                 }

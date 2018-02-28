@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -28,7 +28,6 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.App;
 using Xunit;
 using Xunit.Abstractions;
-using Dapplo.Windows.Citrix;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Icons;
 

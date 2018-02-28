@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -58,8 +58,7 @@ namespace Dapplo.Windows.Desktop
         {
             get
             {
-                ScrollInfo scrollInfo;
-                if (!GetPosition(out scrollInfo))
+                if (!GetPosition(out var scrollInfo))
                 {
                     return false;
                 }
@@ -79,8 +78,7 @@ namespace Dapplo.Windows.Desktop
         {
             get
             {
-                ScrollInfo scrollInfo;
-                if (!GetPosition(out scrollInfo))
+                if (!GetPosition(out var scrollInfo))
                 {
                     return false;
                 }
@@ -134,14 +132,14 @@ namespace Dapplo.Windows.Desktop
             {
                 using (var key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", false))
                 {
-                    var wheelScrollLines = key?.GetValue("WheelScrollLines") as string;
-                    if (wheelScrollLines != null)
+                    if (!(key?.GetValue("WheelScrollLines") is string wheelScrollLines))
                     {
-                        int scrollLines;
-                        if (int.TryParse(wheelScrollLines, out scrollLines))
-                        {
-                            return scrollLines;
-                        }
+                        return 3;
+                    }
+
+                    if (int.TryParse(wheelScrollLines, out var scrollLines))
+                    {
+                        return scrollLines;
                     }
                 }
                 return 3;
@@ -190,8 +188,7 @@ namespace Dapplo.Windows.Desktop
         public bool End()
         {
             var result = false;
-            ScrollInfo scrollInfoBefore;
-            var hasScrollInfo = TryRetrievePosition(out scrollInfoBefore);
+            var hasScrollInfo = TryRetrievePosition(out var scrollInfoBefore);
             switch (ScrollMode)
             {
                 case ScrollModes.KeyboardPageUpDown:
@@ -291,8 +288,7 @@ namespace Dapplo.Windows.Desktop
         public bool Next()
         {
             var result = false;
-            ScrollInfo scrollInfoBefore;
-            var hasScrollInfo = TryRetrievePosition(out scrollInfoBefore);
+            var hasScrollInfo = TryRetrievePosition(out var scrollInfoBefore);
 
             switch (ScrollMode)
             {
@@ -328,8 +324,7 @@ namespace Dapplo.Windows.Desktop
         public bool Previous()
         {
             var result = false;
-            ScrollInfo scrollInfoBefore;
-            var hasScrollInfo = TryRetrievePosition(out scrollInfoBefore);
+            var hasScrollInfo = TryRetrievePosition(out var scrollInfoBefore);
 
             switch (ScrollMode)
             {
@@ -395,8 +390,7 @@ namespace Dapplo.Windows.Desktop
         public bool Start()
         {
             var result = false;
-            ScrollInfo scrollInfoBefore;
-            var hasScrollInfo = TryRetrievePosition(out scrollInfoBefore);
+            var hasScrollInfo = TryRetrievePosition(out var scrollInfoBefore);
             switch (ScrollMode)
             {
                 case ScrollModes.KeyboardPageUpDown:
@@ -440,16 +434,18 @@ namespace Dapplo.Windows.Desktop
         private bool TryRetrievePosition(out ScrollInfo scrollInfo)
         {
             var hasScrollInfo = GetPosition(out scrollInfo);
-            if (Log.IsVerboseEnabled())
+            if (!Log.IsVerboseEnabled())
             {
-                if (hasScrollInfo)
-                {
-                    Log.Verbose().WriteLine("Retrieved ScrollInfo: {0}", scrollInfo);
-                }
-                else
-                {
-                    Log.Verbose().WriteLine("Couldn't get scrollinfo.");
-                }
+                return hasScrollInfo;
+            }
+
+            if (hasScrollInfo)
+            {
+                Log.Verbose().WriteLine("Retrieved ScrollInfo: {0}", scrollInfo);
+            }
+            else
+            {
+                Log.Verbose().WriteLine("Couldn't get scrollinfo.");
             }
             return hasScrollInfo;
         }

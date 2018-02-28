@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -148,28 +148,30 @@ namespace Dapplo.Windows.App
 
             foreach (var screen in User32Api.AllDisplays())
             {
-                if (screen.Bounds.Contains(windowBounds))
+                if (!screen.Bounds.Contains(windowBounds))
                 {
-                    if (windowBounds.Equals(screen.Bounds))
+                    continue;
+                }
+
+                if (windowBounds.Equals(screen.Bounds))
+                {
+                    // Fullscreen, it's "visible" when AppVisibilityOnMonitor says yes
+                    // Although it might be the other App, this is not "very" important
+                    var rect = screen.Bounds;
+                    var monitor = User32Api.MonitorFromRect(ref rect, MonitorFrom.DefaultToNearest);
+                    if (monitor != IntPtr.Zero)
                     {
-                        // Fullscreen, it's "visible" when AppVisibilityOnMonitor says yes
-                        // Although it might be the other App, this is not "very" important
-                        var rect = screen.Bounds;
-                        var monitor = User32Api.MonitorFromRect(ref rect, MonitorFrom.DefaultToNearest);
-                        if (monitor != IntPtr.Zero)
+                        var monitorAppVisibility = AppVisibility.ComObject.GetAppVisibilityOnMonitor(monitor);
+                        if (monitorAppVisibility == MonitorAppVisibility.MAV_APP_VISIBLE)
                         {
-                            var monitorAppVisibility = AppVisibility.ComObject.GetAppVisibilityOnMonitor(monitor);
-                            if (monitorAppVisibility == MonitorAppVisibility.MAV_APP_VISIBLE)
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
-                    else
-                    {
-                        // Is only partly on the screen, when this happens the app is allways visible!
-                        return true;
-                    }
+                }
+                else
+                {
+                    // Is only partly on the screen, when this happens the app is allways visible!
+                    return true;
                 }
             }
             return false;

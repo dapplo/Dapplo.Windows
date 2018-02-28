@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2017-2018  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -85,9 +85,7 @@ namespace Dapplo.Windows.Citrix
         /// <returns>Optional ConnectStates</returns>
         public static ConnectStates? QuerySessionConnectState()
         {
-            IntPtr state;
-            int returned;
-            if (!WFQuerySessionInformation(CurrentServer, CurrentSession, InfoClasses.ConnectState, out state, out returned))
+            if (!WFQuerySessionInformation(CurrentServer, CurrentSession, InfoClasses.ConnectState, out var state, out _))
             {
                 return null;
             }
@@ -110,9 +108,7 @@ namespace Dapplo.Windows.Citrix
             where T : struct
         {
             var expectedType = typeof(T);
-            IntPtr addr;
-            int returned;
-            if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out addr, out returned))
+            if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out var addr, out _))
             {
                 return default(T);
             }
@@ -133,8 +129,7 @@ namespace Dapplo.Windows.Citrix
         /// <returns>EventMask with the events that happened</returns>
         public static EventMask WaitSystemEvent(EventMask eventMask)
         {
-            EventMask result;
-            if (WFWaitSystemEvent(CurrentServer, eventMask, out result))
+            if (WFWaitSystemEvent(CurrentServer, eventMask, out var result))
             {
                 return result;
             }
@@ -148,9 +143,7 @@ namespace Dapplo.Windows.Citrix
         /// <returns>string with the value</returns>
         public static string QuerySessionInformation(InfoClasses infoClass)
         {
-            IntPtr addr;
-            int returned;
-            if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out addr, out returned))
+            if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out var addr, out _))
             {
                 return null;
             }
