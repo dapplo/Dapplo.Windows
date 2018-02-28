@@ -39,10 +39,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -57,10 +53,6 @@
     <Compile Include="Structs\ShellFileInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
-      <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
-      <Name>Dapplo.Windows.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj">
       <Project>{e4a0ce9d-681c-44d0-85f5-4f677ec54658}</Project>
       <Name>Dapplo.Windows.Gdi32</Name>
