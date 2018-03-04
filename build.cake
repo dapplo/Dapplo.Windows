@@ -4,7 +4,7 @@
 #addin "SharpZipLib"
 #addin "Cake.FileHelpers"
 #addin "Cake.DocFx"
-#addin "Cake.Compression"
+#addin nuget:?package=Cake.Compression&version=0.1.4
 
 var target = Argument("target", "Build");
 var configuration = Argument("configuration", "release");
