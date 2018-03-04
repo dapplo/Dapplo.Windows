@@ -212,7 +212,8 @@ _Pvt_Extensions/
 ModelManifest.xml
 
 # Cake tools
-tools/
+tools/*
+!tools/packages.config
 
 # DocFX
 _site/
