@@ -8,9 +8,6 @@ test: off
 branches:
   only:
   - master
-# Workaround for http://help.appveyor.com/discussions/problems/7097-builds-timing-out
-hosts:
-  api.nuget.org: 93.184.221.200
 environment:
   NuGetApiKey:
     secure: xkDQ385+smLqdzhESsXBJvnUjK4FZ4Djjrqi9tFR29dwESIvPYOrQAqgri5Nf/fA
