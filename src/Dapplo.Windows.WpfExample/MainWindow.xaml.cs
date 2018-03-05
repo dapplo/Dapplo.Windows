@@ -16,11 +16,9 @@ namespace Dapplo.Windows.WpfExample
             InitializeComponent();
             this.AttachDpiHandler();
 
-
-            this.WindowMessages().Where(m => m.Message == WindowsMessages.WM_DESTROY)
+            this.WinProcMessages()
+                .Where(m => m.Message == WindowsMessages.WM_DESTROY)
                 .Subscribe(m => { MessageBox.Show($"{m.Message}"); });
-
-
         }
     }
 }

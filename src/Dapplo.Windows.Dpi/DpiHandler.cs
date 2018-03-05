@@ -186,36 +186,54 @@ namespace Dapplo.Windows.Dpi
         /// <returns>IntPtr</returns>
         internal IntPtr HandleWindowMessages(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            var windowsMessage = (WindowsMessages) msg;
+            if (HandleWindowMessages(WindowMessageInfo.Create(hwnd, msg, wParam, lParam)))
+            {
+                handled = true;
+            }
+            return IntPtr.Zero;
+        }
+
+        /// <summary>
+        ///     Message handler of the Per_Monitor_DPI_Aware window.
+        ///     The handles the WM_DPICHANGED message and adjusts window size, graphics and text based on the DPI of the monitor.
+        ///     The window message provides the new window size (lparam) and new DPI (wparam)
+        ///     See
+        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn312083(v=vs.85).aspx">WM_DPICHANGED message</a>
+        /// </summary>
+        /// <param name="windowMessageInfo">WindowMessageInfo</param>
+        /// <returns>IntPtr</returns>
+        internal bool HandleWindowMessages(WindowMessageInfo windowMessageInfo)
+        {
+            bool handled = false;
             var currentDpi = (int) DefaultScreenDpi;
             bool isDpiMessage = false;
-            switch (windowsMessage)
+            switch (windowMessageInfo.Message)
             {
                 // Handle the WM_NCCREATE for Forms / controls, for WPF this is done differently
                 case WindowsMessages.WM_NCCREATE:
-                    TryEnableNonClientDpiScaling(hwnd);
+                    TryEnableNonClientDpiScaling(windowMessageInfo.Handle);
                     break;
                 // Handle the WM_CREATE, this is where we can get the DPI via system calls
                 case WindowsMessages.WM_CREATE:
                     isDpiMessage = true;
-                    Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for window {1}", windowsMessage, hwnd);
-                    currentDpi = GetDpi(hwnd);
+                    Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    currentDpi = GetDpi(windowMessageInfo.Handle);
                     break;
                 // Handle the DPI change message, this is where it's supplied
                 case WindowsMessages.WM_DPICHANGED:
                     isDpiMessage = true;
-                    Log.Verbose().WriteLine("Processing {0} event, resizing / positioning window {1}", windowsMessage, hwnd);
+                    Log.Verbose().WriteLine("Processing {0} event, resizing / positioning window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
                     // Retrieve the adviced location
-                    var lprNewRect = (NativeRect) Marshal.PtrToStructure(lParam, typeof(NativeRect));
+                    var lprNewRect = (NativeRect) Marshal.PtrToStructure(windowMessageInfo.LongParam, typeof(NativeRect));
                     // Move the window to it's location, and resize
-                    User32Api.SetWindowPos(hwnd,
+                    User32Api.SetWindowPos(windowMessageInfo.Handle,
                         IntPtr.Zero,
                         lprNewRect.Left,
                         lprNewRect.Top,
                         lprNewRect.Width,
                         lprNewRect.Height,
                         WindowPos.SWP_NOZORDER | WindowPos.SWP_NOOWNERZORDER | WindowPos.SWP_NOACTIVATE);
-                    currentDpi = wParam.ToInt32() & 0xFFFF;
+                    currentDpi = windowMessageInfo.WordParam.ToInt32() & 0xFFFF;
                     // specify that the message was handled
                     handled = true;
                     break;
@@ -224,7 +242,7 @@ namespace Dapplo.Windows.Dpi
                     if (Math.Abs(Dpi) < double.Epsilon && !IsDpiAware)
                     {
                         isDpiMessage = true;
-                        currentDpi = GetDpi(hwnd);
+                        currentDpi = GetDpi(windowMessageInfo.Handle);
                     }
                     break;
                 case WindowsMessages.WM_SETICON:
@@ -234,18 +252,20 @@ namespace Dapplo.Windows.Dpi
                         isDpiMessage = true;
                         // disable workaround
                         _needsListenerWorkaround = false;
-                        currentDpi = GetDpi(hwnd);
+                        currentDpi = GetDpi(windowMessageInfo.Handle);
                     }
                     break;
                 case WindowsMessages.WM_DESTROY:
                     // If the window is destroyed, we complete the subject
                     _onDpiChanged.OnCompleted();
+                    // Dispose all resources
+                    Dispose();
                     break;
             }
             // Check if the DPI was changed, if so call the action (if any)
             if (!isDpiMessage)
             {
-                return IntPtr.Zero;
+                return handled;
             }
             if (!IsEqual(Dpi, currentDpi))
             {
@@ -262,35 +282,30 @@ namespace Dapplo.Windows.Dpi
                 Log.Verbose().WriteLine("DPI was unchanged from {0}", Dpi);
             }
 
-            return IntPtr.Zero;
+            return handled;
         }
 
 
         /// <summary>
-        ///     Message handler of the DPI Aware ContextMenuStrip.
+        ///     Message handler of the DPI Aware ContextMenuStrip, this is simplified compared to the normal
         ///     The handles the WM_DPICHANGED message and adjusts window size, graphics and text based on the DPI of the monitor.
         ///     The window message provides the new window size (lparam) and new DPI (wparam)
         ///     See
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn312083(v=vs.85).aspx">WM_DPICHANGED message</a>
         /// </summary>
-        /// <param name="hwnd">IntPtr with the hWnd</param>
-        /// <param name="msg">The Windows message</param>
-        /// <param name="wParam">IntPtr</param>
-        /// <param name="lParam">IntPtr</param>
-        /// <param name="handled">ref bool</param>
+        /// <param name="windowMessageInfo">WindowMessageInfo</param>
         /// <returns>IntPtr</returns>
-        internal IntPtr HandleContextMenuMessages(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        internal IntPtr HandleContextMenuMessages(WindowMessageInfo windowMessageInfo)
         {
-            var windowsMessage = (WindowsMessages)msg;
             var currentDpi = (int)DefaultScreenDpi;
             bool isDpiMessage = false;
-            switch (windowsMessage)
+            switch (windowMessageInfo.Message)
             {
                 // Handle the WM_CREATE, this is where we can get the DPI via system calls
                 case WindowsMessages.WM_SHOWWINDOW:
                     isDpiMessage = true;
-                    Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for ContextMenuStrip {1}", windowsMessage, hwnd);
-                    currentDpi = GetDpi(hwnd);
+                    Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for ContextMenuStrip {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    currentDpi = GetDpi(windowMessageInfo.Handle);
                     break;
                 case WindowsMessages.WM_DESTROY:
                     // If the window is destroyed, we complete the subject
@@ -319,6 +334,7 @@ namespace Dapplo.Windows.Dpi
 
             return IntPtr.Zero;
         }
+
         /// <summary>
         ///     Compare helper for doubles
         /// </summary>

@@ -34,9 +34,9 @@ namespace Dapplo.Windows.Messages
         /// <param name="msg">WindowsMessages which is the actual message</param>
         /// <param name="wParam">IntPtr with the word-param</param>
         /// <param name="lParam">IntPtr with the long-param</param>
-        /// <param name="handled"></param>
+        /// <param name="handled">bool</param>
         /// <returns>WindowMessageInfo</returns>
-        public static WindowMessageInfo Create(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        public static WindowMessageInfo Create(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam)
         {
             return new WindowMessageInfo
             {

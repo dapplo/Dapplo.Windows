@@ -21,6 +21,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
+using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Dpi.Forms
 {
@@ -41,8 +42,7 @@ namespace Dapplo.Windows.Dpi.Forms
         /// <param name="m">Message</param>
         protected override void WndProc(ref Message m)
         {
-            bool handled = false;
-            DpiHandler.HandleWindowMessages(m.HWnd, m.Msg, m.WParam, m.LParam, ref handled);
+            bool handled = DpiHandler.HandleWindowMessages(WindowMessageInfo.Create(m.HWnd, m.Msg, m.WParam, m.LParam));
             if (!handled)
             {
                 base.WndProc(ref m);

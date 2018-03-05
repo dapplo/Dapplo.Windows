@@ -34,37 +34,22 @@ namespace Dapplo.Windows.Messages
     /// <summary>
     ///     A monitor for window messages
     /// </summary>
-    public static class WindowMessageMonitor
+    public static class WinProcWindowsExtensions
     {
-        /// <summary>
-        /// Create a HwndSource for the specified Window
-        /// </summary>
-        /// <param name="window">Window</param>
-        /// <returns>HwndSource</returns>
-        private static HwndSource ToHwndSource(this Window window)
-        {
-            IntPtr windowHandle = new WindowInteropHelper(window).Handle;
-            if (windowHandle == IntPtr.Zero)
-            {
-                return null;
-            }
-            return HwndSource.FromHwnd(windowHandle);
-        }
-
         /// <summary>
         ///     Create an observable for the specified window
         /// </summary>
-        public static IObservable<WindowMessageInfo> WindowMessages(this Window window)
+        public static IObservable<WindowMessageInfo> WinProcMessages(this Window window)
         {
-            return WindowMessages(window, null);
+            return WinProcMessages(window, null);
         }
 
         /// <summary>
         ///     Create an observable for the specified HwndSource
         /// </summary>
-        public static IObservable<WindowMessageInfo> WindowMessages(this HwndSource hwndSource)
+        public static IObservable<WindowMessageInfo> WinProcMessages(this HwndSource hwndSource)
         {
-            return WindowMessages(null, hwndSource);
+            return WinProcMessages(null, hwndSource);
         }
 
         /// <summary>
@@ -73,7 +58,7 @@ namespace Dapplo.Windows.Messages
         /// <param name="window">Window</param>
         /// <param name="hwndSource">HwndSource</param>
         /// <returns>IObservable</returns>
-        private static IObservable<WindowMessageInfo> WindowMessages(Window window, HwndSource hwndSource)
+        private static IObservable<WindowMessageInfo> WinProcMessages(Window window, HwndSource hwndSource)
         {
             if (window == null && hwndSource == null)
             {
@@ -89,7 +74,7 @@ namespace Dapplo.Windows.Messages
                     // This handles the message, and generates the observable OnNext
                     IntPtr WindowMessageHandler(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                     {
-                        observer.OnNext(WindowMessageInfo.Create(hwnd, msg, wParam, lParam, ref handled));
+                        observer.OnNext(WindowMessageInfo.Create(hwnd, msg, wParam, lParam));
                         // ReSharper disable once AccessToDisposedClosure
                         if (hwndSource.IsDisposed)
                         {
@@ -123,6 +108,8 @@ namespace Dapplo.Windows.Messages
                         {
                             hwndSource = window.ToHwndSource();
                             RegisterHwndSource();
+                            // Simulate the WM_NCCREATE
+                            observer.OnNext(WindowMessageInfo.Create(hwndSource.Handle, (int)WindowsMessages.WM_NCCREATE, IntPtr.Zero, IntPtr.Zero));
                         };
                     }
 
@@ -136,6 +123,21 @@ namespace Dapplo.Windows.Messages
                 // Make sure there is always a value produced when connecting
                 .Publish()
                 .RefCount();
+        }
+
+        /// <summary>
+        /// Create a HwndSource for the specified Window
+        /// </summary>
+        /// <param name="window">Window</param>
+        /// <returns>HwndSource</returns>
+        private static HwndSource ToHwndSource(this Window window)
+        {
+            IntPtr windowHandle = new WindowInteropHelper(window).Handle;
+            if (windowHandle == IntPtr.Zero)
+            {
+                return null;
+            }
+            return HwndSource.FromHwnd(windowHandle);
         }
     }
 }

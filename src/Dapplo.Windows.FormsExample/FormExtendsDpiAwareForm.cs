@@ -79,7 +79,7 @@ namespace Dapplo.Windows.FormsExample
             return result;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             contextMenuStrip1.Show();
         }

@@ -71,8 +71,7 @@
     <Compile Include="Enums\MonitorDpiType.cs" />
     <Compile Include="Forms\FormsDpiExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Wpf\WindowExtensions.cs" />
-    <Compile Include="WinProcListener.cs" />
+    <Compile Include="Wpf\WindowDpiExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">

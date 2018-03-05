@@ -23,8 +23,8 @@
 
 using System;
 using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Media;
+using Dapplo.Windows.Messages;
 
 #endregion
 
@@ -33,7 +33,7 @@ namespace Dapplo.Windows.Dpi.Wpf
     /// <summary>
     ///     Extensions for the WPF Window class
     /// </summary>
-    public static class WindowExtensions
+    public static class WindowDpiExtensions
     {
         /// <summary>
         ///     Attach a DpiHandler to the specified window
@@ -42,28 +42,24 @@ namespace Dapplo.Windows.Dpi.Wpf
         /// <param name="dpiHandler">DpiHandler</param>
         private static void AttachDpiHandler(Window window, DpiHandler dpiHandler)
         {
-            var windowInteropHelper = new WindowInteropHelper(window);
-
-            // Due to the nature of the WPF Window, we cannot get to the WM_NCCREATE event from outside
-            // The SourceInitialized event is actually called when this event happens.
-            window.SourceInitialized += (sender, args) =>
+            // Add the layout transform action
+            var transformSubscription = dpiHandler.OnDpiChanged.Subscribe(dpi => window.UpdateLayoutTransform(dpi / DpiHandler.DefaultScreenDpi));
+            window.WinProcMessages().Subscribe(message =>
             {
-                DpiHandler.TryEnableNonClientDpiScaling(windowInteropHelper.Handle);
-
-                // Get the HwndSource for the window, this works very early in the process by calling EnsureHandle (which creates the handle)
-                var hwndSource = HwndSource.FromHwnd(windowInteropHelper.Handle);
-                if (hwndSource == null)
+                switch (message.Message)
                 {
-                    throw new NotSupportedException("No HwndSource available, although EnsureHandle was called?");
+                    case WindowsMessages.WM_NCACTIVATE:
+                        // Apply scaling
+                        window.UpdateLayoutTransform(DpiHandler.GetDpi(message.Handle) / DpiHandler.DefaultScreenDpi);
+                        break;
+                    case WindowsMessages.WM_DESTROY:
+                        // Remove layout transform 
+                        transformSubscription.Dispose();
+                        break;
                 }
-                hwndSource.AddHook(dpiHandler.HandleWindowMessages);
-                dpiHandler.MessageHandler = hwndSource;
-                // Add the layout transform action
-                dpiHandler.OnDpiChanged.Subscribe(dpi => window.UpdateLayoutTransform(dpi / DpiHandler.DefaultScreenDpi));
-                // Apply scaling
-                window.UpdateLayoutTransform(DpiHandler.GetDpi(windowInteropHelper.Handle) / DpiHandler.DefaultScreenDpi);
-            };
 
+                dpiHandler.HandleWindowMessages(message);
+            });
         }
 
         /// <summary>

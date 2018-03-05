@@ -21,7 +21,9 @@
 
 #region using
 
+using System;
 using System.Windows.Forms;
+using Dapplo.Windows.Messages;
 
 #endregion
 
@@ -44,9 +46,7 @@ namespace Dapplo.Windows.Dpi.Forms
         {
             // Create a DpiHandler which runs "outside" of the form (not via WinProc)
             var dpiHandler = new DpiHandler(true);
-            var listener = new WinProcListener(form);
-            listener.AddHook(dpiHandler.HandleWindowMessages);
-            dpiHandler.MessageHandler = listener;
+            dpiHandler.MessageHandler = form.WinProcFormsMessages().Subscribe(message => dpiHandler.HandleWindowMessages(message));
             return dpiHandler;
         }
 
@@ -59,9 +59,7 @@ namespace Dapplo.Windows.Dpi.Forms
         {
             // Create a DpiHandler which runs "outside" of the contextMenu (not via WinProc)
             var dpiHandler = new DpiHandler(true);
-            var listener = new WinProcListener(contextMenuStrip);
-            listener.AddHook(dpiHandler.HandleContextMenuMessages);
-            dpiHandler.MessageHandler = listener;
+            dpiHandler.MessageHandler = contextMenuStrip.WinProcFormsMessages().Subscribe(message => dpiHandler.HandleContextMenuMessages(message));
             return dpiHandler;
         }
     }

@@ -23,13 +23,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Permissions;
 using System.Windows.Forms;
 using System.Windows.Interop;
 
 #endregion
 
-namespace Dapplo.Windows.Dpi
+namespace Dapplo.Windows.Messages
 {
     /// <summary>
     ///     This is a Listener for WinProc messages
@@ -39,18 +40,31 @@ namespace Dapplo.Windows.Dpi
         private readonly IList<HwndSourceHook> _hooks = new List<HwndSourceHook>();
 
         /// <summary>
+        /// Is the WinProcListener already disposed?
+        /// </summary>
+        public bool IsDisposed { get; private set; }
+
+        /// <summary>
         ///     Constructor for a window listener
         /// </summary>
         /// <param name="control">Control to listen to</param>
         public WinProcListener(Control control)
         {
-            control.HandleCreated += OnHandleCreated;
+            if (control.IsHandleCreated)
+            {
+                AssignHandle(control.Handle);
+            }
+            else
+            {
+                control.HandleCreated += OnHandleCreated;
+            }
             control.HandleDestroyed += OnHandleDestroyed;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+            IsDisposed = true;
             _hooks.Clear();
             ReleaseHandle();
         }
@@ -99,12 +113,11 @@ namespace Dapplo.Windows.Dpi
 
         /// <inheritdoc />
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
-        protected override void WndProc(ref Message message)
+        protected override void WndProc(ref Message m)
         {
-            bool handled = ProcessMessage(message);
-            if (!handled)
+            if (!ProcessMessage(m))
             {
-                base.WndProc(ref message);
+                base.WndProc(ref m);
             }
         }
 
@@ -116,7 +129,7 @@ namespace Dapplo.Windows.Dpi
         private bool ProcessMessage(Message message)
         {
             bool handled = false;
-            foreach (var hwndSourceHook in _hooks)
+            foreach (var hwndSourceHook in _hooks.ToList())
             {
                 message.Result = hwndSourceHook.Invoke(message.HWnd, message.Msg, message.WParam, message.LParam, ref handled);
                 if (handled)

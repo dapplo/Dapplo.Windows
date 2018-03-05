@@ -42,10 +42,9 @@ namespace Dapplo.Windows.FormsExample
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             var form1 = new FormExtendsDpiAwareForm();
-            form1.Show();
             var form2 = new FormWithAttachedDpiHandler();
             form2.Show();
-            Application.Run();
+            Application.Run(form1);
         }
     }
 }
