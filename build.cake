@@ -125,6 +125,7 @@ Task("Coverage")
                     XmlReport = true,
                     HtmlReport = true,
                     ReportName = solutionName,
+                    Parallelism = ParallelismOption.None,
                     OutputDirectory = "./artifacts",
                     WorkingDirectory = "./src"
                 });

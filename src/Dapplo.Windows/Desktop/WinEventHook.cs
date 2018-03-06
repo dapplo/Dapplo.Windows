@@ -62,14 +62,15 @@ namespace Dapplo.Windows.Desktop
                         observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime));
                     }
 
-                    var hookPtr = SetWinEventHook(winEventStart, winEventEnd ?? winEventStart, IntPtr.Zero, WinEventHookDelegate, process, thread, WinEventHookFlags.OutOfContext);
+                    WinEventDelegate winEventDelegate = WinEventHookDelegate;
+                    var hookPtr = SetWinEventHook(winEventStart, winEventEnd ?? winEventStart, IntPtr.Zero, winEventDelegate, process, thread, WinEventHookFlags.OutOfContext);
                     if (hookPtr == IntPtr.Zero)
                     {
                         observer.OnError(new Win32Exception("Can't hook."));
                         return Disposable.Empty;
                     }
                     // Store to keep a reference to it, otherwise it's GC'ed
-                    Delegates[hookPtr] = WinEventHookDelegate;
+                    Delegates[hookPtr] = winEventDelegate;
 
                     return Disposable.Create(() =>
                     {

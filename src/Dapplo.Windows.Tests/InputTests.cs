@@ -62,6 +62,8 @@ namespace Dapplo.Windows.Tests
                 // Wait until the process started it's message pump (listening for input)
                 process.WaitForInputIdle();
 
+                User32Api.SetWindowText(process.MainWindowHandle, "TestInput");
+
                 // Find the belonging window
                 var notepadWindow = await WindowsEnumerator.EnumerateWindowsAsync()
                     .Where(interopWindow =>

@@ -50,7 +50,7 @@ namespace Dapplo.Windows.Messages
         /// <param name="control">Control to listen to</param>
         public WinProcListener(Control control)
         {
-            if (control.IsHandleCreated)
+            if (control.IsHandleCreated && Handle == IntPtr.Zero)
             {
                 AssignHandle(control.Handle);
             }

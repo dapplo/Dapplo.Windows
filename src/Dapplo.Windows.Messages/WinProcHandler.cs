@@ -74,6 +74,10 @@ namespace Dapplo.Windows.Messages
                     }
                     // Create a new message window
                     _hwndSource = CreateMessageWindow();
+                    _hwndSource.Disposed += (sender, args) =>
+                    {
+                        UnsubscribeAllHooks();
+                    };
                     // Hook automatic removing of all the hooks
                     _hwndSource.AddHook((IntPtr hwnd, int msg, IntPtr param, IntPtr lParam, ref bool handled) =>
                     {

@@ -430,6 +430,16 @@ namespace Dapplo.Windows.User32
 
         /// <summary>
         ///     Get the caption of the window
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633546.aspx">SetWindowText function</a>
+        /// </summary>
+        /// <param name="hWnd">IntPtr with the window handle</param>
+        /// <param name="caption">string with the new caption</param>
+        /// <returns>int with the size of the caption</returns>
+        [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern int SetWindowText(IntPtr hWnd, string caption);
+
+        /// <summary>
+        ///     Get the caption of the window
         /// </summary>
         /// <param name="hWnd">IntPtr with the window handle</param>
         /// <param name="lpString">StringBuilder which is marshalled as buffer</param>

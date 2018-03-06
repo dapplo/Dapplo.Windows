@@ -28,6 +28,7 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Icons;
+using Dapplo.Windows.User32;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -55,6 +56,7 @@ namespace Dapplo.Windows.Tests
                 Assert.NotNull(process);
                 // Wait until the process started it's message pump (listening for input)
                 process.WaitForInputIdle();
+                User32Api.SetWindowText(process.MainWindowHandle, "TestIcon_GetIcon");
 
                 var window = InteropWindowQuery.GetTopLevelWindows().First();
                 var icon = window.GetIcon<BitmapSource>();
