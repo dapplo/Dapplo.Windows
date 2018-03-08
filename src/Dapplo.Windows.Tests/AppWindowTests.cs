@@ -68,7 +68,7 @@ namespace Dapplo.Windows.Tests
         public void TestApp_TopLevel()
         {
             var topLevelWindows = InteropWindowQuery.GetTopLevelWindows().ToList();
-            Assert.False(topLevelWindows.Any(window => window.IsApp()));
+            Assert.DoesNotContain(topLevelWindows, window => window.IsApp());
         }
     }
 }
