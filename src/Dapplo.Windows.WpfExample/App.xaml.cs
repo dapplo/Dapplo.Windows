@@ -22,6 +22,8 @@
 #region using
 
 using System.Windows;
+using Dapplo.Log;
+using Dapplo.Log.Loggers;
 using Dapplo.Windows.Dpi;
 
 #endregion
@@ -35,8 +37,9 @@ namespace Dapplo.Windows.WpfExample
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
+            LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Verbose);
             DpiHandler.EnableDpiAwareness();
+            base.OnStartup(e);
         }
     }
 }

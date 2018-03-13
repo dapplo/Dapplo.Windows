@@ -265,7 +265,10 @@ namespace Dapplo.Windows.Desktop
             if (!hasScrollbarInfo)
             {
                 var error = Win32.GetLastErrorCode();
-                Log.Verbose().WriteLine("Error retrieving Scrollbar info : {0}", Win32.GetMessage(error));
+                if (Log.IsVerboseEnabled())
+                {
+                    Log.Verbose().WriteLine("Error retrieving Scrollbar info : {0}", Win32.GetMessage(error));
+                }
                 return null;
             }
             ScrollBar = scrollbarInfo;
@@ -439,14 +442,18 @@ namespace Dapplo.Windows.Desktop
                 return hasScrollInfo;
             }
 
-            if (hasScrollInfo)
+            if (Log.IsVerboseEnabled())
             {
-                Log.Verbose().WriteLine("Retrieved ScrollInfo: {0}", scrollInfo);
+                if (hasScrollInfo)
+                {
+                    Log.Verbose().WriteLine("Retrieved ScrollInfo: {0}", scrollInfo);
+                }
+                else
+                {
+                    Log.Verbose().WriteLine("Couldn't get scrollinfo.");
+                }
             }
-            else
-            {
-                Log.Verbose().WriteLine("Couldn't get scrollinfo.");
-            }
+
             return hasScrollInfo;
         }
     }

@@ -90,7 +90,10 @@ namespace Dapplo.Windows.Dpi
             // Can we enable the DpiAwareness?
             if (!WindowsVersion.IsWindows81OrLater)
             {
-                Log.Verbose().WriteLine("The DPI handler will only do one initial Dpi change event, on Window creation, when the DPI settings are different from the default.");
+                if (Log.IsVerboseEnabled())
+                {
+                    Log.Verbose().WriteLine("The DPI handler will only do one initial Dpi change event, on Window creation, when the DPI settings are different from the default.");
+                }
                 return false;
             }
             // Try setting the DpiAwareness
@@ -118,7 +121,11 @@ namespace Dapplo.Windows.Dpi
                 using (var process = Process.GetCurrentProcess())
                 {
                     GetProcessDpiAwareness(process.Handle, out var dpiAwareness);
-                    Log.Verbose().WriteLine("Process {0} has a Dpi awareness {1}", process.ProcessName, dpiAwareness);
+                    if (Log.IsVerboseEnabled())
+                    {
+                        Log.Verbose().WriteLine("Process {0} has a Dpi awareness {1}", process.ProcessName, dpiAwareness);
+                    }
+
                     return dpiAwareness != DpiAwareness.Unaware && dpiAwareness != DpiAwareness.Invalid;
                 }
             }
@@ -211,18 +218,31 @@ namespace Dapplo.Windows.Dpi
             {
                 // Handle the WM_NCCREATE for Forms / controls, for WPF this is done differently
                 case WindowsMessages.WM_NCCREATE:
+                    if (Log.IsVerboseEnabled())
+                    {
+                        Log.Verbose().WriteLine("Processing {0} event, enabling DPI scaling for window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    }
+
                     TryEnableNonClientDpiScaling(windowMessageInfo.Handle);
                     break;
                 // Handle the WM_CREATE, this is where we can get the DPI via system calls
                 case WindowsMessages.WM_CREATE:
                     isDpiMessage = true;
-                    Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    if (Log.IsVerboseEnabled())
+                    {
+                        Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    }
+
                     currentDpi = GetDpi(windowMessageInfo.Handle);
                     break;
                 // Handle the DPI change message, this is where it's supplied
                 case WindowsMessages.WM_DPICHANGED:
                     isDpiMessage = true;
-                    Log.Verbose().WriteLine("Processing {0} event, resizing / positioning window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    if (Log.IsVerboseEnabled())
+                    {
+                        Log.Verbose().WriteLine("Processing {0} event, resizing / positioning window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    }
+
                     // Retrieve the adviced location
                     var lprNewRect = (NativeRect) Marshal.PtrToStructure(windowMessageInfo.LongParam, typeof(NativeRect));
                     // Move the window to it's location, and resize
@@ -256,6 +276,11 @@ namespace Dapplo.Windows.Dpi
                     }
                     break;
                 case WindowsMessages.WM_DESTROY:
+                    if (Log.IsVerboseEnabled())
+                    {
+                        Log.Verbose().WriteLine("Completing the observable for {0}", windowMessageInfo.Handle);
+                    }
+
                     // If the window is destroyed, we complete the subject
                     _onDpiChanged.OnCompleted();
                     // Dispose all resources
@@ -265,19 +290,23 @@ namespace Dapplo.Windows.Dpi
             // Check if the DPI was changed, if so call the action (if any)
             if (!isDpiMessage)
             {
-                return handled;
+                return false;
             }
             if (!IsEqual(Dpi, currentDpi))
             {
                 var beforeDpi = Dpi;
-                Log.Verbose().WriteLine("Changing DPI from {0} to {1}", beforeDpi, currentDpi);
+                if (Log.IsVerboseEnabled())
+                {
+                    Log.Verbose().WriteLine("Changing DPI from {0} to {1}", beforeDpi, currentDpi);
+                }
+
                 _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Before, beforeDpi, currentDpi));
                 Dpi = currentDpi;
                 _onDpiChanged.OnNext(Dpi);
                 _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Change, beforeDpi, currentDpi));
                 _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.After, beforeDpi, currentDpi));
             }
-            else
+            else if(Log.IsVerboseEnabled())
             {
                 Log.Verbose().WriteLine("DPI was unchanged from {0}", Dpi);
             }
@@ -304,7 +333,11 @@ namespace Dapplo.Windows.Dpi
                 // Handle the WM_CREATE, this is where we can get the DPI via system calls
                 case WindowsMessages.WM_SHOWWINDOW:
                     isDpiMessage = true;
-                    Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for ContextMenuStrip {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    if (Log.IsVerboseEnabled())
+                    {
+                        Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for ContextMenuStrip {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    }
+
                     currentDpi = GetDpi(windowMessageInfo.Handle);
                     break;
                 case WindowsMessages.WM_DESTROY:
@@ -320,14 +353,18 @@ namespace Dapplo.Windows.Dpi
             if (!IsEqual(Dpi, currentDpi))
             {
                 var beforeDpi = Dpi;
-                Log.Verbose().WriteLine("Changing DPI from {0} to {1}", beforeDpi, currentDpi);
+                if (Log.IsVerboseEnabled())
+                {
+                    Log.Verbose().WriteLine("Changing DPI from {0} to {1}", beforeDpi, currentDpi);
+                }
+
                 _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Before, beforeDpi, currentDpi));
                 Dpi = currentDpi;
                 _onDpiChanged.OnNext(Dpi);
                 _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Change, beforeDpi, currentDpi));
                 _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.After, beforeDpi, currentDpi));
             }
-            else
+            else if(Log.IsVerboseEnabled())
             {
                 Log.Verbose().WriteLine("DPI was unchanged from {0}", Dpi);
             }
@@ -378,7 +415,11 @@ namespace Dapplo.Windows.Dpi
                 return true;
             }
             var error = Win32.GetLastErrorCode();
-            Log.Verbose().WriteLine("Error enabling non client dpi scaling : {0}", Win32.GetMessage(error));
+            if (Log.IsVerboseEnabled())
+            {
+                Log.Verbose().WriteLine("Error enabling non client dpi scaling : {0}", Win32.GetMessage(error));
+            }
+
             return false;
         }
 

@@ -24,6 +24,7 @@
 using System;
 using System.Windows;
 using System.Windows.Media;
+using Dapplo.Log;
 using Dapplo.Windows.Messages;
 
 #endregion
@@ -35,6 +36,8 @@ namespace Dapplo.Windows.Dpi.Wpf
     /// </summary>
     public static class WindowDpiExtensions
     {
+        private static readonly LogSource Log = new LogSource();
+
         /// <summary>
         ///     Attach a DpiHandler to the specified window
         /// </summary>
@@ -42,23 +45,32 @@ namespace Dapplo.Windows.Dpi.Wpf
         /// <param name="dpiHandler">DpiHandler</param>
         private static void AttachDpiHandler(Window window, DpiHandler dpiHandler)
         {
+            if (Log.IsVerboseEnabled())
+            {
+                Log.Verbose().WriteLine("Registering the UpdateLayoutTransform subscription for {0}", window.GetType());
+            }
             // Add the layout transform action
             var transformSubscription = dpiHandler.OnDpiChanged.Subscribe(dpi => window.UpdateLayoutTransform(dpi / DpiHandler.DefaultScreenDpi));
             window.WinProcMessages().Subscribe(message =>
             {
+                dpiHandler.HandleWindowMessages(message);
                 switch (message.Message)
                 {
-                    case WindowsMessages.WM_NCACTIVATE:
-                        // Apply scaling
+                    case WindowsMessages.WM_NCCREATE:
+                        // Apply scaling 1x time
                         window.UpdateLayoutTransform(DpiHandler.GetDpi(message.Handle) / DpiHandler.DefaultScreenDpi);
                         break;
                     case WindowsMessages.WM_DESTROY:
                         // Remove layout transform 
+                        if (Log.IsVerboseEnabled())
+                        {
+                            Log.Verbose().WriteLine("Removing the UpdateLayoutTransform subscription for {0}", window.GetType());
+                        }
+
                         transformSubscription.Dispose();
                         break;
                 }
 
-                dpiHandler.HandleWindowMessages(message);
             });
         }
 
@@ -69,6 +81,11 @@ namespace Dapplo.Windows.Dpi.Wpf
         /// <returns>DpiHandler</returns>
         public static DpiHandler AttachDpiHandler(this Window window)
         {
+            if (Log.IsVerboseEnabled())
+            {
+                Log.Verbose().WriteLine("Creating a dpi handler for {0}", window.GetType());
+            }
+
             var dpiHandler = new DpiHandler();
             AttachDpiHandler(window, dpiHandler);
 
@@ -82,6 +99,11 @@ namespace Dapplo.Windows.Dpi.Wpf
         /// <param name="scaleFactor">double with the factor (1.0 = 100% = 96 dpi)</param>
         public static void UpdateLayoutTransform(this FrameworkElement frameworkElement, double scaleFactor)
         {
+            if (Log.IsVerboseEnabled())
+            {
+                Log.Verbose().WriteLine("Updating dpi for {0} to a scale factor {1}", frameworkElement.GetType(), scaleFactor);
+            }
+
             // Adjust the rendering graphics and text size by applying the scale transform to the top level visual node of the Window
             var child = VisualTreeHelper.GetChild(frameworkElement, 0);
             if (Math.Abs(scaleFactor) > 1)

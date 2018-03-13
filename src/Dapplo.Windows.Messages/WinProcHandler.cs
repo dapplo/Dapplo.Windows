@@ -86,7 +86,12 @@ namespace Dapplo.Windows.Messages
                         {
                             return IntPtr.Zero;
                         }
-                        Log.Verbose().WriteLine("Message window with handle {0} is destroyed, removing all hooks.", _hwndSource.Handle);
+
+                        if (Log.IsVerboseEnabled())
+                        {
+                            Log.Verbose().WriteLine("Message window with handle {0} is destroyed, removing all hooks.", _hwndSource.Handle);
+                        }
+
                         // The hooks are no longer valid, either there is no _hwndSource or it was disposed.
                         lock (Lock)
                         {

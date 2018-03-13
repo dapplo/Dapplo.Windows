@@ -53,7 +53,10 @@ namespace Dapplo.Windows.Clipboard
             if (hWnd == IntPtr.Zero)
             {
                 // Take the default
-                Log.Verbose().WriteLine("Taking windows handle {0} from the WinProcHandler", WinProcHandler.Instance.Handle);
+                if (Log.IsVerboseEnabled())
+                {
+                    Log.Verbose().WriteLine("Taking windows handle {0} from the WinProcHandler", WinProcHandler.Instance.Handle);
+                }
 
                 hWnd = WinProcHandler.Instance.Handle;
             }
