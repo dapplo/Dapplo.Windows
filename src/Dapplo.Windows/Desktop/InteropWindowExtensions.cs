@@ -149,13 +149,15 @@ namespace Dapplo.Windows.Desktop
                 return interopWindow.Caption;
             }
 
-            // Calling User32Api.GetText (GetWindowText) for the current Process will hang, this should be ignored
+            // Calling User32Api.GetText (GetWindowText) for the current Process will hang, deadlock, this should be ignored
             if (interopWindow.IsOwnedByCurrentThread())
             {
-                // TODO: it might have a value, and null would be bad... so empty
+                // TODO: it might have a value, but can't get it. Returning null would be bad... so return empty
                 interopWindow.Caption = string.Empty;
+
+                Log.Warn().WriteLine("Do not call GetWindowText for a Window ({0}) which belongs the current thread! An empty string is returned.", interopWindow.Handle);
                 // TODO: Maybe create a solution where we can return the current Caption?
-                return interopWindow.Caption;
+                return string.Empty;
             }
             var caption = User32Api.GetText(interopWindow.Handle);
             interopWindow.Caption = caption;

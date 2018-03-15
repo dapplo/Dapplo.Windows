@@ -191,6 +191,7 @@ namespace Dapplo.Windows.User32
 
         /// <summary>
         ///     Retrieve the windows caption, also called Text
+        ///     Note: Do not call this from the same thread as the message pump
         /// </summary>
         /// <param name="hWnd">IntPtr for the window</param>
         /// <returns>string</returns>
