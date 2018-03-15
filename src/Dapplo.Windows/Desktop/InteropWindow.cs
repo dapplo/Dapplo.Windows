@@ -107,8 +107,11 @@ namespace Dapplo.Windows.Desktop
         public bool? IsMaximized { get; set; }
 
         /// <inheritdoc />
-        public int? ProcessId { get; set; }
+        public int? ThreadId { get; set; }
 
+        /// <inheritdoc />
+        public int? ProcessId { get; set; }
+        
         /// <inheritdoc />
         public WindowPlacement? Placement { get; set; }
 
@@ -185,7 +188,7 @@ namespace Dapplo.Windows.Desktop
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
+            if (obj is null)
             {
                 return false;
             }

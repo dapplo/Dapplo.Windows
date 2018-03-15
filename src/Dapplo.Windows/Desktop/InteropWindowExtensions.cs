@@ -150,8 +150,10 @@ namespace Dapplo.Windows.Desktop
             }
 
             // Calling User32Api.GetText (GetWindowText) for the current Process will hang, this should be ignored
-            if (interopWindow.IsOwnedByCurrentProcess())
+            if (interopWindow.IsOwnedByCurrentThread())
             {
+                // TODO: it might have a value, and null would be bad... so empty
+                interopWindow.Caption = string.Empty;
                 // TODO: Maybe create a solution where we can return the current Caption?
                 return interopWindow.Caption;
             }
@@ -304,11 +306,11 @@ namespace Dapplo.Windows.Desktop
         }
 
         /// <summary>
-        ///     Get the process which the specified window belongs to, the value is cached into the ProcessId of the WindowInfo
+        ///     Get the process and thread which the specified window belongs to, the value is cached into the ProcessId of the WindowInfo
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
         /// <param name="forceUpdate">set to true to make sure the value is updated</param>
-        /// <returns>int with process Id</returns>
+        /// <returns>uint with process Id</returns>
         public static int GetProcessId(this IInteropWindow interopWindow, bool forceUpdate = false)
         {
             if (interopWindow.ProcessId.HasValue && !forceUpdate)
@@ -316,7 +318,8 @@ namespace Dapplo.Windows.Desktop
                 return interopWindow.ProcessId.Value;
             }
 
-            User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var processId);
+            var threadId = User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var processId);
+            interopWindow.ThreadId = threadId;
             interopWindow.ProcessId = processId;
             return interopWindow.ProcessId.Value;
         }
@@ -508,6 +511,18 @@ namespace Dapplo.Windows.Desktop
         public static bool IsOwnedByCurrentProcess(this IInteropWindow interopWindow)
         {
             return Kernel32Api.GetCurrentProcessId() == interopWindow.GetProcessId();
+        }
+
+        /// <summary>
+        ///     Test if the window is owned by the current thread
+        /// </summary>
+        /// <param name="interopWindow">InteropWindow</param>
+        /// <returns>bool true if the window is owned by the current thread</returns>
+        public static bool IsOwnedByCurrentThread(this IInteropWindow interopWindow)
+        {
+            // Although the process id is returned, the following also reads the Thread-ID
+            interopWindow.GetProcessId();
+            return Kernel32Api.GetCurrentThreadId() == interopWindow.ThreadId;
         }
 
         /// <summary>

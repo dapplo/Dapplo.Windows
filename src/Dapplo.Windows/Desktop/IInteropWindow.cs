@@ -118,7 +118,12 @@ namespace Dapplo.Windows.Desktop
         WindowPlacement? Placement { get; set; }
 
         /// <summary>
-        ///     Get the process ID this window belongs to
+        ///     Get the thread ID this window belongs to, read with GetProcessId()
+        /// </summary>
+        int? ThreadId { get; set; }
+
+        /// <summary>
+        ///     Get the process ID this window belongs to, read with GetProcessId()
         /// </summary>
         int? ProcessId { get; set; }
 

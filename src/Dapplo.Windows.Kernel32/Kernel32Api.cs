@@ -110,7 +110,14 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <returns>int</returns>
         [DllImport("kernel32", SetLastError = true)]
-        public static extern uint GetCurrentProcessId();
+        public static extern int GetCurrentProcessId();
+
+        /// <summary>
+        /// Retrieves the thread identifier of the calling thread.
+        /// </summary>
+        /// <returns>int</returns>
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern int GetCurrentThreadId();
 
         /// <summary>
         /// Attaches the calling process to the console of the specified process.
