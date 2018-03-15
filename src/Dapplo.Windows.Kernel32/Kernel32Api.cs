@@ -106,6 +106,13 @@ namespace Dapplo.Windows.Kernel32
         public static extern bool AllocConsole();
 
         /// <summary>
+        /// Retrieves the process identifier of the calling process.
+        /// </summary>
+        /// <returns>int</returns>
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern uint GetCurrentProcessId();
+
+        /// <summary>
         /// Attaches the calling process to the console of the specified process.
         /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms681944(v=vs.85).aspx">AllocConsole function</a>
         /// </summary>

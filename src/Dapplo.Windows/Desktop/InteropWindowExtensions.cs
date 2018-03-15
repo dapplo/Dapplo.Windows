@@ -42,6 +42,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using Dapplo.Log;
 using Dapplo.Windows.Extensions;
+using Dapplo.Windows.Kernel32;
 
 #endregion
 
@@ -143,11 +144,19 @@ namespace Dapplo.Windows.Desktop
         /// <returns>string with the caption</returns>
         public static string GetCaption(this IInteropWindow interopWindow, bool forceUpdate = false)
         {
-            if (interopWindow.Caption == null || forceUpdate)
+            if (interopWindow.Caption != null && !forceUpdate)
             {
-                var caption = User32Api.GetText(interopWindow.Handle);
-                interopWindow.Caption = caption;
+                return interopWindow.Caption;
             }
+
+            // Calling User32Api.GetText (GetWindowText) for the current Process will hang, this should be ignored
+            if (interopWindow.IsOwnedByCurrentProcess())
+            {
+                // TODO: Maybe create a solution where we can return the current Caption?
+                return interopWindow.Caption;
+            }
+            var caption = User32Api.GetText(interopWindow.Handle);
+            interopWindow.Caption = caption;
             return interopWindow.Caption;
         }
 
@@ -184,11 +193,13 @@ namespace Dapplo.Windows.Desktop
         /// <returns>string with the classname</returns>
         public static string GetClassname(this IInteropWindow interopWindow, bool forceUpdate = false)
         {
-            if (interopWindow.Classname == null || forceUpdate)
+            if (interopWindow.Classname != null && !forceUpdate)
             {
-                var className = User32Api.GetClassname(interopWindow.Handle);
-                interopWindow.Classname = className;
+                return interopWindow.Classname;
             }
+
+            var className = User32Api.GetClassname(interopWindow.Handle);
+            interopWindow.Classname = className;
             return interopWindow.Classname;
         }
 
@@ -487,6 +498,16 @@ namespace Dapplo.Windows.Desktop
                 interopWindow.IsVisible = User32Api.IsWindowVisible(interopWindow.Handle);
             }
             return interopWindow.IsVisible.Value;
+        }
+
+        /// <summary>
+        ///     Test if the window is owned by the current process
+        /// </summary>
+        /// <param name="interopWindow">InteropWindow</param>
+        /// <returns>bool true if the window is owned by the current process</returns>
+        public static bool IsOwnedByCurrentProcess(this IInteropWindow interopWindow)
+        {
+            return Kernel32Api.GetCurrentProcessId() == interopWindow.GetProcessId();
         }
 
         /// <summary>
