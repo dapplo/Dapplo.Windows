@@ -194,37 +194,44 @@ namespace Dapplo.Windows.Desktop
                 return false;
             }
 
-            // Ignore windows without title
-            if (interopWindow.GetCaption().Length == 0)
-            {
-                return false;
-            }
             // Windows without size
             if (interopWindow.GetInfo().Bounds.IsEmpty)
             {
                 return false;
             }
+
+            // Ignore windows with a parent
             if (interopWindow.GetParent() != IntPtr.Zero)
             {
                 return false;
             }
+
             var exWindowStyle = interopWindow.GetInfo().ExtendedStyle;
             if (exWindowStyle.HasFlag(ExtendedWindowStyleFlags.WS_EX_TOOLWINDOW))
             {
                 return false;
             }
+
             // Skip everything which is not rendered "normally"
             if (!interopWindow.IsWin8App() && exWindowStyle.HasFlag(ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP))
             {
                 return false;
             }
+
             // A Windows 10 App which runs in the background, has a HWnd but is not visible.
             if (interopWindow.IsBackgroundWin10App())
             {
                 return false;
             }
+
             // Skip preview windows, like the one from Firefox
             if (!interopWindow.GetInfo().Style.HasFlag(WindowStyleFlags.WS_VISIBLE))
+            {
+                return false;
+            }
+
+            // Ignore windows without title
+            if (interopWindow.GetCaption().Length == 0)
             {
                 return false;
             }
