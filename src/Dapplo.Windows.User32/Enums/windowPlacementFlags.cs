@@ -35,6 +35,11 @@ namespace Dapplo.Windows.User32.Enums
     public enum WindowPlacementFlags : uint
     {
         /// <summary>
+        /// When no flags are used
+        /// </summary>
+        None = 0,
+
+        /// <summary>
         ///     The coordinates of the minimized window may be specified.
         ///     This flag must be specified if the coordinates are set in the ptMinPosition member.
         /// </summary>
