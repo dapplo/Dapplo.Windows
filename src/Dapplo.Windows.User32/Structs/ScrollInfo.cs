@@ -111,7 +111,7 @@ namespace Dapplo.Windows.User32.Structs
 		/// <param name="mask">ScrollInfoMask</param>
 		public static ScrollInfo Create(ScrollInfoMask mask)
 		{
-			return new ScrollInfo()
+			return new ScrollInfo
 			{
 				_cbSize = (uint)Marshal.SizeOf(typeof(ScrollInfo)),
 				_fMask = mask,

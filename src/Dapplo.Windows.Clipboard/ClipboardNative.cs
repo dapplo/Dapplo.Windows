@@ -73,7 +73,7 @@ namespace Dapplo.Windows.Clipboard
         /// <param name="retryInterval">Timespan between retries, default 200ms</param>
         /// <param name="timeout">Timeout for getting the lock</param>
         /// <returns>IDisposable, which will unlock when Dispose is called</returns>
-        public static IDisposable Lock(IntPtr hWnd = default(IntPtr), int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
+        public static IDisposable Lock(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
         {
             return ClipboardLock.Lock(hWnd, retries, retryInterval, timeout);
         }
@@ -86,7 +86,7 @@ namespace Dapplo.Windows.Clipboard
         /// <param name="retryInterval">Timespan between retries, default 200ms</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>IDisposable in a Task, which will unlock when Dispose is called</returns>
-        public static Task<IDisposable> LockAsync(IntPtr hWnd = default(IntPtr), int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default(CancellationToken))
+        public static Task<IDisposable> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default)
         {
             return ClipboardLock.LockAsync(hWnd, retries, retryInterval, cancellationToken);
         }

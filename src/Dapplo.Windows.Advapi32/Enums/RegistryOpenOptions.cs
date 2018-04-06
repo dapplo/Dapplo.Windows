@@ -25,6 +25,9 @@ using System;
 
 namespace Dapplo.Windows.Advapi32.Enums
 {
+    /// <summary>
+    /// Specifies the option to apply when opening the key. 
+    /// </summary>
     [Flags]
     public enum RegistryOpenOptions
     {

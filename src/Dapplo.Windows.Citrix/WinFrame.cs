@@ -110,7 +110,7 @@ namespace Dapplo.Windows.Citrix
             var expectedType = typeof(T);
             if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out var addr, out _))
             {
-                return default(T);
+                return default;
             }
             try
             {

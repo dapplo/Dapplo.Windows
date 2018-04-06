@@ -37,7 +37,7 @@ namespace Dapplo.Windows.Advapi32
     /// <summary>
     /// 
     /// </summary>
-    public static class Registry
+    public static class RegistryMonitor
     {
         /// <summary>
         /// Create an observable to monitor for registry changes

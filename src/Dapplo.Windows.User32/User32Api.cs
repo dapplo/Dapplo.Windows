@@ -276,7 +276,7 @@ namespace Dapplo.Windows.User32
         /// <param name="result">out IntPtr</param>
         /// <param name="timeout">uint with optional number of milliseconds, default is 300</param>
         /// <returns>bool true if the SendMessage worked</returns>
-        public static bool TrySendMessage(IntPtr hWnd, WindowsMessages message, IntPtr wParam, out IntPtr result, IntPtr lParam = default(IntPtr), uint timeout = 300)
+        public static bool TrySendMessage(IntPtr hWnd, WindowsMessages message, IntPtr wParam, out IntPtr result, IntPtr lParam = default, uint timeout = 300)
         {
             var isSuccess = SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung |SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
             if (!isSuccess)
@@ -296,7 +296,7 @@ namespace Dapplo.Windows.User32
         /// <param name="result">out IntPtr</param>
         /// <param name="timeout">uint with optional number of milliseconds, default is 300</param>
         /// <returns>bool true if the SendMessage worked</returns>
-        public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, out IntPtr result, IntPtr lParam = default(IntPtr), uint timeout = 300)
+        public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, out IntPtr result, IntPtr lParam = default, uint timeout = 300)
         {
             var isSuccess = SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung | SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
             if (!isSuccess)
@@ -316,7 +316,7 @@ namespace Dapplo.Windows.User32
         /// <param name="result">out UIntPtr</param>
         /// <param name="timeout">uint with optional number of milliseconds, default is 300</param>
         /// <returns>bool true if the SendMessage worked</returns>
-        public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, out UIntPtr result, IntPtr lParam = default(IntPtr), uint timeout = 300)
+        public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, out UIntPtr result, IntPtr lParam = default, uint timeout = 300)
         {
             var isSuccess = SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung | SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
             if (!isSuccess)

@@ -25,6 +25,9 @@ using System;
 
 namespace Dapplo.Windows.Advapi32.Enums
 {
+    /// <summary>
+    /// A value that indicates the changes that should be reported
+    /// </summary>
     [Flags]
     public enum RegistryNotifyFilter
     {

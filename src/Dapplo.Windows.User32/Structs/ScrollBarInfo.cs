@@ -96,7 +96,7 @@ namespace Dapplo.Windows.User32.Structs
 				_dxyLineButton = 0,
 				_thumbBottom = 0,
 				_thumbTop = 0,
-				_reserved = 0,
+				_reserved = 0
 			};
 		}
 	}

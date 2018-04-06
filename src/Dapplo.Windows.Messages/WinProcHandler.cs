@@ -167,7 +167,7 @@ namespace Dapplo.Windows.Messages
         /// <param name="parent">IntPtr for the parent, this should usually not be set</param>
         /// <param name="title">Title of the window, a default is already set</param>
         /// <returns>HwndSource</returns>
-        public static HwndSource CreateMessageWindow(IntPtr parent = default(IntPtr), string title = "Dapplo.MessageHandlerWindow")
+        public static HwndSource CreateMessageWindow(IntPtr parent = default, string title = "Dapplo.MessageHandlerWindow")
         {
             return new HwndSource(new HwndSourceParameters
             {

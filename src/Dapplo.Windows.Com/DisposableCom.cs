@@ -92,7 +92,7 @@ namespace Dapplo.Windows.Com
                 {
                     Marshal.ReleaseComObject(ComObject);
                 }
-                ComObject = default(T);
+                ComObject = default;
             }
             catch
             {

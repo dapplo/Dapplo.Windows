@@ -48,7 +48,7 @@ namespace Dapplo.Windows.Clipboard
         /// <param name="retryInterval">TimeSpan for the time between retries</param>
         /// <param name="timeout">A timeout for waiting on the semaphore</param>
         /// <returns></returns>
-        public IDisposable Lock(IntPtr hWnd = default(IntPtr), int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
+        public IDisposable Lock(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
         {
             if (hWnd == IntPtr.Zero)
             {
@@ -107,7 +107,7 @@ namespace Dapplo.Windows.Clipboard
         /// <param name="retryInterval">optional TimeSpan</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>Task with disposable</returns>
-        public async Task<IDisposable> LockAsync(IntPtr hWnd = default(IntPtr), int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IDisposable> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default)
         {
             if (hWnd == IntPtr.Zero)
             {
@@ -128,7 +128,7 @@ namespace Dapplo.Windows.Clipboard
                     break;
                 }
                 retries--;
-                await Task.Delay(retryInterval ?? TimeSpan.FromMilliseconds(200), cancellationToken);
+                await Task.Delay(retryInterval ?? TimeSpan.FromMilliseconds(200), cancellationToken).ConfigureAwait(true);
             } while (retries >= 0);
 
             if (!isLocked)

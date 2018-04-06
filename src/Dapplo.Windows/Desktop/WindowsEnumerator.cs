@@ -67,7 +67,7 @@ namespace Dapplo.Windows.Desktop
         /// <param name="hWndParent">IntPtr with the hwnd of the parent, or null for all</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>IObservable with WinWindowInfo</returns>
-        public static IObservable<IInteropWindow> EnumerateWindowsAsync(IntPtr? hWndParent = null, CancellationToken cancellationToken = default(CancellationToken))
+        public static IObservable<IInteropWindow> EnumerateWindowsAsync(IntPtr? hWndParent = null, CancellationToken cancellationToken = default)
         {
             return Observable.Create<IInteropWindow>(observer =>
             {

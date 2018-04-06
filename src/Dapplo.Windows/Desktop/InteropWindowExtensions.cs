@@ -762,7 +762,7 @@ namespace Dapplo.Windows.Desktop
             {
                 Log.Error().WriteLine("Error calling print window: {0}", exceptionOccured.Message);
                 printWindowBitmap.Dispose();
-                return default(TBitmap);
+                return default;
             }
             if (typeof(TBitmap).IsAssignableFrom(typeof(Bitmap)))
             {

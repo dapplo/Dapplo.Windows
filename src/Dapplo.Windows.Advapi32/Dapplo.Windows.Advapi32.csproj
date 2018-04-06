@@ -62,7 +62,7 @@
     <Compile Include="Enums\RegistryOpenOptions.cs" />
     <Compile Include="Enums\RegistryNotifyFilter.cs" />
     <Compile Include="Enums\RegistryKeySecurityAccessRights.cs" />
-    <Compile Include="Registry.cs" />
+    <Compile Include="RegistryMonitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

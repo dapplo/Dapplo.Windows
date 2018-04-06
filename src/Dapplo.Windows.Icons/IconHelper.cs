@@ -52,17 +52,17 @@ namespace Dapplo.Windows.Icons
             var exePath = GetAppProcessPath(interopWindow);
             if (exePath == null)
             {
-                return default(TBitmap);
+                return default;
             }
             var dir = Path.GetDirectoryName(exePath);
             if (!Directory.Exists(dir))
             {
-                return default(TBitmap);
+                return default;
             }
             var manifestPath = Path.Combine(dir, "AppxManifest.xml");
             if (!File.Exists(manifestPath))
             {
-                return default(TBitmap);
+                return default;
             }
             // this is manifest file
             string pathToLogo;
@@ -78,7 +78,7 @@ namespace Dapplo.Windows.Icons
             var logoDirectoryName = Path.GetDirectoryName(pathToLogo);
             if (logoDirectoryName == null)
             {
-                return default(TBitmap);
+                return default;
             }
             var logoDirectory = Path.Combine(dir, logoDirectoryName);
 
@@ -90,7 +90,7 @@ namespace Dapplo.Windows.Icons
 
             if (finalLogoPath == null || !File.Exists(finalLogoPath))
             {
-                return default(TBitmap);
+                return default;
             }
             using (var fileStream = File.OpenRead(finalLogoPath))
             {
@@ -105,7 +105,7 @@ namespace Dapplo.Windows.Icons
                 }
                 if (typeof(Bitmap) != typeof(TBitmap))
                 {
-                    return default(TBitmap);
+                    return default;
                 }
                 using (var bitmap = Image.FromStream(fileStream))
                 {
@@ -302,7 +302,7 @@ namespace Dapplo.Windows.Icons
         {
             if (iconHandle == IntPtr.Zero)
             {
-                return default(TIcon);
+                return default;
             }
             if (typeof(TIcon) == typeof(Icon))
             {
@@ -317,7 +317,7 @@ namespace Dapplo.Windows.Icons
             }
             if (typeof(TIcon) != typeof(BitmapSource))
             {
-                return default(TIcon);
+                return default;
             }
             using (var icon = Icon.FromHandle(iconHandle))
             {

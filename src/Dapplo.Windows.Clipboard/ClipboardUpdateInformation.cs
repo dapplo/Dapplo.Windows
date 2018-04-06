@@ -64,7 +64,7 @@ namespace Dapplo.Windows.Clipboard
         /// </summary>
         /// <param name="hWnd">IntPtr, optional, with the hWnd for the clipboard lock</param>
         /// <returns>ClipboardUpdateInformation</returns>
-        public static ClipboardUpdateInformation Create(IntPtr hWnd = default(IntPtr))
+        public static ClipboardUpdateInformation Create(IntPtr hWnd = default)
         {
             if (hWnd == IntPtr.Zero)
             {

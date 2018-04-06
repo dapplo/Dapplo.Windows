@@ -114,7 +114,7 @@ namespace Dapplo.Windows.Icons
 
             }
             // Nothing found, REALLY!
-            return default(TIcon);
+            return default;
         }
 
         /// <summary>

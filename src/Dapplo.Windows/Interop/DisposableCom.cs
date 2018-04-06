@@ -101,7 +101,7 @@ namespace Dapplo.Windows.Interop
             {
                 Marshal.ReleaseComObject(ComObject);
             }
-            ComObject = default(T);
+            ComObject = default;
         }
     }
 }

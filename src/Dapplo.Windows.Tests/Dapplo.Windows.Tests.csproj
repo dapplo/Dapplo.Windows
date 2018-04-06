@@ -17,6 +17,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
+	<LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -83,6 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RegistryTests.cs" />
     <Compile Include="DpiTests.cs" />
     <Compile Include="IconTests.cs" />
     <Compile Include="InteropWindowTests.cs" />
@@ -114,6 +116,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Advapi32\Dapplo.Windows.Advapi32.csproj">
+      <Project>{148ea259-e0a5-4285-9f95-c2a044a95e64}</Project>
+      <Name>Dapplo.Windows.Advapi32</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dapplo.Windows.Citrix\Dapplo.Windows.Citrix.csproj">
       <Project>{E6A137AD-B848-41FD-A467-121FB20F3BB0}</Project>
       <Name>Dapplo.Windows.Citrix</Name>

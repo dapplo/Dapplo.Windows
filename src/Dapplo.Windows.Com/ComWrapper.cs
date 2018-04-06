@@ -445,7 +445,7 @@ namespace Dapplo.Windows.Com
                 }
                 return (T) comObject;
             }
-            return default(T);
+            return default;
         }
 
         /// <summary>
@@ -516,7 +516,7 @@ namespace Dapplo.Windows.Com
             {
                 return (TCom) comObject;
             }
-            return default(TCom);
+            return default;
         }
 
         /// <summary>
@@ -592,7 +592,7 @@ namespace Dapplo.Windows.Com
                     else if (comE.ErrorCode == CO_E_CLASSSTRING)
                     {
                         Log.Warn().WriteLine("Unknown progId {0} (application not installed)", progId);
-                        return default(T);
+                        return default;
                     }
                     else
                     {
@@ -649,7 +649,7 @@ namespace Dapplo.Windows.Com
                 }
                 return (T) comObject;
             }
-            return default(T);
+            return default;
         }
 
         /// <summary>
