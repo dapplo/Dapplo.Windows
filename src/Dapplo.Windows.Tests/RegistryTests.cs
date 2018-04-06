@@ -86,7 +86,14 @@ namespace Dapplo.Windows.Tests
                 finally
                 {
                     // Restore back to the original
-                    regKey.SetValue(autoConfigUrlKey, originalValue);
+                    if (originalValue == null)
+                    {
+                        regKey.DeleteValue(autoConfigUrlKey);
+                    }
+                    else
+                    {
+                        regKey.SetValue(autoConfigUrlKey, originalValue);
+                    }
                     var resetValue = regKey.GetValue(autoConfigUrlKey) as string;
                     Log.Debug().WriteLine("Reset back to value {0}", resetValue);
                 }
