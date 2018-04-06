@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows", "Dapplo.Windows\Dapplo.Windows.csproj", "{8AA469BB-856A-4330-96CE-2BB75A014070}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Advapi32", "Dapplo.Windows.Advapi32\Dapplo.Windows.Advapi32.csproj", "{148EA259-E0A5-4285-9F95-C2A044A95E64}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Citrix", "Dapplo.Windows.Citrix\Dapplo.Windows.Citrix.csproj", "{E6A137AD-B848-41FD-A467-121FB20F3BB0}"
 EndProject
@@ -18,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Dpi", "Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj", "{B8B5782D-EECD-4260-8BED-643EF8B8B6D0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Gdi32", "Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj", "{E4A0CE9D-681C-44D0-85F5-4F677EC54658}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Icons", "Dapplo.Windows.Icons\Dapplo.Windows.Icons.csproj", "{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Input", "Dapplo.Windows.Input\Dapplo.Windows.Input.csproj", "{171A9FF9-8ABB-4E40-8C88-75157A899B71}"
 EndProject
@@ -41,8 +45,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CE6CF982
 	ProjectSection(SolutionItems) = preProject
 		..\build.cake = ..\build.cake
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.Icons", "Dapplo.Windows.Icons\Dapplo.Windows.Icons.csproj", "{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -122,8 +124,15 @@ Global
 		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E8763890-D69A-4845-940A-E46152192D72}
 	EndGlobalSection
 EndGlobal

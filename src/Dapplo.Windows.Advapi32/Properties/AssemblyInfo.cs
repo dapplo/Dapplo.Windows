@@ -3,11 +3,11 @@
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Dapplo.Windows.Clipboard")]
-[assembly: AssemblyDescription("A modern Windows Clipboard API")]
+[assembly: AssemblyTitle("Dapplo.Windows.Advapi32")]
+[assembly: AssemblyDescription("Advanced Windows 32 Base API")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dapplo")]
-[assembly: AssemblyProduct("Dapplo.Windows.Clipboard")]
+[assembly: AssemblyProduct("Dapplo.Windows.Advapi32")]
 [assembly: AssemblyCopyright("Copyright © Dapplo 2017-2018")]
 [assembly: AssemblyTrademark("Dapplo")]
 [assembly: AssemblyCulture("")]
