@@ -45,80 +45,88 @@ namespace Dapplo.Windows.Input
         /// <returns></returns>
         public static string GetKeyName(Keys givenKey)
         {
-            var keyName = new StringBuilder();
-            const uint numpad = 55;
+            unsafe
+            {
+                const int capacity = 100;
+                var keyName = stackalloc char[capacity];
+                const uint numpad = 55;
 
-            var virtualKey = givenKey;
-            string keyString;
-            // Make VC's to real keys
-            switch (virtualKey)
-            {
-                case Keys.Alt:
-                    virtualKey = Keys.LMenu;
-                    break;
-                case Keys.Control:
-                    virtualKey = Keys.ControlKey;
-                    break;
-                case Keys.Shift:
-                    virtualKey = Keys.LShiftKey;
-                    break;
-                case Keys.Multiply:
-                    GetKeyNameText(numpad << 16, keyName, 100);
-                    keyString = keyName.ToString().Replace("*", "").Trim().ToLower();
-                    if (keyString.IndexOf("(", StringComparison.Ordinal) >= 0)
-                    {
-                        return "* " + keyString;
-                    }
-                    keyString = keyString.Substring(0, 1).ToUpper() + keyString.Substring(1).ToLower();
-                    return keyString + " *";
-                case Keys.Divide:
-                    GetKeyNameText(numpad << 16, keyName, 100);
-                    keyString = keyName.ToString().Replace("*", "").Trim().ToLower();
-                    if (keyString.IndexOf("(", StringComparison.Ordinal) >= 0)
-                    {
-                        return "/ " + keyString;
-                    }
-                    keyString = keyString.Substring(0, 1).ToUpper() + keyString.Substring(1).ToLower();
-                    return keyString + " /";
-            }
-            var scanCode = MapVirtualKey((uint) virtualKey, (uint) MapVkType.VkToVsc);
+                var virtualKey = givenKey;
+                string keyString;
+                int nrCharacters;
+                // Make VC's to real keys
+                switch (virtualKey)
+                {
+                    case Keys.Alt:
+                        virtualKey = Keys.LMenu;
+                        break;
+                    case Keys.Control:
+                        virtualKey = Keys.ControlKey;
+                        break;
+                    case Keys.Shift:
+                        virtualKey = Keys.LShiftKey;
+                        break;
+                    case Keys.Multiply:
+                        nrCharacters = GetKeyNameText(numpad << 16, keyName, 100);
 
-            // because MapVirtualKey strips the extended bit for some keys
-            switch (virtualKey)
-            {
-                case Keys.Left:
-                case Keys.Up:
-                case Keys.Right:
-                case Keys.Down: // arrow keys
-                case Keys.Prior:
-                case Keys.Next: // page up and page down
-                case Keys.End:
-                case Keys.Home:
-                case Keys.Insert:
-                case Keys.Delete:
-                case Keys.NumLock:
-                    Log.Debug().WriteLine("Modifying Extended bit");
-                    scanCode |= 0x100; // set extended bit
-                    break;
-                case Keys.PrintScreen: // PrintScreen
-                    scanCode = 311;
-                    break;
-                case Keys.Pause: // PrintScreen
-                    scanCode = 69;
-                    break;
-            }
-            scanCode |= 0x200;
-            if (GetKeyNameText(scanCode << 16, keyName, 100) == 0)
-            {
-                return givenKey.ToString();
-            }
+                        keyString = new string(keyName,0, nrCharacters).Replace("*", "").Trim().ToLower();
+                        if (keyString.IndexOf("(", StringComparison.Ordinal) >= 0)
+                        {
+                            return "* " + keyString;
+                        }
+                        keyString = keyString.Substring(0, 1).ToUpper() + keyString.Substring(1).ToLower();
+                        return keyString + " *";
+                    case Keys.Divide:
+                        nrCharacters = GetKeyNameText(numpad << 16, keyName, capacity);
+                        keyString = new string(keyName, 0, nrCharacters).Replace("*", "").Trim().ToLower();
+                        if (keyString.IndexOf("(", StringComparison.Ordinal) >= 0)
+                        {
+                            return "/ " + keyString;
+                        }
+                        keyString = keyString.Substring(0, 1).ToUpper() + keyString.Substring(1).ToLower();
+                        return keyString + " /";
+                }
+                var scanCode = MapVirtualKey((uint)virtualKey, (uint)MapVkType.VkToVsc);
 
-            var visibleName = keyName.ToString();
-            if (visibleName.Length > 1)
-            {
-                visibleName = visibleName.Substring(0, 1) + visibleName.Substring(1).ToLower();
+                // because MapVirtualKey strips the extended bit for some keys
+                switch (virtualKey)
+                {
+                    case Keys.Left:
+                    case Keys.Up:
+                    case Keys.Right:
+                    case Keys.Down: // arrow keys
+                    case Keys.Prior:
+                    case Keys.Next: // page up and page down
+                    case Keys.End:
+                    case Keys.Home:
+                    case Keys.Insert:
+                    case Keys.Delete:
+                    case Keys.NumLock:
+                        Log.Debug().WriteLine("Modifying Extended bit");
+                        scanCode |= 0x100; // set extended bit
+                        break;
+                    case Keys.PrintScreen: // PrintScreen
+                        scanCode = 311;
+                        break;
+                    case Keys.Pause: // PrintScreen
+                        scanCode = 69;
+                        break;
+                }
+                scanCode |= 0x200;
+                nrCharacters = GetKeyNameText(scanCode << 16, keyName, capacity);
+                if (nrCharacters == 0)
+                {
+                    return givenKey.ToString();
+                }
+
+                var visibleName = new string(keyName, 0, nrCharacters);
+                if (visibleName.Length > 1)
+                {
+                    visibleName = visibleName.Substring(0, 1) + visibleName.Substring(1).ToLower();
+                }
+                return visibleName;
+
             }
-            return visibleName;
         }
 
         /// <summary>
@@ -266,8 +274,15 @@ namespace Dapplo.Windows.Input
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lParam"></param>
+        /// <param name="lpString"></param>
+        /// <param name="nSize"></param>
+        /// <returns>int with the number of characters returned</returns>
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern int GetKeyNameText(uint lParam, [Out] StringBuilder lpString, int nSize);
+        private static extern unsafe int GetKeyNameText(uint lParam, [Out] char* lpString, int nSize);
 
         #endregion
     }

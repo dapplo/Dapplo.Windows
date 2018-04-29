@@ -60,20 +60,63 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <param name="hProcess">IntPtr, A handle to the process that contains the module.</param>
         /// <param name="hModule">IntPtr A handle to the module. If this parameter is NULL, GetModuleFileNameEx returns the path of the executable file of the process specified in hProcess.</param>
-        /// <param name="lpFilename">StringBuilder that receives the full path to the executable file.</param>
+        /// <returns>string</returns>
+        public static string GetModuleFilename(IntPtr hProcess, IntPtr hModule)
+        {
+            unsafe
+            {
+                const int capacity = 512;
+                var pathBuffer = stackalloc char[capacity];
+                var nrCharacters = PsApi.GetModuleFileNameEx(hProcess, hModule, pathBuffer, capacity);
+                if (nrCharacters > 0)
+                {
+                    return new string(pathBuffer, 0, nrCharacters);
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the fully qualified path for the file containing the specified module.
+        /// </summary>
+        /// <param name="hProcess">IntPtr, A handle to the process that contains the module.</param>
+       /// <returns>string</returns>
+        public static string GetProcessImageFileName(IntPtr hProcess)
+        {
+            unsafe
+            {
+                const int capacity = 512;
+                var pathBuffer = stackalloc char[capacity];
+                var nrCharacters = GetProcessImageFileName(hProcess, pathBuffer, capacity);
+                if (nrCharacters > 0)
+                {
+                    return new string(pathBuffer, 0, nrCharacters);
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the fully qualified path for the file containing the specified module.
+        /// </summary>
+        /// <param name="hProcess">IntPtr, A handle to the process that contains the module.</param>
+        /// <param name="hModule">IntPtr A handle to the module. If this parameter is NULL, GetModuleFileNameEx returns the path of the executable file of the process specified in hProcess.</param>
+        /// <param name="lpFilename">char * that receives the full path to the executable file.</param>
         /// <param name="nSize">uint</param>
         /// <returns>uint If the function succeeds, the return value specifies the length of the string copied to the buffer.</returns>
         [DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, [Out] StringBuilder lpFilename, uint nSize);
+        private static extern unsafe int GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, [Out] char * lpFilename, int nSize);
 
         /// <summary>
         /// Retrieves the name of the executable file for the specified process.
         /// </summary>
         /// <param name="hProcess">IntPtr, A handle to the process that contains the module.</param>
-        /// <param name="lpImageFileName">StringBuilder that receives the full path to the executable file.</param>
-        /// <param name="nSize">uint</param>
+        /// <param name="lpImageFileName">char * that receives the full path to the executable file.</param>
+        /// <param name="nSize">int</param>
         /// <returns>If the function succeeds, the return value specifies the length of the string copied to the buffer</returns>
         [DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern uint GetProcessImageFileName(IntPtr hProcess, [Out] StringBuilder lpImageFileName, uint nSize);
+        public static extern unsafe int GetProcessImageFileName(IntPtr hProcess, [Out] char * lpImageFileName, int nSize);
     }
 }

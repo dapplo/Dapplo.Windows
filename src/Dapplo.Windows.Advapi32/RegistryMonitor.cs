@@ -140,20 +140,6 @@ namespace Dapplo.Windows.Advapi32
         /// Opens the specified registry key. Note that key names are not case sensitive.
         /// To perform transacted registry operations on a key, call the RegOpenKeyTransacted function.
         /// </summary>
-        /// <param name="hive">RegistryHive</param>
-        /// <param name="subKey">string</param>
-        /// <param name="ulOptions">RegistryOpenOptions</param>
-        /// <param name="samDesired">RegistryKeySecurityAccessRights</param>
-        /// <param name="hOpenedKey">UIntPtr a handle to the registry key</param>
-        /// <returns></returns>
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int RegOpenKeyEx(RegistryHive hive, string subKey, RegistryOpenOptions ulOptions, RegistryKeySecurityAccessRights samDesired, out IntPtr hOpenedKey);
-
-
-        /// <summary>
-        /// Opens the specified registry key. Note that key names are not case sensitive.
-        /// To perform transacted registry operations on a key, call the RegOpenKeyTransacted function.
-        /// </summary>
         /// <param name="hKey">IntPtr A handle to an open registry key.</param>
         /// <param name="subKey">
         /// The name of the registry subkey to be opened.
@@ -167,7 +153,6 @@ namespace Dapplo.Windows.Advapi32
         /// <returns></returns>
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int RegOpenKeyEx(IntPtr hKey, string subKey, RegistryOpenOptions ulOptions, RegistryKeySecurityAccessRights samDesired, out IntPtr hOpenedKey);
-
 
         /// <summary>
         /// Closes a handle to the specified registry key.

@@ -38,7 +38,7 @@ namespace Dapplo.Windows.Kernel32.Structs
     [SuppressMessage("Sonar Code Smell", "S1450:Trivial properties should be auto-implementedPrivate fields only used as local variables in methods should become local variables", Justification = "Interop!")]
     [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public struct OsVersionInfoEx
+    public unsafe struct OsVersionInfoEx
     {
         /// <summary>
         ///     The size of this data structure, in bytes. Set this member to sizeof(OSVERSIONINFOEX).
@@ -48,8 +48,7 @@ namespace Dapplo.Windows.Kernel32.Structs
         private readonly int _dwMinorVersion;
         private readonly int _dwBuildNumber;
         private readonly int _dwPlatformId;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
-        private readonly string _szCSDVersion;
+        private fixed char _szCSDVersion[128];
         private readonly short _wServicePackMajor;
         private readonly short _wServicePackMinor;
         private readonly WindowsSuites _wSuiteMask;
@@ -80,7 +79,17 @@ namespace Dapplo.Windows.Kernel32.Structs
         ///     A null-terminated string, such as "Service Pack 3", that indicates the latest Service Pack installed on the system.
         ///     If no Service Pack has been installed, the string is empty.
         /// </summary>
-        public string ServicePackVersion => _szCSDVersion;
+        public string ServicePackVersion
+        {
+            get
+            {
+                fixed(char * servicePackVersion = _szCSDVersion)
+                {
+                    return new string(servicePackVersion);
+                }
+                
+            }
+        }
 
         /// <summary>
         ///     The major version number of the latest Service Pack installed on the system. For example, for Service Pack 3, the

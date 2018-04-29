@@ -24,6 +24,7 @@
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Kernel32;
+using Dapplo.Windows.Kernel32.Structs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -45,5 +46,14 @@ namespace Dapplo.Windows.Tests
         {
             Assert.False(PackageInfo.IsRunningOnUwp);
         }
+
+        [Fact]
+        private void Test_GetOsVersionInfoEx()
+        {
+            var osVersionInfoEx= OsVersionInfoEx.Create();
+            Assert.True(Kernel32Api.GetVersionEx(ref osVersionInfoEx));
+            //Assert.NotEmpty(osVersionInfoEx.ServicePackVersion);
+        }
+
     }
 }

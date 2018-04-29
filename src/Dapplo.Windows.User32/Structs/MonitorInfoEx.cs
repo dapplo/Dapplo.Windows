@@ -40,11 +40,8 @@ namespace Dapplo.Windows.User32.Structs
     [SuppressMessage("Sonar Code Smell", "S1450:Private fields only used as local variables in methods should become local variables", Justification = "Interop!")]
     [SuppressMessage("Sonar Code Smell", "S3459:Unassigned members should be removed", Justification = "Interop!")]
     [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
-    public struct MonitorInfoEx
+    public unsafe struct MonitorInfoEx
     {
-        // size of a device name string
-        private const int CCHDEVICENAME = 32;
-
         /// <summary>
         ///     The size, in bytes, of the structure. Set this member to sizeof(MONITORINFOEX) (72) before calling the
         ///     GetMonitorInfo function.
@@ -55,7 +52,7 @@ namespace Dapplo.Windows.User32.Structs
         private readonly NativeRect _monitor;
         private readonly NativeRect _workArea;
         private readonly MonitorInfoFlags _flags;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)] private string _deviceName;
+        private fixed char _deviceName[32];
 
         /// <summary>
         ///     A RECT structure that specifies the display monitor rectangle, expressed in virtual-screen coordinates.
@@ -85,8 +82,14 @@ namespace Dapplo.Windows.User32.Structs
         /// </summary>
         public string DeviceName
         {
-            get { return _deviceName; }
-            set { _deviceName = value; }
+            get
+            {
+                fixed (char* deviceName = _deviceName)
+                {
+                    return new string(deviceName);
+                }
+
+            }
         }
 
         /// <summary>
@@ -96,8 +99,7 @@ namespace Dapplo.Windows.User32.Structs
         {
             return new MonitorInfoEx
             {
-                _cbSize = Marshal.SizeOf(typeof(MonitorInfoEx)),
-                DeviceName = string.Empty
+                _cbSize = Marshal.SizeOf(typeof(MonitorInfoEx))
             };
         }
     }

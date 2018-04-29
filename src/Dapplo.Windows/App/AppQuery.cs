@@ -196,7 +196,6 @@ namespace Dapplo.Windows.App
             return null;
         }
 
-
         /// <summary>
         ///     This checks if the window is an App (Win8 or Win10)
         /// </summary>
@@ -251,6 +250,7 @@ namespace Dapplo.Windows.App
             }
             return AppFrameWindowClass.Equals(interopWindow.GetClassname()) && !interopWindow.GetChildren().Any(window => string.Equals(window.GetClassname(), AppWindowClass));
         }
+
         /// <summary>
         ///     This checks if the window is a Windows 8 App, not Win 10!
         /// </summary>

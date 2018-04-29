@@ -32,12 +32,11 @@ namespace Dapplo.Windows.Citrix.Structs
     ///     This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.ClientAddress
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct ClientAddress
+    public unsafe struct ClientAddress
     {
         private readonly int _adressFamily;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
-        private readonly byte[] _address;
+        private fixed byte _address[20];
 
         /// <summary>
         ///     Address Family
@@ -47,6 +46,15 @@ namespace Dapplo.Windows.Citrix.Structs
         /// <summary>
         ///     IP Address used
         /// </summary>
-        public string IpAddress => $"{_address[2]}.{_address[3]}.{_address[4]}.{_address[5]}";
+        public string IpAddress
+        {
+            get
+            {
+                fixed (byte* address = _address)
+                {
+                    return $"{address[2]}.{address[3]}.{address[4]}.{address[5]}";
+                }
+            }
+        }
     }
 }

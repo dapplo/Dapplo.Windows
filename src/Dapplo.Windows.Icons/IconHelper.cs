@@ -31,6 +31,7 @@ using Dapplo.Windows.App;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.User32;
 using System.Collections.Generic;
+using Dapplo.Windows.Kernel32;
 
 namespace Dapplo.Windows.Icons
 {
@@ -130,10 +131,8 @@ namespace Dapplo.Windows.Icons
             {
                 return null;
             }
-            using (var process = Process.GetProcessById(pid))
-            {
-                return process.MainModule.FileName;
-            }
+
+            return Kernel32Api.GetProcessPath(pid);
         }
 
         /// <summary>

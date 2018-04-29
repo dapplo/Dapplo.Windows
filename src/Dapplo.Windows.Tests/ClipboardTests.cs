@@ -172,7 +172,7 @@ namespace Dapplo.Windows.Tests
         {
             using (ClipboardNative.Lock())
             {
-                var filenames = ClipboardNative.GetFilenames().ToList();
+                var filenames = ClipboardNative.GetFilenames();
                 Assert.True(filenames.Any());
             }
         }

@@ -126,13 +126,17 @@ namespace Dapplo.Windows.User32
         /// <returns>string</returns>
         public static string GetClassname(IntPtr hWnd)
         {
-            var classNameBuilder = new StringBuilder(260, 260);
-            var hresult = GetClassName(hWnd, classNameBuilder, classNameBuilder.Capacity);
-            if (hresult == 0)
+            unsafe
             {
-                return null;
+                const int capacity = 260;
+                char* classname = stackalloc char[capacity];
+                var characters = GetClassName(hWnd, classname, capacity);
+                if (characters == 0)
+                {
+                    return string.Empty;
+                }
+                return new string(classname, 0, characters);
             }
-            return classNameBuilder.ToString();
         }
 
         /// <summary>
@@ -197,9 +201,18 @@ namespace Dapplo.Windows.User32
         /// <returns>string</returns>
         public static string GetText(IntPtr hWnd)
         {
-            var caption = new StringBuilder(260, 260);
-            GetWindowText(hWnd, caption, caption.Capacity);
-            return caption.ToString();
+            unsafe
+            {
+                const int capacity = 260;
+                var caption = stackalloc char[capacity];
+                var nrCharacters = GetWindowText(hWnd, caption, capacity);
+                if (nrCharacters == 0)
+                {
+                    return string.Empty;
+                }
+                return new string(caption, 0, nrCharacters);
+            }
+
         }
 
         /// <summary>
@@ -217,10 +230,13 @@ namespace Dapplo.Windows.User32
             {
                 return null;
             }
-            var text = new StringBuilder(size + 1);
 
-            SendMessage(hWnd, WindowsMessages.WM_GETTEXT, text.Capacity, text);
-            return text.ToString();
+            unsafe
+            {
+                var text = stackalloc char[size + 1];
+                SendMessage(hWnd, WindowsMessages.WM_GETTEXT, size, text);
+                return new string(text, 0, size);
+            }
         }
 
         /// <summary>
@@ -443,11 +459,11 @@ namespace Dapplo.Windows.User32
         ///     Get the caption of the window
         /// </summary>
         /// <param name="hWnd">IntPtr with the window handle</param>
-        /// <param name="lpString">StringBuilder which is marshalled as buffer</param>
+        /// <param name="lpString">char * to place the </param>
         /// <param name="capacity">size of the buffer</param>
         /// <returns>int with the size of the caption</returns>
         [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int capacity);
+        private static extern unsafe int GetWindowText(IntPtr hWnd, char * lpString, int capacity);
 
         /// <summary>
         /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633521.aspx">GetWindowTextLength  function</a>
@@ -565,11 +581,11 @@ namespace Dapplo.Windows.User32
         ///     Get the classname of the specified window
         /// </summary>
         /// <param name="hWnd">IntPtr with the hWnd</param>
-        /// <param name="className">StringBuilder to place the classname into</param>
+        /// <param name="className">char * to place the classname into</param>
         /// <param name="nMaxCount">max size for the string builder length</param>
         /// <returns>nr of characters returned</returns>
         [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern int GetClassName(IntPtr hWnd, StringBuilder className, int nMaxCount);
+        private static extern unsafe int GetClassName(IntPtr hWnd, char* className, int nMaxCount);
 
         [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern IntPtr GetClassLong(IntPtr hWnd, ClassLongIndex index);
@@ -650,10 +666,10 @@ namespace Dapplo.Windows.User32
         /// <param name="hWnd">IntPtr for the Window handle</param>
         /// <param name="windowsMessage"></param>
         /// <param name="wParam">int with the capacity of the string builder</param>
-        /// <param name="lParam">StringBuilder</param>
+        /// <param name="lParam">char *</param>
         /// <returns></returns>
         [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, StringBuilder lParam);
+        private static extern unsafe IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, char * lParam);
 
         /// <summary>
         ///     Used for WM_SETTEXT or another message where a string needs to be send

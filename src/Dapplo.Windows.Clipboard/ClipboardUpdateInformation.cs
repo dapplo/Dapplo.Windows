@@ -49,7 +49,7 @@ namespace Dapplo.Windows.Clipboard
         /// <summary>
         /// The formats in this clipboard contents
         /// </summary>
-        public IEnumerable<string> Formats { get; } = ClipboardNative.AvailableFormats().ToList();
+        public IEnumerable<string> Formats { get; } = ClipboardNative.AvailableFormats();
 
         /// <summary>
         /// This class can only be instanciated when there is a clipboard lock, that is why the constructor is private.

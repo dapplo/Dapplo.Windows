@@ -163,7 +163,7 @@ namespace Dapplo.Windows.Input
                     result.DeviceName = Marshal.PtrToStringUni(deviceNamePtr);
 
                     // Use the devicename to find information in the registry
-                    if (result.DeviceName != null)
+                    if (!string.IsNullOrEmpty(result.DeviceName))
                     {
                         string[] split = result.DeviceName.Substring(4).Split('#');
                         string classCode = split[0];

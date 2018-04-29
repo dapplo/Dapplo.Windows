@@ -156,17 +156,29 @@ namespace Dapplo.Windows.Clipboard
         public static IEnumerable<string> GetFilenames()
         {
             var hDrop = NativeMethods.GetClipboardData((uint)StandardClipboardFormats.Drop);
-            var files = NativeMethods.DragQueryFile(hDrop, uint.MaxValue, null, 0);
-            if (files == 0)
-            {
-                yield break;
-            }
 
-            for (uint i = 0; i < files; i++)
+            unsafe
             {
-                var filename = new StringBuilder(260);
-                NativeMethods.DragQueryFile(hDrop, i, filename, filename.Capacity);
-                yield return filename.ToString();
+                var files = NativeMethods.DragQueryFile(hDrop, uint.MaxValue, null, 0);
+                if (files == 0)
+                {
+                    return Enumerable.Empty<string>();
+                }
+
+                var result = new List<string>();
+                const int capacity = 260;
+                var filename = stackalloc char[capacity];
+                for (uint i = 0; i < files; i++)
+                {
+                    var nrCharacters = NativeMethods.DragQueryFile(hDrop, i, filename, capacity);
+                    if (nrCharacters == 0)
+                    {
+                        continue;
+                    }
+                    result.Add(new string(filename, 0, nrCharacters));
+                }
+
+                return result;
             }
         }
 
@@ -264,40 +276,49 @@ namespace Dapplo.Windows.Clipboard
         ///     Enumerate through all formats on the clipboard, assumes the clipboard was already locked.
         /// </summary>
         /// <returns>IEnumerable with strings defining the format</returns>
-        public static IEnumerable<string> AvailableFormats()
+        public static IList<string> AvailableFormats()
         {
             uint clipboardFormatId = 0;
-            var clipboardFormatName = new StringBuilder(256);
-            while (true)
-            {
-                clipboardFormatId = NativeMethods.EnumClipboardFormats(clipboardFormatId);
-                if (clipboardFormatId == 0)
-                {
-                    // If GetLastWin32Error return SuccessError, this is the end
-                    if (Marshal.GetLastWin32Error() == SuccessError)
-                    {
-                        yield break;
-                    }
-                    // GetLastWin32Error didn't return SuccessError, so throw exception
-                    throw new Win32Exception();
-                }
 
-                clipboardFormatName.Length = 0;
-                if (Id2Format.TryGetValue(clipboardFormatId, out var formatName))
+            var result = new List<string>();
+            unsafe
+            {
+                const int capacity = 256;
+                var clipboardFormatName = stackalloc char[capacity];
+                while (true)
                 {
-                    yield return formatName;
-                    continue;
+                    clipboardFormatId = NativeMethods.EnumClipboardFormats(clipboardFormatId);
+                    if (clipboardFormatId == 0)
+                    {
+                        // If GetLastWin32Error return SuccessError, this is the end
+                        if (Marshal.GetLastWin32Error() == SuccessError)
+                        {
+                            break;
+                        }
+                        // GetLastWin32Error didn't return SuccessError, so throw exception
+                        throw new Win32Exception();
+                    }
+
+                    if (Id2Format.TryGetValue(clipboardFormatId, out var formatName))
+                    {
+                        result.Add(formatName);
+                        continue;
+                    }
+
+                    var nrCharacters =  NativeMethods.GetClipboardFormatName(clipboardFormatId, clipboardFormatName, capacity);
+                    if (nrCharacters <= 0)
+                    {
+                        // No name
+                        continue;
+                    }
+                    formatName = new string(clipboardFormatName, 0, nrCharacters);
+                    Id2Format[clipboardFormatId] = formatName;
+                    Format2Id[formatName] = clipboardFormatId;
+                    result.Add(formatName);
                 }
-                if (NativeMethods.GetClipboardFormatName(clipboardFormatId, clipboardFormatName, clipboardFormatName.Capacity) <= 0)
-                {
-                    // No name
-                    continue;
-                }
-                formatName = clipboardFormatName.ToString();
-                Id2Format[clipboardFormatId] = formatName;
-                Format2Id[formatName] = clipboardFormatId;
-                yield return clipboardFormatName.ToString();
             }
+
+            return result;
         }
 
         #region Native methods
@@ -372,7 +393,7 @@ namespace Dapplo.Windows.Clipboard
             /// <param name="cchMaxCount">Maximum size of the output</param>
             /// <returns></returns>
             [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetClipboardFormatName(uint format, [Out] StringBuilder lpszFormatName, int cchMaxCount);
+            internal static extern unsafe int GetClipboardFormatName(uint format, [Out] char * lpszFormatName, int cchMaxCount);
 
             /// <summary>
             /// Registers a new clipboard format. This format can then be used as a valid clipboard format.
@@ -417,7 +438,7 @@ namespace Dapplo.Windows.Clipboard
             /// If the index value is between zero and the total number of dropped files, and the lpszFile buffer address is NULL, the return value is the required size, in characters, of the buffer, not including the terminating null character.
             /// </returns>
             [DllImport("shell32")]
-            internal static extern uint DragQueryFile(IntPtr hDrop, uint iFile, [Out] StringBuilder lpszFile, int cch);
+            internal static extern unsafe int DragQueryFile(IntPtr hDrop, uint iFile, [Out] char* lpszFile, int cch);
         }
         #endregion
     }

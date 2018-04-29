@@ -22,7 +22,6 @@
 #region using
 
 using System.Runtime.InteropServices;
-using System.Text;
 using Dapplo.Windows.Common;
 
 #endregion
@@ -36,8 +35,14 @@ namespace Dapplo.Windows.Kernel32
     {
         private const long AppModelErrorNoPackage = 15700L;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="packageFullNameLength"></param>
+        /// <param name="packageFullName"></param>
+        /// <returns></returns>
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern int GetCurrentPackageFullName(ref int packageFullNameLength, StringBuilder packageFullName);
+        private static extern unsafe int GetCurrentPackageFullName(ref int packageFullNameLength, char * packageFullName);
 
         /// <summary>
         /// Get the current package fullname
@@ -53,11 +58,18 @@ namespace Dapplo.Windows.Kernel32
                 }
 
                 int length = 0;
-                GetCurrentPackageFullName(ref length, null);
-                var sb = new StringBuilder(length);
-                var result = GetCurrentPackageFullName(ref length, sb);
+                unsafe
+                {
+                    var result = GetCurrentPackageFullName(ref length, null);
+                    if (result == AppModelErrorNoPackage)
+                    {
+                        return null;
+                    }
+                    var packageName = stackalloc char[length];
+                    result = GetCurrentPackageFullName(ref length, packageName);
 
-                return result == AppModelErrorNoPackage ? null : sb.ToString();
+                    return result == AppModelErrorNoPackage ? null : new string(packageName, 0, length);
+                }
             }
         }
 

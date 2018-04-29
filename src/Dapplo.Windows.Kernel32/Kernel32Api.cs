@@ -186,11 +186,10 @@ namespace Dapplo.Windows.Kernel32
         /// <summary>
         ///     Method to get the process path
         /// </summary>
-        /// <param name="processid"></param>
+        /// <param name="processid">int with the process ID</param>
         /// <returns>string</returns>
         public static string GetProcessPath(int processid)
         {
-            var pathBuffer = new StringBuilder(512);
             // Try the GetModuleFileName method first since it's the fastest. 
             // May return ACCESS_DENIED (due to VM_READ flag) if the process is not owned by the current user.
             // Will fail if we are compiled as x86 and we're trying to open a 64 bit process...not allowed.
@@ -199,9 +198,10 @@ namespace Dapplo.Windows.Kernel32
             {
                 try
                 {
-                    if (PsApi.GetModuleFileNameEx(hprocess, IntPtr.Zero, pathBuffer, (uint) pathBuffer.Capacity) > 0)
+                    var path = PsApi.GetModuleFilename(hprocess, IntPtr.Zero);
+                    if (path != null)
                     {
-                        return pathBuffer.ToString();
+                        return path;
                     }
                 }
                 finally
@@ -216,31 +216,45 @@ namespace Dapplo.Windows.Kernel32
                 return null;
             }
 
-            try
+            unsafe
             {
-                // Try this method for Vista or higher operating systems
-                var size = (uint) pathBuffer.Capacity;
-                if (Environment.OSVersion.Version.Major >= 6 && QueryFullProcessImageName(hprocess, 0, pathBuffer, ref size) && size > 0)
-                {
-                    return pathBuffer.ToString();
-                }
+                const int capacity = 512;
+                var pathBuffer = stackalloc char[capacity];
 
-                // Try the GetProcessImageFileName method
-                if (PsApi.GetProcessImageFileName(hprocess, pathBuffer, (uint) pathBuffer.Capacity) > 0)
+                try
                 {
-                    var dospath = pathBuffer.ToString();
-                    foreach (var drive in Environment.GetLogicalDrives())
+                    // Try this method for Vista or higher operating systems
+                    int bufferSize = capacity;
+                    if (Environment.OSVersion.Version.Major >= 6 && QueryFullProcessImageName(hprocess, 0, pathBuffer, ref bufferSize) && bufferSize > 0)
                     {
-                        if (QueryDosDevice(drive.TrimEnd('\\'), pathBuffer, (uint) pathBuffer.Capacity) > 0 && dospath.StartsWith(pathBuffer.ToString()))
+                        return new string(pathBuffer, 0 , bufferSize);
+                    }
+
+                    // Try the GetProcessImageFileName method
+                    var dosPath = PsApi.GetProcessImageFileName(hprocess);
+                    
+                    if (dosPath != null)
+                    {
+                        foreach (var drive in Environment.GetLogicalDrives())
                         {
-                            return drive + dospath.Remove(0, pathBuffer.Length);
+                            var nrChars = QueryDosDevice(drive.TrimEnd('\\'), pathBuffer, capacity);
+                            if (nrChars == 0)
+                            {
+                                continue;
+                            }
+                            var dosDevice = new string(pathBuffer, 0, nrChars);
+                            if (dosPath.StartsWith(dosDevice))
+                            {
+                                return drive + dosPath.Remove(0, nrChars);
+                            }
                         }
                     }
                 }
-            }
-            finally
-            {
-                CloseHandle(hprocess);
+                finally
+                {
+                    CloseHandle(hprocess);
+                }
+
             }
 
             return null;
@@ -307,7 +321,7 @@ namespace Dapplo.Windows.Kernel32
         /// <param name="uuchMax">The maximum number of TCHARs that can be stored into the buffer pointed to by lpTargetPath.</param>
         /// <returns>If the function succeeds, the return value is the number of TCHARs stored into the buffer pointed to by lpTargetPath.</returns>
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern uint QueryDosDevice(string lpDeviceName, [Out] StringBuilder lpTargetPath, uint uuchMax);
+        public static extern unsafe int QueryDosDevice(string lpDeviceName, [Out] char* lpTargetPath, int uuchMax);
 
         /// <summary>
         /// Retrieves the full name of the executable image for the specified process.
@@ -326,7 +340,7 @@ namespace Dapplo.Windows.Kernel32
         /// </returns>
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
+        public static extern unsafe bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, char * lpExeName, ref int lpdwSize);
 
         /// <summary>
         /// Allocates the specified number of bytes from the heap.

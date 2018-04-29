@@ -20,7 +20,6 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Dapplo.Windows.Messages
 {
@@ -42,12 +41,17 @@ namespace Dapplo.Windows.Messages
                 return ((WindowsMessages)messageId).ToString();
             }
             // We "abuse" the GetClipboardFormatName to get this information, looks weird but it works
-            var clipboardFormatName = new StringBuilder(256);
-            if (GetClipboardFormatName(messageId, clipboardFormatName, clipboardFormatName.Capacity) <= 0)
+            unsafe
             {
-                return null;
+                const int capacity = 256;
+                var clipboardFormatName = stackalloc char[capacity];
+                if (GetClipboardFormatName(messageId, clipboardFormatName, capacity) <= 0)
+                {
+                    return null;
+                }
+                return new string(clipboardFormatName, 0, capacity);
+
             }
-            return clipboardFormatName.ToString();
         }
 
         /// <summary>
@@ -69,9 +73,9 @@ namespace Dapplo.Windows.Messages
         /// <param name="format">int with the id of the format</param>
         /// <param name="lpszFormatName">Name of the format</param>
         /// <param name="cchMaxCount">Maximum size of the output</param>
-        /// <returns></returns>
+        /// <returns>characters</returns>
         [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern int GetClipboardFormatName(uint format, [Out] StringBuilder lpszFormatName, int cchMaxCount);
+        private static extern unsafe int GetClipboardFormatName(uint format, [Out] char* lpszFormatName, int cchMaxCount);
 
         /// <summary>
         /// Defines a new window message that is guaranteed to be unique throughout the system. The message value can be used when sending or posting messages.

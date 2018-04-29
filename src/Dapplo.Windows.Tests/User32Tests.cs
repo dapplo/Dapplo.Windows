@@ -29,6 +29,7 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
 using Xunit;
@@ -45,6 +46,15 @@ namespace Dapplo.Windows.Tests
         public User32Tests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
+
+        [Fact]
+        public void TestGetClassname()
+        {
+            var desktopHandle = InteropWindowQuery.GetDesktopWindow();
+
+            var classname = User32Api.GetClassname(desktopHandle.Handle);
+            Assert.Equal("#32769", classname);
         }
 
         /// <summary>

@@ -50,13 +50,13 @@ namespace Dapplo.Windows.Desktop
             User32Api.EnumChildWindows(parent?.Handle ?? IntPtr.Zero, (hwnd, param) =>
             {
                 // check if we should continue
-                var windowInfo = InteropWindowFactory.CreateFor(hwnd);
+                var interopWindow = InteropWindowFactory.CreateFor(hwnd);
 
-                if (wherePredicate?.Invoke(windowInfo) != false)
+                if (wherePredicate == null || wherePredicate(interopWindow))
                 {
-                    result.Add(windowInfo);
+                    result.Add(interopWindow);
                 }
-                return takeWhileFunc?.Invoke(windowInfo) != false;
+                return takeWhileFunc == null || takeWhileFunc(interopWindow);
             }, IntPtr.Zero);
             return result;
         }
