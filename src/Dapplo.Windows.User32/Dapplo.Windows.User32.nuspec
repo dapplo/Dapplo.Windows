@@ -17,8 +17,8 @@
 		<tags>windows user32</tags>
     </metadata>
 	<files>
-		<file src="bin\release\$id$.pdb" target="lib\net45" />
-		<file src="bin\release\$id$.xml" target="lib\net45" />
-		<file src="bin\release\$id$.dll" target="lib\net45" />
+		<file src="bin\release\$id$.pdb" target="lib\net46" />
+		<file src="bin\release\$id$.xml" target="lib\net46" />
+		<file src="bin\release\$id$.dll" target="lib\net46" />
 	</files>
 </package>
