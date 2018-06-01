@@ -53,7 +53,7 @@ namespace Dapplo.Windows.FormsExample
             // This can be used to do something with DPI changes, subscription should be disposed!
             _dpiChangeSubscription = _dpiHandler.OnDpiChanged.Subscribe(dpi =>
             {
-                var width = DpiHandler.ScaleWithDpi(20, dpi);
+                var width = _dpiHandler.ScaleWithCurrentDpi(20);
                 var size = new Size(width, width);
                 //menuStrip1.ImageScalingSize = size;
             });
@@ -81,7 +81,7 @@ namespace Dapplo.Windows.FormsExample
         /// <returns></returns>
         private Bitmap ScaleIconForDisplaying(Bitmap bitmap, double dpi)
         {
-            var newSize = DpiHandler.ScaleWithDpi(16, dpi);
+            var newSize = _dpiHandler.ScaleWithCurrentDpi(16);
             var result = new Bitmap(newSize, newSize, bitmap.PixelFormat);
             using (var graphics = Graphics.FromImage(result))
             {

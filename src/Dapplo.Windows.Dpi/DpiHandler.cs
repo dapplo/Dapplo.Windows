@@ -385,7 +385,19 @@ namespace Dapplo.Windows.Dpi
         }
 
         /// <summary>
-        ///     Scale the supplied base width according to the supplied dpi
+        ///     Scale the supplied number according to the supplied dpi
+        /// </summary>
+        /// <param name="someNumber">double with e.g. the width 16 for 16x16 images</param>
+        /// <param name="dpi">current dpi, normal is 96.</param>
+        /// <returns>double with the scaled number</returns>
+        public static double ScaleWithDpi(double someNumber, double dpi)
+        {
+            var scaleFactor = dpi / DefaultScreenDpi;
+            return scaleFactor * someNumber;
+        }
+
+        /// <summary>
+        ///     Scale the supplied bnumber according to the supplied dpi
         /// </summary>
         /// <param name="baseWidth">int with e.g. 16 for 16x16 images</param>
         /// <param name="dpi">current dpi, normal is 96.</param>
@@ -395,6 +407,26 @@ namespace Dapplo.Windows.Dpi
             var scaleFactor = dpi / DefaultScreenDpi;
             var width = (int) (scaleFactor * baseWidth);
             return width;
+        }
+
+        /// <summary>
+        ///     Scale the supplied number to the current dpi
+        /// </summary>
+        /// <param name="someNumber">double with e.g. a width like 16 for 16x16 images</param>
+        /// <returns>double with scaled number</returns>
+        public double ScaleWithCurrentDpi(double someNumber)
+        {
+            return ScaleWithDpi(someNumber, Dpi);
+        }
+
+        /// <summary>
+        ///     Scale the supplied number to the current dpi
+        /// </summary>
+        /// <param name="someNumber">int with e.g. a width like 16 for 16x16 images</param>
+        /// <returns>int with scaled number</returns>
+        public int ScaleWithCurrentDpi(int someNumber)
+        {
+            return ScaleWithDpi(someNumber, Dpi);
         }
 
         /// <summary>

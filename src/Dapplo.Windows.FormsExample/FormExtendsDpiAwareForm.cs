@@ -50,7 +50,7 @@ namespace Dapplo.Windows.FormsExample
             {
                 Log.Info().WriteLine("ContextMenuStrip DPI: {0}", dpi);
             });
-            ScaleHandler = BitmapScaleHandler.WithComponentResourceManager(DpiHandler, GetType(), ScaleIconForDisplaying);
+            ScaleHandler = BitmapScaleHandler.WithComponentResourceManager(FormDpiHandler, GetType(), ScaleIconForDisplaying);
 
             ScaleHandler.AddTarget(somethingMenuItem, "somethingMenuItem.Image");
             ScaleHandler.AddTarget(something2MenuItem, "something2MenuItem.Image");
@@ -69,7 +69,7 @@ namespace Dapplo.Windows.FormsExample
         /// <returns>Bitmap</returns>
         private Bitmap ScaleIconForDisplaying(Bitmap bitmap, double dpi)
         {
-            var newSize = DpiHandler.ScaleWithDpi(16, dpi);
+            var newSize = FormDpiHandler.ScaleWithCurrentDpi(16);
             var result = new Bitmap(newSize, newSize, bitmap.PixelFormat);
             using (var graphics = Graphics.FromImage(result))
             {

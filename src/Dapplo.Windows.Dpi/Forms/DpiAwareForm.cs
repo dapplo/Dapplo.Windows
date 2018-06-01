@@ -34,7 +34,7 @@ namespace Dapplo.Windows.Dpi.Forms
         /// <summary>
         /// The DpiHandler used for this form
         /// </summary>
-        protected DpiHandler DpiHandler { get; } = new DpiHandler();
+        protected DpiHandler FormDpiHandler { get; } = new DpiHandler();
 
         /// <summary>
         /// Override the WndProc to make sure the DpiHandler is informed of the WM_NCCREATE message
@@ -42,7 +42,7 @@ namespace Dapplo.Windows.Dpi.Forms
         /// <param name="m">Message</param>
         protected override void WndProc(ref Message m)
         {
-            bool handled = DpiHandler.HandleWindowMessages(WindowMessageInfo.Create(m.HWnd, m.Msg, m.WParam, m.LParam));
+            bool handled = FormDpiHandler.HandleWindowMessages(WindowMessageInfo.Create(m.HWnd, m.Msg, m.WParam, m.LParam));
             if (!handled)
             {
                 base.WndProc(ref m);

@@ -47,14 +47,14 @@ namespace Dapplo.Windows.Tests
         [Fact]
         public void Test_ScaleWithDpi()
         {
-            var size_96 = DpiHandler.ScaleWithDpi(16, 96);
-            Assert.Equal(16, size_96);
-            var size_120 = DpiHandler.ScaleWithDpi(16, 120);
-            Assert.Equal(20, size_120);
-            var size_144 = DpiHandler.ScaleWithDpi(16, 144);
-            Assert.Equal(24, size_144);
-            var size_192 = DpiHandler.ScaleWithDpi(16, 192);
-            Assert.Equal(32, size_192);
+            var size96 = DpiHandler.ScaleWithDpi(16, 96);
+            Assert.Equal(16, size96);
+            var size120 = DpiHandler.ScaleWithDpi(16, 120);
+            Assert.Equal(20, size120);
+            var size144 = DpiHandler.ScaleWithDpi(16, 144);
+            Assert.Equal(24, size144);
+            var size192 = DpiHandler.ScaleWithDpi(16, 192);
+            Assert.Equal(32, size192);
         }
     }
 }
