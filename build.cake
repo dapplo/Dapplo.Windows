@@ -2,13 +2,13 @@
 #tool "OpenCover"
 #tool "GitVersion.CommandLine"
 #tool "docfx.console"
-#tool "coveralls.net"
+//#tool "coveralls.net"
 #tool "PdbGit"
 // Needed for Cake.Compression, as described here: https://github.com/akordowski/Cake.Compression/issues/3
 #addin "SharpZipLib"
 #addin "Cake.FileHelpers"
 #addin "Cake.DocFx"
-#addin "Cake.Coveralls"
+//#addin "Cake.Coveralls"
 #addin "Cake.Compression"
 
 var target = Argument("target", "Build");
@@ -125,10 +125,11 @@ Task("UploadCoverageReport")
     .WithCriteria(() => !string.IsNullOrEmpty(coverallsRepoToken))
     .Does(() =>
 {
-    CoverallsNet("./artifacts/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings
-    {
-        RepoToken = coverallsRepoToken
-    });
+
+    //CoverallsNet("./artifacts/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings
+    //{
+    //    RepoToken = coverallsRepoToken
+    //});
 });
 
 // Run the XUnit tests via OpenCover, so be get an coverage.xml report
