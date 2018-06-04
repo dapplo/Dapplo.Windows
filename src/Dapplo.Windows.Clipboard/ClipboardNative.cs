@@ -31,6 +31,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapplo.Windows.Clipboard.Internals;
 using Dapplo.Windows.Kernel32.Enums;
 
 namespace Dapplo.Windows.Clipboard
@@ -111,42 +112,14 @@ namespace Dapplo.Windows.Clipboard
         public static uint SequenceNumber => NativeMethods.GetClipboardSequenceNumber();
 
         /// <summary>
-        /// Place byte[] on the clipboard, this assumes you already locked the clipboard.
-        /// </summary>
-        /// <param name="bytes">bytes to place on the clipboard</param>
-        /// <param name="format">format to place the bytes under</param>
-        public static void SetAsBytes(byte[] bytes, string format)
-        {
-            using (var stream = new MemoryStream())
-            {
-                stream.Write(bytes, 0, bytes.Length);
-                SetAsStream(format, stream);
-            }
-        }
-
-        /// <summary>
-        /// Place string on the clipboard, this assumes you already locked the clipboard.
-        /// It uses CF_UNICODETEXT by default, as all other formats are automatically generated from this by Windows.
-        /// </summary>
-        /// <param name="text">string to place on the clipboard</param>
-        /// <param name="format"></param>
-        public static void SetAsUnicodeString(string text, string format = "CF_UNICODETEXT")
-        {
-            var unicodeBytes = Encoding.Unicode.GetBytes(text + "\0");
-            SetAsBytes(unicodeBytes, format);
-        }
-
-        /// <summary>
         /// Get a string from the clipboard, this assumes you already locked the clipboard.
         /// This always takes the CF_UNICODETEXT format, as Windows automatically converts
         /// </summary>
         /// <returns>string</returns>
         public static string GetAsUnicodeString(string format = "CF_UNICODETEXT")
         {
-            using (var textStream = GetAsStream(format))
-            {
-                return Encoding.Unicode.GetString(textStream.GetBuffer(), 0, (int) textStream.Length).TrimEnd('\0');
-            }
+            var bytes = GetAsBytes(format);
+            return Encoding.Unicode.GetString(GetAsBytes(format), 0, bytes.Length).TrimEnd('\0');
         }
 
         /// <summary>
@@ -188,7 +161,44 @@ namespace Dapplo.Windows.Clipboard
         /// </summary>
         /// <param name="format">the format to retrieve the content for</param>
         /// <returns>MemoryStream</returns>
-        public static MemoryStream GetAsStream(string format)
+        public static Stream GetAsStream(string format)
+        {
+            var prepareResult = PrepareGet(format);
+
+            // return the memory stream, the global unlock is done when the UnmanagedMemoryStreamWrapper is disposed
+            unsafe
+            {
+                var result = new UnmanagedMemoryStreamWrapper((byte*)prepareResult.Item2, prepareResult.Item3, prepareResult.Item3, FileAccess.Read);
+
+                result.SetGlobal(prepareResult.Item1);
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// Retrieve the content for the specified format.
+        /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
+        /// </summary>
+        /// <param name="format">the format to retrieve the content for</param>
+        /// <returns>byte array</returns>
+        public static byte[] GetAsBytes(string format)
+        {
+            var prepareResult = PrepareGet(format);
+
+            var bytes = new byte[prepareResult.Item3];
+
+            // Fill the memory stream
+            Marshal.Copy(prepareResult.Item2, bytes, 0, prepareResult.Item3);
+
+            return bytes;
+        }
+
+        /// <summary>
+        /// This prepares the get
+        /// </summary>
+        /// <param name="format">string</param>
+        /// <returns>IntPtr to the locked global memory</returns>
+        private static Tuple<IntPtr, IntPtr, int> PrepareGet(string format)
         {
             if (!Format2Id.TryGetValue(format, out var formatId))
             {
@@ -196,23 +206,24 @@ namespace Dapplo.Windows.Clipboard
             }
             var hGlobal = NativeMethods.GetClipboardData(formatId);
             var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
-            try
+            if (memoryPtr == IntPtr.Zero)
             {
-                if (memoryPtr == IntPtr.Zero)
-                {
-                    throw new Win32Exception();
-                }
-                var size = Kernel32Api.GlobalSize(hGlobal);
-                var stream = new MemoryStream(size);
-                stream.SetLength(size);
-                // Fill the memory stream
-                Marshal.Copy(memoryPtr, stream.GetBuffer(), 0, size);
-                return stream;
+                throw new Win32Exception();
             }
-            finally
-            {
-                Kernel32Api.GlobalUnlock(hGlobal);
-            }
+            var size = Kernel32Api.GlobalSize(hGlobal);
+            return Tuple.Create(hGlobal, memoryPtr, size);
+        }
+
+        /// <summary>
+        /// Place string on the clipboard, this assumes you already locked the clipboard.
+        /// It uses CF_UNICODETEXT by default, as all other formats are automatically generated from this by Windows.
+        /// </summary>
+        /// <param name="text">string to place on the clipboard</param>
+        /// <param name="format"></param>
+        public static void SetAsUnicodeString(string text, string format = "CF_UNICODETEXT")
+        {
+            var unicodeBytes = Encoding.Unicode.GetBytes(text + "\0");
+            SetAsBytes(unicodeBytes, format);
         }
 
         /// <summary>
@@ -221,13 +232,43 @@ namespace Dapplo.Windows.Clipboard
         /// </summary>
         /// <param name="format">the format to set the content for</param>
         /// <param name="stream">MemoryStream with the content</param>
-        public static void SetAsStream(string format, MemoryStream stream)
+        /// <param name="size">long with the size, if the stream is not seekable</param>
+        public static void SetAsStream(string format, Stream stream, long? size = null)
         {
             if (!Format2Id.TryGetValue(format, out var formatId))
             {
                 formatId = RegisterFormat(format);
             }
-            var length = stream.Length;
+
+            if (!stream.CanRead)
+            {
+                throw new NotSupportedException("Can't read stream");
+            }
+
+            bool needsDispose = false;
+            long length;
+            if (stream.CanSeek)
+            {
+                // Calculate the rest left
+                length = stream.Length - stream.Position;
+                if (length == 0)
+                {
+                    throw new NotSupportedException("Cannot write 0 length stream.");
+                }
+            }
+            else if (size.HasValue)
+            {
+                length = size.Value;
+            }
+            else
+            {
+                var bufferStream = new MemoryStream();
+                needsDispose = true;
+                stream.CopyTo(bufferStream);
+                length = bufferStream.Length;
+                stream = bufferStream;
+            }
+
             var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable , new UIntPtr((ulong)length));
             if (hGlobal == IntPtr.Zero)
             {
@@ -240,8 +281,57 @@ namespace Dapplo.Windows.Clipboard
                 {
                     throw new Win32Exception();
                 }
-                // Fill the global memory
-                Marshal.Copy(stream.GetBuffer(), 0, memoryPtr, (int)length);
+                unsafe
+                {
+                    using (var unsafeMemoryStream = new UnmanagedMemoryStream((byte*) memoryPtr, length, length, FileAccess.Write))
+                    {
+                        stream.CopyTo(unsafeMemoryStream);
+                    }
+                }
+            }
+            finally
+            {
+                if (needsDispose)
+                {
+                    stream.Dispose();
+                }
+                Kernel32Api.GlobalUnlock(hGlobal);
+            }
+            // Place the content on the clipboard
+            NativeMethods.SetClipboardData(formatId, hGlobal);
+        }
+
+        /// <summary>
+        /// Place byte[] on the clipboard, this assumes you already locked the clipboard.
+        /// </summary>
+        /// <param name="bytes">bytes to place on the clipboard</param>
+        /// <param name="format">format to place the bytes under</param>
+        public static void SetAsBytes(byte[] bytes, string format)
+        {
+            if (!Format2Id.TryGetValue(format, out var formatId))
+            {
+                formatId = RegisterFormat(format);
+            }
+
+            var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable, new UIntPtr((ulong)bytes.Length));
+            if (hGlobal == IntPtr.Zero)
+            {
+                throw new Win32Exception();
+            }
+            var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
+            try
+            {
+                if (memoryPtr == IntPtr.Zero)
+                {
+                    throw new Win32Exception();
+                }
+                unsafe
+                {
+                    using (var unsafeMemoryStream = new UnmanagedMemoryStream((byte*)memoryPtr, bytes.Length, bytes.Length, FileAccess.Write))
+                    {
+                        unsafeMemoryStream.Write(bytes, 0, bytes.Length);
+                    }
+                }
             }
             finally
             {

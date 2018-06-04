@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Windows.Messages;
 
-namespace Dapplo.Windows.Clipboard
+namespace Dapplo.Windows.Clipboard.Internals
 {
     /// <summary>
     /// This can be used to get a lock to the clipboard, and free it again.

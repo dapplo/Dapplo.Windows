@@ -45,11 +45,13 @@ namespace Dapplo.Windows.Messages
             {
                 const int capacity = 256;
                 var clipboardFormatName = stackalloc char[capacity];
-                if (GetClipboardFormatName(messageId, clipboardFormatName, capacity) <= 0)
+
+                int numberOfChars = GetClipboardFormatName(messageId, clipboardFormatName, capacity);
+                if (numberOfChars <= 0)
                 {
                     return null;
                 }
-                return new string(clipboardFormatName, 0, capacity);
+                return new string(clipboardFormatName, 0, numberOfChars);
 
             }
         }

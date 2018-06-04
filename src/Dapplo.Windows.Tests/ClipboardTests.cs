@@ -60,11 +60,10 @@ namespace Dapplo.Windows.Tests
         ///     Test monitoring the clipboard
         /// </summary>
         /// <returns></returns>
-        //[WpfFact]
         public async Task TestClipboardMonitor_WaitForCopy()
         {
             var tcs = new TaskCompletionSource<bool>();
-            var subscription = ClipboardMonitor.OnUpdate.Subscribe(clipboard =>
+            var subscription = ClipboardMonitor.OnUpdate.Skip(1).Subscribe(clipboard =>
             {
                 Log.Debug().WriteLine("Formats {0}", string.Join(",", clipboard.Formats));
                 Log.Debug().WriteLine("Owner {0}", clipboard.OwnerHandle);
@@ -74,14 +73,16 @@ namespace Dapplo.Windows.Tests
                 {
                     using (ClipboardNative.Lock())
                     {
-                        var stream = ClipboardNative.GetAsStream("PNG");
-                        using (var fileStream = File.Create(@"D:\test.png"))
+                        using (var stream = ClipboardNative.GetAsStream("PNG"))
                         {
-                            stream.CopyTo(fileStream);
+                            using (var fileStream = File.Create(@"c:\projects\test.png"))
+                            {
+                                stream.CopyTo(fileStream);
+                            }
                         }
-                        
                     }
                 }
+                
                 tcs.TrySetResult(true);
             });
 
@@ -189,10 +190,10 @@ namespace Dapplo.Windows.Tests
             var bytes = Encoding.Unicode.GetBytes(testString + "\0");
             Assert.Equal(testString, Encoding.Unicode.GetString(bytes).TrimEnd('\0'));
             testStream.Write(bytes, 0, bytes.Length);
-   
+
+            testStream.Seek(0, SeekOrigin.Begin);
             Assert.Equal(testString, Encoding.Unicode.GetString(testStream.GetBuffer(), 0, (int)testStream.Length).TrimEnd('\0'));
 
-            MemoryStream resultStream;
             using (ClipboardNative.Lock())
             {
                 ClipboardNative.Clear();
@@ -201,10 +202,18 @@ namespace Dapplo.Windows.Tests
             await Task.Delay(1000);
             using (ClipboardNative.Lock())
             {
-                resultStream = ClipboardNative.GetAsStream("CF_UNICODETEXT");
+                Assert.Equal(testString, ClipboardNative.GetAsUnicodeString());
+                var unicodeBytes = ClipboardNative.GetAsBytes("CF_UNICODETEXT");
+                Assert.Equal(testString, Encoding.Unicode.GetString(unicodeBytes, 0, unicodeBytes.Length).TrimEnd('\0'));
 
+                var unicodeStream = ClipboardNative.GetAsStream("CF_UNICODETEXT");
+                using (var memoryStream = new MemoryStream())
+                {
+                    unicodeStream.CopyTo(memoryStream);
+                    Assert.Equal(testString, Encoding.Unicode.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length).TrimEnd('\0'));
+
+                }
             }
-            Assert.Equal(testString, Encoding.Unicode.GetString(resultStream.GetBuffer(), 0, (int)resultStream.Length).TrimEnd('\0'));
         }
     }
 }
