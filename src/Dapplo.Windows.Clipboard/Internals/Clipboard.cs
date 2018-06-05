@@ -20,30 +20,35 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
-using System.IO;
 
 namespace Dapplo.Windows.Clipboard.Internals
 {
-    /// <summary>
-    /// This wraps an UnmanagedMemoryStream, to also take care or disposing some disposable
-    /// </summary>
-    internal class UnmanagedMemoryStreamWrapper : UnmanagedMemoryStream
+    internal class Clipboard : IClipboard
     {
-        private IDisposable _disposable;
+        private readonly Action _disposeAction;
 
-        public unsafe UnmanagedMemoryStreamWrapper(byte* bytes, long length, long capacity, FileAccess fileAccess) : base(bytes, length, capacity, fileAccess)
+        public Clipboard(Action disposeAction)
         {
+            _disposeAction = disposeAction;
         }
 
-        public void SetDisposable(IDisposable disposable)
+        /// <inheritdoc />
+        public void Dispose()
         {
-            _disposable = disposable;
+            CanAccess = true;
+            _disposeAction();
         }
 
-        protected override void Dispose(bool disposing)
+        /// <inheritdoc />
+        public bool CanAccess { get; private set; }
+
+        /// <inheritdoc />
+        public void ThrowWhenNoAccess()
         {
-            base.Dispose(disposing);
-            _disposable?.Dispose();;
+            if (CanAccess)
+            {
+                throw new NotSupportedException();
+            }
         }
     }
 }

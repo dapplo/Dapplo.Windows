@@ -21,7 +21,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Clipboard
@@ -49,14 +48,14 @@ namespace Dapplo.Windows.Clipboard
         /// <summary>
         /// The formats in this clipboard contents
         /// </summary>
-        public IEnumerable<string> Formats { get; } = ClipboardNative.AvailableFormats();
+        public IEnumerable<string> Formats { get; }
 
         /// <summary>
         /// This class can only be instanciated when there is a clipboard lock, that is why the constructor is private.
         /// </summary>
-        private ClipboardUpdateInformation()
+        private ClipboardUpdateInformation(IClipboard clipboard)
         {
-            
+            Formats = clipboard.AvailableFormats();
         }
 
         /// <summary>
@@ -70,9 +69,9 @@ namespace Dapplo.Windows.Clipboard
             {
                 hWnd = WinProcHandler.Instance.Handle;
             }
-            using (ClipboardNative.Lock(hWnd))
+            using (var clipboard = ClipboardNative.AccessClipboard(hWnd))
             {
-                return new ClipboardUpdateInformation();
+                return new ClipboardUpdateInformation(clipboard);
             }
         }
     }

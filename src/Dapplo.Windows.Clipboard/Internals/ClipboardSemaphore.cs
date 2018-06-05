@@ -21,7 +21,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,8 +46,8 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// <param name="retries">int with number of retries</param>
         /// <param name="retryInterval">TimeSpan for the time between retries</param>
         /// <param name="timeout">A timeout for waiting on the semaphore</param>
-        /// <returns></returns>
-        public IDisposable Lock(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
+        /// <returns>IClipboardLock</returns>
+        public IClipboard Lock(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
         {
             if (hWnd == IntPtr.Zero)
             {
@@ -93,7 +92,7 @@ namespace Dapplo.Windows.Clipboard.Internals
                 throw new Win32Exception();
             }
             // Return a disposable which cleans up the current state.
-            return Disposable.Create(() => {
+            return new Clipboard(() => {
                 CloseClipboard();
                 _semaphoreSlim.Release();
             });
@@ -106,8 +105,8 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// <param name="retries">int with the number of retries</param>
         /// <param name="retryInterval">optional TimeSpan</param>
         /// <param name="cancellationToken">CancellationToken</param>
-        /// <returns>Task with disposable</returns>
-        public async Task<IDisposable> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default)
+        /// <returns>Task with IClipboardLock</returns>
+        public async Task<IClipboard> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default)
         {
             if (hWnd == IntPtr.Zero)
             {
@@ -135,8 +134,8 @@ namespace Dapplo.Windows.Clipboard.Internals
             {
                 throw new Win32Exception();
             }
-            return Disposable.Create(() =>
-            {
+
+            return new Clipboard(() => {
                 CloseClipboard();
                 _semaphoreSlim.Release();
             });

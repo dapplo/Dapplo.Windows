@@ -19,20 +19,16 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using Dapplo.Windows.Kernel32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Windows.Clipboard.Internals;
-using Dapplo.Windows.Kernel32.Enums;
 
 namespace Dapplo.Windows.Clipboard
 {
@@ -44,7 +40,7 @@ namespace Dapplo.Windows.Clipboard
         private const int SuccessError = 0;
 
         // "Global" clipboard lock
-        private static readonly ClipboardSemaphore ClipboardLock = new ClipboardSemaphore();
+        private static readonly ClipboardSemaphore ClipboardLockProvider = new ClipboardSemaphore();
 
         // Cache for all the known clipboard format names
         private static readonly IDictionary<uint, string> Id2Format = new Dictionary<uint, string>();
@@ -67,36 +63,37 @@ namespace Dapplo.Windows.Clipboard
         }
 
         /// <summary>
-        /// Get a global lock to the clipboard
+        /// Get access, a global lock, to the clipboard
         /// </summary>
         /// <param name="hWnd">IntPtr with the windows handle</param>
         /// <param name="retries">int with the amount of lock attempts are made</param>
         /// <param name="retryInterval">Timespan between retries, default 200ms</param>
         /// <param name="timeout">Timeout for getting the lock</param>
-        /// <returns>IDisposable, which will unlock when Dispose is called</returns>
-        public static IDisposable Lock(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
+        /// <returns>IClipboard, which will unlock when Dispose is called</returns>
+        public static IClipboard AccessClipboard(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
         {
-            return ClipboardLock.Lock(hWnd, retries, retryInterval, timeout);
+            return ClipboardLockProvider.Lock(hWnd, retries, retryInterval, timeout);
         }
 
         /// <summary>
-        /// Get a global lock to the clipboard
+        /// Get access, a global lock, to the clipboard
         /// </summary>
         /// <param name="hWnd">IntPtr with the windows handle</param>
         /// <param name="retries">int with the amount of lock attempts are made</param>
         /// <param name="retryInterval">Timespan between retries, default 200ms</param>
         /// <param name="cancellationToken">CancellationToken</param>
-        /// <returns>IDisposable in a Task, which will unlock when Dispose is called</returns>
-        public static Task<IDisposable> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default)
+        /// <returns>IClipboard in a Task, which will unlock when Dispose is called</returns>
+        public static Task<IClipboard> AccessClipboardAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default)
         {
-            return ClipboardLock.LockAsync(hWnd, retries, retryInterval, cancellationToken);
+            return ClipboardLockProvider.LockAsync(hWnd, retries, retryInterval, cancellationToken);
         }
 
         /// <summary>
         /// Empties the clipboard, this assumes that a lock has already been retrieved.
         /// </summary>
-        public static void Clear()
+        public static void ClearContents(this IClipboard clipboard)
         {
+            clipboard.ThrowWhenNoAccess();
             NativeMethods.EmptyClipboard();
         }
 
@@ -112,233 +109,18 @@ namespace Dapplo.Windows.Clipboard
         public static uint SequenceNumber => NativeMethods.GetClipboardSequenceNumber();
 
         /// <summary>
-        /// Get a string from the clipboard, this assumes you already locked the clipboard.
-        /// This always takes the CF_UNICODETEXT format, as Windows automatically converts
+        /// Method to map a clipboard format to an ID
         /// </summary>
-        /// <returns>string</returns>
-        public static string GetAsUnicodeString(string format = "CF_UNICODETEXT")
-        {
-            var bytes = GetAsBytes(format);
-            return Encoding.Unicode.GetString(GetAsBytes(format), 0, bytes.Length).TrimEnd('\0');
-        }
-
-        /// <summary>
-        /// Get a list of filenames on the clipboard
-        /// </summary>
-        /// <returns>IEnumerable of string</returns>
-        public static IEnumerable<string> GetFilenames()
-        {
-            var hDrop = NativeMethods.GetClipboardData((uint)StandardClipboardFormats.Drop);
-
-            unsafe
-            {
-                var files = NativeMethods.DragQueryFile(hDrop, uint.MaxValue, null, 0);
-                if (files == 0)
-                {
-                    return Enumerable.Empty<string>();
-                }
-
-                var result = new List<string>();
-                const int capacity = 260;
-                var filename = stackalloc char[capacity];
-                for (uint i = 0; i < files; i++)
-                {
-                    var nrCharacters = NativeMethods.DragQueryFile(hDrop, i, filename, capacity);
-                    if (nrCharacters == 0)
-                    {
-                        continue;
-                    }
-                    result.Add(new string(filename, 0, nrCharacters));
-                }
-
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// Retrieve the content for the specified format.
-        /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
-        /// </summary>
-        /// <param name="format">the format to retrieve the content for</param>
-        /// <returns>MemoryStream</returns>
-        public static Stream GetAsStream(string format)
-        {
-            var prepareResult = PrepareGet(format);
-
-            // return the memory stream, the global unlock is done when the UnmanagedMemoryStreamWrapper is disposed
-            unsafe
-            {
-                var result = new UnmanagedMemoryStreamWrapper((byte*)prepareResult.Item2, prepareResult.Item3, prepareResult.Item3, FileAccess.Read);
-
-                result.SetGlobal(prepareResult.Item1);
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// Retrieve the content for the specified format.
-        /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
-        /// </summary>
-        /// <param name="format">the format to retrieve the content for</param>
-        /// <returns>byte array</returns>
-        public static byte[] GetAsBytes(string format)
-        {
-            var prepareResult = PrepareGet(format);
-
-            var bytes = new byte[prepareResult.Item3];
-
-            // Fill the memory stream
-            Marshal.Copy(prepareResult.Item2, bytes, 0, prepareResult.Item3);
-
-            return bytes;
-        }
-
-        /// <summary>
-        /// This prepares the get
-        /// </summary>
-        /// <param name="format">string</param>
-        /// <returns>IntPtr to the locked global memory</returns>
-        private static Tuple<IntPtr, IntPtr, int> PrepareGet(string format)
-        {
-            if (!Format2Id.TryGetValue(format, out var formatId))
-            {
-                formatId = RegisterFormat(format);
-            }
-            var hGlobal = NativeMethods.GetClipboardData(formatId);
-            var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
-            if (memoryPtr == IntPtr.Zero)
-            {
-                throw new Win32Exception();
-            }
-            var size = Kernel32Api.GlobalSize(hGlobal);
-            return Tuple.Create(hGlobal, memoryPtr, size);
-        }
-
-        /// <summary>
-        /// Place string on the clipboard, this assumes you already locked the clipboard.
-        /// It uses CF_UNICODETEXT by default, as all other formats are automatically generated from this by Windows.
-        /// </summary>
-        /// <param name="text">string to place on the clipboard</param>
-        /// <param name="format"></param>
-        public static void SetAsUnicodeString(string text, string format = "CF_UNICODETEXT")
-        {
-            var unicodeBytes = Encoding.Unicode.GetBytes(text + "\0");
-            SetAsBytes(unicodeBytes, format);
-        }
-
-        /// <summary>
-        /// Set the content for the specified format.
-        /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
-        /// </summary>
-        /// <param name="format">the format to set the content for</param>
-        /// <param name="stream">MemoryStream with the content</param>
-        /// <param name="size">long with the size, if the stream is not seekable</param>
-        public static void SetAsStream(string format, Stream stream, long? size = null)
+        /// <param name="format">clipboard format</param>
+        /// <returns>dtring with the id</returns>
+        public static uint MapFormatToId(string format)
         {
             if (!Format2Id.TryGetValue(format, out var formatId))
             {
                 formatId = RegisterFormat(format);
             }
 
-            if (!stream.CanRead)
-            {
-                throw new NotSupportedException("Can't read stream");
-            }
-
-            bool needsDispose = false;
-            long length;
-            if (stream.CanSeek)
-            {
-                // Calculate the rest left
-                length = stream.Length - stream.Position;
-                if (length == 0)
-                {
-                    throw new NotSupportedException("Cannot write 0 length stream.");
-                }
-            }
-            else if (size.HasValue)
-            {
-                length = size.Value;
-            }
-            else
-            {
-                var bufferStream = new MemoryStream();
-                needsDispose = true;
-                stream.CopyTo(bufferStream);
-                length = bufferStream.Length;
-                stream = bufferStream;
-            }
-
-            var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable , new UIntPtr((ulong)length));
-            if (hGlobal == IntPtr.Zero)
-            {
-                throw new Win32Exception();
-            }
-            var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
-            try
-            {
-                if (memoryPtr == IntPtr.Zero)
-                {
-                    throw new Win32Exception();
-                }
-                unsafe
-                {
-                    using (var unsafeMemoryStream = new UnmanagedMemoryStream((byte*) memoryPtr, length, length, FileAccess.Write))
-                    {
-                        stream.CopyTo(unsafeMemoryStream);
-                    }
-                }
-            }
-            finally
-            {
-                if (needsDispose)
-                {
-                    stream.Dispose();
-                }
-                Kernel32Api.GlobalUnlock(hGlobal);
-            }
-            // Place the content on the clipboard
-            NativeMethods.SetClipboardData(formatId, hGlobal);
-        }
-
-        /// <summary>
-        /// Place byte[] on the clipboard, this assumes you already locked the clipboard.
-        /// </summary>
-        /// <param name="bytes">bytes to place on the clipboard</param>
-        /// <param name="format">format to place the bytes under</param>
-        public static void SetAsBytes(byte[] bytes, string format)
-        {
-            if (!Format2Id.TryGetValue(format, out var formatId))
-            {
-                formatId = RegisterFormat(format);
-            }
-
-            var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable, new UIntPtr((ulong)bytes.Length));
-            if (hGlobal == IntPtr.Zero)
-            {
-                throw new Win32Exception();
-            }
-            var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
-            try
-            {
-                if (memoryPtr == IntPtr.Zero)
-                {
-                    throw new Win32Exception();
-                }
-                unsafe
-                {
-                    using (var unsafeMemoryStream = new UnmanagedMemoryStream((byte*)memoryPtr, bytes.Length, bytes.Length, FileAccess.Write))
-                    {
-                        unsafeMemoryStream.Write(bytes, 0, bytes.Length);
-                    }
-                }
-            }
-            finally
-            {
-                Kernel32Api.GlobalUnlock(hGlobal);
-            }
-            // Place the content on the clipboard
-            NativeMethods.SetClipboardData(formatId, hGlobal);
+            return formatId;
         }
 
         /// <summary>
@@ -366,8 +148,10 @@ namespace Dapplo.Windows.Clipboard
         ///     Enumerate through all formats on the clipboard, assumes the clipboard was already locked.
         /// </summary>
         /// <returns>IEnumerable with strings defining the format</returns>
-        public static IList<string> AvailableFormats()
+        public static IList<string> AvailableFormats(this IClipboard clipboard)
         {
+            clipboard.ThrowWhenNoAccess();
+
             uint clipboardFormatId = 0;
 
             var result = new List<string>();
@@ -410,126 +194,5 @@ namespace Dapplo.Windows.Clipboard
 
             return result;
         }
-
-        #region Native methods
-
-        private static class NativeMethods
-        {
-            /// <summary>
-            ///     See
-            ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649038(v=vs.85).aspx">EnumClipboardFormats function</a>
-            ///     Enumerates the data formats currently available on the clipboard.
-            ///     Clipboard data formats are stored in an ordered list. To perform an enumeration of clipboard data formats, you make
-            ///     a series of calls to the EnumClipboardFormats function. For each call, the format parameter specifies an available
-            ///     clipboard format, and the function returns the next available clipboard format.
-            /// </summary>
-            /// <param name="format">
-            ///     To start an enumeration of clipboard formats, set format to zero. When format is zero, the
-            ///     function retrieves the first available clipboard format. For subsequent calls during an enumeration, set format to
-            ///     the result of the previous EnumClipboardFormats call.
-            /// </param>
-            /// <returns>If the function succeeds, the return value is the clipboard format that follows the specified format, namely the next available clipboard format.
-            ///     If the function fails, the return value is zero. To get extended error information, call GetLastError. If the clipboard is not open, the function fails.
-            ///     If there are no more clipboard formats to enumerate, the return value is zero. In this case, the GetLastError function returns the value ERROR_SUCCESS.
-            ///     This lets you distinguish between function failure and the end of enumeration.
-            /// </returns>
-            [DllImport("user32", SetLastError = true)]
-            internal static extern uint EnumClipboardFormats(uint format);
-
-            /// <summary>
-            /// Determines whether the clipboard contains data in the specified format.
-            /// </summary>
-            /// <param name="format">uint for the format</param>
-            /// <returns>bool</returns>
-            [DllImport("user32", SetLastError = true)]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool IsClipboardFormatAvailable(uint format);
-
-            /// <summary>
-            /// Empties the clipboard and frees handles to data in the clipboard. The function then assigns ownership of the clipboard to the window that currently has the clipboard open.
-            /// </summary>
-            /// <returns>bool</returns>
-            [DllImport("user32", SetLastError = true)]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool EmptyClipboard();
-
-            /// <summary>
-            /// Retrieves data from the clipboard in a specified format. The clipboard must have been opened previously.
-            /// </summary>
-            /// <param name="format">uint with the clipboard format.</param>
-            /// <returns>IntPtr with a handle to the memory</returns>
-            [DllImport("user32", SetLastError = true)]
-            internal static extern IntPtr GetClipboardData(uint format);
-
-            /// <summary>
-            /// Places data on the clipboard in a specified clipboard format.
-            /// The window must be the current clipboard owner, and the application must have called the OpenClipboard function.
-            /// (When responding to the WM_RENDERFORMAT and WM_RENDERALLFORMATS messages, the clipboard owner must not call OpenClipboard before calling SetClipboardData.)
-            /// </summary>
-            /// <param name="format">uint</param>
-            /// <param name="memory">IntPtr to the memory area</param>
-            /// <returns></returns>
-            [DllImport("user32", SetLastError = true)]
-            internal static extern IntPtr SetClipboardData(uint format, IntPtr memory);
-
-            /// <summary>
-            ///     See
-            ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649040(v=vs.85).aspx">GetClipboardFormatName function</a>
-            ///     Retrieves from the clipboard the name of the specified registered format.
-            ///     The function copies the name to the specified buffer.
-            /// </summary>
-            /// <param name="format">uint with the id of the format</param>
-            /// <param name="lpszFormatName">Name of the format</param>
-            /// <param name="cchMaxCount">Maximum size of the output</param>
-            /// <returns></returns>
-            [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern unsafe int GetClipboardFormatName(uint format, [Out] char * lpszFormatName, int cchMaxCount);
-
-            /// <summary>
-            /// Registers a new clipboard format. This format can then be used as a valid clipboard format.
-            /// 
-            /// If a registered format with the specified name already exists, a new format is not registered and the return value identifies the existing format. This enables more than one application to copy and paste data using the same registered clipboard format. Note that the format name comparison is case-insensitive.
-            /// Registered clipboard formats are identified by values in the range 0xC000 through 0xFFFF.
-            /// When registered clipboard formats are placed on or retrieved from the clipboard, they must be in the form of an HGLOBAL value.
-            /// </summary>
-            /// <param name="lpszFormat">The name of the new format.</param>
-            /// <returns>
-            /// If the function succeeds, the return value identifies the registered clipboard format.
-            /// If the function fails, the return value is zero. To get extended error information, call GetLastError.
-            /// </returns>
-            [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint RegisterClipboardFormat(string lpszFormat);
-
-            /// <summary>
-            /// Returns the hWnd of the owner of the clipboard content
-            /// </summary>
-            /// <returns>IntPtr with a hWnd</returns>
-            [DllImport("user32", SetLastError = true)]
-            internal static extern IntPtr GetClipboardOwner();
-
-            /// <summary>
-            /// Retrieves the sequence number of the clipboard
-            /// </summary>
-            /// <returns>sequence number or 0 if this cannot be retrieved</returns>
-            [DllImport("user32", SetLastError = true)]
-            internal static extern uint GetClipboardSequenceNumber();
-
-            /// <summary>
-            /// Retrieves the names of dropped files that result from a successful drag-and-drop operation.
-            /// </summary>
-            /// <param name="hDrop">Identifier of the structure that contains the file names of the dropped files.</param>
-            /// <param name="iFile">Index of the file to query. If the value of this parameter is 0xFFFFFFFF, DragQueryFile returns a count of the files dropped. If the value of this parameter is between zero and the total number of files dropped, DragQueryFile copies the file name with the corresponding value to the buffer pointed to by the lpszFile parameter.</param>
-            /// <param name="lpszFile">The address of a buffer that receives the file name of a dropped file when the function returns. This file name is a null-terminated string. If this parameter is NULL, DragQueryFile returns the required size, in characters, of this buffer.</param>
-            /// <param name="cch">The size, in characters, of the lpszFile buffer.</param>
-            /// <returns>
-            /// A nonzero value indicates a successful call.
-            /// When the function copies a file name to the buffer, the return value is a count of the characters copied, not including the terminating null character.
-            /// If the index value is 0xFFFFFFFF, the return value is a count of the dropped files. Note that the index variable itself returns unchanged, and therefore remains 0xFFFFFFFF.
-            /// If the index value is between zero and the total number of dropped files, and the lpszFile buffer address is NULL, the return value is the required size, in characters, of the buffer, not including the terminating null character.
-            /// </returns>
-            [DllImport("shell32")]
-            internal static extern unsafe int DragQueryFile(IntPtr hDrop, uint iFile, [Out] char* lpszFile, int cch);
-        }
-        #endregion
     }
 }

@@ -20,30 +20,40 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
-using System.IO;
+using Dapplo.Windows.Kernel32;
 
 namespace Dapplo.Windows.Clipboard.Internals
 {
     /// <summary>
-    /// This wraps an UnmanagedMemoryStream, to also take care or disposing some disposable
+    /// This class contains native information to handle the clipboard contents
     /// </summary>
-    internal class UnmanagedMemoryStreamWrapper : UnmanagedMemoryStream
+    internal class ClipboardNativeInfo : IDisposable
     {
-        private IDisposable _disposable;
+        internal IntPtr GlobalHandle { get; set; }
+        internal bool NeedsWrite { get; set; }
 
-        public unsafe UnmanagedMemoryStreamWrapper(byte* bytes, long length, long capacity, FileAccess fileAccess) : base(bytes, length, capacity, fileAccess)
-        {
-        }
+        /// <summary>
+        /// The format id which is processed
+        /// </summary>
+        internal uint FormatId { get; set; }
+        internal IntPtr MemoryPtr { get; set; }
 
-        public void SetDisposable(IDisposable disposable)
-        {
-            _disposable = disposable;
-        }
+        /// <summary>
+        /// Returns the size of the clipboard area
+        /// </summary>
+        internal int Size => Kernel32Api.GlobalSize(GlobalHandle);
 
-        protected override void Dispose(bool disposing)
+        /// <summary>
+        /// Cleanup this native info by unlocking the global handle
+        /// </summary>
+        public void Dispose()
         {
-            base.Dispose(disposing);
-            _disposable?.Dispose();;
+            Kernel32Api.GlobalUnlock(GlobalHandle);
+            if (NeedsWrite)
+            {
+                // Place the content on the clipboard
+                NativeMethods.SetClipboardData(FormatId, GlobalHandle);
+            }
         }
     }
 }
