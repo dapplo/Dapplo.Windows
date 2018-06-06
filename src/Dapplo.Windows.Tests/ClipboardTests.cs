@@ -94,7 +94,7 @@ namespace Dapplo.Windows.Tests
         /// <summary>
         ///     Test the format mappers
         /// </summary>
-        [Fact]
+        [WpfFact]
         public void TestClipboard_Formats()
         {
             Assert.Equal((uint)StandardClipboardFormats.DisplayBitmap, ClipboardFormatExtensions.MapFormatToId(StandardClipboardFormats.DisplayBitmap.AsString()));
