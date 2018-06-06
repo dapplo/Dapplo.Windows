@@ -26,6 +26,7 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using Dapplo.Windows.Clipboard.Internals;
 using Dapplo.Windows.Messages;
 
 #endregion
@@ -79,7 +80,7 @@ namespace Dapplo.Windows.Clipboard
                     }
 
                     var hookSubscription = WinProcHandler.Instance.Subscribe(WinProcClipboardMessageHandler);
-                    if (!AddClipboardFormatListener(WinProcHandler.Instance.Handle))
+                    if (!NativeMethods.AddClipboardFormatListener(WinProcHandler.Instance.Handle))
                     {
                         observer.OnError(new Win32Exception());
                     }
@@ -91,7 +92,7 @@ namespace Dapplo.Windows.Clipboard
 
                     return Disposable.Create(() =>
                     {
-                        RemoveClipboardFormatListener(WinProcHandler.Instance.Handle);
+                        NativeMethods.RemoveClipboardFormatListener(WinProcHandler.Instance.Handle);
                         hookSubscription.Dispose();
                     });
                 })
@@ -106,36 +107,5 @@ namespace Dapplo.Windows.Clipboard
         /// </summary>
         public static IObservable<ClipboardUpdateInformation> OnUpdate => Singleton.Value._clipboardObservable;
 
-        #region Native methods
-
-        /// <summary>
-        ///     Add a window as a clipboard format listener
-        ///     See
-        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649033(v=vs.85).aspx">
-        ///         AddClipboardFormatListener
-        ///         function
-        ///     </a>
-        /// </summary>
-        /// <param name="hWnd">IntPtr for the window to handle the messages</param>
-        /// <returns>true if it worked, false if not; call GetLastError to see what was the problem</returns>
-        [DllImport("user32", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool AddClipboardFormatListener(IntPtr hWnd);
-
-        /// <summary>
-        ///     Remove a window as a clipboard format listener
-        ///     See
-        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649050(v=vs.85).aspx">
-        ///         RemoveClipboardFormatListener
-        ///         function
-        ///     </a>
-        /// </summary>
-        /// <param name="hWnd">IntPtr for the window to handle the messages</param>
-        /// <returns>true if it worked, false if not; call GetLastError to see what was the problem</returns>
-        [DllImport("user32", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool RemoveClipboardFormatListener(IntPtr hWnd);
-
-        #endregion
     }
 }

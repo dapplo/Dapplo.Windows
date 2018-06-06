@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// <param name="retryInterval">TimeSpan for the time between retries</param>
         /// <param name="timeout">A timeout for waiting on the semaphore</param>
         /// <returns>IClipboardLock</returns>
-        public IClipboard Lock(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
+        public IClipboardAccessToken Lock(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
         {
             if (hWnd == IntPtr.Zero)
             {
@@ -92,7 +92,7 @@ namespace Dapplo.Windows.Clipboard.Internals
                 throw new Win32Exception();
             }
             // Return a disposable which cleans up the current state.
-            return new Clipboard(() => {
+            return new ClipboardAccessToken(() => {
                 CloseClipboard();
                 _semaphoreSlim.Release();
             });
@@ -106,7 +106,7 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// <param name="retryInterval">optional TimeSpan</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>Task with IClipboardLock</returns>
-        public async Task<IClipboard> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default)
+        public async Task<IClipboardAccessToken> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default)
         {
             if (hWnd == IntPtr.Zero)
             {
@@ -135,7 +135,7 @@ namespace Dapplo.Windows.Clipboard.Internals
                 throw new Win32Exception();
             }
 
-            return new Clipboard(() => {
+            return new ClipboardAccessToken(() => {
                 CloseClipboard();
                 _semaphoreSlim.Release();
             });

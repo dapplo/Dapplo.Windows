@@ -19,36 +19,22 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using System;
+using Dapplo.Windows.Clipboard.Internals;
 
-namespace Dapplo.Windows.Clipboard.Internals
+namespace Dapplo.Windows.Clipboard
 {
-    internal class Clipboard : IClipboard
+    /// <summary>
+    /// These are extensions to work with the clipboard
+    /// </summary>
+    public static class ClipboardMiscExtensions
     {
-        private readonly Action _disposeAction;
-
-        public Clipboard(Action disposeAction)
+        /// <summary>
+        /// Empties the clipboard, this assumes that a lock has already been retrieved.
+        /// </summary>
+        public static void ClearContents(this IClipboardAccessToken clipboardAccessToken)
         {
-            _disposeAction = disposeAction;
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            CanAccess = true;
-            _disposeAction();
-        }
-
-        /// <inheritdoc />
-        public bool CanAccess { get; private set; }
-
-        /// <inheritdoc />
-        public void ThrowWhenNoAccess()
-        {
-            if (CanAccess)
-            {
-                throw new NotSupportedException();
-            }
+            clipboardAccessToken.ThrowWhenNoAccess();
+            NativeMethods.EmptyClipboard();
         }
     }
 }

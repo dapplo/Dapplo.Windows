@@ -53,9 +53,9 @@ namespace Dapplo.Windows.Clipboard
         /// <summary>
         /// This class can only be instanciated when there is a clipboard lock, that is why the constructor is private.
         /// </summary>
-        private ClipboardUpdateInformation(IClipboard clipboard)
+        private ClipboardUpdateInformation(IClipboardAccessToken clipboardAccessToken)
         {
-            Formats = clipboard.AvailableFormats();
+            Formats = clipboardAccessToken.AvailableFormats();
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Dapplo.Windows.Clipboard
             {
                 hWnd = WinProcHandler.Instance.Handle;
             }
-            using (var clipboard = ClipboardNative.AccessClipboard(hWnd))
+            using (var clipboard = ClipboardNative.Access(hWnd))
             {
                 return new ClipboardUpdateInformation(clipboard);
             }

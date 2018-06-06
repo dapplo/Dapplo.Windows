@@ -31,14 +31,13 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// <summary>
         /// Create ClipboardNativeInfo to read
         /// </summary>
-        /// <param name="clipboard">IClipboardLock</param>
-        /// <param name="format">string</param>
+        /// <param name="clipboardAccessToken">IClipboardLock</param>
+        /// <param name="formatId">uint</param>
         /// <returns>ClipboardNativeInfo</returns>
-        public static ClipboardNativeInfo ReadInfo(this IClipboard clipboard, string format)
+        public static ClipboardNativeInfo ReadInfo(this IClipboardAccessToken clipboardAccessToken, uint formatId)
         {
-            clipboard.ThrowWhenNoAccess();
+            clipboardAccessToken.ThrowWhenNoAccess();
 
-            var formatId = ClipboardNative.MapFormatToId(format);
             var hGlobal = NativeMethods.GetClipboardData(formatId);
             var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
             if (memoryPtr == IntPtr.Zero)
@@ -57,15 +56,13 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// <summary>
         /// Factory for the write information
         /// </summary>
-        /// <param name="clipboard">IClipboardLock</param>
-        /// <param name="format">string</param>
+        /// <param name="clipboardAccessToken">IClipboardLock</param>
+        /// <param name="formatId">uint with the format id</param>
         /// <param name="size">int with the size of the clipboard area</param>
         /// <returns>ClipboardNativeInfo</returns>
-        public static ClipboardNativeInfo WriteInfo(this IClipboard clipboard, string format, long size)
+        public static ClipboardNativeInfo WriteInfo(this IClipboardAccessToken clipboardAccessToken, uint formatId, long size)
         {
-            clipboard.ThrowWhenNoAccess();
-
-            var formatId = ClipboardNative.MapFormatToId(format);
+            clipboardAccessToken.ThrowWhenNoAccess();
 
             var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable, new UIntPtr((ulong)size));
             if (hGlobal == IntPtr.Zero)

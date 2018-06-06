@@ -140,5 +140,33 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// </returns>
         [DllImport("shell32")]
         internal static extern unsafe int DragQueryFile(IntPtr hDrop, uint iFile, [Out] char* lpszFile, int cch);
+
+        /// <summary>
+        ///     Add a window as a clipboard format listener
+        ///     See
+        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649033(v=vs.85).aspx">
+        ///         AddClipboardFormatListener
+        ///         function
+        ///     </a>
+        /// </summary>
+        /// <param name="hWnd">IntPtr for the window to handle the messages</param>
+        /// <returns>true if it worked, false if not; call GetLastError to see what was the problem</returns>
+        [DllImport("user32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool AddClipboardFormatListener(IntPtr hWnd);
+
+        /// <summary>
+        ///     Remove a window as a clipboard format listener
+        ///     See
+        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649050(v=vs.85).aspx">
+        ///         RemoveClipboardFormatListener
+        ///         function
+        ///     </a>
+        /// </summary>
+        /// <param name="hWnd">IntPtr for the window to handle the messages</param>
+        /// <returns>true if it worked, false if not; call GetLastError to see what was the problem</returns>
+        [DllImport("user32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool RemoveClipboardFormatListener(IntPtr hWnd);
     }
 }

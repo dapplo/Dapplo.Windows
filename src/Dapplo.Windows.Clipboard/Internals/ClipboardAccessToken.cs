@@ -21,22 +21,34 @@
 
 using System;
 
-namespace Dapplo.Windows.Clipboard
+namespace Dapplo.Windows.Clipboard.Internals
 {
-    /// <summary>
-    /// This interface is returned by the ClipboardLockProvider
-    /// As long as you have this, you can access the clipboard
-    /// </summary>
-    public interface IClipboard : IDisposable
+    internal class ClipboardAccessToken : IClipboardAccessToken
     {
-        /// <summary>
-        /// Check if the clipboard can be accessed
-        /// </summary>
-        bool CanAccess { get; }
+        private readonly Action _disposeAction;
 
-        /// <summary>
-        /// This throws a NotSupportedException when the clipboard can't be accessed
-        /// </summary>
-        void ThrowWhenNoAccess();
+        public ClipboardAccessToken(Action disposeAction)
+        {
+            _disposeAction = disposeAction;
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            CanAccess = true;
+            _disposeAction();
+        }
+
+        /// <inheritdoc />
+        public bool CanAccess { get; private set; }
+
+        /// <inheritdoc />
+        public void ThrowWhenNoAccess()
+        {
+            if (CanAccess)
+            {
+                throw new NotSupportedException();
+            }
+        }
     }
 }

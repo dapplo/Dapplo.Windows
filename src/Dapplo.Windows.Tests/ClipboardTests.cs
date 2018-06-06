@@ -71,7 +71,7 @@ namespace Dapplo.Windows.Tests
 
                 if (clipboardUpdateInformation.Formats.Contains("PNG"))
                 {
-                    using (var clipboard = ClipboardNative.AccessClipboard())
+                    using (var clipboard = ClipboardNative.Access())
                     {
                         using (var stream = clipboard.GetAsStream("PNG"))
                         {
@@ -92,6 +92,15 @@ namespace Dapplo.Windows.Tests
         }
 
         /// <summary>
+        ///     Test the format mappers
+        /// </summary>
+        [Fact]
+        public void TestClipboard_Formats()
+        {
+            Assert.Equal((uint)StandardClipboardFormats.DisplayBitmap, ClipboardFormatExtensions.MapFormatToId(StandardClipboardFormats.DisplayBitmap.AsString()));
+        }
+
+        /// <summary>
         ///     Test registering a clipboard format for the clipboard
         /// </summary>
         [WpfFact]
@@ -100,14 +109,14 @@ namespace Dapplo.Windows.Tests
             string format = "DAPPLO.DOPY" + ClipboardNative.SequenceNumber;
 
             // Register the format
-            var id1 = ClipboardNative.RegisterFormat(format);
+            var id1 = ClipboardFormatExtensions.RegisterFormat(format);
             // Register the format again
-            var id2 = ClipboardNative.RegisterFormat(format);
+            var id2 = ClipboardFormatExtensions.RegisterFormat(format);
 
             Assert.Equal(id1, id2);
 
             // Make sure it works
-            using (var clipboard = ClipboardNative.AccessClipboard())
+            using (var clipboard = ClipboardNative.Access())
             {
                 clipboard.ClearContents();
                 clipboard.SetAsUnicodeString("Blub", format);
@@ -131,10 +140,10 @@ namespace Dapplo.Windows.Tests
 
                 hasNewContent = true;
             });
-            using (var clipboard = ClipboardNative.AccessClipboard())
+            using (var clipboardAccessToken = ClipboardNative.Access())
             {
-                clipboard.ClearContents();
-                clipboard.SetAsUnicodeString(testString, "TEST_FORMAT");
+                clipboardAccessToken.ClearContents();
+                clipboardAccessToken.SetAsUnicodeString(testString, "TEST_FORMAT");
             }
             await Task.Delay(1000);
             subscription.Dispose();
@@ -151,15 +160,15 @@ namespace Dapplo.Windows.Tests
         public async Task TestClipboardStore_String()
         {
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
-            using (var clipboard = ClipboardNative.AccessClipboard())
+            using (var clipboardAccessToken = ClipboardNative.Access())
             {
-                clipboard.ClearContents();
-                clipboard.SetAsUnicodeString(testString);
+                clipboardAccessToken.ClearContents();
+                clipboardAccessToken.SetAsUnicodeString(testString);
             }
             await Task.Delay(1000);
-            using (var clipboard = ClipboardNative.AccessClipboard())
+            using (var clipboardAccessToken = ClipboardNative.Access())
             {
-                Assert.Equal(testString, clipboard.GetAsUnicodeString());
+                Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
             }
         }
 
@@ -171,9 +180,9 @@ namespace Dapplo.Windows.Tests
         //[WpfFact]
         public void TestClipboard_Filenames()
         {
-            using (var clipboard = ClipboardNative.AccessClipboard())
+            using (var clipboardAccessToken = ClipboardNative.Access())
             {
-                var filenames = clipboard.GetFilenames();
+                var filenames = clipboardAccessToken.GetFilenames();
                 Assert.True(filenames.Any());
             }
         }
@@ -194,19 +203,19 @@ namespace Dapplo.Windows.Tests
             testStream.Seek(0, SeekOrigin.Begin);
             Assert.Equal(testString, Encoding.Unicode.GetString(testStream.GetBuffer(), 0, (int)testStream.Length).TrimEnd('\0'));
 
-            using (var clipboard = ClipboardNative.AccessClipboard())
+            using (var clipboardAccessToken = ClipboardNative.Access())
             {
-                clipboard.ClearContents();
-                clipboard.SetAsStream("CF_UNICODETEXT", testStream);
+                clipboardAccessToken.ClearContents();
+                clipboardAccessToken.SetAsStream(StandardClipboardFormats.UnicodeText, testStream);
             }
             await Task.Delay(1000);
-            using (var clipboard = ClipboardNative.AccessClipboard())
+            using (var clipboardAccessToken = ClipboardNative.Access())
             {
-                Assert.Equal(testString, clipboard.GetAsUnicodeString());
-                var unicodeBytes = clipboard.GetAsBytes("CF_UNICODETEXT");
+                Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
+                var unicodeBytes = clipboardAccessToken.GetAsBytes(StandardClipboardFormats.UnicodeText);
                 Assert.Equal(testString, Encoding.Unicode.GetString(unicodeBytes, 0, unicodeBytes.Length).TrimEnd('\0'));
 
-                var unicodeStream = clipboard.GetAsStream("CF_UNICODETEXT");
+                var unicodeStream = clipboardAccessToken.GetAsStream(StandardClipboardFormats.UnicodeText);
                 using (var memoryStream = new MemoryStream())
                 {
                     unicodeStream.CopyTo(memoryStream);

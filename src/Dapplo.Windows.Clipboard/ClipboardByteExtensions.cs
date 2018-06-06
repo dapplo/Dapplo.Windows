@@ -34,12 +34,36 @@ namespace Dapplo.Windows.Clipboard
         /// Retrieve the content for the specified format.
         /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
         /// </summary>
-        /// <param name="clipboard">IClipboardLock</param>
-        /// <param name="format">the format to retrieve the content for</param>
+        /// <param name="clipboardAccessToken">IClipboardLock</param>
+        /// <param name="format">StandardClipboardFormats with the format to retrieve the content for</param>
         /// <returns>byte array</returns>
-        public static byte[] GetAsBytes(this IClipboard clipboard, string format)
+        public static byte[] GetAsBytes(this IClipboardAccessToken clipboardAccessToken, StandardClipboardFormats format)
         {
-            using (var readInfo = clipboard.ReadInfo(format))
+            return clipboardAccessToken.GetAsBytes((uint)format);
+        }
+
+        /// <summary>
+        /// Retrieve the content for the specified format.
+        /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
+        /// </summary>
+        /// <param name="clipboardAccessToken">IClipboardLock</param>
+        /// <param name="format">string with the format to retrieve the content for</param>
+        /// <returns>byte array</returns>
+        public static byte[] GetAsBytes(this IClipboardAccessToken clipboardAccessToken, string format)
+        {
+            return clipboardAccessToken.GetAsBytes(ClipboardFormatExtensions.MapFormatToId(format));
+        }
+
+        /// <summary>
+        /// Retrieve the content for the specified format.
+        /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
+        /// </summary>
+        /// <param name="clipboardAccessToken">IClipboardLock</param>
+        /// <param name="formatId">uint with the format to retrieve the content for</param>
+        /// <returns>byte array</returns>
+        public static byte[] GetAsBytes(this IClipboardAccessToken clipboardAccessToken, uint formatId)
+        {
+            using (var readInfo = clipboardAccessToken.ReadInfo(formatId))
             {
                 var bytes = new byte[readInfo.Size];
 
@@ -52,12 +76,34 @@ namespace Dapplo.Windows.Clipboard
         /// <summary>
         /// Place byte[] on the clipboard, this assumes you already locked the clipboard.
         /// </summary>
-        /// <param name="clipboard">IClipboardLock</param>
+        /// <param name="clipboardAccessToken">IClipboardLock</param>
         /// <param name="bytes">bytes to place on the clipboard</param>
-        /// <param name="format">format to place the bytes under</param>
-        public static void SetAsBytes(this IClipboard clipboard, byte[] bytes, string format)
+        /// <param name="format">StandardClipboardFormats with format to place the bytes under</param>
+        public static void SetAsBytes(this IClipboardAccessToken clipboardAccessToken, byte[] bytes, StandardClipboardFormats format)
         {
-            using (var writeInfo = clipboard.WriteInfo(format, bytes.Length))
+            clipboardAccessToken.SetAsBytes(bytes, (uint)format);
+        }
+
+        /// <summary>
+        /// Place byte[] on the clipboard, this assumes you already locked the clipboard.
+        /// </summary>
+        /// <param name="clipboardAccessToken">IClipboardLock</param>
+        /// <param name="bytes">bytes to place on the clipboard</param>
+        /// <param name="format">string with the format to place the bytes under</param>
+        public static void SetAsBytes(this IClipboardAccessToken clipboardAccessToken, byte[] bytes, string format)
+        {
+            clipboardAccessToken.SetAsBytes(bytes, ClipboardFormatExtensions.MapFormatToId(format));
+        }
+
+        /// <summary>
+        /// Place byte[] on the clipboard, this assumes you already locked the clipboard.
+        /// </summary>
+        /// <param name="clipboardAccessToken">IClipboardLock</param>
+        /// <param name="bytes">bytes to place on the clipboard</param>
+        /// <param name="formatId">uint with the format ID to place the bytes under</param>
+        public static void SetAsBytes(this IClipboardAccessToken clipboardAccessToken, byte[] bytes, uint formatId)
+        {
+            using (var writeInfo = clipboardAccessToken.WriteInfo(formatId, bytes.Length))
             {
                 unsafe
                 {

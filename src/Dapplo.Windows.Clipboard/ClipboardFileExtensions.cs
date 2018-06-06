@@ -33,11 +33,11 @@ namespace Dapplo.Windows.Clipboard
         /// <summary>
         /// Get a list of filenames on the clipboard
         /// </summary>
-        /// <param name="clipboard">IClipboard</param>
+        /// <param name="clipboardAccessToken">IClipboard</param>
         /// <returns>IEnumerable of string</returns>
-        public static IEnumerable<string> GetFilenames(this IClipboard clipboard)
+        public static IEnumerable<string> GetFilenames(this IClipboardAccessToken clipboardAccessToken)
         {
-            clipboard.ThrowWhenNoAccess();
+            clipboardAccessToken.ThrowWhenNoAccess();
 
             var hDrop = NativeMethods.GetClipboardData((uint)StandardClipboardFormats.Drop);
 

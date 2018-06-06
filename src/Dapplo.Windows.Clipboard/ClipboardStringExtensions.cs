@@ -32,25 +32,25 @@ namespace Dapplo.Windows.Clipboard
         /// Place string on the clipboard, this assumes you already locked the clipboard.
         /// It uses CF_UNICODETEXT by default, as all other formats are automatically generated from this by Windows.
         /// </summary>
-        /// <param name="clipboard">IClipboardLock</param>
+        /// <param name="clipboardAccessToken">IClipboardLock</param>
         /// <param name="text">string to place on the clipboard</param>
         /// <param name="format"></param>
-        public static void SetAsUnicodeString(this IClipboard clipboard, string text, string format = "CF_UNICODETEXT")
+        public static void SetAsUnicodeString(this IClipboardAccessToken clipboardAccessToken, string text, string format = "CF_UNICODETEXT")
         {
             var unicodeBytes = Encoding.Unicode.GetBytes(text + "\0");
-            clipboard.SetAsBytes(unicodeBytes, format);
+            clipboardAccessToken.SetAsBytes(unicodeBytes, format);
         }
 
         /// <summary>
         /// Get a string from the clipboard, this assumes you already locked the clipboard.
         /// This always takes the CF_UNICODETEXT format, as Windows automatically converts
         /// </summary>
-        /// <param name="clipboard">IClipboardLock</param>
+        /// <param name="clipboardAccessToken">IClipboardLock</param>
         /// <param name="format">string</param>
         /// <returns>string</returns>
-        public static string GetAsUnicodeString(this IClipboard clipboard, string format = "CF_UNICODETEXT")
+        public static string GetAsUnicodeString(this IClipboardAccessToken clipboardAccessToken, string format = "CF_UNICODETEXT")
         {
-            var bytes = clipboard.GetAsBytes(format);
+            var bytes = clipboardAccessToken.GetAsBytes(format);
             return Encoding.Unicode.GetString(bytes, 0, bytes.Length).TrimEnd('\0');
         }
     }

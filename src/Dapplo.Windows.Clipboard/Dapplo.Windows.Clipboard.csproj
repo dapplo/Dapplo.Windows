@@ -52,14 +52,16 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClipboardFormatExtensions.cs" />
+    <Compile Include="ClipboardMiscExtensions.cs" />
     <Compile Include="ClipboardFileExtensions.cs" />
     <Compile Include="ClipboardStringExtensions.cs" />
     <Compile Include="ClipboardByteExtensions.cs" />
     <Compile Include="ClipboardStreamExtensions.cs" />
-    <Compile Include="IClipboard.cs" />
+    <Compile Include="IClipboardAccessToken.cs" />
     <Compile Include="Internals\ClipboardInfoExtensions.cs" />
     <Compile Include="Internals\ClipboardNativeInfo.cs" />
-    <Compile Include="Internals\Clipboard.cs" />
+    <Compile Include="Internals\ClipboardAccessToken.cs" />
     <Compile Include="Internals\ClipboardSemaphore.cs" />
     <Compile Include="ClipboardMonitor.cs" />
     <Compile Include="ClipboardUpdateInformation.cs" />
