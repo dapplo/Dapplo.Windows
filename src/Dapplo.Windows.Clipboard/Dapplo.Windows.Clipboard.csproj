@@ -63,7 +63,6 @@
     <Compile Include="Internals\ClipboardNativeInfo.cs" />
     <Compile Include="Internals\ClipboardAccessToken.cs" />
     <Compile Include="Internals\ClipboardSemaphore.cs" />
-    <Compile Include="ClipboardMonitor.cs" />
     <Compile Include="ClipboardUpdateInformation.cs" />
     <Compile Include="ClipboardNative.cs" />
     <Compile Include="Internals\NativeMethods.cs" />

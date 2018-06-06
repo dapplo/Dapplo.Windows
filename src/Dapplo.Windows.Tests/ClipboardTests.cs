@@ -63,7 +63,7 @@ namespace Dapplo.Windows.Tests
         public async Task TestClipboardMonitor_WaitForCopy()
         {
             var tcs = new TaskCompletionSource<bool>();
-            var subscription = ClipboardMonitor.OnUpdate.Skip(1).Subscribe(clipboardUpdateInformation =>
+            var subscription = ClipboardNative.OnUpdate.Skip(1).Subscribe(clipboardUpdateInformation =>
             {
                 Log.Debug().WriteLine("Formats {0}", string.Join(",", clipboardUpdateInformation.Formats));
                 Log.Debug().WriteLine("Owner {0}", clipboardUpdateInformation.OwnerHandle);
@@ -132,7 +132,7 @@ namespace Dapplo.Windows.Tests
         {
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
             bool hasNewContent = false;
-            var subscription = ClipboardMonitor.OnUpdate.Where(clipboard => clipboard.Formats.Contains("TEST_FORMAT")).Subscribe(clipboard =>
+            var subscription = ClipboardNative.OnUpdate.Where(clipboard => clipboard.Formats.Contains("TEST_FORMAT")).Subscribe(clipboard =>
             {
                 Log.Debug().WriteLine("Detected change {0}", string.Join(",", clipboard.Formats));
                 Log.Debug().WriteLine("Owner {0}", clipboard.OwnerHandle);
