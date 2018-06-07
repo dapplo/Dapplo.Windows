@@ -51,6 +51,10 @@ namespace Dapplo.Windows.Clipboard
             foreach (var enumValue in typeof(StandardClipboardFormats).GetEnumValues().Cast<StandardClipboardFormats>())
             {
                 var formatName = enumValue.AsString();
+                if (string.IsNullOrEmpty(formatName))
+                {
+                    continue;
+                }
                 uint id = (uint)enumValue;
                 Format2Id[formatName] = id;
                 Id2Format[id] = formatName;
@@ -64,9 +68,8 @@ namespace Dapplo.Windows.Clipboard
         /// <returns>string</returns>
         public static string AsString(this StandardClipboardFormats format)
         {
-            var formatToString = format.ToString();
-            var displayAttribute = format.GetType().GetMember(formatToString).FirstOrDefault()?.GetCustomAttributes<DisplayAttribute>().FirstOrDefault();
-            return displayAttribute != null ? displayAttribute.Name : formatToString;
+            var displayAttribute = format.GetType().GetMember(format.ToString()).FirstOrDefault()?.GetCustomAttributes<DisplayAttribute>().FirstOrDefault();
+            return displayAttribute?.Name;
         }
 
         /// <summary>
