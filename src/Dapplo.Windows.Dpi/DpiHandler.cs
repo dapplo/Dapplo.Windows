@@ -94,8 +94,7 @@ namespace Dapplo.Windows.Dpi
             {
                 if (Log.IsVerboseEnabled())
                 {
-                    Log.Verbose().WriteLine(
-                        "The DPI handler will only do one initial Dpi change event, on Window creation, when the DPI settings are different from the default.");
+                    Log.Verbose().WriteLine("The DPI handler will only do one initial Dpi change event, on Window creation, when the DPI settings are different from the default.");
                 }
 
                 return false;

@@ -89,7 +89,7 @@ namespace Dapplo.Windows.Dpi
         /// Returns the system DPI.
         /// </summary>
         /// <returns>uint with the system DPI</returns>
-        [DllImport("shcore")]
+        [DllImport(User32Api.User32)]
         public static extern uint GetDpiForSystem();
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Dapplo.Windows.Dpi
         /// This method will return the latest DPI_AWARENESS_CONTEXT sent to SetThreadDpiAwarenessContext. If SetThreadDpiAwarenessContext was never called for this thread, then the return value will equal the default DPI_AWARENESS_CONTEXT for the process.
         /// </summary>
         /// <returns>DpiAwarenessContext</returns>
-        [DllImport("shcore")]
+        [DllImport(User32Api.User32)]
         public static extern DpiAwarenessContext GetThreadDpiAwarenessContext();
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         /// <param name="dpiAwarenessContext">DpiAwarenessContext the new value for the current thread</param>
         /// <returns>DpiAwarenessContext previous value</returns>
-        [DllImport("shcore")]
+        [DllImport(User32Api.User32)]
         public static extern DpiAwarenessContext SetThreadDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext);
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         /// <param name="dpiAwarenessContext">DpiAwarenessContext</param>
         /// <returns>DpiAwareness</returns>
-        [DllImport("shcore")]
+        [DllImport(User32Api.User32)]
         public static extern DpiAwareness GetAwarenessFromDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext);
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         /// <param name="dpiAwarenessContext">DpiAwarenessContext</param>
         /// <returns>uint with dpi value</returns>
-        [DllImport("shcore")]
+        [DllImport(User32Api.User32)]
         public static extern uint GetDpiFromDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext);
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         /// <param name="dpiAwarenessContext">DpiAwarenessContext The context that you want to determine if it is supported.</param>
         /// <returns>bool true if supported otherwise false</returns>
-        [DllImport("shcore")]
+        [DllImport(User32Api.User32)]
         public static extern bool IsValidDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext);
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace Dapplo.Windows.Dpi
         /// This API allows you to examine the hosting behavior of a window after it has been created. A window's hosting behavior is the hosting behavior of the thread in which the window was created, as set by a call to SetThreadDpiHostingBehavior. This is a permanent value and cannot be changed after the window is created, even if the thread's hosting behavior is changed.
         /// </summary>
         /// <returns>DpiHostingBehavior</returns>
-        [DllImport("shcore")]
+        [DllImport(User32Api.User32)]
         public static extern DpiHostingBehavior GetWindowDpiHostingBehavior();
 
         /// <summary>
@@ -179,14 +179,14 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         /// <param name="dpiHostingBehavior">DpiHostingBehavior</param>
         /// <returns>previous DpiHostingBehavior</returns>
-        [DllImport("shcore")]
+        [DllImport(User32Api.User32)]
         public static extern DpiHostingBehavior SetThreadDpiHostingBehavior(DpiHostingBehavior dpiHostingBehavior);
 
         /// <summary>
         ///Retrieves the DPI_HOSTING_BEHAVIOR from the current thread.
         /// </summary>
         /// <returns>DpiHostingBehavior</returns>
-        [DllImport("shcore")]
+        [DllImport(User32Api.User32)]
         public static extern DpiHostingBehavior GetThreadDpiHostingBehavior();
 
         /// <summary>

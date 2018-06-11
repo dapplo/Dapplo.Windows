@@ -44,7 +44,8 @@ namespace Dapplo.Windows.FormsExample
             var form1 = new FormExtendsDpiAwareForm();
             var form2 = new FormWithAttachedDpiHandler();
             form2.Show();
-            var form3 = new FormWithAttachedDpiHandler();
+            Application.DoEvents();
+            var form3 = new FormDpiUnaware();
             form3.Show();
             Application.Run(form1);
         }

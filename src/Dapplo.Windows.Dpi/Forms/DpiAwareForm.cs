@@ -19,8 +19,11 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
+using Dapplo.Windows.Common;
+using Dapplo.Windows.Dpi.Enums;
 using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Dpi.Forms
@@ -31,10 +34,40 @@ namespace Dapplo.Windows.Dpi.Forms
     [SuppressMessage("Sonar Code Smell", "S110:Inheritance tree of classes should not be too deep", Justification = "This is what extending Form does...")]
     public class DpiAwareForm : Form
     {
+        private DpiAwarenessContext? _previousDpiAwarenessContext;
+
         /// <summary>
         /// The DpiHandler used for this form
         /// </summary>
         protected DpiHandler FormDpiHandler { get; } = new DpiHandler();
+
+        /// <inheritdoc />
+        protected override void CreateHandle()
+        {
+            // Test if this is supported, before calling
+            if (WindowsVersion.IsWindows10BuildOrLater(14393))
+            {
+                if (NativeDpiMethods.IsValidDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2))
+                {
+                    _previousDpiAwarenessContext = NativeDpiMethods.SetThreadDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2);
+                }
+                else if (NativeDpiMethods.IsValidDpiAwarenessContext(DpiAwarenessContext.PerMonitorAware))
+                {
+                    _previousDpiAwarenessContext = NativeDpiMethods.SetThreadDpiAwarenessContext(DpiAwarenessContext.PerMonitorAware);
+                }
+            }
+            base.CreateHandle();
+        }
+
+        /// <inheritdoc />
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            if (_previousDpiAwarenessContext.HasValue)
+            {
+                NativeDpiMethods.SetThreadDpiAwarenessContext(_previousDpiAwarenessContext.Value);
+            }
+            base.OnHandleCreated(e);
+        }
 
         /// <summary>
         /// Override the WndProc to make sure the DpiHandler is informed of the WM_NCCREATE message
