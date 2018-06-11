@@ -19,7 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.Windows.Dpi
+namespace Dapplo.Windows.Dpi.Enums
 {
     /// <summary>
     ///     Identifies the dots per inch (dpi) setting for a thread, process, or window.

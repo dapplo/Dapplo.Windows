@@ -19,34 +19,28 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-using System;
-using System.Windows.Forms;
-using Dapplo.Log;
-using Dapplo.Log.Loggers;
-
-#endregion
-
-namespace Dapplo.Windows.FormsExample
+namespace Dapplo.Windows.Dpi.Enums
 {
-    internal static class Program
+    /// <summary>
+    ///     Identifies the DPI hosting behavior for a window.
+    ///     This behavior allows windows created in the thread to host child windows with a different DPI_AWARENESS_CONTEXT
+    /// </summary>
+    public enum DpiHostingBehavior
     {
         /// <summary>
-        ///     The main entry point for the application.
+        ///     Invalid DPI hosting behavior. This usually occurs if the previous SetThreadDpiHostingBehavior call used an invalid parameter.
         /// </summary>
-        [STAThread]
-        private static void Main()
-        {
-            LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Verbose);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            var form1 = new FormExtendsDpiAwareForm();
-            var form2 = new FormWithAttachedDpiHandler();
-            form2.Show();
-            var form3 = new FormWithAttachedDpiHandler();
-            form3.Show();
-            Application.Run(form1);
-        }
+        Invalid = -1,
+
+        /// <summary>
+        ///     Default DPI hosting behavior. The associated window behaves as normal, and cannot create or re-parent child windows with a different DPI_AWARENESS_CONTEXT.
+        /// </summary>
+        Default = 0,
+
+        /// <summary>
+        ///     Mixed DPI hosting behavior. This enables the creation and re-parenting of child windows with different DPI_AWARENESS_CONTEXT. These child windows will be independently scaled by the OS.
+        /// </summary>
+        Mixed = 1
+
     }
 }

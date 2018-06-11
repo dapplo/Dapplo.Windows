@@ -22,31 +22,27 @@
 #region using
 
 using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using Dapplo.Log;
-using Dapplo.Log.Loggers;
+using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Dpi.Forms;
 
 #endregion
 
 namespace Dapplo.Windows.FormsExample
 {
-    internal static class Program
+    /// <summary>
+    /// This extends the DpiUnawareForm to disable DPI awareness
+    /// </summary>
+    public partial class FormDpiUnaware : DpiUnawareForm
     {
-        /// <summary>
-        ///     The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        private static void Main()
+        public FormDpiUnaware()
         {
-            LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Verbose);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            var form1 = new FormExtendsDpiAwareForm();
-            var form2 = new FormWithAttachedDpiHandler();
-            form2.Show();
-            var form3 = new FormWithAttachedDpiHandler();
-            form3.Show();
-            Application.Run(form1);
+            InitializeComponent();
         }
+
     }
 }

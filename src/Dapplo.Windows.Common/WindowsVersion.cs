@@ -106,5 +106,16 @@ namespace Dapplo.Windows.Common
         /// </summary>
         /// <returns>true if we are running on Windows XP or later</returns>
         public static bool IsWindowsXpOrLater => WinVersion.Major >= 5 || WinVersion.Major == 5 && WinVersion.Minor >= 1;
+
+        /// <summary>
+        ///     Test if the current Windows version is 10 and the build number or later
+        ///     See the build numbers <a href="https://en.wikipedia.org/wiki/Windows_10_version_history">here</a>
+        /// </summary>
+        /// <param name="minimalBuildNumber"></param>
+        /// <returns></returns>
+        public static bool IsWindows10BuildOrLater(int minimalBuildNumber)
+        {
+            return IsWindows10 && WinVersion.Build >= minimalBuildNumber;
+        }
     }
 }

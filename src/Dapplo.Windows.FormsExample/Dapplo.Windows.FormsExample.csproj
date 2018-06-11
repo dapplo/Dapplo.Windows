@@ -60,6 +60,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormDpiUnaware.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormDpiUnaware.Designer.cs">
+      <DependentUpon>FormDpiUnaware.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormWithAttachedDpiHandler.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -74,6 +80,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FormDpiUnaware.resx">
+      <DependentUpon>FormDpiUnaware.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormWithAttachedDpiHandler.resx">
       <DependentUpon>FormWithAttachedDpiHandler.cs</DependentUpon>
     </EmbeddedResource>

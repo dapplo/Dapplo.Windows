@@ -490,6 +490,45 @@ namespace Dapplo.Windows.Messages
         WM_DPICHANGED = 0x02E0,
 
         /// <summary>
+        /// For Per Monitor v2 top-level windows, this message is sent to all HWNDs in the child HWDN tree of the window that is undergoing a DPI change.
+        /// This message occurs before the top-level window receives WM_DPICHANGED, and traverses the child tree from the bottom up.
+        ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt807678.aspx">WM_DPICHANGED_BEFOREPARENT message</a>
+        /// </summary>
+        WM_DPICHANGED_BEFOREPARENT = 0x02E2,
+
+        /// <summary>
+        ///     For Per Monitor v2 top-level windows, this message is sent to all HWNDs in the child HWDN tree of the window that is undergoing a DPI change.
+        ///     This message occurs after the top-level window receives WM_DPICHANGED, and traverses the child tree from the top down.
+        ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt807677.aspx">WM_DPICHANGED_AFTERPARENT message</a>
+        /// </summary>
+        WM_DPICHANGED_AFTERPARENT = 0x02E3,
+
+        /// <summary>
+        ///     This message tells the operating system that the window will be sized to dimensions other than the default.
+        ///     This message is sent to top-level windows with a DPI_AWARENESS_CONTEXT of Per Monitor v2 before a WM_DPICHANGED message is sent, and allows the window to compute its desired size for the pending DPI change.
+        ///     As linear DPI scaling is the default behavior, this is only useful in scenarios where the window wants to scale non-linearly.
+        ///     If the application responds to this message, the resulting size will be the candidate rectangle send to WM_DPICHANGED.
+        ///     Use this message to alter the size of the rect that is provided with WM_DPICHANGED.
+        ///
+        ///     wParam
+        ///     The WPARAM contains a DPI value. The scaled window size that the application would set needs to be computed as if the window were to switch to this DPI.
+        /// 
+        ///     lParam
+        ///     The LPARAM is an in/out pointer to a SIZE struct. The _In_ value in the LPARAM is the pending size of the window after a user-initiated move or a call to SetWindowPos. If the window is being resized, this size is not necessarily the same as the window's current size at the time this message is received.
+        /// 
+        ///     The _Out_ value in the LPARAM should be written to by the application to specify the desired scaled window size corresponding to the provided DPI value in the WPARAM.
+        ///
+        ///     The function returns a BOOL. Returning TRUE indicates that a new size has been computed. Returning FALSE indicates that the message will not be handled, and the default linear DPI scaling will apply to the window.
+        ///
+        ///     Remarks:
+        ///     This message is only sent to top-level windows which have a DPI awareness context of Per Monitor v2.
+        ///     This event is necessary to facilitate graceful non-linear scaling, and ensures that the windows's position remains constant in relationship to the cursor and when moving back and forth across monitors.
+        ///      There is no specific default handling of this message in DefWindowProc. As for all messages it does not explicitly handle, DefWindowProc will return zero for this message. As noted above, this return tells the system to use the default linear behavior.
+        ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt807679.aspx">WM_GETDPISCALEDSIZE message</a>
+        /// </summary>
+        WM_GETDPISCALEDSIZE = 0x02E4,
+
+        /// <summary>
         /// An application sends a WM_CUT message to an edit control or combo box to delete (cut) the current selection, if any, in the edit control and copy the deleted text to the clipboard in CF_TEXT format.
         /// <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649023.aspx">WM_CUT message</a>
         /// </summary>
