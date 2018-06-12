@@ -58,7 +58,7 @@ namespace Dapplo.Windows.Dpi.Wpf
                 {
                     case WindowsMessages.WM_NCCREATE:
                         // Apply scaling 1x time
-                        window.UpdateLayoutTransform(DpiHandler.GetDpi(message.Handle) / DpiHandler.DefaultScreenDpi);
+                        window.UpdateLayoutTransform((double)NativeDpiMethods.GetDpi(message.Handle) / DpiHandler.DefaultScreenDpi);
                         break;
                     case WindowsMessages.WM_DESTROY:
                         // Remove layout transform 

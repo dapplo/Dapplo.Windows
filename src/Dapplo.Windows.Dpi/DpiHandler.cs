@@ -30,9 +30,6 @@ using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Dpi.Enums;
-using Dapplo.Windows.Gdi32;
-using Dapplo.Windows.Gdi32.Enums;
-using Dapplo.Windows.Gdi32.SafeHandles;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
@@ -42,100 +39,41 @@ using Dapplo.Windows.User32.Enums;
 namespace Dapplo.Windows.Dpi
 {
     /// <summary>
-    ///     This handles DPI changes see u.a.
-    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn469266(v=vs.85).aspx">Writing DPI-Aware Desktop and Win32 Applications</a>
+    ///     This handles DPI changes see 
+    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn469266.aspx">Writing DPI-Aware Desktop and Win32 Applications</a>
     /// </summary>
     public sealed class DpiHandler : IDisposable
     {
+        private static readonly LogSource Log = new LogSource();
+
         /// <summary>
         ///     This is the default DPI for the screen
         /// </summary>
-        public const double DefaultScreenDpi = 96d;
-
-        private static readonly LogSource Log = new LogSource();
+        public const uint DefaultScreenDpi = 96;
 
         // Stores if the handler is runing via a listener
         private bool _needsListenerWorkaround;
 
         // Via this the dpi values are published
-        private readonly ISubject<double> _onDpiChanged = new Subject<double>();
+        private readonly ISubject<uint> _onDpiChanged = new Subject<uint>();
 
         // Via this the dpi values are published in details
         private readonly ISubject<DpiChangeInfo> _onDpiChangeInfo = new Subject<DpiChangeInfo>();
 
+        private readonly IDisposable _scopedThreadDpiAwarenessContext;
         /// <summary>
         ///     Create a DpiHandler
         /// </summary>
         public DpiHandler(bool needsListenerWorkaround = false)
         {
             _needsListenerWorkaround = needsListenerWorkaround;
-            EnableDpiAwareness();
+            _scopedThreadDpiAwarenessContext = NativeDpiMethods.DefaultScopedThreadDpiAwarenessContext();
         }
 
         /// <summary>
         ///     Retrieve the current DPI for the window
         /// </summary>
-        public double Dpi { get; private set; }
-
-        /// <summary>
-        /// Turn on the Dpi awareness
-        /// </summary>
-        /// <returns>bool if this is enabled</returns>
-        public static bool EnableDpiAwareness()
-        {
-            if (IsDpiAware)
-            {
-                // Nothing to do
-                return true;
-            }
-
-            // Can we enable the DpiAwareness?
-            if (!WindowsVersion.IsWindows81OrLater)
-            {
-                if (Log.IsVerboseEnabled())
-                {
-                    Log.Verbose().WriteLine("The DPI handler will only do one initial Dpi change event, on Window creation, when the DPI settings are different from the default.");
-                }
-
-                return false;
-            }
-
-            // Try setting the DpiAwareness
-            if (NativeDpiMethods.SetProcessDpiAwareness(DpiAwareness.PerMonitorAware).Succeeded())
-            {
-                return true;
-            }
-
-            Log.Warn().WriteLine("Couldn't enable Dpi Awareness.");
-            return false;
-        }
-
-        /// <summary>
-        ///     Check if the process is DPI Aware, an DpiHandler doesn't make sense if not.
-        /// </summary>
-        public static bool IsDpiAware
-        {
-            get
-            {
-                // We can only test this for Windows 8.1 or later
-                if (!WindowsVersion.IsWindows81OrLater)
-                {
-                    Log.Verbose().WriteLine("An application can only be DPI aware starting with Window 8.1 and later.");
-                    return false;
-                }
-
-                using (var process = Process.GetCurrentProcess())
-                {
-                    NativeDpiMethods.GetProcessDpiAwareness(process.Handle, out var dpiAwareness);
-                    if (Log.IsVerboseEnabled())
-                    {
-                        Log.Verbose().WriteLine("Process {0} has a Dpi awareness {1}", process.ProcessName, dpiAwareness);
-                    }
-
-                    return dpiAwareness != DpiAwareness.Unaware && dpiAwareness != DpiAwareness.Invalid;
-                }
-            }
-        }
+        public uint Dpi { get; private set; }
 
         /// <summary>
         ///     This is that which handles the windows messages, and needs to be disposed
@@ -151,38 +89,7 @@ namespace Dapplo.Windows.Dpi
         /// <summary>
         ///     This subject publishes whenever the dpi settings are changed
         /// </summary>
-        public IObservable<double> OnDpiChanged => _onDpiChanged;
-
-        /// <summary>
-        ///     Retrieve the DPI value for the supplied window handle
-        /// </summary>
-        /// <param name="hWnd">IntPtr</param>
-        /// <returns>dpi value</returns>
-        public static uint GetDpi(IntPtr hWnd)
-        {
-            // Use the easiest method, but this only works for Windows 10
-            if (WindowsVersion.IsWindows10OrLater)
-            {
-                return NativeDpiMethods.GetDpiForWindow(hWnd);
-            }
-
-            // Use the second easiest method, but this only works for Windows 8.1 or later
-            if (WindowsVersion.IsWindows81OrLater)
-            {
-                var hMonitor = User32Api.MonitorFromWindow(hWnd, MonitorFrom.DefaultToNearest);
-                // ReSharper disable once UnusedVariable
-                if (NativeDpiMethods.GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY))
-                {
-                    return dpiX;
-                }
-            }
-
-            // Fallback to the global DPI settings
-            using (var hdc = SafeDeviceContextHandle.FromHWnd(hWnd))
-            {
-                return (uint)Gdi32Api.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
-            }
-        }
+        public IObservable<uint> OnDpiChanged => _onDpiChanged;
 
         /// <summary>
         ///     Message handler of the Per_Monitor_DPI_Aware window.
@@ -219,7 +126,7 @@ namespace Dapplo.Windows.Dpi
         internal bool HandleWindowMessages(WindowMessageInfo windowMessageInfo)
         {
             bool handled = false;
-            var currentDpi = (uint) DefaultScreenDpi;
+            var currentDpi = DefaultScreenDpi;
             bool isDpiMessage = false;
             switch (windowMessageInfo.Message)
             {
@@ -240,7 +147,8 @@ namespace Dapplo.Windows.Dpi
                         Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
                     }
 
-                    currentDpi = GetDpi(windowMessageInfo.Handle);
+                    currentDpi = NativeDpiMethods.GetDpi(windowMessageInfo.Handle);
+                    _scopedThreadDpiAwarenessContext.Dispose();
                     break;
                 // Handle the DPI change message, this is where it's supplied
                 case WindowsMessages.WM_DPICHANGED:
@@ -266,12 +174,11 @@ namespace Dapplo.Windows.Dpi
                     break;
                 case WindowsMessages.WM_PAINT:
                     // This is a workaround for non DPI aware applications, these don't seem to get a WM_CREATE
-                    if (Math.Abs(Dpi) < double.Epsilon && !IsDpiAware)
+                    if (Dpi == 0)
                     {
                         isDpiMessage = true;
-                        currentDpi = GetDpi(windowMessageInfo.Handle);
+                        currentDpi = NativeDpiMethods.GetDpi(windowMessageInfo.Handle);
                     }
-
                     break;
                 case WindowsMessages.WM_SETICON:
                     // This is a workaround for handling WinProc outside of the class
@@ -280,7 +187,7 @@ namespace Dapplo.Windows.Dpi
                         isDpiMessage = true;
                         // disable workaround
                         _needsListenerWorkaround = false;
-                        currentDpi = GetDpi(windowMessageInfo.Handle);
+                        currentDpi = NativeDpiMethods.GetDpi(windowMessageInfo.Handle);
                     }
 
                     break;
@@ -303,7 +210,7 @@ namespace Dapplo.Windows.Dpi
                 return false;
             }
 
-            if (!IsEqual(Dpi, currentDpi))
+            if (Dpi != currentDpi)
             {
                 var beforeDpi = Dpi;
                 if (Log.IsVerboseEnabled())
@@ -337,7 +244,7 @@ namespace Dapplo.Windows.Dpi
         /// <returns>IntPtr</returns>
         internal IntPtr HandleContextMenuMessages(WindowMessageInfo windowMessageInfo)
         {
-            var currentDpi = (uint) DefaultScreenDpi;
+            var currentDpi = DefaultScreenDpi;
             bool isDpiMessage = false;
             switch (windowMessageInfo.Message)
             {
@@ -349,7 +256,7 @@ namespace Dapplo.Windows.Dpi
                         Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for ContextMenuStrip {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
                     }
 
-                    currentDpi = GetDpi(windowMessageInfo.Handle);
+                    currentDpi = NativeDpiMethods.GetDpi(windowMessageInfo.Handle);
                     break;
                 case WindowsMessages.WM_DESTROY:
                     // If the window is destroyed, we complete the subject
@@ -363,7 +270,7 @@ namespace Dapplo.Windows.Dpi
                 return IntPtr.Zero;
             }
 
-            if (!IsEqual(Dpi, currentDpi))
+            if (Dpi != currentDpi)
             {
                 var beforeDpi = Dpi;
                 if (Log.IsVerboseEnabled())
@@ -386,26 +293,14 @@ namespace Dapplo.Windows.Dpi
         }
 
         /// <summary>
-        ///     Compare helper for doubles
-        /// </summary>
-        /// <param name="d1">double</param>
-        /// <param name="d2">double</param>
-        /// <param name="precisionFactor">uint</param>
-        /// <returns>bool</returns>
-        private static bool IsEqual(double d1, double d2, uint precisionFactor = 2)
-        {
-            return Math.Abs(d1 - d2) < precisionFactor * double.Epsilon;
-        }
-
-        /// <summary>
         ///     Scale the supplied number according to the supplied dpi
         /// </summary>
         /// <param name="someNumber">double with e.g. the width 16 for 16x16 images</param>
         /// <param name="dpi">current dpi, normal is 96.</param>
         /// <returns>double with the scaled number</returns>
-        public static double ScaleWithDpi(double someNumber, double dpi)
+        public static double ScaleWithDpi(double someNumber, uint dpi)
         {
-            var scaleFactor = dpi / DefaultScreenDpi;
+            var scaleFactor = (double)dpi / DefaultScreenDpi;
             return scaleFactor * someNumber;
         }
 
@@ -415,9 +310,9 @@ namespace Dapplo.Windows.Dpi
         /// <param name="baseWidth">int with e.g. 16 for 16x16 images</param>
         /// <param name="dpi">current dpi, normal is 96.</param>
         /// <returns>Scaled width</returns>
-        public static int ScaleWithDpi(int baseWidth, double dpi)
+        public static int ScaleWithDpi(int baseWidth, uint dpi)
         {
-            var scaleFactor = dpi / DefaultScreenDpi;
+            var scaleFactor = (double)dpi / DefaultScreenDpi;
             var width = (int) (scaleFactor * baseWidth);
             return width;
         }

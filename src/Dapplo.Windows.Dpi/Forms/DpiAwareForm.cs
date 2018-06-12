@@ -22,7 +22,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
-using Dapplo.Windows.Common;
 using Dapplo.Windows.Dpi.Enums;
 using Dapplo.Windows.Messages;
 
@@ -34,7 +33,7 @@ namespace Dapplo.Windows.Dpi.Forms
     [SuppressMessage("Sonar Code Smell", "S110:Inheritance tree of classes should not be too deep", Justification = "This is what extending Form does...")]
     public class DpiAwareForm : Form
     {
-        private DpiAwarenessContext? _previousDpiAwarenessContext;
+        private IDisposable _dpiAwarenessContextScope;
 
         /// <summary>
         /// The DpiHandler used for this form
@@ -44,28 +43,14 @@ namespace Dapplo.Windows.Dpi.Forms
         /// <inheritdoc />
         protected override void CreateHandle()
         {
-            // Test if this is supported, before calling
-            if (WindowsVersion.IsWindows10BuildOrLater(14393))
-            {
-                if (NativeDpiMethods.IsValidDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2))
-                {
-                    _previousDpiAwarenessContext = NativeDpiMethods.SetThreadDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2);
-                }
-                else if (NativeDpiMethods.IsValidDpiAwarenessContext(DpiAwarenessContext.PerMonitorAware))
-                {
-                    _previousDpiAwarenessContext = NativeDpiMethods.SetThreadDpiAwarenessContext(DpiAwarenessContext.PerMonitorAware);
-                }
-            }
+            //_dpiAwarenessContextScope = NativeDpiMethods.ScopedThreadDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2, DpiAwarenessContext.PerMonitorAware);
             base.CreateHandle();
         }
 
         /// <inheritdoc />
         protected override void OnHandleCreated(EventArgs e)
         {
-            if (_previousDpiAwarenessContext.HasValue)
-            {
-                NativeDpiMethods.SetThreadDpiAwarenessContext(_previousDpiAwarenessContext.Value);
-            }
+            //_dpiAwarenessContextScope.Dispose();
             base.OnHandleCreated(e);
         }
 

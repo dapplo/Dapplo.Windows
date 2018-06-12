@@ -1100,27 +1100,6 @@ namespace Dapplo.Windows.User32
         ///         SystemParametersInfo
         ///         function
         ///     </a>
-        ///     For setting an IntPtr
-        /// </summary>
-        /// <param name="uiAction">SystemParametersInfoActions</param>
-        /// <param name="uiParam">
-        ///     A parameter whose usage and format depends on the system parameter being queried or set. For more
-        ///     information about system-wide parameters, see the uiAction parameter. If not otherwise indicated, you must specify
-        ///     zero for this parameter.
-        /// </param>
-        /// <param name="pvParam">IntPtr</param>
-        /// <param name="fWinIni">SystemParametersInfoBehaviors</param>
-        /// <returns>bool</returns>
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, IntPtr pvParam, SystemParametersInfoBehaviors fWinIni);
-
-        /// <summary>
-        ///     See
-        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947(v=vs.85).aspx">
-        ///         SystemParametersInfo
-        ///         function
-        ///     </a>
         ///     For setting a string parameter
         /// </summary>
         /// <param name="uiAction">SystemParametersInfoActions</param>

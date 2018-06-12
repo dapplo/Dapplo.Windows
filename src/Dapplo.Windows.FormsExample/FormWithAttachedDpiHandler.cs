@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -37,56 +38,57 @@ namespace Dapplo.Windows.FormsExample
     /// <summary>
     /// This extends the form with extra DPI aware capabilities
     /// </summary>
-    public partial class FormWithAttachedDpiHandler : Form
+    public partial class FormWithAttachedDpiHandler : Form //DpiAwareForm
     {
         private static readonly LogSource Log = new LogSource();
-        protected readonly BitmapScaleHandler<string> ScaleHandler;
-        private readonly DpiHandler _dpiHandler;
+        private readonly BitmapScaleHandler<string> _scaleHandler;
+        private readonly DpiHandler FormDpiHandler;
         private readonly IDisposable _dpiChangeSubscription;
 
         public FormWithAttachedDpiHandler()
         {
-            _dpiHandler = this.AttachDpiHandler();
+            FormDpiHandler = this.AttachDpiHandler();
             InitializeComponent();
-            ScaleHandler = BitmapScaleHandler.WithComponentResourceManager(_dpiHandler, GetType(), ScaleIconForDisplaying);
+
+            _scaleHandler = BitmapScaleHandler.WithComponentResourceManager(FormDpiHandler, GetType(), ScaleIconForDisplaying)
+                .AddTarget(somethingMenuItem, "somethingMenuItem.Image")
+                .AddTarget(something2MenuItem, "something2MenuItem.Image");
 
             // This can be used to do something with DPI changes, subscription should be disposed!
-            _dpiChangeSubscription = _dpiHandler.OnDpiChanged.Subscribe(dpi =>
+            _dpiChangeSubscription = FormDpiHandler.OnDpiChanged.Subscribe(dpi =>
             {
-                var width = _dpiHandler.ScaleWithCurrentDpi(20);
-                var size = new Size(width, width);
-                //menuStrip1.ImageScalingSize = size;
+                Log.Info().WriteLine("New DPI: {0}", dpi);
             });
-
-
-            ScaleHandler.AddTarget(somethingMenuItem, "somethingMenuItem.Image");
-            ScaleHandler.AddTarget(something2MenuItem, "something2MenuItem.Image");
 
             EnvironmentMonitor.EnvironmentUpdateEvents.Subscribe(args =>
             {
                 Log.Info().WriteLine("{0} - {1}", args.SystemParametersInfoAction, args.Area);
-                MessageBox.Show(this, $"{args.SystemParametersInfoAction} - {args.Area}", "Change!");
+                MessageBox.Show(this, $@"{args.SystemParametersInfoAction} - {args.Area}", @"Change!");
             });
         }
 
-        protected override void WndProc(ref Message m)
+        protected override void OnClosing(CancelEventArgs e)
         {
-            base.WndProc(ref m);
+            _dpiChangeSubscription.Dispose();
+            _scaleHandler.Dispose();
+            base.OnClosing(e);
         }
 
         /// <summary>
+        /// A simple scaling routine
         /// </summary>
-        /// <param name="bitmap"></param>
-        /// <param name="dpi"></param>
-        /// <returns></returns>
-        private Bitmap ScaleIconForDisplaying(Bitmap bitmap, double dpi)
+        /// <param name="bitmap">Bitmap</param>
+        /// <param name="dpi">uint</param>
+        /// <returns>Bitmap</returns>
+        private static Bitmap ScaleIconForDisplaying(Bitmap bitmap, uint dpi)
         {
-            var newSize = _dpiHandler.ScaleWithCurrentDpi(16);
-            var result = new Bitmap(newSize, newSize, bitmap.PixelFormat);
+            var newWidth = DpiHandler.ScaleWithDpi(bitmap.Width, dpi);
+            var newHeight = DpiHandler.ScaleWithDpi(bitmap.Height, dpi);
+            var result = new Bitmap(newWidth, newHeight, bitmap.PixelFormat);
             using (var graphics = Graphics.FromImage(result))
             {
                 graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-                graphics.DrawImage(bitmap, new Rectangle(0, 0, newSize, newSize), new Rectangle(0, 0, 16, 16), GraphicsUnit.Pixel);
+                graphics.DrawImage(bitmap, new Rectangle(0, 0, newWidth, newHeight), new Rectangle(0, 0, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
             }
             return result;
         }

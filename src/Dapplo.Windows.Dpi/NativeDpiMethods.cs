@@ -20,11 +20,20 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
+using System.Diagnostics;
+using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
+using Dapplo.Log;
+using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Enums;
+using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Dpi.Enums;
+using Dapplo.Windows.Gdi32;
+using Dapplo.Windows.Gdi32.Enums;
+using Dapplo.Windows.Gdi32.SafeHandles;
 using Dapplo.Windows.User32;
+using Dapplo.Windows.User32.Enums;
 
 namespace Dapplo.Windows.Dpi
 {
@@ -34,6 +43,137 @@ namespace Dapplo.Windows.Dpi
     /// </summary>
     public static class NativeDpiMethods
     {
+        private static readonly LogSource Log = new LogSource();
+
+        /// <summary>
+        /// Make the current process DPI Aware
+        /// </summary>
+        /// <returns></returns>
+        public static bool EnableDpiAwareness()
+        {
+            // We can only test this for Windows 8.1 or later
+            if (!WindowsVersion.IsWindows81OrLater)
+            {
+                Log.Verbose().WriteLine("An application can only be DPI aware starting with Window 8.1 and later.");
+                return false;
+            }
+
+            if (!WindowsVersion.IsWindows10BuildOrLater(15063))
+            {
+                return SetProcessDpiAwareness(DpiAwareness.PerMonitorAware).Succeeded();
+            }
+
+            if (IsValidDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2))
+            {
+                SetProcessDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2);
+            }
+            else
+            {
+                SetProcessDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        ///     Check if the process is DPI Aware, an DpiHandler doesn't make sense if not.
+        /// </summary>
+        public static bool IsDpiAware
+        {
+            get
+            {
+                // We can only test this for Windows 8.1 or later
+                if (!WindowsVersion.IsWindows81OrLater)
+                {
+                    Log.Verbose().WriteLine("An application can only be DPI aware starting with Window 8.1 and later.");
+                    return false;
+                }
+
+                using (var process = Process.GetCurrentProcess())
+                {
+                    GetProcessDpiAwareness(process.Handle, out var dpiAwareness);
+                    if (Log.IsVerboseEnabled())
+                    {
+                        Log.Verbose().WriteLine("Process {0} has a Dpi awareness {1}", process.ProcessName, dpiAwareness);
+                    }
+
+                    return dpiAwareness != DpiAwareness.Unaware && dpiAwareness != DpiAwareness.Invalid;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Retrieve the DPI value for the supplied window handle
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <returns>dpi value</returns>
+        public static uint GetDpi(IntPtr hWnd)
+        {
+            // Use the easiest method, but this only works for Windows 10
+            if (WindowsVersion.IsWindows10OrLater)
+            {
+                return NativeDpiMethods.GetDpiForWindow(hWnd);
+            }
+
+            // Use the second easiest method, but this only works for Windows 8.1 or later
+            if (WindowsVersion.IsWindows81OrLater)
+            {
+                var hMonitor = User32Api.MonitorFromWindow(hWnd, MonitorFrom.DefaultToNearest);
+                // ReSharper disable once UnusedVariable
+                if (NativeDpiMethods.GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY))
+                {
+                    return dpiX;
+                }
+            }
+
+            // Fallback to the global DPI settings
+            using (var hdc = SafeDeviceContextHandle.FromHWnd(hWnd))
+            {
+                return (uint)Gdi32Api.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
+            }
+        }
+
+        /// <summary>
+        /// Create a scope for the DpiAwarenessContext which enables Dpi Aware
+        /// </summary>
+        /// <returns>IDisposable</returns>
+        public static IDisposable DefaultScopedThreadDpiAwarenessContext()
+        {
+            return ScopedThreadDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2, DpiAwarenessContext.PerMonitorAware);
+        }
+
+        /// <summary>
+        /// Create a scope for the DpiAwarenessContext
+        /// </summary>
+        /// <param name="dpiAwarenessContext">DpiAwarenessContext</param>
+        /// <param name="alternativeAwarenessContext">DpiAwarenessContext when the first isn't accepted</param>
+        /// <returns>IDisposable</returns>
+        public static IDisposable ScopedThreadDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext, DpiAwarenessContext? alternativeAwarenessContext = null)
+        {
+            DpiAwarenessContext? previousDpiAwarenessContext = null;
+            if (!WindowsVersion.IsWindows10BuildOrLater(14393))
+            {
+                return Disposable.Empty;
+            }
+
+            if (IsValidDpiAwarenessContext(dpiAwarenessContext))
+            {
+                previousDpiAwarenessContext = SetThreadDpiAwarenessContext(dpiAwarenessContext);
+            }
+            else if (alternativeAwarenessContext.HasValue && IsValidDpiAwarenessContext(alternativeAwarenessContext.Value))
+            {
+                previousDpiAwarenessContext = SetThreadDpiAwarenessContext(alternativeAwarenessContext.Value);
+            }
+            // Make the scope disposable
+            return Disposable.Create(() =>
+            {
+                if (previousDpiAwarenessContext.HasValue)
+                {
+                    SetThreadDpiAwarenessContext(previousDpiAwarenessContext.Value);
+                }
+            });
+        }
+
         /// <summary>
         /// See details <a hef="https://msdn.microsoft.com/en-us/library/windows/desktop/dn302113(v=vs.85).aspx">GetProcessDpiAwareness function</a>
         /// Retrieves the dots per inch (dpi) awareness of the specified process.
@@ -43,6 +183,30 @@ namespace Dapplo.Windows.Dpi
         /// <returns>HResult</returns>
         [DllImport("shcore")]
         public static extern HResult GetProcessDpiAwareness(IntPtr processHandle, out DpiAwareness value);
+
+        /// <summary>
+        /// Sets the current process to a specified dots per inch (dpi) awareness level. The DPI awareness levels are from the PROCESS_DPI_AWARENESS enumeration.
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn302122(v=vs.85).aspx">SetProcessDpiAwareness function</a>
+        /// </summary>
+        /// <param name="dpiAwareness">DpiAwareness</param>
+        /// <returns>HResult</returns>
+        [DllImport("shcore")]
+        public static extern HResult SetProcessDpiAwareness(DpiAwareness dpiAwareness);
+
+        /// <summary>
+        /// It is recommended that you set the process-default DPI awareness via application manifest. See Setting the default DPI awareness for a process for more information. Setting the process-default DPI awareness via API call can lead to unexpected application behavior.
+        /// 
+        /// Sets the current process to a specified dots per inch (dpi) awareness context. The DPI awareness contexts are from the DPI_AWARENESS_CONTEXT value.
+        /// Remarks:
+        /// This API is a more advanced version of the previously existing SetProcessDpiAwareness API, allowing for the process default to be set to the finer-grained DPI_AWARENESS_CONTEXT values. Most importantly, this allows you to programmatically set Per Monitor v2 as the process default value, which is not possible with the previous API.
+        /// 
+        /// This method sets the default DPI_AWARENESS_CONTEXT for all threads within an application. Individual threads can have their DPI awareness changed from the default with the SetThreadDpiAwarenessContext method.
+       /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt807676(v=vs.85).aspx">SetProcessDpiAwarenessContext function</a>
+       /// </summary>
+       /// <param name="dpiAwarenessContext">DpiAwarenessContext</param>
+       /// <returns>bool</returns>
+        [DllImport(User32Api.User32, SetLastError = true)]
+        public static extern bool SetProcessDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext);
 
         /// <summary>
         /// See more at <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt748624(v=vs.85).aspx">GetDpiForWindow function</a>
@@ -76,15 +240,6 @@ namespace Dapplo.Windows.Dpi
         public static extern HResult EnableNonClientDpiScaling(IntPtr hWnd);
 
         /// <summary>
-        /// Sets the current process to a specified dots per inch (dpi) awareness level. The DPI awareness levels are from the PROCESS_DPI_AWARENESS enumeration.
-        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn302122(v=vs.85).aspx">SetProcessDpiAwareness function</a>
-        /// </summary>
-        /// <param name="dpiAwareness">DpiAwareness</param>
-        /// <returns>HResult</returns>
-        [DllImport("shcore")]
-        public static extern HResult SetProcessDpiAwareness(DpiAwareness dpiAwareness);
-
-        /// <summary>
         /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt748623(v=vs.85).aspx">GetDpiForSystem function</a>
         /// Returns the system DPI.
         /// </summary>
@@ -111,6 +266,27 @@ namespace Dapplo.Windows.Dpi
         /// <returns>bool</returns>
         [DllImport(User32Api.User32)]
         public static extern bool PhysicalToLogicalPointForPerMonitorDPI(IntPtr hWnd, ref NativePoint point);
+
+        /// <summary>
+        ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947(v=vs.85).aspx">SystemParametersInfo function</a>
+        ///     Retrieves the value of one of the system-wide parameters, taking into account the provided DPI value.
+        /// </summary>
+        /// <param name="uiAction">
+        /// SystemParametersInfoActions The system-wide parameter to be retrieved.
+        /// This function is only intended for use with SPI_GETICONTITLELOGFONT, SPI_GETICONMETRICS, or SPI_GETNONCLIENTMETRICS. See SystemParametersInfo for more information on these values.
+        /// </param>
+        /// <param name="uiParam">
+        ///     A parameter whose usage and format depends on the system parameter being queried or set. For more
+        ///     information about system-wide parameters, see the uiAction parameter. If not otherwise indicated, you must specify
+        ///     zero for this parameter.
+        /// </param>
+        /// <param name="pvParam">IntPtr</param>
+        /// <param name="fWinIni">SystemParametersInfoBehaviors</param>
+        /// <param name="dpi">uint with dpi value</param>
+        /// <returns>bool</returns>
+        [DllImport(User32Api.User32, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SystemParametersInfoForDpi(SystemParametersInfoActions uiAction, uint uiParam, IntPtr pvParam, SystemParametersInfoBehaviors fWinIni, uint dpi);
 
         /// <summary>
         /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt748626(v=vs.85).aspx">GetThreadDpiAwarenessContext function</a>

@@ -38,7 +38,7 @@ namespace Dapplo.Windows.WpfExample
         protected override void OnStartup(StartupEventArgs e)
         {
             LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Verbose);
-            DpiHandler.EnableDpiAwareness();
+            NativeDpiMethods.EnableDpiAwareness();
             base.OnStartup(e);
         }
     }
