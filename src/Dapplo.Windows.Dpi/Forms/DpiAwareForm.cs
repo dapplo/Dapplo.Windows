@@ -43,14 +43,14 @@ namespace Dapplo.Windows.Dpi.Forms
         /// <inheritdoc />
         protected override void CreateHandle()
         {
-            //_dpiAwarenessContextScope = NativeDpiMethods.ScopedThreadDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2, DpiAwarenessContext.PerMonitorAware);
+            _dpiAwarenessContextScope = NativeDpiMethods.ScopedThreadDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2, DpiAwarenessContext.PerMonitorAware);
             base.CreateHandle();
         }
 
         /// <inheritdoc />
         protected override void OnHandleCreated(EventArgs e)
         {
-            //_dpiAwarenessContextScope.Dispose();
+            _dpiAwarenessContextScope.Dispose();
             base.OnHandleCreated(e);
         }
 
