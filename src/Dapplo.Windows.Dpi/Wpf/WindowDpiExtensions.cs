@@ -75,7 +75,7 @@ namespace Dapplo.Windows.Dpi.Wpf
         }
 
         /// <summary>
-        ///     Handle DPI changes for the specified Window
+        ///     Handle DPI changes for the specified Window, this is actually not really needed for WPF.
         /// </summary>
         /// <param name="window">Window</param>
         /// <returns>DpiHandler</returns>

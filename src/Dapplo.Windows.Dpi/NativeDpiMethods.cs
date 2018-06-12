@@ -46,10 +46,10 @@ namespace Dapplo.Windows.Dpi
         private static readonly LogSource Log = new LogSource();
 
         /// <summary>
-        /// Make the current process DPI Aware
+        /// Make the current process DPI Aware, this should be done via the manifest but sometimes this is not possible.
         /// </summary>
-        /// <returns></returns>
-        public static bool EnableDpiAwareness()
+        /// <returns>bool true if it was possible to change the DPI awareness</returns>
+        public static bool EnableDpiAware()
         {
             // We can only test this for Windows 8.1 or later
             if (!WindowsVersion.IsWindows81OrLater)
@@ -58,21 +58,20 @@ namespace Dapplo.Windows.Dpi
                 return false;
             }
 
-            if (!WindowsVersion.IsWindows10BuildOrLater(15063))
+            if (WindowsVersion.IsWindows10BuildOrLater(15063))
             {
-                return SetProcessDpiAwareness(DpiAwareness.PerMonitorAware).Succeeded();
-            }
+                if (IsValidDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2))
+                {
+                    SetProcessDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2);
+                }
+                else
+                {
+                    SetProcessDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2);
+                }
 
-            if (IsValidDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2))
-            {
-                SetProcessDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2);
+                return true;
             }
-            else
-            {
-                SetProcessDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2);
-            }
-
-            return true;
+            return SetProcessDpiAwareness(DpiAwareness.PerMonitorAware).Succeeded();
         }
 
         /// <summary>
@@ -112,7 +111,7 @@ namespace Dapplo.Windows.Dpi
             // Use the easiest method, but this only works for Windows 10
             if (WindowsVersion.IsWindows10OrLater)
             {
-                return NativeDpiMethods.GetDpiForWindow(hWnd);
+                return GetDpiForWindow(hWnd);
             }
 
             // Use the second easiest method, but this only works for Windows 8.1 or later
@@ -120,7 +119,7 @@ namespace Dapplo.Windows.Dpi
             {
                 var hMonitor = User32Api.MonitorFromWindow(hWnd, MonitorFrom.DefaultToNearest);
                 // ReSharper disable once UnusedVariable
-                if (NativeDpiMethods.GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY))
+                if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY))
                 {
                     return dpiX;
                 }

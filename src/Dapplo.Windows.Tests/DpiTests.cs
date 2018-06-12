@@ -43,7 +43,6 @@ namespace Dapplo.Windows.Tests
         /// <summary>
         ///     Test ScaleWithDpi
         /// </summary>
-        /// <returns></returns>
         [Fact]
         public void Test_ScaleWithDpi()
         {
