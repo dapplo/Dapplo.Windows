@@ -30,6 +30,11 @@ The following functionality is available:
 * A lot of the native structs and enums
 ... more
 
+# Dapplo.Windows.Dpi
+This helps with making application using Windows.Forms be able to scale with DPI changes.
+The easiest way is to have your form extend DpiAwareForm or, if you need default scaling use DpiUnwareForm.
+When you want to handle DPI changes directly, e.g. scale bitmaps, is to use a DpiHandler.
+
 # Dapplo.Windows.Messages
 Has all the Windows Messages defined for some of the projects in the solution, so if someone uses part of the functionality not everything is included.
 
