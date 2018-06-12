@@ -23,7 +23,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
 using Dapplo.Windows.Kernel32.Enums;
 using Dapplo.Windows.Kernel32.Structs;
 

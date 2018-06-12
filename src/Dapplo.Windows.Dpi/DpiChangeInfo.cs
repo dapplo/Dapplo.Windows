@@ -32,23 +32,24 @@ namespace Dapplo.Windows.Dpi
         /// Specifies the type of change:
         /// </summary>
         public DpiChangeEventTypes DpiChangeEventType { get; }
+
         /// <summary>
         /// The current DPI, from before the change
         /// </summary>
-        public double CurrentDpi { get; }
+        public uint CurrentDpi { get; }
 
         /// <summary>
         /// The new DPI
         /// </summary>
-        public double NewDpi { get; }
+        public uint NewDpi { get; }
 
         /// <summary>
         /// Creates a DpiChangeInfo
         /// </summary>
         /// <param name="dpiChangeEventType">DpiChangeEventTypes</param>
-        /// <param name="currentDpi">double</param>
-        /// <param name="newDpi">double</param>
-        public DpiChangeInfo(DpiChangeEventTypes dpiChangeEventType, double currentDpi, double newDpi)
+        /// <param name="currentDpi">uint</param>
+        /// <param name="newDpi">uint</param>
+        public DpiChangeInfo(DpiChangeEventTypes dpiChangeEventType, uint currentDpi, uint newDpi)
         {
             DpiChangeEventType = dpiChangeEventType;
             CurrentDpi = currentDpi;
