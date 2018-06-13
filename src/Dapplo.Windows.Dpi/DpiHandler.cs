@@ -218,9 +218,8 @@ namespace Dapplo.Windows.Dpi
                 {
                     Log.Verbose().WriteLine("Changing DPI from {0} to {1}", beforeDpi, currentDpi);
                 }
-
-                _onDpiChanged.OnNext(new DpiChangeInfo(beforeDpi, currentDpi));
                 Dpi = currentDpi;
+                _onDpiChanged.OnNext(new DpiChangeInfo(beforeDpi, currentDpi));
             }
             else if (Log.IsVerboseEnabled())
             {
