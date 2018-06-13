@@ -54,6 +54,7 @@ To use the most recent version of the Internet Explorer, call:
 ```
 InternetExplorerVersion.ChangeEmbeddedVersion();
 ```
+an example is provided in the Dapplo.Windows.FormsExample project.
 
 # Dapplo.Windows.Clipboard
 In Dapplo.Clipboard specialized code for using the Windows clipboard is place.
