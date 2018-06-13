@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -55,11 +56,34 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         /// <param name="dpiHandler">DpiHandler</param>
         /// <param name="resourceType">Type to create the ComponentResourceManager for</param>
-        /// <param name="bitmapScaler">A function to provide a newly scaled bitmap</param>
+        /// <param name="bitmapScaler">A function to provide a newly scaled bitmap, you can return the provide bitmap if you want to keep it as is</param>
         public static BitmapScaleHandler<string> WithComponentResourceManager(DpiHandler dpiHandler, Type resourceType, Func<Bitmap, uint, Bitmap> bitmapScaler = null)
         {
             var resources = new ComponentResourceManager(resourceType);
             return Create<string>(dpiHandler, (imageName, dpi) => (Bitmap) resources.GetObject(imageName), bitmapScaler);
+        }
+
+        /// <summary>
+        /// A simple scaling routine
+        /// </summary>
+        /// <param name="bitmap">Bitmap to scale</param>
+        /// <param name="dpi">uint with the dpi value to scale for</param>
+        /// <returns>Bitmap</returns>
+        public static Bitmap SimpleBitmapScaler(Bitmap bitmap, uint dpi)
+        {
+            if (dpi == DpiHandler.DefaultScreenDpi)
+            {
+                return bitmap;
+            }
+
+            var newSize = DpiHandler.ScaleWithDpi(bitmap.Size, dpi);
+            var result = new Bitmap(newSize.Width, newSize.Height, bitmap.PixelFormat);
+            using (var graphics = Graphics.FromImage(result))
+            {
+                graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+                graphics.DrawImage(bitmap, new Rectangle(0, 0, newSize.Width, newSize.Height), new Rectangle(0, 0, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
+            }
+            return result;
         }
     }
 
@@ -154,16 +178,16 @@ namespace Dapplo.Windows.Dpi
         }
 
         /// <summary>
-        ///     Call with a new DPI setting
+        ///     Processes DPI Change informaation
         /// </summary>
-        /// <param name="dpi">uint with the DPI value</param>
-        private void DpiChange(uint dpi)
+        /// <param name="dpiChangeInfo">DpiChangeInfo with the DPI information</param>
+        private void ProcessDpiChange(DpiChangeInfo dpiChangeInfo)
         {
             // Make list of current bitmaps, to dispose
             var imagesToDispose = _images.Values.ToList();
             _images.Clear();
             // Store the current DPI value, for creating the images
-            _dpi = dpi;
+            _dpi = dpiChangeInfo.NewDpi;
             // Apply new images
             foreach (var key in ApplyActions.Keys)
             {
@@ -225,7 +249,7 @@ namespace Dapplo.Windows.Dpi
             BitmapScaler = bitmapScaler;
             if (dpiHandler != null)
             {
-                _dpiChangeSubscription = dpiHandler.OnDpiChanged.Subscribe(DpiChange);
+                _dpiChangeSubscription = dpiHandler.OnDpiChanged.Subscribe(ProcessDpiChange);
             }
         }
 

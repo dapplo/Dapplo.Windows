@@ -36,6 +36,5 @@ namespace Dapplo.Windows.FormsExample
         {
             InitializeComponent();
         }
-
     }
 }

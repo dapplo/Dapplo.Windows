@@ -20,7 +20,14 @@ namespace Dapplo.Windows.Com
     {
         private const int MK_E_UNAVAILABLE = -2147221021;
         private const int CO_E_CLASSSTRING = -2147221005;
+        /// <summary>
+        /// This pretty much means that the COM message was rejected by the receiving application
+        /// </summary>
         public const int RPC_E_CALL_REJECTED = unchecked((int) 0x80010001);
+
+        /// <summary>
+        /// This is a more hard error, but we are processing this like RPC_E_CALL_REJECTED
+        /// </summary>
         public const int RPC_E_FAIL = unchecked((int) 0x80004005);
         private static readonly LogSource Log = new LogSource();
 

@@ -85,6 +85,17 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        ///     Size contructor
+        /// </summary>
+        /// <param name="width">double</param>
+        /// <param name="height">double</param>
+        public NativeSizeFloat(double width, double height)
+        {
+            _width = (float)width;
+            _height = (float)height;
+        }
+
+        /// <summary>
         ///     Checks if the width * height are 0
         /// </summary>
         /// <returns>true if the size is empty</returns>

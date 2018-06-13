@@ -57,7 +57,6 @@
     <Compile Include="Enums\DialogDpiChangeBehaviors.cs" />
     <Compile Include="Enums\DialogScalingBehaviors.cs" />
     <Compile Include="Enums\DpiHostingBehavior.cs" />
-    <Compile Include="Enums\DpiChangeEventTypes.cs" />
     <Compile Include="Forms\DpiUnawareForm.cs">
       <SubType>Form</SubType>
     </Compile>

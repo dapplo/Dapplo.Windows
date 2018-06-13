@@ -28,7 +28,6 @@ using Dapplo.Log;
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Dpi.Enums;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
@@ -53,11 +52,8 @@ namespace Dapplo.Windows.Dpi
         // Stores if the handler is runing via a listener
         private bool _needsListenerWorkaround;
 
-        // Via this the dpi values are published
-        private readonly ISubject<uint> _onDpiChanged = new Subject<uint>();
-
         // Via this the dpi values are published in details
-        private readonly ISubject<DpiChangeInfo> _onDpiChangeInfo = new Subject<DpiChangeInfo>();
+        private readonly ISubject<DpiChangeInfo> _onDpiChanged = new Subject<DpiChangeInfo>();
 
         private readonly IDisposable _scopedThreadDpiAwarenessContext;
         /// <summary>
@@ -70,7 +66,7 @@ namespace Dapplo.Windows.Dpi
         }
 
         /// <summary>
-        ///     Retrieve the current DPI for the window
+        ///     Retrieve the current DPI for the UI element whic is related to this DpiHandler
         /// </summary>
         public uint Dpi { get; private set; }
 
@@ -79,16 +75,10 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         internal IDisposable MessageHandler { get; set; }
 
-
         /// <summary>
-        ///     This subject publishes whenever the dpi settings are changed
+        ///     This subject publishes whenever the dpi settings are changed, with some details
         /// </summary>
-        public IObservable<DpiChangeInfo> OnDpiChangeInfo => _onDpiChangeInfo;
-
-        /// <summary>
-        ///     This subject publishes whenever the dpi settings are changed
-        /// </summary>
-        public IObservable<uint> OnDpiChanged => _onDpiChanged;
+        public IObservable<DpiChangeInfo> OnDpiChanged => _onDpiChanged;
 
         /// <summary>
         ///     Message handler of the Per_Monitor_DPI_Aware window.
@@ -190,6 +180,18 @@ namespace Dapplo.Windows.Dpi
                     }
 
                     break;
+                case WindowsMessages.WM_DPICHANGED_BEFOREPARENT:
+                    if (Log.IsVerboseEnabled())
+                    {
+                        Log.Verbose().WriteLine("Dpi changed on {0} before parent", windowMessageInfo.Handle);
+                    }
+                    break;
+                case WindowsMessages.WM_DPICHANGED_AFTERPARENT:
+                    if (Log.IsVerboseEnabled())
+                    {
+                        Log.Verbose().WriteLine("Dpi changed on {0} after parent", windowMessageInfo.Handle);
+                    }
+                    break;
                 case WindowsMessages.WM_DESTROY:
                     if (Log.IsVerboseEnabled())
                     {
@@ -217,11 +219,8 @@ namespace Dapplo.Windows.Dpi
                     Log.Verbose().WriteLine("Changing DPI from {0} to {1}", beforeDpi, currentDpi);
                 }
 
-                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Before, beforeDpi, currentDpi));
+                _onDpiChanged.OnNext(new DpiChangeInfo(beforeDpi, currentDpi));
                 Dpi = currentDpi;
-                _onDpiChanged.OnNext(Dpi);
-                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Change, beforeDpi, currentDpi));
-                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.After, beforeDpi, currentDpi));
             }
             else if (Log.IsVerboseEnabled())
             {
@@ -274,14 +273,11 @@ namespace Dapplo.Windows.Dpi
                 var beforeDpi = Dpi;
                 if (Log.IsVerboseEnabled())
                 {
-                    Log.Verbose().WriteLine("Changing DPI from {0} to {1}", beforeDpi, currentDpi);
+                    Log.Verbose().WriteLine("DPI changed from {0} to {1}", beforeDpi, currentDpi);
                 }
 
-                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Before, beforeDpi, currentDpi));
+                _onDpiChanged.OnNext(new DpiChangeInfo(beforeDpi, currentDpi));
                 Dpi = currentDpi;
-                _onDpiChanged.OnNext(Dpi);
-                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.Change, beforeDpi, currentDpi));
-                _onDpiChangeInfo.OnNext(new DpiChangeInfo(DpiChangeEventTypes.After, beforeDpi, currentDpi));
             }
             else if (Log.IsVerboseEnabled())
             {
@@ -292,48 +288,125 @@ namespace Dapplo.Windows.Dpi
         }
 
         /// <summary>
+        /// Calculate a DPI scale factor
+        /// </summary>
+        /// <param name="dpi">uint</param>
+        /// <returns>double</returns>
+        public static double DpiScaleFactor(uint dpi)
+        {
+            return (double) dpi / DefaultScreenDpi;
+        }
+
+        /// <summary>
         ///     Scale the supplied number according to the supplied dpi
         /// </summary>
         /// <param name="someNumber">double with e.g. the width 16 for 16x16 images</param>
         /// <param name="dpi">current dpi, normal is 96.</param>
+        /// <param name="scaleModifier">A function which can modify the scale factor</param>
         /// <returns>double with the scaled number</returns>
-        public static double ScaleWithDpi(double someNumber, uint dpi)
+        public static double ScaleWithDpi(double someNumber, uint dpi, Func<double, double> scaleModifier = null)
         {
-            var scaleFactor = (double)dpi / DefaultScreenDpi;
-            return scaleFactor * someNumber;
+            var dpiScaleFactor = DpiScaleFactor(dpi);
+            if (scaleModifier != null)
+            {
+                dpiScaleFactor = scaleModifier(dpiScaleFactor);
+            }
+            return dpiScaleFactor * someNumber;
         }
 
         /// <summary>
-        ///     Scale the supplied bnumber according to the supplied dpi
+        ///     Scale the supplied number according to the supplied dpi
         /// </summary>
-        /// <param name="baseWidth">int with e.g. 16 for 16x16 images</param>
+        /// <param name="number">int with e.g. 16 for 16x16 images</param>
         /// <param name="dpi">current dpi, normal is 96.</param>
+        /// <param name="scaleModifier">A function which can modify the scale factor</param>
         /// <returns>Scaled width</returns>
-        public static int ScaleWithDpi(int baseWidth, uint dpi)
+        public static int ScaleWithDpi(int number, uint dpi, Func<double, double> scaleModifier = null)
         {
-            var scaleFactor = (double)dpi / DefaultScreenDpi;
-            var width = (int) (scaleFactor * baseWidth);
-            return width;
+            var dpiScaleFactor = DpiScaleFactor(dpi);
+            if (scaleModifier != null)
+            {
+                dpiScaleFactor = scaleModifier(dpiScaleFactor);
+            }
+            return (int)(dpiScaleFactor * number);
+        }
+
+        /// <summary>
+        ///     Scale the supplied NativeSize according to the supplied dpi
+        /// </summary>
+        /// <param name="size">NativeSize to resize</param>
+        /// <param name="dpi">current dpi, normal is 96.</param>
+        /// <param name="scaleModifier">A function which can modify the scale factor</param>
+        /// <returns>NativeSize scaled</returns>
+        public static NativeSize ScaleWithDpi(NativeSize size, uint dpi, Func<double, double> scaleModifier = null)
+        {
+            var dpiScaleFactor = DpiScaleFactor(dpi);
+            if (scaleModifier != null)
+            {
+                dpiScaleFactor = scaleModifier(dpiScaleFactor);
+            }
+            return new NativeSize((int)(dpiScaleFactor * size.Width), (int)(dpiScaleFactor * size.Height));
+        }
+
+        /// <summary>
+        ///     Scale the supplied NativeSizeFloat according to the supplied dpi
+        /// </summary>
+        /// <param name="size">NativeSizeFloat to resize</param>
+        /// <param name="dpi">current dpi, normal is 96.</param>
+        /// <param name="scaleModifier">A function which can modify the scale factor</param>
+        /// <returns>NativeSize scaled</returns>
+        public static NativeSizeFloat ScaleWithDpi(NativeSizeFloat size, uint dpi, Func<double, double> scaleModifier = null)
+        {
+            var dpiScaleFactor = DpiScaleFactor(dpi);
+            if (scaleModifier != null)
+            {
+                dpiScaleFactor = scaleModifier(dpiScaleFactor);
+            }
+            return new NativeSizeFloat(dpiScaleFactor * size.Width, dpiScaleFactor * size.Height);
         }
 
         /// <summary>
         ///     Scale the supplied number to the current dpi
         /// </summary>
         /// <param name="someNumber">double with e.g. a width like 16 for 16x16 images</param>
+        /// <param name="scaleModifier">A function which can modify the scale factor</param>
         /// <returns>double with scaled number</returns>
-        public double ScaleWithCurrentDpi(double someNumber)
+        public double ScaleWithCurrentDpi(double someNumber, Func<double, double> scaleModifier = null)
         {
-            return ScaleWithDpi(someNumber, Dpi);
+            return ScaleWithDpi(someNumber, Dpi, scaleModifier);
         }
 
         /// <summary>
         ///     Scale the supplied number to the current dpi
         /// </summary>
         /// <param name="someNumber">int with e.g. a width like 16 for 16x16 images</param>
+        /// <param name="scaleModifier">A function which can modify the scale factor</param>
         /// <returns>int with scaled number</returns>
-        public int ScaleWithCurrentDpi(int someNumber)
+        public int ScaleWithCurrentDpi(int someNumber, Func<double, double> scaleModifier = null)
         {
-            return ScaleWithDpi(someNumber, Dpi);
+            return ScaleWithDpi(someNumber, Dpi, scaleModifier);
+        }
+
+        /// <summary>
+        ///     Scale the supplied NativeSize to the current dpi
+        /// </summary>
+        /// <param name="size">NativeSize to scale</param>
+        /// <param name="scaleModifier">A function which can modify the scale factor</param>
+        /// <returns>NativeSize scaled</returns>
+        public NativeSize ScaleWithCurrentDpi(NativeSize size, Func<double, double> scaleModifier = null)
+        {
+            return ScaleWithDpi(size, Dpi, scaleModifier);
+        }
+
+        /// <summary>
+        ///     Scale the supplied NativeSizeFloat to the current dpi
+        /// </summary>
+        /// <param name="size">NativeSizeFloat to scale</param>
+        /// <param name="scaleModifier">A function which can modify the scale factor</param>
+        /// <returns>NativeSize scaled</returns>
+        public NativeSizeFloat ScaleWithCurrentDpi(NativeSizeFloat size, Func<double, double> scaleModifier = null)
+        {
+            return ScaleWithDpi(size, Dpi, scaleModifier);
         }
 
         /// <summary>

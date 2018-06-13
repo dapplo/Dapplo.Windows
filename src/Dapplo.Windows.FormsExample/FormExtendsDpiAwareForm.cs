@@ -23,8 +23,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Windows.Desktop;
@@ -50,9 +48,17 @@ namespace Dapplo.Windows.FormsExample
 
             _dpiChangeSubscription = _contextMenuDpiHandler.OnDpiChanged.Subscribe(dpi =>
             {
-                Log.Info().WriteLine("ContextMenuStrip DPI: {0}", dpi);
+                Log.Info().WriteLine("ContextMenuStrip DPI: {0}", dpi.NewDpi);
             });
-            _scaleHandler = BitmapScaleHandler.WithComponentResourceManager(FormDpiHandler, GetType(), ScaleIconForDisplaying)
+
+            // TODO: Create a "SizeScaleHandler" or something
+            var initialMenuStripSize = menuStrip1.ImageScalingSize;
+            FormDpiHandler.OnDpiChanged.Subscribe(dpiChangeInfo =>
+            {
+                menuStrip1.ImageScalingSize = DpiHandler.ScaleWithDpi(initialMenuStripSize, dpiChangeInfo.NewDpi);
+            });
+
+            _scaleHandler = BitmapScaleHandler.WithComponentResourceManager(FormDpiHandler, GetType(), BitmapScaleHandler.SimpleBitmapScaler)
                 .AddTarget(somethingMenuItem, "somethingMenuItem.Image")
                 .AddTarget(something2MenuItem, "something2MenuItem.Image");
 
@@ -65,28 +71,10 @@ namespace Dapplo.Windows.FormsExample
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            _contextMenuDpiHandler.Dispose();
             _dpiChangeSubscription.Dispose();
             _scaleHandler.Dispose();
             base.OnClosing(e);
-        }
-
-        /// <summary>
-        /// A simple scaling routine
-        /// </summary>
-        /// <param name="bitmap">Bitmap</param>
-        /// <param name="dpi">uint</param>
-        /// <returns>Bitmap</returns>
-        private static Bitmap ScaleIconForDisplaying(Bitmap bitmap, uint dpi)
-        {
-            var newWidth = DpiHandler.ScaleWithDpi(bitmap.Width, dpi);
-            var newHeight = DpiHandler.ScaleWithDpi(bitmap.Height, dpi);
-            var result = new Bitmap(newWidth, newHeight, bitmap.PixelFormat);
-            using (var graphics = Graphics.FromImage(result))
-            {
-                graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-                graphics.DrawImage(bitmap, new Rectangle(0, 0, newWidth, newHeight), new Rectangle(0, 0, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
-            }
-            return result;
         }
 
         private void Button1_Click(object sender, EventArgs e)

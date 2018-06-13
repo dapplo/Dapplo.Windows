@@ -19,8 +19,6 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using Dapplo.Windows.Dpi.Enums;
-
 namespace Dapplo.Windows.Dpi
 {
     /// <summary>
@@ -29,14 +27,9 @@ namespace Dapplo.Windows.Dpi
     public class DpiChangeInfo
     {
         /// <summary>
-        /// Specifies the type of change:
+        /// The DPI from before the change
         /// </summary>
-        public DpiChangeEventTypes DpiChangeEventType { get; }
-
-        /// <summary>
-        /// The current DPI, from before the change
-        /// </summary>
-        public uint CurrentDpi { get; }
+        public uint PreviousDpi { get; }
 
         /// <summary>
         /// The new DPI
@@ -46,13 +39,11 @@ namespace Dapplo.Windows.Dpi
         /// <summary>
         /// Creates a DpiChangeInfo
         /// </summary>
-        /// <param name="dpiChangeEventType">DpiChangeEventTypes</param>
-        /// <param name="currentDpi">uint</param>
+        /// <param name="previousDpi">uint</param>
         /// <param name="newDpi">uint</param>
-        public DpiChangeInfo(DpiChangeEventTypes dpiChangeEventType, uint currentDpi, uint newDpi)
+        public DpiChangeInfo(uint previousDpi, uint newDpi)
         {
-            DpiChangeEventType = dpiChangeEventType;
-            CurrentDpi = currentDpi;
+            PreviousDpi = previousDpi;
             NewDpi = newDpi;
         }
     }
