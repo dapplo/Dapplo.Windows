@@ -13,6 +13,7 @@ THIS IS WORK IN PROGRESS!
 - NuGet package: [![NuGet package Dapplo.Windows.DesktopWindowsManager](https://badge.fury.io/nu/Dapplo.Windows.DesktopWindowsManager.svg)](https://badge.fury.io/nu/Dapplo.Windows.DesktopWindowsManager)
 - NuGet package: [![NuGet package Dapplo.Windows.Dpi](https://badge.fury.io/nu/Dapplo.Windows.Dpi.svg)](https://badge.fury.io/nu/Dapplo.Windows.Dpi)
 - NuGet package: [![NuGet package Dapplo.Windows.Gdi32](https://badge.fury.io/nu/Dapplo.Windows.Gdi32.svg)](https://badge.fury.io/nu/Dapplo.Windows.Gdi32)
+- NuGet package: [![NuGet package Dapplo.Windows.EmbeddedBrowser](https://badge.fury.io/nu/Dapplo.Windows.EmbeddedBrowser.svg)](https://badge.fury.io/nu/Dapplo.Windows.EmbeddedBrowser)
 - NuGet package: [![NuGet package Dapplo.Windows.Input](https://badge.fury.io/nu/Dapplo.Windows.Input.svg)](https://badge.fury.io/nu/Dapplo.Windows.Input)
 - NuGet package: [![NuGet package Dapplo.Windows.Kernel32](https://badge.fury.io/nu/Dapplo.Windows.Kernel32.svg)](https://badge.fury.io/nu/Dapplo.Windows.Kernel32)
 - NuGet package: [![NuGet package Dapplo.Windows.Messages](https://badge.fury.io/nu/Dapplo.Windows.Messages.svg)](https://badge.fury.io/nu/Dapplo.Windows.Messages)
@@ -45,6 +46,13 @@ if (WinFrame.IsAvailble) {
 	// Citrix specific code here
 	var clientHostname = WinFrame.QuerySessionInformation(InfoClasses.ClientName);
 }
+```
+
+# Dapplo.Windows.EmbeddedBrowser
+Drag ExtendedWebBrowser onto your form, and use it like the normal WebBrowser component.
+To use the most recent version of the Internet Explorer, call:
+```
+InternetExplorerVersion.ChangeEmbeddedVersion();
 ```
 
 # Dapplo.Windows.Clipboard

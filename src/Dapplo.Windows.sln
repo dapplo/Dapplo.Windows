@@ -46,6 +46,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CE6CF982
 		..\build.cake = ..\build.cake
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.EmbeddedBrowser", "Dapplo.Windows.EmbeddedBrowser\Dapplo.Windows.EmbeddedBrowser.csproj", "{66472B6B-50E2-4F2C-BE17-5DFC5FF839DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{8AA469BB-856A-4330-96CE-2BB75A014070}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AA469BB-856A-4330-96CE-2BB75A014070}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AA469BB-856A-4330-96CE-2BB75A014070}.Release|Any CPU.Build.0 = Release|Any CPU
+		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E6A137AD-B848-41FD-A467-121FB20F3BB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E6A137AD-B848-41FD-A467-121FB20F3BB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6A137AD-B848-41FD-A467-121FB20F3BB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -84,6 +90,10 @@ Global
 		{E4A0CE9D-681C-44D0-85F5-4F677EC54658}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4A0CE9D-681C-44D0-85F5-4F677EC54658}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4A0CE9D-681C-44D0-85F5-4F677EC54658}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{171A9FF9-8ABB-4E40-8C88-75157A899B71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{171A9FF9-8ABB-4E40-8C88-75157A899B71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{171A9FF9-8ABB-4E40-8C88-75157A899B71}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -120,14 +130,10 @@ Global
 		{192695D4-18D3-42BF-BE52-D35D0C1A2B23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{192695D4-18D3-42BF-BE52-D35D0C1A2B23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{192695D4-18D3-42BF-BE52-D35D0C1A2B23}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{148EA259-E0A5-4285-9F95-C2A044A95E64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66472B6B-50E2-4F2C-BE17-5DFC5FF839DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66472B6B-50E2-4F2C-BE17-5DFC5FF839DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66472B6B-50E2-4F2C-BE17-5DFC5FF839DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66472B6B-50E2-4F2C-BE17-5DFC5FF839DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

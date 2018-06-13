@@ -47,6 +47,8 @@ namespace Dapplo.Windows.FormsExample
             formWithAttachedDpiHandler.Show();
             var formExtendsDpiAwareForm = new FormExtendsDpiAwareForm();
             formExtendsDpiAwareForm.Show();
+            var webBrowserForm = new WebBrowserForm();
+            webBrowserForm.Show();
             Application.Run();
         }
     }
