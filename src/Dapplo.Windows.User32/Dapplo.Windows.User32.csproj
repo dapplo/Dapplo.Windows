@@ -72,11 +72,9 @@
     <Compile Include="Enums\TitleBarInfoIndexes.cs" />
     <Compile Include="Enums\WindowPos.cs" />
     <Compile Include="SafeHandles\SafeCurrentInputDesktopHandle.cs" />
-    <Compile Include="SafeHandles\SafeIconHandle.cs" />
     <Compile Include="Structs\AnimationInfo.cs" />
     <Compile Include="Structs\CursorInfo.cs" />
     <Compile Include="Structs\DisplayInfo.cs" />
-    <Compile Include="Structs\IconInfo.cs" />
     <Compile Include="Structs\MonitorInfoEx.cs" />
     <Compile Include="Enums\MonitorInfoFlags.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

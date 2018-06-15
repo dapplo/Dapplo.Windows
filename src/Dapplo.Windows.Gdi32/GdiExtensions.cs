@@ -75,15 +75,5 @@ namespace Dapplo.Windows.Gdi32
         {
             return new SafeHBitmapHandle(bitmap);
         }
-
-        /// <summary>
-        ///     Get a SafeIconHandle so one can use using to automatically cleanup the HIcon
-        /// </summary>
-        /// <param name="bitmap">Bitmap</param>
-        /// <returns>SafeIconHandle</returns>
-        public static SafeIconHandle GetSafeIconHandle(this Bitmap bitmap)
-        {
-            return new SafeIconHandle(bitmap);
-        }
     }
 }

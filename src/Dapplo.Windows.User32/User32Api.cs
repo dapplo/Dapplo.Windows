@@ -1004,46 +1004,6 @@ namespace Dapplo.Windows.User32
         public static extern int GetSystemMetrics(SystemMetric index);
 
         /// <summary>
-        ///     The following is used for Icon handling, and copies a hicon to a new
-        /// </summary>
-        /// <param name="hIcon">IntPtr</param>
-        /// <returns>SafeIconHandle</returns>
-        [DllImport(User32, SetLastError = true)]
-        public static extern SafeIconHandle CopyIcon(IntPtr hIcon);
-
-        /// <summary>
-        /// Destroys an icon and frees any memory the icon occupied.
-        /// </summary>
-        /// <remarks>It is only necessary to call DestroyIcon for icons and cursors created with the following functions: CreateIconFromResourceEx (if called without the LR_SHARED flag), CreateIconIndirect, and CopyIcon. Do not use this function to destroy a shared icon. A shared icon is valid as long as the module from which it was loaded remains in memory. The following functions obtain a shared icon.</remarks>
-        /// <param name="hIcon">A handle to the icon to be destroyed. The icon must not be in use.</param>
-        /// <returns>bool true if the destroy succeeded</returns>
-        [DllImport(User32, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool DestroyIcon(IntPtr hIcon);
-
-        /// <summary>
-        ///     See
-        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648389(v=vs.85).aspx">GetCursorInfo function</a>
-        ///     Retrieves information about the global cursor.
-        /// </summary>
-        /// <param name="cursorInfo">a CURSORINFO structure</param>
-        /// <returns>bool</returns>
-        [DllImport(User32, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetCursorInfo(out CursorInfo cursorInfo);
-
-        /// <summary>
-        /// Retrieves information about the specified icon or cursor.
-        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648070(v=vs.85).aspx">GetIconInfo function</a>
-        /// This also describes to get more info on standard icons and cursors
-        /// </summary>
-        /// <param name="iconHandle">A handle to the icon or cursor.</param>
-        /// <param name="iconInfo">A pointer to an ICONINFO structure. The function fills in the structure's members.</param>
-        /// <returns>bool true if the function succeeds, the return value is in the IconInfo structure.</returns>
-        [DllImport(User32, SetLastError = true)]
-        public static extern bool GetIconInfo(SafeIconHandle iconHandle, out IconInfo iconInfo);
-
-        /// <summary>
         /// Sets the mouse capture to the specified window belonging to the current thread.SetCapture captures mouse input either when the mouse is over the capturing window, or when the mouse button was pressed while the mouse was over the capturing window and the button is still down. Only one window at a time can capture the mouse.
         /// If the mouse cursor is over a window created by another thread, the system will direct mouse input to the specified window only if a mouse button is down.
         /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646262(v=vs.85).aspx">SetCapture function</a>
@@ -1067,14 +1027,6 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ReleaseCapture();
-
-        /// <summary>
-        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648062(v=vs.85).aspx">CreateIconIndirect function</a>
-        /// </summary>
-        /// <param name="icon">IconInfo</param>
-        /// <returns>IntPtr with the icon handle</returns>
-        [DllImport(User32, SetLastError = true)]
-        public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
 
         [DllImport(User32, SetLastError = true)]
         internal static extern IntPtr OpenInputDesktop(uint dwFlags, [MarshalAs(UnmanagedType.Bool)] bool fInherit, DesktopAccessRight dwDesiredAccess);

@@ -23,13 +23,14 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.User32;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
+using Dapplo.Windows.Icons.SafeHandles;
 using Dapplo.Windows.Kernel32;
 
 namespace Dapplo.Windows.Icons
@@ -122,9 +123,9 @@ namespace Dapplo.Windows.Icons
         private static string GetAppProcessPath(IInteropWindow interopWindow)
         {
             User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var pid);
-            if (string.Equals(interopWindow.GetClassname(), AppQuery.AppFrameWindowClass))
+            if (String.Equals(interopWindow.GetClassname(), AppQuery.AppFrameWindowClass))
             {
-                pid = interopWindow.GetChildren().FirstOrDefault(window => string.Equals(AppQuery.AppWindowClass, window.GetClassname()))?.GetProcessId() ?? 0;
+                pid = interopWindow.GetChildren().FirstOrDefault(window => String.Equals(AppQuery.AppWindowClass, window.GetClassname()))?.GetProcessId() ?? 0;
             }
             if (pid <= 0)
             {
@@ -150,7 +151,7 @@ namespace Dapplo.Windows.Icons
             foreach (var image in images)
             {
                 var imageStream = new MemoryStream();
-                image.Save(imageStream, System.Drawing.Imaging.ImageFormat.Png);
+                image.Save(imageStream, ImageFormat.Png);
                 imageSizes.Add(image.Size);
 
                 imageStream.Seek(0, SeekOrigin.Begin);
@@ -249,7 +250,7 @@ namespace Dapplo.Windows.Icons
         /// <returns>Icon</returns>
         public static TIcon ExtractAssociatedIcon<TIcon>(string location, int index = 0, bool useLargeIcon = true) where TIcon : class
         {
-            NativeInvokes.ExtractIconEx(location, index, out var large, out var small, 1);
+            NativeIconMethods.ExtractIconEx(location, index, out var large, out var small, 1);
             TIcon returnIcon = null;
             try
             {
@@ -270,11 +271,11 @@ namespace Dapplo.Windows.Icons
             {
                 if (!IntPtr.Zero.Equals(small))
                 {
-                    User32Api.DestroyIcon(small);
+                    NativeIconMethods.DestroyIcon(small);
                 }
                 if (!IntPtr.Zero.Equals(large))
                 {
-                    User32Api.DestroyIcon(large);
+                    NativeIconMethods.DestroyIcon(large);
                 }
             }
             return returnIcon;
@@ -287,7 +288,7 @@ namespace Dapplo.Windows.Icons
         /// <returns>int with the number of icons in the file</returns>
         public static int CountAssociatedIcons(string location)
         {
-            return NativeInvokes.ExtractIconEx(location, -1, out _, out _, 0);
+            return NativeIconMethods.ExtractIconEx(location, -1, out _, out _, 0);
         }
 
         /// <summary>
@@ -323,22 +324,14 @@ namespace Dapplo.Windows.Icons
             }
         }
 
-        private static class NativeInvokes
+        /// <summary>
+        ///     Get a SafeIconHandle so one can use using to automatically cleanup the HIcon
+        /// </summary>
+        /// <param name="bitmap">Bitmap</param>
+        /// <returns>SafeIconHandle</returns>
+        public static SafeIconHandle GetSafeIconHandle(this Bitmap bitmap)
         {
-
-            /// <summary>
-            ///     Get the Icon from a file
-            /// </summary>
-            /// <param name="sFile"></param>
-            /// <param name="iIndex"></param>
-            /// <param name="piLargeVersion"></param>
-            /// <param name="piSmallVersion"></param>
-            /// <param name="amountIcons"></param>
-            /// <returns></returns>
-            [DllImport("shell32", CharSet = CharSet.Unicode)]
-            internal static extern int ExtractIconEx(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
-
+            return new SafeIconHandle(bitmap);
         }
-
     }
 }

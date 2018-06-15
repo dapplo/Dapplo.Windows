@@ -19,36 +19,26 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-using System;
 using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
+using Dapplo.Windows.User32;
+using Dapplo.Windows.User32.Structs;
 
-#endregion
-
-namespace Dapplo.Windows.Gdi32.SafeHandles
+namespace Dapplo.Windows.Icons
 {
     /// <summary>
-    ///     Abstract class SafeObjectHandle which contains all handles that are cleaned with DeleteObject
+    /// Win32 native methods for Icon
     /// </summary>
-    public abstract class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
+    public static class NativeCursorMethods
     {
         /// <summary>
-        ///     Create SafeObjectHandle
+        ///     See
+        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648389(v=vs.85).aspx">GetCursorInfo function</a>
+        ///     Retrieves information about the global cursor.
         /// </summary>
-        /// <param name="ownsHandle">True if the class owns the handle</param>
-        protected SafeObjectHandle(bool ownsHandle) : base(ownsHandle)
-        {
-        }
-
-        /// <summary>
-        ///     Call DeleteObject
-        /// </summary>
-        /// <returns>true if this worked</returns>
-        protected override bool ReleaseHandle()
-        {
-            return Gdi32Api.DeleteObject(handle);
-        }
+        /// <param name="cursorInfo">CursorInfo structure to fill</param>
+        /// <returns>bool</returns>
+        [DllImport(User32Api.User32, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetCursorInfo(ref CursorInfo cursorInfo);
     }
 }

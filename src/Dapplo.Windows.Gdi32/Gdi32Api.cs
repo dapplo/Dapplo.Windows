@@ -262,5 +262,14 @@ namespace Dapplo.Windows.Gdi32
                 StretchBlt(targetDc, destination.X, destination.Y, destination.Width, destination.Height, safeCompatibleDcHandle, source.Left, source.Top, source.Width, source.Height, rasterOperation);
             }
         }
+
+        /// <summary>
+        /// The DeleteObject function deletes a logical pen, brush, font, bitmap, region, or palette, freeing all system resources associated with the object. After the object is deleted, the specified handle is no longer valid.
+        /// </summary>
+        /// <param name="hObject">A handle to a logical pen, brush, font, bitmap, region, or palette.</param>
+        /// <returns>bool</returns>
+        [DllImport("gdi32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool DeleteObject(IntPtr hObject);
     }
 }

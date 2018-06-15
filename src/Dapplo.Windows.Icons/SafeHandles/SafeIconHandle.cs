@@ -29,7 +29,7 @@ using Microsoft.Win32.SafeHandles;
 
 #endregion
 
-namespace Dapplo.Windows.User32.SafeHandles
+namespace Dapplo.Windows.Icons.SafeHandles
 {
     /// <summary>
     ///     A SafeHandle class implementation for the hIcon
@@ -69,7 +69,7 @@ namespace Dapplo.Windows.User32.SafeHandles
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         protected override bool ReleaseHandle()
         {
-            return User32Api.DestroyIcon(handle);
+            return NativeIconMethods.DestroyIcon(handle);
         }
     }
 }

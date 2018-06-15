@@ -26,9 +26,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using Dapplo.Windows.Icons.Enums;
+using Dapplo.Windows.Icons.SafeHandles;
 using Dapplo.Windows.Icons.Structs;
-using Dapplo.Windows.User32;
-using Dapplo.Windows.User32.SafeHandles;
 
 #endregion
 
@@ -117,7 +116,7 @@ namespace Dapplo.Windows.Icons
                 if (shfi.IconHandle != IntPtr.Zero)
                 {
                     // Cleanup
-                    User32Api.DestroyIcon(shfi.IconHandle);
+                    NativeIconMethods.DestroyIcon(shfi.IconHandle);
                 }
             }
         }
@@ -161,7 +160,7 @@ namespace Dapplo.Windows.Icons
                 if (shellFileInfo.IconHandle != IntPtr.Zero)
                 {
                     // Cleanup
-                    User32Api.DestroyIcon(shellFileInfo.IconHandle);
+                    NativeIconMethods.DestroyIcon(shellFileInfo.IconHandle);
                 }
             }
         }

@@ -24,10 +24,11 @@
 using System;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Gdi32.SafeHandles;
 
 #endregion
 
-namespace Dapplo.Windows.User32.Structs
+namespace Dapplo.Windows.Icons.Structs
 {
 	/// <summary>
 	/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648052(v=vs.85).aspx">ICONINFO structure</a>
@@ -83,7 +84,7 @@ namespace Dapplo.Windows.User32.Structs
 		/// Under this condition, the height should be an even multiple of two.
 		/// If this structure defines a color icon, this mask only defines the AND bitmask of the icon.
 		/// </summary>
-		public IntPtr BitmaskBitmapHandle => _hbmMask;
+		public SafeHBitmapHandle BitmaskBitmapHandle => new SafeHBitmapHandle(_hbmMask);
 
 		/// <summary>
 		/// A handle to the icon color bitmap.
@@ -91,6 +92,6 @@ namespace Dapplo.Windows.User32.Structs
 		/// The AND bitmask of hbmMask is applied with the SRCAND flag to the destination;
 		/// subsequently, the color bitmap is applied (using XOR) to the destination by using the SRCINVERT flag.
 		/// </summary>
-		public IntPtr ColorBitmapHandle => _hbmColor;
+		public SafeHBitmapHandle ColorBitmapHandle => new SafeHBitmapHandle(_hbmColor);
 	}
 }
