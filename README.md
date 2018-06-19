@@ -21,11 +21,12 @@ THIS IS WORK IN PROGRESS!
 - NuGet package: [![NuGet package Dapplo.Windows.Shell32](https://badge.fury.io/nu/Dapplo.Windows.Shell32.svg)](https://badge.fury.io/nu/Dapplo.Windows.Shell32)
 - NuGet package: [![NuGet package Dapplo.Windows.User32](https://badge.fury.io/nu/Dapplo.Windows.User32.svg)](https://badge.fury.io/nu/Dapplo.Windows.User32)
 
-This is actually code I wrote for Greenshot, and with this I am trying to place it into an external repository so it's easier to maintain.
+This is actually a lot of code I wrote for Greenshot, and with this I am trying to place it into an external repository so it's easier to maintain.
 
 The following functionality is available:
 * Hooking windows events (window moved, changed title etc), mouse & Keyboard
 * Generating key presses or mouse input
+* Clipboard access
 * Getting the title, location etc of windows
 * GDI / User 32 native method mapping
 * A lot of the native structs and enums
