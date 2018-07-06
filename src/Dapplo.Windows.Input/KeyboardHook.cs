@@ -164,6 +164,7 @@ namespace Dapplo.Windows.Input
 
             var keyEventArgs = new KeyboardHookEventArgs
             {
+                ScanCode = keyboardLowLevelHookStruct.ScanCode,
                 Key = keyboardLowLevelHookStruct.VirtualKeyCode,
                 IsKeyDown = isKeyDown,
                 IsLeftShift = _leftShift,
