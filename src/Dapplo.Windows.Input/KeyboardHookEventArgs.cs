@@ -129,11 +129,6 @@ namespace Dapplo.Windows.Input
         /// </summary>
         public VirtualKeyCodes Key { get; set; } = VirtualKeyCodes.NONE;
 
-        /// <summary>
-        ///     The scancode
-        /// </summary>
-        public ScanCodes ScanCode { get; set; }
-
         /// <inheritdoc />
         public override string ToString()
         {
