@@ -240,21 +240,6 @@ namespace Dapplo.Windows.Input
         [ResourceExposure(ResourceScope.None)]
         private static extern ushort GetKeyState(Keys keyCode);
 
-        private const int KeyPressed = 0x8000;
-
-        /// <summary>
-        ///     Test if the supplied key is pressed
-        /// </summary>
-        /// <param name="key">Keys</param>
-        /// <returns>true if pressed</returns>
-        public static bool IsPressed(Keys key)
-        {
-            return Convert.ToBoolean(GetKeyState(key) & KeyPressed);
-        }
-
-        #endregion
-
-        #region Native code
 
         /// <summary>
         ///     The actual delegate for the p
