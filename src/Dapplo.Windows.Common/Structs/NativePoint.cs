@@ -43,7 +43,7 @@ namespace Dapplo.Windows.Common.Structs
     [Serializable]
     [TypeConverter(typeof(NativePointTypeConverter))]
     [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
-    public struct NativePoint : IEquatable<NativePoint>
+    public readonly struct NativePoint : IEquatable<NativePoint>
     {
         private readonly int _x;
         private readonly int _y;

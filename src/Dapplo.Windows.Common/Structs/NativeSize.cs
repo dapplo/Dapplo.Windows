@@ -36,7 +36,7 @@ namespace Dapplo.Windows.Common.Structs
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
     [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
-    public struct NativeSize : IEquatable<NativeSize>
+    public readonly struct NativeSize : IEquatable<NativeSize>
     {
         private readonly int _width;
         private readonly int _height;

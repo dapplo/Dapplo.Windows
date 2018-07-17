@@ -43,7 +43,7 @@ namespace Dapplo.Windows.Common.Structs
     [Serializable]
     [TypeConverter(typeof(NativeRectFloatTypeConverter))]
     [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
-    public struct NativeRectFloat : IEquatable<NativeRectFloat>
+    public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     {
         private readonly float _x;
         private readonly float _y;

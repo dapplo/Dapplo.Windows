@@ -45,7 +45,7 @@ namespace Dapplo.Windows.Common.Structs
     [Serializable]
     [TypeConverter(typeof(NativeRectTypeConverter))]
     [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
-    public struct NativeRect : IEquatable<NativeRect>
+    public readonly struct NativeRect : IEquatable<NativeRect>
     {
         private readonly int _left;
         private readonly int _top;

@@ -21,6 +21,7 @@
 
 #region using
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -34,7 +35,7 @@ namespace Dapplo.Windows.Gdi32.Structs
     [StructLayout(LayoutKind.Sequential)]
     [SuppressMessage("Sonar Code Smell", "S2292:Trivial properties should be auto-implemented", Justification = "Interop!")]
     [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
-    public struct BitfieldColorMask
+    public struct BitfieldColorMask : IEquatable<BitfieldColorMask>
     {
         private uint _blue;
         private uint _green;
@@ -82,6 +83,45 @@ namespace Dapplo.Windows.Gdi32.Structs
                 Green = (uint) g << 16,
                 Blue = (uint) b << 24
             };
+        }
+
+        /// <inheritdoc />
+        public bool Equals(BitfieldColorMask other)
+        {
+            return _blue == other._blue && _green == other._green && _red == other._red;
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (obj is null)
+            {
+                return false;
+            }
+
+            return obj is BitfieldColorMask mask && Equals(mask);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (int) _blue;
+                hashCode = (hashCode * 397) ^ (int) _green;
+                hashCode = (hashCode * 397) ^ (int) _red;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(BitfieldColorMask left, BitfieldColorMask right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(BitfieldColorMask left, BitfieldColorMask right)
+        {
+            return !left.Equals(right);
         }
     }
 }
