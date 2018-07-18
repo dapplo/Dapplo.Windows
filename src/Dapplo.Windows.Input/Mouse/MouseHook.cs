@@ -31,7 +31,7 @@ using Dapplo.Windows.Messages;
 
 #endregion
 
-namespace Dapplo.Windows.Input
+namespace Dapplo.Windows.Input.Mouse
 {
     /// <summary>
     ///     A glocal mouse hook, using System.Reactive

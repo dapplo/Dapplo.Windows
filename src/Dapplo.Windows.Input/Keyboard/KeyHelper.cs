@@ -25,24 +25,22 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-using Dapplo.Log;
+using Dapplo.Windows.Input.Enums;
 
 #endregion
 
-namespace Dapplo.Windows.Input
+namespace Dapplo.Windows.Input.Keyboard
 {
     /// <summary>
     ///     Some code to help with hotkeys
     /// </summary>
-    public static class Hotkey
+    public static class KeyHelper
     {
-        private static readonly LogSource Log = new LogSource();
-
         /// <summary>
         ///     Get the name of a key
         /// </summary>
-        /// <param name="givenKey"></param>
-        /// <returns></returns>
+        /// <param name="givenKey">Keys</param>
+        /// <returns>string</returns>
         public static string GetKeyName(Keys givenKey)
         {
             unsafe
@@ -102,7 +100,6 @@ namespace Dapplo.Windows.Input
                     case Keys.Insert:
                     case Keys.Delete:
                     case Keys.NumLock:
-                        Log.Debug().WriteLine("Modifying Extended bit");
                         scanCode |= 0x100; // set extended bit
                         break;
                     case Keys.PrintScreen: // PrintScreen
@@ -136,9 +133,9 @@ namespace Dapplo.Windows.Input
         /// <returns>string</returns>
         public static string GetLocalizedHotkeyStringFromString(string hotkeyString)
         {
-            var virtualKeyCode = HotkeyFromString(hotkeyString);
-            var modifiers = HotkeyModifiersFromString(hotkeyString);
-            return HotkeyToLocalizedString(modifiers, virtualKeyCode);
+            var virtualKeyCode = KeyFromString(hotkeyString);
+            var modifiers = KeyModifiersFromString(hotkeyString);
+            return KeyToLocalizedString(modifiers, virtualKeyCode);
         }
 
         /// <summary>
@@ -146,7 +143,7 @@ namespace Dapplo.Windows.Input
         /// </summary>
         /// <param name="hotkey">string with the hotkey</param>
         /// <returns>Keys</returns>
-        public static Keys HotkeyFromString(string hotkey)
+        public static Keys KeyFromString(string hotkey)
         {
             if (string.IsNullOrEmpty(hotkey))
             {
@@ -165,7 +162,7 @@ namespace Dapplo.Windows.Input
         /// </summary>
         /// <param name="modifiersString"></param>
         /// <returns>Keys</returns>
-        public static Keys HotkeyModifiersFromString(string modifiersString)
+        public static Keys KeyModifiersFromString(string modifiersString)
         {
             if (string.IsNullOrEmpty(modifiersString))
             {
@@ -197,7 +194,7 @@ namespace Dapplo.Windows.Input
         /// </summary>
         /// <param name="modifierKeyCode">Keys</param>
         /// <returns>string</returns>
-        public static string HotkeyModifiersToLocalizedString(Keys modifierKeyCode)
+        public static string KeyModifiersToLocalizedString(Keys modifierKeyCode)
         {
             var hotkeyString = new StringBuilder();
             if ((modifierKeyCode & Keys.Alt) > 0)
@@ -224,7 +221,7 @@ namespace Dapplo.Windows.Input
         /// </summary>
         /// <param name="modifierKeyCode">Keys</param>
         /// <returns>string</returns>
-        public static string HotkeyModifiersToString(Keys modifierKeyCode)
+        public static string KeyModifiersToString(Keys modifierKeyCode)
         {
             var hotkeyString = new StringBuilder();
             if ((modifierKeyCode & Keys.Alt) > 0)
@@ -253,9 +250,9 @@ namespace Dapplo.Windows.Input
         /// <param name="modifierKeyCode">Keys</param>
         /// <param name="virtualKeyCode">Keys</param>
         /// <returns>string</returns>
-        public static string HotkeyToLocalizedString(Keys modifierKeyCode, Keys virtualKeyCode)
+        public static string KeyToLocalizedString(Keys modifierKeyCode, Keys virtualKeyCode)
         {
-            return HotkeyModifiersToLocalizedString(modifierKeyCode) + GetKeyName(virtualKeyCode);
+            return KeyModifiersToLocalizedString(modifierKeyCode) + GetKeyName(virtualKeyCode);
         }
 
         /// <summary>
@@ -264,9 +261,9 @@ namespace Dapplo.Windows.Input
         /// <param name="modifierKeyCode">Keys</param>
         /// <param name="virtualKeyCode">Keys</param>
         /// <returns>string</returns>
-        public static string HotkeyToString(Keys modifierKeyCode, Keys virtualKeyCode)
+        public static string KeyToString(Keys modifierKeyCode, Keys virtualKeyCode)
         {
-            return HotkeyModifiersToString(modifierKeyCode) + virtualKeyCode;
+            return KeyModifiersToString(modifierKeyCode) + virtualKeyCode;
         }
 
         #region Native

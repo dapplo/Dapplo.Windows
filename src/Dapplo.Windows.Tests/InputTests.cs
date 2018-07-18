@@ -29,8 +29,9 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.Input.Keyboard;
+using Dapplo.Windows.Input.Mouse;
 using Dapplo.Windows.User32;
 using Xunit;
 using Xunit.Abstractions;
@@ -75,7 +76,7 @@ namespace Dapplo.Windows.Tests
                 Assert.NotNull(notepadWindow);
 
                 // Send input
-                var sentInputs = InputGenerator.KeyPress(VirtualKeyCodes.KEY_R, VirtualKeyCodes.KEY_O, VirtualKeyCodes.KEY_B, VirtualKeyCodes.KEY_I, VirtualKeyCodes.KEY_N);
+                var sentInputs = KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.KEY_R, VirtualKeyCodes.KEY_O, VirtualKeyCodes.KEY_B, VirtualKeyCodes.KEY_I, VirtualKeyCodes.KEY_N);
                 // Test if we indead sent 10 inputs (5 x down & up)
                 Assert.Equal((uint) 10, sentInputs);
 
@@ -91,9 +92,9 @@ namespace Dapplo.Windows.Tests
         [Fact]
         private void TestMouseInput()
         {
-            InputGenerator.MoveMouse(new NativePoint(10, 10));
+            MouseInputGenerator.MoveMouse(new NativePoint(10, 10));
             Thread.Sleep(1000);
-            InputGenerator.MoveMouse(new NativePoint(100, 100));
+            MouseInputGenerator.MoveMouse(new NativePoint(100, 100));
             Thread.Sleep(1000);
         }
     }

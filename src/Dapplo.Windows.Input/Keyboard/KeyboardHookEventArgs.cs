@@ -27,7 +27,7 @@ using Dapplo.Windows.Input.Enums;
 
 #endregion
 
-namespace Dapplo.Windows.Input
+namespace Dapplo.Windows.Input.Keyboard
 {
     /// <summary>
     ///     Information on keyboard changes

@@ -24,68 +24,18 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 using Dapplo.Windows.User32;
 
 #endregion
 
-namespace Dapplo.Windows.Input
+namespace Dapplo.Windows.Input.Mouse
 {
     /// <summary>
     ///     This is a utility class to help to generate input for mouse and keyboard
     /// </summary>
-    public static class InputGenerator
+    public static class MouseInputGenerator
     {
-        /// <summary>
-        ///     Generate key down
-        /// </summary>
-        /// <param name="keycodes">VirtualKeyCodes for the key downs</param>
-        /// <returns>number of input events generated</returns>
-        public static uint KeyDown(params VirtualKeyCodes[] keycodes)
-        {
-            var keyboardInputs = new KeyboardInput[keycodes.Length];
-            var index = 0;
-            foreach (var virtualKeyCode in keycodes)
-            {
-                keyboardInputs[index++] = KeyboardInput.ForKeyDown(virtualKeyCode);
-            }
-            return SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
-        }
-
-        /// <summary>
-        ///     Generate key press(es)
-        /// </summary>
-        /// <param name="keycodes">params VirtualKeyCodes</param>
-        public static uint KeyPress(params VirtualKeyCodes[] keycodes)
-        {
-            var keyboardInputs = new KeyboardInput[keycodes.Length * 2];
-            var index = 0;
-            foreach (var virtualKeyCode in keycodes)
-            {
-                keyboardInputs[index++] = KeyboardInput.ForKeyDown(virtualKeyCode);
-                keyboardInputs[index++] = KeyboardInput.ForKeyUp(virtualKeyCode);
-            }
-
-            return SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
-        }
-
-        /// <summary>
-        ///     Generate key(s) up
-        /// </summary>
-        /// <param name="keycodes">VirtualKeyCodes for the keys to release</param>
-        /// <returns>number of input events generated</returns>
-        public static uint KeyUp(params VirtualKeyCodes[] keycodes)
-        {
-            var keyboardInputs = new KeyboardInput[keycodes.Length];
-            var index = 0;
-            foreach (var virtualKeyCode in keycodes)
-            {
-                keyboardInputs[index++] = KeyboardInput.ForKeyUp(virtualKeyCode);
-            }
-            return SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
-        }
-
         /// <summary>
         ///     Generate mouse button(s) click
         /// </summary>

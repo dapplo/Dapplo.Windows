@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Input;
+using Dapplo.Windows.Input.Mouse;
 using Dapplo.Windows.Messages;
 using Xunit.Abstractions;
 

@@ -31,6 +31,7 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Xunit;
@@ -94,7 +95,7 @@ namespace Dapplo.Windows.Tests
                         User32Api.SetForegroundWindow(scroller.ScrollingWindow.Handle);
                         await Task.Delay(1000);
                         // Just make sure the window is changed
-                        InputGenerator.KeyPress(VirtualKeyCodes.NEXT, VirtualKeyCodes.DOWN);
+                        KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.NEXT, VirtualKeyCodes.DOWN);
                         await Task.Delay(2000);
                         scroller.ScrollMode = ScrollModes.WindowsMessage;
                         scroller.ShowChanges = false;

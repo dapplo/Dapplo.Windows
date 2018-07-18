@@ -42,6 +42,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using Dapplo.Log;
 using Dapplo.Windows.Extensions;
+using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Kernel32;
 
 #endregion
@@ -634,7 +635,7 @@ namespace Dapplo.Windows.Desktop
             if (workaround)
             {
                 // Simulate an "ALT" key press, make it double to remove menu activation
-                InputGenerator.KeyPress(VirtualKeyCodes.MENU, VirtualKeyCodes.MENU);
+                KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.MENU, VirtualKeyCodes.MENU);
             }
             // Show window in forground.
             User32Api.BringWindowToTop(interopWindow.Handle);

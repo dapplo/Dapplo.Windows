@@ -20,13 +20,15 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 #region using
-
+using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.Input.Keyboard;
+using Xunit;
 using Xunit.Abstractions;
 
 #endregion
@@ -38,6 +40,24 @@ namespace Dapplo.Windows.Tests
         public KeyboardHookTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        }
+
+        [StaFact]
+        private async Task TestKeyHandlerAsync()
+        {
+            int pressCount = 0;
+            using (KeyboardHook.KeyboardEvents.WhereKeyCombination(VirtualKeyCodes.BACK, VirtualKeyCodes.RSHIFT).Subscribe(handler => pressCount++))
+            {
+                await Task.Delay(20);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCodes.BACK, VirtualKeyCodes.RSHIFT);
+                await Task.Delay(20);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCodes.BACK, VirtualKeyCodes.RSHIFT);
+                await Task.Delay(20);
+            }
+            Assert.True(pressCount == 2);
+            KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCodes.BACK, VirtualKeyCodes.RSHIFT);
+            await Task.Delay(20);
+            Assert.True(pressCount == 2);
         }
 
         //[StaFact]

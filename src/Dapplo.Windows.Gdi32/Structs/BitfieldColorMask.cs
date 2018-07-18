@@ -35,39 +35,39 @@ namespace Dapplo.Windows.Gdi32.Structs
     [StructLayout(LayoutKind.Sequential)]
     [SuppressMessage("Sonar Code Smell", "S2292:Trivial properties should be auto-implemented", Justification = "Interop!")]
     [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
-    public struct BitfieldColorMask : IEquatable<BitfieldColorMask>
+    public readonly struct BitfieldColorMask : IEquatable<BitfieldColorMask>
     {
-        private uint _blue;
-        private uint _green;
-        private uint _red;
+        private readonly uint _blue;
+        private readonly uint _green;
+        private readonly uint _red;
 
         /// <summary>
         /// Blue component of the mask
         /// </summary>
-        public uint Blue
-        {
-            get { return _blue; }
-            set { _blue = value; }
-        }
+        public uint Blue => _blue;
 
         /// <summary>
         /// Green component of the mask
         /// </summary>
-        public uint Green
-        {
-            get { return _green; }
-            set { _green = value; }
-        }
+        public uint Green => _green;
 
         /// <summary>
         /// Red component of the mask
         /// </summary>
-        public uint Red
-        {
-            get { return _red; }
-            set { _red = value; }
-        }
+        public uint Red => _red;
 
+        /// <summary>
+        /// Constructor of the BitfieldColorMask
+        /// </summary>
+        /// <param name="r">byte</param>
+        /// <param name="g">byte</param>
+        /// <param name="b">byte</param>
+        public BitfieldColorMask(byte r = 255, byte g = 255, byte b = 255)
+        {
+            _red = (uint)r << 8;
+            _green = (uint)g << 16;
+            _blue = (uint)b << 24;
+        }
 
         /// <summary>
         /// Create with BitfieldColorMask defaults
@@ -77,12 +77,7 @@ namespace Dapplo.Windows.Gdi32.Structs
         /// <param name="b">byte value for Blue component of the mask</param>
         public static BitfieldColorMask Create(byte r = 255, byte g = 255, byte b = 255)
         {
-            return new BitfieldColorMask
-            {
-                Red = (uint) r << 8,
-                Green = (uint) g << 16,
-                Blue = (uint) b << 24
-            };
+            return new BitfieldColorMask(r,g,b);
         }
 
         /// <inheritdoc />
@@ -114,11 +109,23 @@ namespace Dapplo.Windows.Gdi32.Structs
             }
         }
 
+        /// <summary>
+        /// Equals
+        /// </summary>
+        /// <param name="left">BitfieldColorMask</param>
+        /// <param name="right">BitfieldColorMask</param>
+        /// <returns>bool</returns>
         public static bool operator ==(BitfieldColorMask left, BitfieldColorMask right)
         {
             return left.Equals(right);
         }
 
+        /// <summary>
+        /// Not equals
+        /// </summary>
+        /// <param name="left">BitfieldColorMask</param>
+        /// <param name="right">BitfieldColorMask</param>
+        /// <returns>bool</returns>
         public static bool operator !=(BitfieldColorMask left, BitfieldColorMask right)
         {
             return !left.Equals(right);

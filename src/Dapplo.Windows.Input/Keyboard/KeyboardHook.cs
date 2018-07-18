@@ -33,7 +33,7 @@ using Dapplo.Windows.Input.Structs;
 
 #endregion
 
-namespace Dapplo.Windows.Input
+namespace Dapplo.Windows.Input.Keyboard
 {
     /// <summary>
     ///     A glocal keyboard hook, using System.Reactive

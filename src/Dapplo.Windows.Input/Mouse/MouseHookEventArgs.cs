@@ -27,7 +27,7 @@ using Dapplo.Windows.Messages;
 
 #endregion
 
-namespace Dapplo.Windows.Input
+namespace Dapplo.Windows.Input.Mouse
 {
     /// <summary>
     ///     Information on mouse changes

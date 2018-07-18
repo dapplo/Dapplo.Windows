@@ -25,8 +25,9 @@ using System;
 using Dapplo.Log;
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.Input.Keyboard;
+using Dapplo.Windows.Input.Mouse;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
@@ -192,9 +193,9 @@ namespace Dapplo.Windows.Desktop
             switch (ScrollMode)
             {
                 case ScrollModes.KeyboardPageUpDown:
-                    InputGenerator.KeyDown(VirtualKeyCodes.CONTROL);
-                    InputGenerator.KeyPress(VirtualKeyCodes.END);
-                    InputGenerator.KeyUp(VirtualKeyCodes.CONTROL);
+                    KeyboardInputGenerator.KeyDown(VirtualKeyCodes.CONTROL);
+                    KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.END);
+                    KeyboardInputGenerator.KeyUp(VirtualKeyCodes.CONTROL);
                     result = true;
                     break;
                 case ScrollModes.WindowsMessage:
@@ -296,7 +297,7 @@ namespace Dapplo.Windows.Desktop
             switch (ScrollMode)
             {
                 case ScrollModes.KeyboardPageUpDown:
-                    result = InputGenerator.KeyPress(VirtualKeyCodes.NEXT) == 2;
+                    result = KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.NEXT) == 2;
                     break;
                 case ScrollModes.WindowsMessage:
                     result = SendScrollMessage(ScrollBarCommands.SB_PAGEDOWN);
@@ -314,7 +315,7 @@ namespace Dapplo.Windows.Desktop
                 case ScrollModes.MouseWheel:
                     var bounds = ScrollingWindow.GetInfo().Bounds;
                     var middlePoint = new NativePoint(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
-                    result = InputGenerator.MoveMouseWheel(-WheelDelta, middlePoint) == 1;
+                    result = MouseInputGenerator.MoveMouseWheel(-WheelDelta, middlePoint) == 1;
                     break;
             }
             return result;
@@ -332,7 +333,7 @@ namespace Dapplo.Windows.Desktop
             switch (ScrollMode)
             {
                 case ScrollModes.KeyboardPageUpDown:
-                    result = InputGenerator.KeyPress(VirtualKeyCodes.PRIOR) == 2;
+                    result = KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.PRIOR) == 2;
                     break;
                 case ScrollModes.WindowsMessage:
                     result = SendScrollMessage(ScrollBarCommands.SB_PAGEUP);
@@ -350,7 +351,7 @@ namespace Dapplo.Windows.Desktop
                 case ScrollModes.MouseWheel:
                     var bounds = ScrollingWindow.GetInfo().Bounds;
                     var middlePoint = new NativePoint(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
-                    result = InputGenerator.MoveMouseWheel(WheelDelta, middlePoint) == 1;
+                    result = MouseInputGenerator.MoveMouseWheel(WheelDelta, middlePoint) == 1;
                     break;
             }
             return result;
@@ -397,9 +398,9 @@ namespace Dapplo.Windows.Desktop
             switch (ScrollMode)
             {
                 case ScrollModes.KeyboardPageUpDown:
-                    InputGenerator.KeyDown(VirtualKeyCodes.CONTROL);
-                    InputGenerator.KeyPress(VirtualKeyCodes.HOME);
-                    InputGenerator.KeyUp(VirtualKeyCodes.CONTROL);
+                    KeyboardInputGenerator.KeyDown(VirtualKeyCodes.CONTROL);
+                    KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.HOME);
+                    KeyboardInputGenerator.KeyUp(VirtualKeyCodes.CONTROL);
                     result = true;
                     break;
                 case ScrollModes.WindowsMessage:
