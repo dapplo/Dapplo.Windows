@@ -21,11 +21,11 @@
 
 #region using
 using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Keyboard;
 using Xunit;
@@ -43,21 +43,94 @@ namespace Dapplo.Windows.Tests
         }
 
         [StaFact]
-        private async Task TestKeyHandlerAsync()
+        private async Task TestKeyHandler_SingleCombination()
         {
             int pressCount = 0;
-            using (KeyboardHook.KeyboardEvents.WhereKeyCombination(VirtualKeyCodes.BACK, VirtualKeyCodes.RSHIFT).Subscribe(handler => pressCount++))
+            using (KeyboardHook.KeyboardEvents.WhereKeyCombination(VirtualKeyCode.Back, VirtualKeyCode.RightShift).Subscribe(keyboardHookEventArgs => pressCount++))
             {
                 await Task.Delay(20);
-                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCodes.BACK, VirtualKeyCodes.RSHIFT);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
                 await Task.Delay(20);
-                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCodes.BACK, VirtualKeyCodes.RSHIFT);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
                 await Task.Delay(20);
             }
             Assert.True(pressCount == 2);
-            KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCodes.BACK, VirtualKeyCodes.RSHIFT);
+            KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
             await Task.Delay(20);
             Assert.True(pressCount == 2);
+        }
+
+        [StaFact]
+        private async Task TestKeyHandler_Sequence()
+        {
+            int pressCount = 0;
+            var sequenceHandler = new KeySequenceHandler(
+                new KeyCombinationHandler(VirtualKeyCode.Print),
+                new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA));
+
+            using (KeyboardHook.KeyboardEvents.Where(sequenceHandler.Handle).Subscribe(keyboardHookEventArgs => pressCount++))
+            {
+                await Task.Delay(20);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
+                await Task.Delay(20);
+                Assert.True(pressCount == 0);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyB);
+                await Task.Delay(20);
+                Assert.True(pressCount == 0);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
+                await Task.Delay(20);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
+                await Task.Delay(20);
+                Assert.True(pressCount == 1);
+            }
+        }
+
+        [StaFact]
+        private async Task TestKeyHandler_SequenceWithOptionalKeys()
+        {
+            int pressCount = 0;
+            var sequenceHandler = new KeySequenceHandler(
+                new KeyCombinationHandler(VirtualKeyCode.Print),
+                new KeyOrCombinationHandler(
+                    new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA),
+                    new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyB))
+                );
+
+            using (KeyboardHook.KeyboardEvents.Where(sequenceHandler.Handle).Subscribe(keyboardHookEventArgs => pressCount++))
+            {
+                await Task.Delay(20);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
+                await Task.Delay(20);
+                Assert.True(pressCount == 0);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyB);
+                await Task.Delay(20);
+                Assert.True(pressCount == 1);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
+                await Task.Delay(20);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
+                await Task.Delay(20);
+                Assert.True(pressCount == 2);
+            }
+        }
+
+        [Fact]
+        private void TestKeyHelper_VirtualKeyCodesFromString()
+        {
+            const string testKeys = "ctrl + shift + A";
+            var virtualKeyCodes = KeyHelper.VirtualKeyCodesFromString(testKeys).ToList();
+            Assert.NotEmpty(virtualKeyCodes);
+            Assert.Contains(VirtualKeyCode.Shift,virtualKeyCodes);
+            Assert.Contains(VirtualKeyCode.Control, virtualKeyCodes);
+            Assert.Contains(VirtualKeyCode.KeyA, virtualKeyCodes);
+        }
+
+        [Fact]
+        private void TestKeyHelper_VirtualCodeToLocaleDisplayText()
+        {
+            var keyCombination = string.Join(" + ", new[] {VirtualKeyCode.LeftShift, VirtualKeyCode.KeyA}.Select(vk => KeyHelper.VirtualCodeToLocaleDisplayText(vk, false)));
+
+            Assert.NotEmpty(keyCombination);
+            Assert.Contains("+ A", keyCombination);
         }
 
         //[StaFact]
@@ -83,7 +156,7 @@ namespace Dapplo.Windows.Tests
         {
             await KeyboardHook.KeyboardEvents.Where(args =>
                 {
-                    if (args.Key != VirtualKeyCodes.VOLUME_UP)
+                    if (args.Key != VirtualKeyCode.VolumeUp)
                     {
                         return true;
                     }

@@ -37,7 +37,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyboardObservable">IObservable of KeyboardHookEventArgs, e.g. coming from KeyboardHook.KeyboardEvents</param>
         /// <param name="keyCombination">IEnumerable with VirtualKeyCodes</param>
         /// <returns>IObservable with the KeyCombinationHandler</returns>
-        public static IObservable<KeyCombinationHandler> WhereKeyCombination(this IObservable<KeyboardHookEventArgs> keyboardObservable, params VirtualKeyCodes[] keyCombination)
+        public static IObservable<KeyboardHookEventArgs> WhereKeyCombination(this IObservable<KeyboardHookEventArgs> keyboardObservable, params VirtualKeyCode[] keyCombination)
         {
             var keyCombinationHandler = new KeyCombinationHandler(keyCombination);
             return keyboardObservable.WhereKeyCombination(keyCombinationHandler);
@@ -49,7 +49,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyboardObservable">IObservable of KeyboardHookEventArgs, e.g. coming from KeyboardHook.KeyboardEvents</param>
         /// <param name="keyCombination">IEnumerable with VirtualKeyCodes</param>
         /// <returns>IObservable with the KeyCombinationHandler</returns>
-        public static IObservable<KeyCombinationHandler> WhereKeyCombination(this IObservable<KeyboardHookEventArgs> keyboardObservable, IEnumerable<VirtualKeyCodes> keyCombination)
+        public static IObservable<KeyboardHookEventArgs> WhereKeyCombination(this IObservable<KeyboardHookEventArgs> keyboardObservable, IEnumerable<VirtualKeyCode> keyCombination)
         {
             var keyCombinationHandler = new KeyCombinationHandler(keyCombination);
             return keyboardObservable.WhereKeyCombination(keyCombinationHandler);
@@ -61,9 +61,9 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyboardObservable">IObservable of KeyboardHookEventArgs, e.g. coming from KeyboardHook.KeyboardEvents</param>
         /// <param name="keyCombinationHandler">KeyCombinationHandler defines which key combination you want to work with</param>
         /// <returns>IObservable with the KeyCombinationHandler</returns>
-        public static IObservable<KeyCombinationHandler> WhereKeyCombination(this IObservable<KeyboardHookEventArgs> keyboardObservable, KeyCombinationHandler keyCombinationHandler)
+        public static IObservable<KeyboardHookEventArgs> WhereKeyCombination(this IObservable<KeyboardHookEventArgs> keyboardObservable, KeyCombinationHandler keyCombinationHandler)
         {
-            return keyboardObservable.Where(keyCombinationHandler.Handle).Select(e => keyCombinationHandler);
+            return keyboardObservable.Where(keyCombinationHandler.Handle);
         }
     }
 }

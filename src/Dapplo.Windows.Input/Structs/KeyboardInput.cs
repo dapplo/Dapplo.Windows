@@ -37,7 +37,7 @@ namespace Dapplo.Windows.Input.Structs
     [StructLayout(LayoutKind.Sequential)]
     public struct KeyboardInput
     {
-        private VirtualKeyCodes _wVk;
+        private VirtualKeyCode _wVk;
         private ScanCodes _wScan;
         private KeyEventFlags _dwFlags;
         private int _time;
@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Input.Structs
         ///     A virtual-key code. The code must be a value in the range 1 to 254.
         ///     If the dwFlags member specifies KEYEVENTF_UNICODE, wVk must be 0.
         /// </summary>
-        public VirtualKeyCodes VirtualKeyCode
+        public VirtualKeyCode VirtualKeyCode
         {
             get { return _wVk; }
             set { _wVk = value; }
@@ -97,7 +97,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
         /// <param name="timestamp">optional Timestamp</param>
         /// <returns>KeyboardInput[]</returns>
-        public static KeyboardInput[] ForKeyPress(VirtualKeyCodes virtualKeyCode, int timestamp = 0)
+        public static KeyboardInput[] ForKeyPress(VirtualKeyCode virtualKeyCode, int timestamp = 0)
         {
             return new[]
             {
@@ -112,7 +112,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
         /// <param name="timestamp">optional Timestamp</param>
         /// <returns>KeyboardInput</returns>
-        public static KeyboardInput ForKeyDown(VirtualKeyCodes virtualKeyCode, int timestamp = 0)
+        public static KeyboardInput ForKeyDown(VirtualKeyCode virtualKeyCode, int timestamp = 0)
         {
             return new KeyboardInput
             {
@@ -127,7 +127,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
         /// <param name="timestamp">optional Timestamp</param>
         /// <returns>KeyboardInput</returns>
-        public static KeyboardInput ForKeyUp(VirtualKeyCodes virtualKeyCode, int timestamp = 0)
+        public static KeyboardInput ForKeyUp(VirtualKeyCode virtualKeyCode, int timestamp = 0)
         {
             return new KeyboardInput
             {

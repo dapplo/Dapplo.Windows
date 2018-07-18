@@ -40,6 +40,11 @@ namespace Dapplo.Windows.Input.Keyboard
         public bool Handled { get; set; }
 
         /// <summary>
+        /// Specifies if this event is for a modifier key (shift, control, alt etc)
+        /// </summary>
+        public bool IsModifier { get; internal set; }
+
+        /// <summary>
         ///     True if Alt key is pressed
         /// </summary>
         public bool IsAlt => IsLeftAlt || IsRightAlt;
@@ -127,7 +132,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <summary>
         ///     The key code itself
         /// </summary>
-        public VirtualKeyCodes Key { get; set; } = VirtualKeyCodes.NONE;
+        public VirtualKeyCode Key { get; set; } = VirtualKeyCode.None;
 
         /// <inheritdoc />
         public override string ToString()
@@ -183,11 +188,11 @@ namespace Dapplo.Windows.Input.Keyboard
             }
             if (IsNumLockActive)
             {
-                dump.Append(" NumLock");
+                dump.Append(" NumLock active");
             }
             if (IsCapsLockActive)
             {
-                dump.Append(" CapsLock");
+                dump.Append(" CapsLock active");
             }
             return dump.ToString();
         }

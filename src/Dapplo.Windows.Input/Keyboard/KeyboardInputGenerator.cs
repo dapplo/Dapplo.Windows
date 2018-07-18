@@ -40,7 +40,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// </summary>
         /// <param name="keycodes">VirtualKeyCodes for the key downs</param>
         /// <returns>number of input events generated</returns>
-        public static uint KeyDown(params VirtualKeyCodes[] keycodes)
+        public static uint KeyDown(params VirtualKeyCode[] keycodes)
         {
             var keyboardInputs = new KeyboardInput[keycodes.Length];
             var index = 0;
@@ -55,7 +55,7 @@ namespace Dapplo.Windows.Input.Keyboard
         ///     Generate a key combination press(es)
         /// </summary>
         /// <param name="keycodes">params VirtualKeyCodes</param>
-        public static uint KeyCombinationPress(params VirtualKeyCodes[] keycodes)
+        public static uint KeyCombinationPress(params VirtualKeyCode[] keycodes)
         {
             var keyboardInputs = new KeyboardInput[keycodes.Length * 2];
             var index = 0;
@@ -77,7 +77,7 @@ namespace Dapplo.Windows.Input.Keyboard
         ///     Generate key press(es)
         /// </summary>
         /// <param name="keycodes">params VirtualKeyCodes</param>
-        public static uint KeyPresses(params VirtualKeyCodes[] keycodes)
+        public static uint KeyPresses(params VirtualKeyCode[] keycodes)
         {
             var keyboardInputs = new KeyboardInput[keycodes.Length * 2];
             var index = 0;
@@ -95,7 +95,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// </summary>
         /// <param name="keycodes">VirtualKeyCodes for the keys to release</param>
         /// <returns>number of input events generated</returns>
-        public static uint KeyUp(params VirtualKeyCodes[] keycodes)
+        public static uint KeyUp(params VirtualKeyCode[] keycodes)
         {
             var keyboardInputs = new KeyboardInput[keycodes.Length];
             var index = 0;

@@ -193,9 +193,9 @@ namespace Dapplo.Windows.Desktop
             switch (ScrollMode)
             {
                 case ScrollModes.KeyboardPageUpDown:
-                    KeyboardInputGenerator.KeyDown(VirtualKeyCodes.CONTROL);
-                    KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.END);
-                    KeyboardInputGenerator.KeyUp(VirtualKeyCodes.CONTROL);
+                    KeyboardInputGenerator.KeyDown(VirtualKeyCode.Control);
+                    KeyboardInputGenerator.KeyPresses(VirtualKeyCode.End);
+                    KeyboardInputGenerator.KeyUp(VirtualKeyCode.Control);
                     result = true;
                     break;
                 case ScrollModes.WindowsMessage:
@@ -297,7 +297,7 @@ namespace Dapplo.Windows.Desktop
             switch (ScrollMode)
             {
                 case ScrollModes.KeyboardPageUpDown:
-                    result = KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.NEXT) == 2;
+                    result = KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Next) == 2;
                     break;
                 case ScrollModes.WindowsMessage:
                     result = SendScrollMessage(ScrollBarCommands.SB_PAGEDOWN);
@@ -333,7 +333,7 @@ namespace Dapplo.Windows.Desktop
             switch (ScrollMode)
             {
                 case ScrollModes.KeyboardPageUpDown:
-                    result = KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.PRIOR) == 2;
+                    result = KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Prior) == 2;
                     break;
                 case ScrollModes.WindowsMessage:
                     result = SendScrollMessage(ScrollBarCommands.SB_PAGEUP);
@@ -398,9 +398,9 @@ namespace Dapplo.Windows.Desktop
             switch (ScrollMode)
             {
                 case ScrollModes.KeyboardPageUpDown:
-                    KeyboardInputGenerator.KeyDown(VirtualKeyCodes.CONTROL);
-                    KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.HOME);
-                    KeyboardInputGenerator.KeyUp(VirtualKeyCodes.CONTROL);
+                    KeyboardInputGenerator.KeyDown(VirtualKeyCode.Control);
+                    KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Home);
+                    KeyboardInputGenerator.KeyUp(VirtualKeyCode.Control);
                     result = true;
                     break;
                 case ScrollModes.WindowsMessage:

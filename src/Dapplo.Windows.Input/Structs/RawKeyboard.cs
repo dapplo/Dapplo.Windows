@@ -46,7 +46,7 @@ namespace Dapplo.Windows.Input.Structs
         // Always 0
         private readonly ushort _reserved;
         // Virtual Key Code
-        private readonly VirtualKeyCodes _vkey;
+        private readonly VirtualKeyCode _vkey;
         // Corresponding Windows message for exmaple (WM_KEYDOWN, WM_SYASKEYDOWN etc)
         private readonly WindowsMessages _message;
         // The device-specific addition information for the event (seems to always be zero for keyboards)
@@ -55,7 +55,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <summary>
         /// The virtual key code
         /// </summary>
-        public VirtualKeyCodes VirtualKey
+        public VirtualKeyCode VirtualKey
         {
             get { return _vkey; }
         }

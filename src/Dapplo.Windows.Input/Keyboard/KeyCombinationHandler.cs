@@ -28,32 +28,38 @@ namespace Dapplo.Windows.Input.Keyboard
     /// <summary>
     /// This defines a certain key request which needs to be fullfilled
     /// </summary>
-    public class KeyCombinationHandler
+    public class KeyCombinationHandler : IKeyboardHookEventHandler
     {
-        private readonly IList<VirtualKeyCodes> _otherPressedKeys = new List<VirtualKeyCodes>();
+        private readonly IList<VirtualKeyCode> _otherPressedKeys = new List<VirtualKeyCode>();
         private readonly bool[] _availableKeys;
-        private readonly VirtualKeyCodes[] _wantedCombination;
+        private readonly VirtualKeyCode[] _wantedCombination;
 
         /// <summary>
         /// Get the VirtualKeyCodes which trigger the combination
         /// </summary>
-        public VirtualKeyCodes[] TriggerCombination => _wantedCombination;
+        public VirtualKeyCode[] TriggerCombination => _wantedCombination;
 
         /// <summary>
-        /// Create a KeyHandler for the specified VirtualKeyCodes
+        /// Defines if the key press needs to be passed through to other applications.
+        /// By default (false) a keypress which is specified is marked as handled and will not be seen by others
+        /// </summary>
+        public bool IsPassthrough { get; set; }
+
+        /// <summary>
+        /// Create a KeyCombinationHandler for the specified VirtualKeyCodes
         /// </summary>
         /// <param name="keyCombination">IEnumerable with VirtualKeyCodes</param>
-        public KeyCombinationHandler(IEnumerable<VirtualKeyCodes> keyCombination)
+        public KeyCombinationHandler(IEnumerable<VirtualKeyCode> keyCombination)
         {
             _wantedCombination = keyCombination.Distinct().ToArray();
             _availableKeys = new bool[_wantedCombination.Length];
         }
 
         /// <summary>
-        /// Create a KeyHandler for the specified VirtualKeyCodes
+        /// Create a KeyCombinationHandler for the specified VirtualKeyCodes
         /// </summary>
         /// <param name="keyCombination">params with VirtualKeyCodes</param>
-        public KeyCombinationHandler(params VirtualKeyCodes[] keyCombination)
+        public KeyCombinationHandler(params VirtualKeyCode[] keyCombination)
         {
             _wantedCombination = keyCombination.Distinct().ToArray();
             _availableKeys = new bool[_wantedCombination.Length];
@@ -62,13 +68,13 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <summary>
         /// Check if the keys are pressed
         /// </summary>
-        /// <param name="keyboardHookEventArgs"></param>
+        /// <param name="keyboardHookEventArgs">KeyboardHookEventArgs</param>
         public bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
         {
             bool keyMatched = false;
             for (int i = 0; i < _wantedCombination.Length; i++)
             {
-                if (_wantedCombination[i] != keyboardHookEventArgs.Key)
+                if (!CompareVk(keyboardHookEventArgs.Key, _wantedCombination[i]))
                 {
                     continue;
                 }
@@ -90,7 +96,39 @@ namespace Dapplo.Windows.Input.Keyboard
                 }
             }
 
-            return _otherPressedKeys.Count == 0 && _availableKeys.All(b => b);
+            // Make as handled
+            var isHandled = _otherPressedKeys.Count == 0 && _availableKeys.All(b => b);
+            if (isHandled && !IsPassthrough)
+            {
+                keyboardHookEventArgs.Handled = true;
+            }
+            return isHandled;
+        }
+
+        /// <summary>
+        /// Helper method to compare VirtualKeyCode
+        /// </summary>
+        /// <param name="current">VirtualKeyCode</param>
+        /// <param name="expected">VirtualKeyCode</param>
+        /// <returns>bool true if match</returns>
+        private static bool CompareVk(VirtualKeyCode current, VirtualKeyCode expected)
+        {
+            if (current == expected)
+            {
+                return true;
+            }
+
+            switch (expected)
+            {
+                case VirtualKeyCode.Shift:
+                    return VirtualKeyCode.LeftShift == current || VirtualKeyCode.RightShift == current;
+                case VirtualKeyCode.Control:
+                    return VirtualKeyCode.LeftControl == current || VirtualKeyCode.RightControl == current;
+                case VirtualKeyCode.Menu:
+                    return VirtualKeyCode.LeftMenu == current || VirtualKeyCode.RightMenu == current;
+            }
+
+            return false;
         }
     }
 }

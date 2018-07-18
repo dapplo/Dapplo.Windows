@@ -93,7 +93,7 @@ namespace Dapplo.Windows.Tests
                 }
             }))
             {
-                var device = await rawInputObservable.FirstAsync(args => args.RawInput.Device.Keyboard.VirtualKey == VirtualKeyCodes.LEFT);
+                var device = await rawInputObservable.FirstAsync(args => args.RawInput.Device.Keyboard.VirtualKey == VirtualKeyCode.Left);
                 Assert.Equal(RawInputDeviceTypes.Keyboard, device.RawInput.Header.Type);
             }
 

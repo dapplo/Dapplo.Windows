@@ -62,7 +62,7 @@ namespace Dapplo.Windows.Tests
             IDisposable keyboardhook = null;
             try
             {
-                keyboardhook = KeyboardHook.KeyboardEvents.Where(args => args.Key == VirtualKeyCodes.ESCAPE).Subscribe(args => breakScroll = true);
+                keyboardhook = KeyboardHook.KeyboardEvents.Where(args => args.Key == VirtualKeyCode.Escape).Subscribe(args => breakScroll = true);
                 // Start a process to test against
                 using (var process = Process.Start("notepad.exe", "C:\\Windows\\setupact.log"))
                 {
@@ -95,7 +95,7 @@ namespace Dapplo.Windows.Tests
                         User32Api.SetForegroundWindow(scroller.ScrollingWindow.Handle);
                         await Task.Delay(1000);
                         // Just make sure the window is changed
-                        KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.NEXT, VirtualKeyCodes.DOWN);
+                        KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Next, VirtualKeyCode.Down);
                         await Task.Delay(2000);
                         scroller.ScrollMode = ScrollModes.WindowsMessage;
                         scroller.ShowChanges = false;

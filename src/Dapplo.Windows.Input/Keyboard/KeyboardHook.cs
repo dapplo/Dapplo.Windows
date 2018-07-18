@@ -114,57 +114,69 @@ namespace Dapplo.Windows.Input.Keyboard
             var isKeyDown = wParam == (IntPtr) WmKeydown || wParam == (IntPtr) WmSyskeydown;
 
             var keyboardLowLevelHookStruct = (KeyboardLowLevelHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardLowLevelHookStruct));
-
+            bool isModifier = false;
             // Check the key to find if there any modifiers, store these in the global values.
             switch (keyboardLowLevelHookStruct.VirtualKeyCode)
             {
-                case VirtualKeyCodes.CAPITAL:
+                case VirtualKeyCode.Capital:
                     if (isKeyDown)
                     {
                         _capsLock = !_capsLock;
                     }
+                    isModifier = true;
                     break;
-                case VirtualKeyCodes.NUMLOCK:
+                case VirtualKeyCode.NumLock:
                     if (isKeyDown)
                     {
                         _numLock = !_numLock;
                     }
+                    isModifier = true;
                     break;
-                case VirtualKeyCodes.SCROLL:
+                case VirtualKeyCode.Scroll:
                     if (isKeyDown)
                     {
                         _scrollLock = !_scrollLock;
                     }
+                    isModifier = true;
                     break;
-                case VirtualKeyCodes.LSHIFT:
+                case VirtualKeyCode.LeftShift:
                     _leftShift = isKeyDown;
+                    isModifier = true;
                     break;
-                case VirtualKeyCodes.RSHIFT:
+                case VirtualKeyCode.RightShift:
                     _rightShift = isKeyDown;
+                    isModifier = true;
                     break;
-                case VirtualKeyCodes.LCONTROL:
+                case VirtualKeyCode.LeftControl:
                     _leftCtrl = isKeyDown;
+                    isModifier = true;
                     break;
-                case VirtualKeyCodes.RCONTROL:
+                case VirtualKeyCode.RightControl:
                     _rightCtrl = isKeyDown;
+                    isModifier = true;
                     break;
-                case VirtualKeyCodes.LMENU:
+                case VirtualKeyCode.LeftMenu:
                     _leftAlt = isKeyDown;
+                    isModifier = true;
                     break;
-                case VirtualKeyCodes.RMENU:
+                case VirtualKeyCode.RightMenu:
                     _rightAlt = isKeyDown;
+                    isModifier = true;
                     break;
-                case VirtualKeyCodes.LWIN:
+                case VirtualKeyCode.LeftWin:
                     _leftWin = isKeyDown;
+                    isModifier = true;
                     break;
-                case VirtualKeyCodes.RWIN:
+                case VirtualKeyCode.RightWin:
                     _rightWin = isKeyDown;
+                    isModifier = true;
                     break;
             }
 
             var keyEventArgs = new KeyboardHookEventArgs
             {
                 Key = keyboardLowLevelHookStruct.VirtualKeyCode,
+                IsModifier = isModifier,
                 IsKeyDown = isKeyDown,
                 IsLeftShift = _leftShift,
                 IsRightShift = _rightShift,

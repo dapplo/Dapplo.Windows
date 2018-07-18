@@ -635,7 +635,7 @@ namespace Dapplo.Windows.Desktop
             if (workaround)
             {
                 // Simulate an "ALT" key press, make it double to remove menu activation
-                KeyboardInputGenerator.KeyPresses(VirtualKeyCodes.MENU, VirtualKeyCodes.MENU);
+                KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Menu, VirtualKeyCode.Menu);
             }
             // Show window in forground.
             User32Api.BringWindowToTop(interopWindow.Handle);
