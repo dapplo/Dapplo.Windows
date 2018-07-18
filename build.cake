@@ -4,12 +4,9 @@
 #tool "docfx.console"
 //#tool "coveralls.net"
 #tool "PdbGit"
-// Needed for Cake.Compression, as described here: https://github.com/akordowski/Cake.Compression/issues/3
-#addin "SharpZipLib"
 #addin "Cake.FileHelpers"
 #addin "Cake.DocFx"
 //#addin "Cake.Coveralls"
-#addin "Cake.Compression"
 
 var target = Argument("target", "Build");
 var configuration = Argument("configuration", "release");
@@ -109,7 +106,7 @@ Task("Documentation")
 
     CreateDirectory("artifacts");
     // Archive the generated site
-    ZipCompress("./doc/_site", "./artifacts/site.zip");
+	Zip("./doc/_site", "./artifacts/site.zip");
 });
 
 Task("CreateAndUploadCoverageReport")
