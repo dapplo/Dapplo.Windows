@@ -25,7 +25,8 @@ using System.Linq;
 namespace Dapplo.Windows.Input.Keyboard
 {
     /// <summary>
-    /// This defines a certain key sequence which needs to be fullfilled
+    /// This is an IKeyboardHookEventHandler which checks multiple IKeyboardHookEventHandler.
+    /// Handle returns true if one can handle the key press.
     /// </summary>
     public class KeyOrCombinationHandler : IKeyboardHookEventHandler
     {

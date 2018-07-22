@@ -26,18 +26,17 @@ using Dapplo.Windows.Input.Enums;
 namespace Dapplo.Windows.Input.Keyboard
 {
     /// <summary>
-    /// This defines a certain key request which needs to be fullfilled
+    /// This is an IKeyboardHookEventHandler which can handle a combination of VirtualKeyCode presses.
     /// </summary>
     public class KeyCombinationHandler : IKeyboardHookEventHandler
     {
         private readonly IList<VirtualKeyCode> _otherPressedKeys = new List<VirtualKeyCode>();
         private readonly bool[] _availableKeys;
-        private readonly VirtualKeyCode[] _wantedCombination;
 
         /// <summary>
         /// Get the VirtualKeyCodes which trigger the combination
         /// </summary>
-        public VirtualKeyCode[] TriggerCombination => _wantedCombination;
+        public VirtualKeyCode[] TriggerCombination { get; }
 
         /// <summary>
         /// Defines if the key press needs to be passed through to other applications.
@@ -51,8 +50,8 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyCombination">IEnumerable with VirtualKeyCodes</param>
         public KeyCombinationHandler(IEnumerable<VirtualKeyCode> keyCombination)
         {
-            _wantedCombination = keyCombination.Distinct().ToArray();
-            _availableKeys = new bool[_wantedCombination.Length];
+            TriggerCombination = keyCombination.Distinct().ToArray();
+            _availableKeys = new bool[TriggerCombination.Length];
         }
 
         /// <summary>
@@ -61,8 +60,8 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyCombination">params with VirtualKeyCodes</param>
         public KeyCombinationHandler(params VirtualKeyCode[] keyCombination)
         {
-            _wantedCombination = keyCombination.Distinct().ToArray();
-            _availableKeys = new bool[_wantedCombination.Length];
+            TriggerCombination = keyCombination.Distinct().ToArray();
+            _availableKeys = new bool[TriggerCombination.Length];
         }
 
         /// <summary>
@@ -72,9 +71,9 @@ namespace Dapplo.Windows.Input.Keyboard
         public bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
         {
             bool keyMatched = false;
-            for (int i = 0; i < _wantedCombination.Length; i++)
+            for (int i = 0; i < TriggerCombination.Length; i++)
             {
-                if (!CompareVk(keyboardHookEventArgs.Key, _wantedCombination[i]))
+                if (!CompareVk(keyboardHookEventArgs.Key, TriggerCombination[i]))
                 {
                     continue;
                 }

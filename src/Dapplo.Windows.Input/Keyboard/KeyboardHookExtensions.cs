@@ -20,9 +20,7 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
-using System.Collections.Generic;
 using System.Reactive.Linq;
-using Dapplo.Windows.Input.Enums;
 
 namespace Dapplo.Windows.Input.Keyboard
 {
@@ -32,38 +30,14 @@ namespace Dapplo.Windows.Input.Keyboard
     public static class KeyboardHookExtensions
     {
         /// <summary>
-        /// Filter the KeyboardHookEventArgs with a KeyCombinationHandler
+        /// Filter the KeyboardHookEventArgs with a IKeyboardHookEventHandler
         /// </summary>
         /// <param name="keyboardObservable">IObservable of KeyboardHookEventArgs, e.g. coming from KeyboardHook.KeyboardEvents</param>
-        /// <param name="keyCombination">IEnumerable with VirtualKeyCodes</param>
-        /// <returns>IObservable with the KeyCombinationHandler</returns>
-        public static IObservable<KeyboardHookEventArgs> WhereKeyCombination(this IObservable<KeyboardHookEventArgs> keyboardObservable, params VirtualKeyCode[] keyCombination)
+        /// <param name="keyboardHookEventHandler">IKeyboardHookEventHandler</param>
+        /// <returns>IObservable with the KeyboardHookEventArgs which was handled</returns>
+        public static IObservable<KeyboardHookEventArgs> Where(this IObservable<KeyboardHookEventArgs> keyboardObservable, IKeyboardHookEventHandler keyboardHookEventHandler)
         {
-            var keyCombinationHandler = new KeyCombinationHandler(keyCombination);
-            return keyboardObservable.WhereKeyCombination(keyCombinationHandler);
-        }
-
-        /// <summary>
-        /// Filter the KeyboardHookEventArgs with a KeyCombinationHandler, if this combination is triggered it's passed in the resulting IObservable
-        /// </summary>
-        /// <param name="keyboardObservable">IObservable of KeyboardHookEventArgs, e.g. coming from KeyboardHook.KeyboardEvents</param>
-        /// <param name="keyCombination">IEnumerable with VirtualKeyCodes</param>
-        /// <returns>IObservable with the KeyCombinationHandler</returns>
-        public static IObservable<KeyboardHookEventArgs> WhereKeyCombination(this IObservable<KeyboardHookEventArgs> keyboardObservable, IEnumerable<VirtualKeyCode> keyCombination)
-        {
-            var keyCombinationHandler = new KeyCombinationHandler(keyCombination);
-            return keyboardObservable.WhereKeyCombination(keyCombinationHandler);
-        }
-
-        /// <summary>
-        /// Filter the KeyboardHookEventArgs with a KeyCombinationHandler, if this combination is triggered it's passed in the resulting IObservable
-        /// </summary>
-        /// <param name="keyboardObservable">IObservable of KeyboardHookEventArgs, e.g. coming from KeyboardHook.KeyboardEvents</param>
-        /// <param name="keyCombinationHandler">KeyCombinationHandler defines which key combination you want to work with</param>
-        /// <returns>IObservable with the KeyCombinationHandler</returns>
-        public static IObservable<KeyboardHookEventArgs> WhereKeyCombination(this IObservable<KeyboardHookEventArgs> keyboardObservable, KeyCombinationHandler keyCombinationHandler)
-        {
-            return keyboardObservable.Where(keyCombinationHandler.Handle);
+            return keyboardObservable.Where(keyboardHookEventHandler.Handle);
         }
     }
 }

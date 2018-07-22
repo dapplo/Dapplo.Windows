@@ -65,7 +65,7 @@
     <Compile Include="Enums\RawInputDevices.cs" />
     <Compile Include="Enums\RawKeyboardFlags.cs" />
     <Compile Include="Enums\VirtualKeyCode.cs" />
-    <Compile Include="Keyboard\IKeyHandler.cs" />
+    <Compile Include="Keyboard\IKeyboardHookEventHandler.cs" />
     <Compile Include="Keyboard\KeyboardInputGenerator.cs" />
     <Compile Include="Keyboard\KeyOrCombinationHandler.cs" />
     <Compile Include="Keyboard\KeySequenceHandler.cs" />

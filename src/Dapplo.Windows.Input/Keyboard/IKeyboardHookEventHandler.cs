@@ -22,7 +22,7 @@
 namespace Dapplo.Windows.Input.Keyboard
 {
     /// <summary>
-    /// This can handle KeyboardHookEventArgs
+    /// This can handle KeyboardHookEventArgs, the handle method returns true if the key was handled.
     /// </summary>
     public interface IKeyboardHookEventHandler
     {

@@ -46,7 +46,8 @@ namespace Dapplo.Windows.Tests
         private async Task TestKeyHandler_SingleCombination()
         {
             int pressCount = 0;
-            using (KeyboardHook.KeyboardEvents.WhereKeyCombination(VirtualKeyCode.Back, VirtualKeyCode.RightShift).Subscribe(keyboardHookEventArgs => pressCount++))
+            var keyHandler = new KeyCombinationHandler(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
+            using (KeyboardHook.KeyboardEvents.Where(keyHandler).Subscribe(keyboardHookEventArgs => pressCount++))
             {
                 await Task.Delay(20);
                 KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
@@ -68,7 +69,7 @@ namespace Dapplo.Windows.Tests
                 new KeyCombinationHandler(VirtualKeyCode.Print),
                 new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA));
 
-            using (KeyboardHook.KeyboardEvents.Where(sequenceHandler.Handle).Subscribe(keyboardHookEventArgs => pressCount++))
+            using (KeyboardHook.KeyboardEvents.Where(sequenceHandler).Subscribe(keyboardHookEventArgs => pressCount++))
             {
                 await Task.Delay(20);
                 KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
@@ -82,6 +83,7 @@ namespace Dapplo.Windows.Tests
                 KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
                 await Task.Delay(20);
                 Assert.True(pressCount == 1);
+
             }
         }
 
@@ -94,22 +96,33 @@ namespace Dapplo.Windows.Tests
                 new KeyOrCombinationHandler(
                     new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA),
                     new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyB))
-                );
+            )
+            {
+                // Timeout for test
+                Timeout = TimeSpan.FromMilliseconds(200)
+            };
 
-            using (KeyboardHook.KeyboardEvents.Where(sequenceHandler.Handle).Subscribe(keyboardHookEventArgs => pressCount++))
+            using (KeyboardHook.KeyboardEvents.Where(sequenceHandler).Subscribe(keyboardHookEventArgs => pressCount++))
             {
                 await Task.Delay(20);
                 KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
                 await Task.Delay(20);
-                Assert.True(pressCount == 0);
+                Assert.Equal(0, pressCount);
                 KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyB);
                 await Task.Delay(20);
-                Assert.True(pressCount == 1);
+                Assert.Equal(1, pressCount);
                 KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
                 await Task.Delay(20);
                 KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
                 await Task.Delay(20);
-                Assert.True(pressCount == 2);
+                Assert.Equal(2, pressCount);
+
+                // Test with timeout, waiting to long
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
+                await Task.Delay(400);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
+                await Task.Delay(20);
+                Assert.Equal(2, pressCount);
             }
         }
 
