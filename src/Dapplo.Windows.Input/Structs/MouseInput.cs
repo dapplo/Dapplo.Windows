@@ -116,19 +116,20 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="location">Location of the event</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>MouseInput</returns>
-        public static MouseInput MoveMouseWheel(int wheelDelta, NativePoint? location = null, uint timestamp = 0)
+        public static MouseInput MoveMouseWheel(int wheelDelta, NativePoint? location = null, uint? timestamp = null)
         {
             if (location.HasValue)
             {
                 location = RemapLocation(location.Value);
             }
             var mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
+            var messageTime = timestamp ?? (uint)Environment.TickCount;
             return new MouseInput
             {
                 MouseData = wheelDelta,
                 dx = location?.X ?? 0,
                 dy = location?.Y ?? 0,
-                Timestamp = timestamp,
+                Timestamp = messageTime,
                 MouseEventFlags = mouseEventFlags | MouseEventFlags.Wheel
             };
         }
@@ -139,15 +140,16 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="location">Where is the click located</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>MouseInput</returns>
-        public static MouseInput MouseMove(NativePoint location, uint timestamp = 0)
+        public static MouseInput MouseMove(NativePoint location, uint? timestamp = null)
         {
             location = RemapLocation(location);
             var bounds = DisplayInfo.GetAllScreenBounds();
+            var messageTime = timestamp ?? (uint)Environment.TickCount;
             return new MouseInput
             {
                 dx = location.X * (65535 / bounds.Width),
                 dy = location.Y * (65535 / bounds.Height),
-                Timestamp = timestamp,
+                Timestamp = messageTime,
                 MouseEventFlags = MouseMoveMouseEventFlags
             };
         }
@@ -159,7 +161,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="location">Where is the click located</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>MouseInput</returns>
-        public static MouseInput MouseDown(MouseButtons mouseButtons, NativePoint? location = null, uint timestamp = 0)
+        public static MouseInput MouseDown(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
         {
             if (location.HasValue)
             {
@@ -190,11 +192,12 @@ namespace Dapplo.Windows.Input.Structs
                 mouseEventFlags |= MouseEventFlags.XDown;
                 mouseData |= 2;
             }
+            var messageTime = timestamp ?? (uint)Environment.TickCount;
             return new MouseInput
             {
                 dx = location?.X ?? 0,
                 dy = location?.Y ?? 0,
-                Timestamp = timestamp,
+                Timestamp = messageTime,
                 MouseData = mouseData,
                 MouseEventFlags = mouseEventFlags
             };
@@ -207,7 +210,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="location">Where is the click located</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>MouseInput</returns>
-        public static MouseInput MouseUp(MouseButtons mouseButtons, NativePoint? location = null, uint timestamp = 0)
+        public static MouseInput MouseUp(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
         {
             if (location.HasValue)
             {
@@ -238,11 +241,12 @@ namespace Dapplo.Windows.Input.Structs
                 mouseEventFlags |= MouseEventFlags.XUp;
                 mouseData |= 2;
             }
+            var messageTime = timestamp ?? (uint)Environment.TickCount;
             return new MouseInput
             {
                 dx = location?.X ?? 0,
                 dy = location?.Y ?? 0,
-                Timestamp = timestamp,
+                Timestamp = messageTime,
                 MouseData = mouseData,
                 MouseEventFlags = mouseEventFlags
             };

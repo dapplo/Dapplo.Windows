@@ -39,6 +39,11 @@ namespace Dapplo.Windows.Input.Enums
     public enum ExtendedKeyFlags : uint
     {
         /// <summary>
+        /// No flags
+        /// </summary>
+        None = 0,
+
+        /// <summary>
         ///     Test the extended-key flag.
         /// </summary>
         Extended = 0x01,

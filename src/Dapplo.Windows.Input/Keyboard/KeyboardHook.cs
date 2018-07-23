@@ -175,7 +175,9 @@ namespace Dapplo.Windows.Input.Keyboard
 
             var keyEventArgs = new KeyboardHookEventArgs
             {
+                TimeStamp = keyboardLowLevelHookStruct.TimeStamp,
                 Key = keyboardLowLevelHookStruct.VirtualKeyCode,
+                Flags = keyboardLowLevelHookStruct.Flags,
                 IsModifier = isModifier,
                 IsKeyDown = isKeyDown,
                 IsLeftShift = _leftShift,

@@ -132,7 +132,39 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <summary>
         ///     The key code itself
         /// </summary>
-        public VirtualKeyCode Key { get; set; } = VirtualKeyCode.None;
+        public VirtualKeyCode Key { get; internal set; } = VirtualKeyCode.None;
+
+        /// <summary>
+        /// Timestamp of the event, a DateTime can be calculated by using EventTime instead
+        /// </summary>
+        public uint TimeStamp { get; internal set; }
+
+        /// <summary>
+        /// Returns the DateTimeOffset for this event
+        /// </summary>
+        public DateTimeOffset EventTime
+        {
+            get
+            {
+                var runningTimeSpan = TimeSpan.FromMilliseconds(Environment.TickCount - TimeStamp);
+                return DateTimeOffset.Now.Subtract(runningTimeSpan);
+            }
+        }
+
+        /// <summary>
+        /// Detaila on the keyboard event
+        /// </summary>
+        public ExtendedKeyFlags Flags { get; internal set; } = ExtendedKeyFlags.None;
+
+        /// <summary>
+        /// Test if this event is injected by another process
+        /// </summary>
+        public bool IsInjectedByProcess => (Flags & ExtendedKeyFlags.Injected) != 0;
+
+        /// <summary>
+        /// Test if this event is injected by another process with a lower integrity level
+        /// </summary>
+        public bool IsInjectedByLowerInterityLevelProcess => (Flags & ExtendedKeyFlags.Injected) != 0 && (Flags & ExtendedKeyFlags.LowerIntegretyInjected) != 0;
 
         /// <inheritdoc />
         public override string ToString()

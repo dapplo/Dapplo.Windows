@@ -97,7 +97,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
         /// <param name="timestamp">optional Timestamp</param>
         /// <returns>KeyboardInput[]</returns>
-        public static KeyboardInput[] ForKeyPress(VirtualKeyCode virtualKeyCode, int timestamp = 0)
+        public static KeyboardInput[] ForKeyPress(VirtualKeyCode virtualKeyCode, int? timestamp = null)
         {
             return new[]
             {
@@ -112,12 +112,13 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
         /// <param name="timestamp">optional Timestamp</param>
         /// <returns>KeyboardInput</returns>
-        public static KeyboardInput ForKeyDown(VirtualKeyCode virtualKeyCode, int timestamp = 0)
+        public static KeyboardInput ForKeyDown(VirtualKeyCode virtualKeyCode, int? timestamp = null)
         {
+            var messageTime = timestamp ?? Environment.TickCount;
             return new KeyboardInput
             {
                 VirtualKeyCode = virtualKeyCode,
-                Timestamp = timestamp
+                Timestamp = messageTime
             };
         }
 
@@ -127,13 +128,14 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
         /// <param name="timestamp">optional Timestamp</param>
         /// <returns>KeyboardInput</returns>
-        public static KeyboardInput ForKeyUp(VirtualKeyCode virtualKeyCode, int timestamp = 0)
+        public static KeyboardInput ForKeyUp(VirtualKeyCode virtualKeyCode, int? timestamp = null)
         {
+            var messageTime = timestamp ?? Environment.TickCount;
             return new KeyboardInput
             {
                 VirtualKeyCode = virtualKeyCode,
                 KeyEventFlags = KeyEventFlags.KeyUp,
-                Timestamp = timestamp
+                Timestamp = messageTime
             };
         }
     }

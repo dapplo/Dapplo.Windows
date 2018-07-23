@@ -43,7 +43,7 @@ namespace Dapplo.Windows.Input.Mouse
         /// <param name="location">optional NativePoint to specify where the mouse click takes place</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>number of input events generated</returns>
-        public static uint MouseClick(MouseButtons mouseButtons, NativePoint? location = null, uint timestamp = 0)
+        public static uint MouseClick(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
         {
             return SendInput(Structs.Input.CreateMouseInputs(MouseInput.MouseDown(mouseButtons, location, timestamp), MouseInput.MouseDown(mouseButtons, location, timestamp)));
         }
@@ -55,7 +55,7 @@ namespace Dapplo.Windows.Input.Mouse
         /// <param name="location">optional NativePoint to specify where the mouse down takes place</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>number of input events generated</returns>
-        public static uint MouseDown(MouseButtons mouseButtons, NativePoint? location = null, uint timestamp = 0)
+        public static uint MouseDown(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
         {
             var mouseWheelInput = MouseInput.MouseDown(mouseButtons, location, timestamp);
             return SendInput(Structs.Input.CreateMouseInputs(mouseWheelInput));
@@ -68,7 +68,7 @@ namespace Dapplo.Windows.Input.Mouse
         /// <param name="location">optional NativePoint to specify where the mouse up takes place</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>number of input events generated</returns>
-        public static uint MouseUp(MouseButtons mouseButtons, NativePoint? location = null, uint timestamp = 0)
+        public static uint MouseUp(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
         {
             var mouseWheelInput = MouseInput.MouseUp(mouseButtons, location, timestamp);
             return SendInput(Structs.Input.CreateMouseInputs(mouseWheelInput));
@@ -80,7 +80,7 @@ namespace Dapplo.Windows.Input.Mouse
         /// <param name="location">NativePoint to specify where the mouse moves</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>number of input events generated</returns>
-        public static uint MoveMouse(NativePoint location, uint timestamp = 0)
+        public static uint MoveMouse(NativePoint location, uint? timestamp = null)
         {
             var mouseMoveInput = MouseInput.MouseMove(location, timestamp);
             return SendInput(Structs.Input.CreateMouseInputs(mouseMoveInput));
@@ -93,7 +93,7 @@ namespace Dapplo.Windows.Input.Mouse
         /// <param name="location">optional NativePoint to specify where the mouse wheel takes place</param>
         /// <param name="timestamp">The time stamp for the event</param>
         /// <returns>number of input events generated</returns>
-        public static uint MoveMouseWheel(int wheelDelta, NativePoint? location = null, uint timestamp = 0)
+        public static uint MoveMouseWheel(int wheelDelta, NativePoint? location = null, uint? timestamp = null)
         {
             var mouseWheelInput = MouseInput.MoveMouseWheel(wheelDelta, location, timestamp);
             return SendInput(Structs.Input.CreateMouseInputs(mouseWheelInput));
