@@ -225,7 +225,12 @@ namespace Dapplo.Windows.Input.Enums
         Execute = 0x2B,
 
         /// <summary>
-        ///     PRINT SCREEN key
+        ///     This is the PrintScreen key, which is also called Snapshot
+        /// </summary>
+        PrintScreen = 0x2C,
+
+        /// <summary>
+        ///     This is the PrintScreen key, which is also called Snapshot
         /// </summary>
         Snapshot = 0x2C,
 
