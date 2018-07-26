@@ -62,7 +62,7 @@ namespace Dapplo.Windows.Tests
         }
 
         [StaFact]
-        private async Task TestKeyHandler_Sequence()
+        private async Task TestKeyHandler_Sequence_InputGenerator()
         {
             int pressCount = 0;
             var sequenceHandler = new KeySequenceHandler(
@@ -85,6 +85,58 @@ namespace Dapplo.Windows.Tests
                 Assert.True(pressCount == 1);
 
             }
+        }
+
+        [Fact]
+        private void TestKeyHandler_Sequence()
+        {
+            var sequenceHandler = new KeySequenceHandler(
+                new KeyCombinationHandler(VirtualKeyCode.Print),
+                new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA));
+
+            var keyOneEvent = new KeyboardHookEventArgs
+            {
+                Key = VirtualKeyCode.Print,
+                IsKeyDown = true
+            };
+
+
+            var keyTwoDownEvent = new KeyboardHookEventArgs
+            {
+                Key = VirtualKeyCode.Control,
+                IsKeyDown = true,
+                IsModifier = true
+            };
+            var keyTwoUpEvent = new KeyboardHookEventArgs
+            {
+                Key = VirtualKeyCode.Control,
+                IsKeyDown = false,
+                IsModifier = true
+            };
+            var keyThreeModifierEvent = new KeyboardHookEventArgs
+            {
+                Key = VirtualKeyCode.Shift,
+                IsKeyDown = true,
+                IsModifier = true
+            };
+            var keyThreeEvent = new KeyboardHookEventArgs
+            {
+                Key = VirtualKeyCode.KeyA,
+                IsKeyDown = true
+            };
+
+            var result = sequenceHandler.Handle(keyOneEvent);
+            Assert.False(result);
+            result = sequenceHandler.Handle(keyTwoDownEvent);
+            Assert.False(result);
+            result = sequenceHandler.Handle(keyTwoDownEvent);
+            Assert.False(result);
+            result = sequenceHandler.Handle(keyTwoUpEvent);
+            Assert.False(result);
+            result = sequenceHandler.Handle(keyThreeModifierEvent);
+            Assert.False(result);
+            result = sequenceHandler.Handle(keyThreeEvent);
+            Assert.True(result);
         }
 
         [StaFact]

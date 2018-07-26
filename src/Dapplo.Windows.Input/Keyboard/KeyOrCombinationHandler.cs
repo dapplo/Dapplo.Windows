@@ -30,7 +30,7 @@ namespace Dapplo.Windows.Input.Keyboard
     /// </summary>
     public class KeyOrCombinationHandler : IKeyboardHookEventHandler
     {
-        private readonly IList<IKeyboardHookEventHandler> _keyCombinations;
+        private readonly IKeyboardHookEventHandler[] _keyCombinations;
 
         /// <summary>
         /// Create a KeyOrCombinationHandler for the specified Key Combinations
@@ -38,7 +38,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyCombinations">IEnumerable with KeyCombinationHandler</param>
         public KeyOrCombinationHandler(IEnumerable<IKeyboardHookEventHandler> keyCombinations)
         {
-            _keyCombinations = keyCombinations.ToList();
+            _keyCombinations = keyCombinations.ToArray();
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyCombinations">params with KeyCombinationHandler</param>
         public KeyOrCombinationHandler(params IKeyboardHookEventHandler[] keyCombinations)
         {
-            _keyCombinations = keyCombinations.ToList();
+            _keyCombinations = keyCombinations.ToArray();
         }
 
         /// <summary>

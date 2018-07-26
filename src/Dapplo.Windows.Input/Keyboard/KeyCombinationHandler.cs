@@ -30,7 +30,7 @@ namespace Dapplo.Windows.Input.Keyboard
     /// </summary>
     public class KeyCombinationHandler : IKeyboardHookEventHandler
     {
-        private readonly IList<VirtualKeyCode> _otherPressedKeys = new List<VirtualKeyCode>();
+        private readonly ISet<VirtualKeyCode> _otherPressedKeys = new HashSet<VirtualKeyCode>();
         private readonly bool[] _availableKeys;
 
         /// <summary>

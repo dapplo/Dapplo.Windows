@@ -30,7 +30,7 @@ namespace Dapplo.Windows.Input.Keyboard
     /// </summary>
     public class KeySequenceHandler : IKeyboardHookEventHandler
     {
-        private readonly IList<IKeyboardHookEventHandler> _keyCombinations;
+        private readonly IKeyboardHookEventHandler[] _keyCombinations;
         private int _offset;
         private DateTimeOffset? _expireAfter;
 
@@ -46,7 +46,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyCombinations">IEnumerable with KeyCombinationHandler</param>
         public KeySequenceHandler(IEnumerable<IKeyboardHookEventHandler> keyCombinations)
         {
-            _keyCombinations = keyCombinations.ToList();
+            _keyCombinations = keyCombinations.ToArray();
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyCombinations">params with KeyCombinationHandler</param>
         public KeySequenceHandler(params IKeyboardHookEventHandler[] keyCombinations)
         {
-            _keyCombinations = keyCombinations.ToList();
+            _keyCombinations = keyCombinations.ToArray();
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Dapplo.Windows.Input.Keyboard
             // Check if timeout passed
             var now = DateTimeOffset.Now;
             var isExpired = _expireAfter.HasValue && _expireAfter.Value < now;
-            if (isExpired || _offset == _keyCombinations.Count)
+            if (isExpired || _offset == _keyCombinations.Length)
             {
                 Reset();
             }
@@ -89,7 +89,7 @@ namespace Dapplo.Windows.Input.Keyboard
                     _expireAfter = now.Add(Timeout.Value);
                 }
                 _offset++;
-                return _offset == _keyCombinations.Count;
+                return _offset == _keyCombinations.Length;
             }
 
             // Don't let the second key pass through
