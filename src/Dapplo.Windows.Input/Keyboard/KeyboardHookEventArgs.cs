@@ -170,46 +170,49 @@ namespace Dapplo.Windows.Input.Keyboard
         public override string ToString()
         {
             var dump = new StringBuilder();
-            if (IsShift)
+            if (!IsModifier)
             {
-                if (IsLeftShift)
+                if (IsShift)
                 {
-                    dump.Append("left ");
+                    if (IsLeftShift)
+                    {
+                        dump.Append("left ");
+                    }
+                    if (IsRightShift)
+                    {
+                        dump.Append("right ");
+                    }
+                    dump.Append("shift +");
                 }
-                if (IsRightShift)
-                {
-                    dump.Append("right ");
-                }
-                dump.Append("shift +");
-            }
 
-            if (IsControl)
-            {
-                if (IsLeftControl)
+                if (IsControl)
                 {
-                    dump.Append("left ");
+                    if (IsLeftControl)
+                    {
+                        dump.Append("left ");
+                    }
+                    if (IsRightControl)
+                    {
+                        dump.Append("right ");
+                    }
+                    dump.Append("control +");
                 }
-                if (IsRightControl)
+                if (IsLeftAlt)
                 {
-                    dump.Append("right ");
+                    dump.Append(" with left-alt");
                 }
-                dump.Append("control +");
-            }
-            if (IsLeftAlt)
-            {
-                dump.Append(" with left-alt");
-            }
-            if (IsRightAlt)
-            {
-                dump.Append(" with right-alt");
-            }
-            if (IsLeftWindows)
-            {
-                dump.Append(" with left-windows");
-            }
-            if (IsRightWindows)
-            {
-                dump.Append(" with right-windows");
+                if (IsRightAlt)
+                {
+                    dump.Append(" with right-alt");
+                }
+                if (IsLeftWindows)
+                {
+                    dump.Append(" with left-windows");
+                }
+                if (IsRightWindows)
+                {
+                    dump.Append(" with right-windows");
+                }
             }
 
             dump.Append(Key).Append(IsKeyDown ? " down" : " up");
