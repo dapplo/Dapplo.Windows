@@ -39,6 +39,11 @@ namespace Dapplo.Windows.Input.Keyboard
         public VirtualKeyCode[] TriggerCombination { get; }
 
         /// <summary>
+        /// Defines if repeats are allowed, default is false
+        /// </summary>
+        public bool CanRepeat { get; set; } = false;
+
+        /// <summary>
         /// Defines if the key press needs to be passed through to other applications.
         /// By default (false) a keypress which is specified is marked as handled and will not be seen by others
         /// </summary>
@@ -71,6 +76,7 @@ namespace Dapplo.Windows.Input.Keyboard
         public bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
         {
             bool keyMatched = false;
+            bool isRepeat = false;
             for (int i = 0; i < TriggerCombination.Length; i++)
             {
                 if (!CompareVk(keyboardHookEventArgs.Key, TriggerCombination[i]))
@@ -78,6 +84,7 @@ namespace Dapplo.Windows.Input.Keyboard
                     continue;
                 }
 
+                isRepeat = _availableKeys[i];
                 _availableKeys[i] = keyboardHookEventArgs.IsKeyDown;
                 keyMatched = true;
                 break;
@@ -100,6 +107,11 @@ namespace Dapplo.Windows.Input.Keyboard
             if (isHandled && !IsPassthrough)
             {
                 keyboardHookEventArgs.Handled = true;
+            }
+
+            if (!CanRepeat && isRepeat)
+            {
+                return false;
             }
             return isHandled;
         }

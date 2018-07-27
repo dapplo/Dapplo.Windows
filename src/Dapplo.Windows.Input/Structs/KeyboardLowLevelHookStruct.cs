@@ -39,8 +39,8 @@ namespace Dapplo.Windows.Input.Structs
     [SuppressMessage("ReSharper", "ArrangeAccessorOwnerBody")]
     public struct KeyboardLowLevelHookStruct
     {
-        private VirtualKeyCode _vkCode;
-        private ScanCodes _scanCode;
+        private uint _vkCode;
+        private uint _scanCode;
         private ExtendedKeyFlags _flags;
         private uint _time;
         private UIntPtr _dwExtraInfo;
@@ -50,8 +50,8 @@ namespace Dapplo.Windows.Input.Structs
         /// </summary>
         public VirtualKeyCode VirtualKeyCode
         {
-            get { return _vkCode; }
-            set { _vkCode = value; }
+            get { return (VirtualKeyCode)_vkCode; }
+            set { _vkCode = (uint)value; }
         }
 
         /// <summary>
@@ -59,8 +59,8 @@ namespace Dapplo.Windows.Input.Structs
         /// </summary>
         public ScanCodes ScanCode
         {
-            get { return _scanCode; }
-            set { _scanCode = value; }
+            get { return (ScanCodes)_scanCode; }
+            set { _scanCode = (uint)value; }
         }
 
         /// <summary>

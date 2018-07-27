@@ -88,6 +88,35 @@ namespace Dapplo.Windows.Tests
         }
 
         [Fact]
+        private void TestKeyHandler_Repeat()
+        {
+            var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Print);
+
+            var keyPrintDown = new KeyboardHookEventArgs
+            {
+                Key = VirtualKeyCode.Print,
+                IsKeyDown = true
+            };
+
+            var keyPrintUp = new KeyboardHookEventArgs
+            {
+                Key = VirtualKeyCode.Print,
+                IsKeyDown = false
+            };
+
+            var result = keyCombinationHandler.Handle(keyPrintDown);
+            Assert.True(result);
+            result = keyCombinationHandler.Handle(keyPrintDown);
+            Assert.False(result);
+
+            // Key up again
+            result = keyCombinationHandler.Handle(keyPrintUp);
+            Assert.False(result);
+            result = keyCombinationHandler.Handle(keyPrintDown);
+            Assert.True(result);
+        }
+
+        [Fact]
         private void TestKeyHandler_Sequence()
         {
             var sequenceHandler = new KeySequenceHandler(

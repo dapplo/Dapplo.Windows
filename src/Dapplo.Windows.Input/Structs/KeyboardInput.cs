@@ -40,7 +40,7 @@ namespace Dapplo.Windows.Input.Structs
         private VirtualKeyCode _wVk;
         private ScanCodes _wScan;
         private KeyEventFlags _dwFlags;
-        private int _time;
+        private uint _time;
         private UIntPtr _dwExtraInfo;
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Dapplo.Windows.Input.Structs
         ///     The time stamp for the event, in milliseconds. If this parameter is zero, the system will provide its own time
         ///     stamp.
         /// </summary>
-        public int Timestamp
+        public uint Timestamp
         {
             get { return _time; }
             set { _time = value; }
@@ -97,7 +97,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
         /// <param name="timestamp">optional Timestamp</param>
         /// <returns>KeyboardInput[]</returns>
-        public static KeyboardInput[] ForKeyPress(VirtualKeyCode virtualKeyCode, int? timestamp = null)
+        public static KeyboardInput[] ForKeyPress(VirtualKeyCode virtualKeyCode, uint? timestamp = null)
         {
             return new[]
             {
@@ -112,9 +112,9 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
         /// <param name="timestamp">optional Timestamp</param>
         /// <returns>KeyboardInput</returns>
-        public static KeyboardInput ForKeyDown(VirtualKeyCode virtualKeyCode, int? timestamp = null)
+        public static KeyboardInput ForKeyDown(VirtualKeyCode virtualKeyCode, uint? timestamp = null)
         {
-            var messageTime = timestamp ?? Environment.TickCount;
+            var messageTime = timestamp ?? (uint)Environment.TickCount;
             return new KeyboardInput
             {
                 VirtualKeyCode = virtualKeyCode,
@@ -128,9 +128,9 @@ namespace Dapplo.Windows.Input.Structs
         /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
         /// <param name="timestamp">optional Timestamp</param>
         /// <returns>KeyboardInput</returns>
-        public static KeyboardInput ForKeyUp(VirtualKeyCode virtualKeyCode, int? timestamp = null)
+        public static KeyboardInput ForKeyUp(VirtualKeyCode virtualKeyCode, uint? timestamp = null)
         {
-            var messageTime = timestamp ?? Environment.TickCount;
+            var messageTime = timestamp ?? (uint)Environment.TickCount;
             return new KeyboardInput
             {
                 VirtualKeyCode = virtualKeyCode,

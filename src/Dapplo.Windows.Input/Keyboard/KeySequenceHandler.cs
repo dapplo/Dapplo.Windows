@@ -73,13 +73,17 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyboardHookEventArgs">KeyboardHookEventArgs</param>
         public bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
         {
-            // Check if timeout passed
             var now = DateTimeOffset.Now;
-            var isExpired = _expireAfter.HasValue && _expireAfter.Value < now;
-            if (isExpired || _offset == _keyCombinations.Length)
+            // Check if timeout passed, to reset the sequence
+            if (_offset > 0)
             {
-                Reset();
+                var isExpired = _expireAfter.HasValue && _expireAfter.Value < now;
+                if (isExpired || _offset == _keyCombinations.Length)
+                {
+                    Reset();
+                }
             }
+
             var combinationHandled = _keyCombinations[_offset].Handle(keyboardHookEventArgs);
             if (combinationHandled)
             {
@@ -92,11 +96,7 @@ namespace Dapplo.Windows.Input.Keyboard
                 return _offset == _keyCombinations.Length;
             }
 
-            // Don't let the second key pass through
-            if (_offset > 0)
-            {
-                keyboardHookEventArgs.Handled = true;
-            }
+            // Only react to a keydown
             if (!keyboardHookEventArgs.IsKeyDown)
             {
                 return false;
