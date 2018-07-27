@@ -33,7 +33,6 @@ using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.User32.Enums;
-using Dapplo.Windows.User32.SafeHandles;
 using Dapplo.Windows.User32.Structs;
 
 #endregion

@@ -23,7 +23,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.User32.Structs;

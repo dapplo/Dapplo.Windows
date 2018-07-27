@@ -22,10 +22,9 @@
 #region using
 
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
-using Dapplo.Windows.User32;
 
 #endregion
 
@@ -117,7 +116,7 @@ namespace Dapplo.Windows.Input.Mouse
         ///     If the function returns zero, the input was already blocked by another thread.
         ///     To get extended error information, call GetLastError.
         /// </summary>
-        [DllImport(User32Api.User32, SetLastError = true)]
+        [DllImport("user32", SetLastError = true)]
         private static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray)] [In] Structs.Input[] inputs, int cbSize);
         #endregion
     }

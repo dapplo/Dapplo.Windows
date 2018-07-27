@@ -19,39 +19,39 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
+using System;
 
-using System.Reactive.Linq;
-using System.Threading.Tasks;
-using Dapplo.Log;
-using Dapplo.Log.XUnit;
-using Dapplo.Windows.Input.Mouse;
-using Dapplo.Windows.Messages;
-using Xunit.Abstractions;
-
-#endregion
-
-namespace Dapplo.Windows.Tests
+namespace Dapplo.Windows.Input.Enums
 {
     /// <summary>
-    ///     Test mouse hooking
+    /// Defines which mouse buttons to use
     /// </summary>
-    public class MouseHookTests
+    [Flags]
+    public enum MouseButtons
     {
-        private readonly LogSource Log = new LogSource();
-
-        public MouseHookTests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
-
-        //[StaFact]
-        private async Task Test_LeftMouseDownAsync()
-        {
-            // This takes care of having a WinProc handler, to make sure the messages arrive
-            // ReSharper disable once UnusedVariable
-            var winProcHandler = WinProcHandler.Instance;
-            await MouseHook.MouseEvents.Where(args => args.WindowsMessage == WindowsMessages.WM_LBUTTONDOWN).FirstAsync();
-        }
+        /// <summary>
+        /// No button
+        /// </summary>
+        None,
+        /// <summary>
+        /// Left mouse button
+        /// </summary>
+        Left = 0x100000,
+        /// <summary>
+        /// Right mouse button
+        /// </summary>
+        Right = 0x200000,
+        /// <summary>
+        /// Middle mouse button
+        /// </summary>
+        Middle = 0x400000,
+        /// <summary>
+        /// Extra button 1
+        /// </summary>
+        XButton1 = 0x800000,
+        /// <summary>
+        /// Extra button 2
+        /// </summary>
+        XButton2 = 0x1000000,
     }
 }

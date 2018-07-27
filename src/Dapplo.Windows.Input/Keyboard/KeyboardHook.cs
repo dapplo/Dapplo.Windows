@@ -26,8 +26,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Windows.Forms;
-using Dapplo.Log;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 
@@ -40,8 +38,6 @@ namespace Dapplo.Windows.Input.Keyboard
     /// </summary>
     public sealed class KeyboardHook
     {
-        private static readonly LogSource Log = new LogSource();
-
         /// <summary>
         ///     The singleton of the KeyboardHook
         /// </summary>
@@ -200,9 +196,6 @@ namespace Dapplo.Windows.Input.Keyboard
                 keyEventArgs.IsLeftAlt = true;
                 keyEventArgs.IsSystemKey = true;
             }
-
-            Log.Debug().WriteLine($"{wParam}:{lParam} -> {keyEventArgs}");
-
             return keyEventArgs;
         }
 
@@ -232,9 +225,9 @@ namespace Dapplo.Windows.Input.Keyboard
         /// </summary>
         private static void SyncLockState()
         {
-            _capsLock = GetKeyState(Keys.Capital) > 0;
-            _numLock = GetKeyState(Keys.NumLock) > 0;
-            _scrollLock = GetKeyState(Keys.Scroll) > 0;
+            _capsLock = GetKeyState(VirtualKeyCode.Capital) > 0;
+            _numLock = GetKeyState(VirtualKeyCode.NumLock) > 0;
+            _scrollLock = GetKeyState(VirtualKeyCode.Scroll) > 0;
         }
 
         #endregion
@@ -252,7 +245,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <returns></returns>
         [DllImport("user32.dll", ExactSpelling = true)]
         [ResourceExposure(ResourceScope.None)]
-        private static extern ushort GetKeyState(Keys keyCode);
+        private static extern ushort GetKeyState(VirtualKeyCode keyCode);
 
 
         /// <summary>

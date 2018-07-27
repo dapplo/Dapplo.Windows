@@ -21,8 +21,6 @@
 
 #region using
 
-using System;
-using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 
 #endregion

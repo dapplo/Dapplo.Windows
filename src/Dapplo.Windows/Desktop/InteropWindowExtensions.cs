@@ -33,7 +33,6 @@ using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.DesktopWindowsManager;
 using Dapplo.Windows.Gdi32;
-using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;

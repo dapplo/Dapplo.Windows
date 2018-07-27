@@ -24,7 +24,6 @@
 using System.Drawing;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Gdi32.SafeHandles;
-using Dapplo.Windows.User32.SafeHandles;
 
 #endregion
 

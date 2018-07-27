@@ -27,7 +27,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Windows.Interop;
-using Dapplo.Log;
 
 #endregion
 
@@ -38,7 +37,6 @@ namespace Dapplo.Windows.Messages
     /// </summary>
     public class WinProcHandler
     {
-        private static readonly LogSource Log = new LogSource();
         private static readonly object Lock = new object();
         private static HwndSource _hwndSource;
 
@@ -87,11 +85,6 @@ namespace Dapplo.Windows.Messages
                             return IntPtr.Zero;
                         }
 
-                        if (Log.IsVerboseEnabled())
-                        {
-                            Log.Verbose().WriteLine("Message window with handle {0} is destroyed, removing all hooks.", _hwndSource.Handle);
-                        }
-
                         // The hooks are no longer valid, either there is no _hwndSource or it was disposed.
                         lock (Lock)
                         {
@@ -125,10 +118,8 @@ namespace Dapplo.Windows.Messages
             {
                 if (_hooks.Contains(hook))
                 {
-                    Log.Verbose().WriteLine("Ignoring duplicate hook.");
                     return Disposable.Empty;
                 }
-                Log.Verbose().WriteLine("Adding a hook to handle messages.");
 
                 MessageHandlerWindow.AddHook(hook);
                 _hooks.Add(hook);
@@ -144,7 +135,6 @@ namespace Dapplo.Windows.Messages
         {
             lock (Lock)
             {
-                Log.Verbose().WriteLine("Removing a hook to handle messages.");
                 MessageHandlerWindow.RemoveHook(hook);
                 _hooks.Remove(hook);
             }
