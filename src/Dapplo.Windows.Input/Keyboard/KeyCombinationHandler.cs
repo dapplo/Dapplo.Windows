@@ -30,13 +30,20 @@ namespace Dapplo.Windows.Input.Keyboard
     /// </summary>
     public class KeyCombinationHandler : IKeyboardHookEventHandler
     {
-        private readonly ISet<VirtualKeyCode> _otherPressedKeys = new HashSet<VirtualKeyCode>();
-        private readonly bool[] _availableKeys;
+        /// <summary>
+        /// The keys that do not makeup the combination, where there are any Handle cannot return true
+        /// </summary>
+        protected ISet<VirtualKeyCode> OtherPressedKeys { get; } = new HashSet<VirtualKeyCode>();
+
+        /// <summary>
+        /// An array with all the current available keys, the locations represent the TriggerCombination array.
+        /// </summary>
+        protected bool[] AvailableKeys;
 
         /// <summary>
         /// Get the VirtualKeyCodes which trigger the combination
         /// </summary>
-        public VirtualKeyCode[] TriggerCombination { get; }
+        public VirtualKeyCode[] TriggerCombination {get; protected set; }
 
         /// <summary>
         /// Defines if repeats are allowed, default is false
@@ -55,8 +62,17 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyCombination">IEnumerable with VirtualKeyCodes</param>
         public KeyCombinationHandler(IEnumerable<VirtualKeyCode> keyCombination)
         {
+            Configure(keyCombination);
+        }
+
+        /// <summary>
+        /// Configure the settings
+        /// </summary>
+        /// <param name="keyCombination">IEnumerable of VirtualKeyCode</param>
+        protected void Configure(IEnumerable<VirtualKeyCode> keyCombination)
+        {
             TriggerCombination = keyCombination.Distinct().ToArray();
-            _availableKeys = new bool[TriggerCombination.Length];
+            AvailableKeys = new bool[TriggerCombination.Length];
         }
 
         /// <summary>
@@ -65,27 +81,26 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyCombination">params with VirtualKeyCodes</param>
         public KeyCombinationHandler(params VirtualKeyCode[] keyCombination)
         {
-            TriggerCombination = keyCombination.Distinct().ToArray();
-            _availableKeys = new bool[TriggerCombination.Length];
+            Configure(keyCombination);
         }
 
         /// <summary>
         /// Check if the keys are pressed
         /// </summary>
         /// <param name="keyboardHookEventArgs">KeyboardHookEventArgs</param>
-        public bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
+        public virtual bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
         {
             bool keyMatched = false;
             bool isRepeat = false;
             for (int i = 0; i < TriggerCombination.Length; i++)
             {
-                if (!CompareVk(keyboardHookEventArgs.Key, TriggerCombination[i]))
+                if (!CompareVirtualKeyCode(keyboardHookEventArgs.Key, TriggerCombination[i]))
                 {
                     continue;
                 }
 
-                isRepeat = _availableKeys[i];
-                _availableKeys[i] = keyboardHookEventArgs.IsKeyDown;
+                isRepeat = AvailableKeys[i];
+                AvailableKeys[i] = keyboardHookEventArgs.IsKeyDown;
                 keyMatched = true;
                 break;
             }
@@ -94,16 +109,16 @@ namespace Dapplo.Windows.Input.Keyboard
             {
                 if (keyboardHookEventArgs.IsKeyDown)
                 {
-                    _otherPressedKeys.Add(keyboardHookEventArgs.Key);
+                    OtherPressedKeys.Add(keyboardHookEventArgs.Key);
                 }
                 else
                 {
-                    _otherPressedKeys.Remove(keyboardHookEventArgs.Key);
+                    OtherPressedKeys.Remove(keyboardHookEventArgs.Key);
                 }
             }
 
             // Make as handled
-            var isHandled = _otherPressedKeys.Count == 0 && _availableKeys.All(b => b);
+            var isHandled = OtherPressedKeys.Count == 0 && AvailableKeys.All(b => b);
             if (isHandled && !IsPassthrough)
             {
                 keyboardHookEventArgs.Handled = true;
@@ -122,7 +137,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="current">VirtualKeyCode</param>
         /// <param name="expected">VirtualKeyCode</param>
         /// <returns>bool true if match</returns>
-        private static bool CompareVk(VirtualKeyCode current, VirtualKeyCode expected)
+        protected virtual bool CompareVirtualKeyCode(VirtualKeyCode current, VirtualKeyCode expected)
         {
             if (current == expected)
             {
