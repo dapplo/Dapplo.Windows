@@ -123,10 +123,10 @@ Task("UploadCoverageReport")
     .Does(() =>
 {
 
-    //CoverallsNet("./artifacts/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings
-    //{
-    //    RepoToken = coverallsRepoToken
-    //});
+    CoverallsNet("./artifacts/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings
+    {
+        RepoToken = coverallsRepoToken
+    });
 });
 
 // Run the XUnit tests via OpenCover, so be get an coverage.xml report
