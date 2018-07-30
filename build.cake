@@ -2,7 +2,7 @@
 #tool "OpenCover"
 #tool "GitVersion.CommandLine"
 #tool "docfx.console"
-#tool "coveralls.io"
+#tool nuget:?package=coveralls.net&version=0.7.0
 #tool "PdbGit"
 #addin "Cake.FileHelpers"
 #addin "Cake.DocFx"
@@ -122,7 +122,7 @@ Task("UploadCoverageReport")
     .WithCriteria(() => !string.IsNullOrEmpty(coverallsRepoToken))
     .Does(() =>
 {
-	CoverallsIo("./artifacts/coverage.xml", new CoverallsIoSettings()
+	CoverallsNet("./artifacts/coverage.xml", CoverallsNetReportType.OpenCover, new CoverallsNetSettings()
     {
         RepoToken = coverallsRepoToken
     });
