@@ -65,6 +65,7 @@
     <Compile Include="Keyboard\KeyOrCombinationHandler.cs" />
     <Compile Include="Keyboard\KeySequenceHandler.cs" />
     <Compile Include="Keyboard\KeyHelper.cs" />
+    <Compile Include="Keyboard\VirtualKeyCodeExtensions.cs" />
     <Compile Include="Mouse\MouseInputGenerator.cs" />
     <Compile Include="Keyboard\KeyboardHook.cs" />
     <Compile Include="Keyboard\KeyboardHookEventArgs.cs" />

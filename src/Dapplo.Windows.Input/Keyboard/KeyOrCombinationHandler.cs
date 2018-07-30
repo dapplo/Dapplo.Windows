@@ -64,5 +64,8 @@ namespace Dapplo.Windows.Input.Keyboard
             return handled;
 
         }
+
+        /// <inheritdoc />
+        public bool HasKeysPressed => _keyCombinations.Any(handler => handler.HasKeysPressed);
     }
 }

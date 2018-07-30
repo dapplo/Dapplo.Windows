@@ -42,6 +42,26 @@ namespace Dapplo.Windows.Tests
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
         }
 
+        private static KeyboardHookEventArgs KeyDown(VirtualKeyCode virtualKeyCode)
+        {
+            return new KeyboardHookEventArgs
+            {
+                Key = virtualKeyCode,
+                IsKeyDown = true,
+                IsModifier = virtualKeyCode.IsModifier()
+            };
+        }
+
+        private static KeyboardHookEventArgs KeyUp(VirtualKeyCode virtualKeyCode)
+        {
+            return new KeyboardHookEventArgs
+            {
+                Key = virtualKeyCode,
+                IsKeyDown = false,
+                IsModifier = virtualKeyCode.IsModifier()
+            };
+        }
+
         [StaFact]
         private async Task TestKeyHandler_SingleCombination()
         {
@@ -69,6 +89,7 @@ namespace Dapplo.Windows.Tests
                 new KeyCombinationHandler(VirtualKeyCode.Print),
                 new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA));
 
+
             using (KeyboardHook.KeyboardEvents.Where(sequenceHandler).Subscribe(keyboardHookEventArgs => pressCount++))
             {
                 await Task.Delay(20);
@@ -83,12 +104,72 @@ namespace Dapplo.Windows.Tests
                 KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
                 await Task.Delay(20);
                 Assert.True(pressCount == 1);
-
             }
         }
 
         [Fact]
-        private void TestKeyHandler_Repeat()
+        private void TestKeyHandler_KeySequenceHandler_Wrong_Right()
+        {
+            var sequenceHandler = new KeySequenceHandler(
+                new KeyCombinationHandler(VirtualKeyCode.Print),
+                new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA))
+            {
+                // Prevent debug issues, we are not testing the timeout here!
+                Timeout = null
+            };
+
+            var result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Print));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Shift));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.KeyB));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.KeyB));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Shift));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Print));
+            Assert.False(result);
+
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Shift));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.KeyA));
+            Assert.True(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.KeyA));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Shift));
+            Assert.False(result);
+            Assert.False(sequenceHandler.HasKeysPressed);
+        }
+
+        [Fact]
+        private void TestKeyHandler_KeySequenceHandler_Right()
+        {
+            var sequenceHandler = new KeySequenceHandler(
+                new KeyCombinationHandler(VirtualKeyCode.Print),
+                new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA))
+            {
+                Timeout = null
+            };
+
+            var result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Print));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Print));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Control));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Control));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Control));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Shift));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.KeyA));
+            Assert.True(result);
+        }
+
+        [Fact]
+        private void TestKeyHandler_KeyCombinationHandler_Repeat()
         {
             var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Print);
 
@@ -120,90 +201,20 @@ namespace Dapplo.Windows.Tests
         /// Test that after a key down, having a not matching key down & up we should not have a "hit"
         /// </summary>
         [Fact]
-        private void TestKeyHandler_KeyUp_AfterCombination()
+        private void TestKeyHandler_KeyCombinationHandler_KeyUp()
         {
             var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Print);
 
-            var keyPrintDown = new KeyboardHookEventArgs
-            {
-                Key = VirtualKeyCode.Print,
-                IsKeyDown = true
-            };
-
-            var keyControlDown = new KeyboardHookEventArgs
-            {
-                Key = VirtualKeyCode.Control,
-                IsKeyDown = true
-            };
-
-            var keyControlUp = new KeyboardHookEventArgs
-            {
-                Key = VirtualKeyCode.Control,
-                IsKeyDown = false
-            };
-
-            var result = keyCombinationHandler.Handle(keyPrintDown);
+            var result = keyCombinationHandler.Handle(KeyDown(VirtualKeyCode.Print));
             Assert.True(result);
-            result = keyCombinationHandler.Handle(keyControlDown);
+            result = keyCombinationHandler.Handle(KeyDown(VirtualKeyCode.Control));
             Assert.False(result);
-            result = keyCombinationHandler.Handle(keyControlUp);
+            result = keyCombinationHandler.Handle(KeyUp(VirtualKeyCode.Control));
             Assert.False(result);
-        }
-
-        [Fact]
-        private void TestKeyHandler_Sequence()
-        {
-            var sequenceHandler = new KeySequenceHandler(
-                new KeyCombinationHandler(VirtualKeyCode.Print),
-                new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA));
-
-            var keyOneEvent = new KeyboardHookEventArgs
-            {
-                Key = VirtualKeyCode.Print,
-                IsKeyDown = true
-            };
-
-
-            var keyTwoDownEvent = new KeyboardHookEventArgs
-            {
-                Key = VirtualKeyCode.Control,
-                IsKeyDown = true,
-                IsModifier = true
-            };
-            var keyTwoUpEvent = new KeyboardHookEventArgs
-            {
-                Key = VirtualKeyCode.Control,
-                IsKeyDown = false,
-                IsModifier = true
-            };
-            var keyThreeModifierEvent = new KeyboardHookEventArgs
-            {
-                Key = VirtualKeyCode.Shift,
-                IsKeyDown = true,
-                IsModifier = true
-            };
-            var keyThreeEvent = new KeyboardHookEventArgs
-            {
-                Key = VirtualKeyCode.KeyA,
-                IsKeyDown = true
-            };
-
-            var result = sequenceHandler.Handle(keyOneEvent);
-            Assert.False(result);
-            result = sequenceHandler.Handle(keyTwoDownEvent);
-            Assert.False(result);
-            result = sequenceHandler.Handle(keyTwoDownEvent);
-            Assert.False(result);
-            result = sequenceHandler.Handle(keyTwoUpEvent);
-            Assert.False(result);
-            result = sequenceHandler.Handle(keyThreeModifierEvent);
-            Assert.False(result);
-            result = sequenceHandler.Handle(keyThreeEvent);
-            Assert.True(result);
         }
 
         [StaFact]
-        private async Task TestKeyHandler_SequenceWithOptionalKeys()
+        private async Task TestKeyHandler_SequenceWithOptionalKeys_KeyboardInputGenerator()
         {
             int pressCount = 0;
             var sequenceHandler = new KeySequenceHandler(
@@ -239,6 +250,75 @@ namespace Dapplo.Windows.Tests
                 await Task.Delay(20);
                 Assert.Equal(2, pressCount);
             }
+        }
+
+        [Fact]
+        private async Task TestKeyHandler_SequenceWithOptionalKeys_Timeout()
+        {
+            var sequenceHandler = new KeySequenceHandler(
+                new KeyCombinationHandler(VirtualKeyCode.Print),
+                new KeyOrCombinationHandler(
+                    new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA),
+                    new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyB))
+            )
+            {
+                Timeout = TimeSpan.FromMilliseconds(200)
+            };
+
+            bool result;
+            // Print key
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Print));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Print));
+            Assert.False(result);
+
+            // Shift KeyB
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Shift));
+            Assert.True(sequenceHandler.HasKeysPressed);
+            Assert.False(result);
+            await Task.Delay(400);
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.KeyB));
+            Assert.True(sequenceHandler.HasKeysPressed);
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.KeyB));
+            Assert.True(sequenceHandler.HasKeysPressed);
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Shift));
+            Assert.False(sequenceHandler.HasKeysPressed);
+            Assert.False(result);
+        }
+
+        [Fact]
+        private void TestKeyHandler_SequenceWithOptionalKeys_OneTry()
+        {
+            var sequenceHandler = new KeySequenceHandler(
+                new KeyCombinationHandler(VirtualKeyCode.Print),
+                new KeyOrCombinationHandler(
+                    new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA),
+                    new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyB))
+            )
+            {
+                Timeout = null
+            };
+
+            bool result;
+
+            // Print key
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Print));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Print));
+            Assert.False(result);
+
+            // Shift KeyB
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Shift));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.KeyB));
+            Assert.True(result);
+            // Shift KeyB
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.KeyB));
+            Assert.False(result);
+            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Shift));
+            Assert.False(result);
         }
 
         [Fact]

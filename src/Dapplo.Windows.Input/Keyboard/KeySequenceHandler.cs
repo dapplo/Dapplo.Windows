@@ -30,7 +30,8 @@ namespace Dapplo.Windows.Input.Keyboard
     /// </summary>
     public class KeySequenceHandler : IKeyboardHookEventHandler
     {
-        private readonly IKeyboardHookEventHandler[] _keyCombinations;
+        private IKeyboardHookEventHandler[] _keyboardHookEventHandlers;
+        private bool[] _isHandled;
         private int _offset;
         private DateTimeOffset? _expireAfter;
 
@@ -46,7 +47,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyCombinations">IEnumerable with KeyCombinationHandler</param>
         public KeySequenceHandler(IEnumerable<IKeyboardHookEventHandler> keyCombinations)
         {
-            _keyCombinations = keyCombinations.ToArray();
+            Configure(keyCombinations);
         }
 
         /// <summary>
@@ -55,7 +56,17 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyCombinations">params with KeyCombinationHandler</param>
         public KeySequenceHandler(params IKeyboardHookEventHandler[] keyCombinations)
         {
-            _keyCombinations = keyCombinations.ToArray();
+            Configure(keyCombinations);
+        }
+
+        /// <summary>
+        /// Private method to configure the fields
+        /// </summary>
+        /// <param name="keyCombinations">IEnumerable of IKeyboardHookEventHandler</param>
+        private void Configure(IEnumerable<IKeyboardHookEventHandler> keyCombinations)
+        {
+            _keyboardHookEventHandlers = keyCombinations.ToArray();
+            _isHandled = new bool[_keyboardHookEventHandlers.Length];
         }
 
         /// <summary>
@@ -65,6 +76,28 @@ namespace Dapplo.Windows.Input.Keyboard
         {
             _expireAfter = null;
             _offset = 0;
+            for (var i = 0; i < _isHandled.Length; i++)
+            {
+                _isHandled[i] = false;
+            }
+        }
+
+        /// <summary>
+        /// Get the current handler
+        /// </summary>
+        private IKeyboardHookEventHandler CurrentHandler => _keyboardHookEventHandlers[_offset];
+
+        /// <summary>
+        /// Helper method to advance a handler
+        /// </summary>
+        /// <returns>bool with true if we advanced</returns>
+        private bool AdvanceHandler()
+        {
+            if (Timeout.HasValue)
+            {
+                _expireAfter = DateTimeOffset.Now.Add(Timeout.Value);
+            }
+            return ++_offset < _keyboardHookEventHandlers.Length;
         }
 
         /// <summary>
@@ -73,41 +106,44 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyboardHookEventArgs">KeyboardHookEventArgs</param>
         public bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
         {
-            var now = DateTimeOffset.Now;
-            // Check if timeout passed, to reset the sequence
-            if (_offset > 0)
+            var currentHandled = CurrentHandler.Handle(keyboardHookEventArgs);
+            var currentNotPressed = !CurrentHandler.HasKeysPressed;
+            if (currentHandled)
             {
-                var isExpired = _expireAfter.HasValue && _expireAfter.Value < now;
-                if (isExpired || _offset == _keyCombinations.Length)
-                {
-                    Reset();
-                }
+                _isHandled[_offset] = true;
             }
-
-            var combinationHandled = _keyCombinations[_offset].Handle(keyboardHookEventArgs);
-            if (combinationHandled)
-            {
-                // If a timeout is wanted, this is default, the expireAfter is set
-                if (Timeout.HasValue)
-                {
-                    _expireAfter = now.Add(Timeout.Value);
-                }
-                _offset++;
-                return _offset == _keyCombinations.Length;
-            }
-
-            // Only react to a keydown
-            if (!keyboardHookEventArgs.IsKeyDown)
-            {
-                return false;
-            }
-
-            // Reset offset, start again
-            if (!keyboardHookEventArgs.IsKeyDown && _offset > 0 && !keyboardHookEventArgs.IsModifier)
+            else if (!keyboardHookEventArgs.IsKeyDown && _offset > 0 && currentNotPressed && !keyboardHookEventArgs.IsModifier)
             {
                 Reset();
             }
-            return false;
+
+            // Check if timeout passed, to reset the sequence
+            if (_expireAfter.HasValue)
+            {
+                var isExpired = _expireAfter.Value < DateTimeOffset.Now;
+                if (isExpired)
+                {
+                    if (currentNotPressed)
+                    {
+                        Reset();
+                    }
+                    return false;
+                }
+            }
+
+            var allHandled = _isHandled.All(b => b);
+
+            // check if we need to advance
+            if (_isHandled[_offset] && currentNotPressed && !AdvanceHandler())
+            {
+                // Advance
+                Reset();
+            }
+
+            return currentHandled && allHandled;
         }
+
+        /// <inheritdoc />
+        public bool HasKeysPressed => _keyboardHookEventHandlers[_offset].HasKeysPressed;
     }
 }

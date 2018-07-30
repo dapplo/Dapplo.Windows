@@ -32,5 +32,10 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <param name="keyboardHookEventArgs"></param>
         /// <returns>bool true if handled</returns>
         bool Handle(KeyboardHookEventArgs keyboardHookEventArgs);
+
+        /// <summary>
+        /// Test if this event handler currently has keys pressed
+        /// </summary>
+        bool HasKeysPressed { get; }
     }
 }

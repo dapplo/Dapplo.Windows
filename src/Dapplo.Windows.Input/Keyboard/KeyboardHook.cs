@@ -110,7 +110,8 @@ namespace Dapplo.Windows.Input.Keyboard
             var isKeyDown = wParam == (IntPtr) WmKeydown || wParam == (IntPtr) WmSyskeydown;
 
             var keyboardLowLevelHookStruct = (KeyboardLowLevelHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardLowLevelHookStruct));
-            bool isModifier = false;
+            bool isModifier = keyboardLowLevelHookStruct.VirtualKeyCode.IsModifier();
+
             // Check the key to find if there any modifiers, store these in the global values.
             switch (keyboardLowLevelHookStruct.VirtualKeyCode)
             {
@@ -119,53 +120,42 @@ namespace Dapplo.Windows.Input.Keyboard
                     {
                         _capsLock = !_capsLock;
                     }
-                    isModifier = true;
                     break;
                 case VirtualKeyCode.NumLock:
                     if (isKeyDown)
                     {
                         _numLock = !_numLock;
                     }
-                    isModifier = true;
                     break;
                 case VirtualKeyCode.Scroll:
                     if (isKeyDown)
                     {
                         _scrollLock = !_scrollLock;
                     }
-                    isModifier = true;
                     break;
                 case VirtualKeyCode.LeftShift:
                     _leftShift = isKeyDown;
-                    isModifier = true;
                     break;
                 case VirtualKeyCode.RightShift:
                     _rightShift = isKeyDown;
-                    isModifier = true;
                     break;
                 case VirtualKeyCode.LeftControl:
                     _leftCtrl = isKeyDown;
-                    isModifier = true;
                     break;
                 case VirtualKeyCode.RightControl:
                     _rightCtrl = isKeyDown;
-                    isModifier = true;
                     break;
                 case VirtualKeyCode.LeftMenu:
                     _leftAlt = isKeyDown;
-                    isModifier = true;
                     break;
                 case VirtualKeyCode.RightMenu:
                     _rightAlt = isKeyDown;
-                    isModifier = true;
                     break;
                 case VirtualKeyCode.LeftWin:
                     _leftWin = isKeyDown;
-                    isModifier = true;
                     break;
                 case VirtualKeyCode.RightWin:
                     _rightWin = isKeyDown;
-                    isModifier = true;
                     break;
             }
 

@@ -134,6 +134,9 @@ namespace Dapplo.Windows.Input.Keyboard
             return isHandled;
         }
 
+        /// <inheritdoc />
+        public bool HasKeysPressed => OtherPressedKeys.Count > 0 || AvailableKeys.Any(b => b);
+
         /// <summary>
         /// Helper method to compare VirtualKeyCode
         /// </summary>
