@@ -5,6 +5,7 @@ THIS IS WORK IN PROGRESS!
 
 - Documentation can be found [here](http://www.dapplo.net/documentation/Dapplo.Windows)
 - Current build status: [![Build status](https://ci.appveyor.com/api/projects/status/n99jafhbbp74n2w7?svg=true)](https://ci.appveyor.com/project/dapplo/dapplo-windows)
+- Coverage: [![Coverage Status](https://coveralls.io/repos/github/dapplo/Dapplo.Windows/badge.svg?branch=master)](https://coveralls.io/github/dapplo/Dapplo.Windows?branch=master)
 - NuGet package: [![NuGet package Dapplo.Windows](https://badge.fury.io/nu/Dapplo.Windows.svg)](https://badge.fury.io/nu/Dapplo.Windows)
 - NuGet package: [![NuGet package Dapplo.Windows.Clipboard](https://badge.fury.io/nu/Dapplo.Windows.Clipboard.svg)](https://badge.fury.io/nu/Dapplo.Windows.Clipboard)
 - NuGet package: [![NuGet package Dapplo.Windows.Citrix](https://badge.fury.io/nu/Dapplo.Windows.Citrix.svg)](https://badge.fury.io/nu/Dapplo.Windows.Citrix)
