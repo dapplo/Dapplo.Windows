@@ -117,13 +117,16 @@ namespace Dapplo.Windows.Input.Keyboard
                 }
             }
 
-            // Make as handled
-            var isHandled = OtherPressedKeys.Count == 0 && AvailableKeys.All(b => b);
+            //  check if this combination is handled
+            var isHandled = keyboardHookEventArgs.IsKeyDown && OtherPressedKeys.Count == 0 && AvailableKeys.All(b => b);
+
+            // Mark as handled if the key combination is handled and we don't have passthrough
             if (isHandled && !IsPassthrough)
             {
                 keyboardHookEventArgs.Handled = true;
             }
 
+            // Do not return a true, if this is a repeat and CanRepeat is disabled
             if (!CanRepeat && isRepeat)
             {
                 return false;

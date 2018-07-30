@@ -116,6 +116,40 @@ namespace Dapplo.Windows.Tests
             Assert.True(result);
         }
 
+        /// <summary>
+        /// Test that after a key down, having a not matching key down & up we should not have a "hit"
+        /// </summary>
+        [Fact]
+        private void TestKeyHandler_KeyUp_AfterCombination()
+        {
+            var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Print);
+
+            var keyPrintDown = new KeyboardHookEventArgs
+            {
+                Key = VirtualKeyCode.Print,
+                IsKeyDown = true
+            };
+
+            var keyControlDown = new KeyboardHookEventArgs
+            {
+                Key = VirtualKeyCode.Control,
+                IsKeyDown = true
+            };
+
+            var keyControlUp = new KeyboardHookEventArgs
+            {
+                Key = VirtualKeyCode.Control,
+                IsKeyDown = false
+            };
+
+            var result = keyCombinationHandler.Handle(keyPrintDown);
+            Assert.True(result);
+            result = keyCombinationHandler.Handle(keyControlDown);
+            Assert.False(result);
+            result = keyCombinationHandler.Handle(keyControlUp);
+            Assert.False(result);
+        }
+
         [Fact]
         private void TestKeyHandler_Sequence()
         {
