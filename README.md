@@ -58,6 +58,13 @@ InternetExplorerVersion.ChangeEmbeddedVersion();
 ```
 an example is provided in the Dapplo.Windows.FormsExample project.
 
+# Dapplo.Windows.Input
+This library helps to process keyboard and mouse input, and can generate keyboard and mouse events.
+It provides a low-level keyboard / mouse event hook, which is provided as an Observable (Reactive Extensions).
+There are handlers to be able to react to a key combination, or a sequence of combinations.
+Examples are provided in the unit-tests [here](https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Tests/KeyboardHookTests.cs)
+
+
 # Dapplo.Windows.Clipboard
 In Dapplo.Clipboard specialized code for using the Windows clipboard is place.
 This is currently being developed and far from ready, it should provide a flexible and fluent API to use the Clipboard.
