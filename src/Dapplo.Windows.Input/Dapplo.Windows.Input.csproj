@@ -74,6 +74,7 @@
     <Compile Include="Keyboard\KeyCombinationHandler.cs" />
     <Compile Include="Enums\MapVkType.cs" />
     <Compile Include="Mouse\MouseHook.cs" />
+    <Compile Include="NativeInput.cs" />
     <Compile Include="RawInputMonitor.cs" />
     <Compile Include="RawInputEventArgs.cs" />
     <Compile Include="RawInputDeviceChangeEventArgs.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Enums\MouseEventFlags.cs" />
     <Compile Include="RawInputApi.cs" />
     <Compile Include="RawInputDeviceInformation.cs" />
+    <Compile Include="Structs\LastInputInfo.cs" />
     <Compile Include="Structs\RawHID.cs" />
     <Compile Include="Structs\RawKeyboard.cs" />
     <Compile Include="Structs\RawMouse.cs" />

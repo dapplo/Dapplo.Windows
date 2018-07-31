@@ -237,7 +237,6 @@ namespace Dapplo.Windows.Input.Keyboard
         [ResourceExposure(ResourceScope.None)]
         private static extern ushort GetKeyState(VirtualKeyCode keyCode);
 
-
         /// <summary>
         ///     The actual delegate for the p
         /// </summary>

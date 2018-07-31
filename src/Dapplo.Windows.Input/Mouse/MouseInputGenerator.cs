@@ -21,7 +21,6 @@
 
 #region using
 
-using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
@@ -44,7 +43,7 @@ namespace Dapplo.Windows.Input.Mouse
         /// <returns>number of input events generated</returns>
         public static uint MouseClick(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
         {
-            return SendInput(Structs.Input.CreateMouseInputs(MouseInput.MouseDown(mouseButtons, location, timestamp), MouseInput.MouseDown(mouseButtons, location, timestamp)));
+            return NativeInput.SendInput(Structs.Input.CreateMouseInputs(MouseInput.MouseDown(mouseButtons, location, timestamp), MouseInput.MouseDown(mouseButtons, location, timestamp)));
         }
 
         /// <summary>
@@ -57,7 +56,7 @@ namespace Dapplo.Windows.Input.Mouse
         public static uint MouseDown(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
         {
             var mouseWheelInput = MouseInput.MouseDown(mouseButtons, location, timestamp);
-            return SendInput(Structs.Input.CreateMouseInputs(mouseWheelInput));
+            return NativeInput.SendInput(Structs.Input.CreateMouseInputs(mouseWheelInput));
         }
 
         /// <summary>
@@ -70,7 +69,7 @@ namespace Dapplo.Windows.Input.Mouse
         public static uint MouseUp(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
         {
             var mouseWheelInput = MouseInput.MouseUp(mouseButtons, location, timestamp);
-            return SendInput(Structs.Input.CreateMouseInputs(mouseWheelInput));
+            return NativeInput.SendInput(Structs.Input.CreateMouseInputs(mouseWheelInput));
         }
 
         /// <summary>
@@ -82,7 +81,7 @@ namespace Dapplo.Windows.Input.Mouse
         public static uint MoveMouse(NativePoint location, uint? timestamp = null)
         {
             var mouseMoveInput = MouseInput.MouseMove(location, timestamp);
-            return SendInput(Structs.Input.CreateMouseInputs(mouseMoveInput));
+            return NativeInput.SendInput(Structs.Input.CreateMouseInputs(mouseMoveInput));
         }
 
         /// <summary>
@@ -95,29 +94,7 @@ namespace Dapplo.Windows.Input.Mouse
         public static uint MoveMouseWheel(int wheelDelta, NativePoint? location = null, uint? timestamp = null)
         {
             var mouseWheelInput = MouseInput.MoveMouseWheel(wheelDelta, location, timestamp);
-            return SendInput(Structs.Input.CreateMouseInputs(mouseWheelInput));
+            return NativeInput.SendInput(Structs.Input.CreateMouseInputs(mouseWheelInput));
         }
-
-
-        /// <summary>
-        ///     Wrapper to simplify sending of inputs
-        /// </summary>
-        /// <param name="inputs">Input array</param>
-        /// <returns>inputs send</returns>
-        private static uint SendInput(Structs.Input[] inputs)
-        {
-            return SendInput((uint)inputs.Length, inputs, Structs.Input.Size);
-        }
-
-        #region DllImports
-        /// <summary>
-        ///     Synthesizes keystrokes, mouse motions, and button clicks.
-        ///     The function returns the number of events that it successfully inserted into the keyboard or mouse input stream.
-        ///     If the function returns zero, the input was already blocked by another thread.
-        ///     To get extended error information, call GetLastError.
-        /// </summary>
-        [DllImport("user32", SetLastError = true)]
-        private static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray)] [In] Structs.Input[] inputs, int cbSize);
-        #endregion
     }
 }

@@ -21,7 +21,6 @@
 
 #region using
 
-using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 
@@ -47,7 +46,7 @@ namespace Dapplo.Windows.Input.Keyboard
             {
                 keyboardInputs[index++] = KeyboardInput.ForKeyDown(virtualKeyCode);
             }
-            return SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
+            return NativeInput.SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
         }
 
         /// <summary>
@@ -69,7 +68,7 @@ namespace Dapplo.Windows.Input.Keyboard
                 keyboardInputs[index++] = KeyboardInput.ForKeyUp(virtualKeyCode);
             }
 
-            return SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
+            return NativeInput.SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
         }
 
         /// <summary>
@@ -86,7 +85,7 @@ namespace Dapplo.Windows.Input.Keyboard
                 keyboardInputs[index++] = KeyboardInput.ForKeyUp(virtualKeyCode);
             }
 
-            return SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
+            return NativeInput.SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
         }
 
         /// <summary>
@@ -102,28 +101,7 @@ namespace Dapplo.Windows.Input.Keyboard
             {
                 keyboardInputs[index++] = KeyboardInput.ForKeyUp(virtualKeyCode);
             }
-            return SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
+            return NativeInput.SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));
         }
-
-        /// <summary>
-        ///     Wrapper to simplify sending of inputs
-        /// </summary>
-        /// <param name="inputs">Input array</param>
-        /// <returns>inputs send</returns>
-        private static uint SendInput(Structs.Input[] inputs)
-        {
-            return SendInput((uint)inputs.Length, inputs, Structs.Input.Size);
-        }
-
-        #region DllImports
-        /// <summary>
-        ///     Synthesizes keystrokes, mouse motions, and button clicks.
-        ///     The function returns the number of events that it successfully inserted into the keyboard or mouse input stream.
-        ///     If the function returns zero, the input was already blocked by another thread.
-        ///     To get extended error information, call GetLastError.
-        /// </summary>
-        [DllImport("user32", SetLastError = true)]
-        private static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray)] [In] Structs.Input[] inputs, int cbSize);
-        #endregion
     }
 }
