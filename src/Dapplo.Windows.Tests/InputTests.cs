@@ -21,6 +21,7 @@
 
 #region using
 
+using System;
 using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Threading;
@@ -29,6 +30,7 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Input.Mouse;
@@ -49,9 +51,33 @@ namespace Dapplo.Windows.Tests
         }
 
         /// <summary>
+        ///     Test LastInputTimeSpan
+        /// </summary>
+        [Fact]
+        private async Task TestInput_LastInputTimeSpan()
+        {
+            var initialLastInputTimeSpan = NativeInput.LastInputTimeSpan;
+            await Task.Delay(100);
+            var laterLastInputTimeSpan = NativeInput.LastInputTimeSpan;
+            Assert.True(laterLastInputTimeSpan > initialLastInputTimeSpan);
+        }
+
+        /// <summary>
+        ///     Test LastInputDateTime
+        /// </summary>
+        [Fact]
+        private async Task TestInput_LastInputDateTime()
+        {
+            var initialLastInput = NativeInput.LastInputDateTime;
+            await Task.Delay(1300);
+            var laterLastInput = NativeInput.LastInputDateTime;
+            var deviation = laterLastInput.Subtract(initialLastInput);
+            Assert.True(deviation < TimeSpan.FromMilliseconds(100));
+        }
+
+        /// <summary>
         ///     Test typing in a notepad
         /// </summary>
-        /// <returns></returns>
         [Fact]
         private async Task TestInput()
         {

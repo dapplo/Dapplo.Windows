@@ -44,31 +44,36 @@ namespace Dapplo.Windows.Input
         /// Get a DateTimeOffset which specifies the last input timestamp
         /// </summary>
         /// <returns>DateTimeOffset</returns>
-        public static DateTimeOffset LastInputDateTime()
+        public static DateTimeOffset LastInputDateTime
         {
-            var lastInputInfo = LastInputInfo.Create();
-            if (GetLastInputInfo(ref lastInputInfo))
+            get
             {
-                return lastInputInfo.LastInputDateTime;
+                var lastInputInfo = LastInputInfo.Create();
+                if (GetLastInputInfo(ref lastInputInfo))
+                {
+                    return lastInputInfo.LastInputDateTime;
+                }
+
+                return DateTimeOffset.MinValue;
             }
-
-            return DateTimeOffset.MinValue;
         }
-
 
         /// <summary>
         /// Get a TimeSpan which specifies how long ago the last input was
         /// </summary>
         /// <returns>TimeSpan</returns>
-        public static TimeSpan LastInputTimeSpan()
+        public static TimeSpan LastInputTimeSpan
         {
-            var lastInputInfo = LastInputInfo.Create();
-            if (GetLastInputInfo(ref lastInputInfo))
+            get
             {
-                return lastInputInfo.LastInputTimeSpan;
-            }
+                var lastInputInfo = LastInputInfo.Create();
+                if (GetLastInputInfo(ref lastInputInfo))
+                {
+                    return lastInputInfo.LastInputTimeSpan;
+                }
 
-            return TimeSpan.MaxValue;
+                return TimeSpan.MaxValue;
+            }
         }
 
         #region DllImports
