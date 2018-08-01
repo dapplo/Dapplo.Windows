@@ -33,54 +33,57 @@ namespace Dapplo.Windows.Advapi32
     /// <summary>
     /// Native methods to get registry or the login session information
     /// </summary>
-    public static class NativeMethods
+    public static class Advapi32Api
     {
         private const uint SeGroupLogonId = 0xC0000000; // from winnt.h
 
         /// <summary>
-        /// Get the Session-ID SID
+        /// Get the current Session-ID SID
         /// </summary>
         /// <returns>string with SessionId as SID</returns>
-        public static string GetSessionId()
+        public static string CurrentSessionId
         {
-            int tokenInfLength = 0;
-            // first call gets lenght of TokenInformation
-            GetTokenInformation(WindowsIdentity.GetCurrent().Token, TokenInformationClasses.TokenGroups, IntPtr.Zero, tokenInfLength, out tokenInfLength);
-            var tokenInformation = Marshal.AllocHGlobal(tokenInfLength);
-            try
+            get
             {
-                var result = GetTokenInformation(WindowsIdentity.GetCurrent().Token, TokenInformationClasses.TokenGroups, tokenInformation, tokenInfLength, out tokenInfLength);
-                if (!result)
+                int tokenInfLength = 0;
+                // first call gets lenght of TokenInformation
+                GetTokenInformation(WindowsIdentity.GetCurrent().Token, TokenInformationClasses.TokenGroups, IntPtr.Zero, tokenInfLength, out tokenInfLength);
+                var tokenInformation = Marshal.AllocHGlobal(tokenInfLength);
+                try
                 {
-                    return string.Empty;
-                }
-                string retVal = string.Empty;
-                var groups = (TokenGroups)Marshal.PtrToStructure(tokenInformation, typeof(TokenGroups));
-                int sidAndAttrSize = Marshal.SizeOf(new SidAndAttributes());
-                for (int i = 0; i < groups.GroupCount; i++)
-                {
-                    var sidAndAttributes = (SidAndAttributes)Marshal.PtrToStructure(new IntPtr(tokenInformation.ToInt64() + i * sidAndAttrSize + IntPtr.Size), typeof(SidAndAttributes));
-                    if ((sidAndAttributes.Attributes & SeGroupLogonId) != SeGroupLogonId)
+                    var result = GetTokenInformation(WindowsIdentity.GetCurrent().Token, TokenInformationClasses.TokenGroups, tokenInformation, tokenInfLength, out tokenInfLength);
+                    if (!result)
                     {
-                        continue;
+                        return string.Empty;
                     }
+                    string retVal = string.Empty;
+                    var groups = (TokenGroups)Marshal.PtrToStructure(tokenInformation, typeof(TokenGroups));
+                    int sidAndAttrSize = Marshal.SizeOf(new SidAndAttributes());
+                    for (int i = 0; i < groups.GroupCount; i++)
+                    {
+                        var sidAndAttributes = (SidAndAttributes)Marshal.PtrToStructure(new IntPtr(tokenInformation.ToInt64() + i * sidAndAttrSize + IntPtr.Size), typeof(SidAndAttributes));
+                        if ((sidAndAttributes.Attributes & SeGroupLogonId) != SeGroupLogonId)
+                        {
+                            continue;
+                        }
 
-                    ConvertSidToStringSid(sidAndAttributes.Sid, out var pstr);
-                    try
-                    {
-                        retVal = Marshal.PtrToStringAuto(pstr);
+                        ConvertSidToStringSid(sidAndAttributes.Sid, out var pstr);
+                        try
+                        {
+                            retVal = Marshal.PtrToStringAuto(pstr);
+                        }
+                        finally
+                        {
+                            Kernel32Api.LocalFree(pstr);
+                        }
+                        break;
                     }
-                    finally
-                    {
-                        Kernel32Api.LocalFree(pstr);
-                    }
-                    break;
+                    return retVal;
                 }
-                return retVal;
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(tokenInformation);
+                finally
+                {
+                    Marshal.FreeHGlobal(tokenInformation);
+                }
             }
         }
 

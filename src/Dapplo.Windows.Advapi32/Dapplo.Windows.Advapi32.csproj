@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\TokenInformationClasses.cs" />
-    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Advapi32Api.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Enums\RegistryOpenOptions.cs" />
     <Compile Include="Enums\RegistryNotifyFilter.cs" />

@@ -67,14 +67,14 @@ namespace Dapplo.Windows.Advapi32
                 {
                     try
                     {
-                        var result = NativeMethods.RegOpenKeyEx(hKey, subKey, RegistryOpenOptions.None, RegistryKeySecurityAccessRights.Read, out var registryKey);
+                        var result = Advapi32Api.RegOpenKeyEx(hKey, subKey, RegistryOpenOptions.None, RegistryKeySecurityAccessRights.Read, out var registryKey);
                         if (result != 0)
                         {
                             throw new Win32Exception(Marshal.GetLastWin32Error());
                         }
                         return new CompositeDisposable(
                             CreateKeyValuesChangedObservable(registryKey, filter).SubscribeOn(registrationScheduler ?? Scheduler.CurrentThread).Subscribe(obs),
-                            Disposable.Create(() => NativeMethods.RegCloseKey(registryKey)));
+                            Disposable.Create(() => Advapi32Api.RegCloseKey(registryKey)));
                     }
                     catch (Win32Exception e)
                     {
@@ -108,7 +108,7 @@ namespace Dapplo.Windows.Advapi32
                 obs =>
                 {
                     var eventNotify = new AutoResetEvent(false);
-                    var result = NativeMethods.RegNotifyChangeKeyValue(key, true, filter, eventNotify.SafeWaitHandle.DangerousGetHandle(), true);
+                    var result = Advapi32Api.RegNotifyChangeKeyValue(key, true, filter, eventNotify.SafeWaitHandle.DangerousGetHandle(), true);
                     if (result != 0)
                     {
                         obs.OnError(new Win32Exception(Marshal.GetLastWin32Error()));
