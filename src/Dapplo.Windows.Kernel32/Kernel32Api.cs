@@ -388,6 +388,15 @@ namespace Dapplo.Windows.Kernel32
         [DllImport("kernel32", SetLastError = true)]
         public static extern ulong GetTickCount64();
 
+
+        /// <summary>
+        /// This function frees the specified local memory object and invalidates its handle.
+        /// </summary>
+        /// <param name="hMem">IntPtr</param>
+        /// <returns>IntPtr</returns>
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr LocalFree(IntPtr hMem);
+
         /// <summary>
         /// Returns a DateTimeOffset which specifies when the system started
         /// </summary>

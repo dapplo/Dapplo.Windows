@@ -67,14 +67,14 @@ namespace Dapplo.Windows.Advapi32
                 {
                     try
                     {
-                        var result = RegOpenKeyEx(hKey, subKey, RegistryOpenOptions.None, RegistryKeySecurityAccessRights.Read, out var registryKey);
+                        var result = NativeMethods.RegOpenKeyEx(hKey, subKey, RegistryOpenOptions.None, RegistryKeySecurityAccessRights.Read, out var registryKey);
                         if (result != 0)
                         {
                             throw new Win32Exception(Marshal.GetLastWin32Error());
                         }
                         return new CompositeDisposable(
                             CreateKeyValuesChangedObservable(registryKey, filter).SubscribeOn(registrationScheduler ?? Scheduler.CurrentThread).Subscribe(obs),
-                            Disposable.Create(() => RegCloseKey(registryKey)));
+                            Disposable.Create(() => NativeMethods.RegCloseKey(registryKey)));
                     }
                     catch (Win32Exception e)
                     {
@@ -108,7 +108,7 @@ namespace Dapplo.Windows.Advapi32
                 obs =>
                 {
                     var eventNotify = new AutoResetEvent(false);
-                    var result = RegNotifyChangeKeyValue(key, true, filter, eventNotify.SafeWaitHandle.DangerousGetHandle(), true);
+                    var result = NativeMethods.RegNotifyChangeKeyValue(key, true, filter, eventNotify.SafeWaitHandle.DangerousGetHandle(), true);
                     if (result != 0)
                     {
                         obs.OnError(new Win32Exception(Marshal.GetLastWin32Error()));
@@ -123,43 +123,5 @@ namespace Dapplo.Windows.Advapi32
                             }));
                 }).Repeat();
         }
-
-        /// <summary>
-        /// Notifies the caller about changes to the attributes or contents of a specified registry key.
-        /// </summary>
-        /// <param name="hKey">IntPtr A handle to an open registry key.</param>
-        /// <param name="watchSubtree">If this parameter is TRUE, the function reports changes in the specified key and its subkeys. If the parameter is FALSE, the function reports changes only in the specified key.</param>
-        /// <param name="notifyFilter">RegChangeNotifyFilter A value that indicates the changes that should be reported. </param>
-        /// <param name="hEvent"></param>
-        /// <param name="asynchronous">If this parameter is TRUE, the function returns immediately and reports changes by signaling the specified event. If this parameter is FALSE, the function does not return until a change has occurred.</param>
-        /// <returns></returns>
-        [DllImport("advapi32.dll", SetLastError = true)]
-        private static extern int RegNotifyChangeKeyValue(IntPtr hKey, bool watchSubtree, RegistryNotifyFilter notifyFilter, IntPtr hEvent, bool asynchronous);
-
-        /// <summary>
-        /// Opens the specified registry key. Note that key names are not case sensitive.
-        /// To perform transacted registry operations on a key, call the RegOpenKeyTransacted function.
-        /// </summary>
-        /// <param name="hKey">IntPtr A handle to an open registry key.</param>
-        /// <param name="subKey">
-        /// The name of the registry subkey to be opened.
-        /// Key names are not case sensitive.
-        /// The lpSubKey parameter can be a pointer to an empty string. If lpSubKey is a pointer to an empty string and hKey is HKEY_CLASSES_ROOT, phkResult receives the same hKey handle passed into the function. Otherwise, phkResult receives a new handle to the key specified by hKey.
-        /// The lpSubKey parameter can be NULL only if hKey is one of the predefined keys. If lpSubKey is NULL and hKey is HKEY_CLASSES_ROOT, phkResult receives a new handle to the key specified by hKey. Otherwise, phkResult receives the same hKey handle passed in to the function.
-        /// </param>
-        /// <param name="ulOptions">RegistryOpenOptions</param>
-        /// <param name="samDesired">RegistryKeySecurityAccessRights</param>
-        /// <param name="hOpenedKey">UIntPtr a handle to the registry key</param>
-        /// <returns></returns>
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int RegOpenKeyEx(IntPtr hKey, string subKey, RegistryOpenOptions ulOptions, RegistryKeySecurityAccessRights samDesired, out IntPtr hOpenedKey);
-
-        /// <summary>
-        /// Closes a handle to the specified registry key.
-        /// </summary>
-        /// <param name="hKey">UIntPtr a handle to the registry key</param>
-        /// <returns></returns>
-        [DllImport("advapi32.dll", SetLastError = true)]
-        private static extern int RegCloseKey(IntPtr hKey);
     }
 }

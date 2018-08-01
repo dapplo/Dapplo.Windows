@@ -123,9 +123,9 @@ namespace Dapplo.Windows.Icons
         private static string GetAppProcessPath(IInteropWindow interopWindow)
         {
             User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var pid);
-            if (String.Equals(interopWindow.GetClassname(), AppQuery.AppFrameWindowClass))
+            if (string.Equals(interopWindow.GetClassname(), AppQuery.AppFrameWindowClass))
             {
-                pid = interopWindow.GetChildren().FirstOrDefault(window => String.Equals(AppQuery.AppWindowClass, window.GetClassname()))?.GetProcessId() ?? 0;
+                pid = interopWindow.GetChildren().FirstOrDefault(window => string.Equals(AppQuery.AppWindowClass, window.GetClassname()))?.GetProcessId() ?? 0;
             }
             if (pid <= 0)
             {
