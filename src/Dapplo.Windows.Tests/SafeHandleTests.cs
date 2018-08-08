@@ -21,6 +21,7 @@
 
 #region using
 
+using System;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Gdi32;
@@ -51,6 +52,15 @@ namespace Dapplo.Windows.Tests
                 {
                     Assert.False(safeCompatibleDcHandle.IsInvalid);
                 }
+            }
+        }
+
+        [Fact]
+        public void TestSafeDeviceContextHandle_IntPtrZero()
+        {
+            using (var safeDeviceContextHandle = SafeDeviceContextHandle.FromHWnd(IntPtr.Zero))
+            {
+                Assert.Null(safeDeviceContextHandle);
             }
         }
     }

@@ -108,6 +108,11 @@ namespace Dapplo.Windows.Dpi
         /// <returns>dpi value</returns>
         public static uint GetDpi(IntPtr hWnd)
         {
+            if (!User32Api.IsWindow(hWnd))
+            {
+                return DpiHandler.DefaultScreenDpi;
+            }
+
             // Use the easiest method, but this only works for Windows 10
             if (WindowsVersion.IsWindows10OrLater)
             {
@@ -128,6 +133,10 @@ namespace Dapplo.Windows.Dpi
             // Fallback to the global DPI settings
             using (var hdc = SafeDeviceContextHandle.FromHWnd(hWnd))
             {
+                if (hdc == null)
+                {
+                    return DpiHandler.DefaultScreenDpi;
+                }
                 return (uint)Gdi32Api.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
             }
         }

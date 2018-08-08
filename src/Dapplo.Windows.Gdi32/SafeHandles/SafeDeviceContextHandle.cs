@@ -25,6 +25,7 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Security;
+using Dapplo.Windows.User32;
 
 #endregion
 
@@ -78,7 +79,16 @@ namespace Dapplo.Windows.Gdi32.SafeHandles
         /// <returns>SafeDeviceContextHandle</returns>
         public static SafeDeviceContextHandle FromHWnd(IntPtr hWnd)
         {
-            return FromGraphics(Graphics.FromHwnd(hWnd));
+            if (!User32Api.IsWindow(hWnd))
+            {
+                return null;
+            }
+            var graphics = Graphics.FromHwnd(hWnd);
+            if (graphics == null)
+            {
+                return null;
+            }
+            return FromGraphics(graphics);
         }
 
         /// <summary>
