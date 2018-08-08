@@ -66,7 +66,7 @@ namespace Dapplo.Windows.Tests
         private async Task TestKeyHandler_SingleCombination()
         {
             int pressCount = 0;
-            var keyHandler = new KeyCombinationHandler(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
+            var keyHandler = new KeyCombinationHandler(VirtualKeyCode.Back, VirtualKeyCode.RightShift) { IgnoreInjected = false };
             using (KeyboardHook.KeyboardEvents.Where(keyHandler).Subscribe(keyboardHookEventArgs => pressCount++))
             {
                 await Task.Delay(20);
@@ -86,8 +86,8 @@ namespace Dapplo.Windows.Tests
         {
             int pressCount = 0;
             var sequenceHandler = new KeySequenceHandler(
-                new KeyCombinationHandler(VirtualKeyCode.Print),
-                new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA));
+                new KeyCombinationHandler(VirtualKeyCode.Print) { IgnoreInjected = false },
+                new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA) { IgnoreInjected = false });
 
 
             using (KeyboardHook.KeyboardEvents.Where(sequenceHandler).Subscribe(keyboardHookEventArgs => pressCount++))
@@ -218,10 +218,10 @@ namespace Dapplo.Windows.Tests
         {
             int pressCount = 0;
             var sequenceHandler = new KeySequenceHandler(
-                new KeyCombinationHandler(VirtualKeyCode.Print),
+                new KeyCombinationHandler(VirtualKeyCode.Print) {IgnoreInjected = false},
                 new KeyOrCombinationHandler(
-                    new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA),
-                    new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyB))
+                    new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA) { IgnoreInjected = false },
+                    new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyB) { IgnoreInjected = false })
             )
             {
                 // Timeout for test

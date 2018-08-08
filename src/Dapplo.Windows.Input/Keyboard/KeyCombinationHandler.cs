@@ -51,6 +51,12 @@ namespace Dapplo.Windows.Input.Keyboard
         public bool CanRepeat { get; set; } = false;
 
         /// <summary>
+        /// Defines if generated (injected) key presses need to be ignored,
+        /// By default (true) only "real" key presses are handled
+        /// </summary>
+        public bool IgnoreInjected { get; set; } = true;
+
+        /// <summary>
         /// Defines if the key press needs to be passed through to other applications.
         /// By default (false) a keypress which is specified is marked as handled and will not be seen by others
         /// </summary>
@@ -85,11 +91,16 @@ namespace Dapplo.Windows.Input.Keyboard
         }
 
         /// <summary>
-        /// Check if the keys are pressed
+        /// Handle key presses to test if the combination is available
         /// </summary>
         /// <param name="keyboardHookEventArgs">KeyboardHookEventArgs</param>
         public virtual bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
         {
+            if (IgnoreInjected && keyboardHookEventArgs.IsInjectedByProcess)
+            {
+                return false;
+            }
+
             bool keyMatched = false;
             bool isRepeat = false;
             for (int i = 0; i < TriggerCombination.Length; i++)
