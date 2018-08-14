@@ -145,7 +145,7 @@ namespace Dapplo.Windows.Tests
                 clipboardAccessToken.ClearContents();
                 clipboardAccessToken.SetAsUnicodeString(testString, "TEST_FORMAT");
             }
-            await Task.Delay(1000);
+            await Task.Delay(100);
             subscription.Dispose();
 
             // Doesn't work on AppVeyor!!
@@ -165,7 +165,7 @@ namespace Dapplo.Windows.Tests
                 clipboardAccessToken.ClearContents();
                 clipboardAccessToken.SetAsUnicodeString(testString);
             }
-            await Task.Delay(1000);
+            await Task.Delay(100);
             using (var clipboardAccessToken = ClipboardNative.Access())
             {
                 Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
@@ -208,7 +208,7 @@ namespace Dapplo.Windows.Tests
                 clipboardAccessToken.ClearContents();
                 clipboardAccessToken.SetAsStream(StandardClipboardFormats.UnicodeText, testStream);
             }
-            await Task.Delay(1000);
+            await Task.Delay(100);
             using (var clipboardAccessToken = ClipboardNative.Access())
             {
                 Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
@@ -222,6 +222,33 @@ namespace Dapplo.Windows.Tests
                     Assert.Equal(testString, Encoding.Unicode.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length).TrimEnd('\0'));
 
                 }
+            }
+        }
+
+        /// <summary>
+        ///     Test AccessAsync
+        /// </summary>
+        [WpfFact]
+        public async Task Test_ClipboardAccess_LockTimeout()
+        {
+            using (var outerClipboardAcess = await ClipboardNative.AccessAsync())
+            {
+                Assert.True(outerClipboardAcess.CanAccess);
+                var clipboardAccessToken = await ClipboardNative.AccessAsync();
+                Assert.True(clipboardAccessToken.IsLockTimeout);
+            }
+        }
+
+        /// <summary>
+        ///     Test AccessAsync
+        /// </summary>
+        [WpfFact]
+        public async Task Test_ClipboardAccess_LockTimeout_Exception()
+        {
+            using (await ClipboardNative.AccessAsync())
+            {
+                var clipboardAccessToken = await ClipboardNative.AccessAsync();
+                Assert.Throws<ClipboardAccessDeniedException>(() => clipboardAccessToken.ThrowWhenNoAccess());
             }
         }
     }

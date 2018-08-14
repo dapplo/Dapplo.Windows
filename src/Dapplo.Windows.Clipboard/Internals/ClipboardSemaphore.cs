@@ -20,7 +20,6 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,6 +33,8 @@ namespace Dapplo.Windows.Clipboard.Internals
     /// </summary>
     internal sealed class ClipboardSemaphore : IDisposable
     {
+        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(400);
+        private static readonly TimeSpan DefaultRetryInterval = TimeSpan.FromMilliseconds(200);
         private static readonly LogSource Log = new LogSource();
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         // To detect redundant calls
@@ -43,12 +44,17 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// Get a lock to the clipboard
         /// </summary>
         /// <param name="hWnd">IntPtr with a hWnd for the potential new owner</param>
-        /// <param name="retries">int with number of retries</param>
+        /// <param name="retries">int with number of retries, default is 5</param>
         /// <param name="retryInterval">TimeSpan for the time between retries</param>
-        /// <param name="timeout">A timeout for waiting on the semaphore</param>
+        /// <param name="timeout">optional TimeSpan for the timeout, default is 400ms</param>
         /// <returns>IClipboardLock</returns>
         public IClipboardAccessToken Lock(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
         {
+            // Set default retry interval
+            retryInterval = retryInterval ?? DefaultRetryInterval;
+            // Set default timeout interval
+            timeout = timeout ?? DefaultTimeout;
+
             if (hWnd == IntPtr.Zero)
             {
                 // Take the default
@@ -61,35 +67,41 @@ namespace Dapplo.Windows.Clipboard.Internals
             }
 
             // If a timeout is passed, use this in the wait
-            if (timeout.HasValue)
+            if (!_semaphoreSlim.Wait(timeout.Value))
             {
-                if (!_semaphoreSlim.Wait(timeout.Value))
+                // Timeout
+                return new ClipboardAccessToken
                 {
-                    throw new TimeoutException("Clipboard lock timeout.");
-                }
-            }
-            else
-            {
-                // This could block idenfinately if used incorrectly.
-                _semaphoreSlim.Wait();
+                    CanAccess = false,
+                    IsLockTimeout = true
+                };
             }
 
             // Create the clipboard lock itself
-            bool isLocked = false;
+            bool isOpened = false;
             do
             {
                 if (OpenClipboard(hWnd))
                 {
-                    isLocked = true;
+                    isOpened = true;
                     break;
                 }
                 retries--;
-                Thread.Sleep(retryInterval ?? TimeSpan.FromMilliseconds(200));
+                // No reason to sleep, if there are no more retries
+                if (retries >= 0)
+                {
+                    Thread.Sleep(retryInterval.Value);
+                }
+                
             } while (retries >= 0);
 
-            if (!isLocked)
+            if (!isOpened)
             {
-                throw new Win32Exception();
+                return new ClipboardAccessToken
+                {
+                    CanAccess = false,
+                    IsOpenTimeout = true
+                };
             }
             // Return a disposable which cleans up the current state.
             return new ClipboardAccessToken(() => {
@@ -104,17 +116,34 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// <param name="hWnd">IntPtr with the hWnd of the potential new owner</param>
         /// <param name="retries">int with the number of retries</param>
         /// <param name="retryInterval">optional TimeSpan</param>
+        /// <param name="timeout">optional TimeSpan for the timeout, default is 400ms</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>Task with IClipboardLock</returns>
-        public async Task<IClipboardAccessToken> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default)
+        public async ValueTask<IClipboardAccessToken> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
         {
+            // Set default retry interval
+            retryInterval = retryInterval ?? DefaultRetryInterval;
+            // Set default timeout interval
+            timeout = timeout ?? DefaultTimeout;
+
             if (hWnd == IntPtr.Zero)
             {
                 // Take the default
                 hWnd = WinProcHandler.Instance.Handle;
             }
-            await _semaphoreSlim.WaitAsync(cancellationToken).ConfigureAwait(false);
-            bool isLocked = false;
+
+            // Await the semaphore, until the timeout is triggered
+            if (!await _semaphoreSlim.WaitAsync(timeout.Value, cancellationToken).ConfigureAwait(false))
+            {
+                // Timeout
+                return new ClipboardAccessToken
+                {
+                    CanAccess = false,
+                    IsLockTimeout = true
+                };
+            }
+
+            bool isOpened = false;
             do
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -123,16 +152,25 @@ namespace Dapplo.Windows.Clipboard.Internals
                 }
                 if (OpenClipboard(hWnd))
                 {
-                    isLocked = true;
+                    isOpened = true;
                     break;
                 }
                 retries--;
-                await Task.Delay(retryInterval ?? TimeSpan.FromMilliseconds(200), cancellationToken).ConfigureAwait(true);
+                // No reason to delay, if there are no more retries
+                if (retries >= 0)
+                {
+                    await Task.Delay(retryInterval.Value, cancellationToken).ConfigureAwait(false);
+                }
             } while (retries >= 0);
 
-            if (!isLocked)
+            if (!isOpened)
             {
-                throw new Win32Exception();
+                // Timeout
+                return new ClipboardAccessToken
+                {
+                    CanAccess = false,
+                    IsOpenTimeout = true
+                };
             }
 
             return new ClipboardAccessToken(() => {

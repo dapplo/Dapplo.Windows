@@ -52,6 +52,13 @@ namespace Dapplo.Windows.Tests
         }
 
         [StaFact]
+        private void EnumerateWindowHandles()
+        {
+            var windows = WindowsEnumerator.EnumerateWindowHandles().ToList();
+            Assert.True(windows.Count > 0);
+        }
+
+        [StaFact]
         private void EnumerateWindows_Take10()
         {
             var windows = WindowsEnumerator.EnumerateWindows().Take(10).ToList();
@@ -62,6 +69,13 @@ namespace Dapplo.Windows.Tests
         private async Task EnumerateWindowsAsync()
         {
             var windows = await WindowsEnumerator.EnumerateWindowsAsync().ToList().ToTask().ConfigureAwait(false);
+            Assert.True(windows.Count > 0);
+        }
+
+        [StaFact]
+        private async Task EnumerateWindowHandlesAsync()
+        {
+            var windows = await WindowsEnumerator.EnumerateWindowHandlesAsync().ToList().ToTask().ConfigureAwait(false);
             Assert.True(windows.Count > 0);
         }
 
@@ -79,7 +93,7 @@ namespace Dapplo.Windows.Tests
             Application.DoEvents();
 
             await Task.Delay(400);
-            var window = await WindowsEnumerator.EnumerateWindowsAsync().Where(info => info.Fill().Caption.Contains(textValue)).FirstOrDefaultAsync();
+            var window = await WindowsEnumerator.EnumerateWindowsAsync().Where(info => info.GetCaption().Contains(textValue)).FirstOrDefaultAsync();
 
             Assert.NotNull(window);
         }

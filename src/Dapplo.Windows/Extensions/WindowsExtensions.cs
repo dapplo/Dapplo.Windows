@@ -39,7 +39,7 @@ namespace Dapplo.Windows.Extensions
         public static InteropWindow AsInteropWindow(this Window window)
         {
             var hwnd = new WindowInteropHelper(window).Handle;
-            return new InteropWindow(hwnd);
+            return InteropWindowFactory.CreateFor(hwnd);
         }
 
         /// <summary>

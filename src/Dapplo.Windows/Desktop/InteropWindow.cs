@@ -39,26 +39,12 @@ namespace Dapplo.Windows.Desktop
     public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
     {
         /// <summary>
-        ///     Constructor
+        /// Create an InteropWindow for the specified windows handle
         /// </summary>
-        /// <param name="handle"></param>
-        internal InteropWindow(IntPtr handle)
+        /// <param name="handle">IntPtr</param>
+        public InteropWindow(IntPtr handle)
         {
             Handle = handle;
-        }
-
-        /// <inheritdoc />
-        public bool Equals(IInteropWindow other)
-        {
-            if (other is null)
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-            return Handle.Equals(other.Handle);
         }
 
         /// <inheritdoc />
@@ -134,55 +120,80 @@ namespace Dapplo.Windows.Desktop
             {
                 dump.AppendLine($"{indentation}{nameof(Caption)}={Caption}");
             }
+
             if (cacheFlags.HasFlag(InteropWindowCacheFlags.Text))
             {
                 dump.AppendLine($"{indentation}{nameof(Text)}={Text}");
             }
+
             if (cacheFlags.HasFlag(InteropWindowCacheFlags.Info))
             {
                 dump.AppendLine($"{indentation}{nameof(Info)}={Info}");
             }
+
             if (cacheFlags.HasFlag(InteropWindowCacheFlags.Maximized))
             {
                 dump.AppendLine($"{indentation}{nameof(IsMaximized)}={IsMaximized}");
             }
+
             if (cacheFlags.HasFlag(InteropWindowCacheFlags.Minimized))
             {
                 dump.AppendLine($"{indentation}{nameof(IsMinimized)}={IsMinimized}");
             }
+
             if (cacheFlags.HasFlag(InteropWindowCacheFlags.Visible))
             {
                 dump.AppendLine($"{indentation}{nameof(IsVisible)}={IsVisible}");
             }
+
             if (cacheFlags.HasFlag(InteropWindowCacheFlags.Parent))
             {
                 dump.AppendLine($"{indentation}{nameof(Parent)}={Parent}");
             }
+
             if (cacheFlags.HasFlag(InteropWindowCacheFlags.ScrollInfo))
             {
                 dump.AppendLine($"{indentation}{nameof(CanScroll)}={CanScroll}");
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children))
+
+            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children) && !HasParent)
             {
-                if (!HasParent)
+                foreach (var child in this.GetChildren())
                 {
-                    foreach (var child in this.GetChildren())
-                    {
-                        child.Dump(cacheFlags, dump, indentation + "\t");
-                    }
+                    child.Dump(cacheFlags, dump, indentation + "\t");
                 }
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
+
+            if (!cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
             {
-                if (!HasParent)
-                {
-                    foreach (var child in this.GetZOrderedChildren())
-                    {
-                        child.Dump(cacheFlags, dump, indentation + "\t");
-                    }
-                }
+                return dump;
             }
+
+            if (HasParent)
+            {
+                return dump;
+            }
+
+            foreach (var child in this.GetZOrderedChildren())
+            {
+                child.Dump(cacheFlags, dump, indentation + "\t");
+            }
+
             return dump;
+        }
+
+        /// <inheritdoc />
+        public bool Equals(IInteropWindow other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            return Handle.Equals(other.Handle);
         }
 
         /// <inheritdoc />

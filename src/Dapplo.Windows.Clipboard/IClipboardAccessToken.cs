@@ -37,7 +37,17 @@ namespace Dapplo.Windows.Clipboard
         bool CanAccess { get; }
 
         /// <summary>
-        /// This throws a NotSupportedException when the clipboard can't be accessed
+        /// The clipboard access was denied due to a timeout
+        /// </summary>
+        bool IsLockTimeout { get; }
+
+        /// <summary>
+        /// The clipboard couldn't be opened
+        /// </summary>
+        bool IsOpenTimeout { get; }
+
+        /// <summary>
+        /// This throws a ClipboardAccessDeniedException when the clipboard can't be accessed
         /// </summary>
         void ThrowWhenNoAccess();
     }

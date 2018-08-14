@@ -301,7 +301,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <returns>bool true if it worked</returns>
         public static bool GetExtendedFrameBounds(IntPtr hWnd, out NativeRect rectangle)
         {
-            var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.DWMWA_EXTENDED_FRAME_BOUNDS, out rectangle, NativeRect.SizeOf);
+            var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.ExtendedFrameBounds, out rectangle, NativeRect.SizeOf);
             if (result.Succeeded())
             {
                 return true;

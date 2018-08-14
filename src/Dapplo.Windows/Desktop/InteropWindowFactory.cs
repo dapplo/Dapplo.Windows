@@ -32,7 +32,6 @@ namespace Dapplo.Windows.Desktop
     /// </summary>
     public static class InteropWindowFactory
     {
-
         /// <summary>
         ///     Factory method to create a InteropWindow for the supplied handle
         /// </summary>

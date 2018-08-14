@@ -20,30 +20,26 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
-using System.IO;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
+using Dapplo.Windows.Clipboard;
+using Dapplo.Windows.Messages;
 
-namespace Dapplo.Windows.Clipboard.Internals
+namespace Dapplo.Windows.Tests.Benchmarks
 {
     /// <summary>
-    /// This wraps an UnmanagedMemoryStream, to also take care or disposing some disposable
+    /// Benchmarks for accessing the clipboard
     /// </summary>
-    internal class UnmanagedMemoryStreamWrapper : UnmanagedMemoryStream
+    [MinColumn, MaxColumn, MemoryDiagnoser]
+    public class ClipboardBenchmarks
     {
-        private IDisposable _disposable;
-
-        public unsafe UnmanagedMemoryStreamWrapper(byte* bytes, long length, long capacity, FileAccess fileAccess) : base(bytes, length, capacity, fileAccess)
+        private readonly IntPtr _handle = WinProcHandler.Instance.Handle;
+        [Benchmark, STAThread]
+        public async Task LockClipboard()
         {
-        }
-
-        public void SetDisposable(IDisposable disposable)
-        {
-            _disposable = disposable;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            _disposable?.Dispose();
+            using (await ClipboardNative.AccessAsync(_handle))
+            {
+            }
         }
     }
 }

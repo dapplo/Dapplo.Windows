@@ -37,7 +37,7 @@ namespace Dapplo.Windows.Extensions
         /// <returns>InteropWindow</returns>
         public static InteropWindow AsInteropWindow(this Form form)
         {
-            return new InteropWindow(form.Handle);
+            return InteropWindowFactory.CreateFor(form.Handle);
         }
 
         /// <summary>

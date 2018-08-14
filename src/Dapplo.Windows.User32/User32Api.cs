@@ -130,11 +130,7 @@ namespace Dapplo.Windows.User32
                 const int capacity = 260;
                 char* classname = stackalloc char[capacity];
                 var characters = GetClassName(hWnd, classname, capacity);
-                if (characters == 0)
-                {
-                    return string.Empty;
-                }
-                return new string(classname, 0, characters);
+                return characters == 0 ? string.Empty : new string(classname, 0, characters);
             }
         }
 

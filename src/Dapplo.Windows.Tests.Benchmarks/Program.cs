@@ -20,30 +20,18 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
-using System.IO;
+using BenchmarkDotNet.Running;
 
-namespace Dapplo.Windows.Clipboard.Internals
+namespace Dapplo.Windows.Tests.Benchmarks
 {
-    /// <summary>
-    /// This wraps an UnmanagedMemoryStream, to also take care or disposing some disposable
-    /// </summary>
-    internal class UnmanagedMemoryStreamWrapper : UnmanagedMemoryStream
+    public static class Program
     {
-        private IDisposable _disposable;
-
-        public unsafe UnmanagedMemoryStreamWrapper(byte* bytes, long length, long capacity, FileAccess fileAccess) : base(bytes, length, capacity, fileAccess)
+        public static void Main(string[] args)
         {
-        }
-
-        public void SetDisposable(IDisposable disposable)
-        {
-            _disposable = disposable;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            _disposable?.Dispose();
+            //BenchmarkRunner.Run<ClipboardBenchmarks>();
+            //BenchmarkRunner.Run<EnumerateWindowsBenchmark>();
+            BenchmarkRunner.Run<InteropWindowBenchmark>();
+            Console.ReadKey();
         }
     }
 }

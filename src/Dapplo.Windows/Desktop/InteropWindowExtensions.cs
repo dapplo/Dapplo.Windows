@@ -154,13 +154,13 @@ namespace Dapplo.Windows.Desktop
             {
                 // TODO: it might have a value, but can't get it. Returning null would be bad... so return empty
                 interopWindow.Caption = string.Empty;
-
                 Log.Warn().WriteLine("Do not call GetWindowText for a Window ({0}) which belongs the current thread! An empty string is returned.", interopWindow.Handle);
-                // TODO: Maybe create a solution where we can return the current Caption?
-                return string.Empty;
             }
-            var caption = User32Api.GetText(interopWindow.Handle);
-            interopWindow.Caption = caption;
+            else
+            {
+                var caption = User32Api.GetText(interopWindow.Handle);
+                interopWindow.Caption = caption;
+            }
             return interopWindow.Caption;
         }
 
@@ -262,8 +262,12 @@ namespace Dapplo.Windows.Desktop
             {
                 return interopWindow.Parent.Value;
             }
-            // TODO: Invalidate ParentWindow if the value changed or is IntPtr.Zero?
             var parent = User32Api.GetParent(interopWindow.Handle);
+            // Invalidate ParentWindow if the value changed or is IntPtr.Zero
+            if (interopWindow.ParentWindow?.Handle != parent)
+            {
+                interopWindow.ParentWindow = null;
+            }
             interopWindow.Parent = parent;
             return interopWindow.Parent.Value;
         }
@@ -280,12 +284,9 @@ namespace Dapplo.Windows.Desktop
             {
                 return interopWindow.ParentWindow;
             }
-            interopWindow.GetParent(forceUpdate);
-            if (interopWindow.Parent.HasValue && interopWindow.Parent.Value != IntPtr.Zero)
-            {
-                interopWindow.ParentWindow = InteropWindowFactory.CreateFor(interopWindow.Parent.Value);
-            }
-            // TODO: Invalidate ParentWindow if IntPtr.Zero?!
+
+            var parent = interopWindow.Parent ?? interopWindow.GetParent(forceUpdate);
+            interopWindow.ParentWindow = parent == IntPtr.Zero ? null : InteropWindowFactory.CreateFor(parent);
             return interopWindow.ParentWindow;
         }
 
@@ -609,7 +610,7 @@ namespace Dapplo.Windows.Desktop
         /// </summary>
         /// <param name="interopWindow">The window to bring to the foreground</param>
         /// <param name="workaround">bool with true to use a trick (press Alt) to really bring the window to the foreground</param>
-        public static async Task ToForegroundAsync(this IInteropWindow interopWindow, bool workaround = true)
+        public static async ValueTask ToForegroundAsync(this IInteropWindow interopWindow, bool workaround = true)
         {
             // Nothing we can do if it's not visible!
             if (!interopWindow.IsVisible())

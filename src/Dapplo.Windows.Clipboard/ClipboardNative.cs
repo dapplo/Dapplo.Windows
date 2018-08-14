@@ -116,11 +116,12 @@ namespace Dapplo.Windows.Clipboard
         /// <param name="hWnd">IntPtr with the windows handle</param>
         /// <param name="retries">int with the amount of lock attempts are made</param>
         /// <param name="retryInterval">Timespan between retries, default 200ms</param>
+        /// <param name="timeout">Timespan to wait for a lock, default 1000ms</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>IClipboard in a Task, which will unlock when Dispose is called</returns>
-        public static Task<IClipboardAccessToken> AccessAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, CancellationToken cancellationToken = default)
+        public static ValueTask<IClipboardAccessToken> AccessAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
         {
-            return ClipboardLockProvider.LockAsync(hWnd, retries, retryInterval, cancellationToken);
+            return ClipboardLockProvider.LockAsync(hWnd, retries, retryInterval, timeout, cancellationToken);
         }
 
         /// <summary>
