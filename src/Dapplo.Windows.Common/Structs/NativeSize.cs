@@ -22,9 +22,12 @@
 #region using
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
 
@@ -36,7 +39,8 @@ namespace Dapplo.Windows.Common.Structs
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
     [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
-    public readonly struct NativeSize : IEquatable<NativeSize>
+    [TypeConverter(typeof(NativeSizeTypeConverter))]
+    public readonly struct NativeSize : IEquatable<NativeSize>, IComparable<NativeSize>
     {
         private readonly int _width;
         private readonly int _height;
@@ -85,67 +89,56 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Checks if the width * height are 0
-        /// </summary>
-        /// <returns>true if the size is empty</returns>
-        public bool IsEmpty => _width * _height == 0;
-
-        /// <summary>
         ///     Implicit cast from NativeSize to Size
         /// </summary>
         /// <param name="size">NativeSize</param>
-        public static implicit operator Size(NativeSize size)
-        {
-            return new Size(size.Width, size.Height);
-        }
+        public static implicit operator Size(NativeSize size) => new Size(size.Width, size.Height);
 
         /// <summary>
         ///     Implicit cast from NativeSize to System.Drawing.Size
         /// </summary>
         /// <param name="size">NativeSize</param>
-        public static implicit operator System.Drawing.Size(NativeSize size)
-        {
-            return new System.Drawing.Size(size.Width, size.Height);
-        }
+        public static implicit operator System.Drawing.Size(NativeSize size) => new System.Drawing.Size(size.Width, size.Height);
 
         /// <summary>
         ///     Implicit cast from System.Drawing.Size to NativeSize
         /// </summary>
         /// <param name="size">System.Drawing.Size</param>
-        public static implicit operator NativeSize(System.Drawing.Size size)
-        {
-            return new NativeSize(size.Width, size.Height);
-        }
+        public static implicit operator NativeSize(System.Drawing.Size size) => new NativeSize(size.Width, size.Height);
 
         /// <summary>
-        /// 
+        /// Equals operator overloading
         /// </summary>
-        /// <param name="size1"></param>
-        /// <param name="size2"></param>
+        /// <param name="size1">NativeSize</param>
+        /// <param name="size2">NativeSize</param>
         /// <returns></returns>
-        public static bool operator ==(NativeSize size1, NativeSize size2)
-        {
-            return size1.Equals(size2);
-        }
+        public static bool operator ==(NativeSize size1, NativeSize size2) => size1.Equals(size2);
 
         /// <summary>
-        /// 
+        /// Not Equals operator overloading
         /// </summary>
-        /// <param name="size1"></param>
-        /// <param name="size2"></param>
+        /// <param name="size1">NativeSize</param>
+        /// <param name="size2">NativeSize</param>
         /// <returns></returns>
-        public static bool operator !=(NativeSize size1, NativeSize size2)
-        {
-            return !(size1 == size2);
-        }
+        public static bool operator !=(NativeSize size1, NativeSize size2) => !(size1 == size2);
+
+        /// <summary>
+        ///     Checks if the width * height are 0
+        /// </summary>
+        /// <returns>true if the size is empty</returns>
+        [Pure]
+        public bool IsEmpty => _width * _height == 0;
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return $"{{Width: {_width}; Height: {_height};}}";
-        }
+        [Pure]
+        public int CompareTo(NativeSize other) => (other.Width * other.Height).CompareTo(Width * Height);
 
         /// <inheritdoc />
+        [Pure]
+        public override string ToString() => $"{{Width: {_width}; Height: {_height};}}";
+
+        /// <inheritdoc />
+        [Pure]
         public override bool Equals(object obj)
         {
             switch (obj)
@@ -160,11 +153,8 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
-        public bool Equals(NativeSize other)
-        {
-            return _width == other._width &&
-                   _height == other._height;
-        }
+        [Pure]
+        public bool Equals(NativeSize other) => _width == other._width && _height == other._height;
 
         /// <summary>
         /// Decontructor for tuples
@@ -178,6 +168,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
         public override int GetHashCode()
         {
             unchecked

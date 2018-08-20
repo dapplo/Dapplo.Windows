@@ -22,9 +22,12 @@
 #region using
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
 
@@ -36,7 +39,8 @@ namespace Dapplo.Windows.Common.Structs
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
     [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
-    public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>
+    [TypeConverter(typeof(NativeSizeFloatTypeConverter))]
+    public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparable<NativeSizeFloat>
     {
         private readonly float _width;
         private readonly float _height;
@@ -60,8 +64,7 @@ namespace Dapplo.Windows.Common.Structs
         ///     Constructor from S.W.Size
         /// </summary>
         /// <param name="size"></param>
-        public NativeSizeFloat(Size size)
-            : this((float) size.Width, (float) size.Height)
+        public NativeSizeFloat(Size size) : this((float) size.Width, (float) size.Height)
         {
         }
 
@@ -96,15 +99,10 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
-        ///     Checks if the width * height are 0
-        /// </summary>
-        /// <returns>true if the size is empty</returns>
-        public bool IsEmpty => Math.Abs(_width * _height) < float.Epsilon;
-
-        /// <summary>
         ///     Implicit cast from NativeSizeFloat to Size
         /// </summary>
         /// <param name="size">NativeSize</param>
+        /// <returns>Size</returns>
         public static implicit operator Size(NativeSizeFloat size)
         {
             return new Size(size.Width, size.Height);
@@ -114,6 +112,7 @@ namespace Dapplo.Windows.Common.Structs
         ///     Implicit cast from Size to NativeSizeFloat
         /// </summary>
         /// <param name="size">Size</param>
+        /// <returns>NativeSizeFloat</returns>
         public static implicit operator NativeSizeFloat(Size size)
         {
             return new NativeSizeFloat((float)size.Width, (float)size.Height);
@@ -123,6 +122,7 @@ namespace Dapplo.Windows.Common.Structs
         ///     Implicit cast from NativeSize to System.Drawing.Size
         /// </summary>
         /// <param name="size">NativeSizeFloat</param>
+        /// <returns>System.Drawing.Size</returns>
         public static implicit operator System.Drawing.Size(NativeSizeFloat size)
         {
             return new System.Drawing.Size((int)size.Width, (int)size.Height);
@@ -132,6 +132,7 @@ namespace Dapplo.Windows.Common.Structs
         ///     Implicit cast from NativeSize to System.Drawing.SizeF
         /// </summary>
         /// <param name="size">NativeSizeFloat</param>
+        /// <returns>System.Drawing.SizeF</returns>
         public static implicit operator System.Drawing.SizeF(NativeSizeFloat size)
         {
             return new System.Drawing.SizeF(size.Width, size.Height);
@@ -141,6 +142,7 @@ namespace Dapplo.Windows.Common.Structs
         ///     Implicit cast from System.Drawing.Size to NativeSizeFloat
         /// </summary>
         /// <param name="size">System.Drawing.Size</param>
+        /// <returns>NativeSizeFloat</returns>
         public static implicit operator NativeSizeFloat(System.Drawing.Size size)
         {
             return new NativeSizeFloat(size.Width, size.Height);
@@ -150,6 +152,7 @@ namespace Dapplo.Windows.Common.Structs
         ///     Implicit cast from NativeSize to NativeSizeFloat
         /// </summary>
         /// <param name="size">NativeSize</param>
+        /// <returns>NativeSizeFloat</returns>
         public static implicit operator NativeSizeFloat(NativeSize size)
         {
             return new NativeSizeFloat(size.Width, size.Height);
@@ -159,6 +162,7 @@ namespace Dapplo.Windows.Common.Structs
         ///     Implicit cast from System.Drawing.SizeF to NativeSizeFloat
         /// </summary>
         /// <param name="size">System.Drawing.Size</param>
+        /// <returns>NativeSizeFloat</returns>
         public static implicit operator NativeSizeFloat(System.Drawing.SizeF size)
         {
             return new NativeSizeFloat(size.Width, size.Height);
@@ -183,10 +187,18 @@ namespace Dapplo.Windows.Common.Structs
         /// <returns>bool</returns>
         public static bool operator !=(NativeSizeFloat float1, NativeSizeFloat float2)
         {
-            return !(float1 == float2);
+            return !float1.Equals(float2);
         }
 
+        /// <summary>
+        ///     Checks if the width * height are 0
+        /// </summary>
+        /// <returns>true if the size is empty</returns>
+        [Pure]
+        public bool IsEmpty => Math.Abs(_width * _height) < float.Epsilon;
+
         /// <inheritdoc />
+        [Pure]
         public override bool Equals(object obj)
         {
             switch (obj)
@@ -203,6 +215,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
         public bool Equals(NativeSizeFloat other)
         {
             return Math.Abs(_width - other._width) < float.Epsilon &&
@@ -210,6 +223,11 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
+        public int CompareTo(NativeSizeFloat other) => (other.Width * other.Height).CompareTo(Width * Height);
+
+        /// <inheritdoc />
+        [Pure]
         public override int GetHashCode()
         {
             unchecked
@@ -230,6 +248,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
         public override string ToString()
         {
             return $"{{Width: {_width}; Height: {_height};}}";

@@ -133,7 +133,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <returns>false if the values are equal</returns>
         public static bool operator !=(NativePoint point1, NativePoint point2)
         {
-            return !(point1 == point2);
+            return !point1.Equals(point2);
         }
 
         /// <inheritdoc />
@@ -148,10 +148,7 @@ namespace Dapplo.Windows.Common.Structs
 
         /// <inheritdoc />
         [Pure]
-        public override string ToString()
-        {
-            return X + "," + Y;
-        }
+        public override string ToString() => $"{{X: {_x}; >: {_y};}}";
 
         /// <inheritdoc />
         [Pure]
@@ -170,13 +167,7 @@ namespace Dapplo.Windows.Common.Structs
 
         /// <inheritdoc />
         [Pure]
-        public bool Equals(NativePoint other)
-        {
-            return _x == other._x &&
-                   _y == other._y &&
-                   X == other.X &&
-                   Y == other.Y;
-        }
+        public bool Equals(NativePoint other) => _x == other._x && _y == other._y;
 
         /// <summary>
         /// Decontructor for tuples

@@ -24,6 +24,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -294,6 +295,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
         public override string ToString()
         {
             return "{Left: " + _x + "; " + "Top: " + _y + "; Right: " + _width + "; Bottom: " + _height + "}";
@@ -304,6 +306,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="rectangle">NativeRectFloat</param>
         /// <returns>bool</returns>
+        [Pure]
         public bool Equals(NativeRectFloat rectangle)
         {
             return Math.Abs(rectangle._x - _x) < float.Epsilon
@@ -316,9 +319,11 @@ namespace Dapplo.Windows.Common.Structs
         ///     Checks if this NativeRectFloat is empty
         /// </summary>
         /// <returns>true when empty</returns>
+        [Pure]
         public bool IsEmpty => Math.Abs(_width * _height) < float.Epsilon;
 
         /// <inheritdoc />
+        [Pure]
         public override bool Equals(object obj)
         {
             switch (obj)
@@ -335,6 +340,7 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <inheritdoc />
+        [Pure]
         public override int GetHashCode()
         {
             unchecked
@@ -353,6 +359,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="point">NativePoint</param>
         /// <returns>true if it contains</returns>
+        [Pure]
         public bool Contains(NativePoint point)
         {
             return point.X >= Left && point.X <= Right && point.Y >= Top && point.Y <= Bottom;
