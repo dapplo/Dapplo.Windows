@@ -27,8 +27,11 @@ using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using System.Drawing;
+using System.Windows;
 using Xunit;
 using Xunit.Abstractions;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 
 #endregion
 
@@ -93,7 +96,12 @@ namespace Dapplo.Windows.Tests
             Rectangle rectangle = nativeRect;
             Assert.Equal(nativeRect, (NativeRect)rectangle);
             Assert.Equal(rectangle, (Rectangle)nativeRect);
+
+            Int32Rect rect = nativeRect;
+            Assert.Equal(nativeRect, (NativeRect)rect);
+            Assert.Equal(rect, (Int32Rect)nativeRect);
         }
+
         [Fact]
         public void NativeRectExtensions()
         {

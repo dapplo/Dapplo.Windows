@@ -188,7 +188,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <returns>NativeRectFloat</returns>
         public static implicit operator NativeRectFloat(Rect rectangle)
         {
-            return new NativeRectFloat((int)rectangle.Left, (int)rectangle.Top, (int)rectangle.Right, (int)rectangle.Bottom);
+            return new NativeRectFloat((float)rectangle.Left, (float)rectangle.Top, (float)rectangle.Right, (float)rectangle.Bottom);
         }
 
         /// <summary>
@@ -212,6 +212,16 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        ///     Cast Int32Rect to NativeRectFloat
+        /// </summary>
+        /// <param name="rectangle">Int32Rect</param>
+        /// <returns>NativeRectFloat</returns>
+        public static implicit operator NativeRectFloat(Int32Rect rectangle)
+        {
+            return new NativeRectFloat(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+        }
+
+        /// <summary>
         ///     Cast NativeRectFloat to Rect
         /// </summary>
         /// <param name="rectangle">NativeRectFloat</param>
@@ -219,6 +229,26 @@ namespace Dapplo.Windows.Common.Structs
         public static implicit operator Rect(NativeRectFloat rectangle)
         {
             return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
+        }
+
+        /// <summary>
+        ///     Cast NativeRectFloat to Int32Rect
+        /// </summary>
+        /// <param name="rectangle">NativeRectFloat</param>
+        /// <returns>Int32Rect</returns>
+        public static implicit operator Int32Rect(NativeRectFloat rectangle)
+        {
+            return new Int32Rect((int)rectangle.Left, (int)rectangle.Top, (int)rectangle.Width, (int)rectangle.Height);
+        }
+
+        /// <summary>
+        ///     Cast NativeRectFloat to NativeRect
+        /// </summary>
+        /// <param name="rectangle">NativeRectFloat</param>
+        /// <returns>NativeRect</returns>
+        public static implicit operator NativeRect(NativeRectFloat rectangle)
+        {
+            return new NativeRect((int)rectangle.Left, (int)rectangle.Top, (int)rectangle.Width, (int)rectangle.Height);
         }
 
         /// <summary>
