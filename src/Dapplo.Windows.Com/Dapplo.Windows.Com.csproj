@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="ComProgIdAttribute.cs" />
     <Compile Include="ComWrapper.cs" />
-    <Compile Include="DisposableCom.cs" />
     <Compile Include="IDispatch.cs" />
     <Compile Include="IOleCommandTarget.cs" />
     <Compile Include="IOleWindow.cs" />

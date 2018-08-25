@@ -19,31 +19,19 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-#endregion
+using System;
 
 namespace Dapplo.Windows.Interop
 {
     /// <summary>
-    ///     A factory for IDisposableCom
+    ///     A simple com wrapper which helps with "using"
     /// </summary>
-    public static class DisposableCom
+    /// <typeparam name="T">Type to wrap</typeparam>
+    public interface IDisposableCom<out T> : IDisposable
     {
         /// <summary>
-        ///     Create a ComDisposable for the supplied type object
+        ///     The actual com object
         /// </summary>
-        /// <typeparam name="T">Type for the com object</typeparam>
-        /// <param name="comObject">the com object itself</param>
-        /// <returns>IDisposableCom of type T</returns>
-        public static IDisposableCom<T> Create<T>(T comObject)
-        {
-            if (Equals(comObject, default(T)))
-            {
-                return null;
-            }
-
-            return new DisposableComImplementation<T>(comObject);
-        }
+        T ComObject { get; }
     }
 }
