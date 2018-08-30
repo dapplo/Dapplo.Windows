@@ -229,7 +229,7 @@ namespace Dapplo.Windows.User32
             unsafe
             {
                 var text = stackalloc char[size + 1];
-                SendMessage(hWnd, WindowsMessages.WM_GETTEXT, size, text);
+                SendMessage(hWnd, WindowsMessages.WM_GETTEXT, size + 1, text);
                 return new string(text, 0, size);
             }
         }
