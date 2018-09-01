@@ -25,10 +25,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Extensions;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
@@ -124,6 +126,25 @@ namespace Dapplo.Windows.Tests
             {
                 Assert.Equal(windowPlacement, windowPlacementResult.Value);
             }
+        }
+
+        /// <summary>
+        ///     Test GetTextFromWindow
+        /// </summary>
+        [WpfFact]
+        private void Test_GetTextFromWindow()
+        {
+            const string title = "1234567890";
+            var window = new Window
+            {
+                Title = title
+            };
+
+            window.Show();
+            var handle = window.GetHandle();
+            var text = User32Api.GetTextFromWindow(handle);
+            window.Close();
+            Assert.Equal(title, text);
         }
     }
 }

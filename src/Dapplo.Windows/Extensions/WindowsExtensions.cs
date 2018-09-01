@@ -19,6 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System;
 using System.Windows;
 using System.Windows.Interop;
 using Dapplo.Windows.Desktop;
@@ -38,8 +39,18 @@ namespace Dapplo.Windows.Extensions
         /// <returns>InteropWindow</returns>
         public static InteropWindow AsInteropWindow(this Window window)
         {
-            var hwnd = new WindowInteropHelper(window).Handle;
-            return InteropWindowFactory.CreateFor(hwnd);
+            return InteropWindowFactory.CreateFor(window.GetHandle());
+        }
+
+        /// <summary>
+        /// Retrieve the handle of a Window
+        /// </summary>
+        /// <param name="window">Window</param>
+        /// <returns>IntPtr</returns>
+        public static IntPtr GetHandle(this Window window)
+        {
+            var windowInteropHelper = new WindowInteropHelper(window);
+            return windowInteropHelper.Handle;
         }
 
         /// <summary>
