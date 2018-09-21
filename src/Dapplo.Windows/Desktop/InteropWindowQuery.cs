@@ -44,10 +44,10 @@ namespace Dapplo.Windows.Desktop
         public static IList<string> IgnoreClasses { get; } = new List<string>(new[] {"Progman", "Button", "Dwm"}); //"MS-SDIa"
 
         /// <summary>
-        ///     Get the currently active window
+        ///     Get the window with which the user is currently working
         /// </summary>
-        /// <returns>InteropWindow</returns>
-        public static IInteropWindow GetActiveWindow()
+        /// <returns>IInteropWindow</returns>
+        public static IInteropWindow GetForegroundWindow()
         {
             return InteropWindowFactory.CreateFor(User32Api.GetForegroundWindow());
         }
@@ -55,7 +55,7 @@ namespace Dapplo.Windows.Desktop
         /// <summary>
         ///     Gets the Desktop window
         /// </summary>
-        /// <returns>InteropWindow for the desktop window</returns>
+        /// <returns>IInteropWindow for the desktop window</returns>
         public static IInteropWindow GetDesktopWindow()
         {
             return InteropWindowFactory.CreateFor(User32Api.GetDesktopWindow());
@@ -65,7 +65,7 @@ namespace Dapplo.Windows.Desktop
         ///     Find windows belonging to the same process (thread) as the process ID.
         /// </summary>
         /// <param name="processId">int with process Id</param>
-        /// <returns>IEnumerable with InteropWindow</returns>
+        /// <returns>IEnumerable with IInteropWindow</returns>
         public static IEnumerable<IInteropWindow> GetWindowsForProcess(int processId)
         {
             using (var process = Process.GetProcessById(processId))
@@ -123,7 +123,7 @@ namespace Dapplo.Windows.Desktop
         /// Check the Classname of the IInteropWindow against a list of know classes which can be ignored.
         /// </summary>
         /// <param name="interopWindow">IInteropWindow</param>
-        /// <returns></returns>
+        /// <returns>bool</returns>
         public static bool CanIgnoreClass(this IInteropWindow interopWindow)
         {
             return IgnoreClasses.Contains(interopWindow.GetClassname());
