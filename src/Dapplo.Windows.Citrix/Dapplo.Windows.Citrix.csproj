@@ -1,78 +1,28 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E6A137AD-B848-41FD-A467-121FB20F3BB0}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dapplo.Windows.Citrix</RootNamespace>
+    <Description>Dapplo.Windows.Citrix is a library which has citrix supporting code</Description>
+    <AssemblyTitle>Dapplo.Windows.Citrix</AssemblyTitle>
+    <TargetFrameworks>net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Citrix</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <LangVersion>latest</LangVersion>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Dapplo.Windows.Citrix.XML</DocumentationFile>
+    <PackageId>Dapplo.Windows.Citrix</PackageId>
+    <PackageTags>windows native citrix</PackageTags>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Dapplo.Windows.Citrix.XML</DocumentationFile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapplo.Log, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.Log.1.2.1\lib\net45\Dapplo.Log.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapplo.Log">
+      <Version>1.3.8</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Enums\ConnectStates.cs" />
-    <Compile Include="Enums\EventMask.cs" />
-    <Compile Include="Enums\InfoClasses.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Structs\ClientAddress.cs" />
-    <Compile Include="Structs\ClientLatency.cs" />
-    <Compile Include="Structs\OsVersionInfo.cs" />
-    <Compile Include="Structs\SessionTime.cs" />
-    <Compile Include="Structs\AppInfo.cs" />
-    <Compile Include="Structs\UserInfo.cs" />
-    <Compile Include="Structs\ClientInfo.cs" />
-    <Compile Include="Structs\ClientDisplay.cs" />
-    <Compile Include="WinFrame.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
-      <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
-      <Name>Dapplo.Windows.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

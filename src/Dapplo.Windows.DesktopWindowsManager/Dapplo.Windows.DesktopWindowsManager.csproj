@@ -1,66 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EF02637F-86A5-47F1-BB75-33E0BA3119CF}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dapplo.Windows.DesktopWindowsManager</RootNamespace>
+    <Description>Dapplo.Windows.DesktopWindowsManager helps to use the windows dwm api</Description>
+    <AssemblyTitle>Dapplo.Windows.DesktopWindowsManager</AssemblyTitle>
+    <TargetFrameworks>net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.DesktopWindowsManager</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <LangVersion>latest</LangVersion>
-    <TargetFrameworkProfile />
+    <PackageId>Dapplo.Windows.DesktopWindowsManager</PackageId>
+    <PackageTags>windows dwm</PackageTags>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Dapplo.Windows.DesktopWindowsManager.XML</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Dapplo.Windows.DesktopWindowsManager.XML</DocumentationFile>
-  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Dwm.cs" />
-    <Compile Include="DwmBlurBehind.cs" />
-    <Compile Include="DwmBlurBehindFlags.cs" />
-    <Compile Include="DwmSetIconicLivePreviewFlags.cs" />
-    <Compile Include="DwmThumbnailProperties.cs" />
-    <Compile Include="DwmThumbnailPropertyFlags.cs" />
-    <Compile Include="DwmWindowAttributes.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
-      <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
-      <Name>Dapplo.Windows.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

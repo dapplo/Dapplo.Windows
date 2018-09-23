@@ -1,48 +1,40 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8AA469BB-856A-4330-96CE-2BB75A014070}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dapplo.Windows</RootNamespace>
+    <Description>Dapplo.Windows has native code for accessing Windows, e.g getting the size/title/location of a window or monitoring the title changes of windows.</Description>
+    <AssemblyTitle>Dapplo.Windows</AssemblyTitle>
+    <TargetFrameworks>net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <DocumentationFile>bin\Debug\Dapplo.Windows.XML</DocumentationFile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <DocumentationFile>bin\Release\Dapplo.Windows.XML</DocumentationFile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageId>Dapplo.Windows</PackageId>
+    <PackageTags>windows native desktop</PackageTags>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapplo.Log, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.Log.1.2.1\lib\net45\Dapplo.Log.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.DesktopWindowsManager\Dapplo.Windows.DesktopWindowsManager.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Input\Dapplo.Windows.Input.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapplo.Log">
+      <Version>1.3.8</Version>
+    </PackageReference>
+    <PackageReference Include="System.Reactive">
+      <Version>4.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
+      <Version>4.5.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.ValueTuple">
+      <Version>4.5.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -50,89 +42,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Reactive, Version=4.1.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.4.1.0\lib\net46\System.Reactive.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.1\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.1\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="App\AppQuery.cs" />
-    <Compile Include="App\IAppVisibility.cs" />
-    <Compile Include="App\MonitorAppVisibility.cs" />
-    <Compile Include="Desktop\EnvironmentChangedEventArgs.cs" />
-    <Compile Include="Desktop\EnvironmentMonitor.cs" />
-    <Compile Include="Desktop\WindowsEnumerator.cs" />
-    <Compile Include="Enums\InteropWindowCacheFlags.cs" />
-    <Compile Include="Desktop\IInteropWindow.cs" />
-    <Compile Include="Desktop\InteropWindow.cs" />
-    <Compile Include="Desktop\InteropWindowExtensions.cs" />
-    <Compile Include="Desktop\InteropWindowFactory.cs" />
-    <Compile Include="Desktop\InteropWindowQuery.cs" />
-    <Compile Include="Extensions\BtmapExtensions.cs" />
-    <Compile Include="Extensions\FormsExtensions.cs" />
-    <Compile Include="Extensions\WindowsExtensions.cs" />
-    <Compile Include="Interop\DisposableCom.cs" />
-    <Compile Include="Enums\WinEvents.cs" />
-    <Compile Include="Enums\WinEventHookFlags.cs" />
-    <Compile Include="Interop\DisposableComImplementation.cs" />
-    <Compile Include="Interop\IDisposableCom.cs" />
-    <Compile Include="Structs\WinEventInfo.cs" />
-    <Compile Include="Desktop\WindowScroller.cs" />
-    <Compile Include="Desktop\WinEventHook.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
-      <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
-      <Name>Dapplo.Windows.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.DesktopWindowsManager\Dapplo.Windows.DesktopWindowsManager.csproj">
-      <Project>{ef02637f-86a5-47f1-bb75-33e0ba3119cf}</Project>
-      <Name>Dapplo.Windows.DesktopWindowsManager</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj">
-      <Project>{e4a0ce9d-681c-44d0-85f5-4f677ec54658}</Project>
-      <Name>Dapplo.Windows.Gdi32</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.Input\Dapplo.Windows.Input.csproj">
-      <Project>{171a9ff9-8abb-4e40-8c88-75157a899b71}</Project>
-      <Name>Dapplo.Windows.Input</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj">
-      <Project>{61832675-c53b-4283-8c44-ef99fd26ad3b}</Project>
-      <Name>Dapplo.Windows.Kernel32</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
-      <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
-      <Name>Dapplo.Windows.Messages</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj">
-      <Project>{fdf2ef88-dc84-40bc-8c85-7b143db9508b}</Project>
-      <Name>Dapplo.Windows.User32</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

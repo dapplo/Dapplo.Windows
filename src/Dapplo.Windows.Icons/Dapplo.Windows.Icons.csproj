@@ -1,40 +1,24 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AB2E5D4D-9028-4D9C-99E9-25CFDA6E5AAD}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dapplo.Windows.Icons</RootNamespace>
+    <Description>Dapplo.Windows.Icons has supporting code for icons.</Description>
+    <AssemblyTitle>Dapplo.Windows.Icons</AssemblyTitle>
+    <TargetFrameworks>net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Icons</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <LangVersion>latest</LangVersion>
-    <TargetFrameworkProfile />
+    <PackageId>Dapplo.Windows.Icons</PackageId>
+    <PackageTags>windows native icons</PackageTags>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Dapplo.Windows.Icons.xml</DocumentationFile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Dapplo.Windows.Icons.xml</DocumentationFile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -46,49 +30,4 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="CursorHelper.cs" />
-    <Compile Include="Enums\FolderType.cs" />
-    <Compile Include="Enums\ShellGetFileInfoFlags.cs" />
-    <Compile Include="IconExtensions.cs" />
-    <Compile Include="IconHelper.cs" />
-    <Compile Include="Enums\IconSize.cs" />
-    <Compile Include="NativeIconMethods.cs" />
-    <Compile Include="NativeCursorMethods.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SafeHandles\SafeIconHandle.cs" />
-    <Compile Include="Shell32.cs" />
-    <Compile Include="Structs\IconInfo.cs" />
-    <Compile Include="Structs\ShellFileInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj">
-      <Project>{41e9ee3a-acea-4532-87d7-0c09d95d9a4e}</Project>
-      <Name>Dapplo.Windows.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj">
-      <Project>{e4a0ce9d-681c-44d0-85f5-4f677ec54658}</Project>
-      <Name>Dapplo.Windows.Gdi32</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj">
-      <Project>{61832675-c53b-4283-8c44-ef99fd26ad3b}</Project>
-      <Name>Dapplo.Windows.Kernel32</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj">
-      <Project>{de471f22-e095-4b11-9702-8306d69b32ca}</Project>
-      <Name>Dapplo.Windows.Messages</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj">
-      <Project>{fdf2ef88-dc84-40bc-8c85-7b143db9508b}</Project>
-      <Name>Dapplo.Windows.User32</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj">
-      <Project>{8aa469bb-856a-4330-96ce-2bb75a014070}</Project>
-      <Name>ScaleWithDpi</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
