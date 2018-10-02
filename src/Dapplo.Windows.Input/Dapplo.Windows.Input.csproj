@@ -19,10 +19,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Reactive">
-      <Version>4.1.0</Version>
+      <Version>4.1.1</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
-      <Version>4.5.1</Version>
+      <Version>4.5.2</Version>
     </PackageReference>
     <PackageReference Include="System.ValueTuple">
       <Version>4.5.0</Version>

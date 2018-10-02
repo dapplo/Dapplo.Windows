@@ -62,7 +62,7 @@ namespace Dapplo.Windows.Tests
         /// <returns></returns>
         public async Task TestClipboardMonitor_WaitForCopy()
         {
-            var tcs = new TaskCompletionSource<bool>();
+            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             var subscription = ClipboardNative.OnUpdate.Skip(1).Subscribe(clipboardUpdateInformation =>
             {
                 Log.Debug().WriteLine("Formats {0}", string.Join(",", clipboardUpdateInformation.Formats));

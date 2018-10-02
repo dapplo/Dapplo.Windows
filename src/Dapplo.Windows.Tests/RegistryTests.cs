@@ -60,7 +60,7 @@ namespace Dapplo.Windows.Tests
                 Log.Debug().WriteLine("Original value {0}", originalValue);
                 try
                 {
-                    var tcs = new TaskCompletionSource<bool>();
+                    var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
                     using (RegistryMonitor.ObserveChanges(RegistryHive.CurrentUser, internetSettingsKey).Subscribe(unit =>
                         {
                             Log.Debug().WriteLine("Got registry change!");
