@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Citrix is a library which has citrix supporting code</Description>
     <AssemblyTitle>Dapplo.Windows.Citrix</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Citrix</AssemblyName>
     <PackageId>Dapplo.Windows.Citrix</PackageId>
     <PackageTags>windows native citrix</PackageTags>
@@ -10,7 +10,6 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
@@ -20,7 +19,7 @@
       <Version>1.3.11</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />

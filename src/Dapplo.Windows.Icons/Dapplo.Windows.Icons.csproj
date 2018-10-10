@@ -2,14 +2,13 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Icons has supporting code for icons.</Description>
     <AssemblyTitle>Dapplo.Windows.Icons</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Icons</AssemblyName>
     <PackageId>Dapplo.Windows.Icons</PackageId>
     <PackageTags>windows native icons</PackageTags>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
@@ -19,7 +18,7 @@
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />

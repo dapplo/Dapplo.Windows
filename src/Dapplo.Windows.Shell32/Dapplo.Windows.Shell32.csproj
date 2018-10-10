@@ -2,19 +2,18 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Shell32 provides logic of the Windows Shell32 API</Description>
     <AssemblyTitle>Dapplo.Windows.Shell32</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Shell32</AssemblyName>
     <PackageId>Dapplo.Windows.Shell32</PackageId>
     <PackageTags>windows native shell32</PackageTags>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Clipboard is a library for accessing the clipboard in a more modern way.</Description>
     <AssemblyTitle>Dapplo.Windows.Clipboard</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Clipboard</AssemblyName>
     <PackageId>Dapplo.Windows.Clipboard</PackageId>
     <PackageTags>windows native clipboard</PackageTags>
@@ -10,7 +10,6 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
@@ -30,7 +29,7 @@
       <Version>4.5.0</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="System" />

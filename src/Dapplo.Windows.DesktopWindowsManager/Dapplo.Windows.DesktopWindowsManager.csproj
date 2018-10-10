@@ -2,19 +2,18 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.DesktopWindowsManager helps to use the windows dwm api</Description>
     <AssemblyTitle>Dapplo.Windows.DesktopWindowsManager</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.DesktopWindowsManager</AssemblyName>
     <PackageId>Dapplo.Windows.DesktopWindowsManager</PackageId>
     <PackageTags>windows dwm</PackageTags>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />

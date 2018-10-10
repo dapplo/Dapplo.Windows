@@ -2,16 +2,15 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Multimedia is a simple wrapper around WinMM</Description>
     <AssemblyTitle>Dapplo.Windows.Multimedia</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Multimedia</AssemblyName>
     <PackageId>Dapplo.Windows.Multimedia</PackageId>
     <PackageTags>windows native winmm</PackageTags>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>

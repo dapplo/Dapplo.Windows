@@ -2,17 +2,16 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Common is a library which contains common files for Dapplo.Windows projects</Description>
     <AssemblyTitle>Dapplo.Windows.Common</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Common</AssemblyName>
     <PackageId>Dapplo.Windows.Common</PackageId>
     <PackageTags>windows native Common</PackageTags>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
