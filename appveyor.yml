@@ -15,7 +15,7 @@ environment:
     secure: l1sHD8smYdYmDTTRTPC0iMooNyPgm/sCOC3v3nBjJrKWLoOQoiAu2d0BGKY5BVOj
 build_script:
 - ps: Start-FileDownload 'https://dotnetcli.blob.core.windows.net/dotnet/Sdk/master/dotnet-sdk-latest-win-x64.exe'
-- ps: dotnet-sdk-latest-win-x64.exe /S /v /qn
+- ps: .\dotnet-sdk-latest-win-x64.exe /S /v /qn
 - ps: .\build.ps1 --settings_skipverification=true
 artifacts:
 - path: src\**\*.nupkg
