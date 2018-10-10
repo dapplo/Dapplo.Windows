@@ -19,7 +19,7 @@ build_script:
 - ps: cat sdkinstall.log
 - ps: .\build.ps1 --settings_skipverification=true
 artifacts:
-- path: *.log
+- path: sdkinstall.log
 - path: src\**\*.nupkg
 - path: artifacts\**\site.zip
 - path: artifacts\*.xml
