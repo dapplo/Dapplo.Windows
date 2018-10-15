@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Kernel32 is a library to assist calling the kernel32 api</Description>
     <AssemblyTitle>Dapplo.Windows.Kernel32</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Kernel32</AssemblyName>
     <PackageId>Dapplo.Windows.Kernel32</PackageId>
     <PackageTags>windows native Kernel32</PackageTags>

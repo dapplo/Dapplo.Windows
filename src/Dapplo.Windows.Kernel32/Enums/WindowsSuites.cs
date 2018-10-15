@@ -23,6 +23,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -35,6 +36,7 @@ namespace Dapplo.Windows.Kernel32.Enums
     ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724833(v=vs.85).aspx">OSVERSIONINFOEX structure</a>
     /// </summary>
     [Flags]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum WindowsSuites : ushort
     {
 #pragma warning disable 1591

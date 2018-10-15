@@ -1,9 +1,9 @@
-﻿using Dapplo.Log;
+﻿using System;
+using Dapplo.Log;
 using Dapplo.Windows.Dpi.Forms;
 using Dapplo.Windows.EmbeddedBrowser;
-using System;
 
-namespace Dapplo.Windows.FormsExample
+namespace Dapplo.Windows.Example.FormsExample
 {
     public partial class WebBrowserForm : DpiAwareForm
     {

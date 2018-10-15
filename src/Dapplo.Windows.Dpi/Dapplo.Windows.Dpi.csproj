@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Dpi assists to make an application Dpi-Aware.</Description>
     <AssemblyTitle>Dapplo.Windows.Dpi</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Dpi</AssemblyName>
     <PackageId>Dapplo.Windows.Dpi</PackageId>
     <PackageTags>windows native dpi</PackageTags>

@@ -1,10 +1,10 @@
-﻿using System.Reactive.Linq;
+﻿using System;
+using System.Reactive.Linq;
 using System.Windows;
 using Dapplo.Windows.Dpi.Wpf;
 using Dapplo.Windows.Messages;
-using System;
 
-namespace Dapplo.Windows.WpfExample
+namespace Dapplo.Windows.Example.WpfExample
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

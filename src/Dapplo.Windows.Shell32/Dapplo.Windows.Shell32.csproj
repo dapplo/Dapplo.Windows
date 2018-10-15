@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Shell32 provides logic of the Windows Shell32 API</Description>
     <AssemblyTitle>Dapplo.Windows.Shell32</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Shell32</AssemblyName>
     <PackageId>Dapplo.Windows.Shell32</PackageId>
     <PackageTags>windows native shell32</PackageTags>

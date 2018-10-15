@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Multimedia is a simple wrapper around WinMM</Description>
     <AssemblyTitle>Dapplo.Windows.Multimedia</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Multimedia</AssemblyName>
     <PackageId>Dapplo.Windows.Multimedia</PackageId>
     <PackageTags>windows native winmm</PackageTags>

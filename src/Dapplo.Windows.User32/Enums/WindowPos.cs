@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -31,6 +32,7 @@ namespace Dapplo.Windows.User32.Enums
     ///     See <a href="http://msdn.microsoft.com/en-us/library/ms633545.aspx">here</a>
     /// </summary>
     [Flags]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum WindowPos
     {
         /// <summary>

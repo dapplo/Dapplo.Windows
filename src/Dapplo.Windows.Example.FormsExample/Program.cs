@@ -21,25 +21,35 @@
 
 #region using
 
-using System.Windows;
+using System;
+using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Log.Loggers;
-using Dapplo.Windows.Dpi;
 
 #endregion
 
-namespace Dapplo.Windows.WpfExample
+namespace Dapplo.Windows.Example.FormsExample
 {
-    /// <summary>
-    ///     Interaction logic for App.xaml
-    /// </summary>
-    public partial class App
+    internal static class Program
     {
-        protected override void OnStartup(StartupEventArgs e)
+        /// <summary>
+        ///     The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        private static void Main()
         {
             LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Verbose);
-            NativeDpiMethods.EnableDpiAware();
-            base.OnStartup(e);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            var formDpiUnaware = new FormDpiUnaware();
+            formDpiUnaware.Show();
+            var formWithAttachedDpiHandler = new FormWithAttachedDpiHandler();
+            formWithAttachedDpiHandler.Show();
+            var formExtendsDpiAwareForm = new FormExtendsDpiAwareForm();
+            formExtendsDpiAwareForm.Show();
+            var webBrowserForm = new WebBrowserForm();
+            webBrowserForm.Show();
+            Application.Run();
         }
     }
 }

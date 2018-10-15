@@ -20,12 +20,10 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 #region using
-
 using System;
-
 #endregion
 
-namespace Dapplo.Windows.Multimedia
+namespace Dapplo.Windows.Multimedia.Enums
 {
     /// <summary>
     ///     See <a href="http://msdn.microsoft.com/en-us/library/aa909766.aspx">PlaySound</a>

@@ -8,10 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Dapplo.Windows.FormsExample.Properties {
-    using System;
-    
-    
+namespace Dapplo.Windows.Example.FormsExample.Properties {
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>

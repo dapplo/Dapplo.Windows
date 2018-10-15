@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Gdi32 bringt Gdi32 and GdiPlus functionality.</Description>
     <AssemblyTitle>Dapplo.Windows.Gdi32</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Gdi32</AssemblyName>
     <PackageId>Dapplo.Windows.Gdi32</PackageId>
     <PackageTags>windows native gdi</PackageTags>

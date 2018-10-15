@@ -19,12 +19,15 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Dapplo.Windows.Gdi32.Enums
 {
     /// <summary>
     ///     Used by GDI32.GetDeviceCaps
     ///     See: http://msdn.microsoft.com/en-us/library/windows/desktop/dd144877%28v=vs.85%29.aspx
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum DeviceCaps
     {
         /// <summary>

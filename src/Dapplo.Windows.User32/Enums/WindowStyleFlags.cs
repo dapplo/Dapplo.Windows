@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -33,6 +34,7 @@ namespace Dapplo.Windows.User32.Enums
     ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms632600(v=vs.85).aspx">Window Styles</a>
     /// </summary>
     [Flags]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum WindowStyleFlags : uint
     {
         /// <summary>

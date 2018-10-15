@@ -19,11 +19,14 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Dapplo.Windows.User32.Enums
 {
     /// <summary>
     ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd373609(v=vs.85).aspx">here</a>
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum ObjectStates : uint
     {
         /// <summary>

@@ -19,11 +19,15 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Dapplo.Windows.Gdi32.Enums
 {
     /// <summary>
+    /// For values see the bV5CSType property <a href="https://docs.microsoft.com/en-gb/windows/desktop/api/wingdi/ns-wingdi-bitmapv5header">here</a>
     /// </summary>
-    public enum ColorSpaceEnum : uint
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public enum ColorSpace : uint
     {
         /// <summary>
         ///     Color values are calibrated red green blue (RGB) values.

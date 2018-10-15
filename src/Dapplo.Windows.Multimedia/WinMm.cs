@@ -24,6 +24,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using Dapplo.Windows.Multimedia.Enums;
 
 #endregion
 

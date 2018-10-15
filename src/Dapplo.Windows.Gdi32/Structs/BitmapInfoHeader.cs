@@ -66,7 +66,7 @@ namespace Dapplo.Windows.Gdi32.Structs
         [FieldOffset(52)]
         private uint _bV5AlphaMask;
         [FieldOffset(56)]
-        private ColorSpaceEnum _bV5CSType;
+        private ColorSpace _bV5CSType;
         [FieldOffset(60)]
         private CieXyzTripple _bV5Endpoints;
         [FieldOffset(96)]
@@ -76,7 +76,7 @@ namespace Dapplo.Windows.Gdi32.Structs
         [FieldOffset(104)]
         private uint _bV5GammaBlue;
         [FieldOffset(108)]
-        private ColorSpaceEnum _bV5Intent;
+        private ColorSpace _bV5Intent;
         [FieldOffset(112)]
         private uint _bV5ProfileData;
         [FieldOffset(116)]
@@ -282,7 +282,7 @@ namespace Dapplo.Windows.Gdi32.Structs
         ///     See also
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd372165(v=vs.85).aspx">LOGCOLORSPACE structure</a>
         /// </summary>
-        public ColorSpaceEnum ColorSpace
+        public ColorSpace ColorSpace
         {
             get { return _bV5CSType; }
             set { _bV5CSType = value; }
@@ -334,7 +334,7 @@ namespace Dapplo.Windows.Gdi32.Structs
         ///     Rendering intent for bitmap. This can be one of the following values:
         ///     LCS_GM_ABS_COLORIMETRIC, LCS_GM_BUSINESS, LCS_GM_GRAPHICS, LCS_GM_IMAGES
         /// </summary>
-        public ColorSpaceEnum Intent
+        public ColorSpace Intent
         {
             get { return _bV5Intent; }
             set { _bV5Intent = value; }
@@ -400,7 +400,7 @@ namespace Dapplo.Windows.Gdi32.Structs
                 _bV5GreenMask = (uint) 255 << 8,
                 _bV5BlueMask = 255,
                 _bV5AlphaMask = (uint) 255 << 24,
-                _bV5CSType = ColorSpaceEnum.LCS_sRGB,
+                _bV5CSType = ColorSpace.LCS_sRGB,
                 _bV5Endpoints = new CieXyzTripple
                 {
                     Blue = CieXyz.Create(0),
@@ -410,7 +410,7 @@ namespace Dapplo.Windows.Gdi32.Structs
                 _bV5GammaRed = 0,
                 _bV5GammaGreen = 0,
                 _bV5GammaBlue = 0,
-                _bV5Intent = ColorSpaceEnum.LCS_GM_IMAGES,
+                _bV5Intent = ColorSpace.LCS_GM_IMAGES,
                 _bV5ProfileData = 0,
                 _bV5ProfileSize = 0,
                 _bV5Reserved = 0

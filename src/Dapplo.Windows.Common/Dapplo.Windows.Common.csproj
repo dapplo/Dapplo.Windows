@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Common is a library which contains common files for Dapplo.Windows projects</Description>
     <AssemblyTitle>Dapplo.Windows.Common</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Common</AssemblyName>
     <PackageId>Dapplo.Windows.Common</PackageId>
     <PackageTags>windows native Common</PackageTags>

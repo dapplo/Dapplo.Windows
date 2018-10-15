@@ -19,29 +19,28 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
-using System.Diagnostics.CodeAnalysis;
+using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.Input.Keyboard;
+using Dapplo.Windows.Messages;
 
-#endregion
-
-namespace Dapplo.Windows.Kernel32.Enums
+namespace Dapplo.Windows.Example.ConsoleDemo
 {
-#pragma warning disable 1591
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    [Flags]
-    public enum ThreadAccess
+    internal static class Program
     {
-        TERMINATE = 0x0001,
-        SUSPEND_RESUME = 0x0002,
-        GET_CONTEXT = 0x0008,
-        SET_CONTEXT = 0x0010,
-        SET_INFORMATION = 0x0020,
-        QUERY_INFORMATION = 0x0040,
-        SET_THREAD_TOKEN = 0x0080,
-        IMPERSONATE = 0x0100,
-        DIRECT_IMPERSONATION = 0x0200
-#pragma warning restore 1591
+        [STAThread]
+        private static void Main(string[] args)
+        {
+            var key = new KeyCombinationHandler(VirtualKeyCode.KeyA);
+            using (KeyboardHook.KeyboardEvents.Where(key).Subscribe(e => Hit()))
+            {
+                MessageLoop.ProcessMessages();
+            }
+        }
+
+        private static void Hit()
+        {
+            Console.WriteLine("Hit");
+        }
     }
 }

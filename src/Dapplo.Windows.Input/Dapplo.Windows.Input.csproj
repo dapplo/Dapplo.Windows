@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Input provides code to generate and get input from keyboard and mouse</Description>
     <AssemblyTitle>Dapplo.Windows.Input</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Input</AssemblyName>
     <PackageId>Dapplo.Windows.Input</PackageId>
     <PackageTags>windows native input</PackageTags>

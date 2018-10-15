@@ -19,6 +19,8 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Dapplo.Windows.User32.Enums
 {
     /// <summary>
@@ -26,6 +28,7 @@ namespace Dapplo.Windows.User32.Enums
     ///    (formerly known as the system or control menu)
     ///     or when the user chooses the maximize button, minimize button, restore button, or close button.
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum SysCommands
     {
         /// <summary>

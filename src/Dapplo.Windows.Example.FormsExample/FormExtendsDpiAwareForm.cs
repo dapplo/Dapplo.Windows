@@ -31,23 +31,27 @@ using Dapplo.Windows.Dpi.Forms;
 
 #endregion
 
-namespace Dapplo.Windows.FormsExample
+namespace Dapplo.Windows.Example.FormsExample
 {
-    /// <summary>
-    /// This extends the form with extra DPI aware capabilities
-    /// </summary>
-    public partial class FormWithAttachedDpiHandler : Form //DpiAwareForm
+    public partial class FormExtendsDpiAwareForm : DpiAwareForm
     {
         private static readonly LogSource Log = new LogSource();
         private readonly BitmapScaleHandler<string> _scaleHandler;
-        private readonly DpiHandler FormDpiHandler;
+        private readonly DpiHandler _contextMenuDpiHandler;
         private readonly IDisposable _dpiChangeSubscription;
 
-        public FormWithAttachedDpiHandler()
+        public FormExtendsDpiAwareForm()
         {
-            FormDpiHandler = this.AttachDpiHandler();
             InitializeComponent();
 
+            _contextMenuDpiHandler = contextMenuStrip1.AttachDpiHandler();
+
+            _dpiChangeSubscription = _contextMenuDpiHandler.OnDpiChanged.Subscribe(dpi =>
+            {
+                Log.Info().WriteLine("ContextMenuStrip DPI: {0}", dpi.NewDpi);
+            });
+
+            // TODO: Create a "SizeScaleHandler" or something
             var initialMenuStripSize = menuStrip1.ImageScalingSize;
             FormDpiHandler.OnDpiChanged.Subscribe(dpiChangeInfo =>
             {
@@ -58,12 +62,6 @@ namespace Dapplo.Windows.FormsExample
                 .AddTarget(somethingMenuItem, "somethingMenuItem.Image")
                 .AddTarget(something2MenuItem, "something2MenuItem.Image");
 
-            // This can be used to do something with DPI changes, subscription should be disposed!
-            _dpiChangeSubscription = FormDpiHandler.OnDpiChanged.Subscribe(dpi =>
-            {
-                Log.Info().WriteLine("New DPI: {0}", dpi);
-            });
-
             EnvironmentMonitor.EnvironmentUpdateEvents.Subscribe(args =>
             {
                 Log.Info().WriteLine("{0} - {1}", args.SystemParametersInfoAction, args.Area);
@@ -73,9 +71,15 @@ namespace Dapplo.Windows.FormsExample
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            _contextMenuDpiHandler.Dispose();
             _dpiChangeSubscription.Dispose();
             _scaleHandler.Dispose();
             base.OnClosing(e);
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            contextMenuStrip1.Show();
         }
     }
 }

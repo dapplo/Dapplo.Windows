@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.User32 provides logic of the Windows User32 API</Description>
     <AssemblyTitle>Dapplo.Windows.User32</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.User32</AssemblyName>
     <PackageId>Dapplo.Windows.User32</PackageId>
     <PackageTags>windows native user32</PackageTags>

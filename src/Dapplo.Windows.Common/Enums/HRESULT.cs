@@ -23,12 +23,15 @@
 
 #endregion
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Dapplo.Windows.Common.Enums
 {
     /// <summary>
     ///     The HRESULT represents Windows error codes
     ///     See <a href="https://en.wikipedia.org/wiki/HRESULT">wikipedia</a>
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum HResult
     {
 #pragma warning disable 1591

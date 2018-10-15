@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Tests</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Tests</AssemblyName>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0</AssemblyVersion>

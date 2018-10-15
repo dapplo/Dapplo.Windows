@@ -19,6 +19,8 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Dapplo.Windows.Enums
 {
     /// <summary>
@@ -27,6 +29,7 @@ namespace Dapplo.Windows.Enums
     ///     and <a href="http://source.winehq.org/source/include/winuser.h">here</a>
     ///     and <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd742691.aspx">here</a>
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum WinEvents : uint
     {
 #pragma warning disable 1591

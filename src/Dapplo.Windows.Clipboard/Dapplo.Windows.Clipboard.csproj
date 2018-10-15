@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Clipboard is a library for accessing the clipboard in a more modern way.</Description>
     <AssemblyTitle>Dapplo.Windows.Clipboard</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Clipboard</AssemblyName>
     <PackageId>Dapplo.Windows.Clipboard</PackageId>
     <PackageTags>windows native clipboard</PackageTags>

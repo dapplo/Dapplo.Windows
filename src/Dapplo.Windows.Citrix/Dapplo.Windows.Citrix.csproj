@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Citrix is a library which has citrix supporting code</Description>
     <AssemblyTitle>Dapplo.Windows.Citrix</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Citrix</AssemblyName>
     <PackageId>Dapplo.Windows.Citrix</PackageId>
     <PackageTags>windows native citrix</PackageTags>

@@ -19,12 +19,15 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Dapplo.Windows.Input.Enums
 {
     /// <summary>
     ///     The type of hook procedure to be installed via the SetWindowsHookEx function. This parameter can be one of the
     ///     following values:
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum HookTypes
     {
         /// <summary>

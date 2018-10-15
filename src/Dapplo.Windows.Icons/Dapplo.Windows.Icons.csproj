@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Icons has supporting code for icons.</Description>
     <AssemblyTitle>Dapplo.Windows.Icons</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Icons</AssemblyName>
     <PackageId>Dapplo.Windows.Icons</PackageId>
     <PackageTags>windows native icons</PackageTags>

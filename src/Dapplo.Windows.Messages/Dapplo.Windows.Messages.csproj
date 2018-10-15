@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Messages is a library with the Windows messages and a WinProc helper.</Description>
     <AssemblyTitle>Dapplo.Windows.Messages</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Messages</AssemblyName>
     <PackageId>Dapplo.Windows.Messages</PackageId>
     <PackageTags>windows messages</PackageTags>
@@ -28,5 +27,8 @@
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
   </ItemGroup>
 </Project>

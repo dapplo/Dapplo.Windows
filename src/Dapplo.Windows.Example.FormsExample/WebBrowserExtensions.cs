@@ -3,7 +3,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Forms;
 
-namespace Dapplo.Windows.FormsExample
+namespace Dapplo.Windows.Example.FormsExample
 {
     public static class WebBrowserExtensions
     {

@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows has native code for accessing Windows, e.g getting the size/title/location of a window or monitoring the title changes of windows.</Description>
     <AssemblyTitle>Dapplo.Windows</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows</AssemblyName>
     <PackageId>Dapplo.Windows</PackageId>
     <PackageTags>windows native desktop</PackageTags>

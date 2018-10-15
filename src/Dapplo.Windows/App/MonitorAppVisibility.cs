@@ -19,11 +19,14 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Dapplo.Windows.App
 {
     /// <summary>
     ///     A simple enum for the GetAppVisibilityOnMonitor method, this tells us if an App is visible on the supplied monitor.
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal enum MonitorAppVisibility
     {
         MAV_UNKNOWN = 0, // The mode for the monitor is unknown

@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyTitle>Dapplo.Windows.FormsExample</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
-    <AssemblyName>Dapplo.Windows.FormsExample</AssemblyName>
+    <AssemblyTitle>Dapplo.Windows.Example.FormsExample</AssemblyTitle>
+    <AssemblyName>Dapplo.Windows.Example.FormsExample</AssemblyName>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>

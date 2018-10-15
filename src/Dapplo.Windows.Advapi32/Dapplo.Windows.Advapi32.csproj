@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Advapi32 is a library for accessing the Advanced Windows 32 Base API</Description>
     <AssemblyTitle>Dapplo.Windows.Advapi32</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Advapi32</AssemblyName>
     <PackageId>Dapplo.Windows.Advapi32</PackageId>
     <PackageTags>windows native Advapi32</PackageTags>

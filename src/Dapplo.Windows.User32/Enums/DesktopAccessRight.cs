@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -31,6 +32,7 @@ namespace Dapplo.Windows.User32.Enums
     ///     Used to open a desktop
     /// </summary>
     [Flags]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum DesktopAccessRight : uint
     {
 #pragma warning disable 1591
