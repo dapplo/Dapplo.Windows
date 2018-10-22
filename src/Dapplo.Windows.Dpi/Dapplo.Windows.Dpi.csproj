@@ -5,9 +5,7 @@
     <AssemblyName>Dapplo.Windows.Dpi</AssemblyName>
     <PackageId>Dapplo.Windows.Dpi</PackageId>
     <PackageTags>windows native dpi</PackageTags>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net461</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />

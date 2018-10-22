@@ -19,6 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#if !NETSTANDARD2_0
 #region using
 
 using System;
@@ -69,3 +70,4 @@ namespace Dapplo.Windows.Messages
         }
     }
 }
+#endif

@@ -26,7 +26,9 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
+#if !NETSTANDARD2_0
 using System.Windows;
+#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
@@ -60,6 +62,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         public static NativeSize Empty { get; } = new NativeSize(0, 0);
 
+#if !NETSTANDARD2_0
         /// <summary>
         ///     Constructor from S.W.Size
         /// </summary>
@@ -68,6 +71,13 @@ namespace Dapplo.Windows.Common.Structs
             : this((int) size.Width, (int) size.Height)
         {
         }
+
+        /// <summary>
+        ///     Implicit cast from NativeSize to Size
+        /// </summary>
+        /// <param name="size">NativeSize</param>
+        public static implicit operator Size(NativeSize size) => new Size(size.Width, size.Height);
+#endif
 
         /// <summary>
         ///     Constructor from S.D.Size
@@ -87,12 +97,6 @@ namespace Dapplo.Windows.Common.Structs
             _width = width;
             _height = height;
         }
-
-        /// <summary>
-        ///     Implicit cast from NativeSize to Size
-        /// </summary>
-        /// <param name="size">NativeSize</param>
-        public static implicit operator Size(NativeSize size) => new Size(size.Width, size.Height);
 
         /// <summary>
         ///     Implicit cast from NativeSize to System.Drawing.Size

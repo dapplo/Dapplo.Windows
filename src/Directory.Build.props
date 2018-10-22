@@ -8,9 +8,12 @@
     <PackageProjectUrl>http://www.dapplo.net/blocks/Dapplo.Windows/</PackageProjectUrl>
     <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl-3.0.en.html</PackageLicenseUrl>
 	<LangVersion>latest</LangVersion>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
+  <PropertyGroup Condition="'$(Configuration)' != 'Debug' And '$(TargetFramework)' == 'net461'">
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Dapplo.Windows.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
@@ -20,7 +23,6 @@
   <PropertyGroup Condition="!$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
   </PropertyGroup>
 
   <!-- Global definition for non test or example projects to enable packaging in release mode -->
@@ -33,7 +35,6 @@
   <PropertyGroup Condition="$(MSBuildProjectName.Contains('Tests')) Or $(MSBuildProjectName.Contains('Example'))">
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <IsPackable>false</IsPackable>
-    <TargetFrameworks>net461</TargetFrameworks>
   </PropertyGroup>  
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -53,11 +54,20 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0'">
 	<FrameworkReference Include="Microsoft.DesktopUI" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Windows.Compatibility">
+      <Version>2.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
   
   <!-- Global definition for non test or example projects to enable InternalsVisibleTo, git versioning and pdbgit -->
   <ItemGroup Condition="!$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+    <AssemblyAttribute Condition="'$(Configuration)' != 'Debug'" Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Dapplo.Windows.Tests,PublicKey=0024000004800000940000000602000000240000525341310004000001000100990aa0451f70232b1ebe2ed5b9263758a8f7f89db93acdc49f954092a9faceed5410ffd5cf6fe9c6946bc3572da2d63bf5359de6c855fb93aefc872d7ae3922b1294ee82c7f5ffd6bdc759fe6586e0eaf0b2b3d0c109961581047dcb66d53a8fe6a7240d2a3984d4625672705e23c7f23be7ba60168f844811cdf7312d3478a8</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Condition="'$(Configuration)' == 'Debug'" Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Dapplo.Windows.Tests</_Parameter1>
     </AssemblyAttribute>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.2.13">
       <PrivateAssets>all</PrivateAssets>

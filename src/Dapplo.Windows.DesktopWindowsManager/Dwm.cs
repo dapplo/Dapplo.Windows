@@ -25,10 +25,14 @@
 
 using System;
 using System.Runtime.InteropServices;
+#if !NETSTANDARD2_0
 using System.Windows.Media;
+#endif
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.DesktopWindowsManager.Enums;
+using Dapplo.Windows.DesktopWindowsManager.Structs;
 using Microsoft.Win32;
 
 #endregion
@@ -46,6 +50,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         // Key to ColorizationColor for DWM
         private const string ColorizationColorKey = @"SOFTWARE\Microsoft\Windows\DWM";
 
+#if !NETSTANDARD2_0
         /// <summary>
         ///     Return the AERO Color
         /// </summary>
@@ -57,6 +62,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
                 return Color.FromArgb(color.A, color.R, color.G, color.B);
             }
         }
+#endif
 
         /// <summary>
         ///     Return the AERO Color

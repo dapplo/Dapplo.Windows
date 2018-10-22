@@ -27,8 +27,9 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+#if !NETSTANDARD2_0
 using System.Windows.Forms;
-
+#endif
 #endregion
 
 namespace Dapplo.Windows.Dpi
@@ -134,6 +135,7 @@ namespace Dapplo.Windows.Dpi
             return this;
         }
 
+#if !NETSTANDARD2_0
         /// <summary>
         ///     Add a Button as a Bitmap target
         /// </summary>
@@ -166,6 +168,7 @@ namespace Dapplo.Windows.Dpi
 
             return this;
         }
+#endif
 
         /// <summary>
         ///     Dispose implementation

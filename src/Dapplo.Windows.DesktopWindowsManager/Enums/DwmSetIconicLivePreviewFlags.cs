@@ -25,13 +25,13 @@ using System;
 
 #endregion
 
-namespace Dapplo.Windows.DesktopWindowsManager
+namespace Dapplo.Windows.DesktopWindowsManager.Enums
 {
     /// <summary>
-    ///     Configuration flags for the DwmEnableBlurBehindWindow function
+    ///     Configuration flags for the DwmSetIconicLivePreviewBitmap function
     /// </summary>
     [Flags]
-    public enum DwmBlurBehindFlags
+    public enum DwmSetIconicLivePreviewFlags
     {
         /// <summary>
         ///     None
@@ -39,18 +39,8 @@ namespace Dapplo.Windows.DesktopWindowsManager
         None = 0,
 
         /// <summary>
-        ///     Transparency Enabled
+        ///     Displays a frame around the provided bitmap.
         /// </summary>
-        Enable = 1,
-
-        /// <summary>
-        ///     Region enabled
-        /// </summary>
-        BlurRegion = 2,
-
-        /// <summary>
-        ///     Transition on maximized enabled
-        /// </summary>
-        TransitionMaximized = 4
+        DisplayFrame = 1
     }
 }

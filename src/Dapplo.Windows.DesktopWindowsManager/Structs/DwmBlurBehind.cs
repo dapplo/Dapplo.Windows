@@ -21,6 +21,7 @@
 
 #region using
 
+using Dapplo.Windows.DesktopWindowsManager.Enums;
 using System;
 using System.Runtime.InteropServices;
 

@@ -29,7 +29,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Runtime.InteropServices;
+#if !NETSTANDARD2_0
 using System.Windows;
+#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
@@ -169,6 +171,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         public NativePoint TopRight => new NativePoint(X + Width, Y);
 
+#if !NETSTANDARD2_0
         /// <summary>
         ///     Cast NativeRect to Rect
         /// </summary>
@@ -178,6 +181,27 @@ namespace Dapplo.Windows.Common.Structs
         {
             return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
         }
+    
+        /// <summary>
+        ///     Cast NativeRect to Int32Rect
+        /// </summary>
+        /// <param name="rectangle">NativeRect</param>
+        /// <returns>Int32Rect</returns>
+        public static implicit operator Int32Rect(NativeRect rectangle)
+        {
+            return new Int32Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
+        }
+
+        /// <summary>
+        ///     Cast Int32Rect to NativeRect
+        /// </summary>
+        /// <param name="rectangle">Int32Rect</param>
+        /// <returns>NativeRect</returns>
+        public static implicit operator NativeRect(Int32Rect rectangle)
+        {
+            return new NativeRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+        }
+#endif
 
         /// <summary>
         ///     Cast NativeRect to RectangleF
@@ -197,26 +221,6 @@ namespace Dapplo.Windows.Common.Structs
         public static implicit operator Rectangle(NativeRect rectangle)
         {
             return new Rectangle(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
-        }
-
-        /// <summary>
-        ///     Cast NativeRect to Int32Rect
-        /// </summary>
-        /// <param name="rectangle">NativeRect</param>
-        /// <returns>Int32Rect</returns>
-        public static implicit operator Int32Rect(NativeRect rectangle)
-        {
-            return new Int32Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
-        }
-
-        /// <summary>
-        ///     Cast Int32Rect to NativeRect
-        /// </summary>
-        /// <param name="rectangle">Int32Rect</param>
-        /// <returns>NativeRect</returns>
-        public static implicit operator NativeRect(Int32Rect rectangle)
-        {
-            return new NativeRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
         }
 
         /// <summary>

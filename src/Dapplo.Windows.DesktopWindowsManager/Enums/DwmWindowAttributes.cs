@@ -19,7 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.Windows.DesktopWindowsManager
+namespace Dapplo.Windows.DesktopWindowsManager.Enums
 {
     /// <summary>
     ///     Flags used by the DwmGetWindowAttribute and DwmSetWindowAttribute functions to specify window attributes for

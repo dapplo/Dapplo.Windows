@@ -26,7 +26,9 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
+#if !NETSTANDARD2_0
 using System.Windows;
+#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
@@ -61,14 +63,6 @@ namespace Dapplo.Windows.Common.Structs
         public static NativeSizeFloat Empty { get; } = new NativeSizeFloat(0, 0);
 
         /// <summary>
-        ///     Constructor from S.W.Size
-        /// </summary>
-        /// <param name="size"></param>
-        public NativeSizeFloat(Size size) : this((float) size.Width, (float) size.Height)
-        {
-        }
-
-        /// <summary>
         ///     Constructor from S.D.Size
         /// </summary>
         /// <param name="size"></param>
@@ -98,6 +92,15 @@ namespace Dapplo.Windows.Common.Structs
             _height = (float)height;
         }
 
+#if !NETSTANDARD2_0
+        /// <summary>
+        ///     Constructor from S.W.Size
+        /// </summary>
+        /// <param name="size"></param>
+        public NativeSizeFloat(Size size) : this((float) size.Width, (float) size.Height)
+        {
+        }
+
         /// <summary>
         ///     Implicit cast from NativeSizeFloat to Size
         /// </summary>
@@ -117,6 +120,7 @@ namespace Dapplo.Windows.Common.Structs
         {
             return new NativeSizeFloat((float)size.Width, (float)size.Height);
         }
+#endif
 
         /// <summary>
         ///     Implicit cast from NativeSize to System.Drawing.Size
@@ -205,8 +209,10 @@ namespace Dapplo.Windows.Common.Structs
             {
                 case NativeSizeFloat f:
                     return Equals(f);
+#if !NETSTANDARD2_0
                 case Size size:
                     return Equals(size);
+#endif
                 case System.Drawing.Size drawingSize:
                     return Equals(drawingSize);
             }

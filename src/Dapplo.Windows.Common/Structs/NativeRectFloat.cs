@@ -27,7 +27,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Runtime.InteropServices;
+#if !NETSTANDARD2_0
 using System.Windows;
+#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
@@ -182,6 +184,7 @@ namespace Dapplo.Windows.Common.Structs
             return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
         }
 
+#if !NETSTANDARD2_0
         /// <summary>
         ///     Cast Rect to NativeRectFloat
         /// </summary>
@@ -190,26 +193,6 @@ namespace Dapplo.Windows.Common.Structs
         public static implicit operator NativeRectFloat(Rect rectangle)
         {
             return new NativeRectFloat((float)rectangle.Left, (float)rectangle.Top, (float)rectangle.Right, (float)rectangle.Bottom);
-        }
-
-        /// <summary>
-        ///     Cast RectangleF to NativeRectFloat
-        /// </summary>
-        /// <param name="rectangle">RectangleF</param>
-        /// <returns>NativeRectFloat</returns>
-        public static implicit operator NativeRectFloat(RectangleF rectangle)
-        {
-            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
-        }
-
-        /// <summary>
-        ///     Cast Rectangle to NativeRectFloat
-        /// </summary>
-        /// <param name="rectangle">Rectangle</param>
-        /// <returns>NativeRectFloat</returns>
-        public static implicit operator NativeRectFloat(Rectangle rectangle)
-        {
-            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
         }
 
         /// <summary>
@@ -240,6 +223,28 @@ namespace Dapplo.Windows.Common.Structs
         public static implicit operator Int32Rect(NativeRectFloat rectangle)
         {
             return new Int32Rect((int)rectangle.Left, (int)rectangle.Top, (int)rectangle.Width, (int)rectangle.Height);
+        }
+#endif
+
+
+        /// <summary>
+        ///     Cast RectangleF to NativeRectFloat
+        /// </summary>
+        /// <param name="rectangle">RectangleF</param>
+        /// <returns>NativeRectFloat</returns>
+        public static implicit operator NativeRectFloat(RectangleF rectangle)
+        {
+            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+        }
+
+        /// <summary>
+        ///     Cast Rectangle to NativeRectFloat
+        /// </summary>
+        /// <param name="rectangle">Rectangle</param>
+        /// <returns>NativeRectFloat</returns>
+        public static implicit operator NativeRectFloat(Rectangle rectangle)
+        {
+            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
         }
 
         /// <summary>
@@ -330,8 +335,10 @@ namespace Dapplo.Windows.Common.Structs
             {
                 case NativeRectFloat f:
                     return Equals(f);
+#if !NETSTANDARD2_0
                 case Rect rect1:
                     return Equals(rect1);
+#endif
                 case RectangleF rectangleF:
                     return Equals(rectangleF);
             }

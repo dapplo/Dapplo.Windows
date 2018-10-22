@@ -20,13 +20,15 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
-using System.ComponentModel;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Windows.Clipboard.Internals;
+#if !NETSTANDARD2_0
+using System.ComponentModel;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using Dapplo.Windows.Messages;
+#endif
 
 namespace Dapplo.Windows.Clipboard
 {
@@ -37,6 +39,9 @@ namespace Dapplo.Windows.Clipboard
     {
         // "Global" clipboard lock
         private static readonly ClipboardSemaphore ClipboardLockProvider = new ClipboardSemaphore();
+
+#if !NETSTANDARD2_0
+        // for now this is not supported in netstandard 2.0
 
         // This maintains the sequence
         private static uint _previousSequence = uint.MinValue;
@@ -96,6 +101,7 @@ namespace Dapplo.Windows.Clipboard
         ///     Best to use SubscribeOn with the UI SynchronizationContext.
         /// </summary>
         public static IObservable<ClipboardUpdateInformation> OnUpdate { get; }
+#endif
 
         /// <summary>
         /// Get access, a global lock, to the clipboard

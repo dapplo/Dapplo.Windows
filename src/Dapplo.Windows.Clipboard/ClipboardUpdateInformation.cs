@@ -73,10 +73,12 @@ namespace Dapplo.Windows.Clipboard
         /// <returns>ClipboardUpdateInformation</returns>
         public static ClipboardUpdateInformation Create(IntPtr hWnd = default)
         {
+#if !NETSTANDARD2_0
             if (hWnd == IntPtr.Zero)
             {
                 hWnd = WinProcHandler.Instance.Handle;
             }
+#endif
             using (var clipboard = ClipboardNative.Access(hWnd))
             {
                 return new ClipboardUpdateInformation(clipboard);

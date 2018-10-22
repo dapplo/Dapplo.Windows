@@ -23,7 +23,9 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+#if !NETSTANDARD2_0
 using System.Windows.Media.Imaging;
+#endif
 using System.Xml.Linq;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Desktop;
@@ -95,6 +97,7 @@ namespace Dapplo.Windows.Icons
             }
             using (var fileStream = File.OpenRead(finalLogoPath))
             {
+#if !NETSTANDARD2_0
                 if (typeof(BitmapSource).IsAssignableFrom(typeof(TBitmap)))
                 {
                     var img = new BitmapImage();
@@ -104,6 +107,7 @@ namespace Dapplo.Windows.Icons
                     img.EndInit();
                     return img as TBitmap;
                 }
+#endif
                 if (typeof(Bitmap) != typeof(TBitmap))
                 {
                     return default;
@@ -314,6 +318,7 @@ namespace Dapplo.Windows.Icons
                     return icon.ToBitmap() as TIcon;
                 }
             }
+#if !NETSTANDARD2_0
             if (typeof(TIcon) != typeof(BitmapSource))
             {
                 return default;
@@ -322,6 +327,9 @@ namespace Dapplo.Windows.Icons
             {
                 return icon.ToBitmapSource() as TIcon;
             }
+#else
+            return default;
+#endif
         }
 
         /// <summary>

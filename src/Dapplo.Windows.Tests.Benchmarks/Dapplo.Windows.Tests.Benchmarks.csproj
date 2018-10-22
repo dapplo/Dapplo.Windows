@@ -3,9 +3,6 @@
     <AssemblyTitle>Dapplo.Windows.Tests.Benchmarks</AssemblyTitle>
     <TargetFrameworks>net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Tests.Benchmarks</AssemblyName>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
 	<OutputType>Exe</OutputType>
 	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>

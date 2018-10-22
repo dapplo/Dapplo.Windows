@@ -5,9 +5,7 @@
     <AssemblyName>Dapplo.Windows.Messages</AssemblyName>
     <PackageId>Dapplo.Windows.Messages</PackageId>
     <PackageTags>windows messages</PackageTags>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net461</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>

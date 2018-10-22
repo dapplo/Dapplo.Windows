@@ -23,10 +23,11 @@
 
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.DesktopWindowsManager.Enums;
 
 #endregion
 
-namespace Dapplo.Windows.DesktopWindowsManager
+namespace Dapplo.Windows.DesktopWindowsManager.Structs
 {
     /// <summary>
     ///     Specifies Desktop Window Manager (DWM) thumbnail properties. Used by the DwmUpdateThumbnailProperties function.

@@ -19,6 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#if !NETSTANDARD2_0
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
@@ -49,3 +50,4 @@ namespace Dapplo.Windows.Dpi.Forms
         }
     }
 }
+#endif

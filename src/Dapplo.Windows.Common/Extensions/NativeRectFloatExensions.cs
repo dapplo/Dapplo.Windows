@@ -361,6 +361,7 @@ namespace Dapplo.Windows.Common.Extensions
             return new NativeRect((int)Math.Round(rect.X), (int)Math.Round(rect.Y), (int)Math.Round(rect.Width), (int)Math.Round(rect.Height));
         }
 
+#if !NETSTANDARD2_0
         /// <summary>
         /// Transform the specified NativeRectFloat
         /// </summary>
@@ -376,7 +377,7 @@ namespace Dapplo.Windows.Common.Extensions
             NativePointFloat bottomRight = myPointArray[1];
             return new NativeRectFloat(topLeft, bottomRight);
         }
-
+#endif
 
         /// <summary>
         /// Normalize the NativeRectFloat by making a negative width and or height absolute

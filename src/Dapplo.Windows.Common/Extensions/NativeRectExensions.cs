@@ -350,6 +350,7 @@ namespace Dapplo.Windows.Common.Extensions
             return rect.Resize(new NativeSize(width ?? rect.Width, height ?? rect.Height));
         }
 
+#if !NETSTANDARD2_0
         /// <summary>
         /// Transform the specified NativeRect
         /// </summary>
@@ -365,6 +366,7 @@ namespace Dapplo.Windows.Common.Extensions
             NativePointFloat bottomRight = myPointArray[1];
             return new NativeRect(topLeft, bottomRight);
         }
+#endif
 
         /// <summary>
         /// Normalize the NativeRect by making a negative width and or height absolute

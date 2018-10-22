@@ -28,7 +28,9 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
+#if !NETSTANDARD2_0
 using System.Windows;
+#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
@@ -69,6 +71,7 @@ namespace Dapplo.Windows.Common.Structs
             _y = y;
         }
 
+#if !NETSTANDARD2_0
         /// <summary>
         ///     Implicit cast from NativePoint to Point
         /// </summary>
@@ -77,6 +80,16 @@ namespace Dapplo.Windows.Common.Structs
         {
             return new Point(point.X, point.Y);
         }
+    
+        /// <summary>
+        ///     Implicit cast from Point to NativePointFloat
+        /// </summary>
+        /// <param name="point">Point</param>
+        public static implicit operator NativePointFloat(Point point)
+        {
+            return new NativePointFloat((float) point.X, (float) point.Y);
+        }
+#endif
 
         /// <summary>
         ///     Implicit cast from NativePoint to System.Drawing.Point
@@ -103,15 +116,6 @@ namespace Dapplo.Windows.Common.Structs
         public static implicit operator NativePointFloat(NativePoint point)
         {
             return new NativePointFloat(point.X, point.Y);
-        }
-
-        /// <summary>
-        ///     Implicit cast from Point to NativePointFloat
-        /// </summary>
-        /// <param name="point">Point</param>
-        public static implicit operator NativePointFloat(Point point)
-        {
-            return new NativePointFloat((float) point.X, (float) point.Y);
         }
 
         /// <summary>
@@ -144,8 +148,10 @@ namespace Dapplo.Windows.Common.Structs
                     return Equals(drawingPoint);
                 case NativePoint nativePoint:
                     return Equals(nativePoint);
+#if !NETSTANDARD2_0
                 case Point point:
                     return Equals(point);
+#endif
             }
 
             return false;

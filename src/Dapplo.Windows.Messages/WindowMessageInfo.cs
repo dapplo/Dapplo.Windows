@@ -30,16 +30,16 @@ namespace Dapplo.Windows.Messages
         /// <summary>
         /// Factory method for the Window Message Info
         /// </summary>
-        /// <param name="hwnd">IntPtr with the Handle of the window</param>
+        /// <param name="hWnd">IntPtr with the Handle of the window</param>
         /// <param name="msg">WindowsMessages which is the actual message</param>
         /// <param name="wParam">IntPtr with the word-param</param>
         /// <param name="lParam">IntPtr with the long-param</param>
         /// <returns>WindowMessageInfo</returns>
-        public static WindowMessageInfo Create(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam)
+        public static WindowMessageInfo Create(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
         {
             return new WindowMessageInfo
             {
-                Handle = hwnd,
+                Handle = hWnd,
                 Message = (WindowsMessages)msg,
                 WordParam = wParam,
                 LongParam = lParam

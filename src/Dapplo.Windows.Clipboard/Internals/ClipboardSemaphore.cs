@@ -55,6 +55,7 @@ namespace Dapplo.Windows.Clipboard.Internals
             // Set default timeout interval
             timeout = timeout ?? DefaultTimeout;
 
+#if !NETSTANDARD2_0
             if (hWnd == IntPtr.Zero)
             {
                 // Take the default
@@ -65,6 +66,7 @@ namespace Dapplo.Windows.Clipboard.Internals
 
                 hWnd = WinProcHandler.Instance.Handle;
             }
+#endif
 
             // If a timeout is passed, use this in the wait
             if (!_semaphoreSlim.Wait(timeout.Value))
@@ -126,11 +128,13 @@ namespace Dapplo.Windows.Clipboard.Internals
             // Set default timeout interval
             timeout = timeout ?? DefaultTimeout;
 
+#if !NETSTANDARD2_0
             if (hWnd == IntPtr.Zero)
             {
                 // Take the default
                 hWnd = WinProcHandler.Instance.Handle;
             }
+#endif
 
             // Await the semaphore, until the timeout is triggered
             if (!await _semaphoreSlim.WaitAsync(timeout.Value, cancellationToken).ConfigureAwait(false))
@@ -180,7 +184,7 @@ namespace Dapplo.Windows.Clipboard.Internals
         }
 
 
-        #region Native
+#region Native
 
         /// <summary>
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649048(v=vs.85).aspx"></a>
@@ -199,9 +203,9 @@ namespace Dapplo.Windows.Clipboard.Internals
         [DllImport("user32", SetLastError = true)]
         private static extern bool CloseClipboard();
 
-        #endregion
+#endregion
 
-        #region IDisposable Support
+#region IDisposable Support
 
         /// <summary>
         ///     Dispose the current async lock, and it's underlying SemaphoreSlim
@@ -235,6 +239,6 @@ namespace Dapplo.Windows.Clipboard.Internals
             GC.SuppressFinalize(this);
         }
 
-        #endregion
+#endregion
     }
 }

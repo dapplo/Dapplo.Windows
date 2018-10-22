@@ -40,7 +40,9 @@ using Dapplo.Windows.User32.Structs;
 using System.Drawing.Imaging;
 using System.Linq;
 using Dapplo.Log;
+#if !NETSTANDARD2_0
 using Dapplo.Windows.Extensions;
+#endif
 using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Kernel32;
 
@@ -769,6 +771,7 @@ namespace Dapplo.Windows.Desktop
             {
                 return printWindowBitmap as TBitmap;
             }
+#if !NETSTANDARD2_0
             try
             {
                 return printWindowBitmap.ToBitmapSource() as TBitmap;
@@ -777,6 +780,9 @@ namespace Dapplo.Windows.Desktop
             {
                 printWindowBitmap.Dispose();
             }
+#else
+            return default;
+#endif
         }
     }
 }

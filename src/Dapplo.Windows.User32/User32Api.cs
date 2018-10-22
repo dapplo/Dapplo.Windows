@@ -27,7 +27,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+#if !NETSTANDARD2_0
 using System.Windows.Forms;
+#endif
 using Dapplo.Log;
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Structs;
@@ -57,8 +59,56 @@ namespace Dapplo.Windows.User32
         public delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr lParam);
 
         private static readonly LogSource Log = new LogSource();
-
+#if !NETSTANDARD2_0
         private static bool _canCallGetPhysicalCursorPos = true;
+        /// <summary>
+        ///     Retrieves the cursor location safely, accounting for DPI settings in Vista/Windows 7.
+        /// </summary>
+        /// <returns>
+        ///     NativePoint with cursor location, relative to the origin of the monitor setup
+        ///     (i.e. negative coordinates are possible in multiscreen setups)
+        /// </returns>
+        public static NativePoint GetCursorLocation()
+        {
+            if (Environment.OSVersion.Version.Major < 6 || !_canCallGetPhysicalCursorPos)
+            {
+                return new NativePoint(Cursor.Position.X, Cursor.Position.Y);
+            }
+            try
+            {
+                if (GetPhysicalCursorPos(out var cursorLocation))
+                {
+                    return cursorLocation;
+                }
+                var error = Win32.GetLastErrorCode();
+                Log.Error().WriteLine("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
+            }
+            catch (Exception ex)
+            {
+                Log.Error().WriteLine(ex, "Exception retrieving PhysicalCursorPos, no longer calling this. Cause :");
+                _canCallGetPhysicalCursorPos = false;
+            }
+            return new NativePoint(Cursor.Position.X, Cursor.Position.Y);
+        }
+#else
+        /// <summary>
+        ///     Retrieves the cursor location safely, accounting for DPI settings in Vista/Windows 7.
+        /// </summary>
+        /// <returns>
+        ///     NativePoint with cursor location, relative to the origin of the monitor setup
+        ///     (i.e. negative coordinates are possible in multiscreen setups)
+        /// </returns>
+        public static NativePoint GetCursorLocation()
+        {
+            if (GetPhysicalCursorPos(out var cursorLocation))
+            {
+                return cursorLocation;
+            }
+            var error = Win32.GetLastErrorCode();
+            Log.Error().WriteLine("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
+            throw new Win32Exception((int)error);
+        }
+#endif
 
         /// <summary>
         ///     Returns the number of Displays using the Win32 functions
@@ -134,35 +184,6 @@ namespace Dapplo.Windows.User32
             }
         }
 
-        /// <summary>
-        ///     Retrieves the cursor location safely, accounting for DPI settings in Vista/Windows 7.
-        /// </summary>
-        /// <returns>
-        ///     NativePoint with cursor location, relative to the origin of the monitor setup
-        ///     (i.e. negative coordinates arepossible in multiscreen setups)
-        /// </returns>
-        public static NativePoint GetCursorLocation()
-        {
-            if (Environment.OSVersion.Version.Major < 6 || !_canCallGetPhysicalCursorPos)
-            {
-                return new NativePoint(Cursor.Position.X, Cursor.Position.Y);
-            }
-            try
-            {
-                if (GetPhysicalCursorPos(out var cursorLocation))
-                {
-                    return cursorLocation;
-                }
-                var error = Win32.GetLastErrorCode();
-                Log.Error().WriteLine("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
-            }
-            catch (Exception ex)
-            {
-                Log.Error().WriteLine(ex, "Exception retrieving PhysicalCursorPos, no longer calling this. Cause :");
-                _canCallGetPhysicalCursorPos = false;
-            }
-            return new NativePoint(Cursor.Position.X, Cursor.Position.Y);
-        }
 
         /// <summary>
         ///     Return the count of GDI objects.
@@ -338,7 +359,7 @@ namespace Dapplo.Windows.User32
         }
         private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr dwData);
 
-        #region Native imports
+#region Native imports
 
         /// <summary>
         /// Determines the visibility state of the specified window.
@@ -1104,6 +1125,6 @@ namespace Dapplo.Windows.User32
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, ref AnimationInfo animationInfo, SystemParametersInfoBehaviors fWinIni);
 
-        #endregion
+#endregion
     }
 }

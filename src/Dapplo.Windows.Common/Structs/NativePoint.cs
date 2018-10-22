@@ -28,7 +28,9 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
+#if !NETSTANDARD2_0
 using System.Windows;
+#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
@@ -69,6 +71,7 @@ namespace Dapplo.Windows.Common.Structs
             _y = y;
         }
 
+#if !NETSTANDARD2_0
         /// <summary>
         ///     Implicit cast from NativePoint to Point
         /// </summary>
@@ -77,6 +80,7 @@ namespace Dapplo.Windows.Common.Structs
         {
             return new Point(point.X, point.Y);
         }
+#endif
 
         /// <summary>
         ///     Implicit cast from NativePoint to System.Drawing.Point

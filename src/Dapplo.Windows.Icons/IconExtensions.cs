@@ -24,15 +24,18 @@ using System.Diagnostics;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.Messages;
-using System.Drawing;
 using System.Linq;
+using Dapplo.Windows.App;
+using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Kernel32;
+
+#if !NETSTANDARD2_0
+using System.Drawing;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using Dapplo.Windows.App;
-using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Gdi32.SafeHandles;
-using Dapplo.Windows.Kernel32;
+#endif
 
 namespace Dapplo.Windows.Icons
 {
@@ -41,6 +44,7 @@ namespace Dapplo.Windows.Icons
     /// </summary>
     public static class IconExtensions
     {
+#if !NETSTANDARD2_0
         /// <summary>
         /// Convert an Icon to an ImageSource
         /// </summary>
@@ -58,7 +62,7 @@ namespace Dapplo.Windows.Icons
                     BitmapSizeOptions.FromEmptyOptions());
             }
         }
-
+#endif
         /// <summary>
         ///     Get the icon for a hWnd
         /// </summary>
