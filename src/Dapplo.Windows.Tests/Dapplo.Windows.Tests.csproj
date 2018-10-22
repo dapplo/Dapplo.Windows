@@ -3,7 +3,7 @@
     <AssemblyTitle>Dapplo.Windows.Tests</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Tests</AssemblyName>
 	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-	<TargetFramework>net461</TargetFramework>
+	<TargetFrameworks>net461</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Advapi32\Dapplo.Windows.Advapi32.csproj" />
