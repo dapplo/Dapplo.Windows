@@ -5,7 +5,7 @@
     <AssemblyName>Dapplo.Windows.Gdi32</AssemblyName>
     <PackageId>Dapplo.Windows.Gdi32</PackageId>
     <PackageTags>windows native gdi</PackageTags>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net461</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />

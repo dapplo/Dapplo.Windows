@@ -5,7 +5,7 @@
     <AssemblyName>Dapplo.Windows.Advapi32</AssemblyName>
     <PackageId>Dapplo.Windows.Advapi32</PackageId>
     <PackageTags>windows native Advapi32</PackageTags>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net461</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />

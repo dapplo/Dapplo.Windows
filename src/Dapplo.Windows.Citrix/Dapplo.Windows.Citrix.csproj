@@ -5,7 +5,7 @@
     <AssemblyName>Dapplo.Windows.Citrix</AssemblyName>
     <PackageId>Dapplo.Windows.Citrix</PackageId>
     <PackageTags>windows native citrix</PackageTags>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net461</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
