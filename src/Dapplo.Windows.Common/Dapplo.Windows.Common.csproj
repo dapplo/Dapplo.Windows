@@ -15,4 +15,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net461'">
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.1.0" />
+  </ItemGroup>
 </Project>

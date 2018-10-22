@@ -34,11 +34,18 @@ namespace Dapplo.Windows.Common
     /// </summary>
     public static class WindowsVersion
     {
-        private static readonly Version WinVersion;
+        /// <summary>
+        /// Get the current windows version
+        /// </summary>
+        public static Version WinVersion { get; }
 
         static WindowsVersion()
         {
+#if NET461
             WinVersion = Environment.OSVersion.Version;
+#else
+            WinVersion = new Version(Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion);
+#endif
         }
 
         /// <summary>
