@@ -10,7 +10,7 @@ branches:
   - develop
 environment:
   NuGetApiKey:
-    secure: FkbOZI29wVSKdzHuFOq9tY8cq05Sy6vFKwvqYnUhDVamagkTUrjNJElPPoACP8Ov
+    secure: Fu7vXeOuWmvDK7WGNsEbTIV2vhDV4P6PiK5k1+UZOmwldhCfvUvkA4HOkml+ZE/n
   CoverallsRepoToken:
     secure: l1sHD8smYdYmDTTRTPC0iMooNyPgm/sCOC3v3nBjJrKWLoOQoiAu2d0BGKY5BVOj
 build_script:
