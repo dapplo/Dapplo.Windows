@@ -26,9 +26,6 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
-#if !NETSTANDARD2_0
-using System.Windows;
-#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
@@ -64,19 +61,25 @@ namespace Dapplo.Windows.Common.Structs
 
 #if !NETSTANDARD2_0
         /// <summary>
-        ///     Constructor from S.W.Size
+        ///     Constructor from System.Windows.Size
         /// </summary>
-        /// <param name="size"></param>
-        public NativeSize(Size size)
+        /// <param name="size">System.Windows.Size</param>
+        public NativeSize(System.Windows.Size size)
             : this((int) size.Width, (int) size.Height)
         {
         }
 
         /// <summary>
+        ///     Implicit cast from System.Windows.Size to NativeSize
+        /// </summary>
+        /// <param name="size">System.Windows.Size</param>
+        public static implicit operator NativeSize(System.Windows.Size size) => new NativeSize((int)size.Width, (int)size.Height);
+
+        /// <summary>
         ///     Implicit cast from NativeSize to Size
         /// </summary>
         /// <param name="size">NativeSize</param>
-        public static implicit operator Size(NativeSize size) => new Size(size.Width, size.Height);
+        public static implicit operator System.Windows.Size(NativeSize size) => new System.Windows.Size(size.Width, size.Height);
 #endif
 
         /// <summary>
@@ -115,7 +118,7 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="size1">NativeSize</param>
         /// <param name="size2">NativeSize</param>
-        /// <returns></returns>
+        /// <returns>bool</returns>
         public static bool operator ==(NativeSize size1, NativeSize size2) => size1.Equals(size2);
 
         /// <summary>
@@ -123,8 +126,74 @@ namespace Dapplo.Windows.Common.Structs
         /// </summary>
         /// <param name="size1">NativeSize</param>
         /// <param name="size2">NativeSize</param>
-        /// <returns></returns>
+        /// <returns>bool</returns>
         public static bool operator !=(NativeSize size1, NativeSize size2) => !(size1 == size2);
+
+        /// <summary>
+        /// Equals operator overloading
+        /// </summary>
+        /// <param name="size1">NativeSize</param>
+        /// <param name="size2">System.Drawing.Size</param>
+        /// <returns>bool</returns>
+        public static bool operator ==(NativeSize size1, System.Drawing.Size size2) => size1.Equals(size2);
+
+        /// <summary>
+        /// Not Equals operator overloading
+        /// </summary>
+        /// <param name="size1">NativeSize</param>
+        /// <param name="size2">System.Drawing.Size</param>
+        /// <returns>bool</returns>
+        public static bool operator !=(NativeSize size1, System.Drawing.Size size2) => !(size1 == size2);
+
+        /// <summary>
+        /// Equals operator overloading
+        /// </summary>
+        /// <param name="size1">System.Drawing.Size</param>
+        /// <param name="size2">NativeSize</param>
+        /// <returns>bool</returns>
+        public static bool operator ==(System.Drawing.Size size1, NativeSize size2) => size2.Equals(size1);
+
+        /// <summary>
+        /// Not Equals operator overloading
+        /// </summary>
+        /// <param name="size1">System.Drawing.Size</param>
+        /// <param name="size2">NativeSize</param>
+        /// <returns>bool</returns>
+        public static bool operator !=(System.Drawing.Size size1, NativeSize size2) => !(size1 == size2);
+
+#if !NETSTANDARD2_0
+        /// <summary>
+        /// Equals operator overloading
+        /// </summary>
+        /// <param name="size1">NativeSize</param>
+        /// <param name="size2">System.Windows.Size</param>
+        /// <returns>bool</returns>
+        public static bool operator ==(NativeSize size1, System.Windows.Size size2) => size1.Equals(size2);
+
+        /// <summary>
+        /// Not Equals operator overloading
+        /// </summary>
+        /// <param name="size1">NativeSize</param>
+        /// <param name="size2">System.Windows.Size</param>
+        /// <returns>bool</returns>
+        public static bool operator !=(NativeSize size1, System.Windows.Size size2) => !(size1 == size2);
+
+        /// <summary>
+        /// Equals operator overloading
+        /// </summary>
+        /// <param name="size1">System.Windows.Size</param>
+        /// <param name="size2">NativeSize</param>
+        /// <returns>bool</returns>
+        public static bool operator ==(System.Windows.Size size1, NativeSize size2) => size2.Equals(size1);
+
+        /// <summary>
+        /// Not Equals operator overloading
+        /// </summary>
+        /// <param name="size1">System.Windows.Size</param>
+        /// <param name="size2">NativeSize</param>
+        /// <returns>bool</returns>
+        public static bool operator !=(System.Windows.Size size1, NativeSize size2) => !(size1 == size2);
+#endif
 
         /// <summary>
         ///     Checks if the width * height are 0
@@ -151,6 +220,10 @@ namespace Dapplo.Windows.Common.Structs
                     return Equals(size);
                 case System.Drawing.Size size1:
                     return Equals(size1);
+#if !NETSTANDARD2_0
+                case System.Windows.Size size1:
+                    return Equals((NativeSize)size1);
+#endif
             }
 
             return false;

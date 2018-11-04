@@ -26,9 +26,6 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
-#if !NETSTANDARD2_0
-using System.Windows;
-#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 #endregion
@@ -97,28 +94,72 @@ namespace Dapplo.Windows.Common.Structs
         ///     Constructor from S.W.Size
         /// </summary>
         /// <param name="size"></param>
-        public NativeSizeFloat(Size size) : this((float) size.Width, (float) size.Height)
+        public NativeSizeFloat(System.Windows.Size size) : this((float) size.Width, (float) size.Height)
         {
         }
 
         /// <summary>
-        ///     Implicit cast from NativeSizeFloat to Size
+        ///     Implicit cast from NativeSizeFloat to System.Windows.Size
         /// </summary>
         /// <param name="size">NativeSize</param>
-        /// <returns>Size</returns>
-        public static implicit operator Size(NativeSizeFloat size)
+        /// <returns>System.Windows.Size</returns>
+        public static implicit operator System.Windows.Size(NativeSizeFloat size)
         {
-            return new Size(size.Width, size.Height);
+            return new System.Windows.Size(size.Width, size.Height);
         }
 
         /// <summary>
         ///     Implicit cast from Size to NativeSizeFloat
         /// </summary>
-        /// <param name="size">Size</param>
+        /// <param name="size">System.Windows.Size</param>
         /// <returns>NativeSizeFloat</returns>
-        public static implicit operator NativeSizeFloat(Size size)
+        public static implicit operator NativeSizeFloat(System.Windows.Size size)
         {
             return new NativeSizeFloat((float)size.Width, (float)size.Height);
+        }
+
+        /// <summary>
+        /// Equals operator
+        /// </summary>
+        /// <param name="float1">NativeSizeFloat</param>
+        /// <param name="float2">System.Windows.Size</param>
+        /// <returns>bool</returns>
+        public static bool operator ==(NativeSizeFloat float1, System.Windows.Size float2)
+        {
+            return float1.Equals(float2);
+        }
+
+        /// <summary>
+        /// Not equals operator
+        /// </summary>
+        /// <param name="float1">NativeSizeFloat</param>
+        /// <param name="float2">System.Windows.Size</param>
+        /// <returns>bool</returns>
+        public static bool operator !=(NativeSizeFloat float1, System.Windows.Size float2)
+        {
+            return !float1.Equals(float2);
+        }
+
+        /// <summary>
+        /// Equals operator
+        /// </summary>
+        /// <param name="float1">System.Windows.Size</param>
+        /// <param name="float2">NativeSizeFloat</param>
+        /// <returns>bool</returns>
+        public static bool operator ==(System.Windows.Size float1, NativeSizeFloat float2)
+        {
+            return float2.Equals(float1);
+        }
+
+        /// <summary>
+        /// Not equals operator
+        /// </summary>
+        /// <param name="float1">System.Windows.Size</param>
+        /// <param name="float2">NativeSizeFloat</param>
+        /// <returns>bool</returns>
+        public static bool operator !=(System.Windows.Size float1, NativeSizeFloat float2)
+        {
+            return !float2.Equals(float1);
         }
 #endif
 
@@ -195,6 +236,50 @@ namespace Dapplo.Windows.Common.Structs
         }
 
         /// <summary>
+        /// Equals operator
+        /// </summary>
+        /// <param name="float1">NativeSizeFloat</param>
+        /// <param name="float2">System.Windows.Size</param>
+        /// <returns>bool</returns>
+        public static bool operator ==(NativeSizeFloat float1, System.Drawing.Size float2)
+        {
+            return float1.Equals(float2);
+        }
+
+        /// <summary>
+        /// Not equals operator
+        /// </summary>
+        /// <param name="float1">NativeSizeFloat</param>
+        /// <param name="float2">System.Windows.Size</param>
+        /// <returns>bool</returns>
+        public static bool operator !=(NativeSizeFloat float1, System.Drawing.Size float2)
+        {
+            return !float1.Equals(float2);
+        }
+
+        /// <summary>
+        /// Equals operator
+        /// </summary>
+        /// <param name="float1">System.Windows.Size</param>
+        /// <param name="float2">NativeSizeFloat</param>
+        /// <returns>bool</returns>
+        public static bool operator ==(System.Drawing.Size float1, NativeSizeFloat float2)
+        {
+            return float2.Equals(float1);
+        }
+
+        /// <summary>
+        /// Not equals operator
+        /// </summary>
+        /// <param name="float1">System.Windows.Size</param>
+        /// <param name="float2">NativeSizeFloat</param>
+        /// <returns>bool</returns>
+        public static bool operator !=(System.Drawing.Size float1, NativeSizeFloat float2)
+        {
+            return !float2.Equals(float1);
+        }
+
+        /// <summary>
         ///     Checks if the width * height are 0
         /// </summary>
         /// <returns>true if the size is empty</returns>
@@ -210,7 +295,7 @@ namespace Dapplo.Windows.Common.Structs
                 case NativeSizeFloat f:
                     return Equals(f);
 #if !NETSTANDARD2_0
-                case Size size:
+                case System.Windows.Size size:
                     return Equals(size);
 #endif
                 case System.Drawing.Size drawingSize:

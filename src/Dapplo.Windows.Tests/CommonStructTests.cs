@@ -94,6 +94,58 @@ namespace Dapplo.Windows.Tests
         }
 
         /// <summary>
+        ///     Test NativeSize operators
+        /// </summary>
+        [Fact]
+        private void Test_NativeSize_Operators()
+        {
+            var nativeSize1 = new NativeSize(123, 456);
+            var nativeSize2 = new NativeSize(123, 456);
+            var drawingSize = new System.Drawing.Size(123, 456);
+            var windowsSize = new System.Windows.Size(123, 456);
+            var drawingSizeNotEqual = new System.Drawing.Size(456, 123);
+            var windowsSizeNotEqual = new System.Windows.Size(456, 123);
+            Assert.True(nativeSize1 == nativeSize2);
+            Assert.True(nativeSize1 == drawingSize);
+            Assert.True(drawingSize == nativeSize1);
+            Assert.False(nativeSize1 != drawingSize);
+            Assert.False(drawingSize != nativeSize1);
+            Assert.True(drawingSizeNotEqual != nativeSize1);
+
+            Assert.True(nativeSize1 == windowsSize);
+            Assert.True(windowsSize == nativeSize1);
+            Assert.False(nativeSize1 != windowsSize);
+            Assert.False(windowsSize != nativeSize1);
+            Assert.True(windowsSizeNotEqual != nativeSize1);
+        }
+
+        /// <summary>
+        ///     Test NativeSize operators
+        /// </summary>
+        [Fact]
+        private void Test_NativeSizeFloat_Operators()
+        {
+            var nativeSize1 = new NativeSizeFloat(123, 456);
+            var nativeSize2 = new NativeSizeFloat(123, 456);
+            var drawingSize = new System.Drawing.Size(123, 456);
+            var windowsSize = new System.Windows.Size(123, 456);
+            var drawingSizeNotEqual = new System.Drawing.Size(456, 123);
+            var windowsSizeNotEqual = new System.Windows.Size(456, 123);
+            Assert.True(nativeSize1 == nativeSize2);
+            Assert.True(nativeSize1 == drawingSize);
+            Assert.True(drawingSize == nativeSize1);
+            Assert.False(nativeSize1 != drawingSize);
+            Assert.False(drawingSize != nativeSize1);
+            Assert.True(drawingSizeNotEqual != nativeSize1);
+
+            Assert.True(nativeSize1 == windowsSize);
+            Assert.True(windowsSize == nativeSize1);
+            Assert.False(nativeSize1 != windowsSize);
+            Assert.False(windowsSize != nativeSize1);
+            Assert.True(windowsSizeNotEqual != nativeSize1);
+        }
+
+        /// <summary>
         ///     Test NativeRect TypeConverter
         /// </summary>
         [Fact]
