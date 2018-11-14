@@ -33,8 +33,6 @@ namespace Dapplo.Windows.Tests
 {
     public class DwmTest
     {
-        private static readonly LogSource Log = new LogSource();
-
         public DwmTest(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);

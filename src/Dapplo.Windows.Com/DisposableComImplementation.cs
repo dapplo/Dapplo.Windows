@@ -22,7 +22,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Dapplo.Windows.Interop
+namespace Dapplo.Windows.Com
 {
     /// <summary>
     ///     Implementation of the IDisposableCom, this is internal to prevent other code to use it directly

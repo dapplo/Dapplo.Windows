@@ -57,9 +57,9 @@ namespace Dapplo.Windows.User32.Enums
         /// <summary>
         ///     Displays a window in its most recent size and position. This value
         ///     is similar to <see cref="ShowWindowCommands.Normal" />, except
-        ///     the window is not actived.
+        ///     the window is not activated.
         /// </summary>
-        ShowNoActivate = 4,
+        ShowRecentNoActivation = 4,
 
         /// <summary>
         ///     Activates the window and displays it in its current size and position.
@@ -77,14 +77,14 @@ namespace Dapplo.Windows.User32.Enums
         ///     <see cref="ShowWindowCommands.ShowMinimized" />, except the
         ///     window is not activated.
         /// </summary>
-        ShowMinNoActive = 7,
+        ShowMinNoActivation = 7,
 
         /// <summary>
         ///     Displays the window in its current size and position. This value is
         ///     similar to <see cref="ShowWindowCommands.Show" />, except the
         ///     window is not activated.
         /// </summary>
-        ShowNA = 8,
+        ShowNoActivation = 8,
 
         /// <summary>
         ///     Activates and displays the window. If the window is minimized or

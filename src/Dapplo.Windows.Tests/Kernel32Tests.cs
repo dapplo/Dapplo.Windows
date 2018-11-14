@@ -34,8 +34,6 @@ namespace Dapplo.Windows.Tests
 {
     public class Kernel32Tests
     {
-        private static readonly LogSource Log = new LogSource();
-
         public Kernel32Tests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);

@@ -38,8 +38,6 @@ namespace Dapplo.Windows.Tests
     /// </summary>
     public class MouseHookTests
     {
-        private readonly LogSource Log = new LogSource();
-
         public MouseHookTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);

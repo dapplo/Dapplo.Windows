@@ -34,7 +34,6 @@ namespace Dapplo.Windows.Tests
 {
     public class InteropWindowTests
     {
-        private static readonly LogSource Log = new LogSource();
         public InteropWindowTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Com is a library which has com supporting code</Description>
     <AssemblyTitle>Dapplo.Windows.Com</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Com</AssemblyName>
     <PackageId>Dapplo.Windows.Com</PackageId>
     <PackageTags>windows native Com</PackageTags>
@@ -17,5 +17,8 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
   </ItemGroup>
 </Project>

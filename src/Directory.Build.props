@@ -70,7 +70,10 @@
     <AssemblyAttribute Condition="'$(Configuration)' == 'Debug'" Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Dapplo.Windows.Tests</_Parameter1>
     </AssemblyAttribute>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.2.13">
+  </ItemGroup>
+  <!-- Global definition for non test or example projects to enable InternalsVisibleTo, git versioning and pdbgit -->
+  <ItemGroup Condition="'$(Configuration)' != 'Debug' And !$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.2.33">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

@@ -24,11 +24,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dapplo.Windows.Com;
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Interop;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 

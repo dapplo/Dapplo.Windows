@@ -2,7 +2,9 @@
 
 using System;
 using System.Runtime.InteropServices;
+#if NETFRAMEWORK
 using System.Runtime.InteropServices.CustomMarshalers;
+#endif
 using DISPPARAMS = System.Runtime.InteropServices.ComTypes.DISPPARAMS;
 using EXCEPINFO = System.Runtime.InteropServices.ComTypes.EXCEPINFO;
 
@@ -26,6 +28,7 @@ namespace Dapplo.Windows.Com
         [PreserveSig]
         int GetTypeInfoCount(out int count);
 
+#if NETFRAMEWORK
         /// <summary>
         /// Retrieves the type information for an object, which can then be used to get the type information for an interface.
         /// </summary>
@@ -34,8 +37,8 @@ namespace Dapplo.Windows.Com
         /// <param name="typeInfo"></param>
         /// <returns></returns>
         [PreserveSig]
-        int GetTypeInfo([MarshalAs(UnmanagedType.U4)] int iTInfo, [MarshalAs(UnmanagedType.U4)] int lcid,
-            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(TypeToTypeInfoMarshaler))] out Type typeInfo);
+        int GetTypeInfo([MarshalAs(UnmanagedType.U4)] int iTInfo, [MarshalAs(UnmanagedType.U4)] int lcid, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(TypeToTypeInfoMarshaler))] out Type typeInfo);
+#endif
 
         /// <summary>
         /// Maps a single member and an optional set of argument names to a corresponding set of integer DISPIDs, which can be used on subsequent calls to Invoke.
@@ -47,8 +50,7 @@ namespace Dapplo.Windows.Com
         /// <param name="rgDispId"></param>
         /// <returns></returns>
         [PreserveSig]
-        int GetIDsOfNames(ref Guid riid, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)] string[] rgsNames, int cNames, int lcid,
-            [MarshalAs(UnmanagedType.LPArray)] int[] rgDispId);
+        int GetIDsOfNames(ref Guid riid, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)] string[] rgsNames, int cNames, int lcid, [MarshalAs(UnmanagedType.LPArray)] int[] rgDispId);
 
         /// <summary>
         /// Provides access to properties and methods exposed by an object.

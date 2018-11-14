@@ -1,4 +1,4 @@
-﻿
+﻿#if NETFRAMEWORK
 #region Usings
 
 using Dapplo.Log;
@@ -855,3 +855,4 @@ namespace Dapplo.Windows.Com
         #endregion
     }
 }
+#endif
