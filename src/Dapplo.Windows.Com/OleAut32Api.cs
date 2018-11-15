@@ -58,13 +58,9 @@ namespace Dapplo.Windows.Com
         public static IDisposableCom<T> GetActiveObject<T>(string progId)
         {
             var clsId = Ole32Api.ClassIdFromProgId(progId);
-            if (GetActiveObject(ref clsId, IntPtr.Zero, out object comObject).Succeeded())
-            {
-                return DisposableCom.Create((T)comObject);
-            }
-
-            return null;
+            return GetActiveObject<T>(ref clsId);
         }
+
         #region Native methods
 
         /// <summary>
