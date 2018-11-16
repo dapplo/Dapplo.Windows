@@ -1,20 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.Common is a library which contains common files for Dapplo.Windows projects</Description>
     <AssemblyTitle>Dapplo.Windows.Common</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Common</AssemblyName>
     <PackageId>Dapplo.Windows.Common</PackageId>
     <PackageTags>windows native Common</PackageTags>
-    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net471</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net471'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' != 'net461'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'net471'">
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.1.0" />
   </ItemGroup>
 </Project>

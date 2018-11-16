@@ -1,16 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.Shell32 provides logic of the Windows Shell32 API</Description>
     <AssemblyTitle>Dapplo.Windows.Shell32</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Shell32</AssemblyName>
     <PackageId>Dapplo.Windows.Shell32</PackageId>
     <PackageTags>windows native shell32</PackageTags>
-    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net471</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>

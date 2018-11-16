@@ -1,17 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.Kernel32 is a library to assist calling the kernel32 api</Description>
     <AssemblyTitle>Dapplo.Windows.Kernel32</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Kernel32</AssemblyName>
     <PackageId>Dapplo.Windows.Kernel32</PackageId>
     <PackageTags>windows native Kernel32</PackageTags>
-	<TargetFrameworks>netcoreapp3.0;netstandard2.0;net461</TargetFrameworks>
+	<TargetFrameworks>netcoreapp3.0;netstandard2.0;net471</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>

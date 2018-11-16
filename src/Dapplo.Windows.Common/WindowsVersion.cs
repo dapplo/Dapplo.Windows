@@ -41,7 +41,7 @@ namespace Dapplo.Windows.Common
 
         static WindowsVersion()
         {
-#if NET461
+#if NET471
             WinVersion = Environment.OSVersion.Version;
 #else
             WinVersion = new Version(Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion);

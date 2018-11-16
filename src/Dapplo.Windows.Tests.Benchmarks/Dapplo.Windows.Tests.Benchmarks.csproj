@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Tests.Benchmarks</AssemblyTitle>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net471</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Tests.Benchmarks</AssemblyName>
 	<OutputType>Exe</OutputType>
 	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
@@ -24,7 +24,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
-      <Version>2.9.0</Version>
+      <Version>2.10.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions">
       <Version>2.1.0</Version>

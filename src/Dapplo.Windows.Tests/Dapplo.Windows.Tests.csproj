@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Tests</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Tests</AssemblyName>
 	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-	<TargetFrameworks>net461</TargetFrameworks>
+	<TargetFrameworks>net471</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Advapi32\Dapplo.Windows.Advapi32.csproj" />
