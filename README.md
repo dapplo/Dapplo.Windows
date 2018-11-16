@@ -1,7 +1,5 @@
 # Dapplo.Windows
-This project contains code which adds Microsoft Windows specific functionality to your application
-
-THIS IS WORK IN PROGRESS, trying to get dotnet core 3.0 support working
+This project contains code which adds Microsoft Windows specific functionality to your .NET Framework or dotnet core 3.x application
 
 - Documentation can be found [here](http://www.dapplo.net/documentation/Dapplo.Windows)
 - Current build status: [![Build status](https://ci.appveyor.com/api/projects/status/n99jafhbbp74n2w7?svg=true)](https://ci.appveyor.com/project/dapplo/dapplo-windows)

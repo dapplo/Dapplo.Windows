@@ -3,10 +3,9 @@
     <AssemblyTitle>Dapplo.Windows.Example.WpfExample</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Example.WpfExample</AssemblyName>
     <TargetFrameworks>netcoreapp3.0;net471</TargetFrameworks>
-	<OutputType>WinExe</OutputType>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-	<ApplicationManifest>app.manifest</ApplicationManifest>
-	<UseWPF>true</UseWPF>
+    <OutputType>WinExe</OutputType>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj" />

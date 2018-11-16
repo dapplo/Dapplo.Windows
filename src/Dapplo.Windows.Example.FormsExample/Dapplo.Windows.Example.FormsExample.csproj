@@ -3,9 +3,8 @@
     <AssemblyTitle>Dapplo.Windows.Example.FormsExample</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Example.FormsExample</AssemblyName>
     <TargetFrameworks>netcoreapp3.0;net471</TargetFrameworks>
-	<OutputType>WinExe</OutputType>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-	<UseWindowsForms>true</UseWindowsForms>
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
