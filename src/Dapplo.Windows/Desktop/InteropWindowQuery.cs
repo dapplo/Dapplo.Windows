@@ -157,13 +157,13 @@ namespace Dapplo.Windows.Desktop
             // Get the info for the style & extended style
             var windowInfo = interopWindow.GetInfo();
             var windowStyle = windowInfo.Style;
-            if (!windowStyle.HasFlag(WindowStyleFlags.WS_POPUP))
+            if ((windowStyle & WindowStyleFlags.WS_POPUP) == 0)
             {
                 return false;
             }
             var exWindowStyle = windowInfo.ExtendedStyle;
             // Skip everything which is not rendered "normally"
-            if (!interopWindow.IsWin8App() && exWindowStyle.HasFlag(ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP))
+            if (!interopWindow.IsWin8App() && (exWindowStyle & ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP) != 0)
             {
                 return false;
             }
@@ -173,7 +173,7 @@ namespace Dapplo.Windows.Desktop
                 return false;
             }
             // Skip preview windows, like the one from Firefox
-            if (!interopWindow.GetInfo().Style.HasFlag(WindowStyleFlags.WS_VISIBLE))
+            if ((windowStyle & WindowStyleFlags.WS_VISIBLE) == 0)
             {
                 return false;
             }
@@ -194,8 +194,9 @@ namespace Dapplo.Windows.Desktop
                 return false;
             }
 
+            var info = interopWindow.GetInfo();
             // Windows without size
-            if (interopWindow.GetInfo().Bounds.IsEmpty)
+            if (info.Bounds.IsEmpty)
             {
                 return false;
             }
@@ -206,14 +207,14 @@ namespace Dapplo.Windows.Desktop
                 return false;
             }
 
-            var exWindowStyle = interopWindow.GetInfo().ExtendedStyle;
-            if (exWindowStyle.HasFlag(ExtendedWindowStyleFlags.WS_EX_TOOLWINDOW))
+            var exWindowStyle = info.ExtendedStyle;
+            if ((exWindowStyle & ExtendedWindowStyleFlags.WS_EX_TOOLWINDOW) != 0)
             {
                 return false;
             }
 
             // Skip everything which is not rendered "normally"
-            if (!interopWindow.IsWin8App() && exWindowStyle.HasFlag(ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP))
+            if (!interopWindow.IsWin8App() && (exWindowStyle & ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP) != 0)
             {
                 return false;
             }
@@ -224,8 +225,8 @@ namespace Dapplo.Windows.Desktop
                 return false;
             }
 
-            // Skip preview windows, like the one from Firefox
-            if (!interopWindow.GetInfo().Style.HasFlag(WindowStyleFlags.WS_VISIBLE))
+            // Skip preview windows, windows without WS_VISIBLE, like the one from Firefox
+            if ((info.Style & WindowStyleFlags.WS_VISIBLE) == 0)
             {
                 return false;
             }

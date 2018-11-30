@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Example.ConsoleDemo</AssemblyTitle>
-    <TargetFrameworks>netcoreapp3.0;net471</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Example.ConsoleDemo</AssemblyName>
 	<OutputType>Exe</OutputType>
   </PropertyGroup>
@@ -10,9 +10,7 @@
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Reactive">
-      <Version>4.1.2</Version>
-    </PackageReference>
+    <PackageReference Include="System.Reactive" Version="4.1.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="System" />

@@ -97,8 +97,8 @@ namespace Dapplo.Windows.Desktop
         /// <summary>
         ///     Enumerate the windows / child windows via an Observable
         /// </summary>
-        /// <param name="hWndParent">IntPtr with the hwnd of the parent, or null for all</param>
-        /// <returns>IObservable with WinWindowInfo</returns>
+        /// <param name="hWndParent">IntPtr with the hWnd of the parent, or null for all</param>
+        /// <returns>IObservable with IInteropWindow</returns>
         public static IObservable<IInteropWindow> EnumerateWindowsAsync(IntPtr? hWndParent = null)
         {
             return Observable.Create<IInteropWindow>(observer =>
@@ -106,7 +106,7 @@ namespace Dapplo.Windows.Desktop
                 var cancellationTokenSource = new CancellationTokenSource();
                 Task.Run(() =>
                 {
-                    bool EnumWindowsProc(IntPtr hwnd, IntPtr param)
+                    bool EnumWindowsProc(IntPtr hWnd, IntPtr param)
                     {
                         // check if we should continue
                         if (cancellationTokenSource.IsCancellationRequested)
@@ -114,8 +114,8 @@ namespace Dapplo.Windows.Desktop
                             return false;
                         }
 
-                        var windowInfo = InteropWindowFactory.CreateFor(hwnd);
-                        observer.OnNext(windowInfo);
+                        var interopWindow = InteropWindowFactory.CreateFor(hWnd);
+                        observer.OnNext(interopWindow);
                         return !cancellationTokenSource.IsCancellationRequested;
                     }
 
@@ -129,7 +129,7 @@ namespace Dapplo.Windows.Desktop
         /// <summary>
         ///     Enumerate the windows and child handles (IntPtr) via an Observable
         /// </summary>
-        /// <param name="hWndParent">IntPtr with the hwnd of the parent, or null for all</param>
+        /// <param name="hWndParent">IntPtr with the hWnd of the parent, or null for all</param>
         /// <returns>IObservable with IntPtr</returns>
         public static IObservable<IntPtr> EnumerateWindowHandlesAsync(IntPtr? hWndParent = null)
         {
@@ -138,7 +138,7 @@ namespace Dapplo.Windows.Desktop
                 var cancellationTokenSource = new CancellationTokenSource();
                 Task.Run(() =>
                 {
-                    bool EnumWindowsProc(IntPtr hwnd, IntPtr param)
+                    bool EnumWindowsProc(IntPtr hWnd, IntPtr param)
                     {
                         // check if we should continue
                         if (cancellationTokenSource.IsCancellationRequested)
@@ -146,7 +146,7 @@ namespace Dapplo.Windows.Desktop
                             return false;
                         }
 
-                        observer.OnNext(hwnd);
+                        observer.OnNext(hWnd);
                         return !cancellationTokenSource.IsCancellationRequested;
                     }
 

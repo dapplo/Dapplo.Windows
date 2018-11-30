@@ -5,7 +5,7 @@
     <AssemblyName>Dapplo.Windows.Icons</AssemblyName>
     <PackageId>Dapplo.Windows.Icons</PackageId>
     <PackageTags>windows native icons</PackageTags>
-    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net471</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />

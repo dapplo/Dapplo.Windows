@@ -73,65 +73,66 @@ namespace Dapplo.Windows.Desktop
         ///     Fill ALL the information of the InteropWindow
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
-        /// <param name="cacheFlags">InteropWindowCacheFlags to specify which information is retrieved and what not</param>
+        /// <param name="retrieveSettings">InteropWindowRetrieveSettings to specify which information is retrieved and what not</param>
         /// <returns>IInteropWindow for fluent calls</returns>
-        public static IInteropWindow Fill(this IInteropWindow interopWindow, InteropWindowCacheFlags cacheFlags = InteropWindowCacheFlags.CacheAll)
+        public static IInteropWindow Fill(this IInteropWindow interopWindow, InteropWindowRetrieveSettings retrieveSettings = InteropWindowRetrieveSettings.CacheAllAutoCorrect)
         {
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children) && cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Children) != 0 && (retrieveSettings & InteropWindowRetrieveSettings.ZOrderedChildren) != 0)
             {
-                throw new ArgumentException("Can't have both Children & ZOrderedChildren", nameof(cacheFlags));
+                throw new ArgumentException("Can't have both Children & ZOrderedChildren", nameof(retrieveSettings));
             }
-            var forceUpdate = cacheFlags.HasFlag(InteropWindowCacheFlags.ForceUpdate);
+            var forceUpdate = (retrieveSettings | InteropWindowRetrieveSettings.ForceUpdate) != 0;
+            var autoCorrect = (retrieveSettings | InteropWindowRetrieveSettings.AutoCorrectValues) != 0;
 
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Info))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Info) != 0)
             {
-                interopWindow.GetInfo(forceUpdate);
+                interopWindow.GetInfo(forceUpdate, autoCorrect);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Caption))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Caption) != 0)
             {
                 interopWindow.GetCaption(forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Classname))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Classname) != 0)
             {
                 interopWindow.GetClassname(forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.ProcessId))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.ProcessId) != 0)
             {
                 interopWindow.GetProcessId(forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Parent))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Parent) != 0)
             {
                 interopWindow.GetParent(forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Visible))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Visible) != 0)
             {
                 interopWindow.IsVisible(forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Maximized))
+            if ((retrieveSettings | InteropWindowRetrieveSettings.Maximized) != 0)
             {
                 interopWindow.IsMaximized(forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Minimized))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Minimized) != 0)
             {
                 interopWindow.IsMinimized(forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.ScrollInfo))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.ScrollInfo) != 0)
             {
                 interopWindow.GetWindowScroller(forceUpdate: forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Children) != 0)
             {
                 interopWindow.GetChildren(forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.ZOrderedChildren) != 0)
             {
                 interopWindow.GetZOrderedChildren(forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Placement))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Placement) != 0)
             {
                 interopWindow.GetPlacement(forceUpdate);
             }
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Text))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Text) != 0)
             {
                 interopWindow.GetText(forceUpdate);
             }
@@ -214,9 +215,9 @@ namespace Dapplo.Windows.Desktop
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
         /// <param name="forceUpdate">set to true to make sure the value is updated</param>
-        /// <param name="cropToParent">set to true to have the bounds cropped to the parent(s)</param>
+        /// <param name="autoCorrect">enable auto correction, e,g, have the bounds cropped to the parent(s)</param>
         /// <returns>WindowInfo</returns>
-        public static WindowInfo GetInfo(this IInteropWindow interopWindow, bool forceUpdate = false, bool cropToParent = true)
+        public static WindowInfo GetInfo(this IInteropWindow interopWindow, bool forceUpdate = false, bool autoCorrect = true)
         {
             if (interopWindow.Info.HasValue && !forceUpdate)
             {
@@ -226,30 +227,31 @@ namespace Dapplo.Windows.Desktop
             var windowInfo = WindowInfo.Create();
             User32Api.GetWindowInfo(interopWindow.Handle, ref windowInfo);
 
-            // Now correct the bounds, for Windows 8+
-            if (Dwm.IsDwmEnabled)
+            // Test if we need to correct some values
+            if (autoCorrect)
             {
-                // This only works for top level windows, otherwise a access denied is returned
-                bool gotFrameBounds = Dwm.GetExtendedFrameBounds(interopWindow.Handle, out var extendedFrameBounds);
-                if (gotFrameBounds && (interopWindow.IsApp() || WindowsVersion.IsWindows10OrLater && !interopWindow.IsMaximized()))
+                // Correct the bounds, for Windows 8+
+                if (Dwm.IsDwmEnabled)
                 {
-                    windowInfo.Bounds = extendedFrameBounds;
+                    // This only works for top level windows, otherwise a access denied is returned
+                    bool gotFrameBounds = Dwm.GetExtendedFrameBounds(interopWindow.Handle, out var extendedFrameBounds);
+                    if (gotFrameBounds && (interopWindow.IsApp() || WindowsVersion.IsWindows10OrLater && !interopWindow.IsMaximized()))
+                    {
+                        windowInfo.Bounds = extendedFrameBounds;
+                    }
                 }
-            }
 
-            if (cropToParent)
-            {
                 var parentWindow = interopWindow.GetParentWindow();
                 if (interopWindow.HasParent)
                 {
-                    var parentInfo = parentWindow.GetInfo(forceUpdate);
+                    var parentInfo = parentWindow.GetInfo(forceUpdate, true);
                     windowInfo.Bounds = windowInfo.Bounds.Intersect(parentInfo.Bounds);
                     windowInfo.ClientBounds = windowInfo.ClientBounds.Intersect(parentInfo.ClientBounds);
                 }
             }
 
             interopWindow.Info = windowInfo;
-            return interopWindow.Info.Value;
+            return windowInfo;
         }
 
         /// <summary>
@@ -364,7 +366,7 @@ namespace Dapplo.Windows.Desktop
             }
             var text = User32Api.GetTextFromWindow(interopWindow.Handle);
             interopWindow.Text = text;
-            return interopWindow.Text;
+            return text;
         }
 
         /// <summary>
@@ -639,7 +641,7 @@ namespace Dapplo.Windows.Desktop
                 // Simulate an "ALT" key press, make it double to remove menu activation
                 KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Menu, VirtualKeyCode.Menu);
             }
-            // Show window in forground.
+            // Show window in foreground.
             User32Api.BringWindowToTop(interopWindow.Handle);
             User32Api.SetForegroundWindow(interopWindow.Handle);
         }
@@ -648,7 +650,7 @@ namespace Dapplo.Windows.Desktop
         /// Move the specified window to a new location
         /// </summary>
         /// <param name="interopWindow">IInteropWindow</param>
-        /// <param name="location">NativePoin with the offset</param>
+        /// <param name="location">NativePoint with the offset</param>
         /// <returns>IInteropWindow for fluent calls</returns>
         public static IInteropWindow MoveTo(this IInteropWindow interopWindow, NativePoint location)
         {

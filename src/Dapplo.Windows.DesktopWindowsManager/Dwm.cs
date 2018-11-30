@@ -25,6 +25,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Dapplo.Windows.Common;
 #if !NETSTANDARD2_0
 using System.Windows.Media;
 #endif
@@ -44,11 +45,12 @@ namespace Dapplo.Windows.DesktopWindowsManager
     /// </summary>
     public static class Dwm
     {
-        private const uint DwmEcDisablecomposition = 0;
-        private const uint DwmEcEnablecomposition = 1;
+        private const uint DwmEcDisableComposition = 0;
+        private const uint DwmEcEnableComposition = 1;
 
         // Key to ColorizationColor for DWM
         private const string ColorizationColorKey = @"SOFTWARE\Microsoft\Windows\DWM";
+        private const string DwmApiDll = "dwmapi.dll";
 
 #if !NETSTANDARD2_0
         /// <summary>
@@ -65,7 +67,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
 #endif
 
         /// <summary>
-        ///     Return the AERO Color
+        ///     Return the Aero Color
         /// </summary>
         public static System.Drawing.Color ColorizationSystemDrawingColor
         {
@@ -94,11 +96,11 @@ namespace Dapplo.Windows.DesktopWindowsManager
                 // According to: http://technet.microsoft.com/en-us/subscriptions/aa969538%28v=vs.85%29.aspx
                 // And: http://msdn.microsoft.com/en-us/library/windows/desktop/aa969510%28v=vs.85%29.aspx
                 // DMW is always enabled on Windows 8! So return true and save a check! ;-)
-                if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 2)
+                if (WindowsVersion.IsWindows8X)
                 {
                     return true;
                 }
-                if (Environment.OSVersion.Version.Major < 6)
+                if (WindowsVersion.IsWindowsBeforeVista)
                 {
                     return false;
                 }
@@ -113,7 +115,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         public static void DisableComposition()
         {
-            DwmEnableComposition(DwmEcDisablecomposition);
+            DwmEnableComposition(DwmEcDisableComposition);
         }
 
         /// <summary>
@@ -127,7 +129,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="hwnd">The handle to the window on which the blur behind data is applied.</param>
         /// <param name="blurBehind">DwmBlurBehind</param>
         /// <returns>HResult</returns>
-        [DllImport("dwmapi", SetLastError = true)]
+        [DllImport(DwmApiDll, SetLastError = true)]
         public static extern HResult DwmEnableBlurBehindWindow(IntPtr hwnd, ref DwmBlurBehind blurBehind);
 
         /// <summary>
@@ -144,7 +146,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         ///     disable composition.
         /// </param>
         /// <returns>HResult</returns>
-        [DllImport("dwmapi", SetLastError = true)]
+        [DllImport(DwmApiDll, SetLastError = true)]
         public static extern HResult DwmEnableComposition(uint uCompositionAction);
 
         /// <summary>
@@ -167,7 +169,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         ///     The size of the DWMWINDOWATTRIBUTE value being retrieved. The size is dependent on the type of the pvAttribute
         ///     parameter.
         /// </returns>
-        [DllImport("dwmapi", SetLastError = true)]
+        [DllImport(DwmApiDll, SetLastError = true)]
         public static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttribute, out NativeRect lpRect, int size);
 
         /// <summary>
@@ -191,7 +193,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         /// <param name="pfEnabled">out bool to get the current state</param>
         /// <returns>If this function succeeds, it returns S_OK. Otherwise, it returns an HRESULT error code.</returns>
-        [DllImport("dwmapi", SetLastError = true)]
+        [DllImport(DwmApiDll, SetLastError = true)]
         private static extern HResult DwmIsCompositionEnabled([MarshalAs(UnmanagedType.Bool)] out bool pfEnabled);
 
         /// <summary>
@@ -202,14 +204,14 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="onTopHandle">IntPtr</param>
         /// <param name="unknown">uint</param>
         /// <returns>HResult</returns>
-        [DllImport("dwmapi", EntryPoint = "#113", SetLastError = true)]
+        [DllImport(DwmApiDll, EntryPoint = "#113", SetLastError = true)]
         internal static extern HResult DwmpActivateLivePreview(uint active, IntPtr handle, IntPtr onTopHandle, uint unknown);
 
         /// <summary>
         ///     Activate Windows + Tab effect
         /// </summary>
         /// <returns>bool if it worked</returns>
-        [DllImport("dwmapi", EntryPoint = "#105", SetLastError = true)]
+        [DllImport(DwmApiDll, EntryPoint = "#105", SetLastError = true)]
         public static extern bool DwmpStartOrStopFlip3D();
 
         /// <summary>
@@ -218,7 +220,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="hThumbnail">A handle to the thumbnail to retrieve the source window size from.</param>
         /// <param name="size">a NativeSize structure that, when this function returns successfully, receives the size of the source thumbnail.</param>
         /// <returns>HResult</returns>
-        [DllImport("dwmapi", SetLastError = true)]
+        [DllImport(DwmApiDll, SetLastError = true)]
         public static extern HResult DwmQueryThumbnailSourceSize(IntPtr hThumbnail, out NativeSize size);
 
         /// <summary>
@@ -228,7 +230,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="hwndSource">The handle to the window to use as the thumbnail source. Setting the source window handle to anything other than a top-level window type will result in a return value of E_INVALIDARG.</param>
         /// <param name="phThumbnailId">A pointer to a handle that, when this function returns successfully, represents the registration of the DWM thumbnail.</param>
         /// <returns>HResult</returns>
-        [DllImport("dwmapi", SetLastError = true)]
+        [DllImport(DwmApiDll, SetLastError = true)]
         public static extern HResult DwmRegisterThumbnail(IntPtr hwndDestination, IntPtr hwndSource, out IntPtr phThumbnailId);
 
         /// <summary>
@@ -249,7 +251,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </param>
         /// <param name="setIconicLivePreviewFlags">The display options for the live preview.</param>
         /// <returns>HResult</returns>
-        [DllImport("dwmapi", SetLastError = true)]
+        [DllImport(DwmApiDll, SetLastError = true)]
         internal static extern HResult DwmSetIconicLivePreviewBitmap(IntPtr hwnd, IntPtr hbitmap, ref NativePoint ptClient, DwmSetIconicLivePreviewFlags setIconicLivePreviewFlags);
 
         /// <summary>
@@ -271,7 +273,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </param>
         /// <param name="cbAttribute">The size, in bytes, of the value type pointed to by the pvAttribute parameter.</param>
         /// <returns></returns>
-        [DllImport("dwmapi", SetLastError = true)]
+        [DllImport(DwmApiDll, SetLastError = true)]
         public static extern HResult DwmSetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttributeToSet, IntPtr pvAttributeValue, uint cbAttribute);
 
         /// <summary>
@@ -279,7 +281,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         /// <param name="hThumbnailId">The handle to the thumbnail relationship to be removed. Null or non-existent handles will result in a return value of E_INVALIDARG.</param>
         /// <returns>HResult</returns>
-        [DllImport("dwmapi", SetLastError = true)]
+        [DllImport(DwmApiDll, SetLastError = true)]
         public static extern HResult DwmUnregisterThumbnail(IntPtr hThumbnailId);
 
         /// <summary>
@@ -288,7 +290,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="hThumbnailId">IntPtr The handle to the DWM thumbnail to be updated. Null or invalid thumbnails, as well as thumbnails owned by other processes will result in a return value of E_INVALIDARG.</param>
         /// <param name="props">A pointer to a DwmThumbnailProperties structure that contains the new thumbnail properties.</param>
         /// <returns>HResult</returns>
-        [DllImport("dwmapi", SetLastError = true)]
+        [DllImport(DwmApiDll, SetLastError = true)]
         public static extern HResult DwmUpdateThumbnailProperties(IntPtr hThumbnailId, ref DwmThumbnailProperties props);
 
         /// <summary>
@@ -296,7 +298,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// </summary>
         public static void EnableComposition()
         {
-            DwmEnableComposition(DwmEcEnablecomposition);
+            DwmEnableComposition(DwmEcEnableComposition);
         }
 
         /// <summary>
@@ -329,7 +331,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="unknown"></param>
         /// <returns></returns>
         [PreserveSig]
-        [DllImport("dwmapi", EntryPoint = "#100", SetLastError = true)]
+        [DllImport(DwmApiDll, EntryPoint = "#100", SetLastError = true)]
         public static extern int GetSharedSurface(IntPtr hWnd, long adapterLuid, uint one, uint two, [In] [Out] ref uint pD3DFormat, [Out] out IntPtr pSharedHandle, ulong unknown);
 
         /// <summary>
@@ -343,7 +345,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="unknown"></param>
         /// <returns></returns>
         [PreserveSig]
-        [DllImport("dwmapi", EntryPoint = "#101", SetLastError = true)]
+        [DllImport(DwmApiDll, EntryPoint = "#101", SetLastError = true)]
         public static extern int UpdateWindowShared(IntPtr hWnd, int one, int two, int three, IntPtr hMonitor, IntPtr unknown);
     }
 }

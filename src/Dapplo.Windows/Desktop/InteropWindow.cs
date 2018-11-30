@@ -105,66 +105,66 @@ namespace Dapplo.Windows.Desktop
         public bool? CanScroll { get; set; }
 
         /// <inheritdoc />
-        public StringBuilder Dump(InteropWindowCacheFlags cacheFlags = InteropWindowCacheFlags.CacheAll, StringBuilder dump = null, string indentation = "")
+        public StringBuilder Dump(InteropWindowRetrieveSettings retrieveSettings = InteropWindowRetrieveSettings.CacheAll, StringBuilder dump = null, string indentation = "")
         {
-            this.Fill(cacheFlags);
+            this.Fill(retrieveSettings);
 
             dump = dump ?? new StringBuilder();
             dump.AppendLine($"{indentation}{nameof(Handle)}={Handle}");
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Classname))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Classname) != 0)
             {
                 dump.AppendLine($"{indentation}{nameof(Classname)}={Classname}");
             }
 
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Caption))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Caption) != 0)
             {
                 dump.AppendLine($"{indentation}{nameof(Caption)}={Caption}");
             }
 
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Text))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Text) != 0)
             {
                 dump.AppendLine($"{indentation}{nameof(Text)}={Text}");
             }
 
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Info))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Info) != 0)
             {
                 dump.AppendLine($"{indentation}{nameof(Info)}={Info}");
             }
 
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Maximized))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Maximized) != 0)
             {
                 dump.AppendLine($"{indentation}{nameof(IsMaximized)}={IsMaximized}");
             }
 
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Minimized))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Minimized) != 0)
             {
                 dump.AppendLine($"{indentation}{nameof(IsMinimized)}={IsMinimized}");
             }
 
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Visible))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Visible) != 0)
             {
                 dump.AppendLine($"{indentation}{nameof(IsVisible)}={IsVisible}");
             }
 
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Parent))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Parent) != 0)
             {
                 dump.AppendLine($"{indentation}{nameof(Parent)}={Parent}");
             }
 
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.ScrollInfo))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.ScrollInfo) != 0)
             {
                 dump.AppendLine($"{indentation}{nameof(CanScroll)}={CanScroll}");
             }
 
-            if (cacheFlags.HasFlag(InteropWindowCacheFlags.Children) && !HasParent)
+            if ((retrieveSettings & InteropWindowRetrieveSettings.Children) != 0 && !HasParent)
             {
                 foreach (var child in this.GetChildren())
                 {
-                    child.Dump(cacheFlags, dump, indentation + "\t");
+                    child.Dump(retrieveSettings, dump, indentation + "\t");
                 }
             }
 
-            if (!cacheFlags.HasFlag(InteropWindowCacheFlags.ZOrderedChildren))
+            if ((retrieveSettings & InteropWindowRetrieveSettings.ZOrderedChildren) == 0)
             {
                 return dump;
             }
@@ -176,7 +176,7 @@ namespace Dapplo.Windows.Desktop
 
             foreach (var child in this.GetZOrderedChildren())
             {
-                child.Dump(cacheFlags, dump, indentation + "\t");
+                child.Dump(retrieveSettings, dump, indentation + "\t");
             }
 
             return dump;

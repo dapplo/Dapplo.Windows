@@ -5,16 +5,14 @@
     <AssemblyName>Dapplo.Windows.Gdi32</AssemblyName>
     <PackageId>Dapplo.Windows.Gdi32</PackageId>
     <PackageTags>windows native gdi</PackageTags>
-    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net471</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dapplo.Log">
-      <Version>1.3.11</Version>
-    </PackageReference>
+    <PackageReference Include="Dapplo.Log" Version="1.3.11" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="Microsoft.CSharp" />

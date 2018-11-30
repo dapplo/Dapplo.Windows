@@ -5,7 +5,7 @@
     <AssemblyName>Dapplo.Windows.DesktopWindowsManager</AssemblyName>
     <PackageId>Dapplo.Windows.DesktopWindowsManager</PackageId>
     <PackageTags>windows dwm</PackageTags>
-    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net471</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />

@@ -31,7 +31,7 @@ namespace Dapplo.Windows.Enums
     ///     These flags define which values are retrieved and if they are cached or not
     /// </summary>
     [Flags]
-    public enum InteropWindowCacheFlags : uint
+    public enum InteropWindowRetrieveSettings : uint
     {
         /// <summary>
         /// </summary>
@@ -103,14 +103,25 @@ namespace Dapplo.Windows.Enums
         Children = 1 << 12,
 
         /// <summary>
-        ///     Retrieve the children by zorder
+        ///     Retrieve the children by z-order
         /// </summary>
         ZOrderedChildren = 1 << 13,
+
+        /// <summary>
+        /// Specify if values are auto corrected, e.g. the WindowInfo bounds are cropped to the parent
+        /// This enables correction, which takes a bit more time
+        /// </summary>
+        AutoCorrectValues = 1 << 14,
 
         /// <summary>
         ///     Cache all, except children, don't force reloading
         /// </summary>
         CacheAll = Caption | Classname | Info | Maximized | Minimized | Parent | Placement | ProcessId | Text | Visible | ScrollInfo,
+
+        /// <summary>
+        ///     Cache all, except children, don't force reloading, auto correct certain values
+        /// </summary>
+        CacheAllAutoCorrect = Caption | Classname | Info | Maximized | Minimized | Parent | Placement | ProcessId | Text | Visible | ScrollInfo | AutoCorrectValues,
 
         /// <summary>
         ///     Cache all, with children, don't force reloading
