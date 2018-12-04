@@ -28,6 +28,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Windows.Interop;
+using Dapplo.Log;
 
 #endregion
 
@@ -38,6 +39,7 @@ namespace Dapplo.Windows.Messages
     /// </summary>
     public class WinProcHandler
     {
+        private static readonly LogSource Log = new LogSource();
         private static HwndSource _hWndSource;
 
         /// <summary>
@@ -64,14 +66,12 @@ namespace Dapplo.Windows.Messages
                 {
                     return _hWndSource;
                 }
-                if (_hWndSource != null && !_hWndSource.IsDisposed)
-                {
-                    return _hWndSource;
-                }
                 // Create a new message window
                 _hWndSource = CreateMessageWindow();
+                Log.Verbose().WriteLine("MessageHandlerWindow with handle {0} was created.", _hWndSource.Handle);
                 _hWndSource.Disposed += (sender, args) =>
                 {
+                    Log.Verbose().WriteLine("MessageHandlerWindow with handle {0} is disposed.", _hWndSource.Handle);
                     UnsubscribeAllHooks();
                 };
                 // Hook automatic removing of all the hooks

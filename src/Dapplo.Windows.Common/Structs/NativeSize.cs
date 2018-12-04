@@ -204,7 +204,7 @@ namespace Dapplo.Windows.Common.Structs
 
         /// <inheritdoc />
         [Pure]
-        public int CompareTo(NativeSize other) => (other.Width * other.Height).CompareTo(Width * Height);
+        public int CompareTo(NativeSize other) => unchecked (other.Width * other.Height).CompareTo(unchecked(Width * Height));
 
         /// <inheritdoc />
         [Pure]

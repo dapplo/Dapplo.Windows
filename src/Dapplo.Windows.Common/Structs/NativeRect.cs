@@ -277,7 +277,7 @@ namespace Dapplo.Windows.Common.Structs
         ///     Checks if this NativeRect is empty
         /// </summary>
         /// <returns>true when empty</returns>
-        public bool IsEmpty => Width * Height == 0;
+        public bool IsEmpty => unchecked (Width * Height) == 0;
 
         /// <inheritdoc />
         [Pure]
