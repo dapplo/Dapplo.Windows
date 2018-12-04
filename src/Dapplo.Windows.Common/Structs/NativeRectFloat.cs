@@ -27,6 +27,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Text;
 #if !NETSTANDARD2_0
 using System.Windows;
 #endif
@@ -303,7 +304,12 @@ namespace Dapplo.Windows.Common.Structs
         [Pure]
         public override string ToString()
         {
-            return "{Left: " + _x + "; " + "Top: " + _y + "; Right: " + _width + "; Bottom: " + _height + "}";
+            var builder = new StringBuilder();
+            builder.Append("Left: ").Append(_x).Append("; ");
+            builder.Append("Top: ").Append(_y).Append("; ");
+            builder.Append("Right: ").Append(Right).Append("; ");
+            builder.Append("Bottom: ").Append(Bottom).Append("}");
+            return builder.ToString();
         }
 
         /// <summary>

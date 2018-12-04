@@ -146,7 +146,7 @@ namespace Dapplo.Windows.App
                 return true;
             }
 
-            foreach (var screen in User32Api.AllDisplays())
+            foreach (var screen in DisplayInfo.AllDisplayInfos)
             {
                 if (!screen.Bounds.Contains(windowBounds))
                 {

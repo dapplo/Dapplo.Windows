@@ -8,6 +8,11 @@
     <TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9" >
+        <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Com\Dapplo.Windows.Com.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">

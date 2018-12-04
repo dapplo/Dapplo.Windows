@@ -150,8 +150,8 @@ namespace Dapplo.Windows.Icons
             var binaryWriter = new BinaryWriter(stream);
 
             short imageCount = 0;
-            IList<Size> imageSizes = new List<Size>();
-            IList<MemoryStream> encodedImages = new List<MemoryStream>();
+            var imageSizes = new List<Size>();
+            var encodedImages = new List<MemoryStream>();
             foreach (var image in images)
             {
                 var imageStream = new MemoryStream();

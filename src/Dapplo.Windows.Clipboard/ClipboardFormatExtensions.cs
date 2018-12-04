@@ -39,8 +39,8 @@ namespace Dapplo.Windows.Clipboard
         // Used for internal locking
         private static readonly object Lock = new object();
         // Cache for all the known clipboard format names
-        private static readonly IDictionary<uint, string> Id2Format = new Dictionary<uint, string>();
-        private static readonly IDictionary<string, uint> Format2Id = new Dictionary<string, uint>();
+        private static readonly Dictionary<uint, string> Id2Format = new Dictionary<uint, string>();
+        private static readonly Dictionary<string, uint> Format2Id = new Dictionary<string, uint>();
 
         /// <summary>
         /// Initialize the static data of the class

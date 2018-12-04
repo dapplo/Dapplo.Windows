@@ -27,6 +27,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Threading;
 #if !NETSTANDARD2_0
 using System.Windows.Forms;
 #endif
@@ -60,8 +61,11 @@ namespace Dapplo.Windows.Dpi
         /// <param name="bitmapScaler">A function to provide a newly scaled bitmap, you can return the provide bitmap if you want to keep it as is</param>
         public static BitmapScaleHandler<string> WithComponentResourceManager(DpiHandler dpiHandler, Type resourceType, Func<Bitmap, uint, Bitmap> bitmapScaler = null)
         {
-            var resources = new ComponentResourceManager(resourceType);
-            return Create<string>(dpiHandler, (imageName, dpi) => (Bitmap) resources.GetObject(imageName), bitmapScaler);
+            return Create<string>(dpiHandler, (imageName, dpi) =>
+            {
+                var resources = new ComponentResourceManager(resourceType);
+                return (Bitmap) resources.GetObject(imageName);
+            }, bitmapScaler);
         }
 
         /// <summary>
@@ -94,7 +98,9 @@ namespace Dapplo.Windows.Dpi
     /// </summary>
     public sealed class BitmapScaleHandler<TKey> : IDisposable
     {
-        private readonly IDictionary<TKey, Bitmap> _images = new Dictionary<TKey, Bitmap>();
+        private readonly ReaderWriterLockSlim _imagesLock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim _actionsLock = new ReaderWriterLockSlim();
+        private readonly Dictionary<TKey, Bitmap> _images = new Dictionary<TKey, Bitmap>();
         private bool _areWeDisposing;
         private uint _dpi;
         private IDisposable _dpiChangeSubscription;
@@ -106,7 +112,7 @@ namespace Dapplo.Windows.Dpi
         /// <summary>
         ///     A list of actions which apply the bitmap
         /// </summary>
-        private IDictionary<object, Action> ApplyActions { get; } = new Dictionary<object, Action>();
+        private Dictionary<object, Action> ApplyActions { get; } = new Dictionary<object, Action>();
 
         /// <summary>
         ///     This function retrieves the bitmap
@@ -126,10 +132,24 @@ namespace Dapplo.Windows.Dpi
         /// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
         public BitmapScaleHandler<TKey> AddApplyAction(Action<Bitmap> apply, TKey imageKey, bool execute = false)
         {
-            ApplyActions[apply] = () => { apply(GetBitmap(imageKey)); };
+            void ApplyAction()
+            {
+                apply(GetBitmap(imageKey));
+            }
+
+            try
+            {
+                _actionsLock.EnterWriteLock();
+
+                ApplyActions[apply] = ApplyAction;
+            }
+            finally
+            {
+                _actionsLock.ExitWriteLock();
+            }
             if (execute)
             {
-                ApplyActions[apply]();
+                ApplyAction();
             }
 
             return this;
@@ -144,10 +164,22 @@ namespace Dapplo.Windows.Dpi
         /// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
         public BitmapScaleHandler<TKey> AddTarget(Button button, TKey imageKey, bool execute = false)
         {
-            ApplyActions[button] = () => { button.Image = GetBitmap(imageKey); };
+            void ApplyAction()
+            {
+                button.Image = GetBitmap(imageKey);
+            }
+            try
+            {
+                _actionsLock.EnterWriteLock();
+                ApplyActions[button] = ApplyAction;
+            }
+            finally
+            {
+                _actionsLock.ExitWriteLock();
+            }
             if (execute)
             {
-                ApplyActions[button]();
+                ApplyAction();
             }
             return this;
         }
@@ -160,10 +192,23 @@ namespace Dapplo.Windows.Dpi
         /// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
         public BitmapScaleHandler<TKey> AddTarget(ToolStripItem toolStripItem, TKey imageKey, bool execute = false)
         {
-            ApplyActions[toolStripItem] = () => { toolStripItem.Image = GetBitmap(imageKey); };
+            void ApplyAction()
+            {
+                toolStripItem.Image = GetBitmap(imageKey);
+            }
+            try
+            {
+                _actionsLock.EnterWriteLock();
+
+                ApplyActions[toolStripItem] = ApplyAction;
+            }
+            finally
+            {
+                _actionsLock.ExitWriteLock();
+            }
             if (execute)
             {
-                ApplyActions[toolStripItem]();
+                ApplyAction();
             }
 
             return this;
@@ -181,26 +226,47 @@ namespace Dapplo.Windows.Dpi
         }
 
         /// <summary>
-        ///     Processes DPI Change informaation
+        ///     Processes DPI Change information
         /// </summary>
         /// <param name="dpiChangeInfo">DpiChangeInfo with the DPI information</param>
         private void ProcessDpiChange(DpiChangeInfo dpiChangeInfo)
         {
-            // Make list of current bitmaps, to dispose
-            var imagesToDispose = _images.Values.ToList();
-            _images.Clear();
+            _imagesLock.EnterWriteLock();
+            List<Bitmap> imagesToDispose;
+            try
+            {
+                // Make list of current bitmaps, to dispose
+                imagesToDispose = _images.Values.ToList();
+                _images.Clear();
+            }
+            finally
+            {
+                _imagesLock.ExitWriteLock();
+            }
             // Store the current DPI value, for creating the images
             _dpi = dpiChangeInfo.NewDpi;
-            // Apply new images
-            foreach (var key in ApplyActions.Keys)
+
+            try
             {
-                ApplyActions[key]();
+                _actionsLock.EnterReadLock();
+
+                // Apply new images
+                foreach (var key in ApplyActions.Keys)
+                {
+                    ApplyActions[key]();
+                }
+            }
+            finally
+            {
+                _actionsLock.ExitReadLock();
             }
             // Dispose list
             foreach (var image in imagesToDispose)
             {
                 image.Dispose();
             }
+
+
         }
 
         /// <inheritdoc />
@@ -222,22 +288,38 @@ namespace Dapplo.Windows.Dpi
                 return null;
             }
 
-            if (_images.TryGetValue(imageKey, out var result))
+            try
             {
+                _imagesLock.EnterUpgradeableReadLock();
+                if (_images.TryGetValue(imageKey, out var result))
+                {
+                    return result;
+                }
+                var image = BitmapProvider(imageKey, _dpi);
+                if (image == null)
+                {
+                    return null;
+                }
+                result = BitmapScaler?.Invoke(image, _dpi);
+                if (result == null || Equals(image, result))
+                {
+                    return image;
+                }
+                try
+                {
+                    _imagesLock.EnterWriteLock();
+                    _images.Add(imageKey, result);
+                }
+                finally
+                {
+                    _imagesLock.ExitWriteLock();
+                }
                 return result;
             }
-            var image = BitmapProvider(imageKey, _dpi);
-            if (image == null)
+            finally
             {
-                return null;
+                _imagesLock.ExitUpgradeableReadLock();
             }
-            result = BitmapScaler?.Invoke(image, _dpi);
-            if (result == null || Equals(image, result))
-            {
-                return image;
-            }
-            _images.Add(imageKey, result);
-            return result;
         }
 
         /// <summary>
@@ -262,19 +344,47 @@ namespace Dapplo.Windows.Dpi
         private void ReleaseUnmanagedResources()
         {
             _areWeDisposing = true;
-            // Set all bitmaps to an empty one
-            foreach (var applyAction in ApplyActions.Values)
+
+            try
             {
-                applyAction();
+                _actionsLock.EnterReadLock();
+                // Set all bitmaps to an empty one
+                foreach (var applyAction in ApplyActions.Values)
+                {
+                    applyAction();
+                }
             }
-            // Dispose all
-            foreach (var bitmapName in _images.Keys.ToList())
+            finally
             {
-                _images[bitmapName].Dispose();
-                _images.Remove(bitmapName);
+                _actionsLock.ExitReadLock();
             }
-            // Remove actions so there are no references anymore
-            ApplyActions.Clear();
+
+            try
+            {
+                _imagesLock.EnterWriteLock();
+                // Dispose all
+                foreach (var bitmapName in _images.Keys)
+                {
+                    _images[bitmapName].Dispose();
+                    _images.Remove(bitmapName);
+                }
+            }
+            finally
+            {
+                _imagesLock.ExitWriteLock();
+            }
+
+            try
+            {
+                _actionsLock.EnterWriteLock();
+                // Remove actions so there are no references anymore
+                ApplyActions.Clear();
+            }
+            finally
+            {
+                _actionsLock.ExitWriteLock();
+            }
+
         }
 
         /// <summary>
@@ -283,7 +393,15 @@ namespace Dapplo.Windows.Dpi
         /// </summary>
         public BitmapScaleHandler<TKey> RemoveTarget(object target)
         {
-            ApplyActions.Remove(target);
+            try
+            {
+                _actionsLock.EnterWriteLock();
+                ApplyActions.Remove(target);
+            }
+            finally
+            {
+                _actionsLock.ExitWriteLock();
+            }
             return this;
         }
     }

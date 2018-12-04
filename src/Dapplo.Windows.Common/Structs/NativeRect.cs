@@ -132,7 +132,7 @@ namespace Dapplo.Windows.Common.Structs
         public int Bottom => _bottom;
 
         /// <summary>
-        ///     Heigh of the NativeRect
+        ///     Height of the NativeRect
         /// </summary>
         public int Height => unchecked(_bottom - _top);
 

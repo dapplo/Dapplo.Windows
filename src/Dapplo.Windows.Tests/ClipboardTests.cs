@@ -145,7 +145,7 @@ namespace Dapplo.Windows.Tests
                 clipboardAccessToken.ClearContents();
                 clipboardAccessToken.SetAsUnicodeString(testString, "TEST_FORMAT");
             }
-            await Task.Delay(100);
+            await Task.Delay(200);
             subscription.Dispose();
 
             // Doesn't work on AppVeyor!!

@@ -14,6 +14,9 @@
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9" >
+        <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="System.Reactive" Version="4.1.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>

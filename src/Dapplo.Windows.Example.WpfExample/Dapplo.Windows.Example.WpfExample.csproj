@@ -8,10 +8,19 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Icons\delete.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9" />
     <PackageReference Include="Dapplo.Log.Loggers" Version="1.3.11" />
     <PackageReference Include="System.Reactive" Version="4.1.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />

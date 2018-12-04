@@ -30,7 +30,8 @@ namespace Dapplo.Windows.Tests.Benchmarks
         {
             //BenchmarkRunner.Run<ClipboardBenchmarks>();
             //BenchmarkRunner.Run<EnumerateWindowsBenchmark>();
-            BenchmarkRunner.Run<InteropWindowBenchmark>();
+            //BenchmarkRunner.Run<InteropWindowBenchmark>();
+            BenchmarkRunner.Run<ScreenboundsBenchmark>();
             Console.ReadKey();
         }
     }

@@ -20,6 +20,7 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 #if !NETSTANDARD2_0
+
 #region using
 
 using System;
@@ -38,7 +39,7 @@ namespace Dapplo.Windows.Messages
     /// </summary>
     public sealed class WinProcListener : NativeWindow, IDisposable
     {
-        private readonly IList<HwndSourceHook> _hooks = new List<HwndSourceHook>();
+        private List<HwndSourceHook> _hooks = new List<HwndSourceHook>();
 
         /// <summary>
         /// Is the WinProcListener already disposed?
@@ -66,7 +67,7 @@ namespace Dapplo.Windows.Messages
         public void Dispose()
         {
             IsDisposed = true;
-            _hooks.Clear();
+            _hooks = null;
             ReleaseHandle();
         }
 
@@ -76,7 +77,9 @@ namespace Dapplo.Windows.Messages
         /// <param name="hook">HwndSourceHook</param>
         public void AddHook(HwndSourceHook hook)
         {
-            _hooks.Add(hook);
+            var newHooks = _hooks.ToList();
+            newHooks.Add(hook);
+            _hooks = newHooks;
         }
 
         /// <summary>
@@ -100,7 +103,7 @@ namespace Dapplo.Windows.Messages
         {
             // Window was destroyed, release hook.
             ReleaseHandle();
-            _hooks.Clear();
+             _hooks = null;
         }
 
         /// <summary>
@@ -109,13 +112,19 @@ namespace Dapplo.Windows.Messages
         /// <param name="hook">HwndSourceHook, The event handler to remove.</param>
         public void RemoveHook(HwndSourceHook hook)
         {
-            _hooks.Remove(hook);
+            var newHooks = _hooks.ToList();
+            newHooks.Remove(hook);
+            _hooks = newHooks;
         }
 
         /// <inheritdoc />
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
         protected override void WndProc(ref Message m)
         {
+            if (IsDisposed)
+            {
+                return;
+            }
             if (!ProcessMessage(m))
             {
                 base.WndProc(ref m);
@@ -130,8 +139,12 @@ namespace Dapplo.Windows.Messages
         private bool ProcessMessage(Message message)
         {
             bool handled = false;
-            foreach (var hwndSourceHook in _hooks.ToList())
+            foreach (var hwndSourceHook in _hooks ?? Enumerable.Empty<HwndSourceHook>())
             {
+                if (IsDisposed)
+                {
+                    break;
+                }
                 message.Result = hwndSourceHook.Invoke(message.HWnd, message.Msg, message.WParam, message.LParam, ref handled);
                 if (handled)
                 {

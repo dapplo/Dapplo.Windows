@@ -54,11 +54,12 @@ namespace Dapplo.Windows.User32
         /// <summary>
         ///     Delegate description for the windows enumeration
         /// </summary>
-        /// <param name="hwnd"></param>
-        /// <param name="lParam"></param>
-        public delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr lParam);
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="lParam">IntPtr</param>
+        public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
         private static readonly LogSource Log = new LogSource();
+
 #if !NETSTANDARD2_0
         private static bool _canCallGetPhysicalCursorPos = true;
         /// <summary>
@@ -66,7 +67,7 @@ namespace Dapplo.Windows.User32
         /// </summary>
         /// <returns>
         ///     NativePoint with cursor location, relative to the origin of the monitor setup
-        ///     (i.e. negative coordinates are possible in multiscreen setups)
+        ///     (i.e. negative coordinates are possible in multi screen setups)
         /// </returns>
         public static NativePoint GetCursorLocation()
         {
@@ -111,35 +112,71 @@ namespace Dapplo.Windows.User32
 #endif
 
         /// <summary>
-        ///     Returns the number of Displays using the Win32 functions
+        /// Get the display info for the specified monitor handle
         /// </summary>
-        /// <returns>collection of Display Info</returns>
-        public static IEnumerable<DisplayInfo> AllDisplays()
+        /// <param name="monitorHandle">IntPtr</param>
+        /// <param name="index"></param>
+        /// <returns>DisplayInfo</returns>
+        public static DisplayInfo GetDisplayInfo(IntPtr monitorHandle, int index)
+        {
+            var monitorInfoEx = MonitorInfoEx.Create();
+            var success = GetMonitorInfo(monitorHandle, ref monitorInfoEx);
+            if (!success)
+            {
+                return null;
+            }
+
+            return new DisplayInfo
+            {
+                Index = index,
+                ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left),
+                ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
+                Bounds = monitorInfoEx.Monitor,
+                WorkingArea = monitorInfoEx.WorkArea,
+                IsPrimary = (monitorInfoEx.Flags & MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary
+            };
+        }
+
+        /// <summary>
+        /// Retrieve all available display infos
+        /// </summary>
+        /// <returns>IReadOnlyList of DisplayInfo</returns>
+        public static IReadOnlyList<DisplayInfo> EnumDisplays()
         {
             var result = new List<DisplayInfo>();
             int index = 1;
-            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr monitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr data) =>
+
+            bool EnumDisplayMonitorsCallback(IntPtr monitorHandle, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr data)
             {
-                var monitorInfoEx = MonitorInfoEx.Create();
-                var success = GetMonitorInfo(monitor, ref monitorInfoEx);
-                if (!success)
+                var displayInfo = GetDisplayInfo(monitorHandle, index++);
+                if (displayInfo != null)
                 {
-                    return true;
+                    result.Add(displayInfo);
                 }
-                var displayInfo = new DisplayInfo
-                {
-                    Index = index++,
-                    ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left),
-                    ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
-                    Bounds = monitorInfoEx.Monitor,
-                    WorkingArea = monitorInfoEx.WorkArea,
-                    IsPrimary = (monitorInfoEx.Flags & MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary
-                };
-                result.Add(displayInfo);
                 return true;
-            }, IntPtr.Zero);
+            }
+
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, EnumDisplayMonitorsCallback, IntPtr.Zero);
+
             return result;
         }
+
+        /// <summary>
+        /// This returns the list of window handles for the specified thread
+        /// </summary>
+        /// <param name="threadId">int</param>
+        /// <returns>List of IntPtr</returns>
+        public static List<IntPtr> EnumThreadWindows(int threadId)
+        {
+            var handles = new List<IntPtr>();
+            EnumThreadWindows(threadId, (hWnd, lParam) =>
+            {
+                handles.Add(hWnd);
+                return true;
+            }, IntPtr.Zero);
+            return handles;
+        }
+
 
         /// <summary>
         ///     Helper method to create a Win32 exception with the windows message in it
@@ -270,36 +307,36 @@ namespace Dapplo.Windows.User32
         /// <summary>
         ///     Wrapper for the GetWindowLong which decides if the system is 64-bit or not and calls the right one.
         /// </summary>
-        /// <param name="hwnd">IntPtr</param>
+        /// <param name="hWnd">IntPtr</param>
         /// <param name="index">WindowLongIndex</param>
         /// <returns></returns>
-        public static long GetWindowLongWrapper(IntPtr hwnd, WindowLongIndex index)
+        public static long GetWindowLongWrapper(IntPtr hWnd, WindowLongIndex index)
         {
             return IntPtr.Size == 8 ?
-                GetWindowLongPtr(hwnd, index).ToInt64() :
-                GetWindowLong(hwnd, index);
+                GetWindowLongPtr(hWnd, index).ToInt64() :
+                GetWindowLong(hWnd, index);
         }
 
         /// <summary>
         ///     Wrapper for the SetWindowLong which decides if the system is 64-bit or not and calls the right one.
         /// </summary>
-        /// <param name="hwnd">IntPtr</param>
+        /// <param name="hWnd">IntPtr</param>
         /// <param name="index">WindowLongIndex</param>
         /// <param name="styleFlags"></param>
-        public static void SetWindowLongWrapper(IntPtr hwnd, WindowLongIndex index, IntPtr styleFlags)
+        public static void SetWindowLongWrapper(IntPtr hWnd, WindowLongIndex index, IntPtr styleFlags)
         {
             if (IntPtr.Size == 8)
             {
-                SetWindowLongPtr(hwnd, index, styleFlags);
+                SetWindowLongPtr(hWnd, index, styleFlags);
             }
             else
             {
-                SetWindowLong(hwnd, index, styleFlags.ToInt32());
+                SetWindowLong(hWnd, index, styleFlags.ToInt32());
             }
         }
 
         /// <summary>
-        /// Try to send a WindowsMessage, this will return if the target didn't responde in the specified timeout (300ms by default)
+        /// Try to send a WindowsMessage, this will return if the target didn't respond in the specified timeout (300ms by default)
         /// </summary>
         /// <param name="hWnd">IntPtr window handle</param>
         /// <param name="message">WindowsMessages</param>
@@ -319,7 +356,7 @@ namespace Dapplo.Windows.User32
         }
 
         /// <summary>
-        /// Try to send a WindowsMessage, this will return if the target didn't responde in the specified timeout (300ms by default)
+        /// Try to send a WindowsMessage, this will return if the target didn't respond in the specified timeout (300ms by default)
         /// </summary>
         /// <param name="hWnd">IntPtr window handle</param>
         /// <param name="message">uint</param>
@@ -339,7 +376,7 @@ namespace Dapplo.Windows.User32
         }
 
         /// <summary>
-        /// Try to send a WindowsMessage, this will return if the target didn't responde in the specified timeout (300ms by default)
+        /// Try to send a WindowsMessage, this will return if the target didn't respond in the specified timeout (300ms by default)
         /// </summary>
         /// <param name="hWnd">IntPtr window handle</param>
         /// <param name="message">uint</param>
@@ -587,11 +624,11 @@ namespace Dapplo.Windows.User32
         /// <summary>
         ///     Return true if the specified window is maximized
         /// </summary>
-        /// <param name="hwnd">IntPtr for the hWnd</param>
+        /// <param name="hWnd">IntPtr for the hWnd</param>
         /// <returns>true if maximized</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool IsZoomed(IntPtr hwnd);
+        public static extern bool IsZoomed(IntPtr hWnd);
 
         /// <summary>
         ///     Get the classname of the specified window
@@ -613,13 +650,13 @@ namespace Dapplo.Windows.User32
         ///     See
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd162869(v=vs.85).aspx">PrintWindow function</a>
         /// </summary>
-        /// <param name="hwnd">IntPtr</param>
+        /// <param name="hWnd">IntPtr</param>
         /// <param name="hDc">IntPtr</param>
         /// <param name="printWindowFlags">PrintWindowFlags</param>
         /// <returns>bool</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool PrintWindow(IntPtr hwnd, IntPtr hDc, PrintWindowFlags printWindowFlags);
+        public static extern bool PrintWindow(IntPtr hWnd, IntPtr hDc, PrintWindowFlags printWindowFlags);
 
         /// <summary>
         ///     Used for the WM_VSCROLL and WM_HSCROLL windows messages
@@ -699,10 +736,10 @@ namespace Dapplo.Windows.User32
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
         [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLong")]
-        private static extern int GetWindowLong(IntPtr hwnd, WindowLongIndex index);
+        private static extern int GetWindowLong(IntPtr hWnd, WindowLongIndex index);
 
         [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLongPtr")]
-        private static extern IntPtr GetWindowLongPtr(IntPtr hwnd, WindowLongIndex nIndex);
+        private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, WindowLongIndex nIndex);
 
         [DllImport(User32, SetLastError = true)]
         private static extern int SetWindowLong(IntPtr hWnd, WindowLongIndex index, int styleFlags);
@@ -719,11 +756,11 @@ namespace Dapplo.Windows.User32
         ///     The MonitorFromWindow function retrieves a handle to the display monitor that has the largest area of intersection
         ///     with the bounding rectangle of a specified window.
         /// </summary>
-        /// <param name="hwnd"></param>
+        /// <param name="hWnd"></param>
         /// <param name="monitorFrom">MonitorFromFlags</param>
         /// <returns>IntPtr for the monitor</returns>
         [DllImport(User32, SetLastError = true)]
-        public static extern IntPtr MonitorFromWindow(IntPtr hwnd, MonitorFrom monitorFrom);
+        public static extern IntPtr MonitorFromWindow(IntPtr hWnd, MonitorFrom monitorFrom);
 
         /// <summary>
         ///     The MonitorFromRect function retrieves a handle to the display monitor that has the largest area of intersection
@@ -741,12 +778,12 @@ namespace Dapplo.Windows.User32
         ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633516(v=vs.85).aspx">GetWindowInfo</a>
         ///     Retrieves information about the specified window.
         /// </summary>
-        /// <param name="hwnd">IntPtr</param>
+        /// <param name="hWnd">IntPtr</param>
         /// <param name="windowInfo">WindowInfo (use WindowInfo.Create)</param>
         /// <returns>bool if false than get the last error</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetWindowInfo(IntPtr hwnd, ref WindowInfo windowInfo);
+        public static extern bool GetWindowInfo(IntPtr hWnd, ref WindowInfo windowInfo);
 
         /// <summary>
         ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a>
@@ -756,7 +793,7 @@ namespace Dapplo.Windows.User32
         /// <returns>true if success</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool EnumWindows(EnumWindowsProc enumFunc, IntPtr param);
+        private static extern bool EnumWindows(EnumWindowsProc enumFunc, IntPtr param);
 
         /// <summary>
         ///     See
@@ -764,7 +801,7 @@ namespace Dapplo.Windows.User32
         ///         EnumThreadWindows
         ///         function
         ///     </a>
-        ///     Enumerates all nonchild windows associated with a thread by passing the handle to each window, in turn, to an
+        ///     Enumerates all non child windows associated with a thread by passing the handle to each window, in turn, to an
         ///     application-defined callback function.
         ///     EnumThreadWindows continues until the last window is enumerated or the callback function returns FALSE.
         ///     To enumerate child windows of a particular window, use the EnumChildWindows function.
@@ -779,7 +816,7 @@ namespace Dapplo.Windows.User32
         /// <summary>
         ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a>
         /// </summary>
-        /// <param name="hWndParent">IntPtr with hwnd of parent window, if this is IntPtr.Zero this function behaves as EnumWindows</param>
+        /// <param name="hWndParent">IntPtr with hWnd of parent window, if this is IntPtr.Zero this function behaves as EnumWindows</param>
         /// <param name="enumFunc">EnumWindowsProc</param>
         /// <param name="param">An application-defined value to be passed to the callback function.</param>
         /// <returns>true if success</returns>
@@ -791,32 +828,32 @@ namespace Dapplo.Windows.User32
         ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787583(v=vs.85).aspx">GetScrollInfo</a> for
         ///     more information.
         /// </summary>
-        /// <param name="hwnd">IntPtr with the window handle</param>
+        /// <param name="hWnd">IntPtr with the window handle</param>
         /// <param name="scrollBar">ScrollBarTypes</param>
         /// <param name="scrollInfo">ScrollInfo ref</param>
         /// <returns>bool if it worked</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo);
+        public static extern bool GetScrollInfo(IntPtr hWnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo);
 
         /// <summary>
         ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787595(v=vs.85).aspx">SetScrollInfo</a> for
         ///     more information.
         /// </summary>
-        /// <param name="hwnd">IntPtr with the window handle</param>
+        /// <param name="hWnd">IntPtr with the window handle</param>
         /// <param name="scrollBar">ScrollBarTypes</param>
         /// <param name="scrollInfo">ScrollInfo ref</param>
         /// <param name="redraw">bool to specify if a redraw should be made</param>
         /// <returns>int with the current position of the scroll box</returns>
         [DllImport(User32, SetLastError = true)]
-        public static extern int SetScrollInfo(IntPtr hwnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo, bool redraw);
+        public static extern int SetScrollInfo(IntPtr hWnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo, bool redraw);
 
         /// <summary>
         ///     See
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787601(v=vs.85).aspx">ShowScrollBar function</a>
         ///     for more information.
         /// </summary>
-        /// <param name="hwnd">IntPtr</param>
+        /// <param name="hWnd">IntPtr</param>
         /// <param name="scrollBar">ScrollBarTypes</param>
         /// <param name="show">true to show, false to hide</param>
         /// <returns>
@@ -825,16 +862,16 @@ namespace Dapplo.Windows.User32
         /// </returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ShowScrollBar(IntPtr hwnd, ScrollBarTypes scrollBar, [MarshalAs(UnmanagedType.Bool)] bool show);
+        public static extern bool ShowScrollBar(IntPtr hWnd, ScrollBarTypes scrollBar, [MarshalAs(UnmanagedType.Bool)] bool show);
 
         /// <summary>
         ///     See
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787581(v=vs.85).aspx">GetScrollBarInfo function</a>
         ///     for more information.
         /// </summary>
-        /// <param name="hwnd">
+        /// <param name="hWnd">
         ///     Handle to a window associated with the scroll bar whose information is to be retrieved. If the
-        ///     idObject parameter is OBJID_CLIENT, hwnd is a handle to a scroll bar control. Otherwise, hwnd is a handle to a
+        ///     idObject parameter is OBJID_CLIENT, hWnd is a handle to a scroll bar control. Otherwise, hWnd is a handle to a
         ///     window created with WS_VSCROLL and/or WS_HSCROLL style.
         /// </param>
         /// <param name="idObject">
@@ -845,7 +882,7 @@ namespace Dapplo.Windows.User32
         /// <returns>bool</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetScrollBarInfo(IntPtr hwnd, ObjectIdentifiers idObject, ref ScrollBarInfo scrollBarInfo);
+        public static extern bool GetScrollBarInfo(IntPtr hWnd, ObjectIdentifiers idObject, ref ScrollBarInfo scrollBarInfo);
 
         /// <summary>
         ///     See
@@ -886,10 +923,10 @@ namespace Dapplo.Windows.User32
         /// The GetDC function retrieves a handle to a device context (DC) for the client area of a specified window or for the entire screen. You can use the returned handle in subsequent GDI functions to draw in the DC. The device context is an opaque data structure, whose values are used internally by GDI.
         /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd144871(v=vs.85).aspx">GetDC function</a>
         /// </summary>
-        /// <param name="hwnd">A handle to the window whose DC is to be retrieved. If this value is NULL, GetDC retrieves the DC for the entire screen.</param>
+        /// <param name="hWnd">A handle to the window whose DC is to be retrieved. If this value is NULL, GetDC retrieves the DC for the entire screen.</param>
         /// <returns>f the function succeeds, the return value is a handle to the DC for the specified window's client area.</returns>
         [DllImport(User32, SetLastError = true)]
-        public static extern IntPtr GetDC(IntPtr hwnd);
+        public static extern IntPtr GetDC(IntPtr hWnd);
 
         /// <summary>
         /// The ReleaseDC function releases a device context (DC), freeing it for use by other applications. The effect of the ReleaseDC function depends on the type of DC. It frees only common and window DCs. It has no effect on class or private DCs.
@@ -914,15 +951,15 @@ namespace Dapplo.Windows.User32
         /// <summary>
         /// Retrieves a handle to a window whose class name and window name match the specified strings. The function searches child windows, beginning with the one following the specified child window. This function does not perform a case-sensitive search.
         /// </summary>
-        /// <param name="hwndParent">
+        /// <param name="hWndParent">
         /// IntPtr, A handle to the parent window whose child windows are to be searched.
-        /// If hwndParent is NULL, the function uses the desktop window as the parent window. The function searches among windows that are child windows of the desktop.
-        /// If hwndParent is HWND_MESSAGE, the function searches all message-only windows.
+        /// If hWndParent is NULL, the function uses the desktop window as the parent window. The function searches among windows that are child windows of the desktop.
+        /// If hWndParent is HWND_MESSAGE, the function searches all message-only windows.
         /// </param>
-        /// <param name="hwndChildAfter">
-        /// IntPtr, a handle to a child window. The search begins with the next child window in the Z order. The child window must be a direct child window of hwndParent, not just a descendant window.
-        /// If hwndChildAfter is NULL, the search begins with the first child window of hwndParent.
-        /// Note that if both hwndParent and hwndChildAfter are NULL, the function searches all top-level and message-only windows.
+        /// <param name="hWndChildAfter">
+        /// IntPtr, a handle to a child window. The search begins with the next child window in the Z order. The child window must be a direct child window of hWndParent, not just a descendant window.
+        /// If hWndChildAfter is NULL, the search begins with the first child window of hWndParent.
+        /// Note that if both hWndParent and hWndChildAfter are NULL, the function searches all top-level and message-only windows.
         /// </param>
         /// <param name="lpszClass">
         /// The class name or a class atom created by a previous call to the RegisterClass or RegisterClassEx function. The atom must be placed in the low-order word of lpszClass; the high-order word must be zero.
@@ -938,7 +975,7 @@ namespace Dapplo.Windows.User32
         /// If the function fails, the return value is NULL. To get extended error information, call GetLastError.
         /// </returns>
         [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+        public static extern IntPtr FindWindowEx(IntPtr hWndParent, IntPtr hWndChildAfter, string lpszClass, string lpszWindow);
 
         /// uiFlags: 0 - Count of GDI objects
         /// uiFlags: 1 - Count of USER objects
@@ -1001,14 +1038,14 @@ namespace Dapplo.Windows.User32
         /// <summary>
         /// The MapWindowPoints function converts (maps) a set of points from a coordinate space relative to one window to a coordinate space relative to another window.
         /// </summary>
-        /// <param name="hwndFrom">IntPtr window handle for the from window</param>
-        /// <param name="hwndTo">IntPtr window handle for the to window</param>
+        /// <param name="hWndFrom">IntPtr window handle for the from window</param>
+        /// <param name="hWndTo">IntPtr window handle for the to window</param>
         /// <param name="lpPoints">A pointer to an array of POINT structures that contain the set of points to be converted. The points are in device units. This parameter can also point to a RECT structure, in which case the cPoints parameter should be set to 2.</param>
         /// <param name="cPoints">The number of POINT structures in the array pointed to by the lpPoints parameter.</param>
         /// <returns>If the function succeeds, the low-order word of the return value is the number of pixels added to the horizontal coordinate of each source point in order to compute the horizontal coordinate of each destination point. (In addition to that, if precisely one of hWndFrom and hWndTo is mirrored, then each resulting horizontal coordinate is multiplied by -1.) The high-order word is the number of pixels added to the vertical coordinate of each source point in order to compute the vertical coordinate of each destination point.
         /// If the function fails, the return value is zero. Call SetLastError prior to calling this method to differentiate an error return value from a legitimate "0" return value.</returns>
         [DllImport(User32, SetLastError = true)]
-        public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, [In, Out] ref NativePoint lpPoints, [MarshalAs(UnmanagedType.U4)] int cPoints);
+        public static extern int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, [In, Out] ref NativePoint lpPoints, [MarshalAs(UnmanagedType.U4)] int cPoints);
 
         /// <summary>
         ///     See

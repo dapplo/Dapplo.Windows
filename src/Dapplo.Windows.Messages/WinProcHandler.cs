@@ -34,22 +34,21 @@ using System.Windows.Interop;
 namespace Dapplo.Windows.Messages
 {
     /// <summary>
-    ///     This can be used to handle WinProc messages, for instance when there is no running winproc
+    ///     This can be used to handle WinProc messages, for instance when there is no running WinProc
     /// </summary>
     public class WinProcHandler
     {
-        private static readonly object Lock = new object();
-        private static HwndSource _hwndSource;
+        private static HwndSource _hWndSource;
 
         /// <summary>
-        ///     Hold the singeton
+        ///     Hold the singleton
         /// </summary>
         private static readonly Lazy<WinProcHandler> Singleton = new Lazy<WinProcHandler>(() => new WinProcHandler());
 
         /// <summary>
         ///     Store hooks, so they can be removed
         /// </summary>
-        private readonly IList<HwndSourceHook> _hooks = new List<HwndSourceHook>();
+        private List<HwndSourceHook> _hooks = new List<HwndSourceHook>();
 
         /// <summary>
         ///     Special HwndSource which is only there for handling messages, is top-level (no parent) to be able to handle ALL windows messages
@@ -59,42 +58,36 @@ namespace Dapplo.Windows.Messages
         {
             get
             {
-                // Special code to make sure the _hwndSource is (re)created when it's not yet there or disposed
-                // For example in xunit tests when WpfFact is used, the _hwndSource is disposed.
-                if (_hwndSource != null && !_hwndSource.IsDisposed)
+                // Special code to make sure the _hWndSource is (re)created when it's not yet there or disposed
+                // For example in xUnit tests when WpfFact is used, the _hWndSource is disposed.
+                if (_hWndSource != null && !_hWndSource.IsDisposed)
                 {
-                    return _hwndSource;
+                    return _hWndSource;
                 }
-                lock (Lock)
+                if (_hWndSource != null && !_hWndSource.IsDisposed)
                 {
-                    if (_hwndSource != null && !_hwndSource.IsDisposed)
+                    return _hWndSource;
+                }
+                // Create a new message window
+                _hWndSource = CreateMessageWindow();
+                _hWndSource.Disposed += (sender, args) =>
+                {
+                    UnsubscribeAllHooks();
+                };
+                // Hook automatic removing of all the hooks
+                _hWndSource.AddHook((IntPtr hWnd, int msg, IntPtr param, IntPtr lParam, ref bool handled) =>
+                {
+                    var windowsMessage = (WindowsMessages)msg;
+                    if (windowsMessage != WindowsMessages.WM_NCDESTROY)
                     {
-                        return _hwndSource;
-                    }
-                    // Create a new message window
-                    _hwndSource = CreateMessageWindow();
-                    _hwndSource.Disposed += (sender, args) =>
-                    {
-                        UnsubscribeAllHooks();
-                    };
-                    // Hook automatic removing of all the hooks
-                    _hwndSource.AddHook((IntPtr hwnd, int msg, IntPtr param, IntPtr lParam, ref bool handled) =>
-                    {
-                        var windowsMessage = (WindowsMessages)msg;
-                        if (windowsMessage != WindowsMessages.WM_NCDESTROY)
-                        {
-                            return IntPtr.Zero;
-                        }
-
-                        // The hooks are no longer valid, either there is no _hwndSource or it was disposed.
-                        lock (Lock)
-                        {
-                            _hooks.Clear();
-                        }
                         return IntPtr.Zero;
-                    });
-                }
-                return _hwndSource;
+                    }
+
+                    // The hooks are no longer valid, either there is no _hWndSource or it was disposed.
+                    _hooks = null;
+                    return IntPtr.Zero;
+                });
+                return _hWndSource;
             }
         }
 
@@ -111,34 +104,41 @@ namespace Dapplo.Windows.Messages
         /// <summary>
         ///     Subscribe a hook to handle messages
         /// </summary>
-        /// <param name="hook">HwndSourceHook</param>
-        /// <returns>IDisposable which unsubscribes the hook when Dispose is called</returns>
-        public IDisposable Subscribe(HwndSourceHook hook)
+        /// <param name="hWndSourceHook">HwndSourceHook</param>
+        /// <returns>IDisposable which unsubscribes the hWndSourceHook when Dispose is called</returns>
+        public IDisposable Subscribe(HwndSourceHook hWndSourceHook)
         {
-            lock (Lock)
+            if (_hooks != null && _hooks.Contains(hWndSourceHook))
             {
-                if (_hooks.Contains(hook))
-                {
-                    return Disposable.Empty;
-                }
-
-                MessageHandlerWindow.AddHook(hook);
-                _hooks.Add(hook);
+                return Disposable.Empty;
             }
-            return Disposable.Create(() => { Unsubscribe(hook); });
+
+            MessageHandlerWindow.AddHook(hWndSourceHook);
+
+            // Clone and add
+            var newHooks = _hooks?.ToList() ?? new List<HwndSourceHook>();
+            newHooks.Add(hWndSourceHook);
+            _hooks = newHooks;
+            return Disposable.Create(() => { Unsubscribe(hWndSourceHook); });
         }
 
         /// <summary>
         ///     Unsubscribe a hook
         /// </summary>
-        /// <param name="hook">HwndSourceHook</param>
-        private void Unsubscribe(HwndSourceHook hook)
+        /// <param name="hWndSourceHook">HwndSourceHook</param>
+        private void Unsubscribe(HwndSourceHook hWndSourceHook)
         {
-            lock (Lock)
+            MessageHandlerWindow.RemoveHook(hWndSourceHook);
+
+            if (_hooks == null)
             {
-                MessageHandlerWindow.RemoveHook(hook);
-                _hooks.Remove(hook);
+                return;
             }
+
+            // Clone and remove
+            var newHooks = _hooks.ToList();
+            newHooks.Remove(hWndSourceHook);
+            _hooks = newHooks;
         }
 
         /// <summary>
@@ -146,10 +146,11 @@ namespace Dapplo.Windows.Messages
         /// </summary>
         public void UnsubscribeAllHooks()
         {
-            foreach (var hwndSourceHook in _hooks.ToList())
+            foreach (var hWndSourceHook in _hooks ?? Enumerable.Empty<HwndSourceHook>())
             {
-                Unsubscribe(hwndSourceHook);
+                MessageHandlerWindow.RemoveHook(hWndSourceHook);
             }
+            _hooks = null;
         }
 
         /// <summary>

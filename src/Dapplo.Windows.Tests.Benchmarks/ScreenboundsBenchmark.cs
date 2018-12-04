@@ -19,80 +19,67 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Dapplo.Log;
-using Dapplo.Log.XUnit;
+using BenchmarkDotNet.Attributes;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Structs;
-using Xunit;
-using Xunit.Abstractions;
 
-#endregion
-
-namespace Dapplo.Windows.Tests
+namespace Dapplo.Windows.Tests.Benchmarks
 {
-    public class DispayTests
+    [MinColumn, MaxColumn, MemoryDiagnoser]
+    public class ScreenboundsBenchmark : IDisposable
     {
-        private static readonly LogSource Log = new LogSource();
-
-        public DispayTests(ITestOutputHelper testOutputHelper)
+        [GlobalSetup]
+        public void Setup()
         {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+            var screenbounds = GetAllScreenBounds();
         }
 
-        [Fact]
-        public void TestAllDisplays()
+        [Benchmark, MemoryDiagnoser]
+        public void ScreenBoundsNative()
         {
-            foreach (var display in DisplayInfo.AllDisplayInfos)
-            {
-                Log.Debug().WriteLine("Index {0} - Primary {3} - Device {1} - Bounds: {2}", display.Index, display.DeviceName, display.Bounds, display.IsPrimary);
-            }
+            var screenbounds = GetScreenBounds();
         }
 
-        [Fact]
-        public void TestGetBounds()
+        [Benchmark, MemoryDiagnoser]
+        public void ScreenBoundsPInvoke()
         {
-            var displayInfo = DisplayInfo.AllDisplayInfos.First();
-            var displayBounds = DisplayInfo.GetBounds(displayInfo.Bounds.Location);
-            Assert.Equal(displayInfo.Bounds, displayBounds);
+            var screenbounds = GetAllScreenBounds();
         }
 
-        [Fact]
-        public void TestScreenbounds()
+        [Benchmark, MemoryDiagnoser]
+        public void ScreenBoundsPInvokeCached()
         {
-            var screenboundsAllScreens = GetScreenBoundsAllScreens();
-            var screenboundsDisplayInfo = DisplayInfo.ScreenBounds;
-            Assert.Equal(screenboundsAllScreens, screenboundsDisplayInfo);
+            var screenbounds = DisplayInfo.ScreenBounds;
         }
 
         /// <summary>
-        /// This is a manual test, it should be started and something needs to change the display settings, it should be detected correctly
+        ///     Get the bounds of the complete screen
         /// </summary>
-        //[WpfFact]
-        public async Task TestScreenboundsSubscription()
+        /// <returns></returns>
+        public NativeRect GetAllScreenBounds()
         {
-            var screenboundsDisplayInfoBefore = DisplayInfo.ScreenBounds;
-            TestAllDisplays();
-
-            await Task.Delay(10000);
-            var screenboundsDisplayInfoAfter = DisplayInfo.ScreenBounds;
-            TestAllDisplays();
-
-            Assert.NotEqual(screenboundsDisplayInfoBefore, screenboundsDisplayInfoAfter);
+            int left = 0, top = 0, bottom = 0, right = 0;
+            foreach (var display in DisplayInfo.AllDisplayInfos)
+            {
+                var currentBounds = display.Bounds;
+                left = Math.Min(left, currentBounds.X);
+                top = Math.Min(top, currentBounds.Y);
+                var screenAbsRight = currentBounds.X + currentBounds.Width;
+                var screenAbsBottom = currentBounds.Y + currentBounds.Height;
+                right = Math.Max(right, screenAbsRight);
+                bottom = Math.Max(bottom, screenAbsBottom);
+            }
+            return new NativeRect(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
         }
-
 
         /// <summary>
         ///     Get the bounds of all screens combined.
         /// </summary>
         /// <returns>A NativeRect of the bounds of the entire display area.</returns>
-        private NativeRect GetScreenBoundsAllScreens()
+        public NativeRect GetScreenBounds()
         {
             int left = 0, top = 0, bottom = 0, right = 0;
             foreach (var screen in Screen.AllScreens)
@@ -106,5 +93,13 @@ namespace Dapplo.Windows.Tests
             }
             return new NativeRect(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
         }
+
+        #region Implementation of IDisposable
+        [GlobalCleanup]
+        public void Dispose()
+        {
+        }
+
+        #endregion
     }
 }

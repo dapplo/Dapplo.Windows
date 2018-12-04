@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -41,7 +42,7 @@ namespace Dapplo.Windows.Desktop
         /// <summary>
         ///     Window classes which can be ignored
         /// </summary>
-        public static IList<string> IgnoreClasses { get; } = new List<string>(new[] {"Progman", "Button", "Dwm"}); //"MS-SDIa"
+        public static ConcurrentBag<string> IgnoreClasses { get; } = new ConcurrentBag<string>(new[] {"Progman", "Button", "Dwm"}); //"MS-SDIa"
 
         /// <summary>
         ///     Get the window with which the user is currently working
@@ -72,19 +73,8 @@ namespace Dapplo.Windows.Desktop
             {
                 foreach (ProcessThread thread in process.Threads)
                 {
-                    var handles = new List<IntPtr>();
-                    try
-                    {
-                        User32Api.EnumThreadWindows(thread.Id, (hWnd, lParam) =>
-                        {
-                            handles.Add(hWnd);
-                            return true;
-                        }, IntPtr.Zero);
-                    }
-                    finally
-                    {
-                        thread?.Dispose();
-                    }
+                    var handles = User32Api.EnumThreadWindows(thread.Id);
+                    thread.Dispose();
                     foreach (var handle in handles)
                     {
                         yield return InteropWindowFactory.CreateFor(handle);

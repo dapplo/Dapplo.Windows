@@ -25,7 +25,7 @@ using System;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Input.Enums;
-using Dapplo.Windows.User32.Structs;
+using Dapplo.Windows.User32;
 
 #endregion
 
@@ -100,7 +100,7 @@ namespace Dapplo.Windows.Input.Structs
         /// <returns>NativePoint</returns>
         private static NativePoint RemapLocation(NativePoint location)
         {
-            var bounds = DisplayInfo.GetAllScreenBounds();
+            var bounds = DisplayInfo.ScreenBounds;
             if (bounds.Width * bounds.Height == 0)
             {
                 return location;
@@ -142,7 +142,7 @@ namespace Dapplo.Windows.Input.Structs
         public static MouseInput MouseMove(NativePoint location, uint? timestamp = null)
         {
             location = RemapLocation(location);
-            var bounds = DisplayInfo.GetAllScreenBounds();
+            var bounds = DisplayInfo.ScreenBounds;
             var messageTime = timestamp ?? (uint)Environment.TickCount;
             return new MouseInput
             {
@@ -168,25 +168,25 @@ namespace Dapplo.Windows.Input.Structs
             }
             var mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
 
-            if (mouseButtons.HasFlag(MouseButtons.Left))
+            if ((mouseButtons & MouseButtons.Left) != 0)
             {
                 mouseEventFlags |= MouseEventFlags.LeftDown;
             }
-            if (mouseButtons.HasFlag(MouseButtons.Right))
+            if ((mouseButtons & MouseButtons.Right) != 0)
             {
                 mouseEventFlags |= MouseEventFlags.RightDown;
             }
-            if (mouseButtons.HasFlag(MouseButtons.Middle))
+            if ((mouseButtons & MouseButtons.Middle) != 0)
             {
                 mouseEventFlags |= MouseEventFlags.MiddleDown;
             }
             var mouseData = 0;
-            if (mouseButtons.HasFlag(MouseButtons.XButton1))
+            if ((mouseButtons & MouseButtons.XButton1) != 0)
             {
                 mouseEventFlags |= MouseEventFlags.XDown;
                 mouseData |= 1;
             }
-            if (mouseButtons.HasFlag(MouseButtons.XButton2))
+            if ((mouseButtons & MouseButtons.XButton2) != 0)
             {
                 mouseEventFlags |= MouseEventFlags.XDown;
                 mouseData |= 2;
@@ -217,25 +217,25 @@ namespace Dapplo.Windows.Input.Structs
             }
             var mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
 
-            if (mouseButtons.HasFlag(MouseButtons.Left))
+            if ((mouseButtons & MouseButtons.Left) != 0)
             {
                 mouseEventFlags |= MouseEventFlags.LeftUp;
             }
-            if (mouseButtons.HasFlag(MouseButtons.Right))
+            if ((mouseButtons & MouseButtons.Right) != 0)
             {
                 mouseEventFlags |= MouseEventFlags.RightUp;
             }
-            if (mouseButtons.HasFlag(MouseButtons.Middle))
+            if ((mouseButtons & MouseButtons.Middle) != 0)
             {
                 mouseEventFlags |= MouseEventFlags.MiddleUp;
             }
             var mouseData = 0;
-            if (mouseButtons.HasFlag(MouseButtons.XButton1))
+            if ((mouseButtons & MouseButtons.XButton1) != 0)
             {
                 mouseEventFlags |= MouseEventFlags.XUp;
                 mouseData |= 1;
             }
-            if (mouseButtons.HasFlag(MouseButtons.XButton2))
+            if ((mouseButtons & MouseButtons.XButton2) != 0)
             {
                 mouseEventFlags |= MouseEventFlags.XUp;
                 mouseData |= 2;

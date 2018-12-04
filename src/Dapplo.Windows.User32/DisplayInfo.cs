@@ -22,18 +22,25 @@
 #region using
 
 using System;
+using System.Linq;
+using System.Threading;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Messages;
 
 #endregion
 
-namespace Dapplo.Windows.User32.Structs
+namespace Dapplo.Windows.User32
 {
     /// <summary>
     ///     The DisplayInfo class is like the Screen class, only not cached.
     /// </summary>
     public class DisplayInfo
     {
+        private static NativeRect? _screenBounds;
+        private static DisplayInfo[] _allDisplayInfos;
+        private static IDisposable _displayInfoUpdate;
+
         /// <summary>
         /// Index of the Display, as specified in the "control panel".
         /// </summary>
@@ -70,22 +77,73 @@ namespace Dapplo.Windows.User32.Structs
         public NativeRect WorkingArea { get; set; }
 
         /// <summary>
-        ///     Get the bounds of the complete screen
+        /// Get the bounds of the complete screen
         /// </summary>
-        /// <returns></returns>
-        public static NativeRect GetAllScreenBounds()
+        public static NativeRect ScreenBounds
         {
-            int left = 0, top = 0, bottom = 0, right = 0;
-            foreach (var display in User32Api.AllDisplays())
+            get
             {
-                left = Math.Min(left, display.Bounds.X);
-                top = Math.Min(top, display.Bounds.Y);
-                var screenAbsRight = display.Bounds.X + display.Bounds.Width;
-                var screenAbsBottom = display.Bounds.Y + display.Bounds.Height;
-                right = Math.Max(right, screenAbsRight);
-                bottom = Math.Max(bottom, screenAbsBottom);
+                if (_screenBounds.HasValue)
+                {
+                    return _screenBounds.Value;
+                }
+
+                int left = 0, top = 0, bottom = 0, right = 0;
+                foreach (var display in AllDisplayInfos)
+                {
+                    var currentBounds = display.Bounds;
+                    left = Math.Min(left, currentBounds.X);
+                    top = Math.Min(top, currentBounds.Y);
+                    var screenAbsRight = currentBounds.X + currentBounds.Width;
+                    var screenAbsBottom = currentBounds.Y + currentBounds.Height;
+                    right = Math.Max(right, screenAbsRight);
+                    bottom = Math.Max(bottom, screenAbsBottom);
+                }
+                _screenBounds = new NativeRect(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
+
+                return _screenBounds.Value;
             }
-            return new NativeRect(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
+        }
+
+        /// <summary>
+        ///     Return all DisplayInfo 
+        /// </summary>
+        /// <returns>array of DisplayInfo</returns>
+        public static DisplayInfo[] AllDisplayInfos
+        {
+            get
+            {
+                if (_allDisplayInfos != null)
+                {
+                    return _allDisplayInfos;
+                }
+
+                _allDisplayInfos = User32Api.EnumDisplays().ToArray();
+
+#if !NETSTANDARD2_0
+
+                IntPtr WinProcDisplayChangeHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                {
+                    var windowsMessage = (WindowsMessages) msg;
+                    if (windowsMessage != WindowsMessages.WM_DISPLAYCHANGE)
+                    {
+                        return IntPtr.Zero;
+                    }
+
+                    _allDisplayInfos = null;
+                    _screenBounds = null;
+
+                    return IntPtr.Zero;
+                }
+
+                // Subscribe to display changes, but only when we didn't yet
+                if (_displayInfoUpdate == null && Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
+                {
+                    _displayInfoUpdate = WinProcHandler.Instance.Subscribe(WinProcDisplayChangeHandler);
+                }
+#endif
+                return _allDisplayInfos;
+            }
         }
 
         /// <summary>
@@ -96,7 +154,7 @@ namespace Dapplo.Windows.User32.Structs
         public static NativeRect GetBounds(NativePoint point)
         {
             DisplayInfo returnValue = null;
-            foreach (var display in User32Api.AllDisplays())
+            foreach (var display in AllDisplayInfos)
             {
                 if (display.IsPrimary && returnValue == null)
                 {

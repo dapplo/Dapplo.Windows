@@ -6,11 +6,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <Menu x:Name="menu" HorizontalAlignment="Left" Height="63" VerticalAlignment="Top" Width="306">
+        <Menu x:Name="menu" HorizontalAlignment="Left" VerticalAlignment="Top" Width="306">
             <Menu.Items>
                <MenuItem Header="Hallo" >
                    <MenuItem.Icon>
-                       <Image Source="delete.png"></Image>
+                        <Image Source="pack://application:,,,/Dapplo.Windows.Example.WpfExample;component/Icons/delete.png" Width="16" Height="16"></Image>
                    </MenuItem.Icon>
                </MenuItem> 
             </Menu.Items>

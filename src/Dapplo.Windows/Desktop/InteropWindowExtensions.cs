@@ -684,11 +684,11 @@ namespace Dapplo.Windows.Desktop
             var windowRectangle = interopWindow.GetInfo().Bounds;
             // assume own location
             formLocation = windowRectangle.Location;
-            var primaryDisplay = User32Api.AllDisplays().First(x => x.IsPrimary);
+            var primaryDisplay = DisplayInfo.AllDisplayInfos.First(x => x.IsPrimary);
             using (var workingArea = new Region(primaryDisplay.Bounds))
             {
                 // Create a region with the screens working area
-                foreach (var display in User32Api.AllDisplays())
+                foreach (var display in DisplayInfo.AllDisplayInfos)
                 {
                     if (!display.IsPrimary)
                     {
@@ -700,7 +700,7 @@ namespace Dapplo.Windows.Desktop
                 if (!workingArea.AreRectangleCornersVisisble(windowRectangle))
                 {
                     // If none found we find the biggest screen
-                    foreach (var display in User32Api.AllDisplays())
+                    foreach (var display in DisplayInfo.AllDisplayInfos)
                     {
                         var newWindowRectangle = new Rectangle(display.WorkingArea.Location, windowRectangle.Size);
                         if (!workingArea.AreRectangleCornersVisisble(newWindowRectangle))

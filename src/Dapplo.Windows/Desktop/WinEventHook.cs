@@ -43,7 +43,7 @@ namespace Dapplo.Windows.Desktop
     /// </summary>
     public static class WinEventHook
     {
-        private static readonly IDictionary<IntPtr, WinEventDelegate> Delegates = new Dictionary<IntPtr, WinEventDelegate>();
+        private static readonly Dictionary<IntPtr, WinEventDelegate> Delegates = new Dictionary<IntPtr, WinEventDelegate>();
 
         /// <summary>
         ///     Create a WinEventHook as observable
@@ -52,7 +52,7 @@ namespace Dapplo.Windows.Desktop
         /// <param name="winEventEnd">WinEvent "end" of which you are interested</param>
         /// <param name="process"></param>
         /// <param name="thread"></param>
-        /// <returns>IObservable which procudes WinEventInfo</returns>
+        /// <returns>IObservable which processes WinEventInfo</returns>
         public static IObservable<WinEventInfo> Create(WinEvents winEventStart, WinEvents? winEventEnd = null, int process = 0, int thread = 0)
         {
             return Observable.Create<WinEventInfo>(observer =>

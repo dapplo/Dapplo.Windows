@@ -57,15 +57,15 @@ namespace Dapplo.Windows.Messages
         /// Create an observable for the specified window or HwndSource
         /// </summary>
         /// <param name="window">Window</param>
-        /// <param name="hwndSource">HwndSource</param>
+        /// <param name="hWndSource">HwndSource</param>
         /// <returns>IObservable</returns>
-        private static IObservable<WindowMessageInfo> WinProcMessages(Window window, HwndSource hwndSource)
+        private static IObservable<WindowMessageInfo> WinProcMessages(Window window, HwndSource hWndSource)
         {
-            if (window == null && hwndSource == null)
+            if (window == null && hWndSource == null)
             {
                 throw new NotSupportedException("One of Window or HwndSource must be supplied");
             }
-            if (window != null && hwndSource != null)
+            if (window != null && hWndSource != null)
             {
                 throw new NotSupportedException("Either Window or HwndSource must be supplied");
             }
@@ -77,7 +77,7 @@ namespace Dapplo.Windows.Messages
                     {
                         observer.OnNext(WindowMessageInfo.Create(hwnd, msg, wParam, lParam));
                         // ReSharper disable once AccessToDisposedClosure
-                        if (hwndSource.IsDisposed)
+                        if (hWndSource.IsDisposed)
                         {
                             observer.OnCompleted();
                         }
@@ -91,15 +91,15 @@ namespace Dapplo.Windows.Messages
                     
                     void RegisterHwndSource()
                     {
-                        hwndSource.Disposed += HwndSourceDisposedHandle;
-                        hwndSource.AddHook(WindowMessageHandler);
+                        hWndSource.Disposed += HwndSourceDisposedHandle;
+                        hWndSource.AddHook(WindowMessageHandler);
                     }
 
                     if (window != null)
                     {
-                        hwndSource = window.ToHwndSource();
+                        hWndSource = window.ToHwndSource();
                     }
-                    if (hwndSource != null) { 
+                    if (hWndSource != null) { 
                         RegisterHwndSource();
                     }
                     else
@@ -107,18 +107,18 @@ namespace Dapplo.Windows.Messages
                         // No, try to get it later
                         window.SourceInitialized += (sender, args) =>
                         {
-                            hwndSource = window.ToHwndSource();
+                            hWndSource = window.ToHwndSource();
                             RegisterHwndSource();
                             // Simulate the WM_NCCREATE
-                            observer.OnNext(WindowMessageInfo.Create(hwndSource.Handle, (int)WindowsMessages.WM_NCCREATE, IntPtr.Zero, IntPtr.Zero));
+                            observer.OnNext(WindowMessageInfo.Create(hWndSource.Handle, (int)WindowsMessages.WM_NCCREATE, IntPtr.Zero, IntPtr.Zero));
                         };
                     }
 
                     return Disposable.Create(() =>
                     {
-                        hwndSource.Disposed -= HwndSourceDisposedHandle;
-                        hwndSource.RemoveHook(WindowMessageHandler);
-                        hwndSource.Dispose();
+                        hWndSource.Disposed -= HwndSourceDisposedHandle;
+                        hWndSource.RemoveHook(WindowMessageHandler);
+                        hWndSource.Dispose();
                     });
                 })
                 // Make sure there is always a value produced when connecting
