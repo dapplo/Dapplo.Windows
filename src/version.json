@@ -10,7 +10,7 @@
   "cloudBuild": {
     "setVersionVariables": true,
     "buildNumber": {
-      "enabled": false,
+      "enabled": true,
       "includeCommitId": {
         "when": "nonPublicReleaseOnly",
         "where": "buildMetadata"

@@ -366,8 +366,8 @@ namespace Dapplo.Windows.Dpi
                 foreach (var bitmapName in _images.Keys)
                 {
                     _images[bitmapName].Dispose();
-                    _images.Remove(bitmapName);
                 }
+                _images.Clear();
             }
             finally
             {
