@@ -241,7 +241,7 @@ namespace Dapplo.Windows.Gdi32
         /// <returns>bool true if success</returns>
         [DllImport("gdi32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool StretchBlt(SafeHandle hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, SafeHandle hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, RasterOperations rasterOperation);
+        public static extern bool StretchBlt(SafeHandle hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, SafeHandle hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, RasterOperations rasterOperation);
 
         /// <summary>
         ///     StretchBlt extension for the graphics object
