@@ -2,6 +2,7 @@
 #tool "OpenCover"
 #tool "docfx.console"
 #tool "coveralls.io"
+#addin "Cake.FileHelpers"
 #addin "Cake.DocFx"
 #addin "Cake.Coveralls"
 
@@ -155,6 +156,22 @@ Task("Clean")
 	CleanDirectories("./**/obj");
 	CleanDirectories("./**/bin");
 	CleanDirectories("./artifacts");
+});
+
+Task("EnableDNC30")
+    .Does(() =>
+{
+    ReplaceRegexInFiles("./**/*.csproj", "<TargetFrameworks>.*</TargetFrameworks><!-- net471;netcoreapp3.0 -->", "<TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>");
+    ReplaceRegexInFiles("./**/*.csproj", "<TargetFrameworks>.*</TargetFrameworks><!-- net471;netcoreapp3.0;netstandard2.0 -->", "<TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>");
+    ReplaceRegexInFiles("./**/*.csproj", "<Project Sdk=\"MSBuild.Sdk.Extras/1.6.65\"><!-- Microsoft.NET.Sdk.WindowsDesktop -->", "<Project Sdk=\"Microsoft.NET.Sdk.WindowsDesktop\">");
+});
+
+Task("DisableDNC30")
+    .Does(() =>
+{
+    ReplaceRegexInFiles("./**/*.csproj", "<TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>", "<TargetFrameworks>net471</TargetFrameworks><!-- net471;netcoreapp3.0 -->");
+    ReplaceRegexInFiles("./**/*.csproj", "<TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>", "<TargetFrameworks>net471</TargetFrameworks><!-- net471;netcoreapp3.0;netstandard2.0 -->");
+    ReplaceRegexInFiles("./**/*.csproj", "<Project Sdk=\"Microsoft.NET.Sdk.WindowsDesktop\">", "<Project Sdk=\"MSBuild.Sdk.Extras/1.6.65\"><!-- Microsoft.NET.Sdk.WindowsDesktop -->");
 });
 
 RunTarget(target);

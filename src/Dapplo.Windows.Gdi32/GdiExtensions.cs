@@ -59,10 +59,10 @@ namespace Dapplo.Windows.Gdi32
         ///     Get a SafeHandle for the GetHdc, so one can use using to automatically cleanup the devicecontext
         /// </summary>
         /// <param name="graphics">Graphics</param>
-        /// <returns>SafeDeviceContextHandle</returns>
-        public static SafeDeviceContextHandle GetSafeDeviceContext(this Graphics graphics)
+        /// <returns>SafeGraphicsDcHandle</returns>
+        public static SafeGraphicsDcHandle GetSafeDeviceContext(this Graphics graphics)
         {
-            return SafeDeviceContextHandle.FromGraphics(graphics);
+            return SafeGraphicsDcHandle.FromGraphics(graphics);
         }
 
         /// <summary>

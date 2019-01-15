@@ -920,11 +920,21 @@ namespace Dapplo.Windows.User32
         public static extern IntPtr GetTopWindow(IntPtr hWnd);
 
         /// <summary>
+        /// The GetWindowDC function retrieves the device context (DC) for the entire window, including title bar, menus, and scroll bars. A window device context permits painting anywhere in a window, because the origin of the device context is the upper-left corner of the window instead of the client area.
+        /// GetWindowDC assigns default attributes to the window device context each time it retrieves the device context.Previous attributes are lost.
+        /// See <a href="https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getwindowdc">GetWindowDC function</a>
+        /// </summary>
+        /// <param name="hWnd">A handle to the window whose DC is to be retrieved. If this value is NULL, GetWindowDC retrieves the DC for the entire screen.</param>
+        /// <returns>If the function succeeds, the return value is a handle to a device context for the specified window.</returns>
+        [DllImport(User32, SetLastError = true)]
+        public static extern IntPtr GetWindowDC(IntPtr hWnd);
+
+        /// <summary>
         /// The GetDC function retrieves a handle to a device context (DC) for the client area of a specified window or for the entire screen. You can use the returned handle in subsequent GDI functions to draw in the DC. The device context is an opaque data structure, whose values are used internally by GDI.
         /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd144871(v=vs.85).aspx">GetDC function</a>
         /// </summary>
         /// <param name="hWnd">A handle to the window whose DC is to be retrieved. If this value is NULL, GetDC retrieves the DC for the entire screen.</param>
-        /// <returns>f the function succeeds, the return value is a handle to the DC for the specified window's client area.</returns>
+        /// <returns>If the function succeeds, the return value is a handle to the DC for the specified window's client area.</returns>
         [DllImport(User32, SetLastError = true)]
         public static extern IntPtr GetDC(IntPtr hWnd);
 

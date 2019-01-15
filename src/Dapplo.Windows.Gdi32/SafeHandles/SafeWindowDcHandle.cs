@@ -60,21 +60,36 @@ namespace Dapplo.Windows.Gdi32.SafeHandles
         }
 
         /// <summary>
+        /// Creates a DC as SafeWindowDcHandle for the whole of the specified hWnd
         /// </summary>
-        /// <returns></returns>
+        /// <param name="hWnd">IntPtr</param>
+        /// <returns>SafeWindowDcHandle</returns>
+        public static SafeWindowDcHandle FromWindow(IntPtr hWnd)
+        {
+            var hDcDesktop = User32Api.GetWindowDC(hWnd);
+            return new SafeWindowDcHandle(hWnd, hDcDesktop);
+        }
+
+        /// <summary>
+        /// Creates a DC as SafeWindowDcHandle for the client area of the specified hWnd
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <returns>SafeWindowDcHandle</returns>
+        public static SafeWindowDcHandle FromWindowClientArea(IntPtr hWnd)
+        {
+            var hDcDesktop = User32Api.GetWindowDC(hWnd);
+            return new SafeWindowDcHandle(hWnd, hDcDesktop);
+        }
+
+        /// <summary>
+        /// Creates a SafeWindowDcHandle for the Desktop
+        /// </summary>
+        /// <returns>SafeWindowDcHandle</returns>
         public static SafeWindowDcHandle FromDesktop()
         {
             var hWndDesktop = User32Api.GetDesktopWindow();
-            var hDcDesktop = GetWindowDC(hWndDesktop);
-            return new SafeWindowDcHandle(hWndDesktop, hDcDesktop);
+            return FromWindow(hWndDesktop);
         }
-
-        [DllImport(User32Api.User32, SetLastError = true)]
-        private static extern IntPtr GetWindowDC(IntPtr hWnd);
-
-        [DllImport(User32Api.User32, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDc);
 
         /// <summary>
         ///     ReleaseDC for the original Window
@@ -83,7 +98,7 @@ namespace Dapplo.Windows.Gdi32.SafeHandles
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         protected override bool ReleaseHandle()
         {
-            return ReleaseDC(_hWnd, handle);
+            return User32Api.ReleaseDC(_hWnd, handle);
         }
     }
 }

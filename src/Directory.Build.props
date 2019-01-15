@@ -12,6 +12,8 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
 	<DisableImplicitFrameworkReferences Condition="'$(TargetFramework)' == 'net471'">true</DisableImplicitFrameworkReferences>
+    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+    <ExtrasEnableWinFormsProjectSetup>false</ExtrasEnableWinFormsProjectSetup>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net471' And '$(Configuration)' == 'Release'">

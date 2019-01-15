@@ -56,11 +56,11 @@ namespace Dapplo.Windows.Tests
         }
 
         [Fact]
-        public void TestSafeDeviceContextHandle_IntPtrZero()
+        public void TestSafeWindowDcHandle_IntPtrZero()
         {
-            using (var safeDeviceContextHandle = SafeDeviceContextHandle.FromHWnd(IntPtr.Zero))
+            using (var safeDctHandle = SafeWindowDcHandle.FromWindow(IntPtr.Zero))
             {
-                Assert.Null(safeDeviceContextHandle);
+                Assert.Null(safeDctHandle);
             }
         }
     }

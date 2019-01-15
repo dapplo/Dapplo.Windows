@@ -131,7 +131,7 @@ namespace Dapplo.Windows.Dpi
             }
 
             // Fallback to the global DPI settings
-            using (var hdc = SafeDeviceContextHandle.FromHWnd(hWnd))
+            using (var hdc = SafeWindowDcHandle.FromWindow(hWnd))
             {
                 if (hdc == null)
                 {
