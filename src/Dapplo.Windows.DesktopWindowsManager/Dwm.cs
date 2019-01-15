@@ -113,10 +113,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <summary>
         ///     Disable composition
         /// </summary>
-        public static void DisableComposition()
-        {
-            DwmEnableComposition(DwmEcDisableComposition);
-        }
+        public static bool DisableComposition() => DwmEnableComposition(DwmEcDisableComposition).Succeeded();
 
         /// <summary>
         ///     See
@@ -296,10 +293,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <summary>
         ///     Enable DWM composition
         /// </summary>
-        public static void EnableComposition()
-        {
-            DwmEnableComposition(DwmEcEnableComposition);
-        }
+        public static bool EnableComposition() => DwmEnableComposition(DwmEcEnableComposition).Succeeded();
 
         /// <summary>
         ///     Helper method to get the window size for DWM Windows

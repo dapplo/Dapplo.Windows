@@ -66,6 +66,10 @@ namespace Dapplo.Windows.Gdi32.SafeHandles
         /// <returns>SafeWindowDcHandle</returns>
         public static SafeWindowDcHandle FromWindow(IntPtr hWnd)
         {
+            if (hWnd == IntPtr.Zero)
+            {
+                return null;
+            }
             var hDcDesktop = User32Api.GetWindowDC(hWnd);
             return new SafeWindowDcHandle(hWnd, hDcDesktop);
         }
