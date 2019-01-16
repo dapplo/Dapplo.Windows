@@ -39,6 +39,17 @@ namespace Dapplo.Windows.Gdi32
     public static class Gdi32Api
     {
         /// <summary>
+        ///     The GdiFlush function flushes the calling thread's current batch.
+        /// </summary>
+        /// <returns>
+        /// If all functions in the current batch succeed, the return value is nonzero.
+        /// If not all functions in the current batch succeed, the return value is zero, indicating that at least one function returned an error.
+        /// </returns>
+        [DllImport("gdi32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GdiFlush();
+
+        /// <summary>
         ///     The BitBlt function performs a bit-block transfer of the color data corresponding to a rectangle of pixels from the
         ///     specified source device context into a destination device context.
         /// </summary>
@@ -60,7 +71,7 @@ namespace Dapplo.Windows.Gdi32
         public static extern bool BitBlt(SafeHandle hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, SafeHandle hdcSrc, int nXSrc, int nYSrc, RasterOperations rasterOperation);
 
         /// <summary>
-        ///     Bitblt extension for the graphics object
+        ///     BitBlt extension for the graphics object
         /// </summary>
         /// <param name="target">Graphics</param>
         /// <param name="sourceBitmap">Bitmap</param>

@@ -47,5 +47,23 @@ namespace Dapplo.Windows.Tests
         {
             Assert.True(Dwm.IsDwmEnabled);
         }
+
+        /// <summary>
+        ///     Test enabling DWM
+        /// </summary>
+        // [Fact]
+        private void TestEnableDwm()
+        {
+            Assert.True(Dwm.EnableComposition());
+        }
+
+        /// <summary>
+        ///     Test disabling DWM
+        /// </summary>
+        //[Fact]
+        private void TestDisableDwm()
+        {
+            Assert.True(Dwm.DisableComposition());
+        }
     }
 }
