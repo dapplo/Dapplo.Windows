@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.User32 provides logic of the Windows User32 API</Description>
     <AssemblyTitle>Dapplo.Windows.User32</AssemblyTitle>
@@ -13,10 +13,10 @@
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9" >
+    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9">
         <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Reactive" Version="4.1.2" />
+    <PackageReference Include="System.Reactive" Version="4.1.3" />
     <PackageReference Include="Dapplo.Log" Version="1.3.11" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">

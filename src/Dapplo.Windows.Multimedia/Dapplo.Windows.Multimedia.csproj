@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.Multimedia is a simple wrapper around WinMM</Description>
     <AssemblyTitle>Dapplo.Windows.Multimedia</AssemblyTitle>

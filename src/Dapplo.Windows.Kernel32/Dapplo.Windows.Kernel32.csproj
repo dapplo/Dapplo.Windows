@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.Kernel32 is a library to assist calling the kernel32 api</Description>
     <AssemblyTitle>Dapplo.Windows.Kernel32</AssemblyTitle>

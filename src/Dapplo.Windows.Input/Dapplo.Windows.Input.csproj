@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.Input provides code to generate and get input from keyboard and mouse</Description>
     <AssemblyTitle>Dapplo.Windows.Input</AssemblyTitle>
@@ -14,10 +14,10 @@
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9" >
+    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9">
         <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Reactive" Version="4.1.2" />
+    <PackageReference Include="System.Reactive" Version="4.1.3" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net471'">

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.EmbeddedBrowser is a small library which helps to embed the Internet Explorer in the most recent version.</Description>
     <AssemblyTitle>Dapplo.Windows.EmbeddedBrowser</AssemblyTitle>

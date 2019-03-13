@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.DesktopWindowsManager helps to use the windows dwm api</Description>
     <AssemblyTitle>Dapplo.Windows.DesktopWindowsManager</AssemblyTitle>
