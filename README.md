@@ -28,6 +28,7 @@ The following functionality is available:
 * Clipboard access
 * Getting the title, location etc of windows
 * GDI / User 32 native method mapping
+* Listing installed software
 * A lot of the native structs and enums
 ... more
 
