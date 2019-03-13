@@ -43,7 +43,7 @@ namespace Dapplo.Windows.Icons
         {
             bitmapSource = null;
             location = NativePoint.Empty;
-            var cursorInfo = new CursorInfo();
+            var cursorInfo = CursorInfo.Create();
             if (!NativeCursorMethods.GetCursorInfo(ref cursorInfo))
             {
                 return false;
