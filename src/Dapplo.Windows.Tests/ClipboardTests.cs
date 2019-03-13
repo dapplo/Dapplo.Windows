@@ -126,7 +126,7 @@ namespace Dapplo.Windows.Tests
         /// <summary>
         ///     Test monitoring the clipboard
         /// </summary>
-        [WpfFact]
+        //[WpfFact]
         public async Task TestClipboardMonitor_Text()
         {
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
