@@ -170,7 +170,7 @@ Task("DisableDNC30")
     .Does(() =>
 {
     ReplaceRegexInFiles("./**/*.csproj", "<TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>", "<TargetFrameworks>net471</TargetFrameworks><!-- net471;netcoreapp3.0 -->");
-    ReplaceRegexInFiles("./**/*.csproj", "<TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>", "<TargetFrameworks>net471</TargetFrameworks><!-- net471;netcoreapp3.0;netstandard2.0 -->");
+    ReplaceRegexInFiles("./**/*.csproj", "<TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>", "<TargetFrameworks>net471;netstandard2.0</TargetFrameworks><!-- net471;netcoreapp3.0;netstandard2.0 -->");
     ReplaceRegexInFiles("./**/*.csproj", "<Project Sdk=\"Microsoft.NET.Sdk.WindowsDesktop\">", "<Project Sdk=\"Microsoft.NET.Sdk\"><!-- Microsoft.NET.Sdk.WindowsDesktop -->");
 });
 
