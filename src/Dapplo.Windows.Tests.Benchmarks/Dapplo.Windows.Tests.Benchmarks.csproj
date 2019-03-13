@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Tests.Benchmarks</AssemblyTitle>
-    <TargetFrameworks>net471</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Tests.Benchmarks</AssemblyName>
-	<OutputType>Exe</OutputType>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <OutputType>Exe</OutputType>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Clipboard\Dapplo.Windows.Clipboard.csproj" />
@@ -35,7 +36,7 @@
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.0" />
     <PackageReference Include="System.Xml.ReaderWriter" Version="4.3.1" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net471' ">
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />

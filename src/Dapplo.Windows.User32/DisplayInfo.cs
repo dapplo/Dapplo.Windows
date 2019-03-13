@@ -139,7 +139,7 @@ namespace Dapplo.Windows.User32
                 // Subscribe to display changes, but only when we didn't yet
                 if (_displayInfoUpdate == null && Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
                 {
-                    _displayInfoUpdate = WinProcHandler.Instance.Subscribe(WinProcDisplayChangeHandler);
+                    //_displayInfoUpdate = WinProcHandler.Instance.Subscribe(WinProcDisplayChangeHandler);
                 }
 #endif
                 return _allDisplayInfos;

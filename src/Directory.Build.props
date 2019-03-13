@@ -59,8 +59,15 @@
       <Version>2.0.1</Version>
     </PackageReference>
   </ItemGroup>
-	
-  <!-- Global definition for non test or example projects to enable InternalsVisibleTo, git versioning and pdbgit -->
+
+  <!-- Global definition for non test or example projects to enable InternalsVisibleTo with dotnet core 3 -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0' And !$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Dapplo.Windows.Tests</_Parameter1>
+	</AssemblyAttribute>
+  </ItemGroup>
+  
+  <!-- Global definition for non test or example projects to enable InternalsVisibleTo -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net471' And !$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">
     <AssemblyAttribute Condition="'$(Configuration)' != 'Debug'" Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Dapplo.Windows.Tests,PublicKey=0024000004800000940000000602000000240000525341310004000001000100990aa0451f70232b1ebe2ed5b9263758a8f7f89db93acdc49f954092a9faceed5410ffd5cf6fe9c6946bc3572da2d63bf5359de6c855fb93aefc872d7ae3922b1294ee82c7f5ffd6bdc759fe6586e0eaf0b2b3d0c109961581047dcb66d53a8fe6a7240d2a3984d4625672705e23c7f23be7ba60168f844811cdf7312d3478a8</_Parameter1>
@@ -70,7 +77,7 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <!-- Global definition for non test or example projects to enable InternalsVisibleTo, git versioning and pdbgit -->
+  <!-- Global definition for non test or example projects to enable git versioning and pdbgit -->
   <ItemGroup Condition="!$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.2.33">
       <PrivateAssets>all</PrivateAssets>

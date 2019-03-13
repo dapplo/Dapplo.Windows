@@ -59,7 +59,7 @@ namespace Dapplo.Windows.Credentials
 	    private const int MaxUsernameLength = 100;
 	    private const int MaxPasswordLength = 100;
 
-        private Image _banner;
+        private Bitmap _banner;
 		private string _caption = string.Empty;
 		private string _message = string.Empty;
 		private string _name = string.Empty;
@@ -73,8 +73,8 @@ namespace Dapplo.Windows.Credentials
 		/// <param name="target">The name of the target for the credentials, typically a server name.</param>
 		/// <param name="caption">The caption of the dialog (null will cause a system default title to be used).</param>
 		/// <param name="message">The message of the dialog (null will cause a system default message to be used).</param>
-		/// <param name="banner">The image to display on the dialog (null will cause a system default image to be used).</param>
-		public CredentialsDialog(string target, string caption = null, string message = null, Image banner = null)
+		/// <param name="banner">The bitmap to display on the dialog (null will cause a system default image to be used).</param>
+		public CredentialsDialog(string target, string caption = null, string message = null, Bitmap banner = null)
 		{
 			Target = target;
 			Caption = caption;
@@ -111,7 +111,7 @@ namespace Dapplo.Windows.Credentials
 					var message = string.Format(
 						Thread.CurrentThread.CurrentUICulture,
 						"The name has a maximum length of {0} characters.",
-						MaxUsernameLength);
+						MaxUsernameLength.ToString());
 					throw new ArgumentException(message, nameof(Name));
 				}
 				_name = value;
@@ -129,7 +129,7 @@ namespace Dapplo.Windows.Credentials
 					var message = string.Format(
 						Thread.CurrentThread.CurrentUICulture,
 						"The password has a maximum length of {0} characters.",
-						MaxPasswordLength);
+						MaxPasswordLength.ToString());
 					throw new ArgumentException(message, nameof(Password));
 				}
 				_password = value;
@@ -158,7 +158,7 @@ namespace Dapplo.Windows.Credentials
 					var message = string.Format(
 						Thread.CurrentThread.CurrentUICulture,
 						"The target has a maximum length of {0} characters.",
-						MaxGenericTargetLength);
+						MaxGenericTargetLength.ToString());
 					throw new ArgumentException(message, nameof(Target));
 				}
 				_target = value;
@@ -177,7 +177,7 @@ namespace Dapplo.Windows.Credentials
 					var message = string.Format(
 						Thread.CurrentThread.CurrentUICulture,
 						"The caption has a maximum length of {0} characters.",
-						MaxCaptionLength);
+						MaxCaptionLength.ToString());
 					throw new ArgumentException(message, nameof(Caption));
 				}
 				_caption = value;
@@ -196,7 +196,7 @@ namespace Dapplo.Windows.Credentials
 					var message = string.Format(
 						Thread.CurrentThread.CurrentUICulture,
 						"The message has a maximum length of {0} characters.",
-						MaxMessageLength);
+						MaxMessageLength.ToString());
 					throw new ArgumentException(message, nameof(Message));
 				}
 				_message = value;
@@ -205,7 +205,7 @@ namespace Dapplo.Windows.Credentials
 
 		/// <summary>Gets or sets the image to display on the dialog.</summary>
 		/// <remarks>A null value will cause a system default image to be used.</remarks>
-		public Image Banner
+		public Bitmap Banner
 		{
 			get { return _banner; }
 			set
@@ -324,20 +324,7 @@ namespace Dapplo.Windows.Credentials
         /// <returns>CredUiInfo</returns>
         private CredUiInfo GetInfo(IWin32Window owner)
 		{
-			var info = new CredUiInfo();
-			if (owner != null)
-			{
-				info.hwndParent = owner.Handle;
-			}
-			info.pszCaptionText = Caption;
-			info.pszMessageText = Message;
-			if (Banner != null)
-			{
-				// TODO: Memory leak!!
-				info.hbmBanner = new Bitmap(Banner, ValidBannerWidth, ValidBannerHeight).GetHbitmap();
-			}
-			info.cbSize = Marshal.SizeOf(info);
-			return info;
+			return new CredUiInfo(Message, Caption, owner?.Handle, Banner?.GetHbitmap());
 		}
 
 		/// <summary>Returns the flags for dialog display options.</summary>

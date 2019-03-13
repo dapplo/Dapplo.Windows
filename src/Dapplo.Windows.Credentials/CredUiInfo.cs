@@ -36,10 +36,46 @@ namespace Dapplo.Windows.Credentials
 	/// </summary>
 	public struct CredUiInfo
 	{
-		public int cbSize;
+        /// <summary>
+        /// Size of the struct, is set by the constructor
+        /// </summary>
+		public readonly int cbSize;
+
+        /// <summary>
+        /// The hWnd for the parent of the dialog
+        /// </summary>
 		public IntPtr hwndParent;
+
+        /// <summary>
+        /// The message to show
+        /// </summary>
 		[MarshalAs(UnmanagedType.LPWStr)] public string pszMessageText;
+
+        /// <summary>
+        /// The text to show
+        /// </summary>
 		[MarshalAs(UnmanagedType.LPWStr)] public string pszCaptionText;
+
+        /// <summary>
+        /// Only used for CredUIPromptForCredentials, not for CredUIPromptForWindowsCredentials
+        /// </summary>
 		public IntPtr hbmBanner;
-	}
+
+        /// <summary>
+        /// Constructor which takes all parameters
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <param name="caption">string</param>
+        /// <param name="parent">IntPtr with the hWnd for the parent</param>
+        /// <param name="hBitmap">IntPtr with the hBitmap to show on the dialog</param>
+        public CredUiInfo(string text = null, string caption = null, IntPtr? parent = null, IntPtr? hBitmap = null)
+        {
+            hwndParent = parent ?? IntPtr.Zero;
+            pszMessageText = text;
+            pszCaptionText = caption;
+            hbmBanner = hBitmap ?? IntPtr.Zero;
+            cbSize = 0;
+            cbSize = Marshal.SizeOf(this);
+        }
+    }
 }
