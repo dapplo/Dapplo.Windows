@@ -126,7 +126,6 @@ namespace Dapplo.Windows.Tests
         /// <summary>
         ///     Test monitoring the clipboard
         /// </summary>
-        /// <returns></returns>
         [WpfFact]
         public async Task TestClipboardMonitor_Text()
         {
@@ -145,7 +144,7 @@ namespace Dapplo.Windows.Tests
                 clipboardAccessToken.ClearContents();
                 clipboardAccessToken.SetAsUnicodeString(testString, "TEST_FORMAT");
             }
-            await Task.Delay(200);
+            await Task.Delay(400);
             subscription.Dispose();
 
             // Doesn't work on AppVeyor!!

@@ -37,11 +37,15 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
+- task: VSTest@2
+  displayName: 'Test'
   inputs:
-    command: test
-    projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+    testAssemblyVer2: '**\Dapplo*.Tests.dll'
+    runInParallel: false
+    codeCoverageEnabled: True
+    platform: '$(BuildPlatform)'
+    configuration: $(buildConfiguration)
+    rerunFailedTests: false
 
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
