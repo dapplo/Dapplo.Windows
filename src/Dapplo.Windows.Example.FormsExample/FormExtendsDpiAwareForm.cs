@@ -23,6 +23,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Windows.Desktop;
@@ -36,7 +37,7 @@ namespace Dapplo.Windows.Example.FormsExample
     public partial class FormExtendsDpiAwareForm : DpiAwareForm
     {
         private static readonly LogSource Log = new LogSource();
-        private readonly BitmapScaleHandler<string> _scaleHandler;
+        private readonly BitmapScaleHandler<string, Bitmap> _scaleHandler;
         private readonly DpiHandler _contextMenuDpiHandler;
         private readonly IDisposable _dpiChangeSubscription;
 
@@ -58,9 +59,9 @@ namespace Dapplo.Windows.Example.FormsExample
                 menuStrip1.ImageScalingSize = DpiHandler.ScaleWithDpi(initialMenuStripSize, dpiChangeInfo.NewDpi);
             });
 
-            _scaleHandler = BitmapScaleHandler.WithComponentResourceManager(FormDpiHandler, GetType(), BitmapScaleHandler.SimpleBitmapScaler)
-                .AddTarget(somethingMenuItem, "somethingMenuItem.Image")
-                .AddTarget(something2MenuItem, "something2MenuItem.Image");
+            _scaleHandler = BitmapScaleHandler.WithComponentResourceManager<Bitmap>(FormDpiHandler, GetType(), BitmapScaleHandler.SimpleBitmapScaler)
+                .AddTarget(somethingMenuItem, "somethingMenuItem.Image", b => b)
+                .AddTarget(something2MenuItem, "something2MenuItem.Image", b => b);
 
             EnvironmentMonitor.EnvironmentUpdateEvents.Subscribe(args =>
             {
