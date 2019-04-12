@@ -15,12 +15,12 @@ steps:
 - task: DotNetCoreInstaller@0
   displayName: 'Use .NET Core sdk 3.0'
   inputs:
-    version: '3.0.100-preview4-010737'
+    version: '3.0.100-preview4-011260'
 
 - task: NuGetToolInstaller@0
-  displayName: 'Use NuGet 4.9.2'
+  displayName: 'Use NuGet 4.9.3'
   inputs:
-    versionSpec: 4.9.2
+    versionSpec: 4.9.3
     checkLatest: true
 
 - task: NuGetCommand@2
@@ -37,15 +37,15 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: VSTest@2
-  displayName: 'Test'
-  inputs:
-    testAssemblyVer2: '**\Dapplo*.Tests.dll'
-    runInParallel: false
-    codeCoverageEnabled: True
-    platform: '$(BuildPlatform)'
-    configuration: $(buildConfiguration)
-    rerunFailedTests: false
+#- task: VSTest@2
+#  displayName: 'Test'
+#  inputs:
+#    testAssemblyVer2: '**\Dapplo*.Tests.dll'
+#    runInParallel: false
+#    codeCoverageEnabled: True
+#    platform: '$(BuildPlatform)'
+#    configuration: $(buildConfiguration)
+#    rerunFailedTests: false
 
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
