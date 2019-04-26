@@ -37,19 +37,19 @@ namespace Dapplo.Windows.Tests.Benchmarks
             var screenbounds = GetAllScreenBounds();
         }
 
-        [Benchmark, MemoryDiagnoser]
+        [Benchmark]
         public void ScreenBoundsNative()
         {
             var screenbounds = GetScreenBounds();
         }
 
-        [Benchmark, MemoryDiagnoser]
+        [Benchmark]
         public void ScreenBoundsPInvoke()
         {
             var screenbounds = GetAllScreenBounds();
         }
 
-        [Benchmark, MemoryDiagnoser]
+        [Benchmark]
         public void ScreenBoundsPInvokeCached()
         {
             var screenbounds = DisplayInfo.ScreenBounds;
