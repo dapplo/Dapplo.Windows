@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2017-2018  Dapplo
+//  Copyright (C) 2017-2019  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -122,13 +122,25 @@ namespace Dapplo.Windows.Icons
         }
 
         /// <summary>
-        ///     Get the icon for a hWnd
+        ///     Get the icon for an IInteropWindow
         /// </summary>
         /// <typeparam name="TIcon">The return type for the icon, can be Icon, Bitmap or BitmapSource</typeparam>
         /// <param name="window">IInteropWindow</param>
         /// <param name="useLargeIcons">true to try to get a big icon first</param>
         /// <returns>TIcon</returns>
         public static TIcon GetIconFromWindow<TIcon>(this IInteropWindow window, bool useLargeIcons = false) where TIcon : class
+        {
+            return GetIconForWindowHandle<TIcon>(window.Handle, useLargeIcons);
+        }
+
+        /// <summary>
+        ///     Get the icon for a hWnd
+        /// </summary>
+        /// <typeparam name="TIcon">The return type for the icon, can be Icon, Bitmap or BitmapSource</typeparam>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="useLargeIcons">true to try to get a big icon first</param>
+        /// <returns>TIcon</returns>
+        public static TIcon GetIconForWindowHandle<TIcon>(IntPtr hWnd, bool useLargeIcons = false) where TIcon : class
         {
             var iconSmall = IntPtr.Zero;
             var iconBig = new IntPtr(1);
@@ -137,24 +149,24 @@ namespace Dapplo.Windows.Icons
             IntPtr iconHandle;
             if (useLargeIcons)
             {
-                if (!User32Api.TrySendMessage(window.Handle, WindowsMessages.WM_GETICON, iconBig, out iconHandle))
+                if (!User32Api.TrySendMessage(hWnd, WindowsMessages.WM_GETICON, iconBig, out iconHandle))
                 {
-                    iconHandle = User32Api.GetClassLongWrapper(window.Handle, ClassLongIndex.IconHandle);
+                    iconHandle = User32Api.GetClassLongWrapper(hWnd, ClassLongIndex.IconHandle);
                 }
             }
-            else if (!User32Api.TrySendMessage(window.Handle, WindowsMessages.WM_GETICON, iconSmall2, out iconHandle))
+            else if (!User32Api.TrySendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall2, out iconHandle))
             {
-                iconHandle = User32Api.GetClassLongWrapper(window.Handle, ClassLongIndex.SmallIconHandle);
+                iconHandle = User32Api.GetClassLongWrapper(hWnd, ClassLongIndex.SmallIconHandle);
             }
 
-            if (iconHandle == IntPtr.Zero && !User32Api.TrySendMessage(window.Handle, WindowsMessages.WM_GETICON, iconSmall, out iconHandle))
+            if (iconHandle == IntPtr.Zero && !User32Api.TrySendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall, out iconHandle))
             {
-                iconHandle = User32Api.GetClassLongWrapper(window.Handle, ClassLongIndex.SmallIconHandle);
+                iconHandle = User32Api.GetClassLongWrapper(hWnd, ClassLongIndex.SmallIconHandle);
             }
 
-            if (iconHandle == IntPtr.Zero && !User32Api.TrySendMessage(window.Handle, WindowsMessages.WM_GETICON, iconBig, out iconHandle))
+            if (iconHandle == IntPtr.Zero && !User32Api.TrySendMessage(hWnd, WindowsMessages.WM_GETICON, iconBig, out iconHandle))
             {
-                iconHandle = User32Api.GetClassLongWrapper(window.Handle, ClassLongIndex.IconHandle);
+                iconHandle = User32Api.GetClassLongWrapper(hWnd, ClassLongIndex.IconHandle);
             }
             return IconHelper.IconHandleTo<TIcon>(iconHandle);
         }

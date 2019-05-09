@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2017-2018  Dapplo
+//  Copyright (C) 2017-2019  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Kernel32.Enums;
 using Dapplo.Windows.Kernel32.Structs;
@@ -36,14 +37,16 @@ namespace Dapplo.Windows.Kernel32
     public static class Kernel32Api
     {
         private static DateTimeOffset? _systemStartup;
+        private static readonly char[] DirectorySeparator = { '\\'};
 
         /// <summary>
-        ///     default value if not specifing a process ID
+        ///     Default value for AttachProcess if not specifying a process ID, this uses the console of the parent of the current process.
         /// </summary>
-        public const uint ATTACHCONSOLE_ATTACHPARENTPROCESS = 0x0ffffffff;
+        private const uint AttachParentProcess = 0xff_ff_ff_ff;
 
         /// <summary>
         /// A helper method to prevent Dll Hijacking, this drastically reduces the DLL search paths!!!!!
+        /// This will not help against a version.dll attack..
         /// </summary>
         /// <param name="allowDllDirectory">An optional single directory where additional  DLL searches are made</param>
         public static void PreventDllHijacking(string allowDllDirectory = "")
@@ -57,6 +60,93 @@ namespace Dapplo.Windows.Kernel32
             {
                 SetDefaultDllDirectories(DefaultDllDirectories.SearchSystem32Directory | DefaultDllDirectories.SearchUserDirectories);
             }
+        }
+
+        /// <summary>
+        ///     Method to get the process path for a process
+        /// </summary>
+        /// <param name="process">Process</param>
+        /// <returns>string</returns>
+        public static string GetProcessPath(this Process process)
+        {
+            return GetProcessPath(process.Id);
+        }
+
+        /// <summary>
+        ///     Method to get the process path
+        /// </summary>
+        /// <param name="processId">int with the process ID</param>
+        /// <returns>string</returns>
+        public static string GetProcessPath(int processId)
+        {
+            // Try the GetModuleFileName method first since it's the fastest. 
+            // May return ACCESS_DENIED (due to VM_READ flag) if the process is not owned by the current user.
+            // Will fail if we are compiled as x86 and we're trying to open a 64 bit process...not allowed.
+            var hProcess = OpenProcess(ProcessAccessRights.QueryInformation | ProcessAccessRights.VirtualMemoryRead, false, processId);
+            if (hProcess != IntPtr.Zero)
+            {
+                try
+                {
+                    var path = PsApi.GetModuleFilename(hProcess, IntPtr.Zero);
+                    if (path != null)
+                    {
+                        return path;
+                    }
+                }
+                finally
+                {
+                    CloseHandle(hProcess);
+                }
+            }
+
+            hProcess = OpenProcess(ProcessAccessRights.QueryInformation, false, processId);
+            if (hProcess == IntPtr.Zero)
+            {
+                return null;
+            }
+
+            unsafe
+            {
+                const int capacity = 512;
+                var pathBuffer = stackalloc char[capacity];
+
+                try
+                {
+                    // Try this method for Vista or higher operating systems
+                    int bufferSize = capacity;
+                    if (Environment.OSVersion.Version.Major >= 6 && QueryFullProcessImageName(hProcess, 0, pathBuffer, ref bufferSize) && bufferSize > 0)
+                    {
+                        return new string(pathBuffer, 0 , bufferSize);
+                    }
+
+                    // Try the GetProcessImageFileName method
+                    var dosPath = PsApi.GetProcessImageFileName(hProcess);
+                    
+                    if (dosPath != null)
+                    {
+                        foreach (var drive in Environment.GetLogicalDrives())
+                        {
+                            var nrChars = QueryDosDevice(drive.TrimEnd(DirectorySeparator), pathBuffer, capacity);
+                            if (nrChars == 0)
+                            {
+                                continue;
+                            }
+                            var dosDevice = new string(pathBuffer, 0, nrChars);
+                            if (dosPath.StartsWith(dosDevice))
+                            {
+                                return drive + dosPath.Remove(0, nrChars);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    CloseHandle(hProcess);
+                }
+
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -123,10 +213,10 @@ namespace Dapplo.Windows.Kernel32
         /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms681944(v=vs.85).aspx">AllocConsole function</a>
         /// </summary>
         /// <param name="dwProcessId">The identifier of the process whose console is to be used. Or -1 to use the console of the parent of the current process.</param>
-        /// <returns></returns>
+        /// <returns>bool if it worked</returns>
         [DllImport("kernel32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool AttachConsole(uint dwProcessId);
+        public static extern bool AttachConsole(uint dwProcessId = AttachParentProcess);
 
         /// <summary>
         /// Closes an open object handle.
@@ -181,83 +271,6 @@ namespace Dapplo.Windows.Kernel32
         /// <returns>If the function succeeds, the return value is a handle to the specified module.</returns>
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr GetModuleHandle(string lpModuleName);
-
-        /// <summary>
-        ///     Method to get the process path
-        /// </summary>
-        /// <param name="processid">int with the process ID</param>
-        /// <returns>string</returns>
-        public static string GetProcessPath(int processid)
-        {
-            // Try the GetModuleFileName method first since it's the fastest. 
-            // May return ACCESS_DENIED (due to VM_READ flag) if the process is not owned by the current user.
-            // Will fail if we are compiled as x86 and we're trying to open a 64 bit process...not allowed.
-            var hprocess = OpenProcess(ProcessAccessRights.QueryInformation | ProcessAccessRights.VirtualMemoryRead, false, processid);
-            if (hprocess != IntPtr.Zero)
-            {
-                try
-                {
-                    var path = PsApi.GetModuleFilename(hprocess, IntPtr.Zero);
-                    if (path != null)
-                    {
-                        return path;
-                    }
-                }
-                finally
-                {
-                    CloseHandle(hprocess);
-                }
-            }
-
-            hprocess = OpenProcess(ProcessAccessRights.QueryInformation, false, processid);
-            if (hprocess == IntPtr.Zero)
-            {
-                return null;
-            }
-
-            unsafe
-            {
-                const int capacity = 512;
-                var pathBuffer = stackalloc char[capacity];
-
-                try
-                {
-                    // Try this method for Vista or higher operating systems
-                    int bufferSize = capacity;
-                    if (Environment.OSVersion.Version.Major >= 6 && QueryFullProcessImageName(hprocess, 0, pathBuffer, ref bufferSize) && bufferSize > 0)
-                    {
-                        return new string(pathBuffer, 0 , bufferSize);
-                    }
-
-                    // Try the GetProcessImageFileName method
-                    var dosPath = PsApi.GetProcessImageFileName(hprocess);
-                    
-                    if (dosPath != null)
-                    {
-                        foreach (var drive in Environment.GetLogicalDrives())
-                        {
-                            var nrChars = QueryDosDevice(drive.TrimEnd('\\'), pathBuffer, capacity);
-                            if (nrChars == 0)
-                            {
-                                continue;
-                            }
-                            var dosDevice = new string(pathBuffer, 0, nrChars);
-                            if (dosPath.StartsWith(dosDevice))
-                            {
-                                return drive + dosPath.Remove(0, nrChars);
-                            }
-                        }
-                    }
-                }
-                finally
-                {
-                    CloseHandle(hprocess);
-                }
-
-            }
-
-            return null;
-        }
 
         /// <summary>
         ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724358.aspx">GetProductInfo function</a>
@@ -387,7 +400,6 @@ namespace Dapplo.Windows.Kernel32
         /// <returns>ulong with the ticks</returns>
         [DllImport("kernel32", SetLastError = true)]
         public static extern ulong GetTickCount64();
-
 
         /// <summary>
         /// This function frees the specified local memory object and invalidates its handle.

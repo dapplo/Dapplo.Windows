@@ -32,8 +32,11 @@ The following functionality is available:
 * A lot of the native structs and enums
 ... more
 
+
+Here are some of the packages explained:
+
 # Dapplo.Windows.Dpi
-This helps with making application using Windows.Forms be able to scale with DPI changes.
+This helps to add DPI awareness to your application, and when using Windows.Forms be able to scale with DPI changes.
 The easiest way is to have your form extend DpiAwareForm or, if you need default scaling use DpiUnwareForm.
 When you want to handle DPI changes directly, e.g. scale bitmaps, is to use a DpiHandler.
 
@@ -84,6 +87,3 @@ Need a way to specify the OpenClipboard / CloseClipboard at the rights moments.
 GetClipboardData should be used to get the contents, they should be converted to MemoryStreams?
 The information is stored/maintained, until the ClipboardContents object is disposed?
 This could be as soon as the next information is placed on the clipboard.
-
-# Dapplo.Windows.Dpi
-A library to add Dpi-Awareness to your application

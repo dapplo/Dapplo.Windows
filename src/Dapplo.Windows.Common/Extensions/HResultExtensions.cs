@@ -1,6 +1,6 @@
-﻿#region Copyright (C) 2016-2018 Dapplo
+﻿#region Copyright (C) 2016-2019 Dapplo
 //  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2018 Dapplo
+//  Copyright (C) 2016-2019 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo

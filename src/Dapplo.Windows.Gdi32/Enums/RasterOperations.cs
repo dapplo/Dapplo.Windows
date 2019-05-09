@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2017-2018  Dapplo
+//  Copyright (C) 2017-2019  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -19,12 +19,15 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System;
+
 namespace Dapplo.Windows.Gdi32.Enums
 {
     /// <summary>
     ///     A raster-operation code. These codes define how the color data for the source rectangle is to be combined with the
     ///     color data for the destination rectangle to achieve the final color.
     /// </summary>
+	[Flags]
     public enum RasterOperations : uint
     {
         /// <summary>

@@ -47,11 +47,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Tests.Benchm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Tests", "Dapplo.Windows.Tests\Dapplo.Windows.Tests.csproj", "{EB93507C-91DA-420D-B77D-9F9F006B62DE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CE6CF982-1BE3-42AD-81F0-0A3851736490}"
-	ProjectSection(SolutionItems) = preProject
-		..\build.cake = ..\build.cake
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

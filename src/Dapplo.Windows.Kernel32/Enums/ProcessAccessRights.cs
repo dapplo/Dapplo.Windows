@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2017-2018  Dapplo
+//  Copyright (C) 2017-2019  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -82,7 +82,6 @@ namespace Dapplo.Windows.Kernel32.Enums
         ///     from the process object.
         /// </summary>
         QueryInformation = 0x00000400,
-
 
         /// <summary>
         ///     Required to retrieve certain information about a process (see GetExitCodeProcess, GetPriorityClass, IsProcessInJob, QueryFullProcessImageName). A handle that has the PROCESS_QUERY_INFORMATION access right is automatically granted PROCESS_QUERY_LIMITED_INFORMATION.
