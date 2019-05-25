@@ -1,6 +1,6 @@
-﻿#region Copyright (C) 2016-2018 Dapplo
+﻿#region Copyright (C) 2016-2019 Dapplo
 //  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2018 Dapplo
+//  Copyright (C) 2016-2019 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -181,8 +181,8 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         /// Equal
         /// </summary>
-        /// <param name="lhs">NativePointFloat lefthandside</param>
-        /// <param name="rhs">NativePointFloat righthandside</param>
+        /// <param name="lhs">NativePointFloat left hand side</param>
+        /// <param name="rhs">NativePointFloat right hand side</param>
         /// <returns>bool true if the values are equal</returns>
         public static bool operator ==(NativePointFloat lhs, NativePointFloat rhs)
         {
@@ -192,8 +192,8 @@ namespace Dapplo.Windows.Common.Structs
         /// <summary>
         /// Not equal
         /// </summary>
-        /// <param name="lhs">NativePointFloat lefthandside</param>
-        /// <param name="rhs">NativePointFloat righthandside</param>
+        /// <param name="lhs">NativePointFloat left hand side</param>
+        /// <param name="rhs">NativePointFloat right hand side</param>
         /// <returns>bool true if the values are not equal</returns>
         public static bool operator !=(NativePointFloat lhs, NativePointFloat rhs)
         {
@@ -204,11 +204,11 @@ namespace Dapplo.Windows.Common.Structs
         [Pure]
         public override string ToString()
         {
-            return X + "," + Y;
+            return $"{X},{Y}";
         }
 
         /// <summary>
-        /// Decontructor for tuples
+        /// De-constructor for tuples
         /// </summary>
         /// <param name="x">float</param>
         /// <param name="y">float</param>

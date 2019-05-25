@@ -1,5 +1,5 @@
 //  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2017-2018  Dapplo
+//  Copyright (C) 2017-2019  Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -107,8 +107,8 @@ namespace Dapplo.Windows.Desktop
         IntPtr? Parent { get; set; }
 
         /// <summary>
-        ///     The actualy IInteropWindow for the parent.
-        ///     This is filled when this window was retrieved via parent.GetChildren or parent.GetZOrderChildrend
+        ///     The actually IInteropWindow for the parent.
+        ///     This is filled when this window was retrieved via parent.GetChildren or parent.GetZOrderChildren
         /// </summary>
         IInteropWindow ParentWindow { get; set; }
 
