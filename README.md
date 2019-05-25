@@ -4,21 +4,21 @@ This project contains code which adds Microsoft Windows specific functionality t
 - Documentation can be found [here](http://www.dapplo.net/documentation/Dapplo.Windows)
 - Current build status: [![Build status](https://ci.appveyor.com/api/projects/status/n99jafhbbp74n2w7?svg=true)](https://ci.appveyor.com/project/dapplo/dapplo-windows)
 - Coverage: [![Coverage Status](https://coveralls.io/repos/github/dapplo/Dapplo.Windows/badge.svg?branch=master)](https://coveralls.io/github/dapplo/Dapplo.Windows?branch=master)
-- NuGet package: [![NuGet package Dapplo.Windows](https://badge.fury.io/nu/Dapplo.Windows.svg)](https://badge.fury.io/nu/Dapplo.Windows)
-- NuGet package: [![NuGet package Dapplo.Windows.Clipboard](https://badge.fury.io/nu/Dapplo.Windows.Clipboard.svg)](https://badge.fury.io/nu/Dapplo.Windows.Clipboard)
-- NuGet package: [![NuGet package Dapplo.Windows.Citrix](https://badge.fury.io/nu/Dapplo.Windows.Citrix.svg)](https://badge.fury.io/nu/Dapplo.Windows.Citrix)
-- NuGet package: [![NuGet package Dapplo.Windows.Com](https://badge.fury.io/nu/Dapplo.Windows.Com.svg)](https://badge.fury.io/nu/Dapplo.Windows.Com)
-- NuGet package: [![NuGet package Dapplo.Windows.Common](https://badge.fury.io/nu/Dapplo.Windows.Common.svg)](https://badge.fury.io/nu/Dapplo.Windows.Common)
-- NuGet package: [![NuGet package Dapplo.Windows.DesktopWindowsManager](https://badge.fury.io/nu/Dapplo.Windows.DesktopWindowsManager.svg)](https://badge.fury.io/nu/Dapplo.Windows.DesktopWindowsManager)
-- NuGet package: [![NuGet package Dapplo.Windows.Dpi](https://badge.fury.io/nu/Dapplo.Windows.Dpi.svg)](https://badge.fury.io/nu/Dapplo.Windows.Dpi)
-- NuGet package: [![NuGet package Dapplo.Windows.Gdi32](https://badge.fury.io/nu/Dapplo.Windows.Gdi32.svg)](https://badge.fury.io/nu/Dapplo.Windows.Gdi32)
-- NuGet package: [![NuGet package Dapplo.Windows.EmbeddedBrowser](https://badge.fury.io/nu/Dapplo.Windows.EmbeddedBrowser.svg)](https://badge.fury.io/nu/Dapplo.Windows.EmbeddedBrowser)
-- NuGet package: [![NuGet package Dapplo.Windows.Input](https://badge.fury.io/nu/Dapplo.Windows.Input.svg)](https://badge.fury.io/nu/Dapplo.Windows.Input)
-- NuGet package: [![NuGet package Dapplo.Windows.Kernel32](https://badge.fury.io/nu/Dapplo.Windows.Kernel32.svg)](https://badge.fury.io/nu/Dapplo.Windows.Kernel32)
-- NuGet package: [![NuGet package Dapplo.Windows.Messages](https://badge.fury.io/nu/Dapplo.Windows.Messages.svg)](https://badge.fury.io/nu/Dapplo.Windows.Messages)
-- NuGet package: [![NuGet package Dapplo.Windows.Multimedia](https://badge.fury.io/nu/Dapplo.Windows.Multimedia.svg)](https://badge.fury.io/nu/Dapplo.Windows.Multimedia)
-- NuGet package: [![NuGet package Dapplo.Windows.Shell32](https://badge.fury.io/nu/Dapplo.Windows.Shell32.svg)](https://badge.fury.io/nu/Dapplo.Windows.Shell32)
-- NuGet package: [![NuGet package Dapplo.Windows.User32](https://badge.fury.io/nu/Dapplo.Windows.User32.svg)](https://badge.fury.io/nu/Dapplo.Windows.User32)
+- Dapplo.Windows: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.svg)](https://www.nuget.org/packages/Dapplo.Windows)
+- Dapplo.Windows.Clipboard: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Clipboard.svg)](https://www.nuget.org/packages/Dapplo.Windows.Clipboard)
+- Dapplo.Windows.Citrix: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Citrix.svg)](https://www.nuget.org/packages/Dapplo.Windows.Citrix)
+- Dapplo.Windows.Com: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Com.svg)](https://www.nuget.org/packages/Dapplo.Windows.Com)
+- Dapplo.Windows.Common: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Common.svg)](https://www.nuget.org/packages/Dapplo.Windows.Common)
+- Dapplo.Windows.DesktopWindowsManager: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.DesktopWindowsManager.svg)](https://www.nuget.org/packages/Dapplo.Windows.DesktopWindowsManager)
+- Dapplo.Windows.Dpi: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Dpi.svg)](https://www.nuget.org/packages/Dapplo.Windows.Dpi)
+- Dapplo.Windows.Gdi32: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Gdi32.svg)](https://www.nuget.org/packages/Dapplo.Windows.Gdi32)
+- Dapplo.Windows.EmbeddedBrowser: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.EmbeddedBrowser.svg)](https://www.nuget.org/packages/Dapplo.Windows.EmbeddedBrowser)
+- Dapplo.Windows.Input: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Input.svg)](https://www.nuget.org/packages/Dapplo.Windows.Input)
+- Dapplo.Windows.Kernel32: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Kernel32.svg)](https://www.nuget.org/packages/Dapplo.Windows.Kernel32)
+- Dapplo.Windows.Messages: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Messages.svg)](https://www.nuget.org/packages/Dapplo.Windows.Messages)
+- Dapplo.Windows.Multimedia: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Multimedia.svg)](https://www.nuget.org/packages/Dapplo.Windows.Multimedia)
+- Dapplo.Windows.Shell32: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Shell32.svg)](https://www.nuget.org/packages/Dapplo.Windows.Shell32)
+- Dapplo.Windows.User32: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.User32.svg)](https://www.nuget.org/packages/Dapplo.Windows.User32)
 
 This is actually a lot of code I wrote for Greenshot, and with this I am trying to place it into an external repository so it's easier to maintain.
 
@@ -84,6 +84,3 @@ Need a way to specify the OpenClipboard / CloseClipboard at the rights moments.
 GetClipboardData should be used to get the contents, they should be converted to MemoryStreams?
 The information is stored/maintained, until the ClipboardContents object is disposed?
 This could be as soon as the next information is placed on the clipboard.
-
-# Dapplo.Windows.Dpi
-A library to add Dpi-Awareness to your application
