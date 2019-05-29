@@ -21,11 +21,7 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 #endregion
 
-#region using
-
 using System;
-
-#endregion
 
 namespace Dapplo.Windows.Common
 {
@@ -38,10 +34,10 @@ namespace Dapplo.Windows.Common
         /// Get the current windows version
         /// </summary>
         public static Version WinVersion { get; } =
-#if NET471
-            Environment.OSVersion.Version;
-#else
+#if NETSTANDARD2_0
             new Version(Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion);
+#else
+            Environment.OSVersion.Version;
 #endif
 
         /// <summary>
