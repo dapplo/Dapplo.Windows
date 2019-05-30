@@ -15,7 +15,7 @@
     <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9">
         <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Dapplo.Log" Version="1.3.17" />
+    <PackageReference Include="Dapplo.Log" Version="1.3.20" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="Microsoft.CSharp" />

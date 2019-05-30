@@ -15,7 +15,7 @@
         <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Reactive" Version="4.1.5" />
-    <PackageReference Include="Dapplo.Log" Version="1.3.17" />
+    <PackageReference Include="Dapplo.Log" Version="1.3.20" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
