@@ -63,13 +63,13 @@ namespace Dapplo.Windows.Input
         /// <summary>
         /// A local function which handles the RawInput messages
         /// </summary>
-        /// <param name="hwnd">IntPtr</param>
+        /// <param name="hWnd">IntPtr</param>
         /// <param name="msg">int</param>
         /// <param name="wParam">IntPtr</param>
         /// <param name="lParam">IntPtr</param>
         /// <param name="handled">ref bool</param>
         /// <returns>IntPtr</returns>
-        private static IntPtr HandleRawInputMessages(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        private static IntPtr HandleRawInputMessages(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             var windowsMessage = (WindowsMessages)msg;
 
@@ -113,7 +113,7 @@ namespace Dapplo.Windows.Input
         }
 
         /// <summary>
-        ///     Create an observable to monitor rawinput device changes
+        ///     Create an observable to monitor raw-input device changes
         /// </summary>
         public static IObservable<RawInputEventArgs> MonitorRawInput(params RawInputDevices[] devices)
         {
@@ -122,7 +122,7 @@ namespace Dapplo.Windows.Input
         }
 
         /// <summary>
-        ///     Create an observable to monitor rawinput device changes
+        ///     Create an observable to monitor raw-input device changes
         /// </summary>
         public static IObservable<RawInputDeviceChangeEventArgs> MonitorRawInputDeviceChanges(params RawInputDevices[] devices)
         {

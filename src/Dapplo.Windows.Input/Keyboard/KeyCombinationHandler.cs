@@ -60,7 +60,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// Defines if the key press needs to be passed through to other applications.
         /// By default (false) a keypress which is specified is marked as handled and will not be seen by others
         /// </summary>
-        public bool IsPassthrough { get; set; }
+        public bool IsPassThrough { get; set; }
 
         /// <summary>
         /// Create a KeyCombinationHandler for the specified VirtualKeyCodes
@@ -131,8 +131,8 @@ namespace Dapplo.Windows.Input.Keyboard
             //  check if this combination is handled
             var isHandled = keyboardHookEventArgs.IsKeyDown && OtherPressedKeys.Count == 0 && AvailableKeys.All(b => b);
 
-            // Mark as handled if the key combination is handled and we don't have passthrough
-            if (isHandled && !IsPassthrough)
+            // Mark as handled if the key combination is handled and we don't have pass-through
+            if (isHandled && !IsPassThrough)
             {
                 keyboardHookEventArgs.Handled = true;
             }

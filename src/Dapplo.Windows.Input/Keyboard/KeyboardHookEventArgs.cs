@@ -152,7 +152,7 @@ namespace Dapplo.Windows.Input.Keyboard
         }
 
         /// <summary>
-        /// Detaila on the keyboard event
+        /// Details on the keyboard event
         /// </summary>
         public ExtendedKeyFlags Flags { get; internal set; } = ExtendedKeyFlags.None;
 
@@ -164,7 +164,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <summary>
         /// Test if this event is injected by another process with a lower integrity level
         /// </summary>
-        public bool IsInjectedByLowerInterityLevelProcess => (Flags & ExtendedKeyFlags.Injected) != 0 && (Flags & ExtendedKeyFlags.LowerIntegretyInjected) != 0;
+        public bool IsInjectedByLowerIntegrityLevelProcess => (Flags & ExtendedKeyFlags.Injected) != 0 && (Flags & ExtendedKeyFlags.LowerIntegretyInjected) != 0;
 
         /// <inheritdoc />
         public override string ToString()

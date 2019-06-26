@@ -25,7 +25,7 @@ using Dapplo.Windows.Input.Structs;
 namespace Dapplo.Windows.Input
 {
     /// <summary>
-    /// Desribes a RawInput device
+    /// Describes a RawInput device
     /// </summary>
     public class RawInputDeviceInformation
     {

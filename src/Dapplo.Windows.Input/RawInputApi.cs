@@ -52,7 +52,7 @@ namespace Dapplo.Windows.Input
         /// <param name="hWnd">IntPtr with the window handle which handles the messages</param>
         /// <param name="device">RawInputDevices</param>
         /// <param name="flags">RawInputDeviceFlags</param>
-        /// <returns>RawInputDevice filleds</returns>
+        /// <returns>RawInputDevice filled</returns>
         public static RawInputDevice CreateRawInputDevice(IntPtr hWnd, RawInputDevices device, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink)
         {
             switch (device)
@@ -84,7 +84,7 @@ namespace Dapplo.Windows.Input
         /// <param name="hWnd">IntPtr with the window handle which handles the messages</param>
         /// <param name="usage">Generic Usage for the raw input device.</param>
         /// <param name="flags">RawInputDeviceFlags</param>
-        /// <returns>RawInputDevice filleds</returns>
+        /// <returns>RawInputDevice filled</returns>
         public static RawInputDevice CreateRawInputDevice(IntPtr hWnd, HidUsagesGeneric usage, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink)
         {
             return new RawInputDevice
@@ -102,7 +102,7 @@ namespace Dapplo.Windows.Input
         /// <param name="hWnd">IntPtr with the window handle which handles the messages</param>
         /// <param name="usage">Consumer Usage for the raw input device.</param>
         /// <param name="flags">RawInputDeviceFlags</param>
-        /// <returns>RawInputDevice filleds</returns>
+        /// <returns>RawInputDevice filled</returns>
         public static RawInputDevice CreateRawInputDevice(IntPtr hWnd, HidUsagesConsumer usage, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink)
         {
             return new RawInputDevice

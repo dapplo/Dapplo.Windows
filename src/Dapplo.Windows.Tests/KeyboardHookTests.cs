@@ -23,6 +23,7 @@
 using System;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
@@ -37,6 +38,7 @@ namespace Dapplo.Windows.Tests
 {
     public class KeyboardHookTests
     {
+        private static LogSource Log = new LogSource();
         public KeyboardHookTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
@@ -79,6 +81,35 @@ namespace Dapplo.Windows.Tests
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
             await Task.Delay(20);
             Assert.True(pressCount == 2);
+        }
+
+        [StaFact]
+        private async Task TestKeyHandler_Slow_Subscriber()
+        {
+            int pressCount = 0;
+            const int pressHandlingTime = 500;
+            // Wait 2x press plus overhead
+            const int waitForPressHandling = (int)((pressHandlingTime * 2) * 1.1);
+
+            var sequenceHandler = new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA) { IgnoreInjected = false };
+
+            using (KeyboardHook.KeyboardEvents.Where(sequenceHandler).Subscribe(keyboardHookEventArgs =>
+            {
+                Log.Info().WriteLine("Key combination was pressed, slow handling!", null);
+                Thread.Sleep(pressHandlingTime);
+                Log.Info().WriteLine("Key combination was pressed, finished!", null);
+                pressCount++;
+            }))
+            {
+                Log.Info().WriteLine("Pressing key combination", null);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
+                Log.Info().WriteLine("Pressed key combination", null);
+                Log.Info().WriteLine("Pressing key combination", null);
+                KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
+                Log.Info().WriteLine("Pressed key combination", null);
+                await Task.Delay(waitForPressHandling);
+                Assert.Equal(2, pressCount);
+            }
         }
 
         [StaFact]

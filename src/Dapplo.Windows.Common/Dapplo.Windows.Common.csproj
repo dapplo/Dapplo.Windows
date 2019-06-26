@@ -7,6 +7,8 @@
     <PackageTags>windows native Common</PackageTags>
     <TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<UseWindowsForms>true</UseWindowsForms>
+	<UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net471'">
     <Reference Include="System" />

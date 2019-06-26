@@ -6,6 +6,8 @@
     <PackageId>Dapplo.Windows.DesktopWindowsManager</PackageId>
     <PackageTags>windows dwm</PackageTags>
     <TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9" >

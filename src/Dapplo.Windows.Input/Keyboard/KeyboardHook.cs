@@ -22,6 +22,7 @@
 #region using
 
 using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
@@ -34,7 +35,7 @@ using Dapplo.Windows.Input.Structs;
 namespace Dapplo.Windows.Input.Keyboard
 {
     /// <summary>
-    ///     A glocal keyboard hook, using System.Reactive
+    ///     A global keyboard hook, using System.Reactive
     /// </summary>
     public sealed class KeyboardHook
     {
@@ -65,7 +66,7 @@ namespace Dapplo.Windows.Input.Keyboard
                     SyncLockState();
 
                     var hookId = IntPtr.Zero;
-                    // Need to hold onto this callback, otherwise it will get GC'd as it is an unmanged callback
+                    // Need to hold onto this callback, otherwise it will get garbage collected as it is an un-manged callback
                     _callback = (nCode, wParam, lParam) =>
                     {
                         if (nCode >= 0)
@@ -90,6 +91,10 @@ namespace Dapplo.Windows.Input.Keyboard
                         _callback = null;
                     });
                 })
+                // Make sure the key presses come in sequentially
+                .Synchronize()
+                // Make sure the subscribed logic runs on the TaskPool so the handling can continue even if this takes time
+                .ObserveOn(TaskPoolScheduler.Default)
                 .Publish()
                 .RefCount();
         }
@@ -107,7 +112,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <returns>KeyboardHookEventArgs</returns>
         private static KeyboardHookEventArgs CreateKeyboardEventArgs(IntPtr wParam, IntPtr lParam)
         {
-            var isKeyDown = wParam == (IntPtr) WmKeydown || wParam == (IntPtr) WmSyskeydown;
+            var isKeyDown = wParam == (IntPtr) WmKeyDown || wParam == (IntPtr) WmSysKeyDown;
 
             var keyboardLowLevelHookStruct = (KeyboardLowLevelHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardLowLevelHookStruct));
             bool isModifier = keyboardLowLevelHookStruct.VirtualKeyCode.IsModifier();
@@ -181,7 +186,7 @@ namespace Dapplo.Windows.Input.Keyboard
 
             // Do we need this??
             //http://msdn.microsoft.com/en-us/library/windows/desktop/ms646286(v=vs.85).aspx
-            if (!keyEventArgs.IsAlt && (wParam == (IntPtr) WmSyskeydown || wParam == (IntPtr)WmSyskeyup))
+            if (!keyEventArgs.IsAlt && (wParam == (IntPtr) WmSysKeyDown || wParam == (IntPtr)WmSysKeyUp))
             {
                 keyEventArgs.IsLeftAlt = true;
                 keyEventArgs.IsSystemKey = true;
@@ -224,9 +229,9 @@ namespace Dapplo.Windows.Input.Keyboard
 
         #region Native
 
-        private const int WmKeydown = 256;
-        private const int WmSyskeyup = 261;
-        private const int WmSyskeydown = 260;
+        private const int WmKeyDown = 256;
+        private const int WmSysKeyUp = 261;
+        private const int WmSysKeyDown = 260;
 
         /// <summary>
         ///     Retrieve the state of a key
@@ -250,12 +255,12 @@ namespace Dapplo.Windows.Input.Keyboard
         ///     Register a windows hook
         /// </summary>
         /// <param name="hookType">HookTypes</param>
-        /// <param name="lpfn">LowLevelKeyboardProc</param>
+        /// <param name="lowLevelKeyboardProc">LowLevelKeyboardProc</param>
         /// <param name="hMod">IntPtr</param>
         /// <param name="dwThreadId">uint</param>
         /// <returns>ID to be able to unhook it again</returns>
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern IntPtr SetWindowsHookEx(HookTypes hookType, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
+        private static extern IntPtr SetWindowsHookEx(HookTypes hookType, LowLevelKeyboardProc lowLevelKeyboardProc, IntPtr hMod, uint dwThreadId);
 
         /// <summary>
         ///     Used to remove a hook which was set with SetWindowsHookEx

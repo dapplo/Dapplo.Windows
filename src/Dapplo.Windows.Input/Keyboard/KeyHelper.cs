@@ -77,7 +77,7 @@ namespace Dapplo.Windows.Input.Keyboard
                             break;
                     }
                 }
-                // Make VC's to real keys
+                // Map virtual key codes to real keys
                 switch (virtualKey)
                 {
                     case VirtualKeyCode.Multiply:

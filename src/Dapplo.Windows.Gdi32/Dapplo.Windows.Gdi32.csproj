@@ -6,6 +6,7 @@
     <PackageId>Dapplo.Windows.Gdi32</PackageId>
     <PackageTags>windows native gdi</PackageTags>
     <TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
@@ -15,7 +16,7 @@
     <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9">
         <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Dapplo.Log" Version="1.3.20" />
+    <PackageReference Include="Dapplo.Log" Version="1.3.21" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="Microsoft.CSharp" />

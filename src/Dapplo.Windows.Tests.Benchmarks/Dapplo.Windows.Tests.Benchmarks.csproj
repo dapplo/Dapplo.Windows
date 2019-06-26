@@ -5,6 +5,8 @@
     <AssemblyName>Dapplo.Windows.Tests.Benchmarks</AssemblyName>
 	<OutputType>Exe</OutputType>
 	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Clipboard\Dapplo.Windows.Clipboard.csproj" />
