@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.Multimedia is a simple wrapper around WinMM</Description>
     <AssemblyTitle>Dapplo.Windows.Multimedia</AssemblyTitle>
@@ -10,10 +10,5 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="System" />
     <Reference Include="System.Core" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9" >
-        <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
 </Project>

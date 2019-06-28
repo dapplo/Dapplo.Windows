@@ -23,7 +23,9 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+#if !NETSTANDARD2_0
 using Dapplo.Log;
+#endif
 using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Clipboard.Internals
@@ -35,7 +37,10 @@ namespace Dapplo.Windows.Clipboard.Internals
     {
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(400);
         private static readonly TimeSpan DefaultRetryInterval = TimeSpan.FromMilliseconds(200);
+#if !NETSTANDARD2_0
         private static readonly LogSource Log = new LogSource();
+#endif
+
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         // To detect redundant calls
         private bool _disposedValue;

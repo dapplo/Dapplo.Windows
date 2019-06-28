@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.Shell32 provides logic of the Windows Shell32 API</Description>
     <AssemblyTitle>Dapplo.Windows.Shell32</AssemblyTitle>
@@ -7,11 +7,6 @@
     <PackageTags>windows native shell32</PackageTags>
     <TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="1.0.0.9" >
-        <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
   </ItemGroup>
