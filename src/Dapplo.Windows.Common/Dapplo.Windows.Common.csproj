@@ -5,12 +5,12 @@
     <AssemblyName>Dapplo.Windows.Common</AssemblyName>
     <PackageId>Dapplo.Windows.Common</PackageId>
     <PackageTags>windows native Common</PackageTags>
-    <TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp3.0;netstandard2.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<UseWindowsForms>true</UseWindowsForms>
 	<UseWPF>true</UseWPF>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net471'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />

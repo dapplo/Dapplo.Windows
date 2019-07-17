@@ -5,7 +5,7 @@
     <AssemblyName>Dapplo.Windows.Messages</AssemblyName>
     <PackageId>Dapplo.Windows.Messages</PackageId>
     <PackageTags>windows messages</PackageTags>
-    <TargetFrameworks>net471;netcoreapp3.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp3.0;netstandard2.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<UseWindowsForms>true</UseWindowsForms>
 	<UseWPF>true</UseWPF>
@@ -15,7 +15,7 @@
     <PackageReference Include="System.Reactive" Version="4.1.5" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
