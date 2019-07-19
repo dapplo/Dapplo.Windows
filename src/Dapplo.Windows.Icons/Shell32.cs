@@ -84,7 +84,7 @@ namespace Dapplo.Windows.Icons
         /// <returns>System.Drawing.Icon</returns>
         public static TIcon GetFileExtensionIcon<TIcon>(string filename, IconSize size, bool linkOverlay) where TIcon : class
         {
-            var shfi = new ShellFileInfo();
+            var shellFileInfo = new ShellFileInfo();
             // UseFileAttributes makes it simulate, just gets the icon for the extension
             var flags = ShellGetFileInfoFlags.Icon | ShellGetFileInfoFlags.UseFileAttributes;
 
@@ -103,20 +103,20 @@ namespace Dapplo.Windows.Icons
                 flags |= ShellGetFileInfoFlags.LargeIcon;
             }
 
-            SHGetFileInfo(Path.GetFileName(filename), FILE_ATTRIBUTE_NORMAL, ref shfi, (uint) Marshal.SizeOf(shfi), flags);
+            SHGetFileInfo(Path.GetFileName(filename), FILE_ATTRIBUTE_NORMAL, ref shellFileInfo, (uint) Marshal.SizeOf(shellFileInfo), flags);
 
-            // TODO: Fix bad practise for cleanup, and use generics to allow the user to specify if it's an icon/bitmap/-source
+            // TODO: Fix bad practice for cleanup, and use generics to allow the user to specify if it's an icon/bitmap/-source
             // Copy (clone) the returned icon to a new object, thus allowing us to clean-up properly
             try
             {
-                return IconHelper.IconHandleTo<TIcon>(shfi.IconHandle);
+                return IconHelper.IconHandleTo<TIcon>(shellFileInfo.IconHandle);
             }
             finally
             {
-                if (shfi.IconHandle != IntPtr.Zero)
+                if (shellFileInfo.IconHandle != IntPtr.Zero)
                 {
                     // Cleanup
-                    NativeIconMethods.DestroyIcon(shfi.IconHandle);
+                    NativeIconMethods.DestroyIcon(shellFileInfo.IconHandle);
                 }
             }
         }

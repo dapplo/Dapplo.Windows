@@ -43,7 +43,7 @@ namespace Dapplo.Windows.Icons
     public static class IconHelper
     {
         /// <summary>
-        /// Helper method to get the app logo from the mandest
+        /// Helper method to get the app logo from the applications AppxManifest
         /// </summary>
         /// <typeparam name="TBitmap">Type for the Bitmap, i.e. BitmapSource or Bitmap</typeparam>
         /// <param name="interopWindow">IInteropWindow</param>
@@ -203,8 +203,8 @@ namespace Dapplo.Windows.Icons
         }
 
         /// <summary>
-        ///     Based on <a href="http://www.codeproject.com/KB/cs/IconExtractor.aspx">this</a>
-        ///     And a hint from <a href="http://www.codeproject.com/KB/cs/IconLib.aspx">this</a>
+        ///     Based on <a href="http://www.codeproject.com/KB/cs/IconExtractor.aspx">Extract icons from EXE or DLL files</a>
+        ///     And a hint from <a href="http://www.codeproject.com/KB/cs/IconLib.aspx">IconLib - Icons Unfolded (MultiIcon and Windows Vista supported)</a>
         /// </summary>
         /// <param name="iconStream">Stream with the icon information</param>
         /// <returns>Bitmap with the Vista Icon (256x256)</returns>
