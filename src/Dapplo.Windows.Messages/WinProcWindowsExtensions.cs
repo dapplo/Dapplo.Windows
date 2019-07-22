@@ -19,11 +19,9 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-
-using System.Runtime.InteropServices;
-using Dapplo.Windows.Messages.Enums;
-using Dapplo.Windows.Messages.Structs;
 #if !NETSTANDARD2_0
+using System.Reactive;
+
 #region using
 
 using System;
@@ -42,29 +40,11 @@ namespace Dapplo.Windows.Messages
     public static class WinProcWindowsExtensions
     {
         /// <summary>
-        /// Registers the device or type of device for which a window will receive notifications.
-        /// </summary>
-        /// <param name="hRecipient">IntPtr</param>
-        /// <param name="notificationFilter">DevBroadcastDeviceInterface</param>
-        /// <param name="flags">DeviceNotifyFlags</param>
-        /// <returns></returns>
-        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern IntPtr RegisterDeviceNotification(IntPtr hRecipient, in DevBroadcastDeviceInterface notificationFilter, DeviceNotifyFlags flags);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="handle"></param>
-        /// <returns></returns>
-        [DllImport("user32.dll")]
-        internal static extern bool UnregisterDeviceNotification(IntPtr handle);
-
-        /// <summary>
         ///     Create an observable for the specified window
         /// </summary>
         public static IObservable<WindowMessageInfo> WinProcMessages(this Window window)
         {
-            return WinProcMessages(window, null);
+            return WinProcMessages<Unit>(window, null);
         }
 
         /// <summary>
@@ -72,22 +52,7 @@ namespace Dapplo.Windows.Messages
         /// </summary>
         public static IObservable<WindowMessageInfo> WinProcMessages(this HwndSource hwndSource)
         {
-            return WinProcMessages(null, hwndSource);
-        }
-
-        /// <summary>
-        ///     Create an observable for devices for the specified window
-        /// </summary>
-        public static IObservable<WindowMessageInfo> DeviceNotifications(this Window window)
-        {
-            return WinProcMessages(window, null, hWnd =>
-            {
-                var devBroadcastDeviceInterface = DevBroadcastDeviceInterface.Create();
-                var deviceNotifyFlags = DeviceNotifyFlags.WindowHandle | DeviceNotifyFlags.AllInterfaceClasses;
-
-                var deviceNotificationHandle = RegisterDeviceNotification(hWnd, devBroadcastDeviceInterface, deviceNotifyFlags);
-                return deviceNotificationHandle;
-            }, o => UnregisterDeviceNotification((IntPtr) o)).Where(windowMessageInfo => windowMessageInfo.Message == WindowsMessages.WM_DEVICECHANGE);
+            return WinProcMessages<Unit>(null, hwndSource);
         }
 
         /// <summary>
@@ -95,8 +60,10 @@ namespace Dapplo.Windows.Messages
         /// </summary>
         /// <param name="window">Window</param>
         /// <param name="hWndSource">HwndSource</param>
+        /// <param name="before">Func which does something as soon as the observable is created</param>
+        /// <param name="disposeAction">Action which disposes something when the observable is disposed</param>
         /// <returns>IObservable</returns>
-        private static IObservable<WindowMessageInfo> WinProcMessages(Window window, HwndSource hWndSource, Func<IntPtr, object> before = null, Action<object> dispose = null)
+        internal static IObservable<WindowMessageInfo> WinProcMessages<TState>(Window window, HwndSource hWndSource, Func<IntPtr, TState> before = null, Action<TState> disposeAction = null)
         {
             if (window == null && hWndSource == null)
             {
@@ -119,7 +86,7 @@ namespace Dapplo.Windows.Messages
                         return IntPtr.Zero;
                     }
 
-                    object state = null;
+                    TState state = default;
 
                     void HwndSourceDisposedHandle(object sender, EventArgs e)
                     {
@@ -128,7 +95,10 @@ namespace Dapplo.Windows.Messages
                     
                     void RegisterHwndSource()
                     {
-                        state = before?.Invoke(hWndSource.Handle);
+                        if (before != null)
+                        {
+                            state = before(hWndSource.Handle);
+                        }
                         hWndSource.Disposed += HwndSourceDisposedHandle;
                         hWndSource.AddHook(WindowMessageHandler);
                     }
@@ -140,7 +110,7 @@ namespace Dapplo.Windows.Messages
                     if (hWndSource != null) { 
                         RegisterHwndSource();
                     }
-                    else
+                    else if (window != null)
                     {
                         // No, try to get it later
                         window.SourceInitialized += (sender, args) =>
@@ -154,7 +124,7 @@ namespace Dapplo.Windows.Messages
 
                     return Disposable.Create(() =>
                     {
-                        dispose?.Invoke(state);
+                        disposeAction?.Invoke(state);
                         hWndSource.Disposed -= HwndSourceDisposedHandle;
                         hWndSource.RemoveHook(WindowMessageHandler);
                         hWndSource.Dispose();

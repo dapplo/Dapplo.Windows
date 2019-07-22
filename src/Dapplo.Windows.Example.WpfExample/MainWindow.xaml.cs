@@ -22,12 +22,12 @@
 using System;
 using System.Diagnostics;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
 using Dapplo.Windows.Dpi.Wpf;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.Messages.Structs;
+using Dapplo.Windows.User32;
 
 namespace Dapplo.Windows.Example.WpfExample
 {
@@ -46,23 +46,22 @@ namespace Dapplo.Windows.Example.WpfExample
                 .Subscribe(m => { MessageBox.Show($"{m.Message}"); });
 
             this.DeviceNotifications()
-                .Subscribe(m =>
+                .Subscribe(deviceChangeEvent =>
                 {
-                    var deviceChangeEvent = (DeviceChangeEvent) m.WordParam.ToInt32();
-                    Debug.WriteLine("Device change!: {0}", deviceChangeEvent);
-                    switch (deviceChangeEvent)
+                    Debug.WriteLine("Device change: {0}", deviceChangeEvent.EventType);
+                    switch (deviceChangeEvent.EventType)
                     {
                         case DeviceChangeEvent.DeviceArrival:
                         case DeviceChangeEvent.DeviceRemoveComplete:
-                            var header = Marshal.PtrToStructure<DevBroadcastHeader>(m.LongParam);
-                            if (header.DeviceType == DeviceBroadcastDeviceType.DeviceInterface)
+                            if (deviceChangeEvent.TryGetDeviceBroadcastDeviceType(out DevBroadcastDeviceInterface devBroadcastDeviceInterface))
                             {
-                                var deviceInterface = Marshal.PtrToStructure<DevBroadcastDeviceInterface>(m.LongParam);
-                                Debug.WriteLine("{0}: device: {1}, class: {2}", deviceChangeEvent, deviceInterface.Name, deviceInterface.ClassGuid);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("{0}: unknown device", deviceChangeEvent);
+                                Debug.WriteLine("{0}: {1}", devBroadcastDeviceInterface, devBroadcastDeviceInterface.FriendlyDeviceName());
+
+                                // A small example to lock the PC when a yubikey is removed
+                                if (devBroadcastDeviceInterface.Name.Contains("Yubi") && deviceChangeEvent.EventType == DeviceChangeEvent.DeviceRemoveComplete)
+                                {
+                                    User32Api.LockWorkStation();
+                                }
                             }
                             break;
                     }

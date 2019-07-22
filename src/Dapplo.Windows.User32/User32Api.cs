@@ -1172,6 +1172,15 @@ namespace Dapplo.Windows.User32
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, ref AnimationInfo animationInfo, SystemParametersInfoBehaviors fWinIni);
 
-#endregion
+
+        /// <summary>
+        /// Locks the workstation's display. Locking a workstation protects it from unauthorized use.
+        /// </summary>
+        /// <returns>Because the function executes asynchronously, true indicates that the operation has been initiated. If false, call GetLastError</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool LockWorkStation();
+
+        #endregion
     }
 }
