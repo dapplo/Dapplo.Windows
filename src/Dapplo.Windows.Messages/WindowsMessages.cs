@@ -527,6 +527,14 @@ namespace Dapplo.Windows.Messages
 
         WM_POWERBROADCAST = 0x0218,
 
+        /// <summary>
+        /// See <a href="https://docs.microsoft.com/en-us/windows/win32/devio/wm-devicechange">WM_DEVICECHANGE message</a>
+        /// Notifies an application of a change to the hardware configuration of a device or the computer.
+        /// wParam - The event that has occurred (DeviceChangeEvent)
+        /// lParam - A pointer to a structure that contains event-specific data. Its format depends on the value of the wParam parameter. For more information, refer to the documentation for each event
+        /// 
+        /// Return TRUE to grant the request, return BROADCAST_QUERY_DENY to deny the request.
+        /// </summary>
         WM_DEVICECHANGE = 0x0219,
 
         WM_MDICREATE = 0x0220,
