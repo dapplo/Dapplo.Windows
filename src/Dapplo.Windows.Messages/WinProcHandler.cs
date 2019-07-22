@@ -50,7 +50,7 @@ namespace Dapplo.Windows.Messages
         /// <summary>
         ///     Store hooks, so they can be removed
         /// </summary>
-        private List<HwndSourceHook> _hooks = new List<HwndSourceHook>();
+        private List<WinProcHandlerHook> _hooks = new List<WinProcHandlerHook>();
 
         /// <summary>
         ///     Special HwndSource which is only there for handling messages, is top-level (no parent) to be able to handle ALL windows messages
@@ -104,31 +104,34 @@ namespace Dapplo.Windows.Messages
         /// <summary>
         ///     Subscribe a hook to handle messages
         /// </summary>
-        /// <param name="hWndSourceHook">HwndSourceHook</param>
+        /// <param name="winProcHandlerHook">WinProcHandlerHook</param>
         /// <returns>IDisposable which unsubscribes the hWndSourceHook when Dispose is called</returns>
-        public IDisposable Subscribe(HwndSourceHook hWndSourceHook)
+        public IDisposable Subscribe(WinProcHandlerHook winProcHandlerHook)
         {
-            if (_hooks != null && _hooks.Contains(hWndSourceHook))
+            if (_hooks != null && _hooks.Contains(winProcHandlerHook))
             {
                 return Disposable.Empty;
             }
 
-            MessageHandlerWindow.AddHook(hWndSourceHook);
+            MessageHandlerWindow.AddHook(winProcHandlerHook.Hook);
 
             // Clone and add
-            var newHooks = _hooks?.ToList() ?? new List<HwndSourceHook>();
-            newHooks.Add(hWndSourceHook);
+            var newHooks = _hooks?.ToList() ?? new List<WinProcHandlerHook>();
+            newHooks.Add(winProcHandlerHook);
             _hooks = newHooks;
-            return Disposable.Create(() => { Unsubscribe(hWndSourceHook); });
+            return Disposable.Create(() =>
+            {
+                Unsubscribe(winProcHandlerHook);
+            });
         }
 
         /// <summary>
         ///     Unsubscribe a hook
         /// </summary>
-        /// <param name="hWndSourceHook">HwndSourceHook</param>
-        private void Unsubscribe(HwndSourceHook hWndSourceHook)
+        /// <param name="winProcHandlerHook">WinProcHandlerHook</param>
+        private void Unsubscribe(WinProcHandlerHook winProcHandlerHook)
         {
-            MessageHandlerWindow.RemoveHook(hWndSourceHook);
+            MessageHandlerWindow.RemoveHook(winProcHandlerHook.Hook);
 
             if (_hooks == null)
             {
@@ -137,8 +140,9 @@ namespace Dapplo.Windows.Messages
 
             // Clone and remove
             var newHooks = _hooks.ToList();
-            newHooks.Remove(hWndSourceHook);
+            newHooks.Remove(winProcHandlerHook);
             _hooks = newHooks;
+            winProcHandlerHook.Disposable?.Dispose();
         }
 
         /// <summary>
@@ -146,9 +150,10 @@ namespace Dapplo.Windows.Messages
         /// </summary>
         public void UnsubscribeAllHooks()
         {
-            foreach (var hWndSourceHook in _hooks ?? Enumerable.Empty<HwndSourceHook>())
+            foreach (var winProcHandlerHook in _hooks ?? Enumerable.Empty<WinProcHandlerHook>())
             {
-                MessageHandlerWindow.RemoveHook(hWndSourceHook);
+                MessageHandlerWindow.RemoveHook(winProcHandlerHook.Hook);
+                winProcHandlerHook.Disposable?.Dispose();
             }
             _hooks = null;
         }

@@ -139,13 +139,13 @@ namespace Dapplo.Windows.Messages
         private bool ProcessMessage(Message message)
         {
             bool handled = false;
-            foreach (var hwndSourceHook in _hooks ?? Enumerable.Empty<HwndSourceHook>())
+            foreach (var hWndSourceHook in _hooks ?? Enumerable.Empty<HwndSourceHook>())
             {
                 if (IsDisposed)
                 {
                     break;
                 }
-                message.Result = hwndSourceHook.Invoke(message.HWnd, message.Msg, message.WParam, message.LParam, ref handled);
+                message.Result = hWndSourceHook.Invoke(message.HWnd, message.Msg, message.WParam, message.LParam, ref handled);
                 if (handled)
                 {
                     break;

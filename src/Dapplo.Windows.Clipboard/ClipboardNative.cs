@@ -74,7 +74,8 @@ namespace Dapplo.Windows.Clipboard
                     return IntPtr.Zero;
                 }
 
-                var hookSubscription = WinProcHandler.Instance.Subscribe(WinProcClipboardMessageHandler);
+                var hook = new WinProcHandlerHook(WinProcClipboardMessageHandler);
+                var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
                 if (!NativeMethods.AddClipboardFormatListener(WinProcHandler.Instance.Handle))
                 {
                     observer.OnError(new Win32Exception());
@@ -85,7 +86,7 @@ namespace Dapplo.Windows.Clipboard
                     observer.OnNext(ClipboardUpdateInformation.Create());
                 }
 
-                return Disposable.Create(() =>
+                return hook.Disposable = Disposable.Create(() =>
                 {
                     NativeMethods.RemoveClipboardFormatListener(WinProcHandler.Instance.Handle);
                     hookSubscription.Dispose();

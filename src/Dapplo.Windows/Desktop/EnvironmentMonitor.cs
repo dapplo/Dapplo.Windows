@@ -69,7 +69,7 @@ namespace Dapplo.Windows.Desktop
                         return IntPtr.Zero;
                     }
 
-                    return WinProcHandler.Instance.Subscribe(WinProcSettingsChangeHandler);
+                    return WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(WinProcSettingsChangeHandler));
                 })
                 .Publish()
                 .RefCount();

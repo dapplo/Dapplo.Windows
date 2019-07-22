@@ -19,33 +19,24 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using System;
-using System.Reactive.Linq;
-using System.Windows;
-using Dapplo.Windows.Dpi.Wpf;
-using Dapplo.Windows.Messages;
-using Dapplo.Windows.User32;
+using Dapplo.Windows.Messages.Enums;
+using Dapplo.Windows.Messages.Structs;
 
-namespace Dapplo.Windows.Example.WpfExample
+namespace Dapplo.Windows.Messages
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Information on device changes
     /// </summary>
-    public partial class MainWindow
+    public class DeviceInterfaceChangeInfo
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-            this.AttachDpiHandler();
+        /// <summary>
+        /// Type of the event
+        /// </summary>
+        public DeviceChangeEvent EventType { get; internal set; }
 
-            this.WinProcMessages()
-                .Where(m => m.Message == WindowsMessages.WM_DESTROY)
-                .Subscribe(m => { MessageBox.Show($"{m.Message}"); });
-
-            // A small example to lock the PC when a yubikey is removed
-            DeviceNotification.OnDeviceRemoved()
-                .Where(deviceInterfaceChangeInfo => deviceInterfaceChangeInfo.Device.Name.Contains("Yubi"))
-                .Subscribe(deviceInterfaceChangeInfo => User32Api.LockWorkStation());
-        }
+        /// <summary>
+        /// The already prepared DevBroadcastDeviceInterface
+        /// </summary>
+        public DevBroadcastDeviceInterface Device { get; internal set; }
     }
 }

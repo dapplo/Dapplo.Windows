@@ -24,7 +24,6 @@ using System.Windows.Forms;
 using BenchmarkDotNet.Attributes;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.User32;
-using Dapplo.Windows.User32.Structs;
 
 namespace Dapplo.Windows.Tests.Benchmarks
 {

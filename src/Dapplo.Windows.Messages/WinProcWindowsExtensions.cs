@@ -70,8 +70,6 @@ namespace Dapplo.Windows.Messages
                 throw new NotSupportedException("One of Window or HwndSource must be supplied");
             }
 
-            // TODO: Use a cache for the observable?
-
             return Observable.Create<WindowMessageInfo>(observer =>
                 {
                     // This handles the message, and generates the observable OnNext

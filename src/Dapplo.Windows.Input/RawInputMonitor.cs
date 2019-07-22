@@ -42,7 +42,7 @@ namespace Dapplo.Windows.Input
 
         static RawInputMonitor()
         {
-            WinProcHandler.Instance.Subscribe(HandleRawInputMessages);
+            WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(HandleRawInputMessages));
         }
 
         /// <summary>

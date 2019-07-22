@@ -25,22 +25,35 @@ using Dapplo.Windows.Messages.Enums;
 namespace Dapplo.Windows.Messages.Structs
 {
     /// <summary>
-    /// Serves as a standard header for information related to a device event reported through the WM_DEVICECHANGE message.
-    /// 
-    /// The members of the DEV_BROADCAST_HDR structure are contained in each device management structure. To determine which structure you have received through WM_DEVICECHANGE, treat the structure as a DEV_BROADCAST_HDR structure and check its dbch_devicetype member.
-    /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/dbt/ns-dbt-_dev_broadcast_hdr">DEV_BROADCAST_HDR structure</a>
+    /// Contains information about a modem, serial, or parallel port.
+    /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/dbt/ns-dbt-dev_broadcast_port_w">DEV_BROADCAST_PORT_W structure</a>
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct DevBroadcastHeader
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct DevBroadcastPort
     {
-        private readonly int _size;
+        private int _size;
         // The device type, which determines the event-specific information that follows the first three members. 
-        private readonly DeviceBroadcastDeviceType _deviceType;
+        private DeviceBroadcastDeviceType _deviceType;
         private readonly int _reserved;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
+        private readonly string _name;
 
         /// <summary>
-        /// The device type, which determines the event-specific information that follows the first three members. 
+        /// The name of the device.
         /// </summary>
-        public DeviceBroadcastDeviceType DeviceType => _deviceType;
+        public string Name => _name;
+
+        /// <summary>
+        /// Factory for an empty DevBroadcastPort
+        /// </summary>
+        /// <returns>DevBroadcastPort</returns>
+        public static DevBroadcastPort Create()
+        {
+            return new DevBroadcastPort
+            {
+                _deviceType = DeviceBroadcastDeviceType.Port,
+                _size = Marshal.SizeOf(typeof(DevBroadcastPort))
+            };
+        }
     }
 }

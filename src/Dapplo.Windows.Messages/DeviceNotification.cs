@@ -19,14 +19,15 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+
 #if !NETSTANDARD2_0
 using System;
+using System.ComponentModel;
 using System.Reactive.Linq;
+using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
-using System.Windows;
 using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.Messages.Structs;
-using Microsoft.Win32;
 
 namespace Dapplo.Windows.Messages
 {
@@ -55,23 +56,94 @@ namespace Dapplo.Windows.Messages
         private static extern bool UnregisterDeviceNotification(IntPtr handle);
 
         /// <summary>
-        ///     Create an observable for devices for the specified window
+        ///     This observable publishes the current clipboard contents after every paste action.
+        ///     Best to use SubscribeOn with the UI SynchronizationContext.
         /// </summary>
-        public static IObservable<DeviceNotificationEvent> DeviceNotifications(this Window window)
-        {
-            // TODO: Change to service handle, instead of WindowHandle which would prevent a lot of window complexity
-            return WinProcWindowsExtensions.WinProcMessages(window, null, hWnd => {
-                    var devBroadcastDeviceInterface = DevBroadcastDeviceInterface.Create();
-                    var deviceNotifyFlags = DeviceNotifyFlags.WindowHandle | DeviceNotifyFlags.AllInterfaceClasses;
+        public static IObservable<DeviceNotificationEvent> OnNotification { get; }
 
-                    var deviceNotificationHandle = RegisterDeviceNotification(hWnd, devBroadcastDeviceInterface, deviceNotifyFlags);
-                    return deviceNotificationHandle;
-                }, deviceNotificationHandle => UnregisterDeviceNotification(deviceNotificationHandle))
-                .Where(windowMessageInfo => windowMessageInfo.Message == WindowsMessages.WM_DEVICECHANGE)
-                .Select(info => new DeviceNotificationEvent
+        /// <summary>
+        ///     Private constructor to create the DeviceNotifications observable
+        /// </summary>
+        static DeviceNotification()
+        {
+            OnNotification = Observable.Create<DeviceNotificationEvent>(observer =>
+            {
+                var devBroadcastDeviceInterface = DevBroadcastDeviceInterface.Create();
+                var deviceNotifyFlags = DeviceNotifyFlags.WindowHandle | DeviceNotifyFlags.AllInterfaceClasses;
+
+                var deviceNotificationHandle = RegisterDeviceNotification(WinProcHandler.Instance.Handle, devBroadcastDeviceInterface, deviceNotifyFlags);
+
+                if (deviceNotificationHandle == IntPtr.Zero)
                 {
-                    EventType = (DeviceChangeEvent)info.WordParam.ToInt32(),
-                    DeviceBroadcastPtr = info.LongParam
+                    observer.OnError(new Win32Exception());
+                }
+
+                // This handles the message
+                IntPtr WinProcClipboardMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                {
+                    var windowsMessage = (WindowsMessages)msg;
+                    if (windowsMessage != WindowsMessages.WM_NCDESTROY)
+                    {
+                        return IntPtr.Zero;
+                    }
+
+                    observer.OnNext(new DeviceNotificationEvent
+                    {
+                        EventType = (DeviceChangeEvent) wParam.ToInt32(),
+                        DeviceBroadcastPtr = lParam
+                    });
+
+                    return IntPtr.Zero;
+                }
+
+                var hook = new WinProcHandlerHook(WinProcClipboardMessageHandler);
+                var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
+                return hook.Disposable = Disposable.Create(() =>
+                {
+                    UnregisterDeviceNotification(deviceNotificationHandle);
+                    hookSubscription.Dispose();
+                });
+            })
+            // Make sure there is always a value produced when connecting
+            .Publish()
+            .RefCount();
+        }
+
+        /// <summary>
+        /// A simplification for on device arrival
+        /// </summary>
+        /// <returns>IObservable with DeviceInterfaceInfo</returns>
+        public static IObservable<DeviceInterfaceChangeInfo> OnDeviceArrival()
+        {
+            return OnNotification
+                .Where(deviceNotificationEvent => deviceNotificationEvent.EventType == DeviceChangeEvent.DeviceArrival)
+                .Select(deviceNotificationEvent =>
+                    {
+                        deviceNotificationEvent.TryGetDeviceBroadcastDeviceType(out var devBroadcastDeviceInterface);
+                        return new DeviceInterfaceChangeInfo
+                        {
+                            EventType = deviceNotificationEvent.EventType,
+                            Device = devBroadcastDeviceInterface
+                        };
+                    });
+        }
+
+        /// <summary>
+        /// A simplification for on device remove complete
+        /// </summary>
+        /// <returns>IObservable with DeviceInterfaceInfo</returns>
+        public static IObservable<DeviceInterfaceChangeInfo> OnDeviceRemoved()
+        {
+            return OnNotification
+                .Where(deviceNotificationEvent => deviceNotificationEvent.EventType == DeviceChangeEvent.DeviceRemoveComplete)
+                .Select(deviceNotificationEvent =>
+                {
+                    deviceNotificationEvent.TryGetDeviceBroadcastDeviceType(out var devBroadcastDeviceInterface);
+                    return new DeviceInterfaceChangeInfo
+                    {
+                        EventType = deviceNotificationEvent.EventType,
+                        Device = devBroadcastDeviceInterface
+                    };
                 });
         }
 
@@ -91,49 +163,6 @@ namespace Dapplo.Windows.Messages
             }
             devBroadcastDeviceInterface = Marshal.PtrToStructure<DevBroadcastDeviceInterface>(deviceNotificationEvent.DeviceBroadcastPtr);
             return true;
-        }
-
-        /// <summary>
-        /// Generate a friendly device name from a DevBroadcastDeviceInterface
-        /// </summary>
-        /// <param name="devBroadcastDeviceInterface">DevBroadcastDeviceInterface</param>
-        /// <returns>string</returns>
-        public static string FriendlyDeviceName(this DevBroadcastDeviceInterface devBroadcastDeviceInterface)
-        {
-            string[] parts = devBroadcastDeviceInterface.Name.Split('#');
-            if (parts.Length < 3)
-            {
-                return devBroadcastDeviceInterface.Name;
-            }
-
-            string devType = parts[0].Substring(parts[0].IndexOf(@"?\", StringComparison.Ordinal) + 2);
-            string deviceInstanceId = parts[1];
-            string deviceUniqueId = parts[2];
-            string regPath = @"SYSTEM\CurrentControlSet\Enum\" + devType + "\\" + deviceInstanceId + "\\" + deviceUniqueId;
-            using (var key = Registry.LocalMachine.OpenSubKey(regPath))
-            {
-                if (key == null)
-                {
-                    return devBroadcastDeviceInterface.Name;
-                }
-
-                if (key.GetValue("FriendlyName") is string result)
-                {
-                    return result;
-                }
-                result = key.GetValue("DeviceDesc") as string;
-                if (result != null)
-                {
-                    // Example: @msclmd.inf,%scmspivcarddevicename%;Identifizierungsgerät (NIST SP 800-73 [PIV])
-                    var semiColonIndex = result.LastIndexOf(';');
-                    if (semiColonIndex >= 0)
-                    {
-                        return result.Substring(semiColonIndex + 1);
-                    }
-                    return result;
-                }
-            }
-            return devBroadcastDeviceInterface.Name;
         }
     }
 }

@@ -19,33 +19,35 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+#if !NETSTANDARD2_0
 using System;
-using System.Reactive.Linq;
-using System.Windows;
-using Dapplo.Windows.Dpi.Wpf;
-using Dapplo.Windows.Messages;
-using Dapplo.Windows.User32;
+using System.Windows.Interop;
 
-namespace Dapplo.Windows.Example.WpfExample
+namespace Dapplo.Windows.Messages
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Wrapper of the HwndSourceHook for the WinProcHandler, to allow to specify a disposable
     /// </summary>
-    public partial class MainWindow
+    public class WinProcHandlerHook
     {
-        public MainWindow()
+        /// <summary>
+        /// The actual HwndSourceHook
+        /// </summary>
+        public HwndSourceHook Hook { get; }
+
+        /// <summary>
+        /// Optional disposable which is called to make a cleanup possible
+        /// </summary>
+        public IDisposable Disposable { get; set; }
+
+        /// <summary>
+        /// Default constructor, taking the needed HwndSourceHook
+        /// </summary>
+        /// <param name="hook">HwndSourceHook</param>
+        public WinProcHandlerHook(HwndSourceHook hook)
         {
-            InitializeComponent();
-            this.AttachDpiHandler();
-
-            this.WinProcMessages()
-                .Where(m => m.Message == WindowsMessages.WM_DESTROY)
-                .Subscribe(m => { MessageBox.Show($"{m.Message}"); });
-
-            // A small example to lock the PC when a yubikey is removed
-            DeviceNotification.OnDeviceRemoved()
-                .Where(deviceInterfaceChangeInfo => deviceInterfaceChangeInfo.Device.Name.Contains("Yubi"))
-                .Subscribe(deviceInterfaceChangeInfo => User32Api.LockWorkStation());
+            Hook = hook;
         }
     }
 }
+#endif

@@ -53,7 +53,7 @@ namespace Dapplo.Windows.Tests
                 return IntPtr.Zero;
             }
 
-            WinProcHandler.Instance.Subscribe(WinProcClipboardHandler);
+            WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(WinProcClipboardHandler));
         }
 
         /// <summary>
