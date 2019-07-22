@@ -42,7 +42,7 @@ namespace Dapplo.Windows.Example.WpfExample
                 .Where(m => m.Message == WindowsMessages.WM_DESTROY)
                 .Subscribe(m => { MessageBox.Show($"{m.Message}"); });
 
-            // A small example to lock the PC when a yubikey is removed
+            // A small example to lock the PC when a YubiKey is removed
             DeviceNotification.OnDeviceRemoved()
                 .Where(deviceInterfaceChangeInfo => deviceInterfaceChangeInfo.Device.Name.Contains("Yubi"))
                 .Subscribe(deviceInterfaceChangeInfo => User32Api.LockWorkStation());

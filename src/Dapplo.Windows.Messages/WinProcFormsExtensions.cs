@@ -47,9 +47,9 @@ namespace Dapplo.Windows.Messages
             {
                 winProcListener.AddHook(WindowMessageHandler);
                 // This handles the message, and generates the observable OnNext
-                IntPtr WindowMessageHandler(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                IntPtr WindowMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                 {
-                    var message = WindowMessageInfo.Create(hwnd, msg, wParam, lParam);
+                    var message = WindowMessageInfo.Create(hWnd, msg, wParam, lParam);
                     observer.OnNext(message);
                     // ReSharper disable once AccessToDisposedClosure
                     if (winProcListener.IsDisposed || message.Message == WindowsMessages.WM_DESTROY)

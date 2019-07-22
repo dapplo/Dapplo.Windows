@@ -123,11 +123,11 @@ namespace Dapplo.Windows.DesktopWindowsManager
         ///     </a>
         ///     Enables the blur effect on a specified window.
         /// </summary>
-        /// <param name="hwnd">The handle to the window on which the blur behind data is applied.</param>
+        /// <param name="hWnd">The handle to the window on which the blur behind data is applied.</param>
         /// <param name="blurBehind">DwmBlurBehind</param>
         /// <returns>HResult</returns>
         [DllImport(DwmApiDll, SetLastError = true)]
-        public static extern HResult DwmEnableBlurBehindWindow(IntPtr hwnd, ref DwmBlurBehind blurBehind);
+        public static extern HResult DwmEnableBlurBehindWindow(IntPtr hWnd, ref DwmBlurBehind blurBehind);
 
         /// <summary>
         ///     See
@@ -155,7 +155,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         ///     Retrieves the current value of a specified attribute applied to a window.
         ///     TODO: Currently only DWMWA_EXTENDED_FRAME_BOUNDS is supported, due to the type of lpRect
         /// </summary>
-        /// <param name="hwnd">The handle to the window from which the attribute data is retrieved.</param>
+        /// <param name="hWnd">The handle to the window from which the attribute data is retrieved.</param>
         /// <param name="dwAttribute">The attribute to retrieve, specified as a DwmWindowAttributes value.</param>
         /// <param name="lpRect">
         ///     A pointer to a value that, when this function returns successfully, receives the current value of
@@ -167,7 +167,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         ///     parameter.
         /// </returns>
         [DllImport(DwmApiDll, SetLastError = true)]
-        public static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttribute, out NativeRect lpRect, int size);
+        public static extern HResult DwmGetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttribute, out NativeRect lpRect, int size);
 
         /// <summary>
         ///     See
@@ -197,12 +197,12 @@ namespace Dapplo.Windows.DesktopWindowsManager
         ///     Activate Aero Peek
         /// </summary>
         /// <param name="active">uint</param>
-        /// <param name="handle"></param>
+        /// <param name="hWnd">IntPtr</param>
         /// <param name="onTopHandle">IntPtr</param>
         /// <param name="unknown">uint</param>
         /// <returns>HResult</returns>
         [DllImport(DwmApiDll, EntryPoint = "#113", SetLastError = true)]
-        internal static extern HResult DwmpActivateLivePreview(uint active, IntPtr handle, IntPtr onTopHandle, uint unknown);
+        internal static extern HResult DwmpActivateLivePreview(uint active, IntPtr hWnd, IntPtr onTopHandle, uint unknown);
 
         /// <summary>
         ///     Activate Windows + Tab effect
@@ -223,12 +223,12 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <summary>
         /// Creates a Desktop Window Manager (DWM) thumbnail relationship between the destination and source windows.
         /// </summary>
-        /// <param name="hwndDestination">The handle to the window that will use the DWM thumbnail. Setting the destination window handle to anything other than a top-level window type will result in a return value of E_INVALIDARG.</param>
-        /// <param name="hwndSource">The handle to the window to use as the thumbnail source. Setting the source window handle to anything other than a top-level window type will result in a return value of E_INVALIDARG.</param>
+        /// <param name="hWndDestination">The handle to the window that will use the DWM thumbnail. Setting the destination window handle to anything other than a top-level window type will result in a return value of E_INVALIDARG.</param>
+        /// <param name="hWndSource">The handle to the window to use as the thumbnail source. Setting the source window handle to anything other than a top-level window type will result in a return value of E_INVALIDARG.</param>
         /// <param name="phThumbnailId">A pointer to a handle that, when this function returns successfully, represents the registration of the DWM thumbnail.</param>
         /// <returns>HResult</returns>
         [DllImport(DwmApiDll, SetLastError = true)]
-        public static extern HResult DwmRegisterThumbnail(IntPtr hwndDestination, IntPtr hwndSource, out IntPtr phThumbnailId);
+        public static extern HResult DwmRegisterThumbnail(IntPtr hWndDestination, IntPtr hWndSource, out IntPtr phThumbnailId);
 
         /// <summary>
         ///     Sets a static, iconic bitmap to display a live preview (also known as a Peek preview) of a window or tab. The
@@ -239,8 +239,8 @@ namespace Dapplo.Windows.DesktopWindowsManager
         ///         function
         ///     </a>
         /// </summary>
-        /// <param name="hwnd">IntPtr for the window Handle</param>
-        /// <param name="hbitmap">IntPtr for the bitmap</param>
+        /// <param name="hWnd">IntPtr for the window Handle</param>
+        /// <param name="hBitmap">IntPtr for the bitmap</param>
         /// <param name="ptClient">
         ///     The offset of a tab window's client region (the content area inside the client window frame)
         ///     from the host window's frame. This offset enables the tab window's contents to be drawn correctly in a live preview
@@ -249,7 +249,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="setIconicLivePreviewFlags">The display options for the live preview.</param>
         /// <returns>HResult</returns>
         [DllImport(DwmApiDll, SetLastError = true)]
-        internal static extern HResult DwmSetIconicLivePreviewBitmap(IntPtr hwnd, IntPtr hbitmap, ref NativePoint ptClient, DwmSetIconicLivePreviewFlags setIconicLivePreviewFlags);
+        internal static extern HResult DwmSetIconicLivePreviewBitmap(IntPtr hWnd, IntPtr hBitmap, ref NativePoint ptClient, DwmSetIconicLivePreviewFlags setIconicLivePreviewFlags);
 
         /// <summary>
         ///     Sets the value of non-client rendering attributes for a window.
@@ -259,7 +259,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         ///         function
         ///     </a>
         /// </summary>
-        /// <param name="hwnd">IntPtr with the handle to the window that will receive the attributes.</param>
+        /// <param name="hWnd">IntPtr with the handle to the window that will receive the attributes.</param>
         /// <param name="dwAttributeToSet">
         ///     A single DWMWINDOWATTRIBUTE flag to apply to the window. This parameter specifies the
         ///     attribute and the pvAttribute parameter points to the value of that attribute.
@@ -271,7 +271,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="cbAttribute">The size, in bytes, of the value type pointed to by the pvAttribute parameter.</param>
         /// <returns></returns>
         [DllImport(DwmApiDll, SetLastError = true)]
-        public static extern HResult DwmSetWindowAttribute(IntPtr hwnd, DwmWindowAttributes dwAttributeToSet, IntPtr pvAttributeValue, uint cbAttribute);
+        public static extern HResult DwmSetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttributeToSet, IntPtr pvAttributeValue, uint cbAttribute);
 
         /// <summary>
         /// Removes a Desktop Window Manager (DWM) thumbnail relationship created by the DwmRegisterThumbnail function.

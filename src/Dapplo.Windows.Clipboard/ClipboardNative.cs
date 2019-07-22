@@ -54,7 +54,7 @@ namespace Dapplo.Windows.Clipboard
             OnUpdate = Observable.Create<ClipboardUpdateInformation>(observer =>
             {
                 // This handles the message
-                IntPtr WinProcClipboardMessageHandler(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                IntPtr WinProcClipboardMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                 {
                     var windowsMessage = (WindowsMessages)msg;
                     if (windowsMessage != WindowsMessages.WM_CLIPBOARDUPDATE)
@@ -62,7 +62,7 @@ namespace Dapplo.Windows.Clipboard
                         return IntPtr.Zero;
                     }
 
-                    var clipboardUpdateInformationInfo = ClipboardUpdateInformation.Create(hwnd);
+                    var clipboardUpdateInformationInfo = ClipboardUpdateInformation.Create(hWnd);
 
                     // Make sure we don't trigger multiple times, this happend while developing.
                     if (clipboardUpdateInformationInfo.Id > _previousSequence)

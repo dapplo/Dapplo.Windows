@@ -32,7 +32,7 @@ namespace Dapplo.Windows.Messages.Structs
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public readonly struct Msg
     {
-        private readonly IntPtr _hwnd;
+        private readonly IntPtr _hWnd;
         private readonly WindowsMessages _message;
         private readonly UIntPtr _wParam;
         private readonly UIntPtr _lParam;
@@ -42,7 +42,7 @@ namespace Dapplo.Windows.Messages.Structs
         /// <summary>
         /// Identifies the window whose window procedure receives the message.
         /// </summary>
-        public IntPtr Handle => _hwnd;
+        public IntPtr Handle => _hWnd;
 
         /// <summary>
         /// The message identifier.

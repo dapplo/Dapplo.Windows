@@ -50,9 +50,9 @@ namespace Dapplo.Windows.Messages
         /// <summary>
         ///     Create an observable for the specified HwndSource
         /// </summary>
-        public static IObservable<WindowMessageInfo> WinProcMessages(this HwndSource hwndSource)
+        public static IObservable<WindowMessageInfo> WinProcMessages(this HwndSource hWndSource)
         {
-            return WinProcMessages<Unit>(null, hwndSource);
+            return WinProcMessages<Unit>(null, hWndSource);
         }
 
         /// <summary>

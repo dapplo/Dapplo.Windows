@@ -37,7 +37,7 @@ namespace Dapplo.Windows.Input.Structs
     /// If RIDEV_NOLEGACY is set for a mouse or a keyboard, the system does not generate any legacy message for that device for the application.
     /// For example, if the mouse TLC is set with RIDEV_NOLEGACY, WM_LBUTTONDOWN and related legacy mouse messages are not generated.
     /// Likewise, if the keyboard TLC is set with RIDEV_NOLEGACY, WM_KEYDOWN and related legacy keyboard messages are not generated.
-    /// If RIDEV_REMOVE is set and the hwndTarget member is not set to NULL, then parameter validation will fail.
+    /// If RIDEV_REMOVE is set and the hWndTarget member is not set to NULL, then parameter validation will fail.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Input.Structs
         private HidUsagePages _usUsagePage;
         private ushort _usUsage;
         private RawInputDeviceFlags _dwFlags;
-        private IntPtr _hwndTarget;
+        private IntPtr _hWndTarget;
 
         /// <summary>
         /// Top level collection Usage page for the raw input device.
@@ -83,8 +83,8 @@ namespace Dapplo.Windows.Input.Structs
         /// </summary>
         public IntPtr TargetHwnd
         {
-            get { return _hwndTarget; }
-            set { _hwndTarget = value; }
+            get { return _hWndTarget; }
+            set { _hWndTarget = value; }
         }
 
         /// <inheritdoc />

@@ -121,13 +121,13 @@ namespace Dapplo.Windows.Multimedia
         /// <param name="command">Pointer to a null-terminated string that specifies an MCI command string. For a list, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd743572(v=vs.85).aspx">Multimedia Command Strings</a></param>
         /// <param name="buffer">Pointer to a buffer that receives return information. If no return information is needed, this parameter can be NULL.</param>
         /// <param name="bufferSize">Size, in characters, of the return buffer specified by the lpszReturnString parameter.</param>
-        /// <param name="hwndCallback">Handle to a callback window if the "notify" flag was specified in the command string.</param>
+        /// <param name="hWndCallback">Handle to a callback window if the "notify" flag was specified in the command string.</param>
         /// <returns>
         /// Returns zero if successful or an error otherwise. The low-order word of the returned DWORD value contains the error return value. If the error is device-specific, the high-order word of the return value is the driver identifier; otherwise, the high-order word is zero.
         /// For a list of possible error values, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd757153(v=vs.85).aspx">MCIERR Return Values</a>.
         /// To retrieve a text description of return values, pass the return value to the <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd757158(v=vs.85).aspx">mciGetErrorString</a> function.
         /// </returns>
         [DllImport("winmm")]
-        private static extern int mciSendString(string command, StringBuilder buffer, int bufferSize, IntPtr hwndCallback);
+        private static extern int mciSendString(string command, StringBuilder buffer, int bufferSize, IntPtr hWndCallback);
     }
 }

@@ -55,7 +55,7 @@ namespace Dapplo.Windows.Desktop
             _environmentObservable = Observable.Create<EnvironmentChangedEventArgs>(observer =>
                 {
                     // This handles the message
-                    IntPtr WinProcSettingsChangeHandler(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                    IntPtr WinProcSettingsChangeHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                     {
                         var windowsMessage = (WindowsMessages) msg;
                         if (windowsMessage != WindowsMessages.WM_SETTINGCHANGE)

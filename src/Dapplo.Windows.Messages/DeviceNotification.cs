@@ -62,60 +62,89 @@ namespace Dapplo.Windows.Messages
         public static IObservable<DeviceNotificationEvent> OnNotification { get; }
 
         /// <summary>
-        ///     Private constructor to create the DeviceNotifications observable
+        ///     Private constructor to create the default DeviceNotifications observable
         /// </summary>
         static DeviceNotification()
         {
-            OnNotification = Observable.Create<DeviceNotificationEvent>(observer =>
+            OnNotification = CreateDeviceNotificationObservable();
+        }
+
+        /// <summary>
+        /// Create a specific DeviceNotification IObservable
+        /// </summary>
+        /// <param name="deviceInterfaceClass">DeviceInterfaceClass</param>
+        /// <returns>IObservable of DeviceNotificationEvent</returns>
+        public static IObservable<DeviceNotificationEvent> CreateDeviceNotificationObservable(DeviceInterfaceClass deviceInterfaceClass = DeviceInterfaceClass.Unknown)
+        {
+            if (deviceInterfaceClass == DeviceInterfaceClass.Unknown && OnNotification != null)
             {
-                var devBroadcastDeviceInterface = DevBroadcastDeviceInterface.Create();
-                var deviceNotifyFlags = DeviceNotifyFlags.WindowHandle | DeviceNotifyFlags.AllInterfaceClasses;
+                return OnNotification;
+            }
 
-                var deviceNotificationHandle = RegisterDeviceNotification(WinProcHandler.Instance.Handle, devBroadcastDeviceInterface, deviceNotifyFlags);
-
-                if (deviceNotificationHandle == IntPtr.Zero)
+            return Observable.Create<DeviceNotificationEvent>(observer =>
                 {
-                    observer.OnError(new Win32Exception());
-                }
+                    var devBroadcastDeviceInterface = DevBroadcastDeviceInterface.Create();
 
-                // This handles the message
-                IntPtr WinProcClipboardMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-                {
-                    var windowsMessage = (WindowsMessages)msg;
-                    if (windowsMessage != WindowsMessages.WM_NCDESTROY)
+                    var deviceNotifyFlags = DeviceNotifyFlags.WindowHandle;
+                    // Use the specified class
+                    if (deviceInterfaceClass != DeviceInterfaceClass.Unknown)
                     {
+                        devBroadcastDeviceInterface.DeviceClass = deviceInterfaceClass;
+                    }
+                    else
+                    {
+                        // React to all interface classes
+                        deviceNotifyFlags = deviceNotifyFlags | DeviceNotifyFlags.AllInterfaceClasses;
+                    }
+
+
+                    var deviceNotificationHandle = RegisterDeviceNotification(WinProcHandler.Instance.Handle, devBroadcastDeviceInterface, deviceNotifyFlags);
+
+                    if (deviceNotificationHandle == IntPtr.Zero)
+                    {
+                        observer.OnError(new Win32Exception());
+                    }
+
+                    // This handles the message
+                    IntPtr WinProcClipboardMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                    {
+                        var windowsMessage = (WindowsMessages)msg;
+                        if (windowsMessage != WindowsMessages.WM_DEVICECHANGE)
+                        {
+                            return IntPtr.Zero;
+                        }
+
+                        observer.OnNext(new DeviceNotificationEvent
+                        {
+                            EventType = (DeviceChangeEvent)wParam.ToInt32(),
+                            DeviceBroadcastPtr = lParam
+                        });
+
                         return IntPtr.Zero;
                     }
 
-                    observer.OnNext(new DeviceNotificationEvent
+                    var hook = new WinProcHandlerHook(WinProcClipboardMessageHandler);
+                    var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
+                    return hook.Disposable = Disposable.Create(() =>
                     {
-                        EventType = (DeviceChangeEvent) wParam.ToInt32(),
-                        DeviceBroadcastPtr = lParam
+                        UnregisterDeviceNotification(deviceNotificationHandle);
+                        hookSubscription.Dispose();
                     });
-
-                    return IntPtr.Zero;
-                }
-
-                var hook = new WinProcHandlerHook(WinProcClipboardMessageHandler);
-                var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
-                return hook.Disposable = Disposable.Create(() =>
-                {
-                    UnregisterDeviceNotification(deviceNotificationHandle);
-                    hookSubscription.Dispose();
-                });
-            })
-            // Make sure there is always a value produced when connecting
-            .Publish()
-            .RefCount();
+                })
+                // Make sure there is always a value produced when connecting
+                .Publish()
+                .RefCount();
         }
 
         /// <summary>
         /// A simplification for on device arrival
         /// </summary>
+        /// <param name="observable">Optional IObservable</param>
         /// <returns>IObservable with DeviceInterfaceInfo</returns>
-        public static IObservable<DeviceInterfaceChangeInfo> OnDeviceArrival()
+        public static IObservable<DeviceInterfaceChangeInfo> OnDeviceArrival(IObservable<DeviceNotificationEvent> observable = null)
         {
-            return OnNotification
+            
+            return (observable ?? OnNotification)
                 .Where(deviceNotificationEvent => deviceNotificationEvent.EventType == DeviceChangeEvent.DeviceArrival)
                 .Select(deviceNotificationEvent =>
                     {
@@ -131,10 +160,11 @@ namespace Dapplo.Windows.Messages
         /// <summary>
         /// A simplification for on device remove complete
         /// </summary>
+        /// <param name="observable">Optional IObservable</param>
         /// <returns>IObservable with DeviceInterfaceInfo</returns>
-        public static IObservable<DeviceInterfaceChangeInfo> OnDeviceRemoved()
+        public static IObservable<DeviceInterfaceChangeInfo> OnDeviceRemoved(IObservable<DeviceNotificationEvent> observable = null)
         {
-            return OnNotification
+            return (observable ?? OnNotification)
                 .Where(deviceNotificationEvent => deviceNotificationEvent.EventType == DeviceChangeEvent.DeviceRemoveComplete)
                 .Select(deviceNotificationEvent =>
                 {

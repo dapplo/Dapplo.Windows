@@ -41,7 +41,7 @@ namespace Dapplo.Windows.Desktop
         /// <summary>
         ///     Enumerate the windows / child windows (this is NOT lazy, unless you add functions)
         /// </summary>
-        /// <param name="parent">IInteropWindow with the hwnd of the parent, or null for all</param>
+        /// <param name="parent">IInteropWindow with the hWnd of the parent, or null for all</param>
         /// <param name="wherePredicate">Func for the where</param>
         /// <param name="takeWhileFunc">Func which can decide to stop enumerating, the second argument is the current count</param>
         /// <returns>IEnumerable with IntPtr</returns>
@@ -49,14 +49,14 @@ namespace Dapplo.Windows.Desktop
         {
             var result = new List<IntPtr>();
 
-            bool EnumWindowsProc(IntPtr hwnd, IntPtr param)
+            bool EnumWindowsProc(IntPtr hWnd, IntPtr param)
             {
                 // check if we should continue
-                var interopWindow = InteropWindowFactory.CreateFor(hwnd);
+                var interopWindow = InteropWindowFactory.CreateFor(hWnd);
 
-                if (wherePredicate == null || wherePredicate(hwnd))
+                if (wherePredicate == null || wherePredicate(hWnd))
                 {
-                    result.Add(hwnd);
+                    result.Add(hWnd);
                 }
 
                 return takeWhileFunc == null || takeWhileFunc(interopWindow, result.Count);
@@ -69,7 +69,7 @@ namespace Dapplo.Windows.Desktop
         /// <summary>
         ///     Enumerate the windows / child windows (this is NOT lazy)
         /// </summary>
-        /// <param name="parent">IInteropWindow with the hwnd of the parent, or null for all</param>
+        /// <param name="parent">IInteropWindow with the hWnd of the parent, or null for all</param>
         /// <param name="wherePredicate">Func for the where</param>
         /// <param name="takeWhileFunc">Func which can decide to stop enumerating, the second argument is the current count</param>
         /// <returns>IEnumerable with InteropWindow</returns>
@@ -77,10 +77,10 @@ namespace Dapplo.Windows.Desktop
         {
             var result = new List<IInteropWindow>();
 
-            bool EnumWindowsProc(IntPtr hwnd, IntPtr param)
+            bool EnumWindowsProc(IntPtr hWnd, IntPtr param)
             {
                 // check if we should continue
-                var interopWindow = InteropWindowFactory.CreateFor(hwnd);
+                var interopWindow = InteropWindowFactory.CreateFor(hWnd);
 
                 if (wherePredicate == null || wherePredicate(interopWindow))
                 {

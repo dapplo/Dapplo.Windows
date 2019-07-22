@@ -119,7 +119,7 @@ namespace Dapplo.Windows.Input
         /// Note:
         /// To receive WM_INPUT messages, an application must first register the raw input devices using RegisterRawInputDevices. By default, an application does not receive raw input.
         /// To receive WM_INPUT_DEVICE_CHANGE messages, an application must specify the RIDEV_DEVNOTIFY flag for each device class that is specified by the usUsagePage and usUsage fields of the RAWINPUTDEVICE structure . By default, an application does not receive WM_INPUT_DEVICE_CHANGE notifications for raw input device arrival and removal.
-        /// If a RAWINPUTDEVICE structure has the RIDEV_REMOVE flag set and the hwndTarget parameter is not set to NULL, then parameter validation will fail.
+        /// If a RAWINPUTDEVICE structure has the RIDEV_REMOVE flag set and the hWndTarget parameter is not set to NULL, then parameter validation will fail.
         /// </summary>
         /// <param name="rawInputDevices">RawInputDevice(s) specifying what to register</param>
         /// <exception cref="Win32Exception">Win32Exception when the registration failed</exception>

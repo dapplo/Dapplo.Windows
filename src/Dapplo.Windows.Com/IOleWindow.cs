@@ -19,8 +19,8 @@ namespace Dapplo.Windows.Com
         /// <summary>
         /// Retrieves a handle to one of the windows participating in in-place activation (frame, document, parent, or in-place object window)
         /// </summary>
-        /// <param name="phwnd">A pointer to a variable that receives the window handle.</param>
-        void GetWindow(out IntPtr phwnd);
+        /// <param name="phWnd">A pointer to a variable that receives the window handle.</param>
+        void GetWindow(out IntPtr phWnd);
         /// <summary>
         /// Determines whether context-sensitive help mode should be entered during an in-place activation session.
         /// </summary>

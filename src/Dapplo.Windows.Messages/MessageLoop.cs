@@ -48,9 +48,9 @@ namespace Dapplo.Windows.Messages
         /// <param name="lpMsg">A pointer to an MSG structure that receives message information from the thread's message queue.</param>
         /// <param name="hWnd">A handle to the window whose messages are to be retrieved. The window must belong to the current thread.
         /// 
-        /// If hWnd is NULL, GetMessage retrieves messages for any window that belongs to the current thread, and any messages on the current thread's message queue whose hwnd value is NULL (see the MSG structure). Therefore if hWnd is NULL, both window messages and thread messages are processed.
+        /// If hWnd is NULL, GetMessage retrieves messages for any window that belongs to the current thread, and any messages on the current thread's message queue whose hWnd value is NULL (see the MSG structure). Therefore if hWnd is NULL, both window messages and thread messages are processed.
         /// 
-        /// If hWnd is -1, GetMessage retrieves only messages on the current thread's message queue whose hwnd value is NULL, that is, thread messages as posted by PostMessage (when the hWnd parameter is NULL) or PostThreadMessage.</param>
+        /// If hWnd is -1, GetMessage retrieves only messages on the current thread's message queue whose hWnd value is NULL, that is, thread messages as posted by PostMessage (when the hWnd parameter is NULL) or PostThreadMessage.</param>
         /// <param name="wMsgFilterMin">The integer value of the lowest message value to be retrieved. Use WM_KEYFIRST (0x0100) to specify the first keyboard message or WM_MOUSEFIRST (0x0200) to specify the first mouse message.
         /// 
         /// Use WM_INPUT here and in wMsgFilterMax to specify only the WM_INPUT messages.

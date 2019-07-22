@@ -46,10 +46,10 @@ namespace Dapplo.Windows.Tests
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
 
-            IntPtr WinProcClipboardHandler(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+            IntPtr WinProcClipboardHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
             {
                 // We can use the GetClipboardFormatName to get the string for the windows message... weird but it works
-                Log.Verbose().WriteLine("WinProc {0}, {1}", hwnd, WindowsMessage.GetWindowsMessage((uint) msg));
+                Log.Verbose().WriteLine("WinProc {0}, {1}", hWnd, WindowsMessage.GetWindowsMessage((uint) msg));
                 return IntPtr.Zero;
             }
 

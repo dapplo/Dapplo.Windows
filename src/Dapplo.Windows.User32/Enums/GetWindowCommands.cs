@@ -74,9 +74,9 @@ namespace Dapplo.Windows.User32.Enums
         ///     The system automatically destroys an owned window when its owner is destroyed.
         ///     An owned window is hidden when its owner is minimized.
         ///     Only an overlapped or pop-up window can be an owner window; a child window cannot be an owner window. An
-        ///     application creates an owned window by specifying the owner's window handle as the hwndParent parameter of
-        ///     CreateWindowEx when it creates a window with the WS_OVERLAPPED or WS_POPUP style. The hwndParent parameter must
-        ///     identify an overlapped or pop-up window. If hwndParent identifies a child window, the system assigns ownership to
+        ///     application creates an owned window by specifying the owner's window handle as the hWndParent parameter of
+        ///     CreateWindowEx when it creates a window with the WS_OVERLAPPED or WS_POPUP style. The hWndParent parameter must
+        ///     identify an overlapped or pop-up window. If hWndParent identifies a child window, the system assigns ownership to
         ///     the top-level parent window of the child window. After creating an owned window, an application cannot transfer
         ///     ownership of the window to another window.
         ///     Dialog boxes and message boxes are owned windows by default. An application specifies the owner window when calling

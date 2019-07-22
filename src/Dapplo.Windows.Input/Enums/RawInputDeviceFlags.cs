@@ -59,7 +59,7 @@ namespace Dapplo.Windows.Input.Enums
 
         /// <summary>
         ///     RIDEV_INPUTSINK: If set, this enables the caller to receive the input even when the caller is not in the foreground.
-        ///     Note that hwndTarget must be specified.
+        ///     Note that hWndTarget must be specified.
         /// </summary>
         InputSink = 0x00000100,
 
@@ -67,7 +67,7 @@ namespace Dapplo.Windows.Input.Enums
         ///     RIDEV_NOHOTKEYS: If set, the application-defined keyboard device hotkeys are not handled.
         ///     However, the system hotkeys; for example, ALT+TAB and CTRL+ALT+DEL, are still handled.
         ///     By default, all keyboard hotkeys are handled.
-        ///     RIDEV_NOHOTKEYS can be specified even if RIDEV_NOLEGACY is not specified and hwndTarget is NULL.
+        ///     RIDEV_NOHOTKEYS can be specified even if RIDEV_NOLEGACY is not specified and hWndTarget is NULL.
         /// </summary>
         NoHotkeys = 0x00000200,
 

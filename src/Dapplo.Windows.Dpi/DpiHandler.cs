@@ -87,15 +87,15 @@ namespace Dapplo.Windows.Dpi
         ///     See
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn312083(v=vs.85).aspx">WM_DPICHANGED message</a>
         /// </summary>
-        /// <param name="hwnd">IntPtr with the hWnd</param>
+        /// <param name="hWnd">IntPtr with the hWnd</param>
         /// <param name="msg">The Windows message</param>
         /// <param name="wParam">IntPtr</param>
         /// <param name="lParam">IntPtr</param>
         /// <param name="handled">ref bool</param>
         /// <returns>IntPtr</returns>
-        internal IntPtr HandleWindowMessages(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        internal IntPtr HandleWindowMessages(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (HandleWindowMessages(WindowMessageInfo.Create(hwnd, msg, wParam, lParam)))
+            if (HandleWindowMessages(WindowMessageInfo.Create(hWnd, msg, wParam, lParam)))
             {
                 handled = true;
             }

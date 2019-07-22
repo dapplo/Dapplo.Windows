@@ -57,9 +57,9 @@ namespace Dapplo.Windows.Desktop
         {
             return Observable.Create<WinEventInfo>(observer =>
                 {
-                    void WinEventHookDelegate(IntPtr eventHook, WinEvents winEvent, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime)
+                    void WinEventHookDelegate(IntPtr eventHook, WinEvents winEvent, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime)
                     {
-                        observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hwnd, idObject, idChild, eventThread, eventTime));
+                        observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hWnd, idObject, idChild, eventThread, eventTime));
                     }
 
                     WinEventDelegate winEventDelegate = WinEventHookDelegate;
@@ -131,12 +131,12 @@ namespace Dapplo.Windows.Desktop
         /// </summary>
         /// <param name="hWinEventHook">IntPtr with the eventhook that this call belongs to</param>
         /// <param name="eventType">WinEvent</param>
-        /// <param name="hwnd">IntPtr</param>
+        /// <param name="hWnd">IntPtr</param>
         /// <param name="idObject">ObjectIdentifiers</param>
         /// <param name="idChild">int</param>
         /// <param name="eventThread">uint with EventThread</param>
         /// <param name="eventTime">uint with EventTime</param>
-        private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvents eventType, IntPtr hwnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime);
+        private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvents eventType, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime);
 
         #endregion
     }
