@@ -46,7 +46,7 @@ namespace Dapplo.Windows.Messages.Structs
         /// <summary>
         /// The GUID for the interface device class.
         /// </summary>
-        public Guid ClassGuid
+        public Guid DeviceClassGuid
         {
             get => _classGuid;
             set => _classGuid = value;

@@ -24,7 +24,9 @@ using System.ComponentModel;
 namespace Dapplo.Windows.Messages.Enums
 {
     /// <summary>
-    ///     This enum contains the device
+    /// This enum contains the device interface classes (GUID)
+    /// See <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/install/overview-of-device-interface-classes">Overview of Device Interface Classes</a>
+    /// The classes themselves can be found under <a href="https://docs.microsoft.com/en-us/previous-versions/ff553412(v=vs.85)">System-Defined Device Interface Classes</a>
     /// </summary>
     public enum DeviceInterfaceClass
     {
@@ -37,9 +39,12 @@ namespace Dapplo.Windows.Messages.Enums
         [Description("6BDD1FC1-810F-11d0-BEC7-08002BE2092F")]
         Bus1394,
 
-        /// <summary>The GUID_61883_CLASS device interface class is defined for devices in the 61883 device setup class.</summary>
+        /// <summary>
+        /// The GUID_61883_CLASS device interface class is defined for devices in the 61883 device setup class.
+        /// The 61883 device interface class includes IEEE 1394 devices that support the IEC-61883 protocol. 
+        /// </summary>
         [Description("7EBEFBC0-3200-11d2-B4C2-00A0C9697D07")]
-        Guid61883,
+        Iec61883,
 
         /// <summary>
         ///     The GUID_DEVICE_APPLICATIONLAUNCH_BUTTON device interface class is defined for Advanced Configuration and
@@ -96,7 +101,15 @@ namespace Dapplo.Windows.Messages.Enums
 
         /// <summary>The GUID_BTHPORT_DEVICE_INTERFACE device interface class is defined for Bluetooth radios.</summary>
         [Description("0850302A-B344-4fda-9BE9-90576B8D46F0")]
-        Bluetooth,
+        BluetoothRadio,
+
+        /// <summary>The GUID_BTH_DEVICE_INTERFACE device interface class is defined for Bluetooth devices.</summary>
+        [Description("00F40965-E89D-4487-9890-87C3ABB211F4")]
+        BluetoothDevice,
+
+        /// <summary>The GUID_BLUETOOTHLE_DEVICE_INTERFACE device interface class is defined for Bluetooth BLE devices.</summary>
+        [Description("00F40965-E89D-4487-9890-87C3ABB211F4")]
+        BluetoothLeDevice,
 
         /// <summary>
         ///     The GUID_DEVINTERFACE_BRIGHTNESS device interface class is defined for display adapter drivers that operate in
@@ -264,6 +277,22 @@ namespace Dapplo.Windows.Messages.Enums
         /// SmartCard filter
         /// </summary>
         [Description("D86354CC-A2AC-4223-95B9-2E48CE154434")]
-        SmartCardFilter
+        SmartCardFilter,
+
+        /// <summary>The GUID_DEVINTERFACE_WPD device interface class is defined for Windows Portable Devices (WPD).</summary>
+        [Description("6AC27878-A6FA-4155-BA85-F98F491D4F33")]
+        WindowsPortableDevices,
+
+        /// <summary>The GUID_DEVINTERFACE_WPD_PRIVATE device interface class is defined for specialized Windows Portable Devices (WPD).</summary>
+        [Description("BA0C718F-4DED-49B7-BDD3-FABE28661211")]
+        PrivateWindowsPortableDevices,
+
+        /// <summary>The GUID_VIRTUAL_AVC_CLASS device interface class is defined for virtual audio video control (AV/C) devices that are supported by the AVStream architecture.</summary>
+        [Description("616EF4D0-23CE-446D-A568-C31EB01913D0")]
+        VirtualAudioVideoControl,
+
+        /// <summary>The GUID_DEVINTERFACE_SIDESHOW device interface class is defined for Windows SideShow devices.</summary>
+        [Description("152E5811-FEB9-4B00-90F4-D32947AE1681")]
+        SideShow
     }
 }
