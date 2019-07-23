@@ -23,7 +23,7 @@
 #if !NETSTANDARD2_0
 using System;
 using System.ComponentModel;
-using System.Reactive.Linq;
+using System.Linq;using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Messages.Enums;
@@ -114,11 +114,7 @@ namespace Dapplo.Windows.Messages
                             return IntPtr.Zero;
                         }
 
-                        observer.OnNext(new DeviceNotificationEvent
-                        {
-                            EventType = (DeviceChangeEvent)wParam.ToInt32(),
-                            DeviceBroadcastPtr = lParam
-                        });
+                        observer.OnNext(new DeviceNotificationEvent(wParam, lParam));
 
                         return IntPtr.Zero;
                     }
@@ -145,10 +141,10 @@ namespace Dapplo.Windows.Messages
         {
             
             return (observable ?? OnNotification)
-                .Where(deviceNotificationEvent => deviceNotificationEvent.EventType == DeviceChangeEvent.DeviceArrival)
+                .Where(deviceNotificationEvent => deviceNotificationEvent.EventType == DeviceChangeEvent.DeviceArrival && deviceNotificationEvent.Is(DeviceBroadcastDeviceType.DeviceInterface))
                 .Select(deviceNotificationEvent =>
                     {
-                        deviceNotificationEvent.TryGetDeviceBroadcastDeviceType(out var devBroadcastDeviceInterface);
+                        deviceNotificationEvent.TryGetDevBroadcastDeviceInterface(out var devBroadcastDeviceInterface);
                         return new DeviceInterfaceChangeInfo
                         {
                             EventType = deviceNotificationEvent.EventType,
@@ -165,10 +161,10 @@ namespace Dapplo.Windows.Messages
         public static IObservable<DeviceInterfaceChangeInfo> OnDeviceRemoved(IObservable<DeviceNotificationEvent> observable = null)
         {
             return (observable ?? OnNotification)
-                .Where(deviceNotificationEvent => deviceNotificationEvent.EventType == DeviceChangeEvent.DeviceRemoveComplete)
+                .Where(deviceNotificationEvent => deviceNotificationEvent.EventType == DeviceChangeEvent.DeviceRemoveComplete && deviceNotificationEvent.Is(DeviceBroadcastDeviceType.DeviceInterface))
                 .Select(deviceNotificationEvent =>
                 {
-                    deviceNotificationEvent.TryGetDeviceBroadcastDeviceType(out var devBroadcastDeviceInterface);
+                    deviceNotificationEvent.TryGetDevBroadcastDeviceInterface(out var devBroadcastDeviceInterface);
                     return new DeviceInterfaceChangeInfo
                     {
                         EventType = deviceNotificationEvent.EventType,
@@ -178,21 +174,45 @@ namespace Dapplo.Windows.Messages
         }
 
         /// <summary>
-        /// Get the DevBroadcastDeviceInterface
+        /// Get all Volume changes
         /// </summary>
-        /// <param name="deviceNotificationEvent">DeviceNotificationEvent</param>
-        /// <param name="devBroadcastDeviceInterface">out DevBroadcastDeviceInterface</param>
-        /// <returns>bool true the value could be converted</returns>
-        public static bool TryGetDeviceBroadcastDeviceType(this DeviceNotificationEvent deviceNotificationEvent, out DevBroadcastDeviceInterface devBroadcastDeviceInterface)
+        /// <param name="observable">Optional IObservable</param>
+        /// <returns>IObservable with VolumeInfo</returns>
+        public static IObservable<VolumeInfo> OnVolumeChanges(IObservable<DeviceNotificationEvent> observable = null)
         {
-            var header = Marshal.PtrToStructure<DevBroadcastHeader>(deviceNotificationEvent.DeviceBroadcastPtr);
-            if (header.DeviceType != DeviceBroadcastDeviceType.DeviceInterface)
-            {
-                devBroadcastDeviceInterface = default;
-                return false;
-            }
-            devBroadcastDeviceInterface = Marshal.PtrToStructure<DevBroadcastDeviceInterface>(deviceNotificationEvent.DeviceBroadcastPtr);
-            return true;
+            return (observable ?? OnNotification)
+                .Where(deviceNotificationEvent => deviceNotificationEvent.Is(DeviceBroadcastDeviceType.Volume))
+                .Select(deviceNotificationEvent =>
+                {
+                    deviceNotificationEvent.TryGetDevBroadcastVolume(out var devBroadcastVolume);
+                    return new VolumeInfo
+                    {
+                        EventType = deviceNotificationEvent.EventType,
+                        Volume = devBroadcastVolume
+                    };
+                });
+        }
+
+        /// <summary>
+        /// A simplification for volume added
+        /// </summary>
+        /// <param name="observable">Optional IObservable</param>
+        /// <returns>IObservable with VolumeInfo</returns>
+        public static IObservable<VolumeInfo> OnVolumeAdded(IObservable<DeviceNotificationEvent> observable = null)
+        {
+            return OnVolumeChanges(observable)
+                .Where(volumeInfo => volumeInfo.EventType == DeviceChangeEvent.DeviceArrival);
+        }
+
+        /// <summary>
+        /// A simplification for volume removed
+        /// </summary>
+        /// <param name="observable">Optional IObservable</param>
+        /// <returns>IObservable with VolumeInfo</returns>
+        public static IObservable<VolumeInfo> OnVolumeRemoved(IObservable<DeviceNotificationEvent> observable = null)
+        {
+            return OnVolumeChanges(observable)
+                .Where(volumeInfo => volumeInfo.EventType == DeviceChangeEvent.DeviceRemoveComplete);
         }
     }
 }

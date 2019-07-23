@@ -19,7 +19,9 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Messages.Structs
@@ -39,9 +41,9 @@ namespace Dapplo.Windows.Messages.Structs
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct DevBroadcastVolume
     {
-        private int _size;
+        private readonly int _size;
         // The device type, which determines the event-specific information that follows the first three members. 
-        private DeviceBroadcastDeviceType _deviceType;
+        private readonly DeviceBroadcastDeviceType _deviceType;
         private readonly uint _reserved;
         // The logical unit mask identifying one or more logical units.
         // Each bit in the mask corresponds to one logical drive.
@@ -53,16 +55,34 @@ namespace Dapplo.Windows.Messages.Structs
         private readonly ushort _flags;
 
         /// <summary>
-        /// Factory for an empty DevBroadcastVolume
+        /// Returns a string with what drive letters are influenced in the message, this can be more than one!
         /// </summary>
-        /// <returns>DevBroadcastVolume</returns>
-        public static DevBroadcastVolume Create()
+        public string Drives
         {
-            return new DevBroadcastVolume
+            get
             {
-                _deviceType = DeviceBroadcastDeviceType.Volume,
-                _size = Marshal.SizeOf(typeof(DevBroadcastVolume))
-            };
+                StringBuilder drives = new StringBuilder();
+                foreach(var letter in Enumerable.Range(0,26))
+                {
+                    uint bit = 1u << letter;
+                    if ((_unitMask & bit) != 0)
+                    {
+                        drives.Append((char)('A'+letter));
+                    }
+                }
+
+                return drives.ToString();
+            }
         }
+
+        /// <summary>
+        /// Change affects media in drive. 
+        /// </summary>
+        public bool IsMediaChange => (_flags & 0x0001) != 0;
+
+        /// <summary>
+        /// Indicated logical volume is a network volume.
+        /// </summary>
+        public bool IsNetworkVolume => (_flags & 0x0002) != 0;
     }
 }

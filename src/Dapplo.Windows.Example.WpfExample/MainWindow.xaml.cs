@@ -20,6 +20,7 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows;
 using Dapplo.Windows.Dpi.Wpf;
@@ -41,6 +42,13 @@ namespace Dapplo.Windows.Example.WpfExample
             this.WinProcMessages()
                 .Where(m => m.Message == WindowsMessages.WM_DESTROY)
                 .Subscribe(m => { MessageBox.Show($"{m.Message}"); });
+
+            DeviceNotification.OnVolumeAdded().Subscribe(volumeInfo => Debug.WriteLine($"Drives {volumeInfo.Volume.Drives} were added"));
+            DeviceNotification.OnVolumeRemoved().Subscribe(volumeInfo => Debug.WriteLine($"Drives {volumeInfo.Volume.Drives} were removed"));
+
+            DeviceNotification
+                .OnDeviceArrival()
+                .Subscribe(info => Debug.WriteLine(info.Device.FriendlyDeviceName));
 
             // A small example to lock the PC when a YubiKey is removed
             DeviceNotification.OnDeviceRemoved()
