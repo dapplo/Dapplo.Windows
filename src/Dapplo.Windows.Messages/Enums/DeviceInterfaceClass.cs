@@ -107,7 +107,7 @@ namespace Dapplo.Windows.Messages.Enums
         [Description("00F40965-E89D-4487-9890-87C3ABB211F4")]
         BluetoothDevice,
 
-        /// <summary>The GUID_BLUETOOTHLE_DEVICE_INTERFACE device interface class is defined for Bluetooth BLE devices.</summary>
+        /// <summary>The GUID_BLUETOOTHLE_DEVICE_INTERFACE device interface class is defined for Bluetooth LE devices.</summary>
         [Description("00F40965-E89D-4487-9890-87C3ABB211F4")]
         BluetoothLeDevice,
 
