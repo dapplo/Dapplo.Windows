@@ -246,9 +246,26 @@ namespace Dapplo.Windows.Input
         [DllImport("user32", SetLastError = true)]
         private static extern uint GetRawInputDeviceList([In, Out] RawInputDeviceList[] rawInputDeviceList, ref uint numDevices, uint size);
 
+        /// <summary>
+        /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getrawinputdeviceinfow">GetRawInputDeviceInfoW function</a>
+        /// Retrieves information about the raw input device.
+        /// </summary>
+        /// <param name="deviceHandle">IntPtr A handle to the raw input device. This comes from the hDevice member of RAWINPUTHEADER or from GetRawInputDeviceList.</param>
+        /// <param name="command">RawInputDeviceInfoCommands</param>
+        /// <param name="hDeviceName">IntPtr</param>
+        /// <param name="dataSize">uint</param>
+        /// <returns>uint gt 0 if success</returns>
         [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern uint GetRawInputDeviceInfo(IntPtr deviceHandle, RawInputDeviceInfoCommands command, IntPtr hDeviceName, ref uint dataSize);
 
+        /// <summary>
+        /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerrawinputdevices">RegisterRawInputDevices function</a>
+        /// Registers the devices that supply the raw input data.
+        /// </summary>
+        /// <param name="pRawInputDevices">RawInputDevice array</param>
+        /// <param name="uiNumDevices">int</param>
+        /// <param name="cbSize">int</param>
+        /// <returns>true if registration works</returns>
         [DllImport("user32")]
         private static extern bool RegisterRawInputDevices([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] RawInputDevice[] pRawInputDevices, int uiNumDevices, int cbSize);
 

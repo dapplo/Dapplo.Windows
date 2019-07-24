@@ -23,6 +23,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Dapplo.Windows.Messages.Enums;
 using Microsoft.Win32;
 
@@ -35,13 +36,17 @@ namespace Dapplo.Windows.Messages.Structs
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct DevBroadcastDeviceInterface
     {
+        private static readonly Regex VendorRegex = new Regex(@"VID_([0-9A-F]{4})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex ProductRegex = new Regex(@"PID_([0-9A-F]{4})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex DeviceTypeRegex = new Regex(@"\\\?\\([A-Z]+)#", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         private int _size;
         // The device type, which determines the event-specific information that follows the first three members. 
         private DeviceBroadcastDeviceType _deviceType;
         private readonly int _reserved;
         private Guid _classGuid;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
-        private readonly string _name;
+        private string _name;
 
         /// <summary>
         /// The GUID for the interface device class.
@@ -116,6 +121,52 @@ namespace Dapplo.Windows.Messages.Structs
         }
 
         /// <summary>
+        /// Returns the device type, e.g. USB or HID
+        /// </summary>
+        public string DeviceType
+        {
+            get
+            {
+                var match = DeviceTypeRegex.Match(_name);
+                return match.Groups.Count != 2 ? null : match.Groups[1].Value;
+            }
+        }
+
+        /// <summary>
+        /// Is this a USB device?
+        /// </summary>
+        public bool IsUsb => "USB".Equals(DeviceType, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Returns the Vendor ID of the device
+        /// </summary>
+        public string VendorId
+        {
+            get
+            {
+                var match = VendorRegex.Match(_name);
+                return match.Groups.Count != 2 ? null : match.Groups[1].Value;
+            }
+        }
+
+        /// <summary>
+        /// Returns the Vendor ID of the device
+        /// </summary>
+        public string ProductId
+        {
+            get
+            {
+                var match = ProductRegex.Match(_name);
+                return match.Groups.Count != 2 ? null : match.Groups[1].Value;
+            }
+        }
+
+        /// <summary>
+        /// Try to generate a Uri which might include more information about the device
+        /// </summary>
+        public Uri UsbDeviceInfoUri => new Uri($"https://www.the-sz.com/products/usbid/index.php?v=0x{VendorId}&p={ProductId}");
+
+        /// <summary>
         /// Use an enum for handling the device class, instead of guid
         /// </summary>
         public DeviceInterfaceClass DeviceClass
@@ -154,6 +205,29 @@ namespace Dapplo.Windows.Messages.Structs
             var memInfo = type.GetMember(enumVal.ToString());
             var attributes = memInfo[0].GetCustomAttributes(typeof(T), false);
             return attributes.Length > 0 ? (T)attributes[0] : null;
+        }
+
+        /// <summary>
+        /// Used for testing
+        /// </summary>
+        /// <param name="deviceName"></param>
+        /// <param name="deviceClass"></param>
+        /// <returns></returns>
+        public static DevBroadcastDeviceInterface Test(string deviceName, DeviceInterfaceClass deviceClass = DeviceInterfaceClass.Unknown)
+        {
+            Guid deviceClassGuid = default;
+            var descriptionAttribute = GetAttributeOfType<DescriptionAttribute>(deviceClass);
+            if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
+            {
+                deviceClassGuid = Guid.Parse(descriptionAttribute.Description);
+            }
+
+            return new DevBroadcastDeviceInterface
+            {
+                _name = deviceName,
+                _deviceType = DeviceBroadcastDeviceType.DeviceInterface,
+                _classGuid = deviceClassGuid
+            };
         }
     }
 }
