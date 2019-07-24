@@ -48,7 +48,7 @@ namespace Dapplo.Windows.Example.WpfExample
 
             DeviceNotification
                 .OnDeviceArrival()
-                .Subscribe(info => Debug.WriteLine(info.Device.FriendlyDeviceName));
+                .Subscribe(deviceInterfaceChangeInfo => Debug.WriteLine("Device added: {0}, for more information goto {1}", deviceInterfaceChangeInfo.Device.FriendlyDeviceName, deviceInterfaceChangeInfo.Device.UsbDeviceInfoUri));
 
             // A small example to lock the PC when a YubiKey is removed
             DeviceNotification.OnDeviceRemoved()

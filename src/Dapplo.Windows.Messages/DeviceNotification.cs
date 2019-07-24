@@ -23,7 +23,7 @@
 #if !NETSTANDARD2_0
 using System;
 using System.ComponentModel;
-using System.Linq;using System.Reactive.Linq;
+using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Messages.Enums;
