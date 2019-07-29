@@ -109,7 +109,7 @@ namespace Dapplo.Windows.Messages
                     IntPtr WinProcClipboardMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                     {
                         var windowsMessage = (WindowsMessages)msg;
-                        if (windowsMessage != WindowsMessages.WM_DEVICECHANGE)
+                        if (windowsMessage != WindowsMessages.WM_DEVICECHANGE || lParam == IntPtr.Zero)
                         {
                             return IntPtr.Zero;
                         }
