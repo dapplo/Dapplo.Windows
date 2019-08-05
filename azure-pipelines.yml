@@ -3,18 +3,19 @@
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
-pool:
-  vmImage: 'Windows-2019'
-
-variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-
 stages:
  - stage: Build
    jobs:
    - job: Build
+
+     pool:
+      vmImage: 'Windows-2019'
+
+     variables:
+      solution: '**/*.sln'
+      buildPlatform: 'Any CPU'
+      buildConfiguration: 'Release'
+
      steps:
       - task: DotNetCoreInstaller@0
         displayName: 'Use .NET Core sdk 3.0'
@@ -69,8 +70,11 @@ stages:
  - stage: Deploy
    jobs:
    - job: Deploy
-     steps:
 
+     pool:
+      vmImage: 'Windows-2019'
+
+     steps:
       - task: DownloadBuildArtifacts@0
         inputs:
           buildType: 'current'
