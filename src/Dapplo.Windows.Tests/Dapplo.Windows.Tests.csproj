@@ -3,7 +3,7 @@
     <AssemblyTitle>Dapplo.Windows.Tests</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Tests</AssemblyName>
 	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-	<TargetFrameworks>net471</TargetFrameworks>
+	<TargetFramework>net471</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
   </PropertyGroup>

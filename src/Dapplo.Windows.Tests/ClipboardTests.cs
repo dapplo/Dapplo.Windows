@@ -230,11 +230,13 @@ namespace Dapplo.Windows.Tests
         [WpfFact]
         public async Task Test_ClipboardAccess_LockTimeout()
         {
-            using (var outerClipboardAcess = await ClipboardNative.AccessAsync())
+            using (var outerClipboardAccessTokeness = await ClipboardNative.AccessAsync())
             {
-                Assert.True(outerClipboardAcess.CanAccess);
-                var clipboardAccessToken = await ClipboardNative.AccessAsync();
-                Assert.True(clipboardAccessToken.IsLockTimeout);
+                Assert.True(outerClipboardAccessTokeness.CanAccess);
+                using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+                {
+                    Assert.True(clipboardAccessToken.IsLockTimeout);
+                }
             }
         }
 
@@ -246,8 +248,10 @@ namespace Dapplo.Windows.Tests
         {
             using (await ClipboardNative.AccessAsync())
             {
-                var clipboardAccessToken = await ClipboardNative.AccessAsync();
-                Assert.Throws<ClipboardAccessDeniedException>(() => clipboardAccessToken.ThrowWhenNoAccess());
+                using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+                {
+                    Assert.Throws<ClipboardAccessDeniedException>(() => clipboardAccessToken.ThrowWhenNoAccess());
+                }
             }
         }
     }
