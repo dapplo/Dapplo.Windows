@@ -4,94 +4,93 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
 stages:
- - stage: Build
-   jobs:
-   - job: Build
-
-     pool:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
       vmImage: 'Windows-2019'
 
-     variables:
+    variables:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
       buildConfiguration: 'Release'
 
-     steps:
-      - task: DotNetCoreInstaller@0
-        displayName: 'Use .NET Core sdk 3.0'
-        inputs:
-          version: '3.0.100-preview9-013685'
+    steps:
+    - task: DotNetCoreInstaller@0
+      displayName: 'Use .NET Core sdk 3.0'
+      inputs:
+        version: '3.0.100-preview9-013685'
 
-      - task: NuGetToolInstaller@0
-        displayName: 'Use NuGet 5.2.0'
-        inputs:
-          versionSpec: 5.2.0
-          checkLatest: true
+    - task: NuGetToolInstaller@0
+      displayName: 'Use NuGet 5.2.0'
+      inputs:
+        versionSpec: 5.2.0
+        checkLatest: true
 
-      - task: NuGetCommand@2
-        displayName: NuGet restore
-        inputs:
-          restoreSolution: '$(solution)'
-          feedsToUse: config
+    - task: NuGetCommand@2
+      displayName: NuGet restore
+      inputs:
+        restoreSolution: '$(solution)'
+        feedsToUse: config
 
-      - task: VSBuild@1
-        displayName: 'Build solution **\*.sln'
-        inputs:
-          vsVersion: 'latest'
-          solution: '$(solution)'
-          platform: '$(buildPlatform)'
-          configuration: '$(buildConfiguration)'
+    - task: VSBuild@1
+      displayName: 'Build solution **\*.sln'
+      inputs:
+        vsVersion: 'latest'
+        solution: '$(solution)'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
 
-      - task: VSTest@2
-        displayName: 'Test'
-        inputs:
-          testAssemblyVer2: '**\Dapplo*.Tests.dll'
-          runInParallel: false
-          codeCoverageEnabled: True
-          platform: '$(BuildPlatform)'
-          configuration: $(buildConfiguration)
-          rerunFailedTests: false
+    - task: VSTest@2
+      displayName: 'Test'
+      inputs:
+        testAssemblyVer2: '**\Dapplo*.Tests.dll'
+        runInParallel: false
+        codeCoverageEnabled: True
+        platform: '$(BuildPlatform)'
+        configuration: $(buildConfiguration)
+        rerunFailedTests: false
 
-      - task: CopyFiles@2
-        displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
-        inputs:
-          SourceFolder: '$(system.defaultworkingdirectory)'
-          Contents: |
-            **\bin\$(BuildConfiguration)\*.nupkg
-            **\TestResults\**\*.coverage
-          TargetFolder: '$(build.artifactstagingdirectory)'
-          flattenFolders: true
-      - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact: drop'
-        inputs:
-          artifactName: 'drop'
-          PathtoPublish: '$(build.artifactstagingdirectory)'
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+      inputs:
+        SourceFolder: '$(system.defaultworkingdirectory)'
+        Contents: |
+          **\bin\$(BuildConfiguration)\*.nupkg
+          **\TestResults\**\*.coverage
+        TargetFolder: '$(build.artifactstagingdirectory)'
+        flattenFolders: true
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: drop'
+      inputs:
+        artifactName: 'drop'
+        PathtoPublish: '$(build.artifactstagingdirectory)'
 
- - stage: Deploy
-   jobs:
-   - job: Deploy
-
-     pool:
+- stage: Deploy
+  jobs:
+  - job: Deploy
+    pool:
       vmImage: 'Windows-2019'
+      environment: 'NuGet'
 
-     steps:
-      - task: DownloadBuildArtifacts@0
-        inputs:
-          buildType: 'current'
-          downloadType: 'single'
-          artifactName: 'drop'
-          downloadPath: '$(System.ArtifactsDirectory)'
+    steps:
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
 
-      - task: NuGetToolInstaller@0
-        displayName: 'Use NuGet 5.2.0'
-        inputs:
-          versionSpec: 5.2.0
-          checkLatest: true
+    - task: NuGetToolInstaller@0
+      displayName: 'Use NuGet 5.2.0'
+      inputs:
+        versionSpec: 5.2.0
+        checkLatest: true
 
-      - task: NuGetCommand@2
-        displayName: 'NuGet push'
-        inputs:
-          command: push
-          packagesToPush: '$(System.ArtifactsDirectory)/Dapplo.Windows/drop/*.nupkg;!$(System.ArtifactsDirectory)/Dapplo.Windows/drop/*.symbols.nupkg'
-          nuGetFeedType: external
-          publishFeedCredentials: 'Dapplo.Windows NuGet Feed'
+    - task: NuGetCommand@2
+      displayName: 'NuGet push'
+      inputs:
+        command: push
+        packagesToPush: '$(System.ArtifactsDirectory)/Dapplo.Windows/drop/*.nupkg;!$(System.ArtifactsDirectory)/Dapplo.Windows/drop/*.symbols.nupkg'
+        nuGetFeedType: external
+        publishFeedCredentials: 'Dapplo.Windows NuGet Feed'
