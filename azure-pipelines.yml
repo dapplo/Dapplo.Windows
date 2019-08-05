@@ -68,7 +68,7 @@ stages:
 
 - stage: Deploy
   jobs:
-  - deployment: Deploy to NuGet
+  - deployment: 'Deploy to NuGet'
     pool:
       vmImage: 'Windows-2019'
 
