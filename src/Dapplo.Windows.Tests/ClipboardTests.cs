@@ -38,6 +38,9 @@ using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests
 {
+    /// <summary>
+    /// All clipboard related tests
+    /// </summary>
     public class ClipboardTests
     {
         private static readonly LogSource Log = new LogSource();
@@ -60,6 +63,7 @@ namespace Dapplo.Windows.Tests
         ///     Test monitoring the clipboard
         /// </summary>
         /// <returns></returns>
+        //[WpfFact]
         public async Task TestClipboardMonitor_WaitForCopy()
         {
             var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -72,14 +76,10 @@ namespace Dapplo.Windows.Tests
                 if (clipboardUpdateInformation.Formats.Contains("PNG"))
                 {
                     using (var clipboard = ClipboardNative.Access())
+                    using (var stream = clipboard.GetAsStream("PNG"))
+                    using (var fileStream = File.Create(@"c:\projects\test.png"))
                     {
-                        using (var stream = clipboard.GetAsStream("PNG"))
-                        {
-                            using (var fileStream = File.Create(@"c:\projects\test.png"))
-                            {
-                                stream.CopyTo(fileStream);
-                            }
-                        }
+                        stream.CopyTo(fileStream);
                     }
                 }
                 
@@ -230,9 +230,9 @@ namespace Dapplo.Windows.Tests
         [WpfFact]
         public async Task Test_ClipboardAccess_LockTimeout()
         {
-            using (var outerClipboardAccessTokeness = await ClipboardNative.AccessAsync())
+            using (var outerClipboardAccessToken = await ClipboardNative.AccessAsync())
             {
-                Assert.True(outerClipboardAccessTokeness.CanAccess);
+                Assert.True(outerClipboardAccessToken.CanAccess);
                 using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
                 {
                     Assert.True(clipboardAccessToken.IsLockTimeout);
@@ -247,11 +247,9 @@ namespace Dapplo.Windows.Tests
         public async Task Test_ClipboardAccess_LockTimeout_Exception()
         {
             using (await ClipboardNative.AccessAsync())
+            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
-                using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
-                {
-                    Assert.Throws<ClipboardAccessDeniedException>(() => clipboardAccessToken.ThrowWhenNoAccess());
-                }
+                Assert.Throws<ClipboardAccessDeniedException>(() => clipboardAccessToken.ThrowWhenNoAccess());
             }
         }
     }
