@@ -68,29 +68,33 @@ stages:
 
 - stage: Deploy
   jobs:
-  - job: Deploy
+  - deployment: Deploy to NuGet
     pool:
       vmImage: 'Windows-2019'
-      environment: 'NuGet'
 
-    steps:
-    - task: DownloadBuildArtifacts@0
-      inputs:
-        buildType: 'current'
-        downloadType: 'single'
-        artifactName: 'drop'
-        downloadPath: '$(System.ArtifactsDirectory)/Dapplo.Windows'
+    environment: 'NuGet'
+    strategy:
+      # default deployment strategy
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.ArtifactsDirectory)/Dapplo.Windows'
 
-    - task: NuGetToolInstaller@0
-      displayName: 'Use NuGet 5.2.0'
-      inputs:
-        versionSpec: 5.2.0
-        checkLatest: true
+          - task: NuGetToolInstaller@0
+            displayName: 'Use NuGet 5.2.0'
+            inputs:
+              versionSpec: 5.2.0
+              checkLatest: true
 
-    - task: NuGetCommand@2
-      displayName: 'NuGet push'
-      inputs:
-        command: push
-        packagesToPush: '$(System.ArtifactsDirectory)/Dapplo.Windows/drop/*.nupkg;!$(System.ArtifactsDirectory)/Dapplo.Windows/drop/*.symbols.nupkg'
-        nuGetFeedType: external
-        publishFeedCredentials: 'Dapplo.Windows NuGet Feed'
+          - task: NuGetCommand@2
+            displayName: 'NuGet push'
+            inputs:
+              command: push
+              packagesToPush: '$(System.ArtifactsDirectory)/Dapplo.Windows/drop/*.nupkg;!$(System.ArtifactsDirectory)/Dapplo.Windows/drop/*.symbols.nupkg'
+              nuGetFeedType: external
+              publishFeedCredentials: 'Dapplo.Windows NuGet Feed'
