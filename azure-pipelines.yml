@@ -92,6 +92,6 @@ stages:
         displayName: 'NuGet push'
         inputs:
           command: push
-          packagesToPush: '$(System.DefaultWorkingDirectory)/Dapplo.Windows/drop/*.nupkg;!$(System.DefaultWorkingDirectory)/Dapplo.Windows/drop/*.symbols.nupkg'
+          packagesToPush: '$(System.ArtifactsDirectory)/Dapplo.Windows/drop/*.nupkg;!$(System.ArtifactsDirectory)/Dapplo.Windows/drop/*.symbols.nupkg'
           nuGetFeedType: external
           publishFeedCredentials: 'Dapplo.Windows NuGet Feed'
