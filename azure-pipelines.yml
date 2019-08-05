@@ -79,7 +79,7 @@ stages:
         buildType: 'current'
         downloadType: 'single'
         artifactName: 'drop'
-        downloadPath: '$(System.ArtifactsDirectory)'
+        downloadPath: '$(System.ArtifactsDirectory)/Dapplo.Windows'
 
     - task: NuGetToolInstaller@0
       displayName: 'Use NuGet 5.2.0'
