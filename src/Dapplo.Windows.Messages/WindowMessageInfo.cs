@@ -20,6 +20,7 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
+using Dapplo.Windows.Messages.Enumerations;
 
 namespace Dapplo.Windows.Messages
 {

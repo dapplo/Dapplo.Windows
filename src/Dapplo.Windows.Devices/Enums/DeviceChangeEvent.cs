@@ -19,7 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.Windows.Messages.Enums
+namespace Dapplo.Windows.Devices.Enums
 {
     /// <summary>
     /// These are the possible device change values, as described in  the <a href="https://docs.microsoft.com/en-us/windows/win32/devio/device-management-events">Device Management Events</a>

@@ -1,20 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <Description>Dapplo.Windows.Messages is a library with the Windows messages and a WinProc helper.</Description>
-    <AssemblyTitle>Dapplo.Windows.Messages</AssemblyTitle>
-    <AssemblyName>Dapplo.Windows.Messages</AssemblyName>
-    <PackageId>Dapplo.Windows.Messages</PackageId>
-    <PackageTags>windows messages</PackageTags>
+    <Description>Dapplo.Windows.Devices is a library which provides device information.</Description>
+    <AssemblyTitle>Dapplo.Windows.Devices</AssemblyTitle>
+    <AssemblyName>Dapplo.Windows.Devies</AssemblyName>
+    <PackageId>Dapplo.Windows.Devices</PackageId>
+    <PackageTags>windows devices</PackageTags>
     <TargetFrameworks>net461;netcoreapp3.0;netstandard2.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<UseWindowsForms>true</UseWindowsForms>
 	<UseWPF>true</UseWPF>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Dapplo.Log" Version="1.3.26" />
-    <PackageReference Include="System.Reactive" Version="4.1.6" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
@@ -26,6 +21,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
   </ItemGroup>
 </Project>

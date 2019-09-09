@@ -21,10 +21,10 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Messages.Enums;
-using Dapplo.Windows.Messages.Structs;
+using Dapplo.Windows.Devices.Enums;
+using Dapplo.Windows.Devices.Structs;
 
-namespace Dapplo.Windows.Messages
+namespace Dapplo.Windows.Devices
 {
     /// <summary>
     /// Information on device changes

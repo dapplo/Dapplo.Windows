@@ -28,7 +28,7 @@ using System.Linq;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Kernel32;
-
+using Dapplo.Windows.Messages.Enumerations;
 #if !NETSTANDARD2_0
 using System.Drawing;
 using System.Windows;

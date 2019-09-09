@@ -24,10 +24,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using Dapplo.Windows.Messages.Enums;
+using Dapplo.Windows.Devices.Enums;
 using Microsoft.Win32;
 
-namespace Dapplo.Windows.Messages.Structs
+namespace Dapplo.Windows.Devices.Structs
 {
     /// <summary>
     /// Contains information about a class of devices.

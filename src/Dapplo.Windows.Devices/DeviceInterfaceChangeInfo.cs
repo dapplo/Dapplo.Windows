@@ -19,15 +19,15 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using Dapplo.Windows.Messages.Enums;
-using Dapplo.Windows.Messages.Structs;
+using Dapplo.Windows.Devices.Enums;
+using Dapplo.Windows.Devices.Structs;
 
-namespace Dapplo.Windows.Messages
+namespace Dapplo.Windows.Devices
 {
     /// <summary>
-    /// Information on a volume change
+    /// Information on device changes
     /// </summary>
-    public class VolumeInfo
+    public class DeviceInterfaceChangeInfo
     {
         /// <summary>
         /// Type of the event
@@ -35,8 +35,8 @@ namespace Dapplo.Windows.Messages
         public DeviceChangeEvent EventType { get; internal set; }
 
         /// <summary>
-        /// The volume that was added / removed
+        /// The already prepared DevBroadcastDeviceInterface
         /// </summary>
-        public DevBroadcastVolume Volume { get; internal set; }
+        public DevBroadcastDeviceInterface Device { get; internal set; }
     }
 }

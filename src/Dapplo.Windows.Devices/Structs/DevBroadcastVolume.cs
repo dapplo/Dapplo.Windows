@@ -22,9 +22,9 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using Dapplo.Windows.Messages.Enums;
+using Dapplo.Windows.Devices.Enums;
 
-namespace Dapplo.Windows.Messages.Structs
+namespace Dapplo.Windows.Devices.Structs
 {
     /// <summary>
     /// Contains information about a logical volume.

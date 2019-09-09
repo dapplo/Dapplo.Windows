@@ -19,30 +19,24 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using System;
+using Dapplo.Windows.Devices.Enums;
+using Dapplo.Windows.Devices.Structs;
 
-namespace Dapplo.Windows.Messages.Enums
+namespace Dapplo.Windows.Devices
 {
     /// <summary>
-    /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerdevicenotificationw">RegisterDeviceNotificationW function</a>
+    /// Information on a volume change
     /// </summary>
-    [Flags]
-    public enum DeviceNotifyFlags : uint
+    public class VolumeInfo
     {
         /// <summary>
-        /// The hRecipient parameter is a window handle.
+        /// Type of the event
         /// </summary>
-        WindowHandle = 0x00000000,
+        public DeviceChangeEvent EventType { get; internal set; }
 
         /// <summary>
-        /// The hRecipient parameter is a service status handle.
+        /// The volume that was added / removed
         /// </summary>
-        ServiceHandle = 0x00000001,
-
-        /// <summary>
-        /// Notifies the recipient of device interface events for all device interface classes. (The dbcc_classguid member is ignored.)
-        /// This value can be used only if the dbch_devicetype member is DBT_DEVTYP_DEVICEINTERFACE.
-        /// </summary>
-        AllInterfaceClasses = 0x00000004,
+        public DevBroadcastVolume Volume { get; internal set; }
     }
 }

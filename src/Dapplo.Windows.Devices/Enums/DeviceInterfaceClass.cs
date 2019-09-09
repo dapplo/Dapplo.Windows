@@ -21,7 +21,7 @@
 
 using System.ComponentModel;
 
-namespace Dapplo.Windows.Messages.Enums
+namespace Dapplo.Windows.Devices.Enums
 {
     /// <summary>
     /// This enum contains the device interface classes (GUID)

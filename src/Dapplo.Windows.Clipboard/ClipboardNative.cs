@@ -23,6 +23,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Windows.Clipboard.Internals;
+using Dapplo.Windows.Messages.Enumerations;
 #if !NETSTANDARD2_0
 using System.ComponentModel;
 using System.Reactive.Disposables;

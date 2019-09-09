@@ -20,9 +20,10 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System.Diagnostics.CodeAnalysis;
+
 #pragma warning disable 1591
 
-namespace Dapplo.Windows.Messages
+namespace Dapplo.Windows.Messages.Enumerations
 {
     /// <summary>
     ///     All possible windows messages
@@ -188,14 +189,49 @@ namespace Dapplo.Windows.Messages
         WM_UAHNCPAINTMENUPOPUP = 0x0095,
         WM_UAHUPDATE = 0x0096,
 
+        /// <summary>
+        /// Posted to a window when the cursor is moved within the nonclient area of the window.
+        /// This message is posted to the window that contains the cursor.
+        /// If a window has captured the mouse, this message is not posted.
+        /// </summary>
         WM_NCMOUSEMOVE = 0x00A0,
+        /// <summary>
+        /// Posted when the user presses the left mouse button while the cursor is within the nonclient area of a window.
+        /// This message is posted to the window that contains the cursor.
+        /// If a window has captured the mouse, this message is not posted.
+        /// </summary>
         WM_NCLBUTTONDOWN = 0x00A1,
+        /// <summary>
+        /// Posted when the user releases the left mouse button while the cursor is within the nonclient area of a window.
+        /// This message is posted to the window that contains the cursor.
+        /// If a window has captured the mouse, this message is not posted.
+        /// </summary>
         WM_NCLBUTTONUP = 0x00A2,
         WM_NCLBUTTONDBLCLK = 0x00A3,
+        /// <summary>
+        /// Posted when the user presses the right mouse button while the cursor is within the nonclient area of a window.
+        /// This message is posted to the window that contains the cursor.
+        /// If a window has captured the mouse, this message is not posted.
+        /// </summary>
         WM_NCRBUTTONDOWN = 0x00A4,
+        /// <summary>
+        /// Posted when the user releases the right mouse button while the cursor is within the nonclient area of a window.
+        /// This message is posted to the window that contains the cursor.
+        /// If a window has captured the mouse, this message is not posted.
+        /// </summary>
         WM_NCRBUTTONUP = 0x00A5,
         WM_NCRBUTTONDBLCLK = 0x00A6,
+        /// <summary>
+        /// Posted when the user presses the middle mouse button while the cursor is within the nonclient area of a window.
+        /// This message is posted to the window that contains the cursor.
+        /// If a window has captured the mouse, this message is not posted.
+        /// </summary>
         WM_NCMBUTTONDOWN = 0x00A7,
+        /// <summary>
+        /// Posted when the user releases the middle mouse button while the cursor is within the nonclient area of a window.
+        /// This message is posted to the window that contains the cursor.
+        /// If a window has captured the mouse, this message is not posted.
+        /// </summary>
         WM_NCMBUTTONUP = 0x00A8,
         WM_NCMBUTTONDBLCLK = 0x00A9,
         WM_NCXBUTTONDOWN = 0x00AB,

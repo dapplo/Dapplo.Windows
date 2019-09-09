@@ -24,6 +24,7 @@
 using System;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Enumerations;
 
 #endregion
 

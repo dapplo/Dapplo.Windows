@@ -19,40 +19,42 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Messages.Enums;
+using Dapplo.Windows.Devices.Enums;
 
-namespace Dapplo.Windows.Messages.Structs
+namespace Dapplo.Windows.Devices.Structs
 {
     /// <summary>
-    /// Contains information about a modem, serial, or parallel port.
-    /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/dbt/ns-dbt-dev_broadcast_port_w">DEV_BROADCAST_PORT_W structure</a>
+    /// Contains information about a file system handle.
+    /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/dbt/ns-dbt-_dev_broadcast_handle">DEV_BROADCAST_HANDLE structure</a>
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct DevBroadcastPort
+    public struct DevBroadcastHandle
     {
         private int _size;
         // The device type, which determines the event-specific information that follows the first three members. 
         private DeviceBroadcastDeviceType _deviceType;
         private readonly int _reserved;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
-        private readonly string _name;
+        private readonly IntPtr _handle;
+        // A handle to the device notification. This handle is returned by RegisterDeviceNotification.
+        private readonly IntPtr _hdevnotify;
+        // The GUID for the custom event. For more information, see Device Events. Valid only for DBT_CUSTOMEVENT.
+        private readonly Guid _eventguid;
+        private readonly ulong _nameoffset;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+        private readonly byte[] dbch_data;
 
         /// <summary>
-        /// The name of the device.
+        /// Factory for an empty DevBroadcastHandle
         /// </summary>
-        public string Name => _name;
-
-        /// <summary>
-        /// Factory for an empty DevBroadcastPort
-        /// </summary>
-        /// <returns>DevBroadcastPort</returns>
-        public static DevBroadcastPort Create()
+        /// <returns>DevBroadcastHandle</returns>
+        public static DevBroadcastHandle Create()
         {
-            return new DevBroadcastPort
+            return new DevBroadcastHandle
             {
-                _deviceType = DeviceBroadcastDeviceType.Port,
-                _size = Marshal.SizeOf(typeof(DevBroadcastPort))
+                _deviceType = DeviceBroadcastDeviceType.Handle,
+                _size = Marshal.SizeOf(typeof(DevBroadcastHandle))
             };
         }
     }

@@ -20,16 +20,19 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 
-#if !NETSTANDARD2_0
 using System;
 using System.ComponentModel;
-using System.Reactive.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Messages.Enums;
-using Dapplo.Windows.Messages.Structs;
+using Dapplo.Windows.Devices.Enums;
+using Dapplo.Windows.Devices.Structs;
+using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Enumerations;
 
-namespace Dapplo.Windows.Messages
+#if !NETSTANDARD2_0
+
+namespace Dapplo.Windows.Devices
 {
     /// <summary>
     /// 
@@ -96,7 +99,6 @@ namespace Dapplo.Windows.Messages
                         // React to all interface classes
                         deviceNotifyFlags = deviceNotifyFlags | DeviceNotifyFlags.AllInterfaceClasses;
                     }
-
 
                     var deviceNotificationHandle = RegisterDeviceNotification(WinProcHandler.Instance.Handle, devBroadcastDeviceInterface, deviceNotifyFlags);
 

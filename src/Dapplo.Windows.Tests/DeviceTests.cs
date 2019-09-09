@@ -24,8 +24,8 @@
 using System;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.Messages.Enums;
-using Dapplo.Windows.Messages.Structs;
+using Dapplo.Windows.Devices.Enums;
+using Dapplo.Windows.Devices.Structs;
 using Xunit;
 using Xunit.Abstractions;
 

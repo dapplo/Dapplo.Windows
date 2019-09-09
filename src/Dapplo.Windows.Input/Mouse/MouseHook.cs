@@ -28,6 +28,7 @@ using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Enumerations;
 
 #endregion
 

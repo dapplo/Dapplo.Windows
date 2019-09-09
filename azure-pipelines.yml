@@ -19,7 +19,7 @@ stages:
     - task: DotNetCoreInstaller@0
       displayName: 'Use .NET Core sdk 3.0'
       inputs:
-        version: '3.0.100-preview9-013685'
+        version: '3.0.100-rc2-014198'
 
     - task: NuGetToolInstaller@0
       displayName: 'Use NuGet 5.2.0'

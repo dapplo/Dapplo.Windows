@@ -20,9 +20,9 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Messages.Enums;
+using Dapplo.Windows.Devices.Enums;
 
-namespace Dapplo.Windows.Messages.Structs
+namespace Dapplo.Windows.Devices.Structs
 {
     /// <summary>
     /// Serves as a standard header for information related to a device event reported through the WM_DEVICECHANGE message.
