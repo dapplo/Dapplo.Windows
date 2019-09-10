@@ -63,7 +63,7 @@ namespace Dapplo.Windows.Input.Keyboard
         /// Private method to configure the fields
         /// </summary>
         /// <param name="keyCombinations">IEnumerable of IKeyboardHookEventHandler</param>
-        private void Configure(IEnumerable<IKeyboardHookEventHandler> keyCombinations)
+        public void Configure(IEnumerable<IKeyboardHookEventHandler> keyCombinations)
         {
             _keyboardHookEventHandlers = keyCombinations.ToArray();
             _isHandled = new bool[_keyboardHookEventHandlers.Length];
