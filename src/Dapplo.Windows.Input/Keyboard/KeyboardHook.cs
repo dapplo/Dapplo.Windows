@@ -78,7 +78,6 @@ namespace Dapplo.Windows.Input.Keyboard
                                 return (IntPtr) 1;
                             }
                         }
-
                         // ReSharper disable once AccessToModifiedClosure
                         return CallNextHookEx(hookId, nCode, wParam, lParam);
                     };
@@ -93,8 +92,8 @@ namespace Dapplo.Windows.Input.Keyboard
                 })
                 // Make sure the key presses come in sequentially
                 .Synchronize()
-                // Make sure the subscribed logic runs on the TaskPool so the handling can continue even if this takes time
-                .ObserveOn(TaskPoolScheduler.Default)
+                // Make sure the subscribed logic runs on the current thread, so we can process the "handled" property
+                .ObserveOn(Scheduler.CurrentThread)
                 .Publish()
                 .RefCount();
         }

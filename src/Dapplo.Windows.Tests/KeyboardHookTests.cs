@@ -68,7 +68,11 @@ namespace Dapplo.Windows.Tests
         private async Task TestKeyHandler_SingleCombination()
         {
             int pressCount = 0;
-            var keyHandler = new KeyCombinationHandler(VirtualKeyCode.Back, VirtualKeyCode.RightShift) { IgnoreInjected = false };
+            var keyHandler = new KeyCombinationHandler(VirtualKeyCode.Back, VirtualKeyCode.RightShift)
+            {
+                IgnoreInjected = false,
+                IsPassThrough = false
+            };
             using (KeyboardHook.KeyboardEvents.Where(keyHandler).Subscribe(keyboardHookEventArgs => pressCount++))
             {
                 await Task.Delay(20);

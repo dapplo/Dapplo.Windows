@@ -72,13 +72,14 @@ namespace Dapplo.Windows.Input.Keyboard
         }
 
         /// <summary>
-        /// Configure the settings
+        /// Configure the key combinations
         /// </summary>
         /// <param name="keyCombination">IEnumerable of VirtualKeyCode</param>
-        protected void Configure(IEnumerable<VirtualKeyCode> keyCombination)
+        public void Configure(IEnumerable<VirtualKeyCode> keyCombination)
         {
             TriggerCombination = keyCombination.Distinct().ToArray();
             AvailableKeys = new bool[TriggerCombination.Length];
+            OtherPressedKeys.Clear();
         }
 
         /// <summary>
