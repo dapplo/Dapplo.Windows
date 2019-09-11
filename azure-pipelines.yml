@@ -92,6 +92,6 @@ stages:
             displayName: 'NuGet push'
             inputs:
               command: push
-              packagesToPush: '$(Pipeline.Workspace)/drop/**/Dapplo.*.nupkg;!$(Pipeline.Workspace)/drop/**/*.symbols.nupkg'
+              packagesToPush: '$(Pipeline.Workspace)/drop/a/.*.nupkg;!$(Pipeline.Workspace)/drop/a/*.symbols.nupkg'
               nuGetFeedType: external
               publishFeedCredentials: 'Dapplo.Windows NuGet Feed'
