@@ -58,13 +58,13 @@ stages:
         Contents: |
           **\bin\$(BuildConfiguration)\*.nupkg
           **\TestResults\**\*.coverage
-        TargetFolder: '$(build.artifactstagingdirectory)'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
         flattenFolders: true
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact: drop'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifacts'
       inputs:
         artifactName: 'drop'
-        PathtoPublish: '$(build.artifactstagingdirectory)'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
 
 - stage: Deploy
   jobs:
@@ -78,12 +78,9 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: DownloadBuildArtifacts@0
+          - task: DownloadPipelineArtifact@2
             inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'drop'
-              downloadPath: '$(System.ArtifactsDirectory)/Dapplo.Windows'
+              artifact: 'drop'
 
           - task: NuGetToolInstaller@0
             displayName: 'Use NuGet 5.2.0'
