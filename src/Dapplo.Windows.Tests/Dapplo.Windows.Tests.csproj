@@ -2,10 +2,13 @@
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Tests</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Tests</AssemblyName>
-	<TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Advapi32\Dapplo.Windows.Advapi32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Citrix\Dapplo.Windows.Citrix.csproj" />
