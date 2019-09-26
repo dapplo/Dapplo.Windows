@@ -2,8 +2,7 @@
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Tests</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Tests</AssemblyName>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-	<TargetFramework>net471</TargetFramework>
+	<TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -47,7 +46,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net471'">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

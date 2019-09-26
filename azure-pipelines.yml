@@ -25,25 +25,17 @@ stages:
         version: 3.0.100
 
     - task: DotNetCoreCLI@2
-      displayName: Build
-      inputs:
-        command: build
-        projects: '$(solution)'
-        arguments: '--configuration $(buildConfiguration) /p:Platform="$(buildPlatform)"'
-
-    - task: DotNetCoreCLI@2
-      displayName: Build
-      inputs:
-        command: build
-        projects: '$(solution)'
-        arguments: '--configuration $(buildConfiguration) /p:Platform="$(buildPlatform)"'
-
-    - task: DotNetCoreCLI@2
       displayName: Test
       inputs:
         command: test
+        arguments: '--configuration Debug /p:Platform="$(buildPlatform)" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+
+    - task: DotNetCoreCLI@2
+      displayName: Build
+      inputs:
+        command: build
         projects: '$(solution)'
-        arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+        arguments: '--configuration $(buildConfiguration) /p:Platform="$(buildPlatform)"'
 
     - task: CopyFiles@2
       displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
