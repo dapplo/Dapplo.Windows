@@ -86,7 +86,7 @@ namespace Dapplo.Windows.Desktop
         ///     Create an observable which only monitors title changes
         /// </summary>
         /// <returns>IObservable with WinEventInfo</returns>
-        public static IObservable<WinEventInfo> WindowTileChangeObservable()
+        public static IObservable<WinEventInfo> WindowTitleChangeObservable()
         {
             return Create(WinEvents.EVENT_OBJECT_NAMECHANGE).Where(winEventInfo => winEventInfo.ObjectIdentifier == ObjectIdentifiers.Window);
         }

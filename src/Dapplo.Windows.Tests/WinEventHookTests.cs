@@ -59,7 +59,7 @@ namespace Dapplo.Windows.Tests
             // This buffers the observable
             var replaySubject = new ReplaySubject<IInteropWindow>();
 
-            var winEventObservable = WinEventHook.WindowTileChangeObservable()
+            var winEventObservable = WinEventHook.WindowTitleChangeObservable()
                 .Select(info => InteropWindowFactory.CreateFor(info.Handle).Fill())
                 .Where(interopWindow => !string.IsNullOrEmpty(interopWindow?.Caption))
                 .Subscribe(interopWindow =>

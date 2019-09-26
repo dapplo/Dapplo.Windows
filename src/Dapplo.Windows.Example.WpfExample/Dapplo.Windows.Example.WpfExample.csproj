@@ -5,7 +5,9 @@
     <TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>
     <OutputType>WinExe</OutputType>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+	<UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
+	<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="delete.png" />
@@ -28,6 +30,7 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />

@@ -33,12 +33,7 @@ namespace Dapplo.Windows.Common
         /// <summary>
         /// Get the current windows version
         /// </summary>
-        public static Version WinVersion { get; } =
-#if NETSTANDARD2_0
-            new Version(Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion);
-#else
-            Environment.OSVersion.Version;
-#endif
+        public static Version WinVersion { get; } = Environment.OSVersion.Version;
 
         /// <summary>
         ///     Test if the current OS is Windows 10

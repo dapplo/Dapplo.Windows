@@ -225,4 +225,6 @@ doc/api/.manifest
 # Coverage
 CoverageReport
 coverage.xml
+coverage.json
+coverage.cobertura.xml
 xunit.xml

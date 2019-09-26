@@ -11,55 +11,56 @@ stages:
       vmImage: 'Windows-2019'
 
     variables:
-      solution: '**/*.sln'
+      solution: '**/src/*.sln'
       buildPlatform: 'Any CPU'
       buildConfiguration: 'Release'
 
     steps:
-    - task: DotNetCoreInstaller@0
+    - task: NuGetToolInstaller@1
+
+    - task: UseDotNet@2
       displayName: 'Use .NET Core sdk 3.0'
       inputs:
-        version: '3.0.100-rc2-014198'
+        packageType: sdk
+        version: 3.0.100
 
-    - task: NuGetToolInstaller@0
-      displayName: 'Use NuGet 5.2.0'
+    - task: DotNetCoreCLI@2
+      displayName: Build
       inputs:
-        versionSpec: 5.2.0
-        checkLatest: true
+        command: build
+        projects: '$(solution)'
+        arguments: '--configuration $(buildConfiguration) /p:Platform="$(buildPlatform)"'
 
-    - task: NuGetCommand@2
-      displayName: NuGet restore
+    - task: DotNetCoreCLI@2
+      displayName: Build
       inputs:
-        restoreSolution: '$(solution)'
-        feedsToUse: config
+        command: build
+        projects: '$(solution)'
+        arguments: '--configuration $(buildConfiguration) /p:Platform="$(buildPlatform)"'
 
-    - task: VSBuild@1
-      displayName: 'Build solution **\*.sln'
+    - task: DotNetCoreCLI@2
+      displayName: Test
       inputs:
-        vsVersion: 'latest'
-        solution: '$(solution)'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-
-    - task: VSTest@2
-      displayName: 'Test'
-      inputs:
-        testAssemblyVer2: '**\Dapplo*.Tests.dll'
-        runInParallel: false
-        codeCoverageEnabled: True
-        platform: '$(BuildPlatform)'
-        configuration: $(buildConfiguration)
-        rerunFailedTests: false
+        command: test
+        projects: '$(solution)'
+        arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
 
     - task: CopyFiles@2
-      displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
       inputs:
-        SourceFolder: '$(system.defaultworkingdirectory)'
+        SourceFolder: '$(System.DefaultWorkingDirectory)'
         Contents: |
-          **\bin\$(BuildConfiguration)\*.nupkg
-          **\TestResults\**\*.coverage
+          **\bin\$(buildConfiguration)\*.nupkg
+          **\coverage.*
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
         flattenFolders: true
+
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: 'src/**/coverage.cobertura.xml'
+        failIfCoverageEmpty: true
+
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Artifacts'
       inputs:
