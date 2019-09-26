@@ -28,6 +28,7 @@ stages:
       displayName: Test
       inputs:
         command: test
+        projects: '$(solution)'
         arguments: '--configuration Debug /p:Platform="$(buildPlatform)" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
 
     - task: DotNetCoreCLI@2
