@@ -1,5 +1,25 @@
-﻿#if NETFRAMEWORK
-#region Usings
+﻿//  Dapplo - building blocks for desktop applications
+//  Copyright (C) 2017-2019  Dapplo
+// 
+//  For more information see: http://dapplo.net/
+//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
+// 
+//  This file is part of Dapplo.Windows
+// 
+//  Dapplo.Windows is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  Dapplo.Windows is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+// 
+//  You should have a copy of the GNU Lesser General Public License
+//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
+
+#if NETFRAMEWORK
 
 using Dapplo.Log;
 using System;
@@ -8,8 +28,6 @@ using System.Runtime.InteropServices;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
-
-#endregion
 
 namespace Dapplo.Windows.Com
 {
@@ -334,8 +352,6 @@ namespace Dapplo.Windows.Com
             return new ReturnMessage(returnValue, outArgs, outArgsCount, callMessage.LogicalCallContext, callMessage);
         }
 
-        #region Private Data
-
         /// <summary>
         ///     Holds reference to the actual COM object which is wrapped by this proxy
         /// </summary>
@@ -355,10 +371,6 @@ namespace Dapplo.Windows.Com
         ///     The humanly readable target name
         /// </summary>
         private readonly string _targetName;
-
-        #endregion
-
-        #region Construction
 
         /// <summary>
         ///     Gets a COM object and returns the transparent proxy which intercepts all calls to the object
@@ -721,10 +733,6 @@ namespace Dapplo.Windows.Com
             _targetName = targetName;
         }
 
-        #endregion
-
-        #region Clean up
-
         /// <summary>
         ///     If <see cref="Dispose()" /> is not called, we need to make
         ///     sure that the COM object is still cleaned up.
@@ -781,10 +789,6 @@ namespace Dapplo.Windows.Com
                 Log.Warn().WriteLine("{0} is not a COM object", _comType);
             }
         }
-
-        #endregion
-
-        #region Object methods
 
         /// <summary>
         ///     Returns a string representing the wrapped object.
@@ -851,8 +855,6 @@ namespace Dapplo.Windows.Com
 
             return byRefType;
         }
-
-        #endregion
     }
 }
 #endif

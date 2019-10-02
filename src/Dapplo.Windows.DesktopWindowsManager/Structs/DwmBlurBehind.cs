@@ -19,13 +19,9 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using Dapplo.Windows.DesktopWindowsManager.Enums;
 using System;
 using System.Runtime.InteropServices;
-
-#endregion
 
 namespace Dapplo.Windows.DesktopWindowsManager
 {

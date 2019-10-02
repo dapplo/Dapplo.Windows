@@ -19,8 +19,6 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.Threading.Tasks;
 using Dapplo.Log;
@@ -29,8 +27,6 @@ using Dapplo.Windows.Advapi32;
 using Microsoft.Win32;
 using Xunit;
 using Xunit.Abstractions;
-
-#endregion
 
 namespace Dapplo.Windows.Tests
 {

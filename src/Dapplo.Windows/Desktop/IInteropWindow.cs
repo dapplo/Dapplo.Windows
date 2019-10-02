@@ -19,15 +19,11 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.User32.Structs;
-
-#endregion
 
 namespace Dapplo.Windows.Desktop
 {

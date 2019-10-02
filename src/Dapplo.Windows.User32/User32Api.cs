@@ -19,8 +19,6 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,8 +35,6 @@ using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
-
-#endregion
 
 namespace Dapplo.Windows.User32
 {
@@ -396,8 +392,6 @@ namespace Dapplo.Windows.User32
             return isSuccess;
         }
         private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr dwData);
-
-#region Native imports
 
         /// <summary>
         /// Determines the visibility state of the specified window.
@@ -1181,7 +1175,5 @@ namespace Dapplo.Windows.User32
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool LockWorkStation();
-
-        #endregion
     }
 }

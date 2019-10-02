@@ -1,9 +1,5 @@
-﻿#region Usings
-
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
-
-#endregion
 
 namespace Dapplo.Windows.Com
 {

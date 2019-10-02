@@ -19,8 +19,6 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -29,8 +27,6 @@ using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
-
-#endregion
 
 namespace Dapplo.Windows.Input.Mouse
 {
@@ -117,8 +113,6 @@ namespace Dapplo.Windows.Input.Mouse
             return mouseEventArgs;
         }
 
-        #region Native code
-
         /// <summary>
         ///     The actual delegate for the p
         /// </summary>
@@ -158,7 +152,5 @@ namespace Dapplo.Windows.Input.Mouse
         /// <returns>IntPtr</returns>
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
-
-        #endregion
     }
 }

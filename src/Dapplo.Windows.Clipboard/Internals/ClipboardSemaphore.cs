@@ -189,8 +189,6 @@ namespace Dapplo.Windows.Clipboard.Internals
         }
 
 
-#region Native
-
         /// <summary>
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms649048(v=vs.85).aspx"></a>
         ///     Opens the clipboard for examination and prevents other applications from modifying the clipboard content.
@@ -207,10 +205,6 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// <returns>true if the clipboard is closed</returns>
         [DllImport("user32", SetLastError = true)]
         private static extern bool CloseClipboard();
-
-#endregion
-
-#region IDisposable Support
 
         /// <summary>
         ///     Dispose the current async lock, and it's underlying SemaphoreSlim
@@ -243,7 +237,5 @@ namespace Dapplo.Windows.Clipboard.Internals
             // Make sure the finalizer for this instance is not called, as we already did what we need to do
             GC.SuppressFinalize(this);
         }
-
-#endregion
     }
 }

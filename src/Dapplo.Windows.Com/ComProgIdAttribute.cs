@@ -1,8 +1,4 @@
-﻿#region Usings
-
-using System;
-
-#endregion
+﻿using System;
 
 namespace Dapplo.Windows.Com
 {

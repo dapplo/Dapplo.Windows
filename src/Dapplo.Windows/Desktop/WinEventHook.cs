@@ -19,8 +19,6 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,8 +29,6 @@ using Dapplo.Windows.Enums;
 using Dapplo.Windows.Structs;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
-
-#endregion
 
 namespace Dapplo.Windows.Desktop
 {
@@ -91,8 +87,6 @@ namespace Dapplo.Windows.Desktop
             return Create(WinEvents.EVENT_OBJECT_NAMECHANGE).Where(winEventInfo => winEventInfo.ObjectIdentifier == ObjectIdentifiers.Window);
         }
 
-        #region native code
-
         [DllImport(User32Api.User32, SetLastError = true)]
         private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
@@ -137,7 +131,5 @@ namespace Dapplo.Windows.Desktop
         /// <param name="eventThread">uint with EventThread</param>
         /// <param name="eventTime">uint with EventTime</param>
         private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvents eventType, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime);
-
-        #endregion
     }
 }

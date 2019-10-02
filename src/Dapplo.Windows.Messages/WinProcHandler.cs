@@ -22,8 +22,6 @@
 
 using Dapplo.Windows.Messages.Enumerations;
 #if !NETSTANDARD2_0
-#region using
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -31,8 +29,6 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Windows.Interop;
 using Dapplo.Log;
-
-#endregion
 
 namespace Dapplo.Windows.Messages
 {

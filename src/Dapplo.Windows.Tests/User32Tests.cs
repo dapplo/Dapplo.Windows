@@ -19,8 +19,6 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -36,8 +34,6 @@ using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
 using Xunit;
 using Xunit.Abstractions;
-
-#endregion
 
 namespace Dapplo.Windows.Tests
 {

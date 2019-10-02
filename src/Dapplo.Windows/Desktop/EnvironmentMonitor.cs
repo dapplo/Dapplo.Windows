@@ -22,15 +22,11 @@
 
 using Dapplo.Windows.Messages.Enumerations;
 #if !NETSTANDARD2_0
-#region using
-
 using System;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.User32.Enums;
-
-#endregion
 
 namespace Dapplo.Windows.Desktop
 {

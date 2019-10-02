@@ -242,7 +242,6 @@ namespace Dapplo.Windows.Input
             }
         }
 
-        #region DllImports
         [DllImport("user32", SetLastError = true)]
         private static extern uint GetRawInputDeviceList([In, Out] RawInputDeviceList[] rawInputDeviceList, ref uint numDevices, uint size);
 
@@ -282,6 +281,5 @@ namespace Dapplo.Windows.Input
         /// <returns></returns>
         [DllImport("user32")]
         public static extern int GetRawInputData(IntPtr hRawInput, RawInputDataCommands uiCommand, out RawInput pData, ref int pcbSize, int cbSizeHeader);
-        #endregion
     }
 }

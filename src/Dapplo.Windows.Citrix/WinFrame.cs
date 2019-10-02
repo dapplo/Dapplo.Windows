@@ -19,16 +19,12 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
 using Dapplo.Windows.Citrix.Enums;
 using Dapplo.Windows.Citrix.Structs;
-
-#endregion
 
 namespace Dapplo.Windows.Citrix
 {
@@ -157,8 +153,6 @@ namespace Dapplo.Windows.Citrix
             }
         }
 
-        #region DllImports
-
         /// <summary>
         ///     See <a href="https://www.citrix.com/content/dam/citrix/en_us/documents/downloads/sdk/wf-api-sdk-guide.pdf">WFQuerySessionInformation Documentation</a>
         ///     Important is that we always use the Unicode version: WFQuerySessionInformationW
@@ -196,7 +190,5 @@ namespace Dapplo.Windows.Citrix
         [DllImport("WFAPI")]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool WFWaitSystemEvent(IntPtr hServer, EventMask eventMask, out EventMask pEventFlags);
-
-        #endregion
     }
 }

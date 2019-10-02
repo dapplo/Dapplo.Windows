@@ -93,12 +93,9 @@ namespace Dapplo.Windows.Tests.Benchmarks
             return new NativeRect(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
         }
 
-        #region Implementation of IDisposable
         [GlobalCleanup]
         public void Dispose()
         {
         }
-
-        #endregion
     }
 }

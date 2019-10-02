@@ -20,13 +20,10 @@
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 #if !NETSTANDARD2_0
-#region using
 
 using System;
 using System.Windows.Forms;
 using Dapplo.Windows.Messages;
-
-#endregion
 
 namespace Dapplo.Windows.Dpi.Forms
 {

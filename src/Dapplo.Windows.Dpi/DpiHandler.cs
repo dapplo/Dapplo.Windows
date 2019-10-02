@@ -19,8 +19,6 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
@@ -32,8 +30,6 @@ using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
-
-#endregion
 
 namespace Dapplo.Windows.Dpi
 {
@@ -287,7 +283,6 @@ namespace Dapplo.Windows.Dpi
             return IntPtr.Zero;
         }
 
-        #region Scale
         /// <summary>
         /// Calculate a DPI scale factor
         /// </summary>
@@ -448,9 +443,7 @@ namespace Dapplo.Windows.Dpi
         {
             return ScaleWithDpi(point, Dpi, scaleModifier);
         }
-        #endregion
 
-        #region unscale
         /// <summary>
         /// Calculate a DPI unscale factor
         /// </summary>
@@ -611,7 +604,6 @@ namespace Dapplo.Windows.Dpi
         {
             return ScaleWithDpi(point, Dpi, scaleModifier);
         }
-        #endregion
 
         /// <summary>
         /// public wrapper for EnableNonClientDpiScaling, this also checks if the function is available.

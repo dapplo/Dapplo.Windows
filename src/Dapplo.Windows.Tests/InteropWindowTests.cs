@@ -19,16 +19,12 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System.Linq;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
-
-#endregion
 
 namespace Dapplo.Windows.Tests
 {

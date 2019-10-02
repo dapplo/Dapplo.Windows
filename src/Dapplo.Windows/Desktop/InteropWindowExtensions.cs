@@ -19,8 +19,6 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,8 +43,6 @@ using Dapplo.Windows.Extensions;
 #endif
 using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Kernel32;
-
-#endregion
 
 namespace Dapplo.Windows.Desktop
 {

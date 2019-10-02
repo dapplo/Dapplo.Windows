@@ -19,15 +19,11 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
-
-#endregion
 
 namespace Dapplo.Windows.Input.Keyboard
 {
@@ -210,8 +206,6 @@ namespace Dapplo.Windows.Input.Keyboard
             return VirtualKeyCode.None;
         }
 
-        #region Native
-
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint MapVirtualKeyEx(uint uCode, uint uMapType, IntPtr dwhkl);
 
@@ -227,7 +221,5 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <returns>int with the number of characters returned</returns>
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern unsafe int GetKeyNameText(uint lParam, [Out] char* lpString, int nSize);
-
-        #endregion
     }
 }

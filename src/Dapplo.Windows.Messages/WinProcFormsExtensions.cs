@@ -22,14 +22,10 @@
 
 using Dapplo.Windows.Messages.Enumerations;
 #if !NETSTANDARD2_0
-#region using
-
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Forms;
-
-#endregion
 
 namespace Dapplo.Windows.Messages
 {

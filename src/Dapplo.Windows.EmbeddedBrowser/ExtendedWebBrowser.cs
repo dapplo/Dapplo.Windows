@@ -59,8 +59,6 @@ namespace Dapplo.Windows.EmbeddedBrowser
             {
             }
 
-            #region IOleCommandTarget Members
-
             /// <inheritdoc />
             public int QueryStatus(Guid pguidCmdGroup, int cCmds, IntPtr prgCmds, IntPtr pCmdText)
             {
@@ -83,8 +81,6 @@ namespace Dapplo.Windows.EmbeddedBrowser
 
                 return OleCmmdErrENotsupported;
             }
-
-            #endregion
         }
 
     }

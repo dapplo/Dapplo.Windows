@@ -88,4 +88,4 @@ stages:
               command: push
               packagesToPush: '$(Pipeline.Workspace)/drop/a/*.nupkg;!$(Pipeline.Workspace)/drop/a/*.symbols.nupkg'
               nuGetFeedType: external
-              publishFeedCredentials: 'Dapplo.Windows NuGet Feed'
+              publishFeedCredentials: 'Dapplo NuGet push'

@@ -60,14 +60,11 @@ namespace Dapplo.Windows.Tests.Benchmarks
             interopWindow.Fill();
         }
 
-        #region Implementation of IDisposable
         [GlobalCleanup]
         public void Dispose()
         {
             // Kill the process
             _notepadProcess.Kill();
         }
-
-        #endregion
     }
 }

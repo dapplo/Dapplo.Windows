@@ -76,8 +76,6 @@ namespace Dapplo.Windows.Input
             }
         }
 
-        #region DllImports
-
         /// <summary>
         /// Get the last input info, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646302(v=vs.85).aspx">GetLastInputInfo function</a>
         /// </summary>
@@ -94,6 +92,5 @@ namespace Dapplo.Windows.Input
         /// </summary>
         [DllImport("user32", SetLastError = true)]
         private static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray)] [In] Structs.Input[] inputs, int cbSize);
-        #endregion
     }
 }

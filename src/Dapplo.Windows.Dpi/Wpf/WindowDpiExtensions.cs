@@ -22,15 +22,11 @@
 
 using Dapplo.Windows.Messages.Enumerations;
 #if !NETSTANDARD2_0
-#region using
-
 using System;
 using System.Windows;
 using System.Windows.Media;
 using Dapplo.Log;
 using Dapplo.Windows.Messages;
-
-#endregion
 
 namespace Dapplo.Windows.Dpi.Wpf
 {

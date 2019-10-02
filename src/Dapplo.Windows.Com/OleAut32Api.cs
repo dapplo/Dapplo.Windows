@@ -1,5 +1,4 @@
-﻿#region Copyright (C) 2016-2019 Dapplo
-//  Dapplo - building blocks for desktop applications
+﻿//  Dapplo - building blocks for desktop applications
 //  Copyright (C) 2016-2019 Dapplo
 // 
 //  For more information see: http://dapplo.net/
@@ -19,7 +18,6 @@
 // 
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
-#endregion
 
 using System;
 using System.Runtime.InteropServices;
@@ -61,8 +59,6 @@ namespace Dapplo.Windows.Com
             return GetActiveObject<T>(ref clsId);
         }
 
-        #region Native methods
-
         /// <summary>
         /// For more details read <a href="https://docs.microsoft.com/en-gb/windows/desktop/api/oleauto/nf-oleauto-getactiveobject">this</a>
         /// </summary>
@@ -72,7 +68,5 @@ namespace Dapplo.Windows.Com
         /// <returns></returns>
         [DllImport("oleaut32.dll")]
         private static extern HResult GetActiveObject(ref Guid rclsId, IntPtr pvReserved, [MarshalAs(UnmanagedType.IUnknown)] out object ppunk);
-
-        #endregion
     }
 }

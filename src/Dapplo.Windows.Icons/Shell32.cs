@@ -19,8 +19,6 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -28,8 +26,6 @@ using System.Text;
 using Dapplo.Windows.Icons.Enums;
 using Dapplo.Windows.Icons.SafeHandles;
 using Dapplo.Windows.Icons.Structs;
-
-#endregion
 
 namespace Dapplo.Windows.Icons
 {
@@ -187,11 +183,7 @@ namespace Dapplo.Windows.Icons
         [DllImport("shell32", CharSet = CharSet.Unicode)]
         private static extern SafeIconHandle ExtractAssociatedIcon(HandleRef hInst, StringBuilder iconPath, ref int iconIndex);
 
-        #region Constants
-
         private const uint FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
         private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080;
-
-        #endregion
     }
 }

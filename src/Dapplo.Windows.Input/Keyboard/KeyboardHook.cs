@@ -19,8 +19,6 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -29,8 +27,6 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
-
-#endregion
 
 namespace Dapplo.Windows.Input.Keyboard
 {
@@ -193,8 +189,6 @@ namespace Dapplo.Windows.Input.Keyboard
             return keyEventArgs;
         }
 
-        #region Current key states
-
         /// <summary>
         ///     Flags for the current state
         /// </summary>
@@ -223,10 +217,6 @@ namespace Dapplo.Windows.Input.Keyboard
             _numLock = GetKeyState(VirtualKeyCode.NumLock) > 0;
             _scrollLock = GetKeyState(VirtualKeyCode.Scroll) > 0;
         }
-
-        #endregion
-
-        #region Native
 
         private const int WmKeyDown = 256;
         private const int WmSysKeyUp = 261;
@@ -280,7 +270,5 @@ namespace Dapplo.Windows.Input.Keyboard
         /// <returns>IntPtr</returns>
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
-
-        #endregion
     }
 }

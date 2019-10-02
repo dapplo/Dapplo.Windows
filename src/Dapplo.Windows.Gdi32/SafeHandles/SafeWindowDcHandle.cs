@@ -19,16 +19,12 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using System;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
 using Dapplo.Windows.User32;
 using Microsoft.Win32.SafeHandles;
-
-#endregion
 
 namespace Dapplo.Windows.Gdi32.SafeHandles
 {
