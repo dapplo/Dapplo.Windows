@@ -1,21 +1,21 @@
 ﻿//  Dapplo - building blocks for desktop applications
 //  Copyright (C) 2017-2019  Dapplo
-// 
+//
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
-// 
+//
 //  This file is part of Dapplo.Windows
-// 
+//
 //  Dapplo.Windows is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-// 
+//
 //  Dapplo.Windows is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
-// 
+//
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
@@ -37,7 +37,7 @@ namespace Dapplo.Windows.Common.Structs
     ///     NativeRect represents the native RECTF structure for calling native methods.
     ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms534497(v=vs.85).aspx">RectF class</a>
     ///     It has conversions from and to System.Drawing.RectangleF or System.Windows.Rect
-    /// 
+    ///
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]
@@ -178,7 +178,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <returns>NativeRectFloat</returns>
         public static implicit operator NativeRectFloat(NativeRect rectangle)
         {
-            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
         }
 
 #if !NETSTANDARD2_0
@@ -189,7 +189,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <returns>NativeRectFloat</returns>
         public static implicit operator NativeRectFloat(Rect rectangle)
         {
-            return new NativeRectFloat((float)rectangle.Left, (float)rectangle.Top, (float)rectangle.Right, (float)rectangle.Bottom);
+            return new NativeRectFloat((float)rectangle.Left, (float)rectangle.Top, (float)rectangle.Width, (float)rectangle.Height);
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <returns>NativeRectFloat</returns>
         public static implicit operator NativeRectFloat(RectangleF rectangle)
         {
-            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
         }
 
         /// <summary>
@@ -241,7 +241,7 @@ namespace Dapplo.Windows.Common.Structs
         /// <returns>NativeRectFloat</returns>
         public static implicit operator NativeRectFloat(Rectangle rectangle)
         {
-            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+            return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
         }
 
         /// <summary>

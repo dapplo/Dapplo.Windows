@@ -1,25 +1,27 @@
 ﻿//  Dapplo - building blocks for desktop applications
 //  Copyright (C) 2017-2019  Dapplo
-// 
+//
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
-// 
+//
 //  This file is part of Dapplo.Windows
-// 
+//
 //  Dapplo.Windows is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-// 
+//
 //  Dapplo.Windows is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
-// 
+//
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System.ComponentModel;
+using System.Drawing;
+using System.Windows;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Extensions;
@@ -194,6 +196,62 @@ namespace Dapplo.Windows.Tests
             var myMatrix = new System.Windows.Media.Matrix(0, 1, 1, 0, offsetX, offsetY);
 
             Assert.Equal(nativeRectAfter, nativeRectBefore.Transform(myMatrix));
+        }
+
+        /// <summary>
+        /// Test implicit conversion for NativeRectFloat
+        /// </summary>
+        [Fact]
+        private void Test_NativeRectFloat_ImplicitConversion()
+        {
+            var nativeRectFloat = new NativeRectFloat(10.5f, 20.5f, 30.5f, 40.5f);
+
+            var nativeRect = new NativeRect(10, 20, 30, 40);
+            var nativeRectFloatExpected1 = new NativeRectFloat(10, 20, 30, 40);
+            NativeRectFloat nativeRectFloatConverted1 = nativeRect;
+            Assert.Equal(nativeRectFloatExpected1, nativeRectFloatConverted1);
+
+            var nativeRectExpected = new NativeRect(10, 20, 30, 40);
+            NativeRect nativeRectConverted = nativeRectFloat;
+            Assert.Equal(nativeRectExpected, nativeRectConverted);
+
+#if !NETSTANDARD2_0
+            var rect = new Rect(10.0, 20.0, 30.0, 40.0);
+            var nativeRectFloatExpected2 = new NativeRectFloat(10.0f, 20.0f, 30.0f, 40.0f);
+            NativeRectFloat nativeRectFloatConverted2 = rect;
+            Assert.Equal(nativeRectFloatExpected2, nativeRectFloatConverted2);
+
+            var rectExpected = new Rect(10.5, 20.5, 30.5, 40.5);
+            Rect rectConverted = nativeRectFloat;
+            Assert.Equal(rectExpected, rectConverted);
+
+            var int32Rect = new Int32Rect(10, 20, 30, 40);
+            var nativeRectFloatExpected3 = new NativeRectFloat(10, 20, 30, 40);
+            NativeRectFloat nativeRectFloatConverted3 = int32Rect;
+            Assert.Equal(nativeRectFloatExpected3, nativeRectFloatConverted3);
+
+            var int32RectExpected = new Int32Rect(10, 20, 30, 40);
+            Int32Rect int32RectConverted = nativeRectFloat;
+            Assert.Equal(int32RectExpected, int32RectConverted);
+#endif
+
+            var rectangle = new Rectangle(10, 20, 30, 40);
+            var nativeRectFloatExpected4 = new NativeRectFloat(10, 20, 30, 40);
+            NativeRectFloat nativeRectFloatConverted4 = rectangle;
+            Assert.Equal(nativeRectFloatExpected4, nativeRectFloatConverted4);
+
+            var rectangleExpected = new Rectangle(10, 20, 30, 40);
+            Rectangle rectangleConverted = nativeRectFloat;
+            Assert.Equal(rectangleExpected, rectangleConverted);
+
+            var rectangleF = new RectangleF(10.5f, 20.5f, 30.5f, 40.5f);
+            var nativeRectFloatExpected5 = new NativeRectFloat(10.5f, 20.5f, 30.5f, 40.5f);
+            NativeRectFloat nativeRectFloatConverted5 = rectangleF;
+            Assert.Equal(nativeRectFloatExpected5, nativeRectFloatConverted5);
+
+            var rectangleFExpected = new RectangleF(10.5f, 20.5f, 30.5f, 40.5f);
+            RectangleF rectangleFConverted = nativeRectFloat;
+            Assert.Equal(rectangleFExpected, rectangleFConverted);
         }
     }
 }
