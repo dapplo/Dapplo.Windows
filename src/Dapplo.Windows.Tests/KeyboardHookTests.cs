@@ -1,24 +1,5 @@
-﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2017-2019  Dapplo
-// 
-//  For more information see: http://dapplo.net/
-//  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
-// 
-//  This file is part of Dapplo.Windows
-// 
-//  Dapplo.Windows is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU Lesser General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-// 
-//  Dapplo.Windows is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU Lesser General Public License for more details.
-// 
-//  You should have a copy of the GNU Lesser General Public License
-//  along with Dapplo.Windows. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
-
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Linq;
 using System.Reactive.Linq;
@@ -39,26 +20,6 @@ namespace Dapplo.Windows.Tests
         public KeyboardHookTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
-
-        private static KeyboardHookEventArgs KeyDown(VirtualKeyCode virtualKeyCode)
-        {
-            return new KeyboardHookEventArgs
-            {
-                Key = virtualKeyCode,
-                IsKeyDown = true,
-                IsModifier = virtualKeyCode.IsModifier()
-            };
-        }
-
-        private static KeyboardHookEventArgs KeyUp(VirtualKeyCode virtualKeyCode)
-        {
-            return new KeyboardHookEventArgs
-            {
-                Key = virtualKeyCode,
-                IsKeyDown = false,
-                IsModifier = virtualKeyCode.IsModifier()
-            };
         }
 
         [StaFact]
@@ -150,26 +111,26 @@ namespace Dapplo.Windows.Tests
                 Timeout = null
             };
 
-            var result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Print));
+            var result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Shift));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Shift));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.KeyB));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyB));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.KeyB));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyB));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Shift));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Shift));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Print));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Print));
             Assert.False(result);
 
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Shift));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Shift));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.KeyA));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyA));
             Assert.True(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.KeyA));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyA));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Shift));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Shift));
             Assert.False(result);
             Assert.False(sequenceHandler.HasKeysPressed);
         }
@@ -184,19 +145,19 @@ namespace Dapplo.Windows.Tests
                 Timeout = null
             };
 
-            var result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Print));
+            var result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Print));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Print));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Control));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Control));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Control));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Control));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Control));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Control));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Shift));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Shift));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.KeyA));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyA));
             Assert.True(result);
         }
 
@@ -205,17 +166,9 @@ namespace Dapplo.Windows.Tests
         {
             var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Print);
 
-            var keyPrintDown = new KeyboardHookEventArgs
-            {
-                Key = VirtualKeyCode.Print,
-                IsKeyDown = true
-            };
+            var keyPrintDown = KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print);
 
-            var keyPrintUp = new KeyboardHookEventArgs
-            {
-                Key = VirtualKeyCode.Print,
-                IsKeyDown = false
-            };
+            var keyPrintUp = KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Print);
 
             var result = keyCombinationHandler.Handle(keyPrintDown);
             Assert.True(result);
@@ -237,11 +190,11 @@ namespace Dapplo.Windows.Tests
         {
             var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Print);
 
-            var result = keyCombinationHandler.Handle(KeyDown(VirtualKeyCode.Print));
+            var result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print));
             Assert.True(result);
-            result = keyCombinationHandler.Handle(KeyDown(VirtualKeyCode.Control));
+            result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Control));
             Assert.False(result);
-            result = keyCombinationHandler.Handle(KeyUp(VirtualKeyCode.Control));
+            result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Control));
             Assert.False(result);
         }
 
@@ -299,23 +252,23 @@ namespace Dapplo.Windows.Tests
 
             bool result;
             // Print key
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Print));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Print));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Print));
             Assert.False(result);
 
             // Shift KeyB
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Shift));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Shift));
             Assert.True(sequenceHandler.HasKeysPressed);
             Assert.False(result);
             await Task.Delay(400);
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.KeyB));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyB));
             Assert.True(sequenceHandler.HasKeysPressed);
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.KeyB));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyB));
             Assert.True(sequenceHandler.HasKeysPressed);
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Shift));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Shift));
             Assert.False(sequenceHandler.HasKeysPressed);
             Assert.False(result);
         }
@@ -336,20 +289,20 @@ namespace Dapplo.Windows.Tests
             bool result;
 
             // Print key
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Print));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Print));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Print));
             Assert.False(result);
 
             // Shift KeyB
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.Shift));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Shift));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyDown(VirtualKeyCode.KeyB));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyB));
             Assert.True(result);
             // Shift KeyB
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.KeyB));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyB));
             Assert.False(result);
-            result = sequenceHandler.Handle(KeyUp(VirtualKeyCode.Shift));
+            result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Shift));
             Assert.False(result);
         }
 
