@@ -106,6 +106,7 @@ namespace Dapplo.Windows.User32
 
             return new DisplayInfo
             {
+                MonitorHandle = monitorHandle,
                 Index = index,
                 ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left),
                 ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
@@ -253,10 +254,10 @@ namespace Dapplo.Windows.User32
         /// <returns>string with the text</returns>
         public static string GetTextFromWindow(IntPtr hWnd)
         {
-            // Get the size of the string required to hold the window's text. 
+            // Get the size of the string required to hold the window's text.
             var size = SendMessage(hWnd, WindowsMessages.WM_GETTEXTLENGTH, 0, 0).ToInt32();
 
-            // If the return is 0, there is no text. 
+            // If the return is 0, there is no text.
             if (size <= 0)
             {
                 return null;
@@ -381,7 +382,7 @@ namespace Dapplo.Windows.User32
         /// <returns>
         /// If the specified window, its parent window, its parent's parent window, and so forth, have the WS_VISIBLE style, the return value is nonzero. Otherwise, the return value is zero.
         /// Because the return value specifies whether the window has the WS_VISIBLE style, it may be nonzero even if the window is totally obscured by other windows.
-        /// 
+        ///
         /// Remarks:
         /// The visibility state of a window is indicated by the WS_VISIBLE style bit. When WS_VISIBLE is set, the window is displayed and subsequent drawing into it is displayed as long as the window has the WS_VISIBLE style.
         /// Any drawing to a window with the WS_VISIBLE style will not be displayed if the window is obscured by other windows or is clipped by its parent window.

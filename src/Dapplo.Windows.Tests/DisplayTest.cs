@@ -7,8 +7,8 @@ using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Dpi;
 using Dapplo.Windows.User32;
-using Dapplo.Windows.User32.Structs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -45,6 +45,16 @@ namespace Dapplo.Windows.Tests
         {
             var screenboundsAllScreens = GetScreenBoundsAllScreens();
             var screenboundsDisplayInfo = DisplayInfo.ScreenBounds;
+
+            // The following scales the screenboundsAllScreens which comes from build in code without DPI awareness
+            // with the current DPI so it should also work when running with a different DPI setting
+            var monitorHandle = DisplayInfo.AllDisplayInfos.First().MonitorHandle;
+            NativeDpiMethods.GetDpiForMonitor(monitorHandle, Dpi.Enums.MonitorDpiType.EffectiveDpi, out var xDpi, out var yDpi);
+            if (xDpi != DpiHandler.DefaultScreenDpi) {
+                var newSize = DpiHandler.ScaleWithDpi(screenboundsAllScreens.Size, xDpi);
+                screenboundsAllScreens = new NativeRect(screenboundsAllScreens.Location, newSize);
+            }
+
             Assert.Equal(screenboundsAllScreens, screenboundsDisplayInfo);
         }
 
@@ -66,7 +76,8 @@ namespace Dapplo.Windows.Tests
 
 
         /// <summary>
-        ///     Get the bounds of all screens combined.
+        ///     Get the bounds of all screens combined, via build in Screen.AllScreens.
+        ///     This has issues when running with alternative DPI settings
         /// </summary>
         /// <returns>A NativeRect of the bounds of the entire display area.</returns>
         private NativeRect GetScreenBoundsAllScreens()

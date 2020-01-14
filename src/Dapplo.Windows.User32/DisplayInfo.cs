@@ -20,6 +20,12 @@ namespace Dapplo.Windows.User32
         private static IDisposable _displayInfoUpdate;
 
         /// <summary>
+        ///     Desktop working area
+        /// </summary>
+        public IntPtr MonitorHandle { get; set; }
+
+
+        /// <summary>
         /// Index of the Display, as specified in the "control panel".
         /// </summary>
         public int? Index { get; set; }
@@ -84,7 +90,7 @@ namespace Dapplo.Windows.User32
         }
 
         /// <summary>
-        ///     Return all DisplayInfo 
+        ///     Return all DisplayInfo
         /// </summary>
         /// <returns>array of DisplayInfo</returns>
         public static DisplayInfo[] AllDisplayInfos
