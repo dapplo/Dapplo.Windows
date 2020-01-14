@@ -1,8 +1,8 @@
 # Dapplo.Windows
 This project contains code which adds Microsoft Windows specific functionality to your .NET Framework or dotnet core 3.x application
 
-- Documentation can be found [here](http://www.dapplo.net/documentation/Dapplo.Windows)
-- Current build status: [![Build status](https://ci.appveyor.com/api/projects/status/n99jafhbbp74n2w7?svg=true)](https://ci.appveyor.com/project/dapplo/dapplo-windows)
+- Documentation can be found [here](http://www.dapplo.net/Dapplo.Windows)
+- Current build status: [![Build Status](https://dev.azure.com/Dapplo/Dapplo%20framework/_apis/build/status/dapplo.Dapplo.Windows?branchName=master)](https://dev.azure.com/Dapplo/Dapplo%20framework/_build/latest?definitionId=10&branchName=master)
 - Coverage: [![Coverage Status](https://coveralls.io/repos/github/dapplo/Dapplo.Windows/badge.svg?branch=master)](https://coveralls.io/github/dapplo/Dapplo.Windows?branch=master)
 - Dapplo.Windows: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.svg)](https://www.nuget.org/packages/Dapplo.Windows)
 - Dapplo.Windows.Clipboard: [![NuGet package](https://img.shields.io/nuget/v/Dapplo.Windows.Clipboard.svg)](https://www.nuget.org/packages/Dapplo.Windows.Clipboard)

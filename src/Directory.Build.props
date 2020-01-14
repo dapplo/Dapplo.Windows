@@ -1,6 +1,6 @@
 ﻿<Project>
   <PropertyGroup>
-    <Copyright>Copyright © Dapplo 2016-2019</Copyright>
+    <Copyright>Copyright © Dapplo 2016-2020</Copyright>
     <Authors>Dapplo</Authors>
     <PackageIconUrl>http://www.dapplo.net/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/dapplo/Dapplo.Windows</RepositoryUrl>
@@ -73,10 +73,10 @@
 
   <!-- Global definition for non test or example projects to enable InternalsVisibleTo, git versioning and pdbgit -->
   <ItemGroup Condition="!$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example')) And $(MSBuildProjectName.StartsWith('Dapplo'))">
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.0.26">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.0.48">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
   </ItemGroup>
 </Project>

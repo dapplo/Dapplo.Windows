@@ -3,12 +3,20 @@
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+    exclude:
+    - gh-pages
+
 stages:
 - stage: Build
   jobs:
   - job: Build
     pool:
-      vmImage: 'Windows-2019'
+      vmImage: 'Windows-latest'
 
     variables:
       solution: '**/src/*.sln'
@@ -16,13 +24,16 @@ stages:
       buildConfiguration: 'Release'
 
     steps:
+    - checkout: self
+      persistCredentials: true
+
     - task: NuGetToolInstaller@1
 
     - task: UseDotNet@2
-      displayName: 'Use .NET Core sdk 3.0'
+      displayName: 'Use .NET Core sdk 3.1'
       inputs:
         packageType: sdk
-        version: 3.0.100
+        version: 3.1.100
 
     - task: DotNetCoreCLI@2
       displayName: Test
@@ -51,20 +62,53 @@ stages:
     - task: PublishCodeCoverageResults@1
       inputs:
         codeCoverageTool: Cobertura
-        summaryFileLocation: 'src/**/coverage.cobertura.xml'
+        summaryFileLocation: 'src/**/coverage.*.xml'
         failIfCoverageEmpty: true
 
-    - task: PublishPipelineArtifact@1
-      displayName: 'Publish Artifacts'
+    - powershell: |
+        choco install docfx -y
+        docfx doc/docfx.json
+        if ($lastexitcode -ne 0){
+          throw ("Error generating docfx document")
+        }
+      displayName: 'docfx build'
+
+    - task: CopyFiles@2
+      displayName: 'Copy generated documentation to ArtifactStagingDirectory'
       inputs:
-        artifactName: 'drop'
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        SourceFolder: '$(System.DefaultWorkingDirectory)/doc/_site'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/site'
+
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: drop
+
+    - script: |
+        @echo on
+        git config --local user.name "Robin Krom"
+        git config --local user.email robin@dapplo.net
+        git config --local core.autocrlf false
+        git config --local core.safecrlf false
+        rem Create a branch to work in
+        git checkout -b docfx
+        rem Remove the .gitignore to make sure this doesn't cause issues
+        del .gitignore
+        rem Add all the files from the generated document, ignore warnings
+        git add doc/_site
+        git commit -m "Generated documentation for %BuildNumber%"
+        rem create a local gh-pages branch containing the splitted output folder
+        git subtree split --prefix doc/_site -b gh-pages
+        rem force the push of the gh-pages branch to the remote gh-pages branch at origin
+        git push -f origin gh-pages:gh-pages
+      condition: ne(variables['Build.Reason'], 'PullRequest')
+      env:
+        BuildNumber: $(Build.BuildNumber)
+      displayName: "docfx publish"
 
 - stage: Deploy
   jobs:
   - deployment: DeployNuGet
     pool:
-      vmImage: 'Windows-2019'
+      vmImage: 'Windows-latest'
 
     environment: 'NuGet'
     strategy:
@@ -77,15 +121,15 @@ stages:
               artifact: 'drop'
 
           - task: NuGetToolInstaller@0
-            displayName: 'Use NuGet 5.2.0'
+            displayName: 'Use NuGet 5.4.0'
             inputs:
-              versionSpec: 5.2.0
+              versionSpec: 5.4.0
               checkLatest: true
 
           - task: NuGetCommand@2
             displayName: 'NuGet push'
             inputs:
               command: push
-              packagesToPush: '$(Pipeline.Workspace)/drop/a/*.nupkg;!$(Pipeline.Workspace)/drop/a/*.symbols.nupkg'
+              packagesToPush: '$(Pipeline.Workspace)/drop/*.nupkg;!$(Pipeline.Workspace)/drop/*.symbols.nupkg'
               nuGetFeedType: external
               publishFeedCredentials: 'Dapplo NuGet push'
