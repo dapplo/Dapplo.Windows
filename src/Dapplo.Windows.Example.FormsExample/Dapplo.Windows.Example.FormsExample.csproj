@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Example.FormsExample</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Example.FormsExample</AssemblyName>
-    <TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp3.1</TargetFrameworks>
     <OutputType>WinExe</OutputType>
     <UseWindowsForms>true</UseWindowsForms>
 	<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>

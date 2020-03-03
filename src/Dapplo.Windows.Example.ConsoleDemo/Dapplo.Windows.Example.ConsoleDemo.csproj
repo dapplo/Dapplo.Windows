@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Example.ConsoleDemo</AssemblyTitle>
-    <TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp3.1</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Example.ConsoleDemo</AssemblyName>
 	<OutputType>Exe</OutputType>
   </PropertyGroup>

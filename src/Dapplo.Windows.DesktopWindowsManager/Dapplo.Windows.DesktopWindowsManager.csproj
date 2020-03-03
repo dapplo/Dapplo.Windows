@@ -5,7 +5,7 @@
     <AssemblyName>Dapplo.Windows.DesktopWindowsManager</AssemblyName>
     <PackageId>Dapplo.Windows.DesktopWindowsManager</PackageId>
     <PackageTags>windows dwm</PackageTags>
-    <TargetFrameworks>net461;netcoreapp3.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp3.1;netstandard2.0</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
   </PropertyGroup>

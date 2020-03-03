@@ -473,7 +473,7 @@ namespace Dapplo.Windows.Desktop
         }
 
         /// <summary>
-        ///     Retrieve if the window is Visible (IsWindowVisible, whatever that means)
+        ///     Retrieve if the window is Visible and not cloaked (different desktop)
         /// </summary>
         /// <param name="interopWindow">InteropWindow</param>
         /// <param name="forceUpdate">set to true to make sure the value is updated</param>
@@ -482,7 +482,7 @@ namespace Dapplo.Windows.Desktop
         {
             if (!interopWindow.IsVisible.HasValue || forceUpdate)
             {
-                interopWindow.IsVisible = User32Api.IsWindowVisible(interopWindow.Handle);
+                interopWindow.IsVisible = User32Api.IsWindowVisible(interopWindow.Handle) && !Dwm.IsWindowCloaked(interopWindow.Handle);
             }
             return interopWindow.IsVisible.Value;
         }

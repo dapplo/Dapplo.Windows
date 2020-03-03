@@ -123,11 +123,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         public static extern HResult DwmEnableComposition(uint uCompositionAction);
 
         /// <summary>
-        ///     See
-        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969515(v=vs.85).aspx">
-        ///         DwmGetWindowAttribute
-        ///         function
-        ///     </a>
+        ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969515(v=vs.85).aspx">DwmGetWindowAttribute function</a>
         ///     Retrieves the current value of a specified attribute applied to a window.
         ///     TODO: Currently only DWMWA_EXTENDED_FRAME_BOUNDS is supported, due to the type of lpRect
         /// </summary>
@@ -138,12 +134,23 @@ namespace Dapplo.Windows.DesktopWindowsManager
         ///     the attribute. The type of the retrieved value depends on the value of the dwAttribute parameter.
         /// </param>
         /// <param name="size"></param>
-        /// <returns>
-        ///     The size of the DWMWINDOWATTRIBUTE value being retrieved. The size is dependent on the type of the pvAttribute
-        ///     parameter.
-        /// </returns>
+        /// <returns>HResult</returns>
         [DllImport(DwmApiDll, SetLastError = true)]
         public static extern HResult DwmGetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttribute, out NativeRect lpRect, int size);
+
+        /// <summary>
+        ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969515(v=vs.85).aspx">DwmGetWindowAttribute function</a>
+        ///     Retrieves the current value of a specified attribute applied to a window.
+        /// </summary>
+        /// <param name="hWnd">The handle to the window from which the attribute data is retrieved.</param>
+        /// <param name="dwAttribute">The attribute to retrieve, specified as a DwmWindowAttributes value.</param>
+        /// <param name="pvAttribute">A pointer to a value that, when this function returns successfully, receives the current value of
+        ///     the attribute. The type of the retrieved value depends on the value of the dwAttribute parameter.
+        /// </param>
+        /// <param name="size"></param>
+        /// <returns>HResult</returns>
+        [DllImport(DwmApiDll, SetLastError = true)]
+        public static extern HResult DwmGetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttribute, out bool pvAttribute, int size);
 
         /// <summary>
         ///     See
@@ -286,6 +293,21 @@ namespace Dapplo.Windows.DesktopWindowsManager
             }
             rectangle = NativeRect.Empty;
             return false;
+        }
+
+        /// <summary>
+        /// This checks if the specified Window is cloaked, e.g. on a different virtual desktop
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <returns>bool if the window is cloaked</returns>
+        public static bool IsWindowCloaked(IntPtr hWnd)
+        {
+            if (!WindowsVersion.IsWindows8OrLater)
+            {
+                return false;
+            }
+            DwmGetWindowAttribute(hWnd, DwmWindowAttributes.Cloaked, out bool isCloaked, Marshal.SizeOf(typeof(bool)));
+            return isCloaked;
         }
 
         /// <summary>

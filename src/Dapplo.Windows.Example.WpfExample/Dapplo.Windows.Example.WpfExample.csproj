@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Example.WpfExample</AssemblyTitle>
     <AssemblyName>Dapplo.Windows.Example.WpfExample</AssemblyName>
-    <TargetFrameworks>net471;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp3.1</TargetFrameworks>
     <OutputType>WinExe</OutputType>
     <ApplicationManifest>app.manifest</ApplicationManifest>
 	<UseWindowsForms>true</UseWindowsForms>
