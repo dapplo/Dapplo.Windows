@@ -12,11 +12,11 @@ namespace Dapplo.Windows.Clipboard
     public static class ClipboardFileExtensions
     {
         /// <summary>
-        /// Get a list of filenames on the clipboard
+        /// Get a list of file-names on the clipboard
         /// </summary>
         /// <param name="clipboardAccessToken">IClipboard</param>
         /// <returns>IEnumerable of string</returns>
-        public static IEnumerable<string> GetFilenames(this IClipboardAccessToken clipboardAccessToken)
+        public static IEnumerable<string> GetFileNames(this IClipboardAccessToken clipboardAccessToken)
         {
             clipboardAccessToken.ThrowWhenNoAccess();
 

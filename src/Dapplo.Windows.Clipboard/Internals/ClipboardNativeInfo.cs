@@ -33,7 +33,7 @@ namespace Dapplo.Windows.Clipboard.Internals
             if (NeedsWrite)
             {
                 // Place the content on the clipboard
-                NativeMethods.SetClipboardData(FormatId, GlobalHandle);
+                NativeMethods.SetClipboardDataWithErrorHandling(FormatId, GlobalHandle);
             }
         }
     }

@@ -37,9 +37,9 @@ namespace Dapplo.Windows.Clipboard.Internals
         public IClipboardAccessToken Lock(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
         {
             // Set default retry interval
-            retryInterval = retryInterval ?? DefaultRetryInterval;
+            retryInterval ??= DefaultRetryInterval;
             // Set default timeout interval
-            timeout = timeout ?? DefaultTimeout;
+            timeout ??= DefaultTimeout;
 
 #if !NETSTANDARD2_0
             if (hWnd == IntPtr.Zero)
@@ -80,7 +80,7 @@ namespace Dapplo.Windows.Clipboard.Internals
                 {
                     Thread.Sleep(retryInterval.Value);
                 }
-                
+
             } while (retries >= 0);
 
             if (!isOpened)
@@ -110,9 +110,9 @@ namespace Dapplo.Windows.Clipboard.Internals
         public async ValueTask<IClipboardAccessToken> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
         {
             // Set default retry interval
-            retryInterval = retryInterval ?? DefaultRetryInterval;
+            retryInterval ??= DefaultRetryInterval;
             // Set default timeout interval
-            timeout = timeout ?? DefaultTimeout;
+            timeout ??= DefaultTimeout;
 
 #if !NETSTANDARD2_0
             if (hWnd == IntPtr.Zero)

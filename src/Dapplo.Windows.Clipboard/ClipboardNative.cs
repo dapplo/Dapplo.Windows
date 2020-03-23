@@ -28,62 +28,127 @@ namespace Dapplo.Windows.Clipboard
         // This maintains the sequence
         private static uint _previousSequence = uint.MinValue;
 
-        /// <summary>
-        ///     Private constructor to create the observable
-        /// </summary>
-        static ClipboardNative()
-        {
-            OnUpdate = Observable.Create<ClipboardUpdateInformation>(observer =>
-            {
-                // This handles the message
-                IntPtr WinProcClipboardMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-                {
-                    var windowsMessage = (WindowsMessages)msg;
-                    if (windowsMessage != WindowsMessages.WM_CLIPBOARDUPDATE)
-                    {
-                        return IntPtr.Zero;
-                    }
-
-                    var clipboardUpdateInformationInfo = ClipboardUpdateInformation.Create(hWnd);
-
-                    // Make sure we don't trigger multiple times, this happend while developing.
-                    if (clipboardUpdateInformationInfo.Id > _previousSequence)
-                    {
-                        _previousSequence = clipboardUpdateInformationInfo.Id;
-                        observer.OnNext(clipboardUpdateInformationInfo);
-                    }
-
-                    return IntPtr.Zero;
-                }
-
-                var hook = new WinProcHandlerHook(WinProcClipboardMessageHandler);
-                var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
-                if (!NativeMethods.AddClipboardFormatListener(WinProcHandler.Instance.Handle))
-                {
-                    observer.OnError(new Win32Exception());
-                }
-                else
-                {
-                    // Make sure the current contents are always published
-                    observer.OnNext(ClipboardUpdateInformation.Create());
-                }
-
-                return hook.Disposable = Disposable.Create(() =>
-                {
-                    NativeMethods.RemoveClipboardFormatListener(WinProcHandler.Instance.Handle);
-                    hookSubscription.Dispose();
-                });
-            })
-            // Make sure there is always a value produced when connecting
-            .Publish()
-            .RefCount();
-        }
+        private static IObservable<ClipboardUpdateInformation> _onUpdate;
+        private static IObservable<ClipboardRenderFormatRequest> _onRenderFormat;
 
         /// <summary>
         ///     This observable publishes the current clipboard contents after every paste action.
         ///     Best to use SubscribeOn with the UI SynchronizationContext.
         /// </summary>
-        public static IObservable<ClipboardUpdateInformation> OnUpdate { get; }
+        public static IObservable<ClipboardUpdateInformation> OnUpdate {
+            get
+            {
+                return _onUpdate ??= Observable.Create<ClipboardUpdateInformation>(observer =>
+                    {
+                        // This handles the message
+                        IntPtr WinProcClipboardMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                        {
+                            var windowsMessage = (WindowsMessages)msg;
+                            if (windowsMessage != WindowsMessages.WM_CLIPBOARDUPDATE)
+                            {
+                                return IntPtr.Zero;
+                            }
+
+                            var clipboardUpdateInformationInfo = ClipboardUpdateInformation.Create(hWnd);
+
+                            // Make sure we don't trigger multiple times, this happened while developing.
+                            if (clipboardUpdateInformationInfo.Id > _previousSequence)
+                            {
+                                _previousSequence = clipboardUpdateInformationInfo.Id;
+                                observer.OnNext(clipboardUpdateInformationInfo);
+                            }
+
+                            return IntPtr.Zero;
+                        }
+
+                        var hook = new WinProcHandlerHook(WinProcClipboardMessageHandler);
+                        var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
+                        if (!NativeMethods.AddClipboardFormatListener(WinProcHandler.Instance.Handle))
+                        {
+                            observer.OnError(new Win32Exception());
+                        }
+                        else
+                        {
+                            // Make sure the current contents are always published
+                            observer.OnNext(ClipboardUpdateInformation.Create());
+                        }
+
+                        return hook.Disposable = Disposable.Create(() =>
+                        {
+                            NativeMethods.RemoveClipboardFormatListener(WinProcHandler.Instance.Handle);
+                            hookSubscription.Dispose();
+                        });
+                    })
+                    // Make sure there is always a value produced when connecting
+                    .Publish()
+                    .RefCount();
+            }
+
+        }
+
+        /// <summary>
+        ///     This observable can be subscribed to be informed if a certain clipboard format is requested
+        ///     Best to use SubscribeOn with the UI SynchronizationContext.
+        /// </summary>
+        public static IObservable<ClipboardRenderFormatRequest> OnRenderFormat
+        {
+            get
+            {
+                return _onRenderFormat ??= Observable.Create<ClipboardRenderFormatRequest>(observer =>
+                {
+                    // This handles the message
+                    IntPtr WinProcClipboardRenderFormatHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                    {
+                        var windowsMessage = (WindowsMessages)msg;
+                        switch (windowsMessage)
+                        {
+                            case WindowsMessages.WM_RENDERALLFORMATS:
+                                var requestRenderFormat = new ClipboardRenderFormatRequest
+                                {
+                                    AccessToken = Access()
+                                };
+                                observer.OnNext(requestRenderFormat);
+                                break;
+                            case WindowsMessages.WM_RENDERFORMAT:
+                                var clipboardFormatId = wParam.ToInt32();
+                                var requestedClipboardFormat = ClipboardFormatExtensions.MapIdToFormat((uint)clipboardFormatId);
+                                var requestSingleFormat = new ClipboardRenderFormatRequest
+                                {
+                                    RequestedFormat = requestedClipboardFormat,
+                                    // According to https://docs.microsoft.com/en-us/windows/win32/dataxchg/wm-renderformat the clipboard must not be open
+                                    AccessToken = new ClipboardAccessToken {
+                                        CanAccess = true,
+                                        IsLockTimeout = true
+                                    }
+                                };
+                                observer.OnNext(requestSingleFormat);
+                                break;
+                            case WindowsMessages.WM_DESTROYCLIPBOARD:
+                                var requestDestroyClipboard = new ClipboardRenderFormatRequest
+                                {
+                                    IsDestroyClipboard = true
+                                };
+                                observer.OnNext(requestDestroyClipboard);
+                                break;
+                        }
+
+                        return IntPtr.Zero;
+                    }
+
+                    var hook = new WinProcHandlerHook(WinProcClipboardRenderFormatHandler);
+                    var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
+
+                    return hook.Disposable = Disposable.Create(() =>
+                    {
+                        hookSubscription.Dispose();
+                    });
+                })
+                // Make sure there is always a value produced when connecting
+                .Publish()
+                .RefCount();
+            }
+
+        }
 #endif
 
         /// <summary>

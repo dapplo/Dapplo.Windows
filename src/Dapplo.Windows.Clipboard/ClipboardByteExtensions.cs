@@ -44,14 +44,12 @@ namespace Dapplo.Windows.Clipboard
         /// <returns>byte array</returns>
         public static byte[] GetAsBytes(this IClipboardAccessToken clipboardAccessToken, uint formatId)
         {
-            using (var readInfo = clipboardAccessToken.ReadInfo(formatId))
-            {
-                var bytes = new byte[readInfo.Size];
+            using var readInfo = clipboardAccessToken.ReadInfo(formatId);
+            var bytes = new byte[readInfo.Size];
 
-                // Fill the memory stream
-                Marshal.Copy(readInfo.MemoryPtr, bytes, 0, readInfo.Size);
-                return bytes;
-            }
+            // Fill the memory stream
+            Marshal.Copy(readInfo.MemoryPtr, bytes, 0, readInfo.Size);
+            return bytes;
         }
 
         /// <summary>
@@ -84,15 +82,11 @@ namespace Dapplo.Windows.Clipboard
         /// <param name="formatId">uint with the format ID to place the bytes under</param>
         public static void SetAsBytes(this IClipboardAccessToken clipboardAccessToken, byte[] bytes, uint formatId)
         {
-            using (var writeInfo = clipboardAccessToken.WriteInfo(formatId, bytes.Length))
+            using var writeInfo = clipboardAccessToken.WriteInfo(formatId, bytes.Length);
+            unsafe
             {
-                unsafe
-                {
-                    using (var unsafeMemoryStream = new UnmanagedMemoryStream((byte*)writeInfo.MemoryPtr, bytes.Length, bytes.Length, FileAccess.Write))
-                    {
-                        unsafeMemoryStream.Write(bytes, 0, bytes.Length);
-                    }
-                }
+                using var unsafeMemoryStream = new UnmanagedMemoryStream((byte*)writeInfo.MemoryPtr, bytes.Length, bytes.Length, FileAccess.Write);
+                unsafeMemoryStream.Write(bytes, 0, bytes.Length);
             }
         }
     }

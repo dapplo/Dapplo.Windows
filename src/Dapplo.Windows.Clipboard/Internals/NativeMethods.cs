@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Clipboard.Internals
@@ -60,9 +61,9 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// </summary>
         /// <param name="format">uint</param>
         /// <param name="memory">IntPtr to the memory area</param>
-        /// <returns></returns>
+        /// <returns>IntPtr with handle or IntPtr.Zero when an error occured</returns>
         [DllImport("user32", SetLastError = true)]
-        internal static extern IntPtr SetClipboardData(uint format, IntPtr memory);
+        private static extern IntPtr SetClipboardData(uint format, IntPtr memory);
 
         /// <summary>
         ///     See
@@ -79,7 +80,7 @@ namespace Dapplo.Windows.Clipboard.Internals
 
         /// <summary>
         /// Registers a new clipboard format. This format can then be used as a valid clipboard format.
-        /// 
+        ///
         /// If a registered format with the specified name already exists, a new format is not registered and the return value identifies the existing format. This enables more than one application to copy and paste data using the same registered clipboard format. Note that the format name comparison is case-insensitive.
         /// Registered clipboard formats are identified by values in the range 0xC000 through 0xFFFF.
         /// When registered clipboard formats are placed on or retrieved from the clipboard, they must be in the form of an HGLOBAL value.
@@ -149,5 +150,22 @@ namespace Dapplo.Windows.Clipboard.Internals
         [DllImport("user32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool RemoveClipboardFormatListener(IntPtr hWnd);
+
+
+        /// <summary>
+        /// Places data on the clipboard in a specified clipboard format.
+        /// The window must be the current clipboard owner, and the application must have called the OpenClipboard function.
+        /// (When responding to the WM_RENDERFORMAT and WM_RENDERALLFORMATS messages, the clipboard owner must not call OpenClipboard before calling SetClipboardData.)
+        /// </summary>
+        /// <param name="format">uint</param>
+        /// <param name="memory">IntPtr</param>
+        public static void SetClipboardDataWithErrorHandling(uint format, IntPtr memory)
+        {
+            var result = SetClipboardData(format, memory);
+            if (result == IntPtr.Zero && memory != IntPtr.Zero)
+            {
+                throw new Win32Exception();
+            }
+        }
     }
 }
