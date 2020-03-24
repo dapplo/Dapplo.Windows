@@ -16,7 +16,7 @@
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="4.1.6" />
+    <PackageReference Include="System.Reactive" Version="4.3.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
