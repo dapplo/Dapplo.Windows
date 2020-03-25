@@ -28,6 +28,11 @@ namespace Dapplo.Windows.Common
         public static bool IsWindows10OrLater { get; } = WinVersion.Major >= 10;
 
         /// <summary>
+        /// Test if the current OS is Windows 7 or earlier
+        /// </summary>
+        public static bool IsWindows7OrLower { get; } = WinVersion.Major < 6 || WinVersion.Major == 6 && WinVersion.Minor >= 1;
+
+        /// <summary>
         ///     Test if the current OS is Windows 7 or later
         /// </summary>
         /// <returns>true if we are running on Windows 7 or later</returns>

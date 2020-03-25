@@ -62,4 +62,7 @@
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestFiles\" />
+  </ItemGroup>
 </Project>

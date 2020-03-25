@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Tests", "Dap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Devices", "Dapplo.Windows.Devices\Dapplo.Windows.Devices.csproj", "{AE4F7436-3100-443B-BAB5-F281E55F1840}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Ten", "Dapplo.Windows.Ten\Dapplo.Windows.Ten.csproj", "{DB8E1720-E891-4C06-BB7E-7EF7E54AFD65}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +149,10 @@ Global
 		{AE4F7436-3100-443B-BAB5-F281E55F1840}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE4F7436-3100-443B-BAB5-F281E55F1840}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE4F7436-3100-443B-BAB5-F281E55F1840}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB8E1720-E891-4C06-BB7E-7EF7E54AFD65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB8E1720-E891-4C06-BB7E-7EF7E54AFD65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB8E1720-E891-4C06-BB7E-7EF7E54AFD65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB8E1720-E891-4C06-BB7E-7EF7E54AFD65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
