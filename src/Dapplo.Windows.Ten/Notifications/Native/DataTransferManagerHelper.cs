@@ -7,7 +7,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel.DataTransfer;
 using Dapplo.Windows.Common.Extensions;
 
-namespace Dapplo.Windows.Ten.Native
+namespace Dapplo.Windows.Ten.Notifications.Native
 {
 	/// <summary>
 	/// Wraps the interop for calling the ShareUI

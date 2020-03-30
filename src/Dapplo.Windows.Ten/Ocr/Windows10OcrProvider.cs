@@ -2,54 +2,45 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
+using Windows.Globalization;
 using Windows.Graphics.Imaging;
 using Windows.Media.Ocr;
 using Windows.Storage.Streams;
 
-namespace Dapplo.Windows.Ten
+namespace Dapplo.Windows.Ten.Ocr
 {
 	/// <summary>
 	/// This uses the OcrEngine from Windows 10 to perform OCR on the captured image.
 	/// </summary>
-	public class Win10OcrProvider : IOcrProvider
-	{
-		private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(typeof(Win10OcrProvider));
+	public class Windows10OcrProvider : IOcrProvider
+    {
+        private readonly OcrEngine _ocrEngine;
 
-		/// <summary>
-		/// Constructor, this is only debug information
-		/// </summary>
-		public Win10OcrProvider()
+        /// <summary>
+        /// Create an OCR provider which uses the Windows 10 build in OcrEngine
+        /// </summary>
+        /// <param name="ocrLanguage">Language to use for the OCR process, null if you want to take the user default</param>
+        public Windows10OcrProvider(Language ocrLanguage = null)
 		{
-			var languages = OcrEngine.AvailableRecognizerLanguages;
-			foreach (var language in languages)
-			{
-				Log.DebugFormat("Found language {0} {1}", language.NativeName, language.LanguageTag);
-			}
+            if (ocrLanguage == null)
+            {
+                _ocrEngine = OcrEngine.TryCreateFromUserProfileLanguages();
+                return;
+            }
+            _ocrEngine = OcrEngine.TryCreateFromLanguage(ocrLanguage);
 		}
 
         /// <summary>
-        /// Scan the surface bitmap for text, and get the OcrResult
+        /// Retrieves all available OCR languages
         /// </summary>
-        /// <param name="surface">ISurface</param>
-        /// <returns>OcrResult sync</returns>
-        public async Task<OcrInformation> DoOcrAsync(ISurface surface)
-        {
-            OcrInformation result;
-            using (var imageStream = new MemoryStream())
-            {
-                ImageOutput.SaveToStream(surface, imageStream, new SurfaceOutputSettings());
-                imageStream.Position = 0;
-                var randomAccessStream = imageStream.AsRandomAccessStream();
+        public static IEnumerable<Language> AvailableLanguages => OcrEngine.AvailableRecognizerLanguages;
 
-                result = await DoOcrAsync(randomAccessStream);
-            }
-            return result;
-        }
-
-		/// <summary>
+        /// <summary>
 		/// Scan the Image for text, and get the OcrResult
 		/// </summary>
 		/// <param name="image">Image</param>
@@ -59,21 +50,32 @@ namespace Dapplo.Windows.Ten
             OcrInformation result;
             using (var imageStream = new MemoryStream())
             {
-                ImageOutput.SaveToStream(image, null, imageStream, new SurfaceOutputSettings());
+                image.Save(imageStream, ImageFormat.Png);
                 imageStream.Position = 0;
-                var randomAccessStream = imageStream.AsRandomAccessStream();
-
-                result = await DoOcrAsync(randomAccessStream);
+                result = await DoOcrAsync(imageStream);
 			}
 			return result;
         }
 
-		/// <summary>
-		/// Scan the surface bitmap for text, and get the OcrResult
-		/// </summary>
-		/// <param name="randomAccessStream">IRandomAccessStream</param>
-		/// <returns>OcrResult sync</returns>
-		public async Task<OcrInformation> DoOcrAsync(IRandomAccessStream randomAccessStream)
+        /// <summary>
+        /// Scan the Image for text, and get the OcrResult
+        /// </summary>
+        /// <param name="imageStream">Stream with the image data</param>
+        /// <returns>OcrResult sync</returns>
+        public async Task<OcrInformation> DoOcrAsync(Stream imageStream)
+        {
+            var randomAccessStream = imageStream.AsRandomAccessStream();
+
+            var result = await DoOcrAsync(randomAccessStream);
+            return result;
+        }
+
+        /// <summary>
+        /// Scan the surface bitmap for text, and get the OcrResult
+        /// </summary>
+        /// <param name="randomAccessStream">IRandomAccessStream</param>
+        /// <returns>OcrResult sync</returns>
+        public async Task<OcrInformation> DoOcrAsync(IRandomAccessStream randomAccessStream)
         {
             var ocrEngine = OcrEngine.TryCreateFromUserProfileLanguages();
             if (ocrEngine is null)

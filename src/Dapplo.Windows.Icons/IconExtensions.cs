@@ -4,7 +4,6 @@ using System;
 using System.Diagnostics;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
-using Dapplo.Windows.Messages;
 using System.Linq;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Desktop;

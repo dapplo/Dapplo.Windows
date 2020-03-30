@@ -20,6 +20,8 @@ namespace Dapplo.Windows.Desktop
     /// </summary>
     public static class WinEventHook
     {
+        // This is needed to keep a reference, to prevent the delegate to be garbage collected
+        // ReSharper disable once CollectionNeverQueried.Local
         private static readonly Dictionary<IntPtr, WinEventDelegate> Delegates = new Dictionary<IntPtr, WinEventDelegate>();
 
         /// <summary>
@@ -27,8 +29,8 @@ namespace Dapplo.Windows.Desktop
         /// </summary>
         /// <param name="winEventStart">WinEvent "start" of which you are interested</param>
         /// <param name="winEventEnd">WinEvent "end" of which you are interested</param>
-        /// <param name="process"></param>
-        /// <param name="thread"></param>
+        /// <param name="process">int</param>
+        /// <param name="thread">int</param>
         /// <returns>IObservable which processes WinEventInfo</returns>
         public static IObservable<WinEventInfo> Create(WinEvents winEventStart, WinEvents? winEventEnd = null, int process = 0, int thread = 0)
         {
@@ -68,6 +70,37 @@ namespace Dapplo.Windows.Desktop
             return Create(WinEvents.EVENT_OBJECT_NAMECHANGE).Where(winEventInfo => winEventInfo.ObjectIdentifier == ObjectIdentifiers.Window);
         }
 
+        /// <summary>
+        ///     Create an observable which only monitors created and destroyed windows
+        /// </summary>
+        /// <returns>IObservable with WinEventInfo</returns>
+        public static IObservable<WinEventInfo> WindowCreateDestroyObservable()
+        {
+            return Create(WinEvents.EVENT_OBJECT_CREATE, WinEvents.EVENT_OBJECT_DESTROY)
+                .Where(EventIsCreateDestroy);
+        }
+
+        /// <summary>
+        /// WinEventDelegate for the creation and destruction
+        /// </summary>
+        /// <param name="winEventInfo">WinEventInfo</param>
+        /// <returns>bool if the event is a create destroy</returns>
+        private static bool EventIsCreateDestroy(WinEventInfo winEventInfo)
+        {
+            if (winEventInfo.Handle == IntPtr.Zero || winEventInfo.ObjectIdentifier != ObjectIdentifiers.Window)
+            {
+                return false;
+            }
+
+            return winEventInfo.WinEvent switch
+            {
+                WinEvents.EVENT_OBJECT_CREATE => true,
+                WinEvents.EVENT_OBJECT_DESTROY => true,
+                _ => false
+            };
+        }
+
+
         [DllImport(User32Api.User32, SetLastError = true)]
         private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
@@ -104,7 +137,7 @@ namespace Dapplo.Windows.Desktop
         /// <summary>
         ///     The delegate called by SetWinEventHook when an event occurs
         /// </summary>
-        /// <param name="hWinEventHook">IntPtr with the eventhook that this call belongs to</param>
+        /// <param name="hWinEventHook">IntPtr with the event-hook that this call belongs to</param>
         /// <param name="eventType">WinEvent</param>
         /// <param name="hWnd">IntPtr</param>
         /// <param name="idObject">ObjectIdentifiers</param>

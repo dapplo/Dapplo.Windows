@@ -13,9 +13,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Dapplo.Windows.Ten.Native.Structs;
+using Dapplo.Windows.Ten.Notifications.Native.Structs;
 
-namespace Dapplo.Windows.Ten.Native
+namespace Dapplo.Windows.Ten.Notifications.Native
 {
     /// <summary>
     /// Text and selection values that the user entered on your notification. The Key is the ID of the input, and the Value is what the user entered.

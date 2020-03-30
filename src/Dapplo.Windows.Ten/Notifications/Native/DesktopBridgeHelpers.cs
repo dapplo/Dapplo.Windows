@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Dapplo.Windows.Common;
 
-namespace Dapplo.Windows.Ten.Native
+namespace Dapplo.Windows.Ten.Notifications.Native
 {
     /// <summary>
     /// Code from https://github.com/qmatteoq/DesktopBridgeHelpers/edit/master/DesktopBridge.Helpers/Helpers.cs

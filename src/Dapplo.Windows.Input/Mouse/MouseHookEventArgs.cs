@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 
 namespace Dapplo.Windows.Input.Mouse

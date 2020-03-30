@@ -10,9 +10,9 @@
 // THE CODE OR THE USE OR OTHER DEALINGS IN THE CODE.
 // ******************************************************************
 
-using Dapplo.Windows.Ten.Native.Structs;
+using Dapplo.Windows.Ten.Notifications.Native.Structs;
 
-namespace Dapplo.Windows.Ten.Native
+namespace Dapplo.Windows.Ten.Notifications.Native
 {
     /// <summary>
     /// Apps must implement this activator to handle notification activation.

@@ -10,26 +10,21 @@
 // THE CODE OR THE USE OR OTHER DEALINGS IN THE CODE.
 // ******************************************************************
 
+using System;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Ten.Native.Structs;
 
-namespace Dapplo.Windows.Ten.Native
+namespace Dapplo.Windows.Ten.Notifications.Native.Structs
 {
     /// <summary>
-    /// This is the interface which allows your notifications to be clicked, which active the application
+    /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/notificationactivationcallback/ns-notificationactivationcallback-notification_user_input_data">NOTIFICATION_USER_INPUT_DATA structure</a>
     /// </summary>
-    [ComImport, Guid("53E31837-6600-4A81-9395-75CFFE746F94"),
-     ComVisible(true), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface INotificationActivationCallback
+    [StructLayout(LayoutKind.Sequential), Serializable]
+    public struct NotificationUserInputData
     {
-        void Activate(
-            [In, MarshalAs(UnmanagedType.LPWStr)]
-            string appUserModelId,
-            [In, MarshalAs(UnmanagedType.LPWStr)]
-            string invokedArgs,
-            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)]
-            NotificationUserInputData[] data,
-            [In, MarshalAs(UnmanagedType.U4)]
-            uint dataCount);
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Key;
+
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Value;
     }
 }

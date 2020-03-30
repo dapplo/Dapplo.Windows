@@ -5,7 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 
-namespace Dapplo.Windows.Ten.Internal
+namespace Dapplo.Windows.Ten.Sharing
 {
     internal class ShareInfo
     {

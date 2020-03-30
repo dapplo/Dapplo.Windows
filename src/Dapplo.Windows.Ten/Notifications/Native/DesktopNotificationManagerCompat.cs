@@ -15,7 +15,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Windows.UI.Notifications;
 
-namespace Dapplo.Windows.Ten.Native
+namespace Dapplo.Windows.Ten.Notifications.Native
 {
     /// <summary>
     ///
@@ -91,9 +91,9 @@ namespace Dapplo.Windows.Ten.Native
         public static void RegisterActivator<T>() where T : NotificationActivator
         {
             // Register type
-            var regService = new RegistrationServices();
+            var registrationServices = new RegistrationServices();
 
-            regService.RegisterTypeForComClients(typeof(T), RegistrationClassContext.LocalServer, RegistrationConnectionType.MultipleUse);
+            registrationServices.RegisterTypeForComClients(typeof(T), RegistrationClassContext.LocalServer, RegistrationConnectionType.MultipleUse);
 
             _registeredActivator = true;
         }

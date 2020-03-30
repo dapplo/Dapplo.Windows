@@ -2,12 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Diagnostics;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Tests.Benchmarks
 {

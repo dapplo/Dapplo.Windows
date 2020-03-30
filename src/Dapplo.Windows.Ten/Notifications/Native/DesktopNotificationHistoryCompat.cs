@@ -13,7 +13,7 @@
 using System.Collections.Generic;
 using Windows.UI.Notifications;
 
-namespace Dapplo.Windows.Ten.Native
+namespace Dapplo.Windows.Ten.Notifications.Native
 {
     /// <summary>
     /// Manages the toast notifications for an app including the ability the clear all toast history and removing individual toasts.

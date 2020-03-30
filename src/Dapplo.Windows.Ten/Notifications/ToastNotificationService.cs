@@ -2,44 +2,59 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using Windows.UI.Notifications;
-using Dapplo.Windows.Ten.Native;
+using Dapplo.Log;
+using Dapplo.Windows.Ten.Notifications.Native;
 
-namespace Dapplo.Windows.Ten
+namespace Dapplo.Windows.Ten.Notifications
 {
     /// <summary>
     /// This service provides a way to inform (notify) the user.
     /// </summary>
-    public class ToastNotificationService : INotificationService
+    public class ToastNotificationService<TActivator> : INotificationService where TActivator : NotificationActivator
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ToastNotificationService));
-        private static readonly CoreConfiguration CoreConfiguration = IniConfig.GetIniSection<CoreConfiguration>();
+        private static readonly LogSource Log = new LogSource();
 
-        private readonly string _imageFilePath;
-        public ToastNotificationService()
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="applicationUserModelId">string</param>
+        public ToastNotificationService(string applicationUserModelId)
         {
             // Register AUMID and COM server (for Desktop Bridge apps, this no-ops)
-            DesktopNotificationManagerCompat.RegisterAumidAndComServer<GreenshotNotificationActivator>("Greenshot");
+            DesktopNotificationManagerCompat.RegisterAumidAndComServer<TActivator>(applicationUserModelId);
             // Register COM server and activator type
-            DesktopNotificationManagerCompat.RegisterActivator<GreenshotNotificationActivator>();
+            DesktopNotificationManagerCompat.RegisterActivator<TActivator>();
+        }
 
-            var localAppData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Greenshot");
+        /// <summary>
+        /// This is the path to the icon which is shown in the toast
+        /// </summary>
+        public string IconPath { get; set; }
+
+        /// <summary>
+        /// Create a file for the supplied bitmap so it can be shown on the toasts
+        /// </summary>
+        /// <param name="icon">Bitmap</param>
+        /// <param name="applicationName">string</param>
+        public void GenerateIcon(Bitmap icon, string applicationName)
+        {
+            var localAppData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), applicationName);
             if (!Directory.Exists(localAppData))
             {
                 Directory.CreateDirectory(localAppData);
             }
-            _imageFilePath = Path.Combine(localAppData, "greenshot.png");
+            IconPath = Path.Combine(localAppData, $"{applicationName}.png");
 
-            if (File.Exists(_imageFilePath))
+            if (File.Exists(IconPath))
             {
                 return;
             }
-
-            using var greenshotImage = GreenshotResources.GetGreenshotIcon().ToBitmap();
-            greenshotImage.Save(_imageFilePath, ImageFormat.Png);
+            icon.Save(IconPath, ImageFormat.Png);
         }
 
         /// <summary>
@@ -47,20 +62,23 @@ namespace Dapplo.Windows.Ten
         /// </summary>
         /// <param name="message">string</param>
         /// <param name="timeout">milliseconds until the toast timeouts</param>
+        /// <param name="notificationType">NotificationType</param>
         /// <param name="onClickAction">Action called when clicked</param>
         /// <param name="onClosedAction">Action called when the toast is closed</param>
-        private void ShowMessage(string message, int timeout, Action onClickAction, Action onClosedAction)
+        private void ShowMessage(string message, int timeout, NotificationType notificationType, Action onClickAction, Action onClosedAction)
         {
             // Do not inform the user if this is disabled
-            if (!CoreConfiguration.ShowTrayNotification)
+            if ((AllowedNotificationTypes & notificationType) == 0)
             {
+                // This message type is not allowed, ignore
                 return;
             }
+
             // Prepare the toast notifier. Be sure to specify the AppUserModelId on your application's shortcut!
             var toastNotifier = DesktopNotificationManagerCompat.CreateToastNotifier();
             if (toastNotifier.Setting != NotificationSetting.Enabled)
             {
-                Log.DebugFormat("Ignored toast due to {0}", toastNotifier.Setting);
+                Log.Debug().WriteLine("Ignored toast due to {0}", toastNotifier.Setting);
                 return;
             }
 
@@ -71,14 +89,14 @@ namespace Dapplo.Windows.Ten
             var stringElement = toastXml.GetElementsByTagName("text").First();
             stringElement.AppendChild(toastXml.CreateTextNode(message));
 
-            if (_imageFilePath != null && File.Exists(_imageFilePath))
+            if (IconPath != null && File.Exists(IconPath))
             {
                 // Specify the absolute path to an image
                 var imageElement = toastXml.GetElementsByTagName("image").First();
                 var imageSrcNode = imageElement.Attributes.GetNamedItem("src");
                 if (imageSrcNode != null)
                 {
-                    imageSrcNode.NodeValue = _imageFilePath;
+                    imageSrcNode.NodeValue = IconPath;
                 }
             }
 
@@ -97,7 +115,7 @@ namespace Dapplo.Windows.Ten
                 }
                 catch (Exception ex)
                 {
-                    Log.Warn("Exception while handling the onclick action: ", ex);
+                    Log.Warn().WriteLine("Exception while handling the onclick action: ", ex);
                 }
 
                 toast.Activated -= ToastActivatedHandler;
@@ -110,14 +128,14 @@ namespace Dapplo.Windows.Ten
 
             void ToastDismissedHandler(ToastNotification toastNotification, ToastDismissedEventArgs eventArgs)
             {
-                Log.Debug("Toast closed");
+                Log.Debug().WriteLine("Toast closed");
                 try
                 {
                     onClosedAction?.Invoke();
                 }
                 catch (Exception ex)
                 {
-                    Log.Warn("Exception while handling the onClosed action: ", ex);
+                    Log.Warn().WriteLine("Exception while handling the onClosed action: ", ex);
                 }
 
                 toast.Dismissed -= ToastDismissedHandler;
@@ -132,23 +150,30 @@ namespace Dapplo.Windows.Ten
 
         private void ToastOnFailed(ToastNotification sender, ToastFailedEventArgs args)
         {
-            Log.WarnFormat("Failed to display a toast due to {0}", args.ErrorCode);
-            Log.Debug(sender.Content.GetXml());
+            Log.Warn().WriteLine("Failed to display a toast due to {0}", args.ErrorCode);
+            Log.Debug().WriteLine(sender.Content.GetXml());
         }
 
+        /// <inheritdoc cref="NotificationType"/>
+        public NotificationType AllowedNotificationTypes { get; set; } =
+            NotificationType.Error | NotificationType.Warning | NotificationType.Info;
+
+        /// <inheritdoc />
         public void ShowWarningMessage(string message, int timeout, Action onClickAction = null, Action onClosedAction = null)
         {
-            ShowMessage(message, timeout, onClickAction, onClosedAction);
+            ShowMessage(message, timeout, NotificationType.Warning, onClickAction, onClosedAction);
         }
 
+        /// <inheritdoc />
         public void ShowErrorMessage(string message, int timeout, Action onClickAction = null, Action onClosedAction = null)
         {
-            ShowMessage(message, timeout, onClickAction, onClosedAction);
+            ShowMessage(message, timeout, NotificationType.Error, onClickAction, onClosedAction);
         }
 
+        /// <inheritdoc />
         public void ShowInfoMessage(string message, int timeout, Action onClickAction = null, Action onClosedAction = null)
         {
-            ShowMessage(message, timeout, onClickAction, onClosedAction);
+            ShowMessage(message, timeout, NotificationType.Info, onClickAction, onClosedAction);
         }
     }
 }
