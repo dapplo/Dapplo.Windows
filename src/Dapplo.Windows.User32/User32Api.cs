@@ -12,7 +12,6 @@ using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
@@ -207,10 +206,8 @@ namespace Dapplo.Windows.User32
         /// <returns>Return the count of GDI objects.</returns>
         public static uint GetGuiResourcesGdiCount()
         {
-            using (var currentProcess = Process.GetCurrentProcess())
-            {
-                return GetGuiResources(currentProcess.Handle, 0);
-            }
+            using var currentProcess = Process.GetCurrentProcess();
+            return GetGuiResources(currentProcess.Handle, 0);
         }
 
         /// <summary>
@@ -219,10 +216,8 @@ namespace Dapplo.Windows.User32
         /// <returns>Return the count of USER objects.</returns>
         public static uint GetGuiResourcesUserCount()
         {
-            using (var currentProcess = Process.GetCurrentProcess())
-            {
-                return GetGuiResources(currentProcess.Handle, 1);
-            }
+            using var currentProcess = Process.GetCurrentProcess();
+            return GetGuiResources(currentProcess.Handle, 1);
         }
 
         /// <summary>
@@ -770,7 +765,7 @@ namespace Dapplo.Windows.User32
         /// <returns>true if success</returns>
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool EnumWindows(EnumWindowsProc enumFunc, IntPtr param);
+        public static extern bool EnumWindows(EnumWindowsProc enumFunc, IntPtr param);
 
         /// <summary>
         ///     See
@@ -860,6 +855,26 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetScrollBarInfo(IntPtr hWnd, ObjectIdentifiers idObject, ref ScrollBarInfo scrollBarInfo);
+
+        /// <summary>
+        /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowdisplayaffinity">>SetWindowDisplayAffinity function</a>
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="windowDisplayAffinity">WindowDisplayAffinity</param>
+        /// <returns>bool true if it worked</returns>
+        [DllImport(User32, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetWindowDisplayAffinity(IntPtr hWnd, WindowDisplayAffinity windowDisplayAffinity);
+
+        /// <summary>
+        /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowdisplayaffinity">>SetWindowDisplayAffinity function</a>
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="windowDisplayAffinity">WindowDisplayAffinity out</param>
+        /// <returns>bool true if it worked</returns>
+        [DllImport(User32, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetWindowDisplayAffinity(IntPtr hWnd, out WindowDisplayAffinity windowDisplayAffinity);
 
         /// <summary>
         ///     See

@@ -13,7 +13,7 @@
     <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="4.3.2" />
+    <PackageReference Include="System.Reactive" Version="4.4.1" />
     <PackageReference Include="Dapplo.Log" Version="1.3.26" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
