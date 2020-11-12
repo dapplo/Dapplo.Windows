@@ -1,16 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.Devices is a library which provides device information.</Description>
-    <AssemblyTitle>Dapplo.Windows.Devices</AssemblyTitle>
-    <AssemblyName>Dapplo.Windows.Devies</AssemblyName>
-    <PackageId>Dapplo.Windows.Devices</PackageId>
     <PackageTags>windows devices</PackageTags>
-    <TargetFrameworks>net461;netcoreapp3.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp3.1;netstandard2.0;net5.0-windows</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<UseWindowsForms>true</UseWindowsForms>
-	<UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

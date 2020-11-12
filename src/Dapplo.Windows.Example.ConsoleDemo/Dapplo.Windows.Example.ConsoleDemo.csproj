@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyTitle>Dapplo.Windows.Example.ConsoleDemo</AssemblyTitle>
-    <TargetFrameworks>net471;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp3.1;net5.0-windows</TargetFrameworks>
     <AssemblyName>Dapplo.Windows.Example.ConsoleDemo</AssemblyName>
-	<OutputType>Exe</OutputType>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Input\Dapplo.Windows.Input.csproj" />
@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="System.Reactive" Version="4.4.1" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />

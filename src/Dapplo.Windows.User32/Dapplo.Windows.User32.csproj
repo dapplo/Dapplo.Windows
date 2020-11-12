@@ -1,12 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.User32 provides logic of the Windows User32 API</Description>
-    <AssemblyTitle>Dapplo.Windows.User32</AssemblyTitle>
-    <AssemblyName>Dapplo.Windows.User32</AssemblyName>
-    <PackageId>Dapplo.Windows.User32</PackageId>
     <PackageTags>windows native user32</PackageTags>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<TargetFrameworks>net461;netcoreapp3.1;netstandard2.0</TargetFrameworks>
+	<TargetFrameworks>net461;netcoreapp3.1;netstandard2.0;net5.0-windows</TargetFrameworks>
 	<UseWindowsForms>true</UseWindowsForms>
 	<UseWPF>true</UseWPF>
   </PropertyGroup>
