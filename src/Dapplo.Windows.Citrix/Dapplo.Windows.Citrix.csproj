@@ -1,17 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.Citrix is a library which has citrix supporting code</Description>
-    <AssemblyTitle>Dapplo.Windows.Citrix</AssemblyTitle>
-    <AssemblyName>Dapplo.Windows.Citrix</AssemblyName>
-    <PackageId>Dapplo.Windows.Citrix</PackageId>
     <PackageTags>windows native citrix</PackageTags>
-    <TargetFrameworks>net461;netcoreapp3.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp3.1;netstandard2.0;net5.0-windows</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Dapplo.Log" Version="1.3.26" />
+    <PackageReference Include="Dapplo.Log" Version="1.4.1" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />

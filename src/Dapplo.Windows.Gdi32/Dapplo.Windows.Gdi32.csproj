@@ -1,11 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.Gdi32 bringt Gdi32 and GdiPlus functionality.</Description>
-    <AssemblyTitle>Dapplo.Windows.Gdi32</AssemblyTitle>
-    <AssemblyName>Dapplo.Windows.Gdi32</AssemblyName>
-    <PackageId>Dapplo.Windows.Gdi32</PackageId>
     <PackageTags>windows native gdi</PackageTags>
-    <TargetFrameworks>net461;netcoreapp3.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp3.1;netstandard2.0;net5.0-windows</TargetFrameworks>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
@@ -13,9 +10,9 @@
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dapplo.Log" Version="1.3.26" />
+    <PackageReference Include="Dapplo.Log" Version="1.4.1" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />

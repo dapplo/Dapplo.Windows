@@ -95,7 +95,9 @@ namespace Dapplo.Windows.Messages
         }
 
         /// <inheritdoc />
+#if !NET5_0
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+#endif
         protected override void WndProc(ref Message m)
         {
             if (IsDisposed)

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.IO;
 using System.Linq;
@@ -99,15 +100,20 @@ namespace Dapplo.Windows.Tests
             // Make the clipboard ready for testing
             using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
+                Assert.True(clipboardAccessToken.CanAccess);
+                Assert.False(clipboardAccessToken.IsLockTimeout);
                 clipboardAccessToken.ClearContents();
                 // Set delayed rendered content
                 clipboardAccessToken.SetDelayedRenderedContent(formatToTestWith);
             }
 
-            await Task.Delay(100).ConfigureAwait(true);
+            await Task.Delay(200).ConfigureAwait(true);
 
             using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
+                Assert.True(clipboardAccessToken.CanAccess);
+                Assert.False(clipboardAccessToken.IsLockTimeout);
+                Assert.True(ClipboardNative.HasFormat(formatToTestWith));
                 // Request the missing content, this should trigger the
                 clipboardAccessToken.GetAsUnicodeString(formatToTestWith);
             }
@@ -141,9 +147,13 @@ namespace Dapplo.Windows.Tests
             Assert.Equal(id1, id2);
 
             // Make sure it works
-            using var clipboard = ClipboardNative.Access();
-            clipboard.ClearContents();
-            clipboard.SetAsUnicodeString("Blub", format);
+            using (var clipboardAccessToken = ClipboardNative.Access())
+            {
+                Assert.True(clipboardAccessToken.CanAccess);
+                Assert.False(clipboardAccessToken.IsLockTimeout);
+                clipboardAccessToken.ClearContents();
+                clipboardAccessToken.SetAsUnicodeString("Blub", format);
+            }
         }
 
         /// <summary>
@@ -164,6 +174,8 @@ namespace Dapplo.Windows.Tests
             });
             using (var clipboardAccessToken = ClipboardNative.Access())
             {
+                Assert.True(clipboardAccessToken.CanAccess);
+                Assert.False(clipboardAccessToken.IsLockTimeout);
                 clipboardAccessToken.ClearContents();
                 clipboardAccessToken.SetAsUnicodeString(testString, "TEST_FORMAT");
             }
@@ -181,6 +193,7 @@ namespace Dapplo.Windows.Tests
         [WpfFact]
         public async Task TestClipboardStore_String()
         {
+            await Task.Delay(900);
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
             using (var clipboardAccessToken = ClipboardNative.Access())
             {
@@ -225,12 +238,16 @@ namespace Dapplo.Windows.Tests
 
             using (var clipboardAccessToken = ClipboardNative.Access())
             {
+                Assert.True(clipboardAccessToken.CanAccess);
+                Assert.False(clipboardAccessToken.IsLockTimeout);
                 clipboardAccessToken.ClearContents();
                 clipboardAccessToken.SetAsStream(StandardClipboardFormats.UnicodeText, testStream);
             }
             await Task.Delay(100);
             using (var clipboardAccessToken = ClipboardNative.Access())
             {
+                Assert.True(clipboardAccessToken.CanAccess);
+                Assert.False(clipboardAccessToken.IsLockTimeout);
                 Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
                 var unicodeBytes = clipboardAccessToken.GetAsBytes(StandardClipboardFormats.UnicodeText);
                 Assert.Equal(testString, Encoding.Unicode.GetString(unicodeBytes, 0, unicodeBytes.Length).TrimEnd('\0'));

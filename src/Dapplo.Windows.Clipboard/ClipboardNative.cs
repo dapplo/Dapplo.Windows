@@ -188,5 +188,19 @@ namespace Dapplo.Windows.Clipboard
         /// This returns 0 if there is no WINSTA_ACCESSCLIPBOARD
         /// </summary>
         public static uint SequenceNumber => NativeMethods.GetClipboardSequenceNumber();
+
+        /// <summary>
+        /// Test if the specified format is available on the clipboard
+        /// </summary>
+        /// <param name="formatId">uint</param>
+        /// <returns>bool</returns>
+        public static bool HasFormat(uint formatId) => NativeMethods.IsClipboardFormatAvailable(formatId);
+
+        /// <summary>
+        /// Test if the specified format is available on the clipboard
+        /// </summary>
+        /// <param name="format">string</param>
+        /// <returns>bool</returns>
+        public static bool HasFormat(string format) => NativeMethods.IsClipboardFormatAvailable(ClipboardFormatExtensions.MapFormatToId(format));
     }
 }

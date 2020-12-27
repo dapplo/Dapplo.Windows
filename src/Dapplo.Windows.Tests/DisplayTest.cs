@@ -17,10 +17,13 @@ namespace Dapplo.Windows.Tests
     public class DispayTests
     {
         private static readonly LogSource Log = new LogSource();
+        private NativeRect _screenboundsAllScreens;
 
         public DispayTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+            _screenboundsAllScreens = GetScreenBoundsAllScreens();
+
         }
 
         [Fact]
@@ -43,19 +46,18 @@ namespace Dapplo.Windows.Tests
         [Fact]
         public void TestScreenbounds()
         {
-            var screenboundsAllScreens = GetScreenBoundsAllScreens();
             var screenboundsDisplayInfo = DisplayInfo.ScreenBounds;
 
             // The following scales the screenboundsAllScreens which comes from build in code without DPI awareness
             // with the current DPI so it should also work when running with a different DPI setting
-            var monitorHandle = DisplayInfo.AllDisplayInfos.First().MonitorHandle;
-            NativeDpiMethods.GetDpiForMonitor(monitorHandle, Dpi.Enums.MonitorDpiType.EffectiveDpi, out var xDpi, out var yDpi);
-            if (xDpi != DpiHandler.DefaultScreenDpi) {
-                var newSize = DpiHandler.ScaleWithDpi(screenboundsAllScreens.Size, xDpi);
-                screenboundsAllScreens = new NativeRect(screenboundsAllScreens.Location, newSize);
-            }
+            //var monitorHandle = DisplayInfo.AllDisplayInfos.First().MonitorHandle;
+            //NativeDpiMethods.GetDpiForMonitor(monitorHandle, Dpi.Enums.MonitorDpiType.EffectiveDpi, out var xDpi, out var yDpi);
+            //if (xDpi != DpiHandler.DefaultScreenDpi) {
+            //    var newSize = DpiHandler.ScaleWithDpi(_screenboundsAllScreens.Size, xDpi);
+            //    _screenboundsAllScreens = new NativeRect(_screenboundsAllScreens.Location, newSize);
+            //}
 
-            Assert.Equal(screenboundsAllScreens, screenboundsDisplayInfo);
+            Assert.Equal(_screenboundsAllScreens, screenboundsDisplayInfo);
         }
 
         /// <summary>

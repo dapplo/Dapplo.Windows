@@ -20,6 +20,14 @@ namespace Dapplo.Windows.Clipboard.Internals
             clipboardAccessToken.ThrowWhenNoAccess();
 
             var hGlobal = NativeMethods.GetClipboardData(formatId);
+            if (hGlobal == IntPtr.Zero)
+            {
+                if (NativeMethods.IsClipboardFormatAvailable(formatId))
+                {
+                    throw new Win32Exception($"Format {formatId} not available.");
+                }
+                throw new Win32Exception();
+            }
             var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
             if (memoryPtr == IntPtr.Zero)
             {
