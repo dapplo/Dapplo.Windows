@@ -89,7 +89,7 @@ namespace Dapplo.Windows.Devices
                     }
 
                     // This handles the message
-                    IntPtr WinProcClipboardMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                    IntPtr WinProcDeviceChangeMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                     {
                         var windowsMessage = (WindowsMessages)msg;
                         if (windowsMessage != WindowsMessages.WM_DEVICECHANGE || lParam == IntPtr.Zero)
@@ -102,7 +102,7 @@ namespace Dapplo.Windows.Devices
                         return IntPtr.Zero;
                     }
 
-                    var hook = new WinProcHandlerHook(WinProcClipboardMessageHandler);
+                    var hook = new WinProcHandlerHook(WinProcDeviceChangeMessageHandler);
                     var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
                     return hook.Disposable = Disposable.Create(() =>
                     {

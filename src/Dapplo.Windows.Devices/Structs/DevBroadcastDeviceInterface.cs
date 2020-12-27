@@ -18,7 +18,8 @@ namespace Dapplo.Windows.Devices.Structs
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct DevBroadcastDeviceInterface
     {
-        private static readonly Regex VendorRegex = new Regex(@"VID_([0-9A-F]{4})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex VendorRegex = new Regex(@"V(ID|EN)_([0-9A-F]{4})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex DeviceIdRegex = new Regex(@"DEV_([0-9A-F]{4})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex ProductRegex = new Regex(@"PID_([0-9A-F]{4})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex DeviceTypeRegex = new Regex(@"\\\?\\([A-Z]+)#", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -43,6 +44,20 @@ namespace Dapplo.Windows.Devices.Structs
         /// The name of the device.
         /// </summary>
         public string Name => _name;
+
+        /// <summary>
+        /// The name of the device.
+        /// </summary>
+        public string DisplayName {
+            get
+            {
+                var displayName = _name.Substring(3);
+                displayName = displayName.Substring(0,displayName.LastIndexOf("#{", StringComparison.Ordinal));
+                displayName = displayName.Replace('#', '\\');
+
+                return displayName;
+            }
+        }
 
         /// <summary>
         /// Factory for an empty, but initialized, DevBroadcastDeviceInterface
@@ -120,6 +135,23 @@ namespace Dapplo.Windows.Devices.Structs
         public bool IsUsb => "USB".Equals(DeviceType, StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
+        /// Is this a PCI device?
+        /// </summary>
+        public bool IsPci => "PCI".Equals(DeviceType, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Returns the Device ID of the device
+        /// </summary>
+        public string DeviceId
+        {
+            get
+            {
+                var match = DeviceIdRegex.Match(_name);
+                return match.Groups.Count != 2 ? null : match.Groups[1].Value;
+            }
+        }
+
+        /// <summary>
         /// Returns the Vendor ID of the device
         /// </summary>
         public string VendorId
@@ -127,7 +159,7 @@ namespace Dapplo.Windows.Devices.Structs
             get
             {
                 var match = VendorRegex.Match(_name);
-                return match.Groups.Count != 2 ? null : match.Groups[1].Value;
+                return match.Groups.Count != 3 ? null : match.Groups[2].Value;
             }
         }
 
@@ -192,9 +224,9 @@ namespace Dapplo.Windows.Devices.Structs
         /// <summary>
         /// Used for testing
         /// </summary>
-        /// <param name="deviceName"></param>
-        /// <param name="deviceClass"></param>
-        /// <returns></returns>
+        /// <param name="deviceName">string</param>
+        /// <param name="deviceClass">DeviceInterfaceClass</param>
+        /// <returns>DevBroadcastDeviceInterface</returns>
         public static DevBroadcastDeviceInterface Test(string deviceName, DeviceInterfaceClass deviceClass = DeviceInterfaceClass.Unknown)
         {
             Guid deviceClassGuid = default;
