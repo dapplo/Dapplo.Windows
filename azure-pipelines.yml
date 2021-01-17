@@ -7,9 +7,10 @@ trigger:
   batch: true
   branches:
     include:
-    - '*'
+    - master
     exclude:
     - gh-pages
+    - feature/*
 
 stages:
 - stage: Build

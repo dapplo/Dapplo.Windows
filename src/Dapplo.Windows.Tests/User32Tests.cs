@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-using System.Collections.Generic;
+
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
@@ -66,7 +66,7 @@ namespace Dapplo.Windows.Tests
         /// </summary>
         /// <returns></returns>
         [Fact]
-        private void TestGetTopLevelWindows()
+        public void TestGetTopLevelWindows()
         {
             var foundWindow = false;
             foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()))
@@ -85,7 +85,7 @@ namespace Dapplo.Windows.Tests
         /// </summary>
         /// <returns></returns>
         [Fact]
-        private void TestWindowPlacement_TypeConverter()
+        public void TestWindowPlacement_TypeConverter()
         {
             var windowPlacement = WindowPlacement.Create();
             windowPlacement.MinPosition = new NativePoint(10, 10);
@@ -109,7 +109,7 @@ namespace Dapplo.Windows.Tests
         ///     Test GetTextFromWindow
         /// </summary>
         [WpfFact]
-        private void Test_GetTextFromWindow()
+        public void Test_GetTextFromWindow()
         {
             const string title = "1234567890";
             var window = new Window

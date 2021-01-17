@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Dapplo.Windows.Gdi32.Enums
 {
     /// <summary>
-    ///     Type of compression used for the bitmap in the BitmapInfoHeader
+    ///     Type of compression used for the bitmap in the BitmapV5Header
     /// </summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum BitmapCompressionMethods : uint

@@ -66,22 +66,22 @@ namespace Dapplo.Windows.Gdi32.Structs
         }
 
         /// <summary>
-        /// Create a BitmapFileHeader which needs a BitmapInfoHeader to calculate the values
+        /// Create a BitmapFileHeader which needs a BitmapV5Header to calculate the values
         /// </summary>
-        /// <param name="bitmapInfoHeader">BitmapInfoHeader</param>
-        public static BitmapFileHeader Create(BitmapInfoHeader bitmapInfoHeader)
+        /// <param name="bitmapV5Header">BitmapV5Header</param>
+        public static BitmapFileHeader Create(BitmapV5Header bitmapV5Header)
         {
             var bitmapFileHeaderSize = Marshal.SizeOf(typeof(BitmapFileHeader));
             return new BitmapFileHeader
             {
                 // Fill with "BM"
                 FileType = 0x4d42,
-                // Size of the file, is the size of this, the size of a BitmapInfoHeader and the size of the image itself.
-                Size = (int) (bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.SizeImage),
+                // Size of the file, is the size of this, the size of a BitmapV5Header and the size of the image itself.
+                Size = (int) (bitmapFileHeaderSize + bitmapV5Header.Size + bitmapV5Header.SizeImage),
                 _reserved1 = 0,
                 _reserved2 = 0,
                 // Specify on what offset the bits are found
-                OffsetToBitmapBits = (int) (bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.ColorsUsed * 4)
+                OffsetToBitmapBits = (int) (bitmapFileHeaderSize + bitmapV5Header.Size + bitmapV5Header.ColorsUsed * 4)
             };
         }
     }

@@ -301,11 +301,11 @@ namespace Dapplo.Windows.User32
         {
             if (IntPtr.Size == 8)
             {
-                SetWindowLongPtr(hWnd, index, styleFlags);
+                _ = SetWindowLongPtr(hWnd, index, styleFlags);
             }
             else
             {
-                SetWindowLong(hWnd, index, styleFlags.ToInt32());
+                _ = SetWindowLong(hWnd, index, styleFlags.ToInt32());
             }
         }
 

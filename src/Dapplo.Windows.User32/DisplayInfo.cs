@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -106,7 +107,7 @@ namespace Dapplo.Windows.User32
 
 #if !NETSTANDARD2_0
 
-                IntPtr WinProcDisplayChangeHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                static IntPtr WinProcDisplayChangeHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                 {
                     var windowsMessage = (WindowsMessages) msg;
                     if (windowsMessage != WindowsMessages.WM_DISPLAYCHANGE)

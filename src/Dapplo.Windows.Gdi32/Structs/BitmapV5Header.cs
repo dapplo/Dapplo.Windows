@@ -8,10 +8,10 @@ namespace Dapplo.Windows.Gdi32.Structs
 {
     /// <summary>
     ///     See
-    ///     <a href="https://docs.microsoft.com/en-us/previous-versions/dd183376">BITMAPINFOHEADER structure</a>
+    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd183381(v=vs.85).aspx">BITMAPV5HEADER structure</a>
     /// </summary>
     [StructLayout(LayoutKind.Explicit)]
-    public struct BitmapInfoHeader
+    public struct BitmapV5Header
     {
         [FieldOffset(0)]
         private uint _biSize;
@@ -35,6 +35,33 @@ namespace Dapplo.Windows.Gdi32.Structs
         private uint _biClrUsed;
         [FieldOffset(36)]
         private uint _biClrImportant;
+        [FieldOffset(40)]
+        private uint _bV5RedMask;
+        [FieldOffset(44)]
+        private uint _bV5GreenMask;
+        [FieldOffset(48)]
+        private uint _bV5BlueMask;
+        [FieldOffset(52)]
+        private uint _bV5AlphaMask;
+        [FieldOffset(56)]
+        private ColorSpace _bV5CSType;
+        [FieldOffset(60)]
+        private CieXyzTripple _bV5Endpoints;
+        [FieldOffset(96)]
+        private uint _bV5GammaRed;
+        [FieldOffset(100)]
+        private uint _bV5GammaGreen;
+        [FieldOffset(104)]
+        private uint _bV5GammaBlue;
+        [FieldOffset(108)]
+        private ColorSpace _bV5Intent;
+        [FieldOffset(112)]
+        private uint _bV5ProfileData;
+        [FieldOffset(116)]
+        private uint _bV5ProfileSize;
+        [FieldOffset(120)]
+        private uint _bV5Reserved;
+
         /// <summary>
         ///     The number of bytes required by the structure.
         ///     Applications should use this member to determine which bitmap information header structure is being used.
@@ -198,18 +225,150 @@ namespace Dapplo.Windows.Gdi32.Structs
         }
 
         /// <summary>
+        ///     Color mask that specifies the red component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
+        /// </summary>
+        public uint RedMask
+        {
+            get => _bV5RedMask;
+            set => _bV5RedMask = value;
+        }
+
+
+        /// <summary>
+        ///     Color mask that specifies the green component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
+        /// </summary>
+        public uint GreenMask
+        {
+            get => _bV5GreenMask;
+            set => _bV5GreenMask = value;
+        }
+
+
+        /// <summary>
+        ///     Color mask that specifies the blue component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
+        /// </summary>
+        public uint BlueMask
+        {
+            get => _bV5BlueMask;
+            set => _bV5BlueMask = value;
+        }
+
+        /// <summary>
+        ///     Color mask that specifies the alpha component of each pixel.
+        /// </summary>
+        public uint AlphaMask
+        {
+            get => _bV5AlphaMask;
+            set => _bV5AlphaMask = value;
+        }
+
+        /// <summary>
+        ///     The color space of the DIB.
+        ///     See also
+        ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd372165(v=vs.85).aspx">LOGCOLORSPACE structure</a>
+        /// </summary>
+        public ColorSpace ColorSpace
+        {
+            get => _bV5CSType;
+            set => _bV5CSType = value;
+        }
+
+        /// <summary>
+        ///     A CIEXYZTRIPLE structure that specifies the x, y, and z coordinates of the three colors that correspond to the red,
+        ///     green, and blue endpoints for the logical color space associated with the bitmap. This member is ignored unless the
+        ///     bV5CSType member specifies LCS_CALIBRATED_RGB.
+        /// </summary>
+        public CieXyzTripple Endpoints
+        {
+            get => _bV5Endpoints;
+            set => _bV5Endpoints = value;
+        }
+
+        /// <summary>
+        ///     Toned response curve for red. Used if bV5CSType is set to LCS_CALIBRATED_RGB. Specify in unsigned fixed 16.16
+        ///     format. The upper 16 bits are the unsigned integer value. The lower 16 bits are the fractional part.
+        /// </summary>
+        public uint GammaRed
+        {
+            get => _bV5GammaRed;
+            set => _bV5GammaRed = value;
+        }
+
+
+        /// <summary>
+        ///     Toned response curve for green. Used if bV5CSType is set to LCS_CALIBRATED_RGB. Specify in unsigned fixed 16.16
+        ///     format. The upper 16 bits are the unsigned integer value. The lower 16 bits are the fractional part.
+        /// </summary>
+        public uint GammaGreen
+        {
+            get => _bV5GammaGreen;
+            set => _bV5GammaRed = value;
+        }
+
+        /// <summary>
+        ///     Toned response curve for blue. Used if bV5CSType is set to LCS_CALIBRATED_RGB. Specify in unsigned fixed 16.16
+        ///     format. The upper 16 bits are the unsigned integer value. The lower 16 bits are the fractional part.
+        /// </summary>
+        public uint GammaBlue
+        {
+            get => _bV5GammaBlue;
+            set => _bV5GammaBlue = value;
+        }
+
+        /// <summary>
+        ///     Rendering intent for bitmap. This can be one of the following values:
+        ///     LCS_GM_ABS_COLORIMETRIC, LCS_GM_BUSINESS, LCS_GM_GRAPHICS, LCS_GM_IMAGES
+        /// </summary>
+        public ColorSpace Intent
+        {
+            get => _bV5Intent;
+            set => _bV5Intent = value;
+        }
+
+        /// <summary>
+        ///     The offset, in bytes, from the beginning of the BITMAPV5HEADER structure to the start of the profile data. If the
+        ///     profile is embedded, profile data is the actual profile, and it is linked. (The profile data is the null-terminated
+        ///     file name of the profile.) This cannot be a Unicode string. It must be composed exclusively of characters from the
+        ///     Windows character set (code page 1252). These profile members are ignored unless the bV5CSType member specifies
+        ///     PROFILE_LINKED or PROFILE_EMBEDDED.
+        /// </summary>
+        public uint ProfileData
+        {
+            get => _bV5ProfileData;
+            set => _bV5ProfileData = value;
+        }
+
+        /// <summary>
+        ///     Size, in bytes, of embedded profile data.
+        /// </summary>
+        public uint ProfileSize
+        {
+            get => _bV5ProfileSize;
+            set => _bV5ProfileSize = value;
+        }
+
+        /// <summary>
+        ///     This member has been reserved. Its value should be set to zero.
+        /// </summary>
+        public uint Reserved
+        {
+            get => _bV5Reserved;
+            set => _bV5Reserved = value;
+        }
+
+        /// <summary>
         ///     Constructor with values
         /// </summary>
         /// <param name="width">int with the width of the bitmap</param>
         /// <param name="height">int with the height of the bitmap</param>
         /// <param name="bpp">int with the bits per pixel of the bitmap</param>
         /// <param name="compression">uint with the compression used</param>
-        public static BitmapInfoHeader Create(int width, int height, ushort bpp, uint? compression = null)
+        public static BitmapV5Header Create(int width, int height, ushort bpp, uint? compression = null)
         {
-            return new BitmapInfoHeader
+            return new BitmapV5Header
             {
                 // BITMAPINFOHEADER < DIBV5 is 40 bytes
-                _biSize = (uint) Marshal.SizeOf(typeof(BitmapInfoHeader)),
+                _biSize = (uint) Marshal.SizeOf(typeof(BitmapV5Header)),
                 // Should always be 1
                 _biPlanes = 1,
                 _biCompression = compression ?? (uint)BitmapCompressionMethods.BI_RGB,
@@ -221,6 +380,26 @@ namespace Dapplo.Windows.Gdi32.Structs
                 _biYPelsPerMeter = 0,
                 _biClrUsed = 0,
                 _biClrImportant = 0,
+
+                // V5
+                _bV5RedMask = (uint) 255 << 16,
+                _bV5GreenMask = (uint) 255 << 8,
+                _bV5BlueMask = 255,
+                _bV5AlphaMask = (uint) 255 << 24,
+                _bV5CSType = ColorSpace.LCS_sRGB,
+                _bV5Endpoints = new CieXyzTripple
+                {
+                    Blue = CieXyz.Create(0),
+                    Green = CieXyz.Create(0),
+                    Red = CieXyz.Create(0)
+                },
+                _bV5GammaRed = 0,
+                _bV5GammaGreen = 0,
+                _bV5GammaBlue = 0,
+                _bV5Intent = ColorSpace.LCS_GM_IMAGES,
+                _bV5ProfileData = 0,
+                _bV5ProfileSize = 0,
+                _bV5Reserved = 0
             };
         }
 
