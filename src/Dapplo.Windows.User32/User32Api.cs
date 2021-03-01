@@ -409,6 +409,19 @@ namespace Dapplo.Windows.User32
         public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int processId);
 
         /// <summary>
+        /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633522(v=vs.85).aspx">GetWindowThreadProcessId function</a>
+        /// Retrieves the identifier of the thread that created the specified window and, optionally, the identifier of the process that created the window.
+        /// </summary>
+        /// <param name="hWnd">A handle to the window.</param>
+        /// <param name="processId">A pointer to a variable that receives the process identifier. If this parameter is not NULL, GetWindowThreadProcessId copies the identifier of the process to the variable; otherwise, it does not.</param>
+        /// <returns>The return value is the identifier of the thread that created the window.</returns>
+        [DllImport(User32, SetLastError = true)]
+        public static extern int GetWindowThreadProcessId(IntPtr hWnd, IntPtr processId);
+
+        [DllImport(User32, SetLastError = true)]
+        public static extern IntPtr AttachThreadInput(int idAttach, int idAttachTo, int fAttach);
+
+        /// <summary>
         ///     Retrieves a handle to the specified window's parent or owner.
         ///     To retrieve a handle to a specified ancestor, use the GetAncestor function.
         /// </summary>

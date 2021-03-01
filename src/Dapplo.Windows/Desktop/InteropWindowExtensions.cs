@@ -591,15 +591,17 @@ namespace Dapplo.Windows.Desktop
         /// </summary>
         /// <param name="interopWindow">The window to bring to the foreground</param>
         /// <param name="workaround">bool with true to use a trick (press Alt) to really bring the window to the foreground</param>
-        public static async ValueTask ToForegroundAsync(this IInteropWindow interopWindow, bool workaround = true)
+        public static async ValueTask ToForegroundAsync(this IInteropWindow interopWindow)
         {
             // Nothing we can do if it's not visible!
             if (!interopWindow.IsVisible())
             {
                 return;
             }
+
+            var foregroundWindow = User32Api.GetForegroundWindow();
             // Window is already the foreground window
-            if (User32Api.GetForegroundWindow() == interopWindow.Handle)
+            if (foregroundWindow == interopWindow.Handle)
             {
                 return;
             }
@@ -613,11 +615,23 @@ namespace Dapplo.Windows.Desktop
             }
 
             // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms633539(v=vs.85).aspx
-            if (workaround)
+            // It was advised to use the menu (ALT) key, but this was a solution which Jan Karger showed me
+
+            var threadId1 = User32Api.GetWindowThreadProcessId(foregroundWindow, IntPtr.Zero);
+            var threadId2 = User32Api.GetWindowThreadProcessId(interopWindow.Handle, IntPtr.Zero);
+
+            // Show window in foreground.
+            if (threadId1 != threadId2)
             {
-                // Simulate an "ALT" key press, make it double to remove menu activation
-                KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Menu, VirtualKeyCode.Menu);
+                User32Api.AttachThreadInput(threadId1, threadId2, 1);
+                User32Api.SetForegroundWindow(interopWindow.Handle);
+                User32Api.AttachThreadInput(threadId1, threadId2, 0);
             }
+            else
+            {
+                User32Api.SetForegroundWindow(interopWindow.Handle);
+            }
+
             // Show window in foreground.
             User32Api.BringWindowToTop(interopWindow.Handle);
             User32Api.SetForegroundWindow(interopWindow.Handle);
