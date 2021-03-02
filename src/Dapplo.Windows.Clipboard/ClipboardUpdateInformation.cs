@@ -28,14 +28,14 @@ namespace Dapplo.Windows.Clipboard
         public IntPtr OwnerHandle { get; } = ClipboardNative.CurrentOwner;
 
         /// <summary>
-        /// The formats in this clipboard contents
+        /// The formats in this clipboard contents as strings
         /// </summary>
         public IEnumerable<string> Formats => FormatIds
             .Select(ClipboardFormatExtensions.MapIdToFormat)
             .Where(format => !string.IsNullOrEmpty(format));
 
         /// <summary>
-        /// The formats in this clipboard contents
+        /// The formats in this clipboard contents as IDs
         /// </summary>
         public IEnumerable<uint> FormatIds { get; }
 

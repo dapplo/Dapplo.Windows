@@ -110,11 +110,10 @@ namespace Dapplo.Windows.Clipboard
                                 observer.OnNext(requestRenderFormat);
                                 break;
                             case WindowsMessages.WM_RENDERFORMAT:
-                                var clipboardFormatId = wParam.ToInt32();
-                                var requestedClipboardFormat = ClipboardFormatExtensions.MapIdToFormat((uint)clipboardFormatId);
+                                var clipboardFormatId = (uint)wParam.ToInt32();
                                 var requestSingleFormat = new ClipboardRenderFormatRequest
                                 {
-                                    RequestedFormat = requestedClipboardFormat,
+                                    RequestedFormatId = clipboardFormatId,
                                     // According to https://docs.microsoft.com/en-us/windows/win32/dataxchg/wm-renderformat the clipboard must not be open
                                     AccessToken = new ClipboardAccessToken {
                                         CanAccess = true,

@@ -72,6 +72,7 @@ namespace Dapplo.Windows.Tests
         [WpfFact]
         public async Task TestClipboardMonitor_DelayedRender()
         {
+            var testString = "Hi";
             var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
             // This is what is going to be called, as soon as the format is retrieved of the clipboard
@@ -88,15 +89,17 @@ namespace Dapplo.Windows.Tests
                         tcs.TrySetResult(false);
                         break;
                     default:
-                        Log.Debug().WriteLine("Format to render {0}", clipboardRenderFormatRequest);
+                        Log.Debug().WriteLine("Got request render {0} ({1}) to the clipboard", clipboardRenderFormatRequest.RequestedFormat, clipboardRenderFormatRequest.RequestedFormatId);
                         // Satisfy the request
-                        clipboardRenderFormatRequest.AccessToken.SetAsUnicodeString("Hi", clipboardRenderFormatRequest.RequestedFormat);
+                        clipboardRenderFormatRequest.AccessToken.SetAsUnicodeString(testString, clipboardRenderFormatRequest.RequestedFormat);
                         tcs.TrySetResult(true);
                         break;
                 }
             });
 
             var formatToTestWith = "TEST_FORMAT";
+            var formatId = ClipboardFormatExtensions.MapFormatToId(formatToTestWith);
+            Log.Debug().WriteLine("Registered clipboard format {0} as {1}", formatToTestWith, formatId);
             // Make the clipboard ready for testing
             using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
@@ -104,7 +107,7 @@ namespace Dapplo.Windows.Tests
                 Assert.False(clipboardAccessToken.IsLockTimeout);
                 clipboardAccessToken.ClearContents();
                 // Set delayed rendered content
-                clipboardAccessToken.SetDelayedRenderedContent(formatToTestWith);
+                clipboardAccessToken.SetDelayedRenderedContent(formatId);
             }
 
             await Task.Delay(200).ConfigureAwait(true);
@@ -113,9 +116,12 @@ namespace Dapplo.Windows.Tests
             {
                 Assert.True(clipboardAccessToken.CanAccess);
                 Assert.False(clipboardAccessToken.IsLockTimeout);
+                Log.Debug().WriteLine("Test if the clipboard has our format {0} as {1}", formatToTestWith, formatId);
                 Assert.True(ClipboardNative.HasFormat(formatToTestWith));
-                // Request the missing content, this should trigger the
-                clipboardAccessToken.GetAsUnicodeString(formatToTestWith);
+                // Request the missing content, this should trigger the rendering
+                Log.Debug().WriteLine("Request the clipboard for our format {0} as {1}", formatToTestWith, formatId);
+                var resultString = clipboardAccessToken.GetAsUnicodeString(formatToTestWith);
+                Assert.Equal(testString, resultString);
             }
             var result = await tcs.Task;
             Assert.True(result);

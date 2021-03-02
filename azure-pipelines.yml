@@ -28,12 +28,16 @@ stages:
       persistCredentials: true
 
     - task: NuGetToolInstaller@1
+      displayName: 'Use NuGet 5.8.1'
+      inputs:
+        versionSpec: 5.8.1
+        checkLatest: false
 
     - task: UseDotNet@2
       displayName: 'Use .NET Core sdk 5.0'
       inputs:
         packageType: sdk
-        version: 5.0.100
+        version: 5.0.103
 
     - task: DotNetCoreCLI@2
       displayName: Test
@@ -120,11 +124,11 @@ stages:
             inputs:
               artifact: 'drop'
 
-          - task: NuGetToolInstaller@0
-            displayName: 'Use NuGet 5.4.0'
+          - task: NuGetToolInstaller@1
+            displayName: 'Use NuGet 5.8.1'
             inputs:
-              versionSpec: 5.4.0
-              checkLatest: true
+              versionSpec: 5.8.1
+              checkLatest: false
 
           - task: NuGetCommand@2
             displayName: 'NuGet push'
