@@ -418,6 +418,13 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, SetLastError = true)]
         public static extern int GetWindowThreadProcessId(IntPtr hWnd, IntPtr processId);
 
+        /// <summary>
+        /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-attachthreadinput">AttachThreadInput function</a>
+        /// </summary>
+        /// <param name="idAttach">int</param>
+        /// <param name="idAttachTo">int</param>
+        /// <param name="fAttach">int</param>
+        /// <returns>IntPtr</returns>
         [DllImport(User32, SetLastError = true)]
         public static extern IntPtr AttachThreadInput(int idAttach, int idAttachTo, int fAttach);
 

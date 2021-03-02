@@ -61,7 +61,7 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// </summary>
         /// <param name="format">uint</param>
         /// <param name="memory">IntPtr to the memory area</param>
-        /// <returns>IntPtr with handle or IntPtr.Zero when an error occured</returns>
+        /// <returns>IntPtr with handle or IntPtr.Zero when an error occurred</returns>
         [DllImport("user32", SetLastError = true)]
         private static extern IntPtr SetClipboardData(uint format, IntPtr memory);
 

@@ -4,9 +4,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-#if !NETSTANDARD2_0
-using Dapplo.Log;
-#endif
+
 using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Clipboard.Internals
@@ -16,12 +14,8 @@ namespace Dapplo.Windows.Clipboard.Internals
     /// </summary>
     internal sealed class ClipboardSemaphore : IDisposable
     {
-        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(400);
-        private static readonly TimeSpan DefaultRetryInterval = TimeSpan.FromMilliseconds(200);
-#if !NETSTANDARD2_0
-        private static readonly LogSource Log = new LogSource();
-#endif
-
+        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(200);
+        private static readonly TimeSpan DefaultRetryInterval = TimeSpan.FromMilliseconds(100);
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         // To detect redundant calls
         private bool _disposedValue;
@@ -45,11 +39,6 @@ namespace Dapplo.Windows.Clipboard.Internals
             if (hWnd == IntPtr.Zero)
             {
                 // Take the default
-                if (Log.IsVerboseEnabled())
-                {
-                    Log.Verbose().WriteLine("Taking windows handle {0} from the WinProcHandler", WinProcHandler.Instance.Handle);
-                }
-
                 hWnd = WinProcHandler.Instance.Handle;
             }
 #endif
@@ -146,12 +135,13 @@ namespace Dapplo.Windows.Clipboard.Internals
                     break;
                 }
                 retries--;
-                // No reason to delay, if there are no more retries
-                if (retries >= 0)
+                // Break if there are no more retries
+                if (retries < 0)
                 {
-                    await Task.Delay(retryInterval.Value, cancellationToken).ConfigureAwait(false);
+                    break;
                 }
-            } while (retries >= 0);
+                await Task.Delay(retryInterval.Value, cancellationToken).ConfigureAwait(false);
+            } while (true);
 
             if (!isOpened)
             {

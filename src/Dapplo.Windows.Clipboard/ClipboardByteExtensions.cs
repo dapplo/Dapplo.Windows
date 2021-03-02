@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Clipboard.Internals;
@@ -82,11 +84,13 @@ namespace Dapplo.Windows.Clipboard
         /// <param name="formatId">uint with the format ID to place the bytes under</param>
         public static void SetAsBytes(this IClipboardAccessToken clipboardAccessToken, byte[] bytes, uint formatId)
         {
-            using var writeInfo = clipboardAccessToken.WriteInfo(formatId, bytes.Length);
-            unsafe
+            using (var writeInfo = clipboardAccessToken.WriteInfo(formatId, bytes.Length))
             {
-                using var unsafeMemoryStream = new UnmanagedMemoryStream((byte*)writeInfo.MemoryPtr, bytes.Length, bytes.Length, FileAccess.Write);
-                unsafeMemoryStream.Write(bytes, 0, bytes.Length);
+                unsafe
+                {
+                    using var unsafeMemoryStream = new UnmanagedMemoryStream(((byte*)writeInfo.MemoryPtr)!, bytes.Length, bytes.Length, FileAccess.Write);
+                    unsafeMemoryStream.Write(bytes, 0, bytes.Length);
+                }
             }
         }
     }

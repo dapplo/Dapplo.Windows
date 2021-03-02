@@ -19,7 +19,7 @@ namespace Dapplo.Windows.Tests
     /// <summary>
     /// All clipboard related tests
     /// </summary>
-    public class ClipboardTests
+    public class ClipboardTests : IDisposable
     {
         private static readonly LogSource Log = new LogSource();
 
@@ -30,11 +30,18 @@ namespace Dapplo.Windows.Tests
             static IntPtr WinProcClipboardHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
             {
                 // We can use the GetClipboardFormatName to get the string for the windows message... weird but it works
-                Log.Verbose().WriteLine("WinProc {0}, {1}", hWnd, WindowsMessage.GetWindowsMessage((uint) msg));
+                Log.Verbose().WriteLine("WinProc {0}, {1}", hWnd, WindowsMessage.GetWindowsMessage((uint)msg));
                 return IntPtr.Zero;
             }
 
             WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(WinProcClipboardHandler));
+        }
+
+        /// <inheritdoc cref="IDisposable"/>
+        public void Dispose()
+        {
+            // Normally not needed, but every test is more or less it's own application and we need to make sure this cleanup is done
+            WinProcHandler.Instance.MessageHandlerWindow.Dispose();
         }
 
         /// <summary>
@@ -80,11 +87,11 @@ namespace Dapplo.Windows.Tests
             {
                 switch (clipboardRenderFormatRequest)
                 {
-                    case { } request when request.IsDestroyClipboard:
+                    case {IsDestroyClipboard: true}:
                         Log.Debug().WriteLine("Destroy clipboard");
                         tcs.TrySetResult(false);
                         break;
-                    case { } request when request.RenderAllFormats:
+                    case {RenderAllFormats: true}:
                         Log.Debug().WriteLine("Render all formats");
                         tcs.TrySetResult(false);
                         break;
@@ -110,7 +117,7 @@ namespace Dapplo.Windows.Tests
                 clipboardAccessToken.SetDelayedRenderedContent(formatId);
             }
 
-            await Task.Delay(200).ConfigureAwait(true);
+            await Task.Delay(200);
 
             using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
@@ -178,7 +185,7 @@ namespace Dapplo.Windows.Tests
 
                 hasNewContent = true;
             });
-            using (var clipboardAccessToken = ClipboardNative.Access())
+            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
                 Assert.True(clipboardAccessToken.CanAccess);
                 Assert.False(clipboardAccessToken.IsLockTimeout);
@@ -199,15 +206,15 @@ namespace Dapplo.Windows.Tests
         [WpfFact]
         public async Task TestClipboardStore_String()
         {
-            await Task.Delay(900);
+
             const string testString = "Dapplo.Windows.Tests.ClipboardTests";
-            using (var clipboardAccessToken = ClipboardNative.Access())
+            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
                 clipboardAccessToken.ClearContents();
                 clipboardAccessToken.SetAsUnicodeString(testString);
             }
             await Task.Delay(100);
-            using (var clipboardAccessToken = ClipboardNative.Access())
+            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
                 Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
             }
@@ -242,7 +249,7 @@ namespace Dapplo.Windows.Tests
             testStream.Seek(0, SeekOrigin.Begin);
             Assert.Equal(testString, Encoding.Unicode.GetString(testStream.GetBuffer(), 0, (int)testStream.Length).TrimEnd('\0'));
 
-            using (var clipboardAccessToken = ClipboardNative.Access())
+            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
                 Assert.True(clipboardAccessToken.CanAccess);
                 Assert.False(clipboardAccessToken.IsLockTimeout);
@@ -250,7 +257,7 @@ namespace Dapplo.Windows.Tests
                 clipboardAccessToken.SetAsStream(StandardClipboardFormats.UnicodeText, testStream);
             }
             await Task.Delay(100);
-            using (var clipboardAccessToken = ClipboardNative.Access())
+            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
                 Assert.True(clipboardAccessToken.CanAccess);
                 Assert.False(clipboardAccessToken.IsLockTimeout);
@@ -260,7 +267,7 @@ namespace Dapplo.Windows.Tests
 
                 var unicodeStream = clipboardAccessToken.GetAsStream(StandardClipboardFormats.UnicodeText);
                 await using var memoryStream = new MemoryStream();
-                unicodeStream.CopyTo(memoryStream);
+                await unicodeStream.CopyToAsync(memoryStream);
                 Assert.Equal(testString, Encoding.Unicode.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length).TrimEnd('\0'));
             }
         }
@@ -271,10 +278,14 @@ namespace Dapplo.Windows.Tests
         [WpfFact]
         public async Task Test_ClipboardAccess_LockTimeout()
         {
-            using var outerClipboardAccessToken = await ClipboardNative.AccessAsync();
-            Assert.True(outerClipboardAccessToken.CanAccess);
-            using var clipboardAccessToken = await ClipboardNative.AccessAsync();
-            Assert.True(clipboardAccessToken.IsLockTimeout);
+            using (var outerClipboardAccessToken = await ClipboardNative.AccessAsync())
+            {
+                Assert.True(outerClipboardAccessToken.CanAccess);
+                using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+                {
+                    Assert.True(clipboardAccessToken.IsLockTimeout);
+                }
+            }
         }
 
         /// <summary>

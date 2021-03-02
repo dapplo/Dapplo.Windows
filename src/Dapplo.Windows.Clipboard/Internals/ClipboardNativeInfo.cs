@@ -29,12 +29,12 @@ namespace Dapplo.Windows.Clipboard.Internals
         /// </summary>
         public void Dispose()
         {
-            Kernel32Api.GlobalUnlock(GlobalHandle);
             if (NeedsWrite)
             {
                 // Place the content on the clipboard
                 NativeMethods.SetClipboardDataWithErrorHandling(FormatId, GlobalHandle);
             }
+            Kernel32Api.GlobalUnlock(GlobalHandle);
         }
     }
 }

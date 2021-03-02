@@ -590,7 +590,6 @@ namespace Dapplo.Windows.Desktop
         ///     Set the window as foreground window
         /// </summary>
         /// <param name="interopWindow">The window to bring to the foreground</param>
-        /// <param name="workaround">bool with true to use a trick (press Alt) to really bring the window to the foreground</param>
         public static async ValueTask ToForegroundAsync(this IInteropWindow interopWindow)
         {
             // Nothing we can do if it's not visible!
