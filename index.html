@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Dapplo.Windows | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Dapplo.Windows | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="styles/docfx.vendor.css">
+    <link rel="stylesheet" href="styles/docfx.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta property="docfx:navrel" content="toc">
+    <meta property="docfx:tocrel" content="toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="">
+                    <a href="articles/intro.html" title="Articles" class="">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="api/index.html" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="dapplowindows">Dapplo.Windows</h1>
+
+<ul>
+<li>Documentation can be found <a href="http://www.dapplo.net/blocks/Dapplo.Windows">here</a> (soon)</li>
+<li>Current build status: <a href="https://ci.appveyor.com/project/dapplo/dapplo-windows"><img src="https://ci.appveyor.com/api/projects/status/n99jafhbbp74n2w7?svg=true" alt="Build status"></a></li>
+<li>NuGet package: <a href="https://badge.fury.io/nu/Dapplo.Windows"><img src="https://badge.fury.io/nu/Dapplo.Windows.svg" alt="NuGet package"></a></li>
+<li>NuGet package: <a href="https://badge.fury.io/nu/Dapplo.Dpi"><img src="https://badge.fury.io/nu/Dapplo.Dpi.svg" alt="NuGet package"></a></li>
+<li>NuGet package: <a href="https://badge.fury.io/nu/Dapplo.WinMessage"><img src="https://badge.fury.io/nu/Dapplo.WinMessage.svg" alt="NuGet package"></a></li>
+<li>NuGet package: <a href="https://badge.fury.io/nu/Dapplo.Clipboard"><img src="https://badge.fury.io/nu/Dapplo.Windows.Clipboard" alt="NuGet package"></a></li>
+</ul>
+<p>This is actually code I wrote for Greenshot, and with this I am trying to place it into an external repository so it&#39;s easier to maintain.</p>
+<p>The following functionality is available:</p>
+<ul>
+<li>Hooking windows events (window moved, changed title etc), mouse &amp; Keyboard</li>
+<li>Generating key presses or mouse input</li>
+<li>Getting the title, location etc of windows</li>
+<li>GDI / User 32 native method mapping</li>
+<li>A lot of the native structs and enums
+... more</li>
+</ul>
+<h1 id="dapplowinmessages">Dapplo.WinMessages</h1>
+<p>Has all the Windows Messages defined for some of the projects in the solution, so if someone uses part of the functionality not everything is included.</p>
+<h1 id="dapplodpi">Dapplo.Dpi</h1>
+<p>A library to add Dpi-Awareness to application</p>
+<h1 id="dapploclipboard">Dapplo.Clipboard</h1>
+<p>In Dapplo.Clipboard specialized code for using the Windows clipboard is place.
+This is currently being developed and far from ready, it should provide a flexible and fluent API to use the Clipboard.
+Currently there is already a simplified monitor, using System.Reactive, build in which allows you to subscribe to changes:</p>
+<pre><code>    var clipboardSubscription = ClipboardMonitor.ClipboardUpdateEvents.Where(args =&gt; args.Formats.Contains(&quot;MyFormat&quot;)).Subscribe(args =&gt;
+    {
+        Debug.WriteLine(&quot;Detected my format between these possible formats: {0}&quot;, string.Join(&quot;,&quot;, args.Formats));
+    });
+</code></pre><p>This allows you to create simple code which calls you logic if the needed format is available, dispose the subscription when you are ready.</p>
+<p>API:
+ClipboardMonitor should publish a ClipboardContents object for every clipboard event.
+The ClipboardContents object will get the formats and content at the first moment these are accessed.
+Need a way to specify the OpenClipboard / CloseClipboard at the rights moments.</p>
+<p>GetClipboardData should be used to get the contents, they should be converted to MemoryStreams?
+The information is stored/maintained, until the ClipboardContents object is disposed?
+This could be as soon as the next information is placed on the clipboard.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>
