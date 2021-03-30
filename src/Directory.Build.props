@@ -52,10 +52,8 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.Windows.Compatibility">
-      <Version>5.0.0</Version>
-    </PackageReference>
+  <ItemGroup Condition="!$(TargetFramework.StartsWith('net4'))">
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
   </ItemGroup>
 	
   <!-- Global definition for non test or example projects to enable InternalsVisibleTo, git versioning and pdbgit -->

@@ -13,5 +13,4 @@
     <Reference Include="System.Drawing" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-
 </Project>
