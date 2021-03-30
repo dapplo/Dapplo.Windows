@@ -34,10 +34,10 @@ stages:
         checkLatest: false
 
     - task: UseDotNet@2
-      displayName: 'Use .NET Core sdk 5.0'
+      displayName: 'Use .NET 5 sdk'
       inputs:
         packageType: sdk
-        version: 5.0.103
+        version: 5.0.201
 
     - task: DotNetCoreCLI@2
       displayName: Test
