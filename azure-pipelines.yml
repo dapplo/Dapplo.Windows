@@ -28,6 +28,10 @@ stages:
     - checkout: self
       persistCredentials: true
 
+    - powershell: |
+        choco install xvid
+      displayName: 'Install XVID codec for testing the codecs code'
+
     - task: NuGetToolInstaller@1
 
     - task: UseDotNet@2
@@ -67,6 +71,7 @@ stages:
         failIfCoverageEmpty: true
 
     - powershell: |
+        choco install xvid
         choco install docfx -y
         docfx doc/docfx.json
         if ($lastexitcode -ne 0){

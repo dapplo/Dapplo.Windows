@@ -34,7 +34,7 @@ namespace Dapplo.Windows.Vfw32
         public static extern IntPtr ICOpen(uint fccType, uint fccHandler, IcModes mode);
 
         /// <summary>
-        /// Get info on the codec
+        /// Get info on the codec, see <a href="https://docs.microsoft.com/en-us/windows/win32/api/vfw/nf-vfw-icinfo">ICInfo function</a>
         /// </summary>
         /// <param name="fccType">uint</param>
         /// <param name="fccHandler">uint</param>

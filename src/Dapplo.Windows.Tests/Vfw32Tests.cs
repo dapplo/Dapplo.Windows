@@ -28,7 +28,7 @@ namespace Dapplo.Windows.Tests
         {
             var frameFormat = BitmapInfoHeader.Create(100, 100, 24);
             var foundOne = false;
-            foreach (var codec in VfwCodec.CodecsFor(frameFormat))
+            foreach (var codec in VfwCodec.AllCodecs(frameFormat))
             {
                 Log.Debug().WriteLine($"VfwCodec {codec.IcInfo.Name}");
                 foundOne = true;
@@ -38,13 +38,13 @@ namespace Dapplo.Windows.Tests
         }
 
         /// <summary>
-        /// Test if there is a list of codecs being returned
+        /// Test the life cycle of a VfwCodec
         /// </summary>
         [Fact]
         public void Test_CodecLifeCycle()
         {
             var frameFormat = BitmapInfoHeader.Create(100, 100, 24);
-            var codec = VfwCodec.CodecsFor(frameFormat).First();
+            var codec = VfwCodec.AllCodecs(frameFormat).First();
             
             codec.Initialize();
             codec.BeginCompress();
@@ -52,5 +52,37 @@ namespace Dapplo.Windows.Tests
             codec.Dispose();
         }
 
+        /// <summary>
+        /// Test if XVID can be found
+        /// You can install this with "choco install xvid"
+        /// </summary>
+        [Fact]
+        public void Test_XvidCodecFromList()
+        {
+            var frameFormat = BitmapInfoHeader.Create(100, 100, 24);
+            var hasXvidCodec = VfwCodec.AllCodecs(frameFormat).Any(vfwCodec => vfwCodec.Name == "XVID");
+            Assert.True(hasXvidCodec);
+        }
+
+        /// <summary>
+        /// Test if XVID can be found
+        /// You can install this with "choco install xvid"
+        /// </summary>
+        [Fact]
+        public void Test_XvidCodec()
+        {
+            var frameFormat = BitmapInfoHeader.Create(100, 100, 24);
+            var xvidCodec = VfwCodec.CodecByName("XVID", BitmapInfoHeader.Create(100,100,24));
+            Assert.Equal("XVID", xvidCodec.Name);
+        }
+
+        /// <summary>
+        /// Test the compression of a codec
+        /// </summary>
+        [WpfFact]
+        public void Test_Compress()
+        {
+
+        }
     }
 }

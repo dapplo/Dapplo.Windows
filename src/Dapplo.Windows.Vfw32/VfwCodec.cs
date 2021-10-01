@@ -23,6 +23,9 @@ namespace Dapplo.Windows.Vfw32
         private int _quality = 0;
         private int _frameIndex;
 
+        /// <inheritdoc cref="ICodec"/>
+        public string Name => IcInfo.Name;
+
         /// <summary>
         /// Details about the codec
         /// </summary>
@@ -174,11 +177,79 @@ namespace Dapplo.Windows.Vfw32
             
             return true;
         }
+
+        /// <summary>
+        /// Retrieve the named codec (FourCC)
+        /// </summary>
+        /// <param name="codec">FourCC</param>
+        /// <param name="inputBitmapInfoHeader">BitmapInfoHeader for the input specifications</param>
+        /// <returns>VfwCodec</returns>
+        public static VfwCodec CodecByName(FourCC codec, BitmapInfoHeader inputBitmapInfoHeader)
+        {
+            var icInfo = new IcInfo(FourCC.CodecTypeVideo);
+            var success = Vfw32Api.ICInfo(icInfo.FccType, (uint)codec, ref icInfo);
+            if (success)
+            {
+                return RetrieveCodec(icInfo, ref inputBitmapInfoHeader);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Internal method to retrieve a codec
+        /// </summary>
+        /// <param name="icInfo"></param>
+        /// <param name="inputBitmapInfoHeader"></param>
+        /// <returns></returns>
+        private static VfwCodec RetrieveCodec(IcInfo icInfo, ref BitmapInfoHeader inputBitmapInfoHeader)
+        {
+            IntPtr hic = Vfw32Api.ICOpen(icInfo.FccType, icInfo.FccHandler, IcModes.ICMODE_QUERY);
+            if (hic == IntPtr.Zero)
+            {
+                return null;
+            }
+
+            try
+            {
+                // We don't care about the output
+                var outHeader = IntPtr.Zero;
+                var queryResult = (IcResults)Vfw32Api.ICSendMessage(hic, IcMessages.ICM_COMPRESS_QUERY, ref inputBitmapInfoHeader, outHeader);
+                if (queryResult.IsSuccess())
+                {
+                    var outBitmapInfoHeader = BitmapInfoHeader.Create(0, 0, 24);
+
+                    var result = (IcResults)Vfw32Api.ICSendMessage(hic, IcMessages.ICM_COMPRESS_GET_FORMAT, ref inputBitmapInfoHeader, ref outBitmapInfoHeader);
+                    if (!result.IsSuccess())
+                    {
+                        throw new InvalidOperationException($"Not able to retrieve format: {result.GetErrorDescription()}");
+                    }
+                    var infoSize = Vfw32Api.ICGetInfo(hic, out var currentCodecInfo, IcInfo.SizeOf);
+                    if (infoSize > 0)
+                    {
+                        var codec = new VfwCodec
+                        {
+                            IcInfo = currentCodecInfo,
+                            InputBitmapFormat = inputBitmapInfoHeader,
+                            OutputBitmapFormat = outBitmapInfoHeader
+                        };
+                        return codec;
+                    }
+                }
+            }
+            finally
+            {
+                Vfw32Api.ICClose(hic);
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// This provides all available VFW codecs
         /// </summary>
         /// <param name="inputBitmapInfoHeader">BitmapInfoHeader specifying what bitmap format is used to supply frames</param>
-        public static IEnumerable<VfwCodec> CodecsFor(BitmapInfoHeader inputBitmapInfoHeader)
+        public static IEnumerable<VfwCodec> AllCodecs(BitmapInfoHeader inputBitmapInfoHeader)
         {
             uint codecNr = 0;
 
@@ -194,45 +265,11 @@ namespace Dapplo.Windows.Vfw32
                     continue;
                 }
 
-
-                IntPtr hic = Vfw32Api.ICOpen(icInfo.FccType, icInfo.FccHandler, IcModes.ICMODE_QUERY);
-                if (hic == IntPtr.Zero)
+                var codec = RetrieveCodec(icInfo, ref inputBitmapInfoHeader);
+                if (codec != null)
                 {
-                    continue;
+                    yield return codec;
                 }
-
-                try
-                {
-                    // We don't care about the output
-                    var outHeader = IntPtr.Zero;
-                    var queryResult = (IcResults)Vfw32Api.ICSendMessage(hic, IcMessages.ICM_COMPRESS_QUERY, ref inputBitmapInfoHeader, outHeader);
-                    if (queryResult.IsSuccess())
-                    {
-                        var outBitmapInfoHeader = BitmapInfoHeader.Create(0, 0, 24);
-
-                        var result = (IcResults)Vfw32Api.ICSendMessage(hic, IcMessages.ICM_COMPRESS_GET_FORMAT, ref inputBitmapInfoHeader, ref outBitmapInfoHeader);
-                        if (!result.IsSuccess())
-                        {
-                            throw new InvalidOperationException($"Not able to retrieve format: {result.GetErrorDescription()}");
-                        }
-                        var infoSize = Vfw32Api.ICGetInfo(hic, out var currentCodecInfo, IcInfo.SizeOf);
-                        if (infoSize > 0)
-                        {
-                            var codec = new VfwCodec
-                            {
-                                IcInfo = currentCodecInfo,
-                                InputBitmapFormat = inputBitmapInfoHeader,
-                                OutputBitmapFormat = outBitmapInfoHeader
-                            };
-                            yield return codec;
-                        }
-                    }
-                }
-                finally
-                {
-                    Vfw32Api.ICClose(hic);
-                }
-
             } while (success);
         }
     }

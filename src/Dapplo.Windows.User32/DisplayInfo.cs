@@ -8,6 +8,7 @@ using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.User32.Structs;
 
 namespace Dapplo.Windows.User32
 {
@@ -19,6 +20,7 @@ namespace Dapplo.Windows.User32
         private static NativeRect? _screenBounds;
         private static DisplayInfo[] _allDisplayInfos;
         private static IDisposable _displayInfoUpdate;
+        private string _deviceName;
 
         /// <summary>
         ///     Desktop working area
@@ -39,7 +41,20 @@ namespace Dapplo.Windows.User32
         /// <summary>
         ///     Device name
         /// </summary>
-        public string DeviceName { get; set; }
+        public string DeviceName 
+        {
+            get 
+            {
+                if (string.IsNullOrEmpty(_deviceName))
+                {
+                    var monitorInfoEx = MonitorInfoEx.Create();
+                    var success = User32Api.GetMonitorInfo(MonitorHandle, ref monitorInfoEx);
+                    _deviceName = success ? monitorInfoEx.DeviceName : "??";
+                }
+                return _deviceName;
+            }
+            internal set => _deviceName = value;
+        }
 
         /// <summary>
         ///     Is this the primary monitor

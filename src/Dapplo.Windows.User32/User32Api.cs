@@ -11,6 +11,8 @@ using System.Windows.Forms;
 #endif
 using Dapplo.Log;
 using Dapplo.Windows.Common;
+using Dapplo.Windows.Common.Enums;
+using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.User32.Enums;
@@ -92,9 +94,10 @@ namespace Dapplo.Windows.User32
         /// Get the display info for the specified monitor handle
         /// </summary>
         /// <param name="monitorHandle">IntPtr</param>
-        /// <param name="index"></param>
+        /// <param name="index">int</param>
+        /// <param name="collectDeviceName">bool</param>
         /// <returns>DisplayInfo</returns>
-        public static DisplayInfo GetDisplayInfo(IntPtr monitorHandle, int index)
+        public static DisplayInfo GetDisplayInfo(IntPtr monitorHandle, int index, bool collectDeviceName = false)
         {
             var monitorInfoEx = MonitorInfoEx.Create();
             var success = GetMonitorInfo(monitorHandle, ref monitorInfoEx);
@@ -111,6 +114,7 @@ namespace Dapplo.Windows.User32
                 ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
                 Bounds = monitorInfoEx.Monitor,
                 WorkingArea = monitorInfoEx.WorkArea,
+                DeviceName = collectDeviceName? monitorInfoEx.DeviceName : null,
                 IsPrimary = (monitorInfoEx.Flags & MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary
             };
         }
@@ -118,15 +122,15 @@ namespace Dapplo.Windows.User32
         /// <summary>
         /// Retrieve all available display infos
         /// </summary>
-        /// <returns>IReadOnlyList of DisplayInfo</returns>
-        public static IReadOnlyList<DisplayInfo> EnumDisplays()
+        /// <returns>IReadOnlyList{DisplayInfo}</returns>
+        public static IReadOnlyList<DisplayInfo> EnumDisplays(bool collectDeviceName = false)
         {
             var result = new List<DisplayInfo>();
             int index = 1;
 
             bool EnumDisplayMonitorsCallback(IntPtr monitorHandle, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr data)
             {
-                var displayInfo = GetDisplayInfo(monitorHandle, index++);
+                var displayInfo = GetDisplayInfo(monitorHandle, index++, collectDeviceName);
                 if (displayInfo != null)
                 {
                     result.Add(displayInfo);
@@ -143,7 +147,7 @@ namespace Dapplo.Windows.User32
         /// This returns the list of window handles for the specified thread
         /// </summary>
         /// <param name="threadId">int</param>
-        /// <returns>List of IntPtr</returns>
+        /// <returns>List{IntPtr}</returns>
         public static List<IntPtr> EnumThreadWindows(int threadId)
         {
             var handles = new List<IntPtr>();
@@ -1099,7 +1103,7 @@ namespace Dapplo.Windows.User32
 
         [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
+        internal static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
 
         /// <summary>
         ///     See
@@ -1164,7 +1168,6 @@ namespace Dapplo.Windows.User32
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, ref AnimationInfo animationInfo, SystemParametersInfoBehaviors fWinIni);
 
-
         /// <summary>
         /// Locks the workstation's display. Locking a workstation protects it from unauthorized use.
         /// </summary>
@@ -1172,5 +1175,63 @@ namespace Dapplo.Windows.User32
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool LockWorkStation();
+
+        [DllImport("user32.dll")]
+        public static extern HResult GetDisplayConfigBufferSizes(
+            QueryDeviceConfigFlags Flags,
+            out uint NumPathArrayElements,
+            out uint NumModeInfoArrayElements
+        );
+
+        [DllImport("user32.dll")]
+        public static extern HResult QueryDisplayConfig(
+            QueryDeviceConfigFlags Flags,
+            ref uint NumPathArrayElements,
+            [Out] DisplayConfigPathInfo[] PathInfoArray,
+            ref uint NumModeInfoArrayElements,
+            [Out] DisplayConfigModeInfo[] ModeInfoArray,
+            IntPtr CurrentTopologyId
+        );
+
+        [DllImport("user32.dll")]
+        public static extern HResult DisplayConfigGetDeviceInfo(
+            ref DisplayConfigTargetDeviceName deviceName
+        );
+
+        public static string MonitorFriendlyName(LUID adapterId, uint targetId)
+        {
+            DisplayConfigTargetDeviceName deviceName = new DisplayConfigTargetDeviceName();
+            deviceName.header.size = (uint)Marshal.SizeOf(typeof(DisplayConfigTargetDeviceName));
+            deviceName.header.adapterId = adapterId;
+            deviceName.header.id = targetId;
+            deviceName.header.type = DisplayConfigDeviceInfoType.DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME;
+            var result = DisplayConfigGetDeviceInfo(ref deviceName);
+            result.ThrowOnFailure();
+            return deviceName.outputTechnology switch
+            {
+                DisplayConfigVideoOutputTechnology.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_MIRACAST => "Miracast",
+                DisplayConfigVideoOutputTechnology.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INTERNAL => "Internal",
+                _ => deviceName.monitorFriendlyDeviceName
+            };
+        }
+
+        public static IEnumerable<string> MonitorNames()
+        {
+            var result = GetDisplayConfigBufferSizes(QueryDeviceConfigFlags.QDC_ONLY_ACTIVE_PATHS, out var pathCount, out var modeCount);
+            result.ThrowOnFailure();
+
+            DisplayConfigPathInfo[] displayPaths = new DisplayConfigPathInfo[pathCount];
+            DisplayConfigModeInfo[] displayModes = new DisplayConfigModeInfo[modeCount];
+            result = QueryDisplayConfig(QueryDeviceConfigFlags.QDC_ONLY_ACTIVE_PATHS, ref pathCount, displayPaths, ref modeCount, displayModes, IntPtr.Zero);
+            result.ThrowOnFailure();
+
+            for (int i = 0; i < modeCount; i++)
+            {
+                if (displayModes[i].infoType == DisplayConfigModeInfoType.DISPLAYCONFIG_MODE_INFO_TYPE_TARGET)
+                {
+                    yield return MonitorFriendlyName(displayModes[i].adapterId, displayModes[i].id);
+                }
+            }
+        }
     }
 }

@@ -15,6 +15,9 @@ namespace Dapplo.Windows.Vfw32
         /// </summary>
         void Initialize();
 
-
+        /// <summary>
+        /// Name or code of the codec
+        /// </summary>
+        string Name { get; }
     }
 }

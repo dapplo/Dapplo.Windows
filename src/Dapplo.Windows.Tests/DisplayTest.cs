@@ -33,6 +33,12 @@ namespace Dapplo.Windows.Tests
             {
                 Log.Debug().WriteLine("Index {0} - Primary {3} - Device {1} - Bounds: {2}", display.Index, display.DeviceName, display.Bounds, display.IsPrimary);
             }
+
+            foreach (var name in User32Api.MonitorNames())
+            {
+                Log.Debug().WriteLine("Monitor: {0}", name);
+            }
+            
         }
 
         [Fact]
