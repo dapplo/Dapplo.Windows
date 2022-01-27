@@ -14,291 +14,290 @@ using Dapplo.Windows.Messages;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Dapplo.Windows.Tests
+namespace Dapplo.Windows.Tests;
+
+/// <summary>
+/// All clipboard related tests
+/// </summary>
+public class ClipboardTests : IDisposable
 {
-    /// <summary>
-    /// All clipboard related tests
-    /// </summary>
-    public class ClipboardTests : IDisposable
+    private static readonly LogSource Log = new LogSource();
+
+    public ClipboardTests(ITestOutputHelper testOutputHelper)
     {
-        private static readonly LogSource Log = new LogSource();
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
 
-        public ClipboardTests(ITestOutputHelper testOutputHelper)
+        static IntPtr WinProcClipboardHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+            // We can use the GetClipboardFormatName to get the string for the windows message... weird but it works
+            Log.Verbose().WriteLine("WinProc {0}, {1}", hWnd, WindowsMessage.GetWindowsMessage((uint)msg));
+            return IntPtr.Zero;
+        }
 
-            static IntPtr WinProcClipboardHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(WinProcClipboardHandler));
+    }
+
+    /// <inheritdoc cref="IDisposable"/>
+    public void Dispose()
+    {
+        // Normally not needed, but every test is more or less it's own application and we need to make sure this cleanup is done
+        WinProcHandler.Instance.MessageHandlerWindow.Dispose();
+    }
+
+    /// <summary>
+    ///     Test monitoring the clipboard
+    /// </summary>
+    //[WpfFact]
+    public async Task TestClipboardMonitor_WaitForCopy()
+    {
+        var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var subscription = ClipboardNative.OnUpdate.Skip(1).Subscribe(clipboardUpdateInformation =>
+        {
+            Log.Debug().WriteLine("Formats {0}", string.Join(",", clipboardUpdateInformation.Formats));
+            Log.Debug().WriteLine("Owner {0}", clipboardUpdateInformation.OwnerHandle);
+            Log.Debug().WriteLine("Sequence {0}", clipboardUpdateInformation.Id);
+
+            if (clipboardUpdateInformation.Formats.Contains("PNG"))
             {
-                // We can use the GetClipboardFormatName to get the string for the windows message... weird but it works
-                Log.Verbose().WriteLine("WinProc {0}, {1}", hWnd, WindowsMessage.GetWindowsMessage((uint)msg));
-                return IntPtr.Zero;
+                using var clipboard = ClipboardNative.Access();
+                using var stream = clipboard.GetAsStream("PNG");
+                using var fileStream = File.Create(@"c:\projects\test.png");
+                stream.CopyTo(fileStream);
             }
 
-            WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(WinProcClipboardHandler));
-        }
+            tcs.TrySetResult(true);
+        });
 
-        /// <inheritdoc cref="IDisposable"/>
-        public void Dispose()
-        {
-            // Normally not needed, but every test is more or less it's own application and we need to make sure this cleanup is done
-            WinProcHandler.Instance.MessageHandlerWindow.Dispose();
-        }
+        await tcs.Task;
 
-        /// <summary>
-        ///     Test monitoring the clipboard
-        /// </summary>
-        //[WpfFact]
-        public async Task TestClipboardMonitor_WaitForCopy()
+        subscription.Dispose();
+    }
+
+    /// <summary>
+    ///     Test delayed rendering of the clipboard
+    /// </summary>
+    [WpfFact]
+    public async Task TestClipboardMonitor_DelayedRender()
+    {
+        var testString = "Hi";
+        var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        // This is what is going to be called, as soon as the format is retrieved of the clipboard
+        var subscription = ClipboardNative.OnRenderFormat.Subscribe(clipboardRenderFormatRequest =>
         {
-            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            var subscription = ClipboardNative.OnUpdate.Skip(1).Subscribe(clipboardUpdateInformation =>
+            switch (clipboardRenderFormatRequest)
             {
-                Log.Debug().WriteLine("Formats {0}", string.Join(",", clipboardUpdateInformation.Formats));
-                Log.Debug().WriteLine("Owner {0}", clipboardUpdateInformation.OwnerHandle);
-                Log.Debug().WriteLine("Sequence {0}", clipboardUpdateInformation.Id);
+                case {IsDestroyClipboard: true}:
+                    Log.Debug().WriteLine("Destroy clipboard");
+                    tcs.TrySetResult(false);
+                    break;
+                case {RenderAllFormats: true}:
+                    Log.Debug().WriteLine("Render all formats");
+                    tcs.TrySetResult(false);
+                    break;
+                default:
+                    Log.Debug().WriteLine("Got request render {0} ({1}) to the clipboard", clipboardRenderFormatRequest.RequestedFormat, clipboardRenderFormatRequest.RequestedFormatId);
+                    // Satisfy the request
+                    clipboardRenderFormatRequest.AccessToken.SetAsUnicodeString(testString, clipboardRenderFormatRequest.RequestedFormat);
+                    tcs.TrySetResult(true);
+                    break;
+            }
+        });
 
-                if (clipboardUpdateInformation.Formats.Contains("PNG"))
-                {
-                    using var clipboard = ClipboardNative.Access();
-                    using var stream = clipboard.GetAsStream("PNG");
-                    using var fileStream = File.Create(@"c:\projects\test.png");
-                    stream.CopyTo(fileStream);
-                }
-
-                tcs.TrySetResult(true);
-            });
-
-            await tcs.Task;
-
-            subscription.Dispose();
+        var formatToTestWith = "TEST_FORMAT";
+        var formatId = ClipboardFormatExtensions.MapFormatToId(formatToTestWith);
+        Log.Debug().WriteLine("Registered clipboard format {0} as {1}", formatToTestWith, formatId);
+        // Make the clipboard ready for testing
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            Assert.False(clipboardAccessToken.IsLockTimeout);
+            clipboardAccessToken.ClearContents();
+            // Set delayed rendered content
+            clipboardAccessToken.SetDelayedRenderedContent(formatId);
         }
 
-        /// <summary>
-        ///     Test delayed rendering of the clipboard
-        /// </summary>
-        [WpfFact]
-        public async Task TestClipboardMonitor_DelayedRender()
+        await Task.Delay(200);
+
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
         {
-            var testString = "Hi";
-            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            Assert.True(clipboardAccessToken.CanAccess);
+            Assert.False(clipboardAccessToken.IsLockTimeout);
+            Log.Debug().WriteLine("Test if the clipboard has our format {0} as {1}", formatToTestWith, formatId);
+            Assert.True(ClipboardNative.HasFormat(formatToTestWith));
+            // Request the missing content, this should trigger the rendering
+            Log.Debug().WriteLine("Request the clipboard for our format {0} as {1}", formatToTestWith, formatId);
+            var resultString = clipboardAccessToken.GetAsUnicodeString(formatToTestWith);
+            Assert.Equal(testString, resultString);
+        }
+        var result = await tcs.Task;
+        Assert.True(result);
+        subscription.Dispose();
+    }
 
-            // This is what is going to be called, as soon as the format is retrieved of the clipboard
-            var subscription = ClipboardNative.OnRenderFormat.Subscribe(clipboardRenderFormatRequest =>
-            {
-                switch (clipboardRenderFormatRequest)
-                {
-                    case {IsDestroyClipboard: true}:
-                        Log.Debug().WriteLine("Destroy clipboard");
-                        tcs.TrySetResult(false);
-                        break;
-                    case {RenderAllFormats: true}:
-                        Log.Debug().WriteLine("Render all formats");
-                        tcs.TrySetResult(false);
-                        break;
-                    default:
-                        Log.Debug().WriteLine("Got request render {0} ({1}) to the clipboard", clipboardRenderFormatRequest.RequestedFormat, clipboardRenderFormatRequest.RequestedFormatId);
-                        // Satisfy the request
-                        clipboardRenderFormatRequest.AccessToken.SetAsUnicodeString(testString, clipboardRenderFormatRequest.RequestedFormat);
-                        tcs.TrySetResult(true);
-                        break;
-                }
-            });
+    /// <summary>
+    ///     Test the format mappers
+    /// </summary>
+    [WpfFact]
+    public void TestClipboard_Formats()
+    {
+        Assert.Equal((uint)StandardClipboardFormats.DisplayBitmap, ClipboardFormatExtensions.MapFormatToId(StandardClipboardFormats.DisplayBitmap.AsString()));
+    }
 
-            var formatToTestWith = "TEST_FORMAT";
-            var formatId = ClipboardFormatExtensions.MapFormatToId(formatToTestWith);
-            Log.Debug().WriteLine("Registered clipboard format {0} as {1}", formatToTestWith, formatId);
-            // Make the clipboard ready for testing
+    /// <summary>
+    ///     Test registering a clipboard format for the clipboard
+    /// </summary>
+    [WpfFact]
+    public void TestClipboard_RegisterFormat()
+    {
+        string format = "DAPPLO.DOPY" + ClipboardNative.SequenceNumber;
+
+        // Register the format
+        var id1 = ClipboardFormatExtensions.RegisterFormat(format);
+        // Register the format again
+        var id2 = ClipboardFormatExtensions.RegisterFormat(format);
+
+        Assert.Equal(id1, id2);
+
+        // Make sure it works
+        using (var clipboardAccessToken = ClipboardNative.Access())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            Assert.False(clipboardAccessToken.IsLockTimeout);
+            clipboardAccessToken.ClearContents();
+            clipboardAccessToken.SetAsUnicodeString("Blub", format);
+        }
+    }
+
+    /// <summary>
+    ///     Test monitoring the clipboard
+    /// </summary>
+    //[WpfFact]
+    public async Task TestClipboardMonitor_Text()
+    {
+        const string testString = "Dapplo.Windows.Tests.ClipboardTests";
+        bool hasNewContent = false;
+        var subscription = ClipboardNative.OnUpdate.Where(clipboard => clipboard.Formats.Contains("TEST_FORMAT")).Subscribe(clipboard =>
+        {
+            Log.Debug().WriteLine("Detected change {0}", string.Join(",", clipboard.Formats));
+            Log.Debug().WriteLine("Owner {0}", clipboard.OwnerHandle);
+            Log.Debug().WriteLine("Sequence {0}", clipboard.Id);
+
+            hasNewContent = true;
+        });
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            Assert.False(clipboardAccessToken.IsLockTimeout);
+            clipboardAccessToken.ClearContents();
+            clipboardAccessToken.SetAsUnicodeString(testString, "TEST_FORMAT");
+        }
+        await Task.Delay(400);
+        subscription.Dispose();
+
+        // Doesn't work on AppVeyor!!
+        Assert.True(hasNewContent);
+    }
+
+    /// <summary>
+    ///     Test monitoring the clipboard
+    /// </summary>
+    /// <returns></returns>
+    [WpfFact]
+    public async Task TestClipboardStore_String()
+    {
+
+        const string testString = "Dapplo.Windows.Tests.ClipboardTests";
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            clipboardAccessToken.ClearContents();
+            clipboardAccessToken.SetAsUnicodeString(testString);
+        }
+        await Task.Delay(100);
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
+        }
+    }
+
+
+    /// <summary>
+    ///     Test if the clipboard contains files
+    /// </summary>
+    /// <returns></returns>
+    //[WpfFact]
+    public void TestClipboard_FileNames()
+    {
+        using var clipboardAccessToken = ClipboardNative.Access();
+        var fileNames = clipboardAccessToken.GetFileNames();
+        Assert.True(fileNames.Any());
+    }
+
+    /// <summary>
+    ///     Test monitoring the clipboard
+    /// </summary>
+    /// <returns></returns>
+    [WpfFact]
+    public async Task TestClipboardStore_MemoryStream()
+    {
+        const string testString = "Dapplo.Windows.Tests.ClipboardTests";
+        var testStream = new MemoryStream();
+        var bytes = Encoding.Unicode.GetBytes(testString + "\0");
+        Assert.Equal(testString, Encoding.Unicode.GetString(bytes).TrimEnd('\0'));
+        testStream.Write(bytes, 0, bytes.Length);
+
+        testStream.Seek(0, SeekOrigin.Begin);
+        Assert.Equal(testString, Encoding.Unicode.GetString(testStream.GetBuffer(), 0, (int)testStream.Length).TrimEnd('\0'));
+
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            Assert.False(clipboardAccessToken.IsLockTimeout);
+            clipboardAccessToken.ClearContents();
+            clipboardAccessToken.SetAsStream(StandardClipboardFormats.UnicodeText, testStream);
+        }
+        await Task.Delay(100);
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            Assert.False(clipboardAccessToken.IsLockTimeout);
+            Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
+            var unicodeBytes = clipboardAccessToken.GetAsBytes(StandardClipboardFormats.UnicodeText);
+            Assert.Equal(testString, Encoding.Unicode.GetString(unicodeBytes, 0, unicodeBytes.Length).TrimEnd('\0'));
+
+            var unicodeStream = clipboardAccessToken.GetAsStream(StandardClipboardFormats.UnicodeText);
+            await using var memoryStream = new MemoryStream();
+            await unicodeStream.CopyToAsync(memoryStream);
+            Assert.Equal(testString, Encoding.Unicode.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length).TrimEnd('\0'));
+        }
+    }
+
+    /// <summary>
+    ///     Test AccessAsync
+    /// </summary>
+    [WpfFact]
+    public async Task Test_ClipboardAccess_LockTimeout()
+    {
+        using (var outerClipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(outerClipboardAccessToken.CanAccess);
             using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
             {
-                Assert.True(clipboardAccessToken.CanAccess);
-                Assert.False(clipboardAccessToken.IsLockTimeout);
-                clipboardAccessToken.ClearContents();
-                // Set delayed rendered content
-                clipboardAccessToken.SetDelayedRenderedContent(formatId);
-            }
-
-            await Task.Delay(200);
-
-            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
-            {
-                Assert.True(clipboardAccessToken.CanAccess);
-                Assert.False(clipboardAccessToken.IsLockTimeout);
-                Log.Debug().WriteLine("Test if the clipboard has our format {0} as {1}", formatToTestWith, formatId);
-                Assert.True(ClipboardNative.HasFormat(formatToTestWith));
-                // Request the missing content, this should trigger the rendering
-                Log.Debug().WriteLine("Request the clipboard for our format {0} as {1}", formatToTestWith, formatId);
-                var resultString = clipboardAccessToken.GetAsUnicodeString(formatToTestWith);
-                Assert.Equal(testString, resultString);
-            }
-            var result = await tcs.Task;
-            Assert.True(result);
-            subscription.Dispose();
-        }
-
-        /// <summary>
-        ///     Test the format mappers
-        /// </summary>
-        [WpfFact]
-        public void TestClipboard_Formats()
-        {
-            Assert.Equal((uint)StandardClipboardFormats.DisplayBitmap, ClipboardFormatExtensions.MapFormatToId(StandardClipboardFormats.DisplayBitmap.AsString()));
-        }
-
-        /// <summary>
-        ///     Test registering a clipboard format for the clipboard
-        /// </summary>
-        [WpfFact]
-        public void TestClipboard_RegisterFormat()
-        {
-            string format = "DAPPLO.DOPY" + ClipboardNative.SequenceNumber;
-
-            // Register the format
-            var id1 = ClipboardFormatExtensions.RegisterFormat(format);
-            // Register the format again
-            var id2 = ClipboardFormatExtensions.RegisterFormat(format);
-
-            Assert.Equal(id1, id2);
-
-            // Make sure it works
-            using (var clipboardAccessToken = ClipboardNative.Access())
-            {
-                Assert.True(clipboardAccessToken.CanAccess);
-                Assert.False(clipboardAccessToken.IsLockTimeout);
-                clipboardAccessToken.ClearContents();
-                clipboardAccessToken.SetAsUnicodeString("Blub", format);
+                Assert.True(clipboardAccessToken.IsLockTimeout);
             }
         }
+    }
 
-        /// <summary>
-        ///     Test monitoring the clipboard
-        /// </summary>
-        //[WpfFact]
-        public async Task TestClipboardMonitor_Text()
+    /// <summary>
+    ///     Test AccessAsync
+    /// </summary>
+    [WpfFact]
+    public async Task Test_ClipboardAccess_LockTimeout_Exception()
+    {
+        using (await ClipboardNative.AccessAsync())
         {
-            const string testString = "Dapplo.Windows.Tests.ClipboardTests";
-            bool hasNewContent = false;
-            var subscription = ClipboardNative.OnUpdate.Where(clipboard => clipboard.Formats.Contains("TEST_FORMAT")).Subscribe(clipboard =>
-            {
-                Log.Debug().WriteLine("Detected change {0}", string.Join(",", clipboard.Formats));
-                Log.Debug().WriteLine("Owner {0}", clipboard.OwnerHandle);
-                Log.Debug().WriteLine("Sequence {0}", clipboard.Id);
-
-                hasNewContent = true;
-            });
-            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
-            {
-                Assert.True(clipboardAccessToken.CanAccess);
-                Assert.False(clipboardAccessToken.IsLockTimeout);
-                clipboardAccessToken.ClearContents();
-                clipboardAccessToken.SetAsUnicodeString(testString, "TEST_FORMAT");
-            }
-            await Task.Delay(400);
-            subscription.Dispose();
-
-            // Doesn't work on AppVeyor!!
-            Assert.True(hasNewContent);
-        }
-
-        /// <summary>
-        ///     Test monitoring the clipboard
-        /// </summary>
-        /// <returns></returns>
-        [WpfFact]
-        public async Task TestClipboardStore_String()
-        {
-
-            const string testString = "Dapplo.Windows.Tests.ClipboardTests";
-            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
-            {
-                clipboardAccessToken.ClearContents();
-                clipboardAccessToken.SetAsUnicodeString(testString);
-            }
-            await Task.Delay(100);
-            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
-            {
-                Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
-            }
-        }
-
-
-        /// <summary>
-        ///     Test if the clipboard contains files
-        /// </summary>
-        /// <returns></returns>
-        //[WpfFact]
-        public void TestClipboard_FileNames()
-        {
-            using var clipboardAccessToken = ClipboardNative.Access();
-            var fileNames = clipboardAccessToken.GetFileNames();
-            Assert.True(fileNames.Any());
-        }
-
-        /// <summary>
-        ///     Test monitoring the clipboard
-        /// </summary>
-        /// <returns></returns>
-        [WpfFact]
-        public async Task TestClipboardStore_MemoryStream()
-        {
-            const string testString = "Dapplo.Windows.Tests.ClipboardTests";
-            var testStream = new MemoryStream();
-            var bytes = Encoding.Unicode.GetBytes(testString + "\0");
-            Assert.Equal(testString, Encoding.Unicode.GetString(bytes).TrimEnd('\0'));
-            testStream.Write(bytes, 0, bytes.Length);
-
-            testStream.Seek(0, SeekOrigin.Begin);
-            Assert.Equal(testString, Encoding.Unicode.GetString(testStream.GetBuffer(), 0, (int)testStream.Length).TrimEnd('\0'));
-
-            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
-            {
-                Assert.True(clipboardAccessToken.CanAccess);
-                Assert.False(clipboardAccessToken.IsLockTimeout);
-                clipboardAccessToken.ClearContents();
-                clipboardAccessToken.SetAsStream(StandardClipboardFormats.UnicodeText, testStream);
-            }
-            await Task.Delay(100);
-            using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
-            {
-                Assert.True(clipboardAccessToken.CanAccess);
-                Assert.False(clipboardAccessToken.IsLockTimeout);
-                Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
-                var unicodeBytes = clipboardAccessToken.GetAsBytes(StandardClipboardFormats.UnicodeText);
-                Assert.Equal(testString, Encoding.Unicode.GetString(unicodeBytes, 0, unicodeBytes.Length).TrimEnd('\0'));
-
-                var unicodeStream = clipboardAccessToken.GetAsStream(StandardClipboardFormats.UnicodeText);
-                await using var memoryStream = new MemoryStream();
-                await unicodeStream.CopyToAsync(memoryStream);
-                Assert.Equal(testString, Encoding.Unicode.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length).TrimEnd('\0'));
-            }
-        }
-
-        /// <summary>
-        ///     Test AccessAsync
-        /// </summary>
-        [WpfFact]
-        public async Task Test_ClipboardAccess_LockTimeout()
-        {
-            using (var outerClipboardAccessToken = await ClipboardNative.AccessAsync())
-            {
-                Assert.True(outerClipboardAccessToken.CanAccess);
-                using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
-                {
-                    Assert.True(clipboardAccessToken.IsLockTimeout);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Test AccessAsync
-        /// </summary>
-        [WpfFact]
-        public async Task Test_ClipboardAccess_LockTimeout_Exception()
-        {
-            using (await ClipboardNative.AccessAsync())
-            {
-                using var clipboardAccessToken = await ClipboardNative.AccessAsync();
-                Assert.Throws<ClipboardAccessDeniedException>(() => clipboardAccessToken.ThrowWhenNoAccess());
-            }
+            using var clipboardAccessToken = await ClipboardNative.AccessAsync();
+            Assert.Throws<ClipboardAccessDeniedException>(() => clipboardAccessToken.ThrowWhenNoAccess());
         }
     }
 }

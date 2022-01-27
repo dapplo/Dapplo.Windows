@@ -5,27 +5,26 @@ using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 
-namespace Dapplo.Windows.Input.Mouse
+namespace Dapplo.Windows.Input.Mouse;
+
+/// <summary>
+///     Information on mouse changes
+///     TODO: Make the information a lot clearer, than processing WindowsMessages
+/// </summary>
+public class MouseHookEventArgs : EventArgs
 {
     /// <summary>
-    ///     Information on mouse changes
-    ///     TODO: Make the information a lot clearer, than processing WindowsMessages
+    ///     Set this to true if the event is handled, other event-handlers in the chain will not be called
     /// </summary>
-    public class MouseHookEventArgs : EventArgs
-    {
-        /// <summary>
-        ///     Set this to true if the event is handled, other event-handlers in the chain will not be called
-        /// </summary>
-        public bool Handled { get; set; }
+    public bool Handled { get; set; }
 
-        /// <summary>
-        ///     The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
-        /// </summary>
-        public NativePoint Point { get; set; }
+    /// <summary>
+    ///     The x- and y-coordinates of the cursor, in per-monitor-aware screen coordinates.
+    /// </summary>
+    public NativePoint Point { get; set; }
 
-        /// <summary>
-        ///     The mouse message
-        /// </summary>
-        public WindowsMessages WindowsMessage { get; set; }
-    }
+    /// <summary>
+    ///     The mouse message
+    /// </summary>
+    public WindowsMessages WindowsMessage { get; set; }
 }

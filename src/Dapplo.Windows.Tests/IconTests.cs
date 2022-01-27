@@ -11,49 +11,48 @@ using Dapplo.Windows.User32;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Dapplo.Windows.Tests
+namespace Dapplo.Windows.Tests;
+
+public class IconTests
 {
-    public class IconTests
+    public IconTests(ITestOutputHelper testOutputHelper)
     {
-        public IconTests(ITestOutputHelper testOutputHelper)
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
+
+    /// <summary>
+    ///     Test getting an Icon for a top level window
+    /// </summary>
+    [WpfFact]
+    public void TestIcon_GetIcon()
+    {
+        // Start a process to test against
+        using (var process = Process.Start("notepad.exe"))
         {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+            // Make sure it's started
+            Assert.NotNull(process);
+            // Wait until the process started it's message pump (listening for input)
+            process.WaitForInputIdle();
+            User32Api.SetWindowText(process.MainWindowHandle, "TestIcon_GetIcon");
 
-        /// <summary>
-        ///     Test getting an Icon for a top level window
-        /// </summary>
-        [WpfFact]
-        public void TestIcon_GetIcon()
-        {
-            // Start a process to test against
-            using (var process = Process.Start("notepad.exe"))
-            {
-                // Make sure it's started
-                Assert.NotNull(process);
-                // Wait until the process started it's message pump (listening for input)
-                process.WaitForInputIdle();
-                User32Api.SetWindowText(process.MainWindowHandle, "TestIcon_GetIcon");
-
-                var window = InteropWindowQuery.GetTopLevelWindows().First();
-                var icon = window.GetIcon<BitmapSource>();
-                Assert.NotNull(icon);
-
-                // Kill the process
-                process.Kill();
-            }
-        }
-
-        /// <summary>
-        ///     Test getting an Icon for the desktop, which doesn't have one
-        /// </summary>
-        [WpfFact]
-        public void TestIcon_GetIcon_Null()
-        {
-            var window = InteropWindowQuery.GetDesktopWindow();
+            var window = InteropWindowQuery.GetTopLevelWindows().First();
             var icon = window.GetIcon<BitmapSource>();
+            Assert.NotNull(icon);
 
-            Assert.Null(icon);
+            // Kill the process
+            process.Kill();
         }
+    }
+
+    /// <summary>
+    ///     Test getting an Icon for the desktop, which doesn't have one
+    /// </summary>
+    [WpfFact]
+    public void TestIcon_GetIcon_Null()
+    {
+        var window = InteropWindowQuery.GetDesktopWindow();
+        var icon = window.GetIcon<BitmapSource>();
+
+        Assert.Null(icon);
     }
 }

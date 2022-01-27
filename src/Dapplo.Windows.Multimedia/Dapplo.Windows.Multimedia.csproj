@@ -2,10 +2,13 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Multimedia is a simple wrapper around WinMM</Description>
     <PackageTags>windows native winmm</PackageTags>
-    <TargetFrameworks>net461;netcoreapp3.1;netstandard2.0;net5.0-windows</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp3.1;netstandard2.0;net5.0-windows;net6.0-windows</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System" />
     <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
   </ItemGroup>
 </Project>

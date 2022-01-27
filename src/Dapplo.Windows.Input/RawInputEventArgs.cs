@@ -3,21 +3,20 @@
 using System;
 using Dapplo.Windows.Input.Structs;
 
-namespace Dapplo.Windows.Input
+namespace Dapplo.Windows.Input;
+
+/// <summary>
+///     Raw Input information
+/// </summary>
+public class RawInputEventArgs : EventArgs
 {
     /// <summary>
-    ///     Raw Input information
+    ///     If true the application was in the foreground
     /// </summary>
-    public class RawInputEventArgs : EventArgs
-    {
-        /// <summary>
-        ///     If true the application was in the foreground
-        /// </summary>
-        public bool IsForeground { get; set; }
+    public bool IsForeground { get; set; }
 
-        /// <summary>
-        ///     The actual raw input
-        /// </summary>
-        public RawInput RawInput { get; set; }
-    }
+    /// <summary>
+    ///     The actual raw input
+    /// </summary>
+    public RawInput RawInput { get; set; }
 }

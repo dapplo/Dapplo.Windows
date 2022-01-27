@@ -10,42 +10,41 @@ using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Icons;
 
-namespace Dapplo.Windows.Tests
+namespace Dapplo.Windows.Tests;
+
+public class AppWindowTests
 {
-    public class AppWindowTests
+    private static readonly LogSource Log = new LogSource();
+    public AppWindowTests(ITestOutputHelper testOutputHelper)
     {
-        private static readonly LogSource Log = new LogSource();
-        public AppWindowTests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
 
-        /// <summary>
-        ///     All apps we find, should give true when IsApp and have a logo.
-        /// </summary>
-        /// <returns></returns>
-        [WpfFact]
-        public void TestAppWindowList()
+    /// <summary>
+    ///     All apps we find, should give true when IsApp and have a logo.
+    /// </summary>
+    /// <returns></returns>
+    [WpfFact]
+    public void TestAppWindowList()
+    {
+        var apps = AppQuery.WindowsStoreApps.ToList();
+        foreach (var interopWindow in apps)
         {
-            var apps = AppQuery.WindowsStoreApps.ToList();
-            foreach (var interopWindow in apps)
-            {
-                Log.Debug().WriteLine("{0} - {1}", interopWindow.GetCaption(), interopWindow.GetClassname());
-                Assert.True(interopWindow.IsApp());
-                var iconBitmapSource = interopWindow.GetIcon<BitmapSource>();
-                Assert.NotNull(iconBitmapSource);
-            }
+            Log.Debug().WriteLine("{0} - {1}", interopWindow.GetCaption(), interopWindow.GetClassname());
+            Assert.True(interopWindow.IsApp());
+            var iconBitmapSource = interopWindow.GetIcon<BitmapSource>();
+            Assert.NotNull(iconBitmapSource);
         }
+    }
 
-        /// <summary>
-        ///     Make sure GetTopLevelWindows doesn't return an App Window.
-        /// </summary>
-        /// <returns></returns>
-        [WpfFact]
-        public void TestApp_TopLevel()
-        {
-            var topLevelWindows = InteropWindowQuery.GetTopLevelWindows().ToList();
-            Assert.DoesNotContain(topLevelWindows, window => window.IsApp());
-        }
+    /// <summary>
+    ///     Make sure GetTopLevelWindows doesn't return an App Window.
+    /// </summary>
+    /// <returns></returns>
+    [WpfFact]
+    public void TestApp_TopLevel()
+    {
+        var topLevelWindows = InteropWindowQuery.GetTopLevelWindows().ToList();
+        Assert.DoesNotContain(topLevelWindows, window => window.IsApp());
     }
 }

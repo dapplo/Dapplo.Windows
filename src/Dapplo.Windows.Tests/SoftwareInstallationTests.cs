@@ -7,28 +7,27 @@ using Dapplo.Windows.Software;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Dapplo.Windows.Tests
-{
-    public class SoftwareInstallationTests
-    {
-        private static readonly LogSource Log = new LogSource();
-        public SoftwareInstallationTests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+namespace Dapplo.Windows.Tests;
 
-        [Fact]
-        private void Test_InstalledSoftware()
+public class SoftwareInstallationTests
+{
+    private static readonly LogSource Log = new LogSource();
+    public SoftwareInstallationTests(ITestOutputHelper testOutputHelper)
+    {
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
+
+    [Fact]
+    private void Test_InstalledSoftware()
+    {
+        var software = InstallationInformation.InstalledSoftware().OrderBy(details => details.DisplayName).ToList();
+        Assert.True(software.Count > 0);
+        foreach (var softwareDetails in software)
         {
-            var software = InstallationInformation.InstalledSoftware().OrderBy(details => details.DisplayName).ToList();
-            Assert.True(software.Count > 0);
-            foreach (var softwareDetails in software)
+            Log.Debug().WriteLine(softwareDetails.ToString(), null);
+            if (!string.IsNullOrEmpty(softwareDetails.HelpLink))
             {
-                Log.Debug().WriteLine(softwareDetails.ToString(), null);
-                if (!string.IsNullOrEmpty(softwareDetails.HelpLink))
-                {
-                    Log.Debug().WriteLine("Help - {0}" , softwareDetails.HelpLink);
-                }
+                Log.Debug().WriteLine("Help - {0}" , softwareDetails.HelpLink);
             }
         }
     }

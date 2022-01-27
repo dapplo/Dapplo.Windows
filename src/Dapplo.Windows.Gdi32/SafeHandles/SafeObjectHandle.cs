@@ -2,28 +2,27 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using Microsoft.Win32.SafeHandles;
 
-namespace Dapplo.Windows.Gdi32.SafeHandles
+namespace Dapplo.Windows.Gdi32.SafeHandles;
+
+/// <summary>
+///     Abstract class SafeObjectHandle which contains all handles that are cleaned with DeleteObject
+/// </summary>
+public abstract class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
 {
     /// <summary>
-    ///     Abstract class SafeObjectHandle which contains all handles that are cleaned with DeleteObject
+    ///     Create SafeObjectHandle
     /// </summary>
-    public abstract class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
+    /// <param name="ownsHandle">True if the class owns the handle</param>
+    protected SafeObjectHandle(bool ownsHandle) : base(ownsHandle)
     {
-        /// <summary>
-        ///     Create SafeObjectHandle
-        /// </summary>
-        /// <param name="ownsHandle">True if the class owns the handle</param>
-        protected SafeObjectHandle(bool ownsHandle) : base(ownsHandle)
-        {
-        }
+    }
 
-        /// <summary>
-        ///     Call DeleteObject
-        /// </summary>
-        /// <returns>true if this worked</returns>
-        protected override bool ReleaseHandle()
-        {
-            return Gdi32Api.DeleteObject(handle);
-        }
+    /// <summary>
+    ///     Call DeleteObject
+    /// </summary>
+    /// <returns>true if this worked</returns>
+    protected override bool ReleaseHandle()
+    {
+        return Gdi32Api.DeleteObject(handle);
     }
 }

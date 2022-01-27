@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29123.88
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows", "Dapplo.Windows\Dapplo.Windows.csproj", "{8AA469BB-856A-4330-96CE-2BB75A014070}"
 EndProject
@@ -48,6 +48,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Tests", "Dapplo.Windows.Tests\Dapplo.Windows.Tests.csproj", "{EB93507C-91DA-420D-B77D-9F9F006B62DE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Devices", "Dapplo.Windows.Devices\Dapplo.Windows.Devices.csproj", "{AE4F7436-3100-443B-BAB5-F281E55F1840}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.ImageSharpInterop", "Dapplo.Windows.ImageSharpInterop\Dapplo.Windows.ImageSharpInterop.csproj", "{0670BE3E-AF5E-471A-B283-0BEAF16137AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,6 +149,10 @@ Global
 		{AE4F7436-3100-443B-BAB5-F281E55F1840}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE4F7436-3100-443B-BAB5-F281E55F1840}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE4F7436-3100-443B-BAB5-F281E55F1840}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0670BE3E-AF5E-471A-B283-0BEAF16137AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0670BE3E-AF5E-471A-B283-0BEAF16137AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0670BE3E-AF5E-471A-B283-0BEAF16137AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0670BE3E-AF5E-471A-B283-0BEAF16137AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

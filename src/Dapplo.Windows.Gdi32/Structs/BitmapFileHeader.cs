@@ -3,86 +3,85 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace Dapplo.Windows.Gdi32.Structs
+namespace Dapplo.Windows.Gdi32.Structs;
+
+/// <summary>
+/// The BITMAPFILEHEADER structure contains information about the type, size, and layout of a file that contains a DIB.
+/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd183374(v=vs.85).aspx">BITMAPFILEHEADER structure</a>
+/// </summary>
+[StructLayout(LayoutKind.Sequential, Pack = 2)]
+[SuppressMessage("Sonar Code Smell", "S1450:Trivial properties should be auto-implementedPrivate fields only used as local variables in methods should become local variables", Justification = "Interop!")]
+[SuppressMessage("ReSharper", "ConvertToAutoProperty")]
+public struct BitmapFileHeader
 {
+    private short _fileType;
+    private int _size;
+    private short _reserved1;
+    private short _reserved2;
+    private int _offsetToBitmapBits;
+
     /// <summary>
-    /// The BITMAPFILEHEADER structure contains information about the type, size, and layout of a file that contains a DIB.
-    /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd183374(v=vs.85).aspx">BITMAPFILEHEADER structure</a>
+    /// The file type; must be BM.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    [SuppressMessage("Sonar Code Smell", "S1450:Trivial properties should be auto-implementedPrivate fields only used as local variables in methods should become local variables", Justification = "Interop!")]
-    [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
-    public struct BitmapFileHeader
+    public short FileType
     {
-        private short _fileType;
-        private int _size;
-        private short _reserved1;
-        private short _reserved2;
-        private int _offsetToBitmapBits;
-
-        /// <summary>
-        /// The file type; must be BM.
-        /// </summary>
-        public short FileType
+        get
         {
-            get
-            {
-                return _fileType;
-            }
-            private set
-            {
-                _fileType = value;
-            }
+            return _fileType;
         }
-
-        /// <summary>
-        /// The size, in bytes, of the bitmap file.
-        /// </summary>
-        public int Size
+        private set
         {
-            get
-            {
-                return _size;
-            }
-            private set
-            {
-                _size = value;
-            }
+            _fileType = value;
         }
+    }
 
-        /// <summary>
-        /// The offset, in bytes, from the beginning of the BITMAPFILEHEADER structure to the bitmap bits.
-        /// </summary>
-        public int OffsetToBitmapBits
+    /// <summary>
+    /// The size, in bytes, of the bitmap file.
+    /// </summary>
+    public int Size
+    {
+        get
         {
-            get
-            {
-                return _offsetToBitmapBits;
-            }
-            private set
-            {
-                _offsetToBitmapBits = value;
-            }
+            return _size;
         }
+        private set
+        {
+            _size = value;
+        }
+    }
 
-        /// <summary>
-        /// Create a BitmapFileHeader which needs a BitmapInfoHeader to calculate the values
-        /// </summary>
-        /// <param name="bitmapInfoHeader">BitmapInfoHeader</param>
-        public static BitmapFileHeader Create(BitmapInfoHeader bitmapInfoHeader)
+    /// <summary>
+    /// The offset, in bytes, from the beginning of the BITMAPFILEHEADER structure to the bitmap bits.
+    /// </summary>
+    public int OffsetToBitmapBits
+    {
+        get
         {
-            var bitmapFileHeaderSize = Marshal.SizeOf(typeof(BitmapFileHeader));
-            return new BitmapFileHeader
-            {
-                // Fill with "BM"
-                FileType = 0x4d42,
-                // Size of the file, is the size of this, the size of a BitmapInfoHeader and the size of the image itself.
-                Size = (int) (bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.SizeImage),
-                _reserved1 = 0,
-                _reserved2 = 0,
-                // Specify on what offset the bits are found
-                OffsetToBitmapBits = (int) (bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.ColorsUsed * 4)
-            };
+            return _offsetToBitmapBits;
         }
+        private set
+        {
+            _offsetToBitmapBits = value;
+        }
+    }
+
+    /// <summary>
+    /// Create a BitmapFileHeader which needs a BitmapInfoHeader to calculate the values
+    /// </summary>
+    /// <param name="bitmapInfoHeader">BitmapInfoHeader</param>
+    public static BitmapFileHeader Create(BitmapInfoHeader bitmapInfoHeader)
+    {
+        var bitmapFileHeaderSize = Marshal.SizeOf(typeof(BitmapFileHeader));
+        return new BitmapFileHeader
+        {
+            // Fill with "BM"
+            FileType = 0x4d42,
+            // Size of the file, is the size of this, the size of a BitmapInfoHeader and the size of the image itself.
+            Size = (int) (bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.SizeImage),
+            _reserved1 = 0,
+            _reserved2 = 0,
+            // Specify on what offset the bits are found
+            OffsetToBitmapBits = (int) (bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.ColorsUsed * 4)
+        };
     }
 }

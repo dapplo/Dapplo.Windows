@@ -7,37 +7,36 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
-namespace Dapplo.Windows.Tests.Benchmarks
+namespace Dapplo.Windows.Tests.Benchmarks;
+
+public static class Program
 {
-    public static class Program
+    [STAThread]
+    public static void Main(string[] args)
     {
-        [STAThread]
-        public static void Main(string[] args)
-        {
 
-            var jobCore50 = Job.Default
-                .WithMaxIterationCount(20)
-                .WithRuntime(CoreRuntime.Core50)
-                .WithPlatform(Platform.X64);
-            var jobCore31 = Job.Default
-                .WithMaxIterationCount(20)
-                .WithRuntime(CoreRuntime.Core31)
-                .WithPlatform(Platform.X64);
-            var jobNet472 = Job.Default
-                .WithMaxIterationCount(20)
-                .WithRuntime(ClrRuntime.Net472)
-                .WithPlatform(Platform.X64);
-            var config = DefaultConfig.Instance
-                    .AddJob(jobCore50)
-                    .AddJob(jobCore31)
-                    .AddJob(jobNet472)
-                ;
+        var jobCore50 = Job.Default
+            .WithMaxIterationCount(20)
+            .WithRuntime(CoreRuntime.Core50)
+            .WithPlatform(Platform.X64);
+        var jobCore31 = Job.Default
+            .WithMaxIterationCount(20)
+            .WithRuntime(CoreRuntime.Core31)
+            .WithPlatform(Platform.X64);
+        var jobNet472 = Job.Default
+            .WithMaxIterationCount(20)
+            .WithRuntime(ClrRuntime.Net472)
+            .WithPlatform(Platform.X64);
+        var config = DefaultConfig.Instance
+                .AddJob(jobCore50)
+                .AddJob(jobCore31)
+                .AddJob(jobNet472)
+            ;
 
-            BenchmarkRunner.Run<ScreenboundsBenchmark>(config);
-            BenchmarkRunner.Run<ClipboardBenchmarks>(config);
-            BenchmarkRunner.Run<EnumerateWindowsBenchmark>(config);
-            BenchmarkRunner.Run<InteropWindowBenchmark>(config);
-            Console.ReadLine();
-        }
+        BenchmarkRunner.Run<ScreenboundsBenchmark>(config);
+        BenchmarkRunner.Run<ClipboardBenchmarks>(config);
+        BenchmarkRunner.Run<EnumerateWindowsBenchmark>(config);
+        BenchmarkRunner.Run<InteropWindowBenchmark>(config);
+        Console.ReadLine();
     }
 }

@@ -6,53 +6,52 @@ using Dapplo.Log;
 using Dapplo.Windows.User32.Enums;
 using Microsoft.Win32.SafeHandles;
 
-namespace Dapplo.Windows.User32.SafeHandles
-{
-    /// <summary>
-    ///     A SafeHandle class implementation for the current input desktop
-    /// </summary>
-    public class SafeCurrentInputDesktopHandle : SafeHandleZeroOrMinusOneIsInvalid
-    {
-        private static readonly LogSource Log = new LogSource();
+namespace Dapplo.Windows.User32.SafeHandles;
 
-        /// <summary>
-        ///     Default constructor, this opens the input destop with GENERIC_ALL
-        ///     This is needed to support marshalling!!
-        /// </summary>
-        public SafeCurrentInputDesktopHandle() : base(true)
+/// <summary>
+///     A SafeHandle class implementation for the current input desktop
+/// </summary>
+public class SafeCurrentInputDesktopHandle : SafeHandleZeroOrMinusOneIsInvalid
+{
+    private static readonly LogSource Log = new LogSource();
+
+    /// <summary>
+    ///     Default constructor, this opens the input destop with GENERIC_ALL
+    ///     This is needed to support marshalling!!
+    /// </summary>
+    public SafeCurrentInputDesktopHandle() : base(true)
+    {
+        var hDesktop = User32Api.OpenInputDesktop(0, true, DesktopAccessRight.GENERIC_ALL);
+        if (hDesktop != IntPtr.Zero)
         {
-            var hDesktop = User32Api.OpenInputDesktop(0, true, DesktopAccessRight.GENERIC_ALL);
-            if (hDesktop != IntPtr.Zero)
+            // Got desktop, store it as handle for the ReleaseHandle
+            SetHandle(hDesktop);
+            if (User32Api.SetThreadDesktop(hDesktop))
             {
-                // Got desktop, store it as handle for the ReleaseHandle
-                SetHandle(hDesktop);
-                if (User32Api.SetThreadDesktop(hDesktop))
-                {
-                    Log.Debug().WriteLine("Switched to desktop {0}", hDesktop);
-                }
-                else
-                {
-                    Log.Warn().WriteLine("Couldn't switch to desktop {0}", hDesktop);
-                    Log.Error().WriteLine(User32Api.CreateWin32Exception("SetThreadDesktop"));
-                }
+                Log.Debug().WriteLine("Switched to desktop {0}", hDesktop);
             }
             else
             {
-                Log.Warn().WriteLine("Couldn't get current desktop.");
-                Log.Error().WriteLine(User32Api.CreateWin32Exception("OpenInputDesktop"));
+                Log.Warn().WriteLine("Couldn't switch to desktop {0}", hDesktop);
+                Log.Error().WriteLine(User32Api.CreateWin32Exception("SetThreadDesktop"));
             }
         }
+        else
+        {
+            Log.Warn().WriteLine("Couldn't get current desktop.");
+            Log.Error().WriteLine(User32Api.CreateWin32Exception("OpenInputDesktop"));
+        }
+    }
 
-        /// <summary>
-        ///     Close the desktop
-        /// </summary>
-        /// <returns>true if this succeeded</returns>
+    /// <summary>
+    ///     Close the desktop
+    /// </summary>
+    /// <returns>true if this succeeded</returns>
 #if !NET5_0
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 #endif
-        protected override bool ReleaseHandle()
-        {
-            return User32Api.CloseDesktop(handle);
-        }
+    protected override bool ReleaseHandle()
+    {
+        return User32Api.CloseDesktop(handle);
     }
 }

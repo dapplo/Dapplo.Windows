@@ -9,25 +9,24 @@ using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Xunit.Abstractions;
 
-namespace Dapplo.Windows.Tests
-{
-    /// <summary>
-    ///     Test mouse hooking
-    /// </summary>
-    public class MouseHookTests
-    {
-        public MouseHookTests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+namespace Dapplo.Windows.Tests;
 
-        //[StaFact]
-        private async Task Test_LeftMouseDownAsync()
-        {
-            // This takes care of having a WinProc handler, to make sure the messages arrive
-            // ReSharper disable once UnusedVariable
-            var winProcHandler = WinProcHandler.Instance;
-            await MouseHook.MouseEvents.Where(args => args.WindowsMessage == WindowsMessages.WM_LBUTTONDOWN).FirstAsync();
-        }
+/// <summary>
+///     Test mouse hooking
+/// </summary>
+public class MouseHookTests
+{
+    public MouseHookTests(ITestOutputHelper testOutputHelper)
+    {
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
+
+    //[StaFact]
+    private async Task Test_LeftMouseDownAsync()
+    {
+        // This takes care of having a WinProc handler, to make sure the messages arrive
+        // ReSharper disable once UnusedVariable
+        var winProcHandler = WinProcHandler.Instance;
+        await MouseHook.MouseEvents.Where(args => args.WindowsMessage == WindowsMessages.WM_LBUTTONDOWN).FirstAsync();
     }
 }

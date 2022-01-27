@@ -6,24 +6,23 @@ using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Windows.Citrix;
 
-namespace Dapplo.Windows.Tests
-{
-    public class CitrixTests
-    {
-        public CitrixTests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+namespace Dapplo.Windows.Tests;
 
-        /// <summary>
-        ///     Assume that we are not running on Citrix
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public void TestCitrix_NotAvailable()
-        {
-            Assert.False(WinFrame.IsAvailabe, "We are running on Citrix????");
+public class CitrixTests
+{
+    public CitrixTests(ITestOutputHelper testOutputHelper)
+    {
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
+
+    /// <summary>
+    ///     Assume that we are not running on Citrix
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public void TestCitrix_NotAvailable()
+    {
+        Assert.False(WinFrame.IsAvailabe, "We are running on Citrix????");
             
-        }
-   }
+    }
 }

@@ -6,77 +6,76 @@ using BenchmarkDotNet.Attributes;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.User32;
 
-namespace Dapplo.Windows.Tests.Benchmarks
+namespace Dapplo.Windows.Tests.Benchmarks;
+
+[MinColumn, MaxColumn, MemoryDiagnoser]
+public class ScreenboundsBenchmark : IDisposable
 {
-    [MinColumn, MaxColumn, MemoryDiagnoser]
-    public class ScreenboundsBenchmark : IDisposable
+    [GlobalSetup]
+    public void Setup()
     {
-        [GlobalSetup]
-        public void Setup()
-        {
-            var screenbounds = GetAllScreenBounds();
-        }
+        var screenbounds = GetAllScreenBounds();
+    }
 
-        [Benchmark]
-        public void ScreenBoundsNative()
-        {
-            var screenbounds = GetScreenBounds();
-        }
+    [Benchmark]
+    public void ScreenBoundsNative()
+    {
+        var screenbounds = GetScreenBounds();
+    }
 
-        [Benchmark]
-        public void ScreenBoundsPInvoke()
-        {
-            var screenbounds = GetAllScreenBounds();
-        }
+    [Benchmark]
+    public void ScreenBoundsPInvoke()
+    {
+        var screenbounds = GetAllScreenBounds();
+    }
 
-        [Benchmark]
-        public void ScreenBoundsPInvokeCached()
-        {
-            var screenbounds = DisplayInfo.ScreenBounds;
-        }
+    [Benchmark]
+    public void ScreenBoundsPInvokeCached()
+    {
+        var screenbounds = DisplayInfo.ScreenBounds;
+    }
 
-        /// <summary>
-        ///     Get the bounds of the complete screen
-        /// </summary>
-        /// <returns></returns>
-        public NativeRect GetAllScreenBounds()
+    /// <summary>
+    ///     Get the bounds of the complete screen
+    /// </summary>
+    /// <returns></returns>
+    public NativeRect GetAllScreenBounds()
+    {
+        int left = 0, top = 0, bottom = 0, right = 0;
+        foreach (var display in DisplayInfo.AllDisplayInfos)
         {
-            int left = 0, top = 0, bottom = 0, right = 0;
-            foreach (var display in DisplayInfo.AllDisplayInfos)
-            {
-                var currentBounds = display.Bounds;
-                left = Math.Min(left, currentBounds.X);
-                top = Math.Min(top, currentBounds.Y);
-                var screenAbsRight = currentBounds.X + currentBounds.Width;
-                var screenAbsBottom = currentBounds.Y + currentBounds.Height;
-                right = Math.Max(right, screenAbsRight);
-                bottom = Math.Max(bottom, screenAbsBottom);
-            }
-            return new NativeRect(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
+            var currentBounds = display.Bounds;
+            left = Math.Min(left, currentBounds.X);
+            top = Math.Min(top, currentBounds.Y);
+            var screenAbsRight = currentBounds.X + currentBounds.Width;
+            var screenAbsBottom = currentBounds.Y + currentBounds.Height;
+            right = Math.Max(right, screenAbsRight);
+            bottom = Math.Max(bottom, screenAbsBottom);
         }
+        return new NativeRect(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
+    }
 
-        /// <summary>
-        ///     Get the bounds of all screens combined.
-        /// </summary>
-        /// <returns>A NativeRect of the bounds of the entire display area.</returns>
-        public NativeRect GetScreenBounds()
+    /// <summary>
+    ///     Get the bounds of all screens combined.
+    /// </summary>
+    /// <returns>A NativeRect of the bounds of the entire display area.</returns>
+    public NativeRect GetScreenBounds()
+    {
+        int left = 0, top = 0, bottom = 0, right = 0;
+        foreach (var screen in Screen.AllScreens)
         {
-            int left = 0, top = 0, bottom = 0, right = 0;
-            foreach (var screen in Screen.AllScreens)
-            {
-                left = Math.Min(left, screen.Bounds.X);
-                top = Math.Min(top, screen.Bounds.Y);
-                var screenAbsRight = screen.Bounds.X + screen.Bounds.Width;
-                var screenAbsBottom = screen.Bounds.Y + screen.Bounds.Height;
-                right = Math.Max(right, screenAbsRight);
-                bottom = Math.Max(bottom, screenAbsBottom);
-            }
-            return new NativeRect(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
+            left = Math.Min(left, screen.Bounds.X);
+            top = Math.Min(top, screen.Bounds.Y);
+            var screenAbsRight = screen.Bounds.X + screen.Bounds.Width;
+            var screenAbsBottom = screen.Bounds.Y + screen.Bounds.Height;
+            right = Math.Max(right, screenAbsRight);
+            bottom = Math.Max(bottom, screenAbsBottom);
         }
+        return new NativeRect(left, top, right + Math.Abs(left), bottom + Math.Abs(top));
+    }
 
-        [GlobalCleanup]
-        public void Dispose()
-        {
-        }
+    [GlobalCleanup]
+    public void Dispose()
+    {
     }
 }

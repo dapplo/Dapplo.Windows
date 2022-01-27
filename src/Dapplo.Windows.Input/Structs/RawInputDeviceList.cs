@@ -5,34 +5,33 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
 
-namespace Dapplo.Windows.Input.Structs
+namespace Dapplo.Windows.Input.Structs;
+
+/// <summary>
+/// Contains information about a raw input device.
+/// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms645568.aspx">RAWINPUTDEVICELIST structure</a>
+/// </summary>
+[StructLayout(LayoutKind.Sequential)]
+[SuppressMessage("ReSharper", "ConvertToAutoProperty")]
+[SuppressMessage("ReSharper", "ArrangeAccessorOwnerBody")]
+public struct RawInputDeviceList
 {
+    private readonly IntPtr _hDevice;
+    private readonly RawInputDeviceTypes _dwType;
+
     /// <summary>
-    /// Contains information about a raw input device.
-    /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms645568.aspx">RAWINPUTDEVICELIST structure</a>
+    /// A handle to the raw input device.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-	[SuppressMessage("ReSharper", "ConvertToAutoProperty")]
-	[SuppressMessage("ReSharper", "ArrangeAccessorOwnerBody")]
-    public struct RawInputDeviceList
+    public IntPtr Handle
     {
-        private readonly IntPtr _hDevice;
-        private readonly RawInputDeviceTypes _dwType;
+        get { return _hDevice; }
+    }
 
-        /// <summary>
-        /// A handle to the raw input device.
-        /// </summary>
-        public IntPtr Handle
-        {
-            get { return _hDevice; }
-        }
-
-        /// <summary>
-        /// The type of device
-        /// </summary>
-        public RawInputDeviceTypes RawInputDeviceType
-        {
-            get { return _dwType; }
-        }
-   }
+    /// <summary>
+    /// The type of device
+    /// </summary>
+    public RawInputDeviceTypes RawInputDeviceType
+    {
+        get { return _dwType; }
+    }
 }
