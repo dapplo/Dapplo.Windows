@@ -64,6 +64,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="TestFile\8521206921.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Update="Microsoft.Windows.Compatibility" Version="6.0.0" />
   </ItemGroup>
 </Project>

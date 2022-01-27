@@ -12,7 +12,7 @@ namespace Dapplo.Windows.ImageSharpInterop
     /// <summary>
     /// This helps to cleanly wrap a WriteableBitmap with an Image
     /// </summary>
-    public class WriteableBitmapWrapper : IDisposable
+    public class WriteableBitmapWrapper : IImageWrapper, IDisposable
     {
         private Image _imageWrapper;
         private bool _isLocked;

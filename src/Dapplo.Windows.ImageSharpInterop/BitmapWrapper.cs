@@ -6,13 +6,14 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using SixLabors.ImageSharp.PixelFormats;
 using Image = SixLabors.ImageSharp.Image;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace Dapplo.Windows.ImageSharpInterop
 {
     /// <summary>
     /// This helps to cleanly wrap a bitmap with an Image
     /// </summary>
-    public class BitmapWrapper : IDisposable
+    public class BitmapWrapper : IImageWrapper, IDisposable
     {
         private BitmapData _bitmapData;
         private Image _imageWrapper;
@@ -34,7 +35,7 @@ namespace Dapplo.Windows.ImageSharpInterop
         /// <summary>
         /// Return the Image wrapper for the Bitmap
         /// </summary>
-        /// <exception cref="NotSupportedException">when a non supported pixelformat is used</exception>
+        /// <exception cref="NotSupportedException">when a non supported pixel format is used</exception>
         public Image ImageWrapper {
             get
             {
@@ -89,6 +90,26 @@ namespace Dapplo.Windows.ImageSharpInterop
         {
             WrappedBitmap.UnlockBits(_bitmapData);
             _imageWrapper = null;
+        }
+
+        /// <summary>
+        /// Allow conversion to Image
+        /// </summary>
+        /// <param name="bitmapWrapper">BitmapWrapper</param>
+        /// <returns>Image</returns>
+        public static implicit operator Image(BitmapWrapper bitmapWrapper)
+        {
+            return bitmapWrapper.ImageWrapper;
+        }
+
+        /// <summary>
+        /// Allow conversion to Bitmap
+        /// </summary>
+        /// <param name="bitmapWrapper">BitmapWrapper</param>
+        /// <returns>Bitmap</returns>
+        public static implicit operator Bitmap(BitmapWrapper bitmapWrapper)
+        {
+            return bitmapWrapper.WrappedBitmap;
         }
     }
 }

@@ -61,17 +61,27 @@ public class ImageSharpInteropTests
     }
 
     /// <summary>
-    ///     Test Bitmap with Format32bppArgb using a ImageSharp Mutate
+    ///     Test Bitmap save to PNG with GDI and ImageSharp
     /// </summary>
     [WpfFact]
     private void Test_Bitmap_Format32bppArgb_ImageSharpInterop_Save()
     {
-        using FileStream fis = File.OpenRead(@"C:\Users\robin\Downloads\8521206921.jpg");
+        var gdiFilename = "blub-gdi.png";
+        var isFilename = "blub-is.png";
+        if (File.Exists(gdiFilename))
+        {
+            File.Delete(gdiFilename);
+        }
+        if (File.Exists(isFilename))
+        {
+            File.Delete(isFilename);
+        }
+        using FileStream fis = File.OpenRead(@"TestFile\8521206921.jpg");
         var bitmap = (Bitmap)System.Drawing.Image.FromStream(fis);
 
         using var bitmapWrapper = bitmap.Wrap();
-        bitmap.Save("blub-gdi.png", ImageFormat.Png);
-        using FileStream fs = File.OpenWrite("blub-is.png");
+        bitmap.Save(gdiFilename, ImageFormat.Png);
+        using FileStream fs = File.OpenWrite(isFilename);
         bitmapWrapper.ImageWrapper.SaveAsPng(fs);
     }
 }
