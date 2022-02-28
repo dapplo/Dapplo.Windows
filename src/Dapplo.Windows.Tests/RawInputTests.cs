@@ -30,13 +30,13 @@ namespace Dapplo.Windows.Tests
             bool foundOneDevice = false;
             foreach (var rawInputDeviceInfo in RawInputApi.GetAllDevices().OrderBy(information => information.DeviceInfo.Type).ThenBy(information => information.DisplayName))
             {
-                Log.Info().WriteLine("RawInput Device {0} with name {1}", rawInputDeviceInfo.DeviceInfo.Type, rawInputDeviceInfo.DisplayName);
+                Log.Info().WriteLine("RawInput Device {0} with handle {1} and name {2} on {3}", rawInputDeviceInfo.DeviceInfo.Type, rawInputDeviceInfo.DeviceHandle, rawInputDeviceInfo.DisplayName, rawInputDeviceInfo.DeviceName);
                 switch (rawInputDeviceInfo.DeviceInfo.Type)
                 {
                     case RawInputDeviceTypes.Keyboard:
                         var keyboardInfo = rawInputDeviceInfo.DeviceInfo.Keyboard;
                         Log.Info().WriteLine("Keyboard is of type {0} and subtype {1} and in mode {2}.", keyboardInfo.Type, keyboardInfo.SubType, keyboardInfo.KeyboardMode);
-                        Log.Info().WriteLine("Keyboard with {0} key, of which {1} function keys and it has {2} LEDs.", keyboardInfo.NumberOfKeysTotal, keyboardInfo.NumberOfFunctionKeys, keyboardInfo.NumberOfIndicators);
+                        Log.Info().WriteLine("Keyboard with {0} keys, of which {1} function keys and it has {2} LEDs.", keyboardInfo.NumberOfKeysTotal, keyboardInfo.NumberOfFunctionKeys, keyboardInfo.NumberOfIndicators);
                         break;
                 }
 
@@ -50,6 +50,7 @@ namespace Dapplo.Windows.Tests
         {
             var device = await RawInputMonitor.MonitorRawInputDeviceChanges(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
             Assert.False(device.Added);
+            Log.Debug().WriteLine($"Display name: {device.DeviceInformation.DisplayName} Device name: {device.DeviceInformation.DeviceName}");
             Assert.Equal(RawInputDeviceTypes.Keyboard, device.DeviceInformation.DeviceInfo.Type);
         }
 
@@ -59,19 +60,23 @@ namespace Dapplo.Windows.Tests
             var rawInputObservable = RawInputMonitor.MonitorRawInput(RawInputDevices.Keyboard);
 
             using (rawInputObservable.Subscribe(ri =>
+                   {
+                       switch (ri.RawInput.Device.Keyboard.Flags)
+                       {
+                           case RawKeyboardFlags.Make:
+                               Log.Debug().WriteLine("Key down {0} from handle {1}", ri.RawInput.Device.Keyboard.VirtualKey, ri.RawInput.Header.DeviceHandle);
+                               break;
+                           case RawKeyboardFlags.Break:
+                               Log.Debug().WriteLine("Key up {0} from handle {1}", ri.RawInput.Device.Keyboard.VirtualKey, ri.RawInput.Header.DeviceHandle);
+                               break;
+                       }
+                   }))
             {
-                if (ri.RawInput.Device.Keyboard.Flags == RawKeyboardFlags.Break)
-                {
-                    Log.Debug().WriteLine("Key down {0}", ri.RawInput.Device.Keyboard.VirtualKey);
-                }
-                if (ri.RawInput.Device.Keyboard.Flags == RawKeyboardFlags.Break)
-                {
-                    Log.Debug().WriteLine("Key up {0}", ri.RawInput.Device.Keyboard.VirtualKey);
-                }
-            }))
-            {
-                var device = await rawInputObservable.FirstAsync(args => args.RawInput.Device.Keyboard.VirtualKey == VirtualKeyCode.Left);
-                Assert.Equal(RawInputDeviceTypes.Keyboard, device.RawInput.Header.Type);
+                var rawInputEvent = await rawInputObservable.FirstAsync(args => args.RawInput.Device.Keyboard.VirtualKey == VirtualKeyCode.Left);
+                Log.Debug().WriteLine("From handle {0}", rawInputEvent.RawInput.Header.DeviceHandle);
+                var device = RawInputMonitor.Devices[rawInputEvent.RawInput.Header.DeviceHandle];
+
+                Assert.Equal(RawInputDeviceTypes.Keyboard, device.DeviceInfo.Type);
             }
 
         }

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Diagnostics;
 using System.Reactive.Linq;
@@ -37,6 +38,6 @@ namespace Dapplo.Windows.Example.WpfExample
             DeviceNotification.OnDeviceRemoved()
                 .Where(deviceInterfaceChangeInfo => deviceInterfaceChangeInfo.Device.Name.Contains("Yubi"))
                 .Subscribe(deviceInterfaceChangeInfo => User32Api.LockWorkStation());
+            }
         }
     }
-}

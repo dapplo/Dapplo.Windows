@@ -109,6 +109,7 @@ namespace Dapplo.Windows.User32
                 Index = index,
                 ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left),
                 ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
+                DeviceName = monitorInfoEx.DeviceName,
                 Bounds = monitorInfoEx.Monitor,
                 WorkingArea = monitorInfoEx.WorkArea,
                 IsPrimary = (monitorInfoEx.Flags & MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary
@@ -296,16 +297,16 @@ namespace Dapplo.Windows.User32
         /// </summary>
         /// <param name="hWnd">IntPtr</param>
         /// <param name="index">WindowLongIndex</param>
-        /// <param name="styleFlags"></param>
+        /// <param name="styleFlags">IntPtr</param>
         public static void SetWindowLongWrapper(IntPtr hWnd, WindowLongIndex index, IntPtr styleFlags)
         {
             if (IntPtr.Size == 8)
             {
-                SetWindowLongPtr(hWnd, index, styleFlags);
+                _ = SetWindowLongPtr(hWnd, index, styleFlags);
             }
             else
             {
-                SetWindowLong(hWnd, index, styleFlags.ToInt32());
+                _ = SetWindowLong(hWnd, index, styleFlags.ToInt32());
             }
         }
 

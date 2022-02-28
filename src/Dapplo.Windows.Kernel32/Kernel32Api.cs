@@ -13,6 +13,10 @@ namespace Dapplo.Windows.Kernel32
     /// </summary>
     public static class Kernel32Api
     {
+        /// <summary>
+        /// The DLL Name for the Kernel32 library
+        /// </summary>
+        public const string Kernel32 = "kernel32";
         private static DateTimeOffset? _systemStartup;
         private static readonly char[] DirectorySeparator = { '\\'};
 
@@ -147,7 +151,7 @@ namespace Dapplo.Windows.Kernel32
         /// It is not possible to revert to the standard DLL search path or remove any directory specified with SetDefaultDllDirectories from the search path. However, the process DLL search path can be overridden by calling LoadLibraryEx with one or more LOAD_LIBRARY_SEARCH flags, and directories added with AddDllDirectory can be removed by calling RemoveDllDirectory.
         /// Windows 7, Windows Server 2008 R2, Windows Vista and Windows Server 2008:  To call this function in an application, use the GetProcAddress function to retrieve its address from Kernel32.dll. KB2533623 must be installed on the target platform.
         /// </remarks>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetDefaultDllDirectories(DefaultDllDirectories directoryFlags);
 
@@ -159,7 +163,7 @@ namespace Dapplo.Windows.Kernel32
         /// If the function succeeds, the return value is nonzero.
         /// If the function fails, the return value is zero. To get extended error information, call GetLastError.
         /// </returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetDllDirectory(string lpPathName);
 
@@ -167,7 +171,7 @@ namespace Dapplo.Windows.Kernel32
         /// Allocates a new console for the calling process.
         /// </summary>
         /// <returns></returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool AllocConsole();
 
@@ -175,14 +179,14 @@ namespace Dapplo.Windows.Kernel32
         /// Retrieves the process identifier of the calling process.
         /// </summary>
         /// <returns>int</returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         public static extern int GetCurrentProcessId();
 
         /// <summary>
         /// Retrieves the thread identifier of the calling thread.
         /// </summary>
         /// <returns>int</returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         public static extern int GetCurrentThreadId();
 
         /// <summary>
@@ -191,7 +195,7 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <param name="dwProcessId">The identifier of the process whose console is to be used. Or -1 to use the console of the parent of the current process.</param>
         /// <returns>bool if it worked</returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool AttachConsole(uint dwProcessId = AttachParentProcess);
 
@@ -221,7 +225,7 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <param name="hObject">A valid handle to an open object.</param>
         /// <returns>true if it worked, use GetLastError if not</returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseHandle(IntPtr hObject);
 
@@ -233,7 +237,7 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <param name="module">IntPtr</param>
         /// <returns>true if it worked, false if an error occured</returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool FreeLibrary(IntPtr module);
 
@@ -246,7 +250,7 @@ namespace Dapplo.Windows.Kernel32
         /// If this parameter is NULL, GetModuleHandle returns a handle to the file used to create the calling process (.exe file).
         /// The GetModuleHandle function does not retrieve handles for modules that were loaded using the LOAD_LIBRARY_AS_DATAFILE flag. For more information, see LoadLibraryEx.</param>
         /// <returns>If the function succeeds, the return value is a handle to the specified module.</returns>
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr GetModuleHandle(string lpModuleName);
 
         /// <summary>
@@ -263,7 +267,7 @@ namespace Dapplo.Windows.Kernel32
         /// <param name="spMinorVersion">The minor version number of the operating system service pack. The minimum value is 0.</param>
         /// <param name="edition">WindowsProducts</param>
         /// <returns></returns>
-        [DllImport("Kernel32")]
+        [DllImport(Kernel32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetProductInfo(int osMajorVersion, int osMinorVersion, int spMajorVersion, int spMinorVersion, out WindowsProducts edition);
 
@@ -273,7 +277,7 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <param name="osVersionInfo">OsVersionInfoEx</param>
         /// <returns>If the function fails, the return value is false. To get extended error information, call GetLastError.</returns>
-        [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(Kernel32, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetVersionEx(ref OsVersionInfoEx osVersionInfo);
 
@@ -284,7 +288,7 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <param name="lpFileName">string with the library</param>
         /// <returns>IntPtr for the module, IntPtr.Zero if this failed, use last error to see what went wrong</returns>
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "LoadLibraryW")]
+        [DllImport(Kernel32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "LoadLibraryW")]
         public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)] string lpFileName);
 
         /// <summary>
@@ -296,7 +300,7 @@ namespace Dapplo.Windows.Kernel32
         /// <param name="dwProcessId">The identifier of the local process to be opened.
         /// If the specified process is the System Process (0x00000000), the function fails and the last error code is ERROR_INVALID_PARAMETER. If the specified process is the Idle process or one of the CSRSS processes, this function fails and the last error code is ERROR_ACCESS_DENIED because their access restrictions prevent user-level code from opening them.</param>
         /// <returns>If the function succeeds, the return value is an open handle to the specified process.</returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         public static extern IntPtr OpenProcess(ProcessAccessRights dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
 
         /// <summary>
@@ -309,7 +313,7 @@ namespace Dapplo.Windows.Kernel32
         /// If lpDeviceName is NULL, the function retrieves a list of all existing MS-DOS device names. Each null-terminated string stored into the buffer is the name of an existing MS-DOS device, for example, \Device\HarddiskVolume1 or \Device\Floppy0.</param>
         /// <param name="uuchMax">The maximum number of TCHARs that can be stored into the buffer pointed to by lpTargetPath.</param>
         /// <returns>If the function succeeds, the return value is the number of TCHARs stored into the buffer pointed to by lpTargetPath.</returns>
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern unsafe int QueryDosDevice(string lpDeviceName, [Out] char* lpTargetPath, int uuchMax);
 
         /// <summary>
@@ -327,7 +331,7 @@ namespace Dapplo.Windows.Kernel32
         /// If the function succeeds, the return value is nonzero.
         /// If the function fails, the return value is zero. To get extended error information, call GetLastError.
         /// </returns>
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern unsafe bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, char * lpExeName, ref int lpdwSize);
 
@@ -341,7 +345,7 @@ namespace Dapplo.Windows.Kernel32
         /// If the function succeeds, the return value is a handle to the newly allocated memory object.
         /// If the function fails, the return value is NULL. To get extended error information, call GetLastError.
         /// </returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         public static extern IntPtr GlobalAlloc(GlobalMemorySettings globalMemorySettings, UIntPtr bytes);
 
         /// <summary>
@@ -349,7 +353,7 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory blockk</param>
         /// <returns>IntPtr to the first byte of the global memory block</returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         public static extern IntPtr GlobalLock(IntPtr hMem);
 
         /// <summary>
@@ -359,7 +363,7 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory block</param>
         /// <returns>bool if the unlock worked.</returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GlobalUnlock(IntPtr hMem);
 
@@ -368,14 +372,14 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory blockk</param>
         /// <returns>int with the size</returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         public static extern int GlobalSize(IntPtr hMem);
 
         /// <summary>
         /// Retrieves the number of milliseconds that have elapsed since the system was started.
         /// </summary>
         /// <returns>ulong with the ticks</returns>
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32, SetLastError = true)]
         public static extern ulong GetTickCount64();
 
         /// <summary>
@@ -383,7 +387,7 @@ namespace Dapplo.Windows.Kernel32
         /// </summary>
         /// <param name="hMem">IntPtr</param>
         /// <returns>IntPtr</returns>
-        [DllImport("kernel32.dll")]
+        [DllImport(Kernel32)]
         public static extern IntPtr LocalFree(IntPtr hMem);
 
         /// <summary>

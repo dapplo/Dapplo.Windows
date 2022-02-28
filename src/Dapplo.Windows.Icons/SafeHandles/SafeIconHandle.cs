@@ -43,7 +43,7 @@ namespace Dapplo.Windows.Icons.SafeHandles
         ///     Call destroy icon
         /// </summary>
         /// <returns>true if this worked</returns>
-#if !NET5_0
+#if !NET5_0 && !NET6_0
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 #endif
         protected override bool ReleaseHandle()

@@ -47,7 +47,7 @@ namespace Dapplo.Windows.User32.SafeHandles
         ///     Close the desktop
         /// </summary>
         /// <returns>true if this succeeded</returns>
-#if !NET5_0
+#if !NET5_0 && !NET6_0
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 #endif
         protected override bool ReleaseHandle()

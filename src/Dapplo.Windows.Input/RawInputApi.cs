@@ -122,7 +122,7 @@ namespace Dapplo.Windows.Input
         {
             var result = new RawInputDeviceInformation
             {
-                Handle = handle
+                DeviceHandle = handle
             };
             uint pcbSize = 0;
             uint returnValue = GetRawInputDeviceInfo(handle, RawInputDeviceInfoCommands.DeviceName, IntPtr.Zero, ref pcbSize);
@@ -143,7 +143,7 @@ namespace Dapplo.Windows.Input
                     }
                     result.DeviceName = Marshal.PtrToStringUni(deviceNamePtr);
 
-                    // Use the devicename to find information in the registry
+                    // Use the device name to find information in the registry
                     if (!string.IsNullOrEmpty(result.DeviceName) && result.DeviceName.Length > 4)
                     {
                         string[] split = result.DeviceName.Substring(4).Split('#');

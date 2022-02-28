@@ -13,7 +13,10 @@ using Dapplo.Windows.Desktop;
 using Dapplo.Windows.User32;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+using Dapplo.Windows.Icons.Enums;
 using Dapplo.Windows.Icons.SafeHandles;
+using Dapplo.Windows.Icons.Structs;
 using Dapplo.Windows.Kernel32;
 
 namespace Dapplo.Windows.Icons
@@ -183,13 +186,125 @@ namespace Dapplo.Windows.Icons
             }
         }
 
+#if NET5_0 || NET6_0
+
         /// <summary>
-        ///     Based on <a href="http://www.codeproject.com/KB/cs/IconExtractor.aspx">Extract icons from EXE or DLL files</a>
-        ///     And a hint from <a href="http://www.codeproject.com/KB/cs/IconLib.aspx">IconLib - Icons Unfolded (MultiIcon and Windows Vista supported)</a>
+        /// This writes an icon to the stream
         /// </summary>
-        /// <param name="iconStream">Stream with the icon information</param>
-        /// <returns>Bitmap with the Vista Icon (256x256)</returns>
-        public static Bitmap ExtractVistaIcon(this Stream iconStream)
+        /// <param name="stream">Stream</param>
+        /// <param name="icons">IReadOnlyCollection{Bitmap}</param>
+        public static void WriteIcon(this Stream stream, IReadOnlyCollection<Bitmap> icons)
+        {
+            int iconDirSizeOf = Marshal.SizeOf(typeof(IconDir));
+            Span<byte> iconDirByteSpan = stackalloc byte[iconDirSizeOf];
+            var iconDirSpan = MemoryMarshal.Cast<byte, IconDir> (iconDirByteSpan);
+            iconDirSpan[0].ImageCount = (short)icons.Count;
+            iconDirSpan[0].IconDirType = IconDirTypes.Icon;
+
+            // Write IconDir
+            stream.Write(iconDirByteSpan);
+
+            var iconDirEntries = new IconDirEntry[icons.Count];
+            Span<IconDirEntry> iconDirEntriesSpan = iconDirEntries;
+            var iconDirEntriesByteSpan = MemoryMarshal.Cast<IconDirEntry, byte>(iconDirEntriesSpan);
+
+            int headerOffset = iconDirByteSpan.Length + iconDirEntriesByteSpan.Length;
+
+            var pngBuffer = new MemoryStream();
+            int index = 0;
+            foreach (var bitmap in icons)
+            {
+                var offset = headerOffset + (int)pngBuffer.Position;
+                bitmap.Save(pngBuffer, ImageFormat.Png);
+                var iconDirEntry = new IconDirEntry
+                {
+                    ImageBytes = (int)pngBuffer.Position - offset,
+                    ImageOffset = offset,
+                    IconBitCount = 0,
+                    ImageColorCount = 0,
+                    Width = bitmap.Width,
+                    Height = bitmap.Height
+                };
+                iconDirEntries[index] = iconDirEntry;
+                index++;
+            }
+
+            // Write the created IconDirEntry-s 
+            stream.Write(iconDirEntriesByteSpan);
+
+            // Write the images
+            pngBuffer.Seek(0, SeekOrigin.Begin);
+            pngBuffer.CopyTo(stream);
+        }
+
+        /// <summary>
+        /// Read icon or cursor IconDirEntry from a .ico or .cur file stream
+        /// </summary>
+        /// <param name="stream">Stream</param>
+        /// <returns>IEnumerable[IconDirEntry]</returns>
+        public static IReadOnlyCollection<IconDirEntry> ReadIconDirEntries(this Stream stream)
+        {
+            // First read the "header" (IconDir), giving us the number of images.
+            int iconDirSizeOf = Marshal.SizeOf(typeof(IconDir));
+            Span<byte> iconDirSpan = stackalloc byte[iconDirSizeOf];
+
+            if (stream.Read(iconDirSpan) != iconDirSizeOf)
+            {
+                return Array.Empty<IconDirEntry>();
+            }
+
+            var iconDirRef = MemoryMarshal.AsRef<IconDir>(iconDirSpan);
+            if (iconDirRef.ImageCount == 0 || iconDirRef.IconDirType == IconDirTypes.Invalid)
+            {
+                return Array.Empty<IconDirEntry>();
+            }
+
+            // Allow place for the IconDirEntry and read into that
+            var iconDirEntries = new IconDirEntry[iconDirRef.ImageCount];
+            Span<IconDirEntry> iconDirEntrySpan = iconDirEntries;
+            var iconDirEntryByteSpan = MemoryMarshal.Cast<IconDirEntry, byte>(iconDirEntrySpan);
+            if (stream.Read(iconDirEntryByteSpan) != iconDirEntryByteSpan.Length)
+            {
+                return Array.Empty<IconDirEntry>();
+            }
+
+            return iconDirEntries
+                .OrderByDescending(ide => ide.ImageColorCount == 0 ? int.MaxValue : ide.ImageColorCount)
+                .ThenByDescending(ide => ide.Width * ide.Height).ToArray();
+        }
+
+        /// <summary>
+        /// Read the Bitmap specified by the iconDirEntry from the .ico or .cur file stream
+        /// </summary>
+        /// <param name="stream">Stream</param>
+        /// <param name="iconDirEntry">IconDirEntry</param>
+        /// <returns>Bitmap</returns>
+        public static Bitmap ReadIconOrCursorImage(this Stream stream, IconDirEntry iconDirEntry)
+        {
+            if (stream.Position != iconDirEntry.ImageOffset)
+            {
+                if (!stream.CanSeek)
+                {
+                    throw new NotSupportedException("Can't seek stream");
+                }
+                stream.Seek(iconDirEntry.ImageOffset, SeekOrigin.Begin);
+            }
+
+            var buffer = new MemoryStream(iconDirEntry.ImageBytes);
+            buffer.Seek(0, SeekOrigin.Begin);
+            stream.CopyTo(buffer, iconDirEntry.ImageBytes);
+            var result = (Bitmap)Image.FromStream(buffer);
+            return result;
+        }
+
+#endif
+            /// <summary>
+            ///     Based on <a href="http://www.codeproject.com/KB/cs/IconExtractor.aspx">Extract icons from EXE or DLL files</a>
+            ///     And a hint from <a href="http://www.codeproject.com/KB/cs/IconLib.aspx">IconLib - Icons Unfolded (MultiIcon and Windows Vista supported)</a>
+            /// </summary>
+            /// <param name="iconStream">Stream with the icon information</param>
+            /// <returns>Bitmap with the Vista Icon (256x256)</returns>
+            public static Bitmap ExtractVistaIcon(this Stream iconStream)
         {
             const int sizeIconDir = 6;
             const int sizeIconDirEntry = 16;
@@ -197,12 +312,14 @@ namespace Dapplo.Windows.Icons
             try
             {
                 var srcBuf = new byte[iconStream.Length];
-                iconStream.Read(srcBuf, 0, (int)iconStream.Length);
+                _ = iconStream.Read(srcBuf, 0, (int)iconStream.Length);
                 int iCount = BitConverter.ToInt16(srcBuf, 4);
                 for (var iIndex = 0; iIndex < iCount; iIndex++)
                 {
                     int iWidth = srcBuf[sizeIconDir + sizeIconDirEntry * iIndex];
                     int iHeight = srcBuf[sizeIconDir + sizeIconDirEntry * iIndex + 1];
+
+                    // If both the width and height are 0, this means it's a 256x256 icon -> vista
                     if (iWidth != 0 || iHeight != 0)
                     {
                         continue;

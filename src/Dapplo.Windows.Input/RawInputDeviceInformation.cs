@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using Dapplo.Windows.Input.Structs;
 
@@ -13,7 +14,7 @@ namespace Dapplo.Windows.Input
         /// <summary>
         /// The handle to the raw input device
         /// </summary>
-        public IntPtr Handle { get; internal set; }
+        public IntPtr DeviceHandle { get; internal set; }
 
         /// <summary>
         /// The cryptic device name

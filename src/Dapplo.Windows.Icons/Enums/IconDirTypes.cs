@@ -4,19 +4,21 @@
 namespace Dapplo.Windows.Icons.Enums
 {
     /// <summary>
-    ///     Options to specify whether folders should be in the open or closed state.
+    /// 
     /// </summary>
-    public enum FolderType
+    public enum IconDirTypes : short
     {
         /// <summary>
-        ///     Specify open folder.
+        /// Default value, which should not be used
         /// </summary>
-        Open = 0,
-
+        Invalid = 0,
         /// <summary>
-        ///     Specify closed folder.
+        /// This is for a .ico file
         /// </summary>
-        Closed = 1
+        Icon  = 1,
+        /// <summary>
+        /// This is for a .cur file
+        /// </summary>
+        Cursor = 2
     }
-
 }
