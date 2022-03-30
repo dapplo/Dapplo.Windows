@@ -290,6 +290,7 @@ namespace Dapplo.Windows.Icons
                 stream.Seek(iconDirEntry.ImageOffset, SeekOrigin.Begin);
             }
 
+            // TODO: Handle non PNG here, as BMP files are without the file header.
             var buffer = new MemoryStream(iconDirEntry.ImageBytes);
             buffer.Seek(0, SeekOrigin.Begin);
             stream.CopyTo(buffer, iconDirEntry.ImageBytes);
