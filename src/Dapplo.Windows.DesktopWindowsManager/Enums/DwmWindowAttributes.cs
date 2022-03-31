@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 namespace Dapplo.Windows.DesktopWindowsManager.Enums
 {
     /// <summary>
@@ -123,6 +124,60 @@ namespace Dapplo.Windows.DesktopWindowsManager.Enums
         ///     Windows 7 and earlier:  This value is not supported.
         /// </summary>
         FreezeRepresentation,
+
+        /// <summary>
+        /// Undocumented :(
+        /// </summary>
+        PassiveUpdateMode,
+
+        /// <summary>
+        /// Use with DwmSetWindowAttribute. Enables a non-UWP window to use host backdrop brushes.
+        /// If this flag is set, then a Win32 app that calls Windows::UI::Composition APIs can build transparency effects using the host backdrop brush (see Compositor.CreateHostBackdropBrush).
+        /// The pvAttribute parameter points to a value of type BOOL. TRUE to enable host backdrop brushes for the window, or FALSE to disable it.
+        /// This value is supported starting with Windows 11 Build 22000.
+        /// </summary>
+        UseHostBackdropBrush,
+
+        /// <summary>
+        /// Use with DwmSetWindowAttribute. Allows the window frame for this window to be drawn in dark mode colors when the dark mode system setting is enabled.
+        /// For compatibility reasons, all windows default to light mode regardless of the system setting.
+        /// The pvAttribute parameter points to a value of type BOOL.
+        /// TRUE to honor dark mode for the window, FALSE to always use light mode.
+        ///  This value is supported starting with Windows 11 Build 22000.
+        /// </summary>
+        UseImmersiveDarkMode = 20,
+
+        /// <summary>
+        /// Use with DwmSetWindowAttribute. Specifies the rounded corner preference for a window. The pvAttribute parameter points to a value of type DWM_WINDOW_CORNER_PREFERENCE.
+        /// This value is supported starting with Windows 11 Build 22000.
+        /// </summary>
+        WindowCornerPreference = 33,
+
+        /// <summary>
+        /// Use with DwmSetWindowAttribute. Specifies the color of the window border. The pvAttribute parameter points to a value of type COLORREF.
+        /// The app is responsible for changing the border color according to state changes, such as a change in window activation.
+        /// This value is supported starting with Windows 11 Build 22000.
+        /// </summary>
+        BorderColor,
+
+        /// <summary>
+        /// Use with DwmSetWindowAttribute. Specifies the color of the caption. The pvAttribute parameter points to a value of type COLORREF.
+        /// This value is supported starting with Windows 11 Build 22000.
+        /// </summary>
+        CaptionColor,
+
+        /// <summary>
+        /// Use with DwmSetWindowAttribute. Specifies the color of the caption text. The pvAttribute parameter points to a value of type COLORREF.
+        /// This value is supported starting with Windows 11 Build 22000.
+        /// </summary>
+        TextColor,
+
+        /// <summary>
+        /// Use with DwmGetWindowAttribute. Retrieves the width of the outer border that the DWM would draw around this window.
+        /// The value can vary depending on the DPI of the window. The pvAttribute parameter points to a value of type UINT.
+        /// This value is supported starting with Windows 11 Build 22000.
+        /// </summary>
+        VisibleFrameBorderThickness,
 
         /// <summary>
         ///     The maximum recognized DWMWINDOWATTRIBUTE value, used for validation purposes.
