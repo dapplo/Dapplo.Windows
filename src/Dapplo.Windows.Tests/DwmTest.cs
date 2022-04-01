@@ -22,7 +22,7 @@ namespace Dapplo.Windows.Tests
         //[Fact]
         private void TestDwmEnabled()
         {
-            Assert.True(Dwm.IsDwmEnabled);
+            Assert.True(DwmApi.IsDwmEnabled);
         }
     }
 }

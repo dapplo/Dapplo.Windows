@@ -208,10 +208,10 @@ namespace Dapplo.Windows.Desktop
             if (autoCorrect)
             {
                 // Correct the bounds, for Windows 8+
-                if (Dwm.IsDwmEnabled)
+                if (DwmApi.IsDwmEnabled)
                 {
                     // This only works for top level windows, otherwise a access denied is returned
-                    bool gotFrameBounds = Dwm.GetExtendedFrameBounds(interopWindow.Handle, out var extendedFrameBounds);
+                    bool gotFrameBounds = DwmApi.GetExtendedFrameBounds(interopWindow.Handle, out var extendedFrameBounds);
                     if (gotFrameBounds && (interopWindow.IsApp() || WindowsVersion.IsWindows10OrLater && !interopWindow.IsMaximized()))
                     {
                         windowInfo.Bounds = extendedFrameBounds;
@@ -482,7 +482,7 @@ namespace Dapplo.Windows.Desktop
         {
             if (!interopWindow.IsVisible.HasValue || forceUpdate)
             {
-                interopWindow.IsVisible = User32Api.IsWindowVisible(interopWindow.Handle) && !Dwm.IsWindowCloaked(interopWindow.Handle);
+                interopWindow.IsVisible = User32Api.IsWindowVisible(interopWindow.Handle) && !DwmApi.IsWindowCloaked(interopWindow.Handle);
             }
             return interopWindow.IsVisible.Value;
         }

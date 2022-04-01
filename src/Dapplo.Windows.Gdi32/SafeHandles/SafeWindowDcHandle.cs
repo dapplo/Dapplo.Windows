@@ -76,7 +76,7 @@ namespace Dapplo.Windows.Gdi32.SafeHandles
         ///     ReleaseDC for the original Window
         /// </summary>
         /// <returns>true if this worked</returns>
-#if !NET5_0
+#if !NET6_0
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 #endif
         protected override bool ReleaseHandle()

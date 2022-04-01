@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Common;
 #if !NETSTANDARD2_0
@@ -17,9 +18,9 @@ using Microsoft.Win32;
 namespace Dapplo.Windows.DesktopWindowsManager
 {
     /// <summary>
-    ///     Dwm Utils class
+    ///     DwmApi Utils class
     /// </summary>
-    public static class Dwm
+    public static class DwmApi
     {
         private const uint DwmEcDisableComposition = 0;
         private const uint DwmEcEnableComposition = 1;
@@ -153,6 +154,20 @@ namespace Dapplo.Windows.DesktopWindowsManager
         public static extern HResult DwmGetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttribute, out bool pvAttribute, int size);
 
         /// <summary>
+        ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969515(v=vs.85).aspx">DwmGetWindowAttribute function</a>
+        ///     Retrieves the current value of a specified attribute applied to a window.
+        /// </summary>
+        /// <param name="hWnd">The handle to the window from which the attribute data is retrieved.</param>
+        /// <param name="dwAttribute">The attribute to retrieve, specified as a DwmWindowAttributes value.</param>
+        /// <param name="pvAttribute">A pointer to a value that, when this function returns successfully, receives the current value of
+        ///     the attribute. The type of the retrieved value depends on the value of the dwAttribute parameter.
+        /// </param>
+        /// <param name="size"></param>
+        /// <returns>HResult</returns>
+        [DllImport(DwmApiDll, SetLastError = true)]
+        public static extern HResult DwmGetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttribute, out uint pvAttribute, int size);
+
+        /// <summary>
         ///     See
         ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa969518(v=vs.85).aspx">
         ///         DwmIsCompositionEnabled
@@ -254,7 +269,7 @@ namespace Dapplo.Windows.DesktopWindowsManager
         /// <param name="cbAttribute">The size, in bytes, of the value type pointed to by the pvAttribute parameter.</param>
         /// <returns></returns>
         [DllImport(DwmApiDll, SetLastError = true)]
-        public static extern HResult DwmSetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttributeToSet, IntPtr pvAttributeValue, uint cbAttribute);
+        public static extern HResult DwmSetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttributeToSet, IntPtr pvAttributeValue, int cbAttribute);
 
         /// <summary>
         /// Removes a Desktop Window Manager (DWM) thumbnail relationship created by the DwmRegisterThumbnail function.
@@ -308,6 +323,43 @@ namespace Dapplo.Windows.DesktopWindowsManager
             }
             DwmGetWindowAttribute(hWnd, DwmWindowAttributes.Cloaked, out bool isCloaked, Marshal.SizeOf(typeof(bool)));
             return isCloaked;
+        }
+
+        /// <summary>
+        /// Retrieve the WindowCornerPreference for the specified window
+        /// </summary>
+        /// <param name="hWnd">IntPtr with the hWnd</param>
+        /// <returns>DwmWindowCornerPreference</returns>
+        public static DwmWindowCornerPreference GetWindowCornerPreference(IntPtr hWnd)
+        {
+            if (!WindowsVersion.IsWindows11OrLater)
+            {
+                return DwmWindowCornerPreference.Default;
+            }
+            var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.WindowCornerPreference, out uint cornerPreference, Marshal.SizeOf(typeof(DwmWindowCornerPreference)));
+            return result.Succeeded() ? (DwmWindowCornerPreference)cornerPreference : DwmWindowCornerPreference.Default;
+        }
+
+        /// <summary>
+        /// Retrieve the WindowCornerPreference for the specified window
+        /// </summary>
+        /// <param name="hWnd">IntPtr with the hWnd</param>
+        /// <param name="windowCornerPreference">DwmWindowCornerPreference</param>
+        /// <returns>bool true if the set worked</returns>
+        public static bool SetWindowCornerPreference(IntPtr hWnd, DwmWindowCornerPreference windowCornerPreference)
+        {
+            if (!WindowsVersion.IsWindows11OrLater)
+            {
+                return false;
+            }
+
+            IntPtr refToWindowCornerPreference;
+            unsafe
+            {
+                refToWindowCornerPreference = new IntPtr(Unsafe.AsPointer(ref windowCornerPreference));
+            }
+            var result = DwmSetWindowAttribute(hWnd, DwmWindowAttributes.WindowCornerPreference, refToWindowCornerPreference, Marshal.SizeOf(typeof(DwmWindowCornerPreference)));
+            return result.Succeeded();
         }
 
         /// <summary>
