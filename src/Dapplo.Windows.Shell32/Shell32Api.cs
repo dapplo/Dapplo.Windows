@@ -12,6 +12,8 @@ namespace Dapplo.Windows.Shell32
     /// </summary>
     public static class Shell32Api
     {
+        private const string Shell32Dll = "shell32.dll";
+
         /// <summary>
         /// Returns an AppBarData struct which describes the Taskbar bounds etc
         /// </summary>
@@ -34,7 +36,7 @@ namespace Dapplo.Windows.Shell32
         /// <param name="pData">A pointer to an AppBarData structure. The content of the structure on entry and on exit depends on the value set in the dwMessage parameter.
         /// See the individual message pages for specifics.</param>
         /// <returns></returns>
-        [DllImport("shell32", SetLastError = true)]
+        [DllImport(Shell32Dll, SetLastError = true)]
         private static extern IntPtr SHAppBarMessage(AppBarMessages dwMessage, [In] ref AppBarData pData);
     }
 }

@@ -15,6 +15,8 @@ namespace Dapplo.Windows.Gdi32
     /// </summary>
     public static class Gdi32Api
     {
+        private const string GDI32Dll = "gdi32.dll";
+
         /// <summary>
         ///     The BitBlt function performs a bit-block transfer of the color data corresponding to a rectangle of pixels from the
         ///     specified source device context into a destination device context.
@@ -32,7 +34,7 @@ namespace Dapplo.Windows.Gdi32
         ///     is to be combined with the color data for the destination rectangle to achieve the final color.
         /// </param>
         /// <returns></returns>
-        [DllImport("gdi32", SetLastError = true)]
+        [DllImport(GDI32Dll, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool BitBlt(SafeHandle hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, SafeHandle hdcSrc, int nXSrc, int nYSrc, RasterOperations rasterOperation);
 
@@ -71,7 +73,7 @@ namespace Dapplo.Windows.Gdi32
         ///     If the function succeeds, the return value is the handle to a memory DC.
         ///     If the function fails, the return value is NULL.
         /// </returns>
-        [DllImport("gdi32", SetLastError = true)]
+        [DllImport(GDI32Dll, SetLastError = true)]
         public static extern SafeCompatibleDcHandle CreateCompatibleDC(SafeHandle hDc);
 
         /// <summary>
@@ -121,7 +123,7 @@ namespace Dapplo.Windows.Gdi32
         ///     bit values.
         ///     If the function fails, the return value is NULL, and *ppvBits is NULL.
         /// </returns>
-        [DllImport("gdi32", SetLastError = true)]
+        [DllImport(GDI32Dll, SetLastError = true)]
         public static extern SafeDibSectionHandle CreateDIBSection(SafeHandle hdc, ref BitmapInfoHeader bmi, DibColors usage, out IntPtr bits, IntPtr hSection, uint dwOffset);
 
         /// <summary>
@@ -137,7 +139,7 @@ namespace Dapplo.Windows.Gdi32
         ///     If the function succeeds, the return value is the handle to the region.
         ///     If the function fails, the return value is NULL.
         /// </returns>
-        [DllImport("gdi32", SetLastError = true)]
+        [DllImport(GDI32Dll, SetLastError = true)]
         public static extern SafeRegionHandle CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
         /// <summary>
@@ -148,7 +150,7 @@ namespace Dapplo.Windows.Gdi32
         /// <param name="hdc">A handle to the DC.</param>
         /// <param name="nIndex">The item to be returned</param>
         /// <returns></returns>
-        [DllImport("gdi32", SetLastError = true)]
+        [DllImport(GDI32Dll, SetLastError = true)]
         public static extern int GetDeviceCaps(SafeHandle hdc, DeviceCaps nIndex);
 
         /// <summary>
@@ -162,7 +164,7 @@ namespace Dapplo.Windows.Gdi32
         ///     The return value is the COLORREF value that specifies the RGB of the pixel. If the pixel is outside of the
         ///     current clipping region, the return value is CLR_INVALID (0xFFFFFFFF defined in Wingdi.h).
         /// </returns>
-        [DllImport("gdi32", SetLastError = true)]
+        [DllImport(GDI32Dll, SetLastError = true)]
         public static extern uint GetPixel(SafeHandle hdc, int nXPos, int nYPos);
 
         /// <summary>
@@ -192,7 +194,7 @@ namespace Dapplo.Windows.Gdi32
         ///     COMPLEXREGION	Region consists of more than one rectangle.
         ///     NULLREGION	Region is empty.
         /// </returns>
-        [DllImport("gdi32", SetLastError = true)]
+        [DllImport(GDI32Dll, SetLastError = true)]
         public static extern IntPtr SelectObject(SafeHandle hDc, SafeHandle hObject);
 
         /// <summary>
@@ -216,7 +218,7 @@ namespace Dapplo.Windows.Gdi32
         ///     used for printing device contexts.
         /// </param>
         /// <returns>bool true if success</returns>
-        [DllImport("gdi32", SetLastError = true)]
+        [DllImport(GDI32Dll, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool StretchBlt(SafeHandle hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, SafeHandle hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, RasterOperations rasterOperation);
 
@@ -245,7 +247,7 @@ namespace Dapplo.Windows.Gdi32
         /// </summary>
         /// <param name="hObject">A handle to a logical pen, brush, font, bitmap, region, or palette.</param>
         /// <returns>bool</returns>
-        [DllImport("gdi32", SetLastError = true)]
+        [DllImport(GDI32Dll, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DeleteObject(IntPtr hObject);
     }

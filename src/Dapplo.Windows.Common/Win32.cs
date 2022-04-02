@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -94,14 +95,6 @@ namespace Dapplo.Windows.Common
 
                 return result.ToString().Replace("\r\n", "");
             }
-
         }
-
-        /// <summary>
-        ///     Change the last error
-        /// </summary>
-        /// <param name="dwErrCode">error code to change to</param>
-        [DllImport("kernel32")]
-        public static extern void SetLastError(uint dwErrCode);
     }
 }
