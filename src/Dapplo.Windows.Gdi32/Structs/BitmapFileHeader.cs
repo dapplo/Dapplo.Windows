@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -25,14 +26,8 @@ namespace Dapplo.Windows.Gdi32.Structs
         /// </summary>
         public short FileType
         {
-            get
-            {
-                return _fileType;
-            }
-            private set
-            {
-                _fileType = value;
-            }
+            get => _fileType;
+            private set => _fileType = value;
         }
 
         /// <summary>
@@ -40,14 +35,8 @@ namespace Dapplo.Windows.Gdi32.Structs
         /// </summary>
         public int Size
         {
-            get
-            {
-                return _size;
-            }
-            private set
-            {
-                _size = value;
-            }
+            get => _size;
+            private set => _size = value;
         }
 
         /// <summary>
@@ -55,14 +44,8 @@ namespace Dapplo.Windows.Gdi32.Structs
         /// </summary>
         public int OffsetToBitmapBits
         {
-            get
-            {
-                return _offsetToBitmapBits;
-            }
-            private set
-            {
-                _offsetToBitmapBits = value;
-            }
+            get => _offsetToBitmapBits;
+            private set => _offsetToBitmapBits = value;
         }
 
         /// <summary>

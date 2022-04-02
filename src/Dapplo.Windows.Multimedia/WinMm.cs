@@ -8,7 +8,7 @@ using Dapplo.Windows.Multimedia.Enums;
 namespace Dapplo.Windows.Multimedia
 {
     /// <summary>
-    ///     Windows Mulit-Media API
+    ///     Windows Multi-Media API
     /// </summary>
     public static class WinMm
     {

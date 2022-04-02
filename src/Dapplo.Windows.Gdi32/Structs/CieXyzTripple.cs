@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -21,8 +22,8 @@ namespace Dapplo.Windows.Gdi32.Structs
         ///     A CIE XYZ 1931 color space for the red component
         /// </summary>
         public CieXyz Red {
-            get { return _cieXyzRed; }
-            set { _cieXyzRed = value; }
+            get => _cieXyzRed;
+            set => _cieXyzRed = value;
         }
 
         /// <summary>
@@ -30,8 +31,8 @@ namespace Dapplo.Windows.Gdi32.Structs
         /// </summary>
         public CieXyz Green
         {
-            get { return _cieXyzGreen; }
-            set { _cieXyzGreen = value; }
+            get => _cieXyzGreen;
+            set => _cieXyzGreen = value;
         }
 
         /// <summary>
@@ -39,8 +40,8 @@ namespace Dapplo.Windows.Gdi32.Structs
         /// </summary>
         public CieXyz Blue
         {
-            get { return _cieXyzBlue; }
-            set { _cieXyzBlue = value; }
+            get => _cieXyzBlue;
+            set => _cieXyzBlue = value;
         }
 
         /// <summary>

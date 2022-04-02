@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -23,8 +24,8 @@ namespace Dapplo.Windows.Gdi32.Structs
         /// </summary>
         public uint X
         {
-            get { return ciexyzX; }
-            set { ciexyzX = value; }
+            get => ciexyzX;
+            set => ciexyzX = value;
         }
 
         /// <summary>
@@ -33,8 +34,8 @@ namespace Dapplo.Windows.Gdi32.Structs
         /// </summary>
         public uint Y
         {
-            get { return ciexyzY; }
-            set { ciexyzY = value; }
+            get => ciexyzY;
+            set => ciexyzY = value;
         }
 
         /// <summary>
@@ -42,8 +43,8 @@ namespace Dapplo.Windows.Gdi32.Structs
         ///     FXPT2DOT30 is a fixed-point values with a 2-bit integer part and a 30-bit fractional part.
         /// </summary>
         public uint Z {
-            get { return ciexyzZ; }
-            set { ciexyzZ = value; }
+            get => ciexyzZ;
+            set => ciexyzZ = value;
         }
 
         /// <summary>
