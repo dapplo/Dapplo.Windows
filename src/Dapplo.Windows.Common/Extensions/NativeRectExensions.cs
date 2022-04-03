@@ -238,6 +238,19 @@ namespace Dapplo.Windows.Common.Extensions
         }
 
         /// <summary>
+        /// Creates a new NativeRect which is rect but inflated with the specified size
+        /// </summary>
+        /// <param name="rect">NativeRect</param>
+        /// <param name="size">NativeSize</param>
+        /// <returns>NativeRect</returns>
+        [Pure]
+        public static NativeRect Inflate(this NativeRect rect, NativeSize size)
+        {
+            // TODO: Replace logic with own code
+            return System.Drawing.Rectangle.Inflate(rect, size.Width, size.Height);
+        }
+
+        /// <summary>
         /// Test if the current rectangle intersects with the specified.
         /// </summary>
         /// <param name="rect1">NativeRect</param>

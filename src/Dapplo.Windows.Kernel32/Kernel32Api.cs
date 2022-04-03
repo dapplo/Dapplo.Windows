@@ -402,10 +402,35 @@ namespace Dapplo.Windows.Kernel32
             }
         }
 
-
         /// <summary>Change the last error</summary>
         /// <param name="dwErrCode">uint with the last error code to change to</param>
         [DllImport(Kernel32Dll)]
         public static extern void SetLastError(uint dwErrCode);
+
+        /// <summary>
+        /// OpenThread
+        /// </summary>
+        /// <param name="dwDesiredAccess">ThreadAccess</param>
+        /// <param name="bInheritHandle">bool</param>
+        /// <param name="dwThreadId">uint</param>
+        /// <returns>IntPtr with hThread</returns>
+        [DllImport(Kernel32Dll, SetLastError = true)]
+        public static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+
+        /// <summary>
+        /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-suspendthread">Suspend thread</a>
+        /// </summary>
+        /// <param name="hThread">IntPtr</param>
+        /// <returns>uint</returns>
+        [DllImport(Kernel32Dll, SetLastError = true)]
+        public static extern uint SuspendThread(IntPtr hThread);
+
+        /// <summary>
+        /// ResumeThread
+        /// </summary>
+        /// <param name="hThread">IntPtr</param>
+        /// <returns>int</returns>
+        [DllImport(Kernel32Dll, SetLastError = true)]
+        public static extern int ResumeThread(IntPtr hThread);
     }
 }

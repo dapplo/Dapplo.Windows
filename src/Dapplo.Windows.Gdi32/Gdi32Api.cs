@@ -124,7 +124,7 @@ namespace Dapplo.Windows.Gdi32
         ///     If the function fails, the return value is NULL, and *ppvBits is NULL.
         /// </returns>
         [DllImport(GDI32Dll, SetLastError = true)]
-        public static extern SafeDibSectionHandle CreateDIBSection(SafeHandle hdc, ref BitmapInfoHeader bmi, DibColors usage, out IntPtr bits, IntPtr hSection, uint dwOffset);
+        public static extern SafeDibSectionHandle CreateDIBSection(SafeHandle hdc, ref BitmapV5Header bmi, DibColors usage, out IntPtr bits, IntPtr hSection, uint dwOffset);
 
         /// <summary>
         ///     The CreateRectRgn function creates a rectangular region.

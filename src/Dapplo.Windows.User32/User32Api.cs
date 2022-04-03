@@ -284,10 +284,10 @@ namespace Dapplo.Windows.User32
         /// <param name="hWnd">IntPtr</param>
         /// <param name="index">WindowLongIndex</param>
         /// <returns></returns>
-        public static long GetWindowLongWrapper(IntPtr hWnd, WindowLongIndex index)
+        public static IntPtr GetWindowLongWrapper(IntPtr hWnd, WindowLongIndex index)
         {
             return IntPtr.Size == 8 ?
-                GetWindowLongPtr(hWnd, index).ToInt64() :
+                GetWindowLongPtr(hWnd, index) :
                 GetWindowLong(hWnd, index);
         }
 
@@ -728,7 +728,7 @@ namespace Dapplo.Windows.User32
         public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
         [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLong")]
-        private static extern int GetWindowLong(IntPtr hWnd, WindowLongIndex index);
+        private static extern IntPtr GetWindowLong(IntPtr hWnd, WindowLongIndex index);
 
         [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLongPtr")]
         private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, WindowLongIndex nIndex);

@@ -41,6 +41,18 @@ namespace Dapplo.Windows.DesktopWindowsManager
                 return Color.FromArgb(color.A, color.R, color.G, color.B);
             }
         }
+
+        /// <summary>
+        ///     Return the AERO Color
+        /// </summary>
+        public static System.Drawing.Color ColorizationDrawingColor
+        {
+            get
+            {
+                var color = ColorizationSystemDrawingColor;
+                return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
+            }
+        }
 #endif
 
         /// <summary>
