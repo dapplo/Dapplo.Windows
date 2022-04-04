@@ -17,7 +17,7 @@ namespace Dapplo.Windows.Enums
         /// <summary>
         ///     Forces an update of the specified flags.
         /// </summary>
-        ForceUpdate = 1 << 0,
+        ForceUpdate = 1,
 
         /// <summary>
         ///     Retrieve the WindowInfo

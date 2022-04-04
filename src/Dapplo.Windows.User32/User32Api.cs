@@ -296,17 +296,37 @@ namespace Dapplo.Windows.User32
         /// </summary>
         /// <param name="hWnd">IntPtr</param>
         /// <param name="index">WindowLongIndex</param>
-        /// <param name="styleFlags"></param>
-        public static void SetWindowLongWrapper(IntPtr hWnd, WindowLongIndex index, IntPtr styleFlags)
+        /// <param name="replacementValue">IntPtr</param>
+        /// <returns>IntPtr with 0 if error, or the previous value</returns>
+        public static IntPtr SetWindowLongWrapper(IntPtr hWnd, WindowLongIndex index, IntPtr replacementValue)
         {
             if (IntPtr.Size == 8)
             {
-                SetWindowLongPtr(hWnd, index, styleFlags);
+                return SetWindowLongPtr(hWnd, index, replacementValue);
             }
-            else
-            {
-                SetWindowLong(hWnd, index, styleFlags.ToInt32());
-            }
+            return new IntPtr(SetWindowLong(hWnd, index, replacementValue.ToInt32()));
+        }
+
+        /// <summary>
+        ///     Set the Extended WindowStyle
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="extendedWindowStyleFlags">ExtendedWindowStyleFlags</param>
+        /// <returns>IntPtr with 0 if error, or the previous value</returns>
+        public static IntPtr SetExtendedWindowStyle(IntPtr hWnd, ExtendedWindowStyleFlags extendedWindowStyleFlags)
+        {
+            return User32Api.SetWindowLongWrapper(hWnd, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint)extendedWindowStyleFlags));
+        }
+
+        /// <summary>
+        ///     Set the WindowStyleFlags
+        /// </summary>
+        /// <param name="hWnd">IntPtr</param>
+        /// <param name="windowStyleFlags">WindowStyleFlags</param>
+        /// <returns>IntPtr with 0 if error, or the previous value</returns>
+        public static IntPtr SetWindowStyle(IntPtr hWnd, WindowStyleFlags windowStyleFlags)
+        {
+            return User32Api.SetWindowLongWrapper(hWnd, WindowLongIndex.GWL_STYLE, new IntPtr((uint)windowStyleFlags));
         }
 
         /// <summary>
@@ -733,11 +753,25 @@ namespace Dapplo.Windows.User32
         [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLongPtr")]
         private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, WindowLongIndex nIndex);
 
+        /// <summary>
+        /// Changes an attribute of the specified window. The function also sets a value at the specified offset in the extra window memory.
+        /// </summary>
+        /// <param name="hWnd">IntPtr with the hWnd</param>
+        /// <param name="index">WindowLongIndex</param>
+        /// <param name="replacementValue">int</param>
+        /// <returns>int with 0 if failed, other value was the previous value</returns>
         [DllImport(User32, SetLastError = true)]
-        private static extern int SetWindowLong(IntPtr hWnd, WindowLongIndex index, int styleFlags);
+        private static extern int SetWindowLong(IntPtr hWnd, WindowLongIndex index, int replacementValue);
 
+        /// <summary>
+        /// Changes an attribute of the specified window. The function also sets a value at the specified offset in the extra window memory.
+        /// </summary>
+        /// <param name="hWnd">IntPtr with the hWnd</param>
+        /// <param name="index">WindowLongIndex</param>
+        /// <param name="replacementValue">IntPtr</param>
+        /// <returns>IntPtr with 0 if failed, other value was the previous value</returns>
         [DllImport(User32, SetLastError = true, EntryPoint = "SetWindowLongPtr")]
-        private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, WindowLongIndex index, IntPtr styleFlags);
+        private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, WindowLongIndex index, IntPtr replacementValue);
 
         /// <summary>
         ///     See

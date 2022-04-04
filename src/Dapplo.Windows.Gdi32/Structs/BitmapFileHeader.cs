@@ -52,7 +52,7 @@ namespace Dapplo.Windows.Gdi32.Structs
         /// Create a BitmapFileHeader which needs a BitmapInfoHeader to calculate the values
         /// </summary>
         /// <param name="bitmapInfoHeader">BitmapInfoHeader</param>
-        public static BitmapFileHeader Create(BitmapInfoHeader bitmapInfoHeader)
+        public static BitmapFileHeader Create(BitmapV5Header bitmapInfoHeader)
         {
             var bitmapFileHeaderSize = Marshal.SizeOf(typeof(BitmapFileHeader));
             return new BitmapFileHeader

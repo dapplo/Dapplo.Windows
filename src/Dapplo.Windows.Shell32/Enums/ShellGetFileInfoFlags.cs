@@ -1,6 +1,9 @@
-﻿using System;
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Dapplo.Windows.Icons.Enums
+using System;
+
+namespace Dapplo.Windows.Shell32.Enums
 {
     /// <summary>
     /// The flags that specify the file information to retrieve when calling SHGetFileInfo.

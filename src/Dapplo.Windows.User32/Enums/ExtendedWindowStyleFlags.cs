@@ -11,7 +11,7 @@ namespace Dapplo.Windows.User32.Enums
     /// </summary>
     [Flags]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum ExtendedWindowStyleFlags : uint
+    public enum ExtendedWindowStyleFlags : int
     {
         /// <summary>
         ///     Default style, with nothing

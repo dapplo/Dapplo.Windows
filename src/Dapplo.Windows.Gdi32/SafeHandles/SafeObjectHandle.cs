@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using Microsoft.Win32.SafeHandles;
 
 namespace Dapplo.Windows.Gdi32.SafeHandles
@@ -23,7 +25,12 @@ namespace Dapplo.Windows.Gdi32.SafeHandles
         /// <returns>true if this worked</returns>
         protected override bool ReleaseHandle()
         {
-            return Gdi32Api.DeleteObject(handle);
+            if (handle != IntPtr.Zero)
+            {
+                return Gdi32Api.DeleteObject(handle);
+            }
+
+            return false;
         }
     }
 }

@@ -12,7 +12,6 @@ using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.DesktopWindowsManager;
 using Dapplo.Windows.Gdi32;
-using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
@@ -22,7 +21,6 @@ using Dapplo.Log;
 #if !NETSTANDARD2_0
 using Dapplo.Windows.Extensions;
 #endif
-using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Kernel32;
 
 namespace Dapplo.Windows.Desktop
@@ -555,7 +553,7 @@ namespace Dapplo.Windows.Desktop
         /// <returns>IInteropWindow for fluent calls</returns>
         public static IInteropWindow SetExtendedStyle(this IInteropWindow interopWindow, ExtendedWindowStyleFlags extendedWindowStyleFlags)
         {
-            User32Api.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint) extendedWindowStyleFlags));
+            User32Api.SetExtendedWindowStyle(interopWindow.Handle, extendedWindowStyleFlags);
             interopWindow.Info = null;
             return interopWindow;
         }
@@ -568,7 +566,7 @@ namespace Dapplo.Windows.Desktop
         /// <returns>IInteropWindow for fluent calls</returns>
         public static IInteropWindow SetStyle(this IInteropWindow interopWindow, WindowStyleFlags windowStyleFlags)
         {
-            User32Api.SetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE, new IntPtr((uint)windowStyleFlags));
+            User32Api.SetWindowStyle(interopWindow.Handle, windowStyleFlags);
             interopWindow.Info = null;
             return interopWindow;
         }

@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Devices.Enums;
 using Microsoft.Win32;
 
@@ -190,8 +192,8 @@ namespace Dapplo.Windows.Devices.Structs
                 var guidToFind = _classGuid.ToString();
                 foreach (var deviceClass in Enum.GetValues(typeof(DeviceInterfaceClass)).Cast<DeviceInterfaceClass>())
                 {
-                    var descriptionAttribute = GetAttributeOfType<DescriptionAttribute>(deviceClass);
-                    if (descriptionAttribute == null || !string.Equals(guidToFind, descriptionAttribute.Description, StringComparison.OrdinalIgnoreCase))
+                    var descriptionAttribute = deviceClass.GetAttributeOfType<DescriptionAttribute>();
+                    if (string.IsNullOrEmpty(descriptionAttribute?.Description) || !string.Equals(guidToFind, descriptionAttribute.Description, StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
@@ -204,21 +206,13 @@ namespace Dapplo.Windows.Devices.Structs
 
             set
             {
-                var descriptionAttribute = GetAttributeOfType<DescriptionAttribute>(value);
-                if (descriptionAttribute != null)
+                var descriptionAttribute = value.GetAttributeOfType<DescriptionAttribute>();
+                if (!string.IsNullOrEmpty(descriptionAttribute?.Description))
                 {
                     _classGuid = Guid.Parse(descriptionAttribute.Description);
                 }
             }
 
-        }
-
-        private static T GetAttributeOfType<T>(Enum enumVal) where T : Attribute
-        {
-            var type = enumVal.GetType();
-            var memInfo = type.GetMember(enumVal.ToString());
-            var attributes = memInfo[0].GetCustomAttributes(typeof(T), false);
-            return attributes.Length > 0 ? (T)attributes[0] : null;
         }
 
         /// <summary>
@@ -230,8 +224,8 @@ namespace Dapplo.Windows.Devices.Structs
         public static DevBroadcastDeviceInterface Test(string deviceName, DeviceInterfaceClass deviceClass = DeviceInterfaceClass.Unknown)
         {
             Guid deviceClassGuid = default;
-            var descriptionAttribute = GetAttributeOfType<DescriptionAttribute>(deviceClass);
-            if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
+            var descriptionAttribute = deviceClass.GetAttributeOfType<DescriptionAttribute>();
+            if (!string.IsNullOrEmpty(descriptionAttribute?.Description))
             {
                 deviceClassGuid = Guid.Parse(descriptionAttribute.Description);
             }

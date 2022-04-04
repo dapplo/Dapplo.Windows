@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using Dapplo.Windows.Kernel32.Enums;
 using Dapplo.Windows.Kernel32.Structs;
 
@@ -432,5 +433,15 @@ namespace Dapplo.Windows.Kernel32
         /// <returns>int</returns>
         [DllImport(Kernel32Dll, SetLastError = true)]
         public static extern int ResumeThread(IntPtr hThread);
+
+        /// <summary>
+        /// GetPackageFullName
+        /// </summary>
+        /// <param name="hProcess">IntPtr</param>
+        /// <param name="packageFullNameLength"></param>
+        /// <param name="fullName">StringBuilder to place the fullname in</param>
+        /// <returns>int</returns>
+        [DllImport(Kernel32Dll, SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern int GetPackageFullName(IntPtr hProcess, ref Int32 packageFullNameLength, StringBuilder fullName);
     }
 }

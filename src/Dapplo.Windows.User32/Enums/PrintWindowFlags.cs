@@ -20,6 +20,11 @@ namespace Dapplo.Windows.User32.Enums
         ///     Only the client area of the window is copied.
         ///     By default, the entire window is copied.
         /// </summary>
-        PW_CLIENTONLY = 0x00000001
+        PW_CLIENTONLY = 0x00000001,
+
+        /// <summary>
+        ///     Works on windows that use DirectX or DirectComposition
+        /// </summary>
+        PW_RENDERFULLCONTENT = 0x00000002
     }
 }

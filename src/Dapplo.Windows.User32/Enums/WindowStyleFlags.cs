@@ -12,7 +12,7 @@ namespace Dapplo.Windows.User32.Enums
     /// </summary>
     [Flags]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum WindowStyleFlags : uint
+    public enum WindowStyleFlags : int
     {
         /// <summary>
         ///     The window is an overlapped window. An overlapped window has a title bar and a border. Same as the WS_TILED style.
@@ -22,7 +22,7 @@ namespace Dapplo.Windows.User32.Enums
         /// <summary>
         ///     The windows is a pop-up window. This style cannot be used with the WS_CHILD style.
         /// </summary>
-        WS_POPUP = 0x80000000,
+        WS_POPUP = -2147483648, // 0x80000000,
 
         /// <summary>
         ///     The window is a child window. A window with this style cannot have a menu bar.
