@@ -77,9 +77,9 @@ namespace Dapplo.Windows.Dpi
     /// </summary>
     public sealed class BitmapScaleHandler<TKey, TValue> : IDisposable where TValue : IDisposable
     {
-        private readonly ReaderWriterLockSlim _imagesLock = new ReaderWriterLockSlim();
-        private readonly ReaderWriterLockSlim _actionsLock = new ReaderWriterLockSlim();
-        private readonly Dictionary<TKey, TValue> _images = new Dictionary<TKey, TValue>();
+        private readonly ReaderWriterLockSlim _imagesLock = new();
+        private readonly ReaderWriterLockSlim _actionsLock = new();
+        private readonly Dictionary<TKey, TValue> _images = new();
         private bool _areWeDisposing;
         private uint _dpi;
         private IDisposable _dpiChangeSubscription;

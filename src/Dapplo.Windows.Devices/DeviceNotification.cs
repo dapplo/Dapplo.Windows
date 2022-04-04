@@ -78,7 +78,7 @@ namespace Dapplo.Windows.Devices
                     else
                     {
                         // React to all interface classes
-                        deviceNotifyFlags = deviceNotifyFlags | DeviceNotifyFlags.AllInterfaceClasses;
+                        deviceNotifyFlags |= DeviceNotifyFlags.AllInterfaceClasses;
                     }
 
                     var deviceNotificationHandle = RegisterDeviceNotification(WinProcHandler.Instance.Handle, devBroadcastDeviceInterface, deviceNotifyFlags);

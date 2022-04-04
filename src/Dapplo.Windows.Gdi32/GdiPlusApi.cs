@@ -22,7 +22,7 @@ public static class GdiPlusApi
     private const string GDIPLUSDLL = "gdiplus.dll";
 
     private static readonly LogSource Log = new LogSource();
-    private static readonly Guid BlurEffectGuid = new Guid("{633C80A4-1843-482B-9EF2-BE2834C5FDD4}");
+    private static readonly Guid BlurEffectGuid = new("{633C80A4-1843-482B-9EF2-BE2834C5FDD4}");
 
     // Constant "FieldInfo" for getting the nativeImage from the Bitmap
     private static readonly FieldInfo FieldInfoNativeImage = typeof(Bitmap).GetField("nativeImage", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
