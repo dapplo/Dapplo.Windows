@@ -132,18 +132,13 @@ public readonly struct NativePoint : IEquatable<NativePoint>
 
     /// <inheritdoc />
     [Pure]
-    public override bool Equals(object obj)
-    {
-        switch (obj)
+    public override bool Equals(object obj) =>
+        obj switch
         {
-            case NativePoint point:
-                return Equals(point);
-            case System.Drawing.Point drawingPoint:
-                return Equals(drawingPoint);
-        }
-
-        return false;
-    }
+            NativePoint point => Equals(point),
+            System.Drawing.Point drawingPoint => Equals(drawingPoint),
+            _ => false
+        };
 
     /// <inheritdoc />
     [Pure]

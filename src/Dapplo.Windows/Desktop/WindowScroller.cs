@@ -111,7 +111,7 @@ public class WindowScroller
         {
             using (var key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", false))
             {
-                if (!(key?.GetValue("WheelScrollLines") is string wheelScrollLines))
+                if (key?.GetValue("WheelScrollLines") is not string wheelScrollLines)
                 {
                     return 3;
                 }

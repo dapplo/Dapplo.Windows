@@ -286,7 +286,7 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
         builder.Append("Left: ").Append(_x).Append("; ");
         builder.Append("Top: ").Append(_y).Append("; ");
         builder.Append("Right: ").Append(Right).Append("; ");
-        builder.Append("Bottom: ").Append(Bottom).Append("}");
+        builder.Append("Bottom: ").Append(Bottom).Append('}');
         return builder.ToString();
     }
 

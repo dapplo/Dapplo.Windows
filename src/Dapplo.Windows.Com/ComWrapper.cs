@@ -70,7 +70,7 @@ namespace Dapplo.Windows.Com
         /// </returns>
         public override IMessage Invoke(IMessage myMessage)
         {
-            if (!(myMessage is IMethodCallMessage callMessage))
+            if (myMessage is not IMethodCallMessage callMessage)
             {
                 Log.Debug().WriteLine("Message type not implemented: {0}", myMessage.GetType());
                 return null;
@@ -120,7 +120,7 @@ namespace Dapplo.Windows.Com
                 var removeHandler = methodName.StartsWith("remove_");
                 methodName = methodName.Substring(removeHandler ? 7 : 4);
                 // TODO: Something is missing here
-                if (!(callMessage.InArgs[0] is Delegate handler))
+                if (callMessage.InArgs[0] is not Delegate handler)
                 {
                     return new ReturnMessage(new ArgumentNullException(nameof(handler)), callMessage);
                 }

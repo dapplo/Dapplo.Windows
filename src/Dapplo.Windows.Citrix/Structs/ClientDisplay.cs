@@ -25,22 +25,14 @@ public struct ClientDisplay
     /// </summary>
     public uint ColorDepth
     {
-        get
-        {
-            switch (_colorDepth)
+        get => _colorDepth switch
             {
-                case 1:
-                    return 4;
-                case 2:
-                    return 8;
-                case 4:
-                    return 16;
-                case 8:
-                    return 24;
-                case 16:
-                    return 32;
-            }
-            return _colorDepth;
-        }
+                1 => 4,
+                2 => 8,
+                4 => 16,
+                8 => 24,
+                16 => 32,
+                _ => _colorDepth
+            };
     }
 }

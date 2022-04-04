@@ -86,7 +86,7 @@ public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
     {
         this.Fill(retrieveSettings);
 
-        dump = dump ?? new StringBuilder();
+        dump ??= new StringBuilder();
         dump.AppendLine($"{indentation}{nameof(Handle)}={Handle}");
         if ((retrieveSettings & InteropWindowRetrieveSettings.Classname) != 0)
         {

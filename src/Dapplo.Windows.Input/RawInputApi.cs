@@ -34,30 +34,19 @@ public static class RawInputApi
     /// <param name="device">RawInputDevices</param>
     /// <param name="flags">RawInputDeviceFlags</param>
     /// <returns>RawInputDevice filled</returns>
-    public static RawInputDevice CreateRawInputDevice(IntPtr hWnd, RawInputDevices device, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink)
-    {
-        switch (device)
+    public static RawInputDevice CreateRawInputDevice(IntPtr hWnd, RawInputDevices device, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink) =>
+        device switch
         {
-            case RawInputDevices.Pointer:
-                return CreateRawInputDevice(hWnd, HidUsagesGeneric.Pointer, flags);
-            case RawInputDevices.Mouse:
-                return CreateRawInputDevice(hWnd, HidUsagesGeneric.Mouse, flags);
-            case RawInputDevices.Joystick:
-                return CreateRawInputDevice(hWnd, HidUsagesGeneric.Joystick, flags);
-            case RawInputDevices.GamePad:
-                return CreateRawInputDevice(hWnd, HidUsagesGeneric.Gamepad, flags);
-            case RawInputDevices.Keyboard:
-                return CreateRawInputDevice(hWnd, HidUsagesGeneric.Keyboard, flags);
-            case RawInputDevices.Keypad:
-                return CreateRawInputDevice(hWnd, HidUsagesGeneric.Keypad, flags);
-            case RawInputDevices.SystemControl:
-                return CreateRawInputDevice(hWnd, HidUsagesGeneric.SystemControl, flags);
-            case RawInputDevices.ConsumerAudioControl:
-                return CreateRawInputDevice(hWnd, HidUsagesConsumer.ConsumerControl, flags);
-            default:
-                throw new NotSupportedException($"Unknown RawInputDevices: {device}");
-        }
-    }
+            RawInputDevices.Pointer => CreateRawInputDevice(hWnd, HidUsagesGeneric.Pointer, flags),
+            RawInputDevices.Mouse => CreateRawInputDevice(hWnd, HidUsagesGeneric.Mouse, flags),
+            RawInputDevices.Joystick => CreateRawInputDevice(hWnd, HidUsagesGeneric.Joystick, flags),
+            RawInputDevices.GamePad => CreateRawInputDevice(hWnd, HidUsagesGeneric.Gamepad, flags),
+            RawInputDevices.Keyboard => CreateRawInputDevice(hWnd, HidUsagesGeneric.Keyboard, flags),
+            RawInputDevices.Keypad => CreateRawInputDevice(hWnd, HidUsagesGeneric.Keypad, flags),
+            RawInputDevices.SystemControl => CreateRawInputDevice(hWnd, HidUsagesGeneric.SystemControl, flags),
+            RawInputDevices.ConsumerAudioControl => CreateRawInputDevice(hWnd, HidUsagesConsumer.ConsumerControl, flags),
+            _ => throw new NotSupportedException($"Unknown RawInputDevices: {device}")
+        };
 
     /// <summary>
     /// Create RawInputDevice, to use with RegisterRawInput

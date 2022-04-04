@@ -143,16 +143,12 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
             return true;
         }
 
-        switch (expected)
+        return expected switch
         {
-            case VirtualKeyCode.Shift:
-                return VirtualKeyCode.LeftShift == current || VirtualKeyCode.RightShift == current;
-            case VirtualKeyCode.Control:
-                return VirtualKeyCode.LeftControl == current || VirtualKeyCode.RightControl == current;
-            case VirtualKeyCode.Menu:
-                return VirtualKeyCode.LeftMenu == current || VirtualKeyCode.RightMenu == current;
-        }
-
-        return false;
+            VirtualKeyCode.Shift => current is VirtualKeyCode.LeftShift or VirtualKeyCode.RightShift,
+            VirtualKeyCode.Control => current is VirtualKeyCode.LeftControl or VirtualKeyCode.RightControl,
+            VirtualKeyCode.Menu => current is VirtualKeyCode.LeftMenu or VirtualKeyCode.RightMenu,
+            _ => false
+        };
     }
 }

@@ -424,7 +424,7 @@ public static class InteropWindowExtensions
     /// <returns>bool true if docked</returns>
     public static bool IsDockedToLeftOf(this IInteropWindow window1, IInteropWindow window2, Func<IInteropWindow, NativeRect> retrieveBoundsFunc = null)
     {
-        retrieveBoundsFunc = retrieveBoundsFunc ?? (window => window.GetInfo().Bounds);
+        retrieveBoundsFunc ??= (window => window.GetInfo().Bounds);
         return retrieveBoundsFunc(window1).IsDockedToLeftOf(retrieveBoundsFunc(window2));
     }
 
@@ -437,7 +437,7 @@ public static class InteropWindowExtensions
     /// <returns>bool true if docked</returns>
     public static bool IsDockedToRightOf(this IInteropWindow window1, IInteropWindow window2, Func<IInteropWindow, NativeRect> retrieveBoundsFunc = null)
     {
-        retrieveBoundsFunc = retrieveBoundsFunc ?? (window => window.GetInfo().Bounds);
+        retrieveBoundsFunc ??= (window => window.GetInfo().Bounds);
         return retrieveBoundsFunc(window1).IsDockedToRightOf(retrieveBoundsFunc(window2));
     }
 

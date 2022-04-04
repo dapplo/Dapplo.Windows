@@ -111,7 +111,7 @@ public static class KeyHelper
                     break;
             }
 
-            scanCode = scanCode << 16;
+            scanCode <<= 16;
             scanCode |= scancodeModifier;
             nrCharacters = GetKeyNameText(scanCode, keyName, capacity);
             if (nrCharacters == 0)
@@ -173,18 +173,14 @@ public static class KeyHelper
         keyDescription = keyDescription.ToLowerInvariant();
             
         // Border cases
-        switch (keyDescription)
+        return keyDescription switch
         {
-            case "alt":
-                return VirtualKeyCode.Menu;
-            case "ctrl":
-                return VirtualKeyCode.Control;
-            case "win":
-                return VirtualKeyCode.LeftWin;
-            case "shift":
-                return VirtualKeyCode.Shift;
-        }
-        return VirtualKeyCode.None;
+            "alt" => VirtualKeyCode.Menu,
+            "ctrl" => VirtualKeyCode.Control,
+            "win" => VirtualKeyCode.LeftWin,
+            "shift" => VirtualKeyCode.Shift,
+            _ => VirtualKeyCode.None
+        };
     }
 
     [DllImport("user32.dll", SetLastError = true)]
