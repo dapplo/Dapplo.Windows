@@ -2,24 +2,23 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 
-namespace Dapplo.Windows.Clipboard
+namespace Dapplo.Windows.Clipboard;
+
+/// <inheritdoc />
+public class ClipboardAccessDeniedException : Exception
 {
     /// <inheritdoc />
-    public class ClipboardAccessDeniedException : Exception
+    public ClipboardAccessDeniedException()
     {
-        /// <inheritdoc />
-        public ClipboardAccessDeniedException()
-        {
-        }
+    }
 
-        /// <inheritdoc />
-        public ClipboardAccessDeniedException(string message) : base(message)
-        {
-        }
+    /// <inheritdoc />
+    public ClipboardAccessDeniedException(string message) : base(message)
+    {
+    }
 
-        /// <inheritdoc />
-        public ClipboardAccessDeniedException(string message, Exception inner) : base(message, inner)
-        {
-        }
+    /// <inheritdoc />
+    public ClipboardAccessDeniedException(string message, Exception inner) : base(message, inner)
+    {
     }
 }

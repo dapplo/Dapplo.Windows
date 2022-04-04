@@ -7,234 +7,233 @@ using System.Text;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.User32.Structs;
 
-namespace Dapplo.Windows.Desktop
+namespace Dapplo.Windows.Desktop;
+
+/// <summary>
+///     Information about a native window
+///     Note: This is a dumb container, and doesn't retrieve anything about the window itself
+/// </summary>
+public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
 {
     /// <summary>
-    ///     Information about a native window
-    ///     Note: This is a dumb container, and doesn't retrieve anything about the window itself
+    /// Create an InteropWindow for the specified windows handle
     /// </summary>
-    public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
+    /// <param name="handle">IntPtr</param>
+    public InteropWindow(IntPtr handle)
     {
-        /// <summary>
-        /// Create an InteropWindow for the specified windows handle
-        /// </summary>
-        /// <param name="handle">IntPtr</param>
-        public InteropWindow(IntPtr handle)
+        Handle = handle;
+    }
+
+    /// <inheritdoc />
+    public IntPtr Handle { get; }
+
+    /// <inheritdoc />
+    public bool HasZOrderedChildren { get; set; }
+
+    /// <inheritdoc />
+    public WindowInfo? Info { get; set; }
+
+    /// <inheritdoc />
+    public IEnumerable<IInteropWindow> Children { get; set; }
+
+    /// <inheritdoc />
+    public bool HasChildren => Children?.Any() == true;
+
+    /// <inheritdoc />
+    public string Classname { get; set; }
+
+    /// <inheritdoc />
+    public bool HasClassname => !string.IsNullOrEmpty(Classname);
+
+    /// <inheritdoc />
+    public bool HasParent => Parent.HasValue && Parent != IntPtr.Zero;
+
+    /// <inheritdoc />
+    public IntPtr? Parent { get; set; }
+
+    /// <inheritdoc />
+    public IInteropWindow ParentWindow { get; set; }
+
+    /// <inheritdoc />
+    public string Caption { get; set; }
+
+    /// <inheritdoc />
+    public string Text { get; set; }
+
+    /// <inheritdoc />
+    public bool? IsVisible { get; set; }
+
+    /// <inheritdoc />
+    public bool? IsMinimized { get; set; }
+
+    /// <inheritdoc />
+    public bool? IsMaximized { get; set; }
+
+    /// <inheritdoc />
+    public int? ThreadId { get; set; }
+
+    /// <inheritdoc />
+    public int? ProcessId { get; set; }
+        
+    /// <inheritdoc />
+    public WindowPlacement? Placement { get; set; }
+
+    /// <inheritdoc />
+    public bool? CanScroll { get; set; }
+
+    /// <inheritdoc />
+    public StringBuilder Dump(InteropWindowRetrieveSettings retrieveSettings = InteropWindowRetrieveSettings.CacheAll, StringBuilder dump = null, string indentation = "")
+    {
+        this.Fill(retrieveSettings);
+
+        dump = dump ?? new StringBuilder();
+        dump.AppendLine($"{indentation}{nameof(Handle)}={Handle}");
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Classname) != 0)
         {
-            Handle = handle;
+            dump.AppendLine($"{indentation}{nameof(Classname)}={Classname}");
         }
 
-        /// <inheritdoc />
-        public IntPtr Handle { get; }
-
-        /// <inheritdoc />
-        public bool HasZOrderedChildren { get; set; }
-
-        /// <inheritdoc />
-        public WindowInfo? Info { get; set; }
-
-        /// <inheritdoc />
-        public IEnumerable<IInteropWindow> Children { get; set; }
-
-        /// <inheritdoc />
-        public bool HasChildren => Children?.Any() == true;
-
-        /// <inheritdoc />
-        public string Classname { get; set; }
-
-        /// <inheritdoc />
-        public bool HasClassname => !string.IsNullOrEmpty(Classname);
-
-        /// <inheritdoc />
-        public bool HasParent => Parent.HasValue && Parent != IntPtr.Zero;
-
-        /// <inheritdoc />
-        public IntPtr? Parent { get; set; }
-
-        /// <inheritdoc />
-        public IInteropWindow ParentWindow { get; set; }
-
-        /// <inheritdoc />
-        public string Caption { get; set; }
-
-        /// <inheritdoc />
-        public string Text { get; set; }
-
-        /// <inheritdoc />
-        public bool? IsVisible { get; set; }
-
-        /// <inheritdoc />
-        public bool? IsMinimized { get; set; }
-
-        /// <inheritdoc />
-        public bool? IsMaximized { get; set; }
-
-        /// <inheritdoc />
-        public int? ThreadId { get; set; }
-
-        /// <inheritdoc />
-        public int? ProcessId { get; set; }
-        
-        /// <inheritdoc />
-        public WindowPlacement? Placement { get; set; }
-
-        /// <inheritdoc />
-        public bool? CanScroll { get; set; }
-
-        /// <inheritdoc />
-        public StringBuilder Dump(InteropWindowRetrieveSettings retrieveSettings = InteropWindowRetrieveSettings.CacheAll, StringBuilder dump = null, string indentation = "")
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Caption) != 0)
         {
-            this.Fill(retrieveSettings);
+            dump.AppendLine($"{indentation}{nameof(Caption)}={Caption}");
+        }
 
-            dump = dump ?? new StringBuilder();
-            dump.AppendLine($"{indentation}{nameof(Handle)}={Handle}");
-            if ((retrieveSettings & InteropWindowRetrieveSettings.Classname) != 0)
-            {
-                dump.AppendLine($"{indentation}{nameof(Classname)}={Classname}");
-            }
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Text) != 0)
+        {
+            dump.AppendLine($"{indentation}{nameof(Text)}={Text}");
+        }
 
-            if ((retrieveSettings & InteropWindowRetrieveSettings.Caption) != 0)
-            {
-                dump.AppendLine($"{indentation}{nameof(Caption)}={Caption}");
-            }
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Info) != 0)
+        {
+            dump.AppendLine($"{indentation}{nameof(Info)}={Info}");
+        }
 
-            if ((retrieveSettings & InteropWindowRetrieveSettings.Text) != 0)
-            {
-                dump.AppendLine($"{indentation}{nameof(Text)}={Text}");
-            }
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Maximized) != 0)
+        {
+            dump.AppendLine($"{indentation}{nameof(IsMaximized)}={IsMaximized}");
+        }
 
-            if ((retrieveSettings & InteropWindowRetrieveSettings.Info) != 0)
-            {
-                dump.AppendLine($"{indentation}{nameof(Info)}={Info}");
-            }
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Minimized) != 0)
+        {
+            dump.AppendLine($"{indentation}{nameof(IsMinimized)}={IsMinimized}");
+        }
 
-            if ((retrieveSettings & InteropWindowRetrieveSettings.Maximized) != 0)
-            {
-                dump.AppendLine($"{indentation}{nameof(IsMaximized)}={IsMaximized}");
-            }
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Visible) != 0)
+        {
+            dump.AppendLine($"{indentation}{nameof(IsVisible)}={IsVisible}");
+        }
 
-            if ((retrieveSettings & InteropWindowRetrieveSettings.Minimized) != 0)
-            {
-                dump.AppendLine($"{indentation}{nameof(IsMinimized)}={IsMinimized}");
-            }
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Parent) != 0)
+        {
+            dump.AppendLine($"{indentation}{nameof(Parent)}={Parent}");
+        }
 
-            if ((retrieveSettings & InteropWindowRetrieveSettings.Visible) != 0)
-            {
-                dump.AppendLine($"{indentation}{nameof(IsVisible)}={IsVisible}");
-            }
+        if ((retrieveSettings & InteropWindowRetrieveSettings.ScrollInfo) != 0)
+        {
+            dump.AppendLine($"{indentation}{nameof(CanScroll)}={CanScroll}");
+        }
 
-            if ((retrieveSettings & InteropWindowRetrieveSettings.Parent) != 0)
-            {
-                dump.AppendLine($"{indentation}{nameof(Parent)}={Parent}");
-            }
-
-            if ((retrieveSettings & InteropWindowRetrieveSettings.ScrollInfo) != 0)
-            {
-                dump.AppendLine($"{indentation}{nameof(CanScroll)}={CanScroll}");
-            }
-
-            if ((retrieveSettings & InteropWindowRetrieveSettings.Children) != 0 && !HasParent)
-            {
-                foreach (var child in this.GetChildren())
-                {
-                    child.Dump(retrieveSettings, dump, indentation + "\t");
-                }
-            }
-
-            if ((retrieveSettings & InteropWindowRetrieveSettings.ZOrderedChildren) == 0)
-            {
-                return dump;
-            }
-
-            if (HasParent)
-            {
-                return dump;
-            }
-
-            foreach (var child in this.GetZOrderedChildren())
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Children) != 0 && !HasParent)
+        {
+            foreach (var child in this.GetChildren())
             {
                 child.Dump(retrieveSettings, dump, indentation + "\t");
             }
+        }
 
+        if ((retrieveSettings & InteropWindowRetrieveSettings.ZOrderedChildren) == 0)
+        {
             return dump;
         }
 
-        /// <inheritdoc />
-        public bool Equals(IInteropWindow other)
+        if (HasParent)
         {
-            if (other is null)
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-            return Handle.Equals(other.Handle);
+            return dump;
         }
 
-        /// <inheritdoc />
-        public override bool Equals(object obj)
+        foreach (var child in this.GetZOrderedChildren())
         {
-            if (obj is null)
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-            if (obj.GetType() != GetType())
-            {
-                return false;
-            }
-            return Equals((IInteropWindow) obj);
+            child.Dump(retrieveSettings, dump, indentation + "\t");
         }
 
-        /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return Handle.GetHashCode();
-        }
+        return dump;
+    }
 
-        /// <summary>
-        /// Operator == overload
-        /// </summary>
-        /// <param name="left">InteropWindow</param>
-        /// <param name="right">InteropWindow</param>
-        /// <returns>bool</returns>
-        public static bool operator ==(InteropWindow left, InteropWindow right)
+    /// <inheritdoc />
+    public bool Equals(IInteropWindow other)
+    {
+        if (other is null)
         {
-            return Equals(left, right);
+            return false;
         }
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+        return Handle.Equals(other.Handle);
+    }
 
-        /// <summary>
-        /// Create (cast) a InteropWindow from an IntPtr
-        /// </summary>
-        /// <param name="handle">IntPtr</param>
-        public static implicit operator InteropWindow(IntPtr handle)
+    /// <inheritdoc />
+    public override bool Equals(object obj)
+    {
+        if (obj is null)
         {
-            return InteropWindowFactory.CreateFor(handle);
+            return false;
         }
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+        if (obj.GetType() != GetType())
+        {
+            return false;
+        }
+        return Equals((IInteropWindow) obj);
+    }
 
-        /// <summary>
-        /// Cast the InteropWindow to it's handle
-        /// </summary>
-        /// <param name="interopWindow">InteropWindow</param>
-        public static implicit operator IntPtr(InteropWindow interopWindow)
-        {
-            return interopWindow.Handle;
-        }
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return Handle.GetHashCode();
+    }
 
-        /// <summary>
-        /// operator != overload
-        /// </summary>
-        /// <param name="left">InteropWindow</param>
-        /// <param name="right">InteropWindow</param>
-        /// <returns>bool</returns>
-        public static bool operator !=(InteropWindow left, InteropWindow right)
-        {
-            return !Equals(left, right);
-        }
+    /// <summary>
+    /// Operator == overload
+    /// </summary>
+    /// <param name="left">InteropWindow</param>
+    /// <param name="right">InteropWindow</param>
+    /// <returns>bool</returns>
+    public static bool operator ==(InteropWindow left, InteropWindow right)
+    {
+        return Equals(left, right);
+    }
+
+    /// <summary>
+    /// Create (cast) a InteropWindow from an IntPtr
+    /// </summary>
+    /// <param name="handle">IntPtr</param>
+    public static implicit operator InteropWindow(IntPtr handle)
+    {
+        return InteropWindowFactory.CreateFor(handle);
+    }
+
+    /// <summary>
+    /// Cast the InteropWindow to it's handle
+    /// </summary>
+    /// <param name="interopWindow">InteropWindow</param>
+    public static implicit operator IntPtr(InteropWindow interopWindow)
+    {
+        return interopWindow.Handle;
+    }
+
+    /// <summary>
+    /// operator != overload
+    /// </summary>
+    /// <param name="left">InteropWindow</param>
+    /// <param name="right">InteropWindow</param>
+    /// <returns>bool</returns>
+    public static bool operator !=(InteropWindow left, InteropWindow right)
+    {
+        return !Equals(left, right);
     }
 }

@@ -5,131 +5,130 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Win32;
 
-namespace Dapplo.Windows.EmbeddedBrowser
+namespace Dapplo.Windows.EmbeddedBrowser;
+
+/// <summary>
+/// Helper class for the Internet Explorer version
+/// </summary>
+public static class InternetExplorerVersion
 {
+    // Internet explorer Registry key
+    private const string IeKey = @"Software\Microsoft\Internet Explorer";
+
     /// <summary>
-    /// Helper class for the Internet Explorer version
+    ///     Get the version of the Internet Explorer
     /// </summary>
-    public static class InternetExplorerVersion
+    /// <returns>int with browser version</returns>
+    public static int Version
     {
-        // Internet explorer Registry key
-        private const string IeKey = @"Software\Microsoft\Internet Explorer";
-
-        /// <summary>
-        ///     Get the version of the Internet Explorer
-        /// </summary>
-        /// <returns>int with browser version</returns>
-        public static int Version
+        get
         {
-            get
+            var maxVer = 0;
+            using (var ieKey = Registry.LocalMachine.OpenSubKey(IeKey, false))
             {
-                var maxVer = 0;
-                using (var ieKey = Registry.LocalMachine.OpenSubKey(IeKey, false))
+                if (ieKey == null)
                 {
-                    if (ieKey == null)
-                    {
-                        return maxVer;
-                    }
-
-                    foreach (var value in new[] { "svcVersion", "svcUpdateVersion", "Version", "W2kVersion" })
-                    {
-                        var objVal = ieKey.GetValue(value, "0");
-                        var strVal = Convert.ToString(objVal);
-
-                        var iPos = strVal.IndexOf('.');
-                        if (iPos > 0)
-                        {
-                            strVal = strVal.Substring(0, iPos);
-                        }
-
-                        if (int.TryParse(strVal, out var res))
-                        {
-                            maxVer = Math.Max(maxVer, res);
-                        }
-                    }
+                    return maxVer;
                 }
 
-                return maxVer;
-            }
-        }
+                foreach (var value in new[] { "svcVersion", "svcUpdateVersion", "Version", "W2kVersion" })
+                {
+                    var objVal = ieKey.GetValue(value, "0");
+                    var strVal = Convert.ToString(objVal);
 
-        /// <summary>
-        ///     Get the highest possible version for the embedded browser
-        /// </summary>
-        /// <param name="ignoreDoctype">true to ignore the doctype when loading a page</param>
-        /// <returns>IE Feature</returns>
-        public static int GetEmbVersion(bool ignoreDoctype = true)
-        {
-            var ieVersion = Version;
+                    var iPos = strVal.IndexOf('.');
+                    if (iPos > 0)
+                    {
+                        strVal = strVal.Substring(0, iPos);
+                    }
 
-            if (ieVersion > 9)
-            {
-                return ieVersion * 1000 + (ignoreDoctype ? 1 : 0);
-            }
-
-            if (ieVersion > 7)
-            {
-                return ieVersion * 1111;
+                    if (int.TryParse(strVal, out var res))
+                    {
+                        maxVer = Math.Max(maxVer, res);
+                    }
+                }
             }
 
-            return 7000;
+            return maxVer;
+        }
+    }
+
+    /// <summary>
+    ///     Get the highest possible version for the embedded browser
+    /// </summary>
+    /// <param name="ignoreDoctype">true to ignore the doctype when loading a page</param>
+    /// <returns>IE Feature</returns>
+    public static int GetEmbVersion(bool ignoreDoctype = true)
+    {
+        var ieVersion = Version;
+
+        if (ieVersion > 9)
+        {
+            return ieVersion * 1000 + (ignoreDoctype ? 1 : 0);
         }
 
-        /// <summary>
-        ///     Change browser version to the highest possible
-        /// </summary>
-        /// <param name="ignoreDoctype">true to ignore the doctype when loading a page</param>
-        public static void ChangeEmbeddedVersion(bool ignoreDoctype = true)
+        if (ieVersion > 7)
         {
-            var applicationName = Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
-            ChangeEmbeddedVersion(applicationName, ignoreDoctype);
+            return ieVersion * 1111;
         }
 
-        /// <summary>
-        ///     Change the browser version for the specified application
-        /// </summary>
-        /// <param name="applicationName">Name of the process</param>
-        /// <param name="ignoreDoctype">true to ignore the doctype when loading a page</param>
-        public static void ChangeEmbeddedVersion(string applicationName, bool ignoreDoctype = true)
-        {
-            ChangeEmbeddedVersion(applicationName, GetEmbVersion(ignoreDoctype));
-        }
+        return 7000;
+    }
 
-        /// <summary>
-        ///     Fix the browser version for the specified application
-        /// </summary>
-        /// <param name="applicationName">Name of the process</param>
-        /// <param name="ieVersion">
-        ///     Version, see
-        ///     <a href="https://msdn.microsoft.com/en-us/library/ee330730(v=vs.85).aspx#browser_emulation">Browser Emulation</a>
-        /// </param>
-        public static void ChangeEmbeddedVersion(string applicationName, int ieVersion)
-        {
-            ModifyRegistry("HKEY_CURRENT_USER", applicationName + ".exe", ieVersion);
+    /// <summary>
+    ///     Change browser version to the highest possible
+    /// </summary>
+    /// <param name="ignoreDoctype">true to ignore the doctype when loading a page</param>
+    public static void ChangeEmbeddedVersion(bool ignoreDoctype = true)
+    {
+        var applicationName = Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
+        ChangeEmbeddedVersion(applicationName, ignoreDoctype);
+    }
+
+    /// <summary>
+    ///     Change the browser version for the specified application
+    /// </summary>
+    /// <param name="applicationName">Name of the process</param>
+    /// <param name="ignoreDoctype">true to ignore the doctype when loading a page</param>
+    public static void ChangeEmbeddedVersion(string applicationName, bool ignoreDoctype = true)
+    {
+        ChangeEmbeddedVersion(applicationName, GetEmbVersion(ignoreDoctype));
+    }
+
+    /// <summary>
+    ///     Fix the browser version for the specified application
+    /// </summary>
+    /// <param name="applicationName">Name of the process</param>
+    /// <param name="ieVersion">
+    ///     Version, see
+    ///     <a href="https://msdn.microsoft.com/en-us/library/ee330730(v=vs.85).aspx#browser_emulation">Browser Emulation</a>
+    /// </param>
+    public static void ChangeEmbeddedVersion(string applicationName, int ieVersion)
+    {
+        ModifyRegistry("HKEY_CURRENT_USER", applicationName + ".exe", ieVersion);
 #if DEBUG
-            ModifyRegistry("HKEY_CURRENT_USER", applicationName + ".vshost.exe", ieVersion);
+        ModifyRegistry("HKEY_CURRENT_USER", applicationName + ".vshost.exe", ieVersion);
 #endif
-        }
+    }
 
-        /// <summary>
-        ///     Make the change to the registry
-        /// </summary>
-        /// <param name="root">HKEY_CURRENT_USER or something</param>
-        /// <param name="applicationName">Name of the executable</param>
-        /// <param name="ieFeatureVersion">Version to use</param>
-        private static void ModifyRegistry(string root, string applicationName, int ieFeatureVersion)
+    /// <summary>
+    ///     Make the change to the registry
+    /// </summary>
+    /// <param name="root">HKEY_CURRENT_USER or something</param>
+    /// <param name="applicationName">Name of the executable</param>
+    /// <param name="ieFeatureVersion">Version to use</param>
+    private static void ModifyRegistry(string root, string applicationName, int ieFeatureVersion)
+    {
+        var regKey = $@"{root}\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION";
+        try
         {
-            var regKey = $@"{root}\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION";
-            try
-            {
-                Registry.SetValue(regKey, applicationName, ieFeatureVersion);
-            }
-            catch (Exception)
-            {
-                // some config will hit access rights exceptions
-                // this is why we try with both LOCAL_MACHINE and CURRENT_USER
-                // Ignore
-            }
+            Registry.SetValue(regKey, applicationName, ieFeatureVersion);
+        }
+        catch (Exception)
+        {
+            // some config will hit access rights exceptions
+            // this is why we try with both LOCAL_MACHINE and CURRENT_USER
+            // Ignore
         }
     }
 }

@@ -7,7 +7,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>http://www.dapplo.net/blocks/Dapplo.Windows/</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <LangVersion>9</LangVersion>
+    <LangVersion>10</LangVersion>
     <DisableImplicitFrameworkReferences Condition="$(TargetFramework.StartsWith('net4'))">true</DisableImplicitFrameworkReferences>
     <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

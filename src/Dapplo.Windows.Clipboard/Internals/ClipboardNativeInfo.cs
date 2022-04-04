@@ -3,38 +3,37 @@
 using System;
 using Dapplo.Windows.Kernel32;
 
-namespace Dapplo.Windows.Clipboard.Internals
+namespace Dapplo.Windows.Clipboard.Internals;
+
+/// <summary>
+/// This class contains native information to handle the clipboard contents
+/// </summary>
+internal class ClipboardNativeInfo : IDisposable
 {
+    internal IntPtr GlobalHandle { get; set; }
+    internal bool NeedsWrite { get; set; }
+
     /// <summary>
-    /// This class contains native information to handle the clipboard contents
+    /// The format id which is processed
     /// </summary>
-    internal class ClipboardNativeInfo : IDisposable
+    internal uint FormatId { get; set; }
+    internal IntPtr MemoryPtr { get; set; }
+
+    /// <summary>
+    /// Returns the size of the clipboard area
+    /// </summary>
+    internal int Size => Kernel32Api.GlobalSize(GlobalHandle);
+
+    /// <summary>
+    /// Cleanup this native info by unlocking the global handle
+    /// </summary>
+    public void Dispose()
     {
-        internal IntPtr GlobalHandle { get; set; }
-        internal bool NeedsWrite { get; set; }
-
-        /// <summary>
-        /// The format id which is processed
-        /// </summary>
-        internal uint FormatId { get; set; }
-        internal IntPtr MemoryPtr { get; set; }
-
-        /// <summary>
-        /// Returns the size of the clipboard area
-        /// </summary>
-        internal int Size => Kernel32Api.GlobalSize(GlobalHandle);
-
-        /// <summary>
-        /// Cleanup this native info by unlocking the global handle
-        /// </summary>
-        public void Dispose()
+        if (NeedsWrite)
         {
-            if (NeedsWrite)
-            {
-                // Place the content on the clipboard
-                NativeMethods.SetClipboardDataWithErrorHandling(FormatId, GlobalHandle);
-            }
-            Kernel32Api.GlobalUnlock(GlobalHandle);
+            // Place the content on the clipboard
+            NativeMethods.SetClipboardDataWithErrorHandling(FormatId, GlobalHandle);
         }
+        Kernel32Api.GlobalUnlock(GlobalHandle);
     }
 }

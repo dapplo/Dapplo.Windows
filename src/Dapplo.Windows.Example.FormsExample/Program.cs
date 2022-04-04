@@ -5,28 +5,27 @@ using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Log.Loggers;
 
-namespace Dapplo.Windows.Example.FormsExample
+namespace Dapplo.Windows.Example.FormsExample;
+
+internal static class Program
 {
-    internal static class Program
+    /// <summary>
+    ///     The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    private static void Main()
     {
-        /// <summary>
-        ///     The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        private static void Main()
-        {
-            LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Verbose);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            var formDpiUnaware = new FormDpiUnaware();
-            formDpiUnaware.Show();
-            var formWithAttachedDpiHandler = new FormWithAttachedDpiHandler();
-            formWithAttachedDpiHandler.Show();
-            var formExtendsDpiAwareForm = new FormExtendsDpiAwareForm();
-            formExtendsDpiAwareForm.Show();
-            var webBrowserForm = new WebBrowserForm();
-            webBrowserForm.Show();
-            Application.Run();
-        }
+        LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Verbose);
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+        var formDpiUnaware = new FormDpiUnaware();
+        formDpiUnaware.Show();
+        var formWithAttachedDpiHandler = new FormWithAttachedDpiHandler();
+        formWithAttachedDpiHandler.Show();
+        var formExtendsDpiAwareForm = new FormExtendsDpiAwareForm();
+        formExtendsDpiAwareForm.Show();
+        var webBrowserForm = new WebBrowserForm();
+        webBrowserForm.Show();
+        Application.Run();
     }
 }

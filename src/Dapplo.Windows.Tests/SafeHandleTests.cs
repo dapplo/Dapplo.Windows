@@ -8,37 +8,36 @@ using Dapplo.Windows.Gdi32.SafeHandles;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Dapplo.Windows.Tests
+namespace Dapplo.Windows.Tests;
+
+public class SafeHandleTests
 {
-    public class SafeHandleTests
+    public SafeHandleTests(ITestOutputHelper testOutputHelper)
     {
-        public SafeHandleTests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
 
-        [Fact]
-        public void TestCreateCompatibleDc()
+    [Fact]
+    public void TestCreateCompatibleDc()
+    {
+        using (var desktopDcHandle = SafeWindowDcHandle.FromDesktop())
         {
-            using (var desktopDcHandle = SafeWindowDcHandle.FromDesktop())
+            Assert.False(desktopDcHandle.IsInvalid);
+
+            // create a device context we can copy to
+            using (var safeCompatibleDcHandle = Gdi32Api.CreateCompatibleDC(desktopDcHandle))
             {
-                Assert.False(desktopDcHandle.IsInvalid);
-
-                // create a device context we can copy to
-                using (var safeCompatibleDcHandle = Gdi32Api.CreateCompatibleDC(desktopDcHandle))
-                {
-                    Assert.False(safeCompatibleDcHandle.IsInvalid);
-                }
+                Assert.False(safeCompatibleDcHandle.IsInvalid);
             }
         }
+    }
 
-        [Fact]
-        public void TestSafeWindowDcHandle_IntPtrZero()
+    [Fact]
+    public void TestSafeWindowDcHandle_IntPtrZero()
+    {
+        using (var safeDctHandle = SafeWindowDcHandle.FromWindow(IntPtr.Zero))
         {
-            using (var safeDctHandle = SafeWindowDcHandle.FromWindow(IntPtr.Zero))
-            {
-                Assert.Null(safeDctHandle);
-            }
+            Assert.Null(safeDctHandle);
         }
     }
 }

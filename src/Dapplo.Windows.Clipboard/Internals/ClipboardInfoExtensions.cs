@@ -5,72 +5,71 @@ using System.ComponentModel;
 using Dapplo.Windows.Kernel32;
 using Dapplo.Windows.Kernel32.Enums;
 
-namespace Dapplo.Windows.Clipboard.Internals
+namespace Dapplo.Windows.Clipboard.Internals;
+
+internal static class ClipboardInfoExtensions
 {
-    internal static class ClipboardInfoExtensions
+    /// <summary>
+    /// Create ClipboardNativeInfo to read
+    /// </summary>
+    /// <param name="clipboardAccessToken">IClipboardLock</param>
+    /// <param name="formatId">uint</param>
+    /// <returns>ClipboardNativeInfo</returns>
+    public static ClipboardNativeInfo ReadInfo(this IClipboardAccessToken clipboardAccessToken, uint formatId)
     {
-        /// <summary>
-        /// Create ClipboardNativeInfo to read
-        /// </summary>
-        /// <param name="clipboardAccessToken">IClipboardLock</param>
-        /// <param name="formatId">uint</param>
-        /// <returns>ClipboardNativeInfo</returns>
-        public static ClipboardNativeInfo ReadInfo(this IClipboardAccessToken clipboardAccessToken, uint formatId)
+        clipboardAccessToken.ThrowWhenNoAccess();
+
+        var hGlobal = NativeMethods.GetClipboardData(formatId);
+        if (hGlobal == IntPtr.Zero)
         {
-            clipboardAccessToken.ThrowWhenNoAccess();
-
-            var hGlobal = NativeMethods.GetClipboardData(formatId);
-            if (hGlobal == IntPtr.Zero)
+            if (NativeMethods.IsClipboardFormatAvailable(formatId))
             {
-                if (NativeMethods.IsClipboardFormatAvailable(formatId))
-                {
-                    throw new Win32Exception($"Format {formatId} not available.");
-                }
-                throw new Win32Exception();
+                throw new Win32Exception($"Format {formatId} not available.");
             }
-            var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
-            if (memoryPtr == IntPtr.Zero)
-            {
-                throw new Win32Exception();
-            }
-
-            return new ClipboardNativeInfo
-            {
-                GlobalHandle = hGlobal,
-                MemoryPtr = memoryPtr,
-                FormatId = formatId
-            };
+            throw new Win32Exception();
+        }
+        var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
+        if (memoryPtr == IntPtr.Zero)
+        {
+            throw new Win32Exception();
         }
 
-        /// <summary>
-        /// Factory for the write information
-        /// </summary>
-        /// <param name="clipboardAccessToken">IClipboardLock</param>
-        /// <param name="formatId">uint with the format id</param>
-        /// <param name="size">int with the size of the clipboard area</param>
-        /// <returns>ClipboardNativeInfo</returns>
-        public static ClipboardNativeInfo WriteInfo(this IClipboardAccessToken clipboardAccessToken, uint formatId, long size)
+        return new ClipboardNativeInfo
         {
-            clipboardAccessToken.ThrowWhenNoAccess();
+            GlobalHandle = hGlobal,
+            MemoryPtr = memoryPtr,
+            FormatId = formatId
+        };
+    }
 
-            var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable, new UIntPtr((ulong)size));
-            if (hGlobal == IntPtr.Zero)
-            {
-                throw new Win32Exception();
-            }
-            var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
-            if (memoryPtr == IntPtr.Zero)
-            {
-                throw new Win32Exception();
-            }
+    /// <summary>
+    /// Factory for the write information
+    /// </summary>
+    /// <param name="clipboardAccessToken">IClipboardLock</param>
+    /// <param name="formatId">uint with the format id</param>
+    /// <param name="size">int with the size of the clipboard area</param>
+    /// <returns>ClipboardNativeInfo</returns>
+    public static ClipboardNativeInfo WriteInfo(this IClipboardAccessToken clipboardAccessToken, uint formatId, long size)
+    {
+        clipboardAccessToken.ThrowWhenNoAccess();
 
-            return new ClipboardNativeInfo
-            {
-                GlobalHandle = hGlobal,
-                MemoryPtr = memoryPtr,
-                NeedsWrite = true,
-                FormatId = formatId
-            };
+        var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable, new UIntPtr((ulong)size));
+        if (hGlobal == IntPtr.Zero)
+        {
+            throw new Win32Exception();
         }
+        var memoryPtr = Kernel32Api.GlobalLock(hGlobal);
+        if (memoryPtr == IntPtr.Zero)
+        {
+            throw new Win32Exception();
+        }
+
+        return new ClipboardNativeInfo
+        {
+            GlobalHandle = hGlobal,
+            MemoryPtr = memoryPtr,
+            NeedsWrite = true,
+            FormatId = formatId
+        };
     }
 }

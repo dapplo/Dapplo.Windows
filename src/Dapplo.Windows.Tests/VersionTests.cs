@@ -7,24 +7,23 @@ using Dapplo.Windows.Kernel32.Structs;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Dapplo.Windows.Tests
-{
-    public class VersionTests
-    {
-        public VersionTests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+namespace Dapplo.Windows.Tests;
 
-        /// <summary>
-        ///     Test GetVersionEx
-        /// </summary>
-        [Fact]
-        public void TestOsVersionInfoEx()
-        {
-            var osVersionInfoEx = OsVersionInfoEx.Create();
-            Assert.True(Kernel32Api.GetVersionEx(ref osVersionInfoEx));
-            Assert.True(osVersionInfoEx.MajorVersion >= 6);
-        }
+public class VersionTests
+{
+    public VersionTests(ITestOutputHelper testOutputHelper)
+    {
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
+
+    /// <summary>
+    ///     Test GetVersionEx
+    /// </summary>
+    [Fact]
+    public void TestOsVersionInfoEx()
+    {
+        var osVersionInfoEx = OsVersionInfoEx.Create();
+        Assert.True(Kernel32Api.GetVersionEx(ref osVersionInfoEx));
+        Assert.True(osVersionInfoEx.MajorVersion >= 6);
     }
 }

@@ -11,69 +11,68 @@ using Dapplo.Windows.Input.Enums;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Dapplo.Windows.Tests
+namespace Dapplo.Windows.Tests;
+
+public class RawInputTests
 {
-    public class RawInputTests
+    private static readonly LogSource Log = new LogSource();
+    public RawInputTests(ITestOutputHelper testOutputHelper)
     {
-        private static readonly LogSource Log = new LogSource();
-        public RawInputTests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
 
-        /// <summary>
-        ///     Test RawInput.GetAllDevices
-        /// </summary>
-        [Fact]
-        public void Test_RawInput_AllDevices()
+    /// <summary>
+    ///     Test RawInput.GetAllDevices
+    /// </summary>
+    [Fact]
+    public void Test_RawInput_AllDevices()
+    {
+        bool foundOneDevice = false;
+        foreach (var rawInputDeviceInfo in RawInputApi.GetAllDevices().OrderBy(information => information.DeviceInfo.Type).ThenBy(information => information.DisplayName))
         {
-            bool foundOneDevice = false;
-            foreach (var rawInputDeviceInfo in RawInputApi.GetAllDevices().OrderBy(information => information.DeviceInfo.Type).ThenBy(information => information.DisplayName))
+            Log.Info().WriteLine("RawInput Device {0} with name {1}", rawInputDeviceInfo.DeviceInfo.Type, rawInputDeviceInfo.DisplayName);
+            switch (rawInputDeviceInfo.DeviceInfo.Type)
             {
-                Log.Info().WriteLine("RawInput Device {0} with name {1}", rawInputDeviceInfo.DeviceInfo.Type, rawInputDeviceInfo.DisplayName);
-                switch (rawInputDeviceInfo.DeviceInfo.Type)
-                {
-                    case RawInputDeviceTypes.Keyboard:
-                        var keyboardInfo = rawInputDeviceInfo.DeviceInfo.Keyboard;
-                        Log.Info().WriteLine("Keyboard is of type {0} and subtype {1} and in mode {2}.", keyboardInfo.Type, keyboardInfo.SubType, keyboardInfo.KeyboardMode);
-                        Log.Info().WriteLine("Keyboard with {0} key, of which {1} function keys and it has {2} LEDs.", keyboardInfo.NumberOfKeysTotal, keyboardInfo.NumberOfFunctionKeys, keyboardInfo.NumberOfIndicators);
-                        break;
-                }
-
-                foundOneDevice = true;
-            }
-            Assert.True(foundOneDevice);
-        }
-
-        //[WpfFact]
-        public async Task Test_RawInput_DeviceChanges_KeyboardRemoved()
-        {
-            var device = await RawInputMonitor.MonitorRawInputDeviceChanges(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
-            Assert.False(device.Added);
-            Assert.Equal(RawInputDeviceTypes.Keyboard, device.DeviceInformation.DeviceInfo.Type);
-        }
-
-        //[WpfFact]
-        public async Task Test_RawInput_Left()
-        {
-            var rawInputObservable = RawInputMonitor.MonitorRawInput(RawInputDevices.Keyboard);
-
-            using (rawInputObservable.Subscribe(ri =>
-            {
-                if (ri.RawInput.Device.Keyboard.Flags == RawKeyboardFlags.Break)
-                {
-                    Log.Debug().WriteLine("Key down {0}", ri.RawInput.Device.Keyboard.VirtualKey);
-                }
-                if (ri.RawInput.Device.Keyboard.Flags == RawKeyboardFlags.Break)
-                {
-                    Log.Debug().WriteLine("Key up {0}", ri.RawInput.Device.Keyboard.VirtualKey);
-                }
-            }))
-            {
-                var device = await rawInputObservable.FirstAsync(args => args.RawInput.Device.Keyboard.VirtualKey == VirtualKeyCode.Left);
-                Assert.Equal(RawInputDeviceTypes.Keyboard, device.RawInput.Header.Type);
+                case RawInputDeviceTypes.Keyboard:
+                    var keyboardInfo = rawInputDeviceInfo.DeviceInfo.Keyboard;
+                    Log.Info().WriteLine("Keyboard is of type {0} and subtype {1} and in mode {2}.", keyboardInfo.Type, keyboardInfo.SubType, keyboardInfo.KeyboardMode);
+                    Log.Info().WriteLine("Keyboard with {0} key, of which {1} function keys and it has {2} LEDs.", keyboardInfo.NumberOfKeysTotal, keyboardInfo.NumberOfFunctionKeys, keyboardInfo.NumberOfIndicators);
+                    break;
             }
 
+            foundOneDevice = true;
         }
+        Assert.True(foundOneDevice);
+    }
+
+    //[WpfFact]
+    public async Task Test_RawInput_DeviceChanges_KeyboardRemoved()
+    {
+        var device = await RawInputMonitor.MonitorRawInputDeviceChanges(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
+        Assert.False(device.Added);
+        Assert.Equal(RawInputDeviceTypes.Keyboard, device.DeviceInformation.DeviceInfo.Type);
+    }
+
+    //[WpfFact]
+    public async Task Test_RawInput_Left()
+    {
+        var rawInputObservable = RawInputMonitor.MonitorRawInput(RawInputDevices.Keyboard);
+
+        using (rawInputObservable.Subscribe(ri =>
+               {
+                   if (ri.RawInput.Device.Keyboard.Flags == RawKeyboardFlags.Break)
+                   {
+                       Log.Debug().WriteLine("Key down {0}", ri.RawInput.Device.Keyboard.VirtualKey);
+                   }
+                   if (ri.RawInput.Device.Keyboard.Flags == RawKeyboardFlags.Break)
+                   {
+                       Log.Debug().WriteLine("Key up {0}", ri.RawInput.Device.Keyboard.VirtualKey);
+                   }
+               }))
+        {
+            var device = await rawInputObservable.FirstAsync(args => args.RawInput.Device.Keyboard.VirtualKey == VirtualKeyCode.Left);
+            Assert.Equal(RawInputDeviceTypes.Keyboard, device.RawInput.Header.Type);
+        }
+
     }
 }

@@ -6,23 +6,22 @@ using Dapplo.Windows.DesktopWindowsManager;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Dapplo.Windows.Tests
-{
-    public class DwmTest
-    {
-        public DwmTest(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+namespace Dapplo.Windows.Tests;
 
-        /// <summary>
-        ///     Test is Dwm is Enabled
-        /// </summary>
-        /// <returns></returns>
-        //[Fact]
-        private void TestDwmEnabled()
-        {
-            Assert.True(DwmApi.IsDwmEnabled);
-        }
+public class DwmTest
+{
+    public DwmTest(ITestOutputHelper testOutputHelper)
+    {
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
+
+    /// <summary>
+    ///     Test is Dwm is Enabled
+    /// </summary>
+    /// <returns></returns>
+    //[Fact]
+    private void TestDwmEnabled()
+    {
+        Assert.True(DwmApi.IsDwmEnabled);
     }
 }

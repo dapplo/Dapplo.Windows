@@ -6,24 +6,23 @@ using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Windows.Shell32;
 
-namespace Dapplo.Windows.Tests
-{
-    public class Shell32Tests
-    {
-        public Shell32Tests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
+namespace Dapplo.Windows.Tests;
 
-        /// <summary>
-        ///     Test AppBarr
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        private void TestAppBar()
-        {
-            var appBarData = Shell32Api.TaskbarPosition;
-            Assert.False(appBarData.Bounds.IsEmpty);
-        }
-   }
+public class Shell32Tests
+{
+    public Shell32Tests(ITestOutputHelper testOutputHelper)
+    {
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
+
+    /// <summary>
+    ///     Test AppBarr
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    private void TestAppBar()
+    {
+        var appBarData = Shell32Api.TaskbarPosition;
+        Assert.False(appBarData.Bounds.IsEmpty);
+    }
 }

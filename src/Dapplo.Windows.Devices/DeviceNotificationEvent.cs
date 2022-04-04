@@ -5,72 +5,71 @@ using System.Runtime.InteropServices;
 using Dapplo.Windows.Devices.Enums;
 using Dapplo.Windows.Devices.Structs;
 
-namespace Dapplo.Windows.Devices
+namespace Dapplo.Windows.Devices;
+
+/// <summary>
+/// Information on device changes
+/// </summary>
+public class DeviceNotificationEvent
 {
+    private DevBroadcastHeader _devBroadcastHeader;
+    // IntPtr to the device broadcast structure
+    private readonly IntPtr _deviceBroadcastPtr;
+
     /// <summary>
-    /// Information on device changes
+    /// Creates an DeviceNotificationEvent from a WM_DEVICECHANGE message
     /// </summary>
-    public class DeviceNotificationEvent
+    /// <param name="wParam"></param>
+    /// <param name="lParam"></param>
+    public DeviceNotificationEvent(IntPtr wParam, IntPtr lParam)
     {
-        private DevBroadcastHeader _devBroadcastHeader;
-        // IntPtr to the device broadcast structure
-        private readonly IntPtr _deviceBroadcastPtr;
+        EventType = (DeviceChangeEvent) wParam.ToInt32();
+        _deviceBroadcastPtr = lParam;
+        _devBroadcastHeader = Marshal.PtrToStructure<DevBroadcastHeader>(_deviceBroadcastPtr);
+    }
 
-        /// <summary>
-        /// Creates an DeviceNotificationEvent from a WM_DEVICECHANGE message
-        /// </summary>
-        /// <param name="wParam"></param>
-        /// <param name="lParam"></param>
-        public DeviceNotificationEvent(IntPtr wParam, IntPtr lParam)
+    /// <summary>
+    /// Type of the event
+    /// </summary>
+    public DeviceChangeEvent EventType { get; }
+
+    /// <summary>
+    /// Test if the message is a certain DeviceBroadcastDeviceType
+    /// </summary>
+    /// <param name="deviceBroadcastDeviceType">DeviceBroadcastDeviceType</param>
+    /// <returns>bool</returns>
+    public bool Is(DeviceBroadcastDeviceType deviceBroadcastDeviceType) => _devBroadcastHeader.DeviceType == deviceBroadcastDeviceType;
+
+
+    /// <summary>
+    /// Get the DevBroadcastVolume
+    /// </summary>
+    /// <param name="devBroadcastVolume">out DevBroadcastVolume</param>
+    /// <returns>bool true the value could be converted</returns>
+    public bool TryGetDevBroadcastVolume(out DevBroadcastVolume devBroadcastVolume)
+    {
+        if (_devBroadcastHeader.DeviceType != DeviceBroadcastDeviceType.Volume)
         {
-            EventType = (DeviceChangeEvent) wParam.ToInt32();
-            _deviceBroadcastPtr = lParam;
-            _devBroadcastHeader = Marshal.PtrToStructure<DevBroadcastHeader>(_deviceBroadcastPtr);
+            devBroadcastVolume = default;
+            return false;
         }
+        devBroadcastVolume = Marshal.PtrToStructure<DevBroadcastVolume>(_deviceBroadcastPtr);
+        return true;
+    }
 
-        /// <summary>
-        /// Type of the event
-        /// </summary>
-        public DeviceChangeEvent EventType { get; }
-
-        /// <summary>
-        /// Test if the message is a certain DeviceBroadcastDeviceType
-        /// </summary>
-        /// <param name="deviceBroadcastDeviceType">DeviceBroadcastDeviceType</param>
-        /// <returns>bool</returns>
-        public bool Is(DeviceBroadcastDeviceType deviceBroadcastDeviceType) => _devBroadcastHeader.DeviceType == deviceBroadcastDeviceType;
-
-
-        /// <summary>
-        /// Get the DevBroadcastVolume
-        /// </summary>
-        /// <param name="devBroadcastVolume">out DevBroadcastVolume</param>
-        /// <returns>bool true the value could be converted</returns>
-        public bool TryGetDevBroadcastVolume(out DevBroadcastVolume devBroadcastVolume)
+    /// <summary>
+    /// Get the DevBroadcastDeviceInterface
+    /// </summary>
+    /// <param name="devBroadcastDeviceInterface">out DevBroadcastDeviceInterface</param>
+    /// <returns>bool true the value could be converted</returns>
+    public bool TryGetDevBroadcastDeviceInterface(out DevBroadcastDeviceInterface devBroadcastDeviceInterface)
+    {
+        if (_devBroadcastHeader.DeviceType != DeviceBroadcastDeviceType.DeviceInterface)
         {
-            if (_devBroadcastHeader.DeviceType != DeviceBroadcastDeviceType.Volume)
-            {
-                devBroadcastVolume = default;
-                return false;
-            }
-            devBroadcastVolume = Marshal.PtrToStructure<DevBroadcastVolume>(_deviceBroadcastPtr);
-            return true;
+            devBroadcastDeviceInterface = default;
+            return false;
         }
-
-        /// <summary>
-        /// Get the DevBroadcastDeviceInterface
-        /// </summary>
-        /// <param name="devBroadcastDeviceInterface">out DevBroadcastDeviceInterface</param>
-        /// <returns>bool true the value could be converted</returns>
-        public bool TryGetDevBroadcastDeviceInterface(out DevBroadcastDeviceInterface devBroadcastDeviceInterface)
-        {
-            if (_devBroadcastHeader.DeviceType != DeviceBroadcastDeviceType.DeviceInterface)
-            {
-                devBroadcastDeviceInterface = default;
-                return false;
-            }
-            devBroadcastDeviceInterface = Marshal.PtrToStructure<DevBroadcastDeviceInterface>(_deviceBroadcastPtr);
-            return true;
-        }
+        devBroadcastDeviceInterface = Marshal.PtrToStructure<DevBroadcastDeviceInterface>(_deviceBroadcastPtr);
+        return true;
     }
 }

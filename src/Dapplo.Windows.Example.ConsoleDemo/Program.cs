@@ -5,23 +5,22 @@ using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Messages;
 
-namespace Dapplo.Windows.Example.ConsoleDemo
-{
-    internal static class Program
-    {
-        [STAThread]
-        private static void Main(string[] args)
-        {
-            var key = new KeyCombinationHandler(VirtualKeyCode.KeyA);
-            using (KeyboardHook.KeyboardEvents.Where(key).Subscribe(e => Hit()))
-            {
-                MessageLoop.ProcessMessages();
-            }
-        }
+namespace Dapplo.Windows.Example.ConsoleDemo;
 
-        private static void Hit()
+internal static class Program
+{
+    [STAThread]
+    private static void Main(string[] args)
+    {
+        var key = new KeyCombinationHandler(VirtualKeyCode.KeyA);
+        using (KeyboardHook.KeyboardEvents.Where(key).Subscribe(e => Hit()))
         {
-            Console.WriteLine("Hit");
+            MessageLoop.ProcessMessages();
         }
+    }
+
+    private static void Hit()
+    {
+        Console.WriteLine("Hit");
     }
 }

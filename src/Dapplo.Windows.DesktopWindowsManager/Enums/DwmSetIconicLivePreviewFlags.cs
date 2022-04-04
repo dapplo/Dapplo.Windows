@@ -2,22 +2,21 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 
-namespace Dapplo.Windows.DesktopWindowsManager.Enums
+namespace Dapplo.Windows.DesktopWindowsManager.Enums;
+
+/// <summary>
+///     Configuration flags for the DwmSetIconicLivePreviewBitmap function
+/// </summary>
+[Flags]
+public enum DwmSetIconicLivePreviewFlags
 {
     /// <summary>
-    ///     Configuration flags for the DwmSetIconicLivePreviewBitmap function
+    ///     None
     /// </summary>
-    [Flags]
-    public enum DwmSetIconicLivePreviewFlags
-    {
-        /// <summary>
-        ///     None
-        /// </summary>
-        None = 0,
+    None = 0,
 
-        /// <summary>
-        ///     Displays a frame around the provided bitmap.
-        /// </summary>
-        DisplayFrame = 1
-    }
+    /// <summary>
+    ///     Displays a frame around the provided bitmap.
+    /// </summary>
+    DisplayFrame = 1
 }

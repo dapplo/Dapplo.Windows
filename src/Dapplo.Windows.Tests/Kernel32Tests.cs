@@ -7,28 +7,27 @@ using Dapplo.Windows.Kernel32.Structs;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Dapplo.Windows.Tests
+namespace Dapplo.Windows.Tests;
+
+public class Kernel32Tests
 {
-    public class Kernel32Tests
+    public Kernel32Tests(ITestOutputHelper testOutputHelper)
     {
-        public Kernel32Tests(ITestOutputHelper testOutputHelper)
-        {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-        }
-
-        [Fact]
-        private void Test_IsRunningAsUwp()
-        {
-            Assert.False(PackageInfo.IsRunningOnUwp);
-        }
-
-        [Fact]
-        private void Test_GetOsVersionInfoEx()
-        {
-            var osVersionInfoEx= OsVersionInfoEx.Create();
-            Assert.True(Kernel32Api.GetVersionEx(ref osVersionInfoEx));
-            //Assert.NotEmpty(osVersionInfoEx.ServicePackVersion);
-        }
-
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
     }
+
+    [Fact]
+    private void Test_IsRunningAsUwp()
+    {
+        Assert.False(PackageInfo.IsRunningOnUwp);
+    }
+
+    [Fact]
+    private void Test_GetOsVersionInfoEx()
+    {
+        var osVersionInfoEx= OsVersionInfoEx.Create();
+        Assert.True(Kernel32Api.GetVersionEx(ref osVersionInfoEx));
+        //Assert.NotEmpty(osVersionInfoEx.ServicePackVersion);
+    }
+
 }
