@@ -203,7 +203,7 @@ public static class IconHelper
         try
         {
             var srcBuf = new byte[iconStream.Length];
-            iconStream.Read(srcBuf, 0, (int)iconStream.Length);
+            _ = iconStream.Read(srcBuf, 0, (int)iconStream.Length);
             int iCount = BitConverter.ToInt16(srcBuf, 4);
             for (var iIndex = 0; iIndex < iCount; iIndex++)
             {
@@ -235,13 +235,30 @@ public static class IconHelper
     ///     See: http://msdn.microsoft.com/en-us/library/windows/desktop/ms648069%28v=vs.85%29.aspx
     /// </summary>
     /// <typeparam name="TIcon"></typeparam>
-    /// <param name="location">The file (EXE or DLL) to get the icon from</param>
+    /// <param name="filePath">The file (EXE or DLL) to get the icon from</param>
     /// <param name="index">Index of the icon</param>
     /// <param name="useLargeIcon">true if the large icon is wanted</param>
     /// <returns>Icon</returns>
-    public static TIcon ExtractAssociatedIcon<TIcon>(string location, int index = 0, bool useLargeIcon = true) where TIcon : class
+    public static TIcon ExtractAssociatedIcon<TIcon>(string filePath, int index = 0, bool useLargeIcon = true) where TIcon : class
     {
-        NativeIconMethods.ExtractIconEx(location, index, out var large, out var small, 1);
+        if (filePath == null)
+        {
+            throw new ArgumentNullException(nameof(filePath));
+        }
+        if (!Uri.TryCreate(filePath, UriKind.Absolute, out var uri))
+        {
+            filePath = Path.GetFullPath(filePath);
+            uri = new Uri(filePath);
+        }
+        if (!uri.IsFile)
+        {
+            return null;
+        }
+        if (!File.Exists(filePath))
+        {
+            return null;
+        }
+        NativeIconMethods.ExtractIconEx(filePath, index, out var large, out var small, 1);
         TIcon returnIcon = null;
         try
         {
@@ -327,42 +344,6 @@ public static class IconHelper
     public static SafeIconHandle GetSafeIconHandle(this Bitmap bitmap)
     {
         return new SafeIconHandle(bitmap);
-    }
-
-    /// <summary>
-    ///     Returns an icon representation of an image contained in the specified file.
-    ///     This function is identical to System.Drawing.Icon.ExtractAssociatedIcon, xcept this version works.
-    ///     See: http://stackoverflow.com/questions/1842226/how-to-get-the-associated-icon-from-a-network-share-file
-    /// </summary>
-    /// <param name="filePath">The path to the file that contains an image.</param>
-    /// <param name="iconIndex">Index of the icon</param>
-    /// <returns>The System.Drawing.Icon representation of the image contained in the specified file.</returns>
-    public static TIcon ExtractAssociatedIcon<TIcon>(string filePath, int iconIndex = 0) where TIcon : class
-    {
-        if (filePath == null)
-        {
-            throw new ArgumentNullException(nameof(filePath));
-        }
-        if (!Uri.TryCreate(filePath, UriKind.Absolute, out var uri))
-        {
-            filePath = Path.GetFullPath(filePath);
-            uri = new Uri(filePath);
-        }
-        if (!uri.IsFile)
-        {
-            return null;
-        }
-        if (!File.Exists(filePath))
-        {
-            return null;
-        }
-        var iconPath = new StringBuilder(1024);
-        iconPath.Append(filePath);
-
-        using (var handle = ExtractAssociatedIcon(new HandleRef(null, IntPtr.Zero), iconPath, ref iconIndex))
-        {
-            return IconHelper.IconHandleTo<TIcon>(handle.DangerousGetHandle());
-        }
     }
 
     /// <summary>
@@ -455,14 +436,4 @@ public static class IconHelper
             }
         }
     }
-
-    /// <summary>
-    /// Retrieves a handle to an indexed icon found in a file or an icon found in an associated executable file.
-    /// </summary>
-    /// <param name="hInst">A handle to the instance of the application calling the function.</param>
-    /// <param name="iconPath">StringBuilder</param>
-    /// <param name="iconIndex">The full path and file name of the file that contains the icon. The function extracts the icon handle from that file, or from an executable file associated with that file. If the icon handle is obtained from an executable file, the function stores the full path and file name of that executable in the string pointed to by lpIconPath.</param>
-    /// <returns>SafeIconHandle</returns>
-    [DllImport("shell32", CharSet = CharSet.Unicode)]
-    private static extern SafeIconHandle ExtractAssociatedIcon(HandleRef hInst, StringBuilder iconPath, ref int iconIndex);
 }

@@ -51,8 +51,8 @@ public struct BitmapFileHeader
     /// <summary>
     /// Create a BitmapFileHeader which needs a BitmapInfoHeader to calculate the values
     /// </summary>
-    /// <param name="bitmapInfoHeader">BitmapInfoHeader</param>
-    public static BitmapFileHeader Create(BitmapV5Header bitmapInfoHeader)
+    /// <param name="bitmapV5Header">BitmapV5Header</param>
+    public static BitmapFileHeader Create(BitmapV5Header bitmapV5Header)
     {
         var bitmapFileHeaderSize = Marshal.SizeOf(typeof(BitmapFileHeader));
         return new BitmapFileHeader
@@ -60,11 +60,31 @@ public struct BitmapFileHeader
             // Fill with "BM"
             FileType = 0x4d42,
             // Size of the file, is the size of this, the size of a BitmapInfoHeader and the size of the image itself.
-            Size = (int) (bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.SizeImage),
+            Size = (int) (bitmapFileHeaderSize + bitmapV5Header.Size + bitmapV5Header.SizeImage),
             _reserved1 = 0,
             _reserved2 = 0,
             // Specify on what offset the bits are found
-            OffsetToBitmapBits = (int) (bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.ColorsUsed * 4)
+            OffsetToBitmapBits = (int) (bitmapFileHeaderSize + bitmapV5Header.Size + bitmapV5Header.ColorsUsed * 4)
+        };
+    }
+
+    /// <summary>
+    /// Create a BitmapFileHeader which needs a BitmapInfoHeader to calculate the values
+    /// </summary>
+    /// <param name="bitmapInfoHeader">BitmapInfoHeader</param>
+    public static BitmapFileHeader Create(BitmapInfoHeader bitmapInfoHeader)
+    {
+        var bitmapFileHeaderSize = Marshal.SizeOf(typeof(BitmapFileHeader));
+        return new BitmapFileHeader
+        {
+            // Fill with "BM"
+            FileType = 0x4d42,
+            // Size of the file, is the size of this, the size of a BitmapInfoHeader and the size of the image itself.
+            Size = (int)(bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.SizeImage),
+            _reserved1 = 0,
+            _reserved2 = 0,
+            // Specify on what offset the bits are found
+            OffsetToBitmapBits = (int)(bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.ColorsUsed * 4)
         };
     }
 }

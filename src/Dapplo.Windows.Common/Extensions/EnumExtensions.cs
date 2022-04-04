@@ -14,8 +14,8 @@ public static class EnumExtensions
     /// <summary>
     /// Get an attribute of a certain type, placed upon an enum value
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="enumVal"></param>
+    /// <typeparam name="T">Type of attribute</typeparam>
+    /// <param name="enumVal">Enum</param>
     /// <returns></returns>
     public static T GetAttributeOfType<T>(this Enum enumVal) where T : Attribute
     {
