@@ -25,7 +25,7 @@ namespace Dapplo.Windows.Dpi
         /// <param name="dpiHandler">DpiHandler</param>
         /// <param name="bitmapProvider">A function which provides the requested bitmap</param>
         /// <param name="bitmapScaler">A function to provide a newly scaled bitmap</param>
-        public static BitmapScaleHandler<TKey, TValue> Create<TKey, TValue>(DpiHandler dpiHandler, Func<TKey, uint, TValue> bitmapProvider, Func<TValue, uint, TValue> bitmapScaler = null) where TValue : IDisposable
+        public static BitmapScaleHandler<TKey, TValue> Create<TKey, TValue>(DpiHandler dpiHandler, Func<TKey, int, TValue> bitmapProvider, Func<TValue, int, TValue> bitmapScaler = null) where TValue : IDisposable
         {
             var scaleHandler = new BitmapScaleHandler<TKey, TValue>();
             scaleHandler.Initialize(dpiHandler, bitmapProvider, bitmapScaler);
@@ -38,7 +38,7 @@ namespace Dapplo.Windows.Dpi
         /// <param name="dpiHandler">DpiHandler</param>
         /// <param name="resourceType">Type to create the ComponentResourceManager for</param>
         /// <param name="bitmapScaler">A function to provide a newly scaled bitmap, you can return the provide bitmap if you want to keep it as is</param>
-        public static BitmapScaleHandler<string, TValue> WithComponentResourceManager<TValue>(DpiHandler dpiHandler, Type resourceType, Func<TValue, uint, TValue> bitmapScaler = null) where TValue : IDisposable
+        public static BitmapScaleHandler<string, TValue> WithComponentResourceManager<TValue>(DpiHandler dpiHandler, Type resourceType, Func<TValue, int, TValue> bitmapScaler = null) where TValue : IDisposable
         {
             return Create<string, TValue>(dpiHandler, (imageName, dpi) =>
             {
@@ -53,7 +53,7 @@ namespace Dapplo.Windows.Dpi
         /// <param name="bitmap">Bitmap to scale</param>
         /// <param name="dpi">uint with the dpi value to scale for</param>
         /// <returns>Bitmap</returns>
-        public static Bitmap SimpleBitmapScaler(Bitmap bitmap, uint dpi)
+        public static Bitmap SimpleBitmapScaler(Bitmap bitmap, int dpi)
         {
             if (dpi == DpiCalculator.DefaultScreenDpi)
             {
@@ -81,7 +81,7 @@ namespace Dapplo.Windows.Dpi
         private readonly ReaderWriterLockSlim _actionsLock = new();
         private readonly Dictionary<TKey, TValue> _images = new();
         private bool _areWeDisposing;
-        private uint _dpi;
+        private int _dpi;
         private IDisposable _dpiChangeSubscription;
 
         internal BitmapScaleHandler()
@@ -96,12 +96,12 @@ namespace Dapplo.Windows.Dpi
         /// <summary>
         ///     This function retrieves the bitmap
         /// </summary>
-        private Func<TKey, uint, TValue> BitmapProvider { get; set; }
+        private Func<TKey, int, TValue> BitmapProvider { get; set; }
 
         /// <summary>
         ///     This function scales the bitmap (if needed)
         /// </summary>
-        private Func<TValue, uint, TValue> BitmapScaler { get; set; }
+        private Func<TValue, int, TValue> BitmapScaler { get; set; }
 
         /// <summary>
         ///     Add an action which applies a bitmap
@@ -312,7 +312,7 @@ namespace Dapplo.Windows.Dpi
         /// <param name="dpiHandler">DpiHandler</param>
         /// <param name="bitmapProvider">A function which provides the requested bitmap</param>
         /// <param name="bitmapScaler">A function to provide a newly scaled bitmap</param>
-        internal void Initialize(DpiHandler dpiHandler, Func<TKey, uint, TValue> bitmapProvider, Func<TValue, uint, TValue> bitmapScaler = null)
+        internal void Initialize(DpiHandler dpiHandler, Func<TKey, int, TValue> bitmapProvider, Func<TValue, int, TValue> bitmapScaler = null)
         {
             BitmapProvider = bitmapProvider;
             BitmapScaler = bitmapScaler;

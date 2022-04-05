@@ -11,19 +11,19 @@ public class DpiChangeInfo
     /// <summary>
     /// The DPI from before the change
     /// </summary>
-    public uint PreviousDpi { get; }
+    public int PreviousDpi { get; }
 
     /// <summary>
     /// The new DPI
     /// </summary>
-    public uint NewDpi { get; }
+    public int NewDpi { get; }
 
     /// <summary>
     /// Creates a DpiChangeInfo
     /// </summary>
     /// <param name="previousDpi">uint</param>
     /// <param name="newDpi">uint</param>
-    public DpiChangeInfo(uint previousDpi, uint newDpi)
+    public DpiChangeInfo(int previousDpi, int newDpi)
     {
         PreviousDpi = previousDpi;
         NewDpi = newDpi;

@@ -87,7 +87,7 @@ public static class NativeDpiMethods
     /// </summary>
     /// <param name="hWnd">IntPtr</param>
     /// <returns>dpi value</returns>
-    public static uint GetDpi(IntPtr hWnd)
+    public static int GetDpi(IntPtr hWnd)
     {
         if (!User32Api.IsWindow(hWnd))
         {
@@ -97,7 +97,7 @@ public static class NativeDpiMethods
         // Use the easiest method, but this only works for Windows 10
         if (WindowsVersion.IsWindows10OrLater)
         {
-            return GetDpiForWindow(hWnd);
+            return (int)GetDpiForWindow(hWnd);
         }
 
         // Use the second easiest method, but this only works for Windows 8.1 or later
@@ -107,7 +107,7 @@ public static class NativeDpiMethods
             // ReSharper disable once UnusedVariable
             if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY))
             {
-                return dpiX;
+                return (int)dpiX;
             }
         }
 
@@ -118,7 +118,7 @@ public static class NativeDpiMethods
             {
                 return DpiCalculator.DefaultScreenDpi;
             }
-            return (uint)Gdi32Api.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
+            return (int)Gdi32Api.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
         }
     }
 

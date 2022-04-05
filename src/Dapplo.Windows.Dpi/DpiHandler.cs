@@ -23,7 +23,7 @@ public sealed class DpiHandler : IDisposable
 {
     private static readonly LogSource Log = new LogSource();
 
-    // Stores if the handler is runing via a listener
+    // Stores if the handler is running via a listener
     private bool _needsListenerWorkaround;
 
     // Via this the dpi values are published in details
@@ -42,7 +42,7 @@ public sealed class DpiHandler : IDisposable
     /// <summary>
     ///     Retrieve the current DPI for the UI element whic is related to this DpiHandler
     /// </summary>
-    public uint Dpi { get; private set; }
+    public int Dpi { get; private set; }
 
     /// <summary>
     ///     This is that which handles the windows messages, and needs to be disposed
@@ -121,7 +121,7 @@ public sealed class DpiHandler : IDisposable
                     Log.Verbose().WriteLine("Processing {0} event, resizing / positioning window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
                 }
 
-                // Retrieve the adviced location
+                // Retrieve the advised location
                 var lprNewRect = (NativeRect) Marshal.PtrToStructure(windowMessageInfo.LongParam, typeof(NativeRect));
                 // Move the window to it's location, and resize
                 User32Api.SetWindowPos(windowMessageInfo.Handle,
@@ -131,7 +131,7 @@ public sealed class DpiHandler : IDisposable
                     lprNewRect.Width,
                     lprNewRect.Height,
                     WindowPos.SWP_NOZORDER | WindowPos.SWP_NOOWNERZORDER | WindowPos.SWP_NOACTIVATE);
-                currentDpi = (uint)windowMessageInfo.WordParam & 0xFFFF;
+                currentDpi = (int)windowMessageInfo.WordParam & 0xFFFF;
                 // specify that the message was handled
                 handled = true;
                 break;
