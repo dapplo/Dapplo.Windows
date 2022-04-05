@@ -118,7 +118,7 @@ public static class NativeDpiMethods
             {
                 return DpiCalculator.DefaultScreenDpi;
             }
-            return (int)Gdi32Api.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
+            return Gdi32Api.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
         }
     }
 
@@ -126,8 +126,8 @@ public static class NativeDpiMethods
     /// Return the DPI for the screen which the location is located on
     /// </summary>
     /// <param name="location">NativePoint</param>
-    /// <returns>uint</returns>
-    public static uint GetDpi(NativePoint location)
+    /// <returns>int</returns>
+    public static int GetDpi(NativePoint location)
     {
         if (!WindowsVersion.IsWindows81OrLater)
         {
@@ -137,7 +137,7 @@ public static class NativeDpiMethods
         IntPtr hMonitor = User32Api.MonitorFromRect(ref rect, MonitorFrom.DefaultToNearest);
         if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY))
         {
-            return dpiX;
+            return (int)dpiX;
         }
 
         return DpiCalculator.DefaultScreenDpi;
