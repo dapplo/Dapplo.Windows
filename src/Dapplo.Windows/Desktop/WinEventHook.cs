@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -68,11 +69,30 @@ public static class WinEventHook
         return Create(WinEvents.EVENT_OBJECT_NAMECHANGE).Where(winEventInfo => winEventInfo.ObjectIdentifier == ObjectIdentifiers.Window);
     }
 
+    /// <summary>
+    ///     Create an observable which only monitors created (open) and destroyed (closed) windows
+    /// </summary>
+    /// <returns>IObservable with WinEventInfo</returns>
+    public static IObservable<WinEventInfo> WindowCreateDestroyObservable()
+    {
+        return Create(WinEvents.EVENT_OBJECT_CREATE, WinEvents.EVENT_OBJECT_DESTROY).Where(winEventInfo => winEventInfo.ObjectIdentifier == ObjectIdentifiers.Window);
+    }
+
+    /// <summary>
+    /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unhookwinevent">UnhookWinEvent</a>
+    ///
+    /// Three common errors cause this function to fail:  
+    /// The hWinEventHook parameter is NULL or not valid.
+    /// The event hook specified by hWinEventHook was already removed.
+    /// UnhookWinEvent is called from a thread that is different from the original call to SetWinEventHook.
+    /// </summary>
+    /// <param name="hWinEventHook">IntPtr with the win event hook handle from SetWinEventHook</param>
+    /// <returns>bool</returns>
     [DllImport(User32Api.User32, SetLastError = true)]
     private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
     /// <summary>
-    ///     Hook to win events
+    ///     Hook to win events, see <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwineventhook">SetWinEventHook</a>
     /// </summary>
     /// <param name="eventMin">
     ///     Specifies the event constant for the lowest event value in the range of events that are handled

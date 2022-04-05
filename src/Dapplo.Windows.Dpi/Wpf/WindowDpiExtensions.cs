@@ -30,7 +30,7 @@ namespace Dapplo.Windows.Dpi.Wpf
                 Log.Verbose().WriteLine("Registering the UpdateLayoutTransform subscription for {0}", window.GetType());
             }
             // Add the layout transform action
-            var transformSubscription = dpiHandler.OnDpiChanged.Subscribe(dpiChangeInfo => window.UpdateLayoutTransform((double)dpiChangeInfo.NewDpi / DpiHandler.DefaultScreenDpi));
+            var transformSubscription = dpiHandler.OnDpiChanged.Subscribe(dpiChangeInfo => window.UpdateLayoutTransform((double)dpiChangeInfo.NewDpi / DpiCalculator.DefaultScreenDpi));
             window.WinProcMessages().Subscribe(message =>
             {
                 dpiHandler.HandleWindowMessages(message);
@@ -38,7 +38,7 @@ namespace Dapplo.Windows.Dpi.Wpf
                 {
                     case WindowsMessages.WM_NCCREATE:
                         // Apply scaling 1x time
-                        window.UpdateLayoutTransform((double)NativeDpiMethods.GetDpi(message.Handle) / DpiHandler.DefaultScreenDpi);
+                        window.UpdateLayoutTransform((double)NativeDpiMethods.GetDpi(message.Handle) / DpiCalculator.DefaultScreenDpi);
                         break;
                     case WindowsMessages.WM_DESTROY:
                         // Remove layout transform 

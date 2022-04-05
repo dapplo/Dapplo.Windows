@@ -23,11 +23,6 @@ public sealed class DpiHandler : IDisposable
 {
     private static readonly LogSource Log = new LogSource();
 
-    /// <summary>
-    ///     This is the default DPI for the screen
-    /// </summary>
-    public const uint DefaultScreenDpi = 96;
-
     // Stores if the handler is runing via a listener
     private bool _needsListenerWorkaround;
 
@@ -94,7 +89,7 @@ public sealed class DpiHandler : IDisposable
     internal bool HandleWindowMessages(WindowMessageInfo windowMessageInfo)
     {
         bool handled = false;
-        var currentDpi = DefaultScreenDpi;
+        var currentDpi = DpiCalculator.DefaultScreenDpi;
         bool isDpiMessage = false;
         switch (windowMessageInfo.Message)
         {
@@ -220,7 +215,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>IntPtr</returns>
     internal IntPtr HandleContextMenuMessages(WindowMessageInfo windowMessageInfo)
     {
-        var currentDpi = DefaultScreenDpi;
+        var currentDpi = DpiCalculator.DefaultScreenDpi;
         bool isDpiMessage = false;
         switch (windowMessageInfo.Message)
         {
@@ -266,101 +261,6 @@ public sealed class DpiHandler : IDisposable
     }
 
     /// <summary>
-    /// Calculate a DPI scale factor
-    /// </summary>
-    /// <param name="dpi">uint</param>
-    /// <returns>double</returns>
-    public static double DpiScaleFactor(uint dpi)
-    {
-        return (double) dpi / DefaultScreenDpi;
-    }
-
-    /// <summary>
-    ///     Scale the supplied number according to the supplied dpi
-    /// </summary>
-    /// <param name="someNumber">double with e.g. the width 16 for 16x16 images</param>
-    /// <param name="dpi">current dpi, normal is 96.</param>
-    /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>double with the scaled number</returns>
-    public static double ScaleWithDpi(double someNumber, uint dpi, Func<double, double> scaleModifier = null)
-    {
-        var dpiScaleFactor = DpiScaleFactor(dpi);
-        if (scaleModifier != null)
-        {
-            dpiScaleFactor = scaleModifier(dpiScaleFactor);
-        }
-        return dpiScaleFactor * someNumber;
-    }
-
-    /// <summary>
-    ///     Scale the supplied number according to the supplied dpi
-    /// </summary>
-    /// <param name="number">int with e.g. 16 for 16x16 images</param>
-    /// <param name="dpi">current dpi, normal is 96.</param>
-    /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>Scaled width</returns>
-    public static int ScaleWithDpi(int number, uint dpi, Func<double, double> scaleModifier = null)
-    {
-        var dpiScaleFactor = DpiScaleFactor(dpi);
-        if (scaleModifier != null)
-        {
-            dpiScaleFactor = scaleModifier(dpiScaleFactor);
-        }
-        return (int)(dpiScaleFactor * number);
-    }
-
-    /// <summary>
-    ///     Scale the supplied NativeSize according to the supplied dpi
-    /// </summary>
-    /// <param name="size">NativeSize to resize</param>
-    /// <param name="dpi">current dpi, normal is 96.</param>
-    /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>NativeSize scaled</returns>
-    public static NativeSize ScaleWithDpi(NativeSize size, uint dpi, Func<double, double> scaleModifier = null)
-    {
-        var dpiScaleFactor = DpiScaleFactor(dpi);
-        if (scaleModifier != null)
-        {
-            dpiScaleFactor = scaleModifier(dpiScaleFactor);
-        }
-        return new NativeSize((int)(dpiScaleFactor * size.Width), (int)(dpiScaleFactor * size.Height));
-    }
-
-    /// <summary>
-    ///     Scale the supplied NativePoint according to the supplied dpi
-    /// </summary>
-    /// <param name="size">NativePoint to resize</param>
-    /// <param name="dpi">current dpi, normal is 96.</param>
-    /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>NativePoint scaled</returns>
-    public static NativePoint ScaleWithDpi(NativePoint size, uint dpi, Func<double, double> scaleModifier = null)
-    {
-        var dpiScaleFactor = DpiScaleFactor(dpi);
-        if (scaleModifier != null)
-        {
-            dpiScaleFactor = scaleModifier(dpiScaleFactor);
-        }
-        return new NativePoint((int)(dpiScaleFactor * size.X), (int)(dpiScaleFactor * size.Y));
-    }
-
-    /// <summary>
-    ///     Scale the supplied NativeSizeFloat according to the supplied dpi
-    /// </summary>
-    /// <param name="size">NativeSizeFloat to resize</param>
-    /// <param name="dpi">current dpi, normal is 96.</param>
-    /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>NativeSize scaled</returns>
-    public static NativeSizeFloat ScaleWithDpi(NativeSizeFloat size, uint dpi, Func<double, double> scaleModifier = null)
-    {
-        var dpiScaleFactor = DpiScaleFactor(dpi);
-        if (scaleModifier != null)
-        {
-            dpiScaleFactor = scaleModifier(dpiScaleFactor);
-        }
-        return new NativeSizeFloat(dpiScaleFactor * size.Width, dpiScaleFactor * size.Height);
-    }
-
-    /// <summary>
     ///     Scale the supplied number to the current dpi
     /// </summary>
     /// <param name="someNumber">double with e.g. a width like 16 for 16x16 images</param>
@@ -368,7 +268,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>double with scaled number</returns>
     public double ScaleWithCurrentDpi(double someNumber, Func<double, double> scaleModifier = null)
     {
-        return ScaleWithDpi(someNumber, Dpi, scaleModifier);
+        return DpiCalculator.ScaleWithDpi(someNumber, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -379,7 +279,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>int with scaled number</returns>
     public int ScaleWithCurrentDpi(int someNumber, Func<double, double> scaleModifier = null)
     {
-        return ScaleWithDpi(someNumber, Dpi, scaleModifier);
+        return DpiCalculator.ScaleWithDpi(someNumber, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -390,7 +290,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>NativeSize scaled</returns>
     public NativeSize ScaleWithCurrentDpi(NativeSize size, Func<double, double> scaleModifier = null)
     {
-        return ScaleWithDpi(size, Dpi, scaleModifier);
+        return DpiCalculator.ScaleWithDpi(size, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -401,7 +301,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>NativeSizeFloat scaled</returns>
     public NativeSizeFloat ScaleWithCurrentDpi(NativeSizeFloat size, Func<double, double> scaleModifier = null)
     {
-        return ScaleWithDpi(size, Dpi, scaleModifier);
+        return DpiCalculator.ScaleWithDpi(size, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -412,7 +312,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>NativePoint scaled</returns>
     public NativePoint ScaleWithCurrentDpi(NativePoint point, Func<double, double> scaleModifier = null)
     {
-        return ScaleWithDpi(point, Dpi, scaleModifier);
+        return DpiCalculator.ScaleWithDpi(point, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -423,102 +323,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>NativePointFloat scaled</returns>
     public NativePointFloat ScaleWithCurrentDpi(NativePointFloat point, Func<double, double> scaleModifier = null)
     {
-        return ScaleWithDpi(point, Dpi, scaleModifier);
-    }
-
-    /// <summary>
-    /// Calculate a DPI unscale factor
-    /// </summary>
-    /// <param name="dpi">uint</param>
-    /// <returns>double</returns>
-    public static double DpiUnscaleFactor(uint dpi)
-    {
-        return (double)DefaultScreenDpi / dpi;
-    }
-
-    /// <summary>
-    ///     Unscale the supplied number according to the supplied dpi
-    /// </summary>
-    /// <param name="someNumber">double with e.g. the scaled width</param>
-    /// <param name="dpi">current dpi, normal is 96.</param>
-    /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>double with the unscaled number</returns>
-    public static double UnscaleWithDpi(double someNumber, uint dpi, Func<double, double> scaleModifier = null)
-    {
-        var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
-        if (scaleModifier != null)
-        {
-            dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
-        }
-        return dpiUnscaleFactor * someNumber;
-    }
-
-    /// <summary>
-    ///    Unscale the supplied number according to the supplied dpi
-    /// </summary>
-    /// <param name="number">int with a scaled width</param>
-    /// <param name="dpi">current dpi, normal is 96.</param>
-    /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>Unscaled width</returns>
-    public static int UnscaleWithDpi(int number, uint dpi, Func<double, double> scaleModifier = null)
-    {
-        var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
-        if (scaleModifier != null)
-        {
-            dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
-        }
-        return (int)(dpiUnscaleFactor * number);
-    }
-
-    /// <summary>
-    ///     Unscale the supplied NativeSize according to the supplied dpi
-    /// </summary>
-    /// <param name="size">NativeSize to unscale</param>
-    /// <param name="dpi">current dpi, normal is 96.</param>
-    /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>NativeSize unscaled</returns>
-    public static NativeSize UnscaleWithDpi(NativeSize size, uint dpi, Func<double, double> scaleModifier = null)
-    {
-        var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
-        if (scaleModifier != null)
-        {
-            dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
-        }
-        return new NativeSize((int)(dpiUnscaleFactor * size.Width), (int)(dpiUnscaleFactor * size.Height));
-    }
-
-    /// <summary>
-    ///     Unscale the supplied NativePoint according to the supplied dpi
-    /// </summary>
-    /// <param name="size">NativePoint to unscale</param>
-    /// <param name="dpi">current dpi, normal is 96.</param>
-    /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>NativePoint unscaled</returns>
-    public static NativePoint UnscaleWithDpi(NativePoint size, uint dpi, Func<double, double> scaleModifier = null)
-    {
-        var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
-        if (scaleModifier != null)
-        {
-            dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
-        }
-        return new NativePoint((int)(dpiUnscaleFactor * size.X), (int)(dpiUnscaleFactor * size.Y));
-    }
-
-    /// <summary>
-    ///     unscale the supplied NativeSizeFloat according to the supplied dpi
-    /// </summary>
-    /// <param name="size">NativeSizeFloat to resize</param>
-    /// <param name="dpi">current dpi, normal is 96.</param>
-    /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>NativeSize unscaled</returns>
-    public static NativeSizeFloat UnscaleWithDpi(NativeSizeFloat size, uint dpi, Func<double, double> scaleModifier = null)
-    {
-        var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
-        if (scaleModifier != null)
-        {
-            dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
-        }
-        return new NativeSizeFloat(dpiUnscaleFactor * size.Width, dpiUnscaleFactor * size.Height);
+        return DpiCalculator.ScaleWithDpi(point, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -529,7 +334,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>double with unscaled number</returns>
     public double UnscaleWithCurrentDpi(double someNumber, Func<double, double> scaleModifier = null)
     {
-        return UnscaleWithDpi(someNumber, Dpi, scaleModifier);
+        return DpiCalculator.UnscaleWithDpi(someNumber, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -540,7 +345,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>int with unscaled number</returns>
     public int UnscaleWithCurrentDpi(int someNumber, Func<double, double> scaleModifier = null)
     {
-        return UnscaleWithDpi(someNumber, Dpi, scaleModifier);
+        return DpiCalculator.UnscaleWithDpi(someNumber, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -551,7 +356,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>NativeSize unscaled</returns>
     public NativeSize UnscaleWithCurrentDpi(NativeSize size, Func<double, double> scaleModifier = null)
     {
-        return UnscaleWithDpi(size, Dpi, scaleModifier);
+        return DpiCalculator.UnscaleWithDpi(size, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -562,7 +367,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>NativeSizeFloat unscaled</returns>
     public NativeSizeFloat UnscaleWithCurrentDpi(NativeSizeFloat size, Func<double, double> scaleModifier = null)
     {
-        return UnscaleWithDpi(size, Dpi, scaleModifier);
+        return DpiCalculator.UnscaleWithDpi(size, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -573,7 +378,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>NativePoint unscaled</returns>
     public NativePoint UnscaleWithCurrentDpi(NativePoint point, Func<double, double> scaleModifier = null)
     {
-        return UnscaleWithDpi(point, Dpi, scaleModifier);
+        return DpiCalculator.UnscaleWithDpi(point, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -584,7 +389,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>NativePointFloat unscaled</returns>
     public NativePointFloat UnscaleWithCurrentDpi(NativePointFloat point, Func<double, double> scaleModifier = null)
     {
-        return ScaleWithDpi(point, Dpi, scaleModifier);
+        return DpiCalculator.ScaleWithDpi(point, Dpi, scaleModifier);
     }
 
     /// <summary>

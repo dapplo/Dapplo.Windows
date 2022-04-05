@@ -30,7 +30,7 @@ public partial class FormWithAttachedDpiHandler : Form //DpiAwareForm
         var initialMenuStripSize = menuStrip1.ImageScalingSize;
         FormDpiHandler.OnDpiChanged.Subscribe(dpiChangeInfo =>
         {
-            menuStrip1.ImageScalingSize = DpiHandler.ScaleWithDpi(initialMenuStripSize, dpiChangeInfo.NewDpi);
+            menuStrip1.ImageScalingSize = DpiCalculator.ScaleWithDpi(initialMenuStripSize, dpiChangeInfo.NewDpi);
         });
 
         _scaleHandler = BitmapScaleHandler.WithComponentResourceManager<Bitmap>(FormDpiHandler, GetType(), BitmapScaleHandler.SimpleBitmapScaler)

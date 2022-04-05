@@ -91,7 +91,7 @@ public static class NativeDpiMethods
     {
         if (!User32Api.IsWindow(hWnd))
         {
-            return DpiHandler.DefaultScreenDpi;
+            return DpiCalculator.DefaultScreenDpi;
         }
 
         // Use the easiest method, but this only works for Windows 10
@@ -116,7 +116,7 @@ public static class NativeDpiMethods
         {
             if (hdc == null)
             {
-                return DpiHandler.DefaultScreenDpi;
+                return DpiCalculator.DefaultScreenDpi;
             }
             return (uint)Gdi32Api.GetDeviceCaps(hdc, DeviceCaps.LOGPIXELSX);
         }

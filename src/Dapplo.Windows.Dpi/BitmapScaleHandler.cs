@@ -55,12 +55,12 @@ namespace Dapplo.Windows.Dpi
         /// <returns>Bitmap</returns>
         public static Bitmap SimpleBitmapScaler(Bitmap bitmap, uint dpi)
         {
-            if (dpi == DpiHandler.DefaultScreenDpi)
+            if (dpi == DpiCalculator.DefaultScreenDpi)
             {
                 return bitmap;
             }
 
-            var newSize = DpiHandler.ScaleWithDpi(bitmap.Size, dpi);
+            var newSize = DpiCalculator.ScaleWithDpi(bitmap.Size, dpi);
             var result = new Bitmap(newSize.Width, newSize.Height, bitmap.PixelFormat);
             using (var graphics = Graphics.FromImage(result))
             {

@@ -114,8 +114,8 @@ public static class AppQuery
     /// <summary>
     ///     Check if a Windows Store App (WinRT) is visible
     /// </summary>
-    /// <param name="windowBounds"></param>
-    /// <returns>true if an app, covering the supplied rect, is visisble</returns>
+    /// <param name="windowBounds">NativeRect</param>
+    /// <returns>true if an app, covering the supplied rect, is visible</returns>
     public static bool AppVisible(NativeRect windowBounds)
     {
         if (AppVisibility == null)
