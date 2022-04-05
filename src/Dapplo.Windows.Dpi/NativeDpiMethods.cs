@@ -105,7 +105,8 @@ public static class NativeDpiMethods
         {
             var hMonitor = User32Api.MonitorFromWindow(hWnd, MonitorFrom.DefaultToNearest);
             // ReSharper disable once UnusedVariable
-            if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY))
+            var result = GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY);
+            if (result.Succeeded())
             {
                 return (int)dpiX;
             }
@@ -135,7 +136,8 @@ public static class NativeDpiMethods
         }
         NativeRect rect = new NativeRect(location.X, location.Y, 1, 1);
         IntPtr hMonitor = User32Api.MonitorFromRect(ref rect, MonitorFrom.DefaultToNearest);
-        if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY))
+        var result = GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY);
+        if (result.Succeeded())
         {
             return (int)dpiX;
         }
@@ -236,10 +238,9 @@ public static class NativeDpiMethods
     /// <param name="dpiType">MonitorDpiType</param>
     /// <param name="dpiX">out int for the horizontal dpi</param>
     /// <param name="dpiY">out int for the vertical dpi</param>
-    /// <returns>true if all okay</returns>
+    /// <returns>HResult</returns>
     [DllImport("shcore")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool GetDpiForMonitor(IntPtr hMonitor, MonitorDpiType dpiType, out uint dpiX, out uint dpiY);
+    public static extern HResult GetDpiForMonitor(IntPtr hMonitor, MonitorDpiType dpiType, out uint dpiX, out uint dpiY);
 
     /// <summary>
     ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt748621(v=vs.85).aspx">EnableNonClientDpiScaling function</a>
