@@ -36,6 +36,24 @@ public sealed class DpiCalculator
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
     /// <returns>double with the scaled number</returns>
+    public static float ScaleWithDpi(float someNumber, uint dpi, Func<float, float> scaleModifier = null)
+    {
+        var dpiScaleFactor = (float)DpiScaleFactor(dpi);
+        if (scaleModifier != null)
+        {
+            dpiScaleFactor = scaleModifier(dpiScaleFactor);
+        }
+
+        return dpiScaleFactor * someNumber;
+    }
+
+    /// <summary>
+    ///     Scale the supplied number according to the supplied dpi
+    /// </summary>
+    /// <param name="someNumber">double with e.g. the width 16 for 16x16 images</param>
+    /// <param name="dpi">current dpi, normal is 96.</param>
+    /// <param name="scaleModifier">A function which can modify the scale factor</param>
+    /// <returns>double with the scaled number</returns>
     public static double ScaleWithDpi(double someNumber, uint dpi, Func<double, double> scaleModifier = null)
     {
         var dpiScaleFactor = DpiScaleFactor(dpi);

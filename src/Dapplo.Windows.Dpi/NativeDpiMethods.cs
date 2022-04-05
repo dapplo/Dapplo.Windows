@@ -123,6 +123,27 @@ public static class NativeDpiMethods
     }
 
     /// <summary>
+    /// Return the DPI for the screen which the location is located on
+    /// </summary>
+    /// <param name="location">NativePoint</param>
+    /// <returns>uint</returns>
+    public static uint GetDpi(NativePoint location)
+    {
+        if (!WindowsVersion.IsWindows81OrLater)
+        {
+            return DpiCalculator.DefaultScreenDpi;
+        }
+        NativeRect rect = new NativeRect(location.X, location.Y, 1, 1);
+        IntPtr hMonitor = User32Api.MonitorFromRect(ref rect, MonitorFrom.DefaultToNearest);
+        if (GetDpiForMonitor(hMonitor, MonitorDpiType.EffectiveDpi, out var dpiX, out var dpiY))
+        {
+            return dpiX;
+        }
+
+        return DpiCalculator.DefaultScreenDpi;
+    }
+
+    /// <summary>
     /// Create a scope for the DpiAwarenessContext which enables Dpi Aware
     /// </summary>
     /// <returns>IDisposable</returns>
