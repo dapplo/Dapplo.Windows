@@ -22,11 +22,22 @@ public sealed class DpiCalculator
     /// <summary>
     /// Calculate a DPI scale factor
     /// </summary>
-    /// <param name="dpi">uint</param>
+    /// <param name="oldDpi">int</param>
+    /// <param name="newDpi">int</param>
     /// <returns>double</returns>
-    public static double DpiScaleFactor(int dpi)
+    public static float DpiScaleFactor(int oldDpi, int newDpi)
     {
-        return (double) dpi / DefaultScreenDpi;
+        return (float)newDpi / oldDpi;
+    }
+
+    /// <summary>
+    /// Calculate a DPI scale factor based on the default
+    /// </summary>
+    /// <param name="dpi">int</param>
+    /// <returns>double</returns>
+    public static float DpiScaleFactor(int dpi)
+    {
+        return (float) dpi / DefaultScreenDpi;
     }
 
     /// <summary>
@@ -54,7 +65,7 @@ public sealed class DpiCalculator
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
     /// <returns>double with the scaled number</returns>
-    public static double ScaleWithDpi(double someNumber, int dpi, Func<double, double> scaleModifier = null)
+    public static double ScaleWithDpi(double someNumber, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiScaleFactor = DpiScaleFactor(dpi);
         if (scaleModifier != null)
@@ -71,7 +82,7 @@ public sealed class DpiCalculator
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
     /// <returns>Scaled width</returns>
-    public static int ScaleWithDpi(int number, int dpi, Func<double, double> scaleModifier = null)
+    public static int ScaleWithDpi(int number, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiScaleFactor = DpiScaleFactor(dpi);
         if (scaleModifier != null)
@@ -88,7 +99,7 @@ public sealed class DpiCalculator
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
     /// <returns>NativeSize scaled</returns>
-    public static NativeSize ScaleWithDpi(NativeSize size, int dpi, Func<double, double> scaleModifier = null)
+    public static NativeSize ScaleWithDpi(NativeSize size, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiScaleFactor = DpiScaleFactor(dpi);
         if (scaleModifier != null)
@@ -105,7 +116,7 @@ public sealed class DpiCalculator
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
     /// <returns>NativePoint scaled</returns>
-    public static NativePoint ScaleWithDpi(NativePoint size, int dpi, Func<double, double> scaleModifier = null)
+    public static NativePoint ScaleWithDpi(NativePoint size, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiScaleFactor = DpiScaleFactor(dpi);
         if (scaleModifier != null)
@@ -122,7 +133,7 @@ public sealed class DpiCalculator
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
     /// <returns>NativeSize scaled</returns>
-    public static NativeSizeFloat ScaleWithDpi(NativeSizeFloat size, int dpi, Func<double, double> scaleModifier = null)
+    public static NativeSizeFloat ScaleWithDpi(NativeSizeFloat size, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiScaleFactor = DpiScaleFactor(dpi);
         if (scaleModifier != null)
@@ -131,16 +142,23 @@ public sealed class DpiCalculator
         }
         return new NativeSizeFloat(dpiScaleFactor * size.Width, dpiScaleFactor * size.Height);
     }
-    
+
     /// <summary>
     /// Calculate a DPI unscale factor
     /// </summary>
     /// <param name="dpi">uint</param>
-    /// <returns>double</returns>
-    public static double DpiUnscaleFactor(int dpi)
+    /// <returns>float</returns>
+    public static float DpiUnscaleFactor(int oldDpi, int newDpi)
     {
-        return (double)DefaultScreenDpi / dpi;
+        return (float)oldDpi / newDpi;
     }
+
+    /// <summary>
+    /// Calculate a DPI unscale factor
+    /// </summary>
+    /// <param name="dpi">int</param>
+    /// <returns>float</returns>
+    public static float DpiUnscaleFactor(int dpi) => DpiUnscaleFactor(DefaultScreenDpi, dpi);
 
     /// <summary>
     ///     Unscale the supplied number according to the supplied dpi
@@ -148,8 +166,8 @@ public sealed class DpiCalculator
     /// <param name="someNumber">double with e.g. the scaled width</param>
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>double with the unscaled number</returns>
-    public static double UnscaleWithDpi(double someNumber, int dpi, Func<double, double> scaleModifier = null)
+    /// <returns>float with the unscaled number</returns>
+    public static double UnscaleWithDpi(double someNumber, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
         if (scaleModifier != null)
@@ -166,7 +184,7 @@ public sealed class DpiCalculator
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
     /// <returns>Unscaled width</returns>
-    public static int UnscaleWithDpi(int number, int dpi, Func<double, double> scaleModifier = null)
+    public static int UnscaleWithDpi(int number, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
         if (scaleModifier != null)
@@ -183,7 +201,7 @@ public sealed class DpiCalculator
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
     /// <returns>NativeSize unscaled</returns>
-    public static NativeSize UnscaleWithDpi(NativeSize size, int dpi, Func<double, double> scaleModifier = null)
+    public static NativeSize UnscaleWithDpi(NativeSize size, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
         if (scaleModifier != null)
@@ -200,7 +218,7 @@ public sealed class DpiCalculator
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
     /// <returns>NativePoint unscaled</returns>
-    public static NativePoint UnscaleWithDpi(NativePoint size, int dpi, Func<double, double> scaleModifier = null)
+    public static NativePoint UnscaleWithDpi(NativePoint size, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
         if (scaleModifier != null)
@@ -217,7 +235,7 @@ public sealed class DpiCalculator
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
     /// <returns>NativeSize unscaled</returns>
-    public static NativeSizeFloat UnscaleWithDpi(NativeSizeFloat size, int dpi, Func<double, double> scaleModifier = null)
+    public static NativeSizeFloat UnscaleWithDpi(NativeSizeFloat size, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
         if (scaleModifier != null)
