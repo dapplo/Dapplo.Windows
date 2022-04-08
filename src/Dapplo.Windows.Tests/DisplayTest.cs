@@ -7,7 +7,6 @@ using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Dpi;
 using Dapplo.Windows.User32;
 using Xunit;
 using Xunit.Abstractions;

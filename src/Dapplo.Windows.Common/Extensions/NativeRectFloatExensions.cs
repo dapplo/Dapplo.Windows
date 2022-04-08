@@ -238,6 +238,20 @@ public static class NativeRectFloatExensions
     }
 
     /// <summary>
+    /// Creates a new NativeRectFloat which is rect but inflated with the specified width and height
+    /// </summary>
+    /// <param name="rect">NativeRectFloat</param>
+    /// <param name="width">float</param>
+    /// <param name="height">float</param>
+    /// <returns>NativeRectFloat</returns>
+    [Pure]
+    public static NativeRectFloat Inflate(this NativeRectFloat rect, float width, float height)
+    {
+        // TODO: Replace logic with own code
+        return RectangleF.Inflate(rect, width, height);
+    }
+
+    /// <summary>
     /// Test if the current NativeRectFloat intersects with the specified.
     /// </summary>
     /// <param name="rect1">NativeRectFloat</param>
