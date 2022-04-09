@@ -7,9 +7,9 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Common.Extensions;
 
 /// <summary>
-///     Helper method for the NativeSizeFloatExensions struct
+///     Helper method for the NativeSizeFloatExtensions struct
 /// </summary>
-public static class NativeSizeFloatExensions
+public static class NativeSizeFloatExtensions
 {
     /// <summary>
     /// Create a new NativeSizeFloat, from the supplied one, using the specified width

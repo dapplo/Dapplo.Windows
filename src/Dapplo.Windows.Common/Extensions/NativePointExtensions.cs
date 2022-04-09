@@ -9,7 +9,7 @@ namespace Dapplo.Windows.Common.Extensions;
 /// <summary>
 ///     Helper method for the NativePoint struct
 /// </summary>
-public static class NativePointExensions
+public static class NativePointExtensions
 {
     /// <summary>
     /// Create a new NativePoint, from the supplied one, using the specified X coordinate

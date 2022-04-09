@@ -9,7 +9,7 @@ namespace Dapplo.Windows.Common.Extensions;
 /// <summary>
 ///     Helper method for the NativePointFloat struct
 /// </summary>
-public static class NativePointFloatExensions
+public static class NativePointFloatExtensions
 {
     /// <summary>
     /// Create a new NativePointFloat, from the supplied one, using the specified X coordinate

@@ -11,7 +11,7 @@ namespace Dapplo.Windows.Common.Extensions;
 /// <summary>
 ///     Helper method for the NativeRect struct
 /// </summary>
-public static class NativeRectExensions
+public static class NativeRectExtensions
 {
     /// <summary>
     /// Create a new NativeRect, from the supplied one, using the specified X coordinate
@@ -203,12 +203,45 @@ public static class NativeRectExensions
     /// </summary>
     /// <param name="rect1">NativeRect</param>
     /// <param name="rect2">NativeRect</param>
-    /// <returns>NativeRect which is the intersection of rect1 and rect2</returns>
+    /// <returns>NativeRect which is the union of rect1 and rect2</returns>
     [Pure]
     public static NativeRect Union(this NativeRect rect1, NativeRect rect2)
     {
-        // TODO: Replace logic with own code
-        return System.Drawing.Rectangle.Union(rect1, rect2);
+        var minX1 = Math.Min(rect1.Left, rect1.Right);
+        var minX2 = Math.Min(rect2.Left, rect2.Right);
+        var minX = Math.Min(minX1, minX2);
+
+        var maxX1 = Math.Max(rect1.Left, rect1.Right);
+        var maxX2 = Math.Max(rect2.Left, rect2.Right);
+        var maxX = Math.Max(maxX1, maxX2);
+
+        var minY1 = Math.Min(rect1.Top, rect1.Bottom);
+        var minY2 = Math.Min(rect2.Top, rect2.Bottom);
+        var minY = Math.Min(minY1, minY2);
+
+        var maxY1 = Math.Max(rect1.Top, rect1.Bottom);
+        var maxY2 = Math.Max(rect2.Top, rect2.Bottom);
+        var maxY = Math.Max(maxY1, maxY2);
+        
+        return new NativeRect(minX, minY, maxX - minX, maxY- minY);
+    }
+
+    /// <summary>
+    /// Creates a new NativeRect which is the intersection of rect1 and rect2
+    /// </summary>
+    /// <param name="rect1">NativeRect</param>
+    /// <param name="rect2">NativeRect</param>
+    /// <returns>NativeRect which is the intersection of rect1 and rect2</returns>
+    [Pure]
+    public static NativeRect Intersect2(this NativeRect rect1, NativeRect rect2)
+    {
+        rect1 = rect1.Normalize();
+        rect2 = rect2.Normalize();
+        var left = Math.Max(rect1.Left, rect2.Left);
+        var right = Math.Min(rect1.Right, rect2.Right);
+        var bottom = Math.Max(rect1.Bottom, rect2.Bottom);
+        var top = Math.Min(rect1.Top, rect2.Top);
+        return new NativeRect(left, top, right-left, bottom-top);
     }
 
     /// <summary>
@@ -220,8 +253,20 @@ public static class NativeRectExensions
     [Pure]
     public static NativeRect Intersect(this NativeRect rect1, NativeRect rect2)
     {
-        // TODO: Replace logic with own code
-        return System.Drawing.Rectangle.Intersect(rect1, rect2);
+        // gives bottom-left point of intersection rectangle
+        int x5 = Math.Max(rect1.Left, rect2.Left);
+        int y5 = Math.Max(rect1.Top, rect2.Top);
+
+        // gives top-right point of intersection rectangle
+        int x6 = Math.Min(rect1.Right, rect2.Right);
+        int y6 = Math.Min(rect1.Bottom, rect2.Bottom);
+
+        // no intersection
+        if (x5 > x6 || y5 > y6)
+        {
+            return NativeRect.Empty;
+        }
+        return new NativeRect(x5, y6, x6 - x5, y5 - y6).Normalize();
     }
 
     /// <summary>
@@ -234,8 +279,7 @@ public static class NativeRectExensions
     [Pure]
     public static NativeRect Inflate(this NativeRect rect, int width, int height)
     {
-        // TODO: Replace logic with own code
-        return System.Drawing.Rectangle.Inflate(rect, width, height);
+        return new NativeRect(rect.X - width, rect.Y - height, rect.Width + 2*width, rect.Height + 2*height);
     }
 
     /// <summary>
@@ -247,8 +291,7 @@ public static class NativeRectExensions
     [Pure]
     public static NativeRect Inflate(this NativeRect rect, NativeSize size)
     {
-        // TODO: Replace logic with own code
-        return System.Drawing.Rectangle.Inflate(rect, size.Width, size.Height);
+        return new NativeRect(rect.X - size.Width, rect.Y - size.Height, rect.Width + 2*size.Width, rect.Height + 2*size.Height);
     }
 
     /// <summary>

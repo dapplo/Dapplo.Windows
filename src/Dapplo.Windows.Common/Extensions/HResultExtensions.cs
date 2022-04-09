@@ -13,7 +13,7 @@ namespace Dapplo.Windows.Common.Extensions;
 public static class HResultExtensions
 {
     /// <summary>
-    ///     Test if the HResult respresents a fail
+    ///     Test if the HResult represents a fail
     /// </summary>
     /// <param name="hResult">HResult</param>
     /// <returns>bool</returns>
@@ -24,7 +24,7 @@ public static class HResultExtensions
     }
 
     /// <summary>
-    ///     Test if the HResult respresents a success
+    ///     Test if the HResult represents a success
     /// </summary>
     /// <param name="hResult">HResult</param>
     /// <returns>bool</returns>

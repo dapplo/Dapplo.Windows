@@ -234,4 +234,58 @@ public class CommonStructTests
         RectangleF rectangleFConverted = nativeRectFloat;
         Assert.Equal(rectangleFExpected, rectangleFConverted);
     }
+
+    /// <summary>
+    /// Test inflate for NativeRect
+    /// </summary>
+    [Theory]
+    [InlineData(10,10,40,40,10,10)]
+    [InlineData(200, 100, -40, -20, 10, 20)]
+    [InlineData(100, 200, -20, -40, 20, 10)]
+    [InlineData(100, 100, 40, 40, -10, 10)]
+    [InlineData(100, 100, 40, 40, 10, -10)]
+    private void Test_NativeRect_Inflate(int x, int y, int width, int height, int inflateX, int inflateY)
+    {
+        var nativeRect = new NativeRect(x, y, width, height);
+        var nativeSize = new NativeSize(inflateX, inflateY);
+        Rectangle rectangle = nativeRect;
+        var nativeRectInflated = nativeRect.Inflate(inflateX, inflateY);
+        var nativeRectInflatedWithSize = nativeRect.Inflate(nativeSize);
+        Assert.Equal(nativeRectInflated, nativeRectInflatedWithSize);
+        rectangle.Inflate(inflateX, inflateY);
+        Assert.NotEqual(nativeRect, nativeRectInflated);
+        Assert.Equal(rectangle, (Rectangle)nativeRectInflated);
+    }
+
+    /// <summary>
+    /// Test union for NativeRect
+    /// </summary>
+    [Theory]
+    [InlineData(10, 10, 40, 40, 20, 20, 10,10)]
+    [InlineData(150, 150, 100, 100, 100, 100, 100, 100)]
+    private void Test_NativeRect_Union(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
+    {
+        var nativeRect1 = new NativeRect(x1, y1, width1, height1);
+        var nativeRect2 = new NativeRect(x2, y2, width2, height2);
+        Rectangle unionNativeRect = nativeRect1.Union(nativeRect2);
+        var unionRectangle = Rectangle.Union(nativeRect1, nativeRect2);
+
+        Assert.Equal(unionRectangle, unionNativeRect);
+    }
+
+    /// <summary>
+    /// Test union for NativeRect
+    /// </summary>
+    [Theory]
+    [InlineData(10, 10, 40, 40, 20, 20, 10, 10)]
+    [InlineData(150, 150, 100, 100, 100, 100, 100, 100)]
+    private void Test_NativeRect_Intersect(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
+    {
+        var nativeRect1 = new NativeRect(x1, y1, width1, height1);
+        var nativeRect2 = new NativeRect(x2, y2, width2, height2);
+        Rectangle intersectNativeRect = nativeRect1.Intersect(nativeRect2);
+        var intersectRectangle = Rectangle.Intersect(nativeRect1, nativeRect2);
+
+        Assert.Equal(intersectRectangle, intersectNativeRect);
+    }
 }

@@ -6,9 +6,9 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Common.Extensions;
 
 /// <summary>
-///     Helper method for the NativeSizeExensions struct
+///     Helper method for the NativeSizeExtensions struct
 /// </summary>
-public static class NativeSizeExensions
+public static class NativeSizeExtensions
 {
     /// <summary>
     /// Create a new NativeSize, from the supplied one, using the specified width

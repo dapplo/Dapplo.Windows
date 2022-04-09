@@ -2,16 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Diagnostics.Contracts;
-using System.Drawing;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
 
 namespace Dapplo.Windows.Common.Extensions;
 
 /// <summary>
-///     Helper method for the NativeRectFloat struct
+///     Helper methods for the NativeRectFloat struct
 /// </summary>
-public static class NativeRectFloatExensions
+public static class NativeRectFloatExtensions
 {
     /// <summary>
     /// Create a new NativeRectFloat, from the supplied one, using the specified X coordinate
@@ -206,12 +205,27 @@ public static class NativeRectFloatExensions
     [Pure]
     public static NativeRectFloat Union(this NativeRectFloat rect1, NativeRectFloat rect2)
     {
-        // TODO: Replace logic with own code
-        return RectangleF.Union(rect1, rect2);
+        var minX1 = Math.Min(rect1.Left, rect1.Right);
+        var minX2 = Math.Min(rect2.Left, rect2.Right);
+        var minX = Math.Min(minX1, minX2);
+
+        var maxX1 = Math.Max(rect1.Left, rect1.Right);
+        var maxX2 = Math.Max(rect2.Left, rect2.Right);
+        var maxX = Math.Max(maxX1, maxX2);
+
+        var minY1 = Math.Min(rect1.Top, rect1.Bottom);
+        var minY2 = Math.Min(rect2.Top, rect2.Bottom);
+        var minY = Math.Min(minY1, minY2);
+
+        var maxY1 = Math.Max(rect1.Top, rect1.Bottom);
+        var maxY2 = Math.Max(rect2.Top, rect2.Bottom);
+        var maxY = Math.Max(maxY1, maxY2);
+
+        return new NativeRectFloat(minX, minY, maxX - minX, maxY - minY);
     }
 
     /// <summary>
-    /// Creates a new NativeRect which is the intersection of rect1 and rect2
+    /// Creates a new NativeRectFloat which is the intersection of rect1 and rect2
     /// </summary>
     /// <param name="rect1">NativeRectFloat</param>
     /// <param name="rect2">NativeRectFloat</param>
@@ -219,8 +233,20 @@ public static class NativeRectFloatExensions
     [Pure]
     public static NativeRectFloat Intersect(this NativeRectFloat rect1, NativeRectFloat rect2)
     {
-        // TODO: Replace logic with own code
-        return RectangleF.Intersect(rect1, rect2);
+        // gives bottom-left point of intersection rectangle
+        var x5 = Math.Max(rect1.Left, rect2.Left);
+        var y5 = Math.Max(rect1.Top, rect2.Top);
+
+        // gives top-right point of intersection rectangle
+        var x6 = Math.Min(rect1.Right, rect2.Right);
+        var y6 = Math.Min(rect1.Bottom, rect2.Bottom);
+
+        // no intersection
+        if (x5 > x6 || y5 > y6)
+        {
+            return NativeRectFloat.Empty;
+        }
+        return new NativeRectFloat(x5, y6, x6 - x5, y5 - y6).Normalize();
     }
 
     /// <summary>
@@ -233,8 +259,7 @@ public static class NativeRectFloatExensions
     [Pure]
     public static NativeRectFloat Inflate(this NativeRectFloat rect, int width, int height)
     {
-        // TODO: Replace logic with own code
-        return RectangleF.Inflate(rect, width, height);
+        return new NativeRectFloat(rect.X - width, rect.Y - height, rect.Width + 2 * width, rect.Height + 2 * height);
     }
 
     /// <summary>
@@ -247,8 +272,19 @@ public static class NativeRectFloatExensions
     [Pure]
     public static NativeRectFloat Inflate(this NativeRectFloat rect, float width, float height)
     {
-        // TODO: Replace logic with own code
-        return RectangleF.Inflate(rect, width, height);
+        return new NativeRectFloat(rect.X - width, rect.Y - height, rect.Width + 2 * width, rect.Height + 2 * height);
+    }
+
+    /// <summary>
+    /// Creates a new NativeRect which is rect but inflated with the specified size
+    /// </summary>
+    /// <param name="rect">NativeRectFloat</param>
+    /// <param name="size">NativeSizeFloat</param>
+    /// <returns>NativeRectFloat</returns>
+    [Pure]
+    public static NativeRectFloat Inflate(this NativeRectFloat rect, NativeSizeFloat size)
+    {
+        return new NativeRectFloat(rect.X - size.Width, rect.Y - size.Height, rect.Width + 2 * size.Width, rect.Height + 2 * size.Height);
     }
 
     /// <summary>
