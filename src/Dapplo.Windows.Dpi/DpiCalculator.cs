@@ -146,7 +146,8 @@ public sealed class DpiCalculator
     /// <summary>
     /// Calculate a DPI unscale factor
     /// </summary>
-    /// <param name="dpi">uint</param>
+    /// <param name="oldDpi">int</param>
+    /// <param name="newDpi">int</param>
     /// <returns>float</returns>
     public static float DpiUnscaleFactor(int oldDpi, int newDpi)
     {
