@@ -235,7 +235,7 @@ public readonly struct NativeRect : IEquatable<NativeRect>
     [Pure]
     public override string ToString()
     {
-        return $"{{Left: {_left}; Top: {_top}; Width: {Width}; Bottom: {Height};}}";
+        return $"{{Left: {_left}; Top: {_top}; Width: {Width}; Height: {Height};}}";
     }
 
     /// <summary>

@@ -281,7 +281,7 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     [Pure]
     public override string ToString()
     {
-        return $"{{Left: {_x}; Top: {_y}; Width: {_width}; Bottom: {_height};}}";
+        return $"{{Left: {_x}; Top: {_y}; Width: {_width}; Height: {_height};}}";
     }
 
     /// <summary>

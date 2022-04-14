@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dapplo.Log;
 using Dapplo.Windows.Common.Structs;
 
 namespace Dapplo.Windows.Dpi;
@@ -12,8 +11,6 @@ namespace Dapplo.Windows.Dpi;
 /// </summary>
 public sealed class DpiCalculator
 {
-    private static readonly LogSource Log = new LogSource();
-
     /// <summary>
     ///     This is the default DPI for the screen
     /// </summary>
@@ -24,7 +21,7 @@ public sealed class DpiCalculator
     /// </summary>
     /// <param name="oldDpi">int</param>
     /// <param name="newDpi">int</param>
-    /// <returns>double</returns>
+    /// <returns>float</returns>
     public static float DpiScaleFactor(int oldDpi, int newDpi)
     {
         return (float)newDpi / oldDpi;
@@ -34,7 +31,7 @@ public sealed class DpiCalculator
     /// Calculate a DPI scale factor based on the default
     /// </summary>
     /// <param name="dpi">int</param>
-    /// <returns>double</returns>
+    /// <returns>float</returns>
     public static float DpiScaleFactor(int dpi)
     {
         return (float) dpi / DefaultScreenDpi;
@@ -43,10 +40,10 @@ public sealed class DpiCalculator
     /// <summary>
     ///     Scale the supplied number according to the supplied dpi
     /// </summary>
-    /// <param name="someNumber">double with e.g. the width 16 for 16x16 images</param>
+    /// <param name="someNumber">float with e.g. the width 16 for 16x16 images</param>
     /// <param name="dpi">current dpi, normal is 96.</param>
     /// <param name="scaleModifier">A function which can modify the scale factor</param>
-    /// <returns>double with the scaled number</returns>
+    /// <returns>float with the scaled number</returns>
     public static float ScaleWithDpi(float someNumber, int dpi, Func<float, float> scaleModifier = null)
     {
         var dpiScaleFactor = (float)DpiScaleFactor(dpi);
@@ -146,19 +143,19 @@ public sealed class DpiCalculator
     /// <summary>
     /// Calculate a DPI unscale factor
     /// </summary>
-    /// <param name="oldDpi">int</param>
-    /// <param name="newDpi">int</param>
-    /// <returns>float</returns>
+    /// <param name="oldDpi">int with the old dpi</param>
+    /// <param name="newDpi">int with the new dpi</param>
+    /// <returns>float with the unscale factor</returns>
     public static float DpiUnscaleFactor(int oldDpi, int newDpi)
     {
         return (float)oldDpi / newDpi;
     }
 
     /// <summary>
-    /// Calculate a DPI unscale factor
+    /// Calculate a DPI unscale factor against the default screen DPI
     /// </summary>
     /// <param name="dpi">int</param>
-    /// <returns>float</returns>
+    /// <returns>float with the unscale factor</returns>
     public static float DpiUnscaleFactor(int dpi) => DpiUnscaleFactor(DefaultScreenDpi, dpi);
 
     /// <summary>
