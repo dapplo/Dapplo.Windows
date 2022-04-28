@@ -51,10 +51,6 @@
     <DebugType>embedded</DebugType>
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
-
-  <ItemGroup Condition="!$(TargetFramework.StartsWith('net4'))">
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
-  </ItemGroup>
 	
   <!-- Global definition for non test or example projects to enable InternalsVisibleTo, git versioning and pdbgit -->
   <ItemGroup Condition="!$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example')) And $(MSBuildProjectName.StartsWith('Dapplo'))">
