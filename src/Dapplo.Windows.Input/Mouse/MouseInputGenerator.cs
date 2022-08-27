@@ -20,7 +20,7 @@ public static class MouseInputGenerator
     /// <returns>number of input events generated</returns>
     public static uint MouseClick(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
     {
-        return NativeInput.SendInput(Structs.Input.CreateMouseInputs(MouseInput.MouseDown(mouseButtons, location, timestamp), MouseInput.MouseDown(mouseButtons, location, timestamp)));
+        return NativeInput.SendInput(Structs.Input.CreateMouseInputs(MouseInput.MouseDown(mouseButtons, location, timestamp), MouseInput.MouseUp(mouseButtons, location, timestamp)));
     }
 
     /// <summary>
