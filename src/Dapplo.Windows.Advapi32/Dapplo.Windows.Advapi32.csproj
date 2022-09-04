@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Description>Dapplo.Windows.Advapi32 is a library for accessing the Advanced Windows 32 Base API</Description>
     <PackageTags>windows native Advapi32</PackageTags>
@@ -11,7 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Reactive" Version="5.0.0" />
-    <PackageReference Include="Dapplo.Log" Version="1.4.1" />
+    <PackageReference Include="Dapplo.Log" Version="2.0.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">

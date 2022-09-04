@@ -28,18 +28,18 @@
   <ItemGroup>
     <PackageReference Include="System.Reactive" Version="5.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="Dapplo.Log.Loggers" Version="1.4.1" />
-    <PackageReference Include="Dapplo.Log.XUnit" Version="1.4.1" />
+    <PackageReference Include="Dapplo.Log.Loggers" Version="2.0.1" />
+    <PackageReference Include="Dapplo.Log.XUnit" Version="2.0.1" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
-    <PackageReference Include="xunit.analyzers" Version="0.10.0" />
-    <PackageReference Include="xunit.core" Version="2.4.1" />
+    <PackageReference Include="xunit.analyzers" Version="1.0.0" />
+    <PackageReference Include="xunit.core" Version="2.4.2" />
     <PackageReference Include="Xunit.StaFact" Version="1.1.11" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="xunit.runner.console" Version="2.4.1">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
+    <PackageReference Include="xunit.runner.console" Version="2.4.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

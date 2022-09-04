@@ -7,7 +7,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>http://www.dapplo.net/blocks/Dapplo.Windows/</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <LangVersion>10</LangVersion>
+    <LangVersion>latest</LangVersion>
     <DisableImplicitFrameworkReferences Condition="$(TargetFramework.StartsWith('net4'))">true</DisableImplicitFrameworkReferences>
     <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -54,7 +54,7 @@
 	
   <!-- Global definition for non test or example projects to enable InternalsVisibleTo, git versioning and pdbgit -->
   <ItemGroup Condition="!$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example')) And $(MSBuildProjectName.StartsWith('Dapplo'))">
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.4.255">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.109">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
