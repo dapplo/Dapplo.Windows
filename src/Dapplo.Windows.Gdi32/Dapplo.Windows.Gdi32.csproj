@@ -2,8 +2,8 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Gdi32 bringt Gdi32 and GdiPlus functionality.</Description>
     <PackageTags>windows native gdi</PackageTags>
-    <TargetFrameworks>net472;netcoreapp3.1;netstandard2.0;net6.0-windows</TargetFrameworks>
-	<UseWindowsForms>true</UseWindowsForms>
+    <TargetFrameworks>net481;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
@@ -13,7 +13,7 @@
     <PackageReference Include="Dapplo.Log" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.1" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="Microsoft.CSharp" />

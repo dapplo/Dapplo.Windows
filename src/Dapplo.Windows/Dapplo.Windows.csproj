@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>Dapplo.Windows has native code for accessing Windows, e.g getting the size/title/location of a window or monitoring the title changes of windows.</Description>
     <PackageTags>windows native desktop</PackageTags>
-    <TargetFrameworks>net472;netcoreapp3.1;netstandard2.0;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net481;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -18,8 +18,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dapplo.Log" Version="2.0.1" />
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="PresentationCore" />
@@ -34,5 +34,4 @@
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-
 </Project>

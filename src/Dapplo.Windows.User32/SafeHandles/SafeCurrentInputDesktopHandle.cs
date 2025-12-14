@@ -47,7 +47,7 @@ public class SafeCurrentInputDesktopHandle : SafeHandleZeroOrMinusOneIsInvalid
     ///     Close the desktop
     /// </summary>
     /// <returns>true if this succeeded</returns>
-#if !NET6_0
+#if !NET6_0_OR_GREATER
     [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 #endif
     protected override bool ReleaseHandle()

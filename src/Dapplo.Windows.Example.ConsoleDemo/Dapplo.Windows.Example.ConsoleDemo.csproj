@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net472;netcoreapp3.1;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net481;net10.0-windows</TargetFrameworks>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
@@ -8,7 +8,7 @@
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System" />

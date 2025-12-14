@@ -3,16 +3,16 @@
     <Description>Dapplo.Windows.User32 provides logic of the Windows User32 API</Description>
     <PackageTags>windows native user32</PackageTags>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<TargetFrameworks>net472;netcoreapp3.1;netstandard2.0;net6.0-windows</TargetFrameworks>
-	<UseWindowsForms>true</UseWindowsForms>
-	<UseWPF>true</UseWPF>
+    <TargetFrameworks>net481;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
     <PackageReference Include="Dapplo.Log" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">

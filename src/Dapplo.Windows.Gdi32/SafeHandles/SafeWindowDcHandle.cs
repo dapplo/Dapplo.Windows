@@ -76,8 +76,8 @@ public class SafeWindowDcHandle : SafeHandleZeroOrMinusOneIsInvalid
     ///     ReleaseDC for the original Window
     /// </summary>
     /// <returns>true if this worked</returns>
-#if !NET6_0
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+#if !NET6_0_OR_GREATER
+    [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 #endif
     protected override bool ReleaseHandle()
     {

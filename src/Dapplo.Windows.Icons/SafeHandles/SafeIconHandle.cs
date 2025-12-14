@@ -44,7 +44,7 @@ public class SafeIconHandle : SafeHandleZeroOrMinusOneIsInvalid
     ///     Call destroy icon
     /// </summary>
     /// <returns>true if this worked</returns>
-#if !NET6_0
+#if !NET6_0_OR_GREATER
     [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 #endif
     protected override bool ReleaseHandle()

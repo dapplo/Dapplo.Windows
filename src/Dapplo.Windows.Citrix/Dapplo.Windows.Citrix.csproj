@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Citrix is a library which has citrix supporting code</Description>
     <PackageTags>windows native citrix</PackageTags>
-    <TargetFrameworks>net472;netcoreapp3.1;netstandard2.0;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net481;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>

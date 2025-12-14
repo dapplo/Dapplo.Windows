@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.EmbeddedBrowser is a small library which helps to embed the Internet Explorer in the most recent version.</Description>
     <PackageTags>windows native browser embedded ie</PackageTags>
-    <TargetFrameworks>net472;netcoreapp3.1;netstandard2.0;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net481;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>

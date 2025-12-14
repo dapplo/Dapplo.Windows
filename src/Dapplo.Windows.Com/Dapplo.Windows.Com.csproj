@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.Com is a library which has com supporting code</Description>
-    <TargetFrameworks>net472;netstandard2.0;netcoreapp3.1;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net481;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
     <PackageTags>windows native Com</PackageTags>
   </PropertyGroup>
   <ItemGroup>

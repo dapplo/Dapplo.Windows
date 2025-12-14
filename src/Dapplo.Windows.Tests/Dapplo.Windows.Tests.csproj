@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -26,8 +26,9 @@
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
     <PackageReference Include="Dapplo.Log.Loggers" Version="2.0.1" />
     <PackageReference Include="Dapplo.Log.XUnit" Version="2.0.1" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />

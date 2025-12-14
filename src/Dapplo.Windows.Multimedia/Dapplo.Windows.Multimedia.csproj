@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Multimedia is a simple wrapper around WinMM</Description>
     <PackageTags>windows native winmm</PackageTags>
-    <TargetFrameworks>net472;netcoreapp3.1;netstandard2.0;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net481;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System" />

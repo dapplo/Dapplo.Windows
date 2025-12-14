@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <TargetFrameworks>net472;net6.0-windows;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net481;net10.0-windows</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
@@ -11,9 +11,9 @@
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageReference Include="System.Console" Version="4.3.1" />
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
