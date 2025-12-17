@@ -28,9 +28,9 @@ stages:
       persistCredentials: true
 
     - task: NuGetToolInstaller@0
-      displayName: 'Use NuGet 7.1.0'
+      displayName: 'Use NuGet 7.0.1'
       inputs:
-        versionSpec: 7.1.0
+        versionSpec: 7.0.1
         checkLatest: true
 
     - task: UseDotNet@2
@@ -125,9 +125,9 @@ stages:
               artifact: 'drop'
 
           - task: NuGetToolInstaller@0
-            displayName: 'Use NuGet 7.1.0'
+            displayName: 'Use NuGet 7.0.1'
             inputs:
-              versionSpec: 7.1.0
+              versionSpec: 7.0.1
               checkLatest: true
 
           - task: NuGetCommand@2
