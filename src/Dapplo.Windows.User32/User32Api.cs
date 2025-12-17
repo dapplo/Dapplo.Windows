@@ -112,7 +112,8 @@ public static class User32Api
             ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
             Bounds = monitorInfoEx.Monitor,
             WorkingArea = monitorInfoEx.WorkArea,
-            IsPrimary = (monitorInfoEx.Flags & MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary
+            IsPrimary = (monitorInfoEx.Flags & MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary,
+            DeviceName = monitorInfoEx.DeviceName
         };
     }
 
