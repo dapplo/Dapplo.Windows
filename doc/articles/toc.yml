@@ -1,2 +1,12 @@
 - name: Introduction
   href: intro.md
+- name: Window Management
+  href: window-management.md
+- name: Clipboard Usage
+  href: clipboard-usage.md
+- name: DPI Awareness
+  href: dpi-awareness.md
+- name: Input Handling
+  href: input-handling.md
+- name: Common Scenarios
+  href: common-scenarios.md
