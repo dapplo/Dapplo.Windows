@@ -11,7 +11,7 @@
 			"**/bin/**",
 			"**/obj/**",
 			"**Tests/*.csproj",
-			"**Example/*.csproj",
+			"**Example/*.csproj"
           ]
         }
       ],
@@ -40,14 +40,14 @@
       {
         "files": [
           "images/**"
-        ],
+        ]
       }
     ],
     "overwrite": [
       {
         "files": [
           "apidoc/**.md"
-        ],
+        ]
       }
     ],
     "dest": "_site",
