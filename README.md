@@ -59,6 +59,7 @@ Dapplo.Windows is a collection of packages that provide P/Invoke wrappers and hi
 - Access clipboard content in various formats (text, files, images, streams)
 - Set clipboard content
 - Delayed rendering support
+- Control Windows Cloud Clipboard and Clipboard History behavior
 
 ### DPI Awareness
 - DPI-aware forms for Windows Forms
@@ -122,6 +123,22 @@ var subscription = ClipboardNative.OnUpdate
         var text = clipboard.GetAsString();
         Console.WriteLine($"Clipboard: {text}");
     });
+```
+
+#### Control Cloud Clipboard and History
+
+```csharp
+using Dapplo.Windows.Clipboard;
+
+// Prevent sensitive data from being saved to clipboard history or cloud
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString("MyPassword123!");
+    clipboard.SetCloudClipboardOptions(
+        canIncludeInHistory: false,
+        canUploadToCloud: false
+    );
+}
 ```
 
 #### Create DPI-Aware Form

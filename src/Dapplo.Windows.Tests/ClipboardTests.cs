@@ -300,4 +300,103 @@ public class ClipboardTests : IDisposable
             Assert.Throws<ClipboardAccessDeniedException>(() => clipboardAccessToken.ThrowWhenNoAccess());
         }
     }
+
+    /// <summary>
+    ///     Test setting cloud clipboard options
+    /// </summary>
+    [WpfFact]
+    public async Task TestCloudClipboard_SetOptions()
+    {
+        const string testString = "Cloud clipboard test";
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            Assert.False(clipboardAccessToken.IsLockTimeout);
+            clipboardAccessToken.ClearContents();
+            clipboardAccessToken.SetAsUnicodeString(testString);
+            
+            // Set cloud clipboard options
+            clipboardAccessToken.SetCloudClipboardOptions(
+                canIncludeInHistory: false,
+                canUploadToCloud: false,
+                excludeFromMonitoring: true
+            );
+        }
+
+        await Task.Delay(100);
+
+        // Verify the formats were set
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            Assert.False(clipboardAccessToken.IsLockTimeout);
+            
+            var formats = clipboardAccessToken.AvailableFormats().ToList();
+            Assert.Contains(ClipboardCloudExtensions.CanIncludeInClipboardHistoryFormat, formats);
+            Assert.Contains(ClipboardCloudExtensions.CanUploadToCloudClipboardFormat, formats);
+            Assert.Contains(ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat, formats);
+            
+            // Verify the text is still there
+            Assert.Equal(testString, clipboardAccessToken.GetAsUnicodeString());
+        }
+    }
+
+    /// <summary>
+    ///     Test setting individual cloud clipboard options
+    /// </summary>
+    [WpfFact]
+    public async Task TestCloudClipboard_SetIndividualOptions()
+    {
+        const string testString = "Individual cloud clipboard test";
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            clipboardAccessToken.ClearContents();
+            clipboardAccessToken.SetAsUnicodeString(testString);
+            
+            // Set individual options
+            clipboardAccessToken.SetCanIncludeInClipboardHistory(false);
+            clipboardAccessToken.SetCanUploadToCloudClipboard(true);
+            clipboardAccessToken.SetExcludeClipboardContentFromMonitorProcessing(true);
+        }
+
+        await Task.Delay(100);
+
+        // Verify the formats were set
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            var formats = clipboardAccessToken.AvailableFormats().ToList();
+            Assert.Contains(ClipboardCloudExtensions.CanIncludeInClipboardHistoryFormat, formats);
+            Assert.Contains(ClipboardCloudExtensions.CanUploadToCloudClipboardFormat, formats);
+            Assert.Contains(ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat, formats);
+        }
+    }
+
+    /// <summary>
+    ///     Test setting cloud clipboard options with default values
+    /// </summary>
+    [WpfFact]
+    public async Task TestCloudClipboard_DefaultOptions()
+    {
+        const string testString = "Default cloud clipboard test";
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            clipboardAccessToken.ClearContents();
+            clipboardAccessToken.SetAsUnicodeString(testString);
+            
+            // Use default values (should allow history and cloud, not exclude monitoring)
+            clipboardAccessToken.SetCloudClipboardOptions();
+        }
+
+        await Task.Delay(100);
+
+        // Verify the formats were set
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            var formats = clipboardAccessToken.AvailableFormats().ToList();
+            Assert.Contains(ClipboardCloudExtensions.CanIncludeInClipboardHistoryFormat, formats);
+            Assert.Contains(ClipboardCloudExtensions.CanUploadToCloudClipboardFormat, formats);
+            Assert.Contains(ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat, formats);
+        }
+    }
 }
