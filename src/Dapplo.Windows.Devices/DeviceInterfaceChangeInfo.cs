@@ -17,7 +17,9 @@ public class DeviceInterfaceChangeInfo
     public DeviceChangeEvent EventType { get; internal set; }
 
     /// <summary>
-    /// The already prepared DevBroadcastDeviceInterface
+    /// The already prepared DevBroadcastDeviceInterface.
+    /// Note: Device.DeviceClassGuid contains the Device Interface Class GUID from the notification.
+    /// For the Device Setup Class GUID shown in Device Manager, use Device.DeviceSetupClassGuid.
     /// </summary>
     public DevBroadcastDeviceInterface Device { get; internal set; }
 }

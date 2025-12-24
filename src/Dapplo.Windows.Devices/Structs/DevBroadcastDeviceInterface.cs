@@ -35,6 +35,8 @@ public struct DevBroadcastDeviceInterface
 
     /// <summary>
     /// The GUID for the interface device class.
+    /// This is the Device Interface Class GUID that comes from the device notification message.
+    /// For the Device Setup Class GUID shown in Device Manager, use <see cref="DeviceSetupClassGuid"/> instead.
     /// </summary>
     public Guid DeviceClassGuid
     {
@@ -75,23 +77,53 @@ public struct DevBroadcastDeviceInterface
     }
 
     /// <summary>
+    /// Helper method to parse the device name and open the corresponding registry key.
+    /// Returns null if the device name format is invalid or the registry key cannot be opened.
+    /// </summary>
+    /// <param name="name">The device name to parse</param>
+    /// <returns>RegistryKey or null. The caller is responsible for disposing the returned RegistryKey.</returns>
+    private static RegistryKey TryOpenDeviceRegistryKey(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return null;
+        }
+
+        string[] parts = name.Split('#');
+        if (parts.Length < 3)
+        {
+            return null;
+        }
+
+        var startIndex = parts[0].IndexOf(@"?\", StringComparison.Ordinal);
+        if (startIndex < 0 || startIndex + 2 >= parts[0].Length)
+        {
+            return null;
+        }
+
+        string devType = parts[0].Substring(startIndex + 2);
+        string deviceInstanceId = parts[1];
+        string deviceUniqueId = parts[2];
+        
+        // Validate that the parts are not empty/whitespace before using them in the registry path
+        if (string.IsNullOrWhiteSpace(devType) || string.IsNullOrWhiteSpace(deviceInstanceId) || string.IsNullOrWhiteSpace(deviceUniqueId))
+        {
+            return null;
+        }
+        
+        string regPath = $@"SYSTEM\CurrentControlSet\Enum\{devType}\{deviceInstanceId}\{deviceUniqueId}";
+        
+        return Registry.LocalMachine.OpenSubKey(regPath);
+    }
+
+    /// <summary>
     /// Returns a more friendly name for the device
     /// </summary>
     public string FriendlyDeviceName
     {
         get
         {
-            string[] parts = _name.Split('#');
-            if (parts.Length < 3)
-            {
-                return _name;
-            }
-
-            string devType = parts[0].Substring(parts[0].IndexOf(@"?\", StringComparison.Ordinal) + 2);
-            string deviceInstanceId = parts[1];
-            string deviceUniqueId = parts[2];
-            string regPath = @"SYSTEM\CurrentControlSet\Enum\" + devType + "\\" + deviceInstanceId + "\\" + deviceUniqueId;
-            using (var key = Registry.LocalMachine.OpenSubKey(regPath))
+            using (var key = TryOpenDeviceRegistryKey(_name))
             {
                 if (key == null)
                 {
@@ -116,6 +148,35 @@ public struct DevBroadcastDeviceInterface
             }
             return _name;
 
+        }
+    }
+
+    /// <summary>
+    /// Returns the Device Setup Class GUID from the Windows registry.
+    /// This is the Class GUID shown in Device Manager (e.g., {4d36e968-e325-11ce-bfc1-08002be10318} for Display adapters).
+    /// This is different from <see cref="DeviceClassGuid"/> which is the Device Interface Class GUID from the notification message.
+    /// Returns null if the registry key cannot be accessed or the ClassGUID value is not found.
+    /// </summary>
+    public Guid? DeviceSetupClassGuid
+    {
+        get
+        {
+            using (var key = TryOpenDeviceRegistryKey(_name))
+            {
+                if (key == null)
+                {
+                    return null;
+                }
+
+                if (key.GetValue("ClassGUID") is string classGuidString)
+                {
+                    if (Guid.TryParse(classGuidString, out var classGuid))
+                    {
+                        return classGuid;
+                    }
+                }
+            }
+            return null;
         }
     }
 
