@@ -44,6 +44,16 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
     public bool IsPassThrough { get; set; }
 
     /// <summary>
+    /// Defines if the handler should trigger when all keys are released instead of when all keys are pressed.
+    /// By default (false) the handler triggers when all keys in the combination are down.
+    /// When true, the handler triggers when the first key of the combination is released (key up),
+    /// but only if all keys were previously pressed together and no other keys are pressed.
+    /// This is useful when you need to inject keypresses after the user has released the modifier keys
+    /// to avoid interference from still-pressed modifier keys.
+    /// </summary>
+    public bool TriggerOnKeyUp { get; set; }
+
+    /// <summary>
     /// Create a KeyCombinationHandler for the specified VirtualKeyCodes
     /// </summary>
     /// <param name="keyCombination">IEnumerable with VirtualKeyCodes</param>
@@ -85,6 +95,8 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
 
         bool keyMatched = false;
         bool isRepeat = false;
+        bool wasAllKeysDown = AvailableKeys.All(b => b);
+        
         for (int i = 0; i < TriggerCombination.Length; i++)
         {
             if (!CompareVirtualKeyCode(keyboardHookEventArgs.Key, TriggerCombination[i]))
@@ -110,8 +122,18 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
             }
         }
 
-        //  check if this combination is handled
-        var isHandled = keyboardHookEventArgs.IsKeyDown && OtherPressedKeys.Count == 0 && AvailableKeys.All(b => b);
+        bool isHandled;
+        if (TriggerOnKeyUp)
+        {
+            // Trigger when a key is released, but only if all keys were previously down
+            // and no other keys are pressed
+            isHandled = !keyboardHookEventArgs.IsKeyDown && keyMatched && wasAllKeysDown && OtherPressedKeys.Count == 0;
+        }
+        else
+        {
+            // Original behavior: trigger when all keys are down
+            isHandled = keyboardHookEventArgs.IsKeyDown && OtherPressedKeys.Count == 0 && AvailableKeys.All(b => b);
+        }
 
         // Mark as handled if the key combination is handled and we don't have pass-through
         if (isHandled && !IsPassThrough)

@@ -358,4 +358,118 @@ public class KeyboardHookTests
             })
             .FirstAsync();
     }
+
+    /// <summary>
+    /// Test that TriggerOnKeyUp triggers when all keys are released, not when pressed
+    /// </summary>
+    [Fact]
+    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_SingleKey()
+    {
+        var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Print)
+        {
+            TriggerOnKeyUp = true
+        };
+
+        // Key down should not trigger
+        var result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print));
+        Assert.False(result);
+        
+        // Key up should trigger
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Print));
+        Assert.True(result);
+    }
+
+    /// <summary>
+    /// Test that TriggerOnKeyUp works correctly with key combinations
+    /// </summary>
+    [Fact]
+    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_Combination()
+    {
+        var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyA)
+        {
+            TriggerOnKeyUp = true
+        };
+
+        // Press all keys in the combination
+        var result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Control));
+        Assert.False(result);
+        
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Shift));
+        Assert.False(result);
+        
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyA));
+        Assert.False(result); // Should not trigger on key down
+        
+        // Start releasing keys - should trigger on first key up
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyA));
+        Assert.True(result);
+        
+        // Further releases should not trigger
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Shift));
+        Assert.False(result);
+        
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Control));
+        Assert.False(result);
+    }
+
+    /// <summary>
+    /// Test that TriggerOnKeyUp does not trigger if an extra key was pressed
+    /// </summary>
+    [Fact]
+    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_WithExtraKey()
+    {
+        var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.KeyA)
+        {
+            TriggerOnKeyUp = true
+        };
+
+        // Press the combination keys
+        var result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Control));
+        Assert.False(result);
+        
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyA));
+        Assert.False(result);
+        
+        // Press an extra key
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyB));
+        Assert.False(result);
+        
+        // Release combination key - should not trigger because extra key is pressed
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyA));
+        Assert.False(result);
+        
+        // Release extra key
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyB));
+        Assert.False(result);
+        
+        // Release last combination key
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Control));
+        Assert.False(result);
+    }
+
+    /// <summary>
+    /// Test that TriggerOnKeyUp does not trigger if not all combination keys were pressed
+    /// </summary>
+    [Fact]
+    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_PartialPress()
+    {
+        var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyA)
+        {
+            TriggerOnKeyUp = true
+        };
+
+        // Press only some keys
+        var result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Control));
+        Assert.False(result);
+        
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyA));
+        Assert.False(result);
+        
+        // Release a key without having pressed Shift - should not trigger
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyA));
+        Assert.False(result);
+        
+        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Control));
+        Assert.False(result);
+    }
 }
