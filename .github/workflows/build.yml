@@ -2,13 +2,11 @@ name: Build and Deploy
 
 on:
   push:
-    branches:
-      - '*'
     branches-ignore:
       - 'gh-pages'
   pull_request:
-    branches:
-      - '*'
+    branches-ignore:
+      - 'gh-pages'
 
 jobs:
   build:
@@ -126,6 +124,11 @@ jobs:
         nuget-version: '7.0.1'
     
     - name: Push to NuGet
+      shell: pwsh
       run: |
-        nuget push "artifacts/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }} -SkipDuplicate
+        Get-ChildItem -Path artifacts -Filter "*.nupkg" | ForEach-Object {
+          if ($_.Name -notlike "*.symbols.nupkg") {
+            nuget push $_.FullName -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }} -SkipDuplicate
+          }
+        }
       continue-on-error: true
