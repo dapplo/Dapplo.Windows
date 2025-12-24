@@ -89,12 +89,18 @@ public struct GrpIconDirEntry
     /// </summary>
     /// <param name="width">Width in pixels (1-256)</param>
     /// <param name="height">Height in pixels (1-256)</param>
-    /// <param name="hotspotX">Horizontal coordinate of the hotspot</param>
-    /// <param name="hotspotY">Vertical coordinate of the hotspot</param>
-    /// <param name="bitCount">Bits per pixel</param>
+    /// <param name="hotspotX">Horizontal coordinate of the hotspot (stored in Planes field)</param>
+    /// <param name="hotspotY">Vertical coordinate of the hotspot (stored in BitCount field)</param>
+    /// <param name="bitCount">Actual bits per pixel for the cursor image (passed but overridden by hotspot Y in structure)</param>
     /// <param name="imageSize">Size of the image data in bytes</param>
     /// <param name="resourceId">Resource ID of the cursor image</param>
     /// <returns>GrpIconDirEntry structure</returns>
+    /// <remarks>
+    /// For cursors, the Planes and BitCount fields are repurposed to store hotspot coordinates:
+    /// - Planes field stores the horizontal hotspot coordinate (X)
+    /// - BitCount field stores the vertical hotspot coordinate (Y)
+    /// The bitCount parameter is ignored for cursor entries as the field is used for hotspot Y.
+    /// </remarks>
     public static GrpIconDirEntry CreateForCursor(int width, int height, ushort hotspotX, ushort hotspotY, ushort bitCount, uint imageSize, ushort resourceId)
     {
         return new GrpIconDirEntry
@@ -104,7 +110,7 @@ public struct GrpIconDirEntry
             ColorCount = 0,
             Reserved = 0,
             Planes = hotspotX, // For cursors, Planes is hotspot X
-            BitCount = hotspotY, // For cursors, BitCount is hotspot Y
+            BitCount = hotspotY, // For cursors, BitCount is hotspot Y (bitCount param is ignored)
             BytesInRes = imageSize,
             Id = resourceId
         };

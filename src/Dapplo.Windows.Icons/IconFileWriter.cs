@@ -156,12 +156,13 @@ public static class IconFileWriter
             var entries = new List<IconDirEntry>();
             foreach (var (size, hotspot, data) in encodedImages)
             {
+                // Note: For cursors, Planes field stores hotspot X and BitCount field stores hotspot Y
                 var entry = IconDirEntry.CreateForCursor(
                     size.Width,
                     size.Height,
                     (ushort)hotspot.X,
                     (ushort)hotspot.Y,
-                    32, // Note: BitCount field is used for hotspot Y in cursors
+                    32, // Bits per pixel for the cursor image
                     (uint)data.Length,
                     offset
                 );
