@@ -399,4 +399,109 @@ public class ClipboardTests : IDisposable
             Assert.Contains(ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat, formats);
         }
     }
+
+    /// <summary>
+    ///     Test TryGetAsStream with available format
+    /// </summary>
+    [WpfFact]
+    public async Task TestClipboardTryGetAsStream_Success()
+    {
+        const string testString = "Dapplo.Windows.Tests.TryGetAsStream";
+        var testStream = new MemoryStream();
+        var bytes = Encoding.Unicode.GetBytes(testString + "\0");
+        testStream.Write(bytes, 0, bytes.Length);
+        testStream.Seek(0, SeekOrigin.Begin);
+
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            clipboardAccessToken.ClearContents();
+            clipboardAccessToken.SetAsStream(StandardClipboardFormats.UnicodeText, testStream);
+        }
+        
+        await Task.Delay(100);
+        
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            
+            // Try to get the stream - should succeed
+            bool success = clipboardAccessToken.TryGetAsStream(StandardClipboardFormats.UnicodeText, out var stream);
+            Assert.True(success);
+            Assert.NotNull(stream);
+            
+            await using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            var resultString = Encoding.Unicode.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length).TrimEnd('\0');
+            Assert.Equal(testString, resultString);
+        }
+    }
+
+    /// <summary>
+    ///     Test TryGetAsStream with unavailable format
+    /// </summary>
+    [WpfFact]
+    public async Task TestClipboardTryGetAsStream_Failure()
+    {
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            clipboardAccessToken.ClearContents();
+        }
+        
+        await Task.Delay(100);
+        
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            
+            // Try to get a non-existent format - should fail gracefully
+            bool success = clipboardAccessToken.TryGetAsStream(StandardClipboardFormats.UnicodeText, out var stream);
+            Assert.False(success);
+            Assert.Null(stream);
+        }
+    }
+
+    /// <summary>
+    ///     Test TryGetAsStream with custom format
+    /// </summary>
+    [WpfFact]
+    public async Task TestClipboardTryGetAsStream_CustomFormat()
+    {
+        const string customFormat = "CUSTOM_TEST_FORMAT";
+        const string testString = "Custom format test data";
+        var testStream = new MemoryStream();
+        var bytes = Encoding.UTF8.GetBytes(testString);
+        testStream.Write(bytes, 0, bytes.Length);
+        testStream.Seek(0, SeekOrigin.Begin);
+
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            clipboardAccessToken.ClearContents();
+            clipboardAccessToken.SetAsStream(customFormat, testStream);
+        }
+        
+        await Task.Delay(100);
+        
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            
+            // Try to get with correct format - should succeed
+            bool success = clipboardAccessToken.TryGetAsStream(customFormat, out var stream);
+            Assert.True(success);
+            Assert.NotNull(stream);
+            
+            await using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            var resultString = Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length);
+            Assert.Equal(testString, resultString);
+            
+            // Try to get with wrong format - should fail
+            success = clipboardAccessToken.TryGetAsStream("WRONG_FORMAT", out stream);
+            Assert.False(success);
+            Assert.Null(stream);
+        }
+    }
 }
