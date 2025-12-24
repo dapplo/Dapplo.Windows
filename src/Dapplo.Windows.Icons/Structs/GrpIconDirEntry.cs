@@ -113,29 +113,4 @@ public struct GrpIconDirEntry
             Id = resourceId
         };
     }
-
-    /// <summary>
-    /// Creates a new GRPICONDIRENTRY for a cursor resource (with explicit bitCount parameter for API consistency)
-    /// </summary>
-    /// <param name="width">Width in pixels (1-256)</param>
-    /// <param name="height">Height in pixels (1-256)</param>
-    /// <param name="hotspotX">Horizontal coordinate of the hotspot (stored in Planes field)</param>
-    /// <param name="hotspotY">Vertical coordinate of the hotspot (stored in BitCount field)</param>
-    /// <param name="bitCount">This parameter exists for API consistency but is not used for cursors. 
-    /// The BitCount field in the structure stores the hotspot Y coordinate instead.</param>
-    /// <param name="imageSize">Size of the image data in bytes</param>
-    /// <param name="resourceId">Resource ID of the cursor image</param>
-    /// <returns>GrpIconDirEntry structure</returns>
-    /// <remarks>
-    /// For cursors, the Planes and BitCount fields are repurposed to store hotspot coordinates:
-    /// - Planes field stores the horizontal hotspot coordinate (X)
-    /// - BitCount field stores the vertical hotspot coordinate (Y)
-    /// The bitCount parameter is included for API consistency but is ignored for cursor entries.
-    /// Use the overload without bitCount parameter for clearer code.
-    /// </remarks>
-    public static GrpIconDirEntry CreateForCursor(int width, int height, ushort hotspotX, ushort hotspotY, ushort bitCount, uint imageSize, ushort resourceId)
-    {
-        // Delegate to the simpler overload, ignoring bitCount parameter
-        return CreateForCursor(width, height, hotspotX, hotspotY, imageSize, resourceId);
-    }
 }

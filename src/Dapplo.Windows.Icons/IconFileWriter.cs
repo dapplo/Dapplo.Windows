@@ -156,7 +156,6 @@ public static class IconFileWriter
             var entries = new List<IconDirEntry>();
             foreach (var (size, hotspot, data) in encodedImages)
             {
-                // Use the cleaner overload without the unused bitCount parameter
                 var entry = IconDirEntry.CreateForCursor(
                     size.Width,
                     size.Height,
