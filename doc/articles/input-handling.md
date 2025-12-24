@@ -95,6 +95,73 @@ var complexComboSubscription = keyboardHook.KeyboardEvents
     });
 ```
 
+### Advanced Key Combination Handling
+
+Use `KeyCombinationHandler` for more sophisticated key combination detection:
+
+```csharp
+using Dapplo.Windows.Input.Keyboard;
+using System.Reactive.Linq;
+
+var keyboardHook = KeyboardHook.Create();
+
+// Create a handler for Ctrl+Alt+T
+var keyCombinationHandler = new KeyCombinationHandler(
+    VirtualKeyCode.Control,
+    VirtualKeyCode.Menu,  // Alt key
+    VirtualKeyCode.T
+);
+
+// Subscribe to the combination
+var subscription = keyboardHook.KeyboardEvents
+    .Where(keyCombinationHandler)
+    .Subscribe(e =>
+    {
+        Console.WriteLine("Ctrl+Alt+T pressed");
+        e.Handled = true; // Prevent other apps from seeing it
+    });
+```
+
+### Trigger on Key Release
+
+When you need to inject keypresses after a key combination, use `TriggerOnKeyUp` to ensure all modifier keys are released before your handler runs. This prevents the injected keys from being modified by still-pressed modifier keys:
+
+```csharp
+using Dapplo.Windows.Input.Keyboard;
+using System;
+using System.Reactive.Linq;
+
+var keyboardHook = KeyboardHook.Create();
+
+// Create a handler that triggers when keys are RELEASED
+var keyCombinationHandler = new KeyCombinationHandler(
+    VirtualKeyCode.Control,
+    VirtualKeyCode.Menu,      // Alt key
+    VirtualKeyCode.LeftWin,   // Windows key
+    VirtualKeyCode.T
+)
+{
+    TriggerOnKeyUp = true,    // Trigger when keys are released, not pressed
+    IgnoreInjected = false    // Allow processing of injected keys if needed
+};
+
+var subscription = keyboardHook.KeyboardEvents
+    .Where(keyCombinationHandler)
+    .Subscribe(e =>
+    {
+        // This runs AFTER all keys are released
+        // So injected keypresses won't be affected by modifier keys
+        var timestamp = DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss");
+        
+        // Type the timestamp safely without modifier interference
+        KeyboardInputGenerator.TypeText(timestamp);
+        
+        e.Handled = true;
+    });
+```
+
+This is especially useful when replacing AutoHotKey scripts or implementing text expansion features where modifier keys in the trigger combination could interfere with the text being typed.
+
 ### Key Sequence Detection
 
 Detect a sequence of keys (like vim commands):
