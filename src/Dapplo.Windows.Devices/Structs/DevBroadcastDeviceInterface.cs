@@ -104,6 +104,13 @@ public struct DevBroadcastDeviceInterface
         string devType = parts[0].Substring(startIndex + 2);
         string deviceInstanceId = parts[1];
         string deviceUniqueId = parts[2];
+        
+        // Validate that the parts don't contain invalid characters that could cause issues
+        if (string.IsNullOrWhiteSpace(devType) || string.IsNullOrWhiteSpace(deviceInstanceId) || string.IsNullOrWhiteSpace(deviceUniqueId))
+        {
+            return null;
+        }
+        
         string regPath = $@"SYSTEM\CurrentControlSet\Enum\{devType}\{deviceInstanceId}\{deviceUniqueId}";
         
         return Registry.LocalMachine.OpenSubKey(regPath);
