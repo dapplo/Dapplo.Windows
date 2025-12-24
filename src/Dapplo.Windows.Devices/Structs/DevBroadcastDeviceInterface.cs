@@ -81,7 +81,7 @@ public struct DevBroadcastDeviceInterface
     /// Returns null if the device name format is invalid or the registry key cannot be opened.
     /// </summary>
     /// <param name="name">The device name to parse</param>
-    /// <returns>RegistryKey or null</returns>
+    /// <returns>RegistryKey or null. The caller is responsible for disposing the returned RegistryKey.</returns>
     private static RegistryKey TryOpenDeviceRegistryKey(string name)
     {
         if (string.IsNullOrEmpty(name))
@@ -104,7 +104,7 @@ public struct DevBroadcastDeviceInterface
         string devType = parts[0].Substring(startIndex + 2);
         string deviceInstanceId = parts[1];
         string deviceUniqueId = parts[2];
-        string regPath = @"SYSTEM\CurrentControlSet\Enum\" + devType + "\\" + deviceInstanceId + "\\" + deviceUniqueId;
+        string regPath = $@"SYSTEM\CurrentControlSet\Enum\{devType}\{deviceInstanceId}\{deviceUniqueId}";
         
         return Registry.LocalMachine.OpenSubKey(regPath);
     }

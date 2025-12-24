@@ -55,7 +55,7 @@ public class DeviceTests
         var devBroadcastDeviceInterface = DevBroadcastDeviceInterface.Test(graphicsCard, DeviceInterfaceClass.DisplayDeviceArrival);
         
         // DeviceClassGuid should be the interface class from the notification
-        Assert.Equal("1ca05180-a699-450a-9a0c-de4fbe3ddd89", devBroadcastDeviceInterface.DeviceClassGuid.ToString(), StringComparer.OrdinalIgnoreCase);
+        Assert.Equal(new Guid("1ca05180-a699-450a-9a0c-de4fbe3ddd89"), devBroadcastDeviceInterface.DeviceClassGuid);
         
         // DeviceSetupClassGuid would be retrieved from registry (e.g., {4d36e968-e325-11ce-bfc1-08002be10318} for Display adapters)
         // In a test environment without the actual registry key, this will be null
