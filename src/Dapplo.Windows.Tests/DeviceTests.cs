@@ -43,4 +43,24 @@ public class DeviceTests
         Assert.True(devBroadcastDeviceInterface.IsPci);
         Log.Info().WriteLine("More information: {0}", devBroadcastDeviceInterface.UsbDeviceInfoUri);
     }
+
+    [Fact]
+    public void TestDeviceClassGuids()
+    {
+        // This test documents the difference between DeviceClassGuid and DeviceSetupClassGuid
+        // DeviceClassGuid (Device Interface Class GUID): comes from the device notification message
+        // For display device arrival events, this is {1ca05180-a699-450a-9a0c-de4fbe3ddd89}
+        const string graphicsCard =
+            @"\?\PCI#VEN_10DE&DEV_1FB8&SUBSYS_09061028&REV_A1#4&32af3f68&0&0008#{1ca05180-a699-450a-9a0c-de4fbe3ddd89}";
+        var devBroadcastDeviceInterface = DevBroadcastDeviceInterface.Test(graphicsCard, DeviceInterfaceClass.DisplayDeviceArrival);
+        
+        // DeviceClassGuid should be the interface class from the notification
+        Assert.Equal("1ca05180-a699-450a-9a0c-de4fbe3ddd89", devBroadcastDeviceInterface.DeviceClassGuid.ToString(), StringComparer.OrdinalIgnoreCase);
+        
+        // DeviceSetupClassGuid would be retrieved from registry (e.g., {4d36e968-e325-11ce-bfc1-08002be10318} for Display adapters)
+        // In a test environment without the actual registry key, this will be null
+        // Note: DeviceSetupClassGuid is what's shown in Windows Device Manager under "Class GUID"
+        var setupClassGuid = devBroadcastDeviceInterface.DeviceSetupClassGuid;
+        Log.Info().WriteLine("DeviceSetupClassGuid (from registry): {0}", setupClassGuid?.ToString() ?? "null (registry key not found)");
+    }
 }

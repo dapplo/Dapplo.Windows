@@ -35,6 +35,8 @@ public struct DevBroadcastDeviceInterface
 
     /// <summary>
     /// The GUID for the interface device class.
+    /// This is the Device Interface Class GUID that comes from the device notification message.
+    /// For the Device Setup Class GUID shown in Device Manager, use <see cref="DeviceSetupClassGuid"/> instead.
     /// </summary>
     public Guid DeviceClassGuid
     {
@@ -116,6 +118,45 @@ public struct DevBroadcastDeviceInterface
             }
             return _name;
 
+        }
+    }
+
+    /// <summary>
+    /// Returns the Device Setup Class GUID from the Windows registry.
+    /// This is the Class GUID shown in Device Manager (e.g., {4d36e968-e325-11ce-bfc1-08002be10318} for Display adapters).
+    /// This is different from <see cref="DeviceClassGuid"/> which is the Device Interface Class GUID from the notification message.
+    /// Returns null if the registry key cannot be accessed or the ClassGUID value is not found.
+    /// </summary>
+    public Guid? DeviceSetupClassGuid
+    {
+        get
+        {
+            string[] parts = _name.Split('#');
+            if (parts.Length < 3)
+            {
+                return null;
+            }
+
+            string devType = parts[0].Substring(parts[0].IndexOf(@"?\", StringComparison.Ordinal) + 2);
+            string deviceInstanceId = parts[1];
+            string deviceUniqueId = parts[2];
+            string regPath = @"SYSTEM\CurrentControlSet\Enum\" + devType + "\\" + deviceInstanceId + "\\" + deviceUniqueId;
+            using (var key = Registry.LocalMachine.OpenSubKey(regPath))
+            {
+                if (key == null)
+                {
+                    return null;
+                }
+
+                if (key.GetValue("ClassGUID") is string classGuidString)
+                {
+                    if (Guid.TryParse(classGuidString, out var classGuid))
+                    {
+                        return classGuid;
+                    }
+                }
+            }
+            return null;
         }
     }
 
