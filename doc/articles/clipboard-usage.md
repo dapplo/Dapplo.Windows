@@ -384,6 +384,141 @@ for (int i = 0; i < maxRetries; i++)
 }
 ```
 
+## Cloud Clipboard and Clipboard History
+
+Windows 10 and later versions support cloud clipboard synchronization and clipboard history. You can control how your clipboard content interacts with these features using the cloud clipboard extensions.
+
+### What are Cloud Clipboard Options?
+
+The cloud clipboard formats allow you to control three aspects of clipboard behavior:
+
+1. **CanIncludeInClipboardHistory** - Controls whether the content appears in Windows clipboard history (Win+V)
+2. **CanUploadToCloudClipboard** - Controls whether the content syncs across devices via cloud
+3. **ExcludeClipboardContentFromMonitorProcessing** - Controls whether clipboard monitoring apps can process the content
+
+### Setting Cloud Clipboard Options
+
+The simplest way to control cloud clipboard behavior is using the `SetCloudClipboardOptions` method:
+
+```csharp
+using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    // Set your clipboard content
+    clipboard.SetAsUnicodeString("Sensitive information");
+    
+    // Prevent from being stored in history or synced to cloud
+    clipboard.SetCloudClipboardOptions(
+        canIncludeInHistory: false,
+        canUploadToCloud: false,
+        excludeFromMonitoring: true
+    );
+}
+```
+
+### Use Cases
+
+#### Private/Sensitive Content
+
+Prevent sensitive data from being stored in history or synced:
+
+```csharp
+using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString("MyPassword123!");
+    
+    // Disable history and cloud sync for sensitive data
+    clipboard.SetCloudClipboardOptions(
+        canIncludeInHistory: false,
+        canUploadToCloud: false
+    );
+}
+```
+
+#### Temporary Content
+
+For temporary clipboard content that shouldn't clutter history:
+
+```csharp
+using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString("Temporary data");
+    
+    // Don't include in history, but allow cloud sync
+    clipboard.SetCloudClipboardOptions(
+        canIncludeInHistory: false,
+        canUploadToCloud: true
+    );
+}
+```
+
+#### Normal Content (Default)
+
+For normal content that should be available in history and cloud:
+
+```csharp
+using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString("Normal clipboard content");
+    
+    // Use defaults - allows history and cloud
+    clipboard.SetCloudClipboardOptions();
+}
+```
+
+### Individual Option Methods
+
+You can also set each option individually:
+
+```csharp
+using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString("My content");
+    
+    // Set options individually
+    clipboard.SetCanIncludeInClipboardHistory(false);
+    clipboard.SetCanUploadToCloudClipboard(true);
+    clipboard.SetExcludeClipboardContentFromMonitorProcessing(true);
+}
+```
+
+### Checking Cloud Clipboard Formats
+
+You can check if cloud clipboard formats are present:
+
+```csharp
+using Dapplo.Windows.Clipboard;
+using System.Linq;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    var formats = clipboard.AvailableFormats().ToList();
+    
+    bool hasHistoryFormat = formats.Contains(
+        ClipboardCloudExtensions.CanIncludeInClipboardHistoryFormat);
+    bool hasCloudFormat = formats.Contains(
+        ClipboardCloudExtensions.CanUploadToCloudClipboardFormat);
+    bool hasMonitorFormat = formats.Contains(
+        ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat);
+}
+```
+
+### Best Practices for Cloud Clipboard
+
+1. **Always set cloud options after setting content** - The cloud formats should be set in the same clipboard access session as your content
+2. **Default to allowing** - Unless you have a specific reason, use the defaults which allow history and cloud sync
+3. **Be consistent** - If you disable history, you probably want to disable cloud sync too
+4. **Consider user privacy** - For passwords and sensitive data, always disable history and cloud sync
+
 ## Common Clipboard Formats
 
 Standard Windows clipboard formats:
