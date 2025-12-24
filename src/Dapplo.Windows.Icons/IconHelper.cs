@@ -129,64 +129,13 @@ public static class IconHelper
     /// <summary>
     ///     Write the images to the stream as icon.
     ///     It's important that the images are not larger than 256x256.
+    ///     This method delegates to <see cref="IconFileWriter.WriteIconFile(Stream, IEnumerable{Image})"/>
     /// </summary>
     /// <param name="stream">Stream to write to</param>
     /// <param name="images">IEnumerable with images</param>
     public static void WriteIcon(Stream stream, IEnumerable<Image> images)
     {
-        var binaryWriter = new BinaryWriter(stream);
-
-        short imageCount = 0;
-        var imageSizes = new List<Size>();
-        var encodedImages = new List<MemoryStream>();
-        foreach (var image in images)
-        {
-            var imageStream = new MemoryStream();
-            image.Save(imageStream, ImageFormat.Png);
-            imageSizes.Add(image.Size);
-
-            imageStream.Seek(0, SeekOrigin.Begin);
-            encodedImages.Add(imageStream);
-            imageCount++;
-        }
-        //
-        // ICONDIR structure
-        //
-        binaryWriter.Write((short)0); // reserved
-        binaryWriter.Write((short)1); // image type (icon)
-        binaryWriter.Write(imageCount); // number of images
-
-        //
-        // ICONDIRENTRY structure
-        //
-        const int iconDirSize = 6;
-        const int iconDirEntrySize = 16;
-
-        var offset = iconDirSize + imageCount * iconDirEntrySize;
-        for (var i = 0; i < imageCount; i++)
-        {
-            var imageSize = imageSizes[i];
-            // Write the width / height, 0 means 256
-            binaryWriter.Write(imageSize.Width == 256 ? (byte)0 : (byte)imageSize.Width);
-            binaryWriter.Write(imageSize.Height == 256 ? (byte)0 : (byte)imageSize.Height);
-            binaryWriter.Write((byte)0); // no pallete
-            binaryWriter.Write((byte)0); // reserved
-            binaryWriter.Write((short)0); // no color planes
-            binaryWriter.Write((short)32); // 32 bpp
-            binaryWriter.Write((int)encodedImages[i].Length); // image data length
-            binaryWriter.Write(offset);
-            offset += (int)encodedImages[i].Length;
-        }
-
-        binaryWriter.Flush();
-        //
-        // Write image data
-        //
-        foreach (var encodedImage in encodedImages)
-        {
-            encodedImage.WriteTo(stream);
-            encodedImage.Dispose();
-        }
+        IconFileWriter.WriteIconFile(stream, images);
     }
 
     /// <summary>
