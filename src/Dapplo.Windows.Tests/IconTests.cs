@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -151,5 +153,229 @@ public class IconTests
         // The icon should be scaled to the requested size
         Assert.Equal(targetSize, icon.PixelWidth);
         Assert.Equal(targetSize, icon.PixelHeight);
+    }
+
+    /// <summary>
+    ///     Test creating an icon file with multiple sizes using IconFileWriter
+    /// </summary>
+    [Fact]
+    public void TestIconFileWriter_WriteIconFile()
+    {
+        // Create test bitmaps of different sizes
+        var images = new List<System.Drawing.Bitmap>
+        {
+            new System.Drawing.Bitmap(16, 16),
+            new System.Drawing.Bitmap(32, 32),
+            new System.Drawing.Bitmap(48, 48),
+            new System.Drawing.Bitmap(256, 256)
+        };
+
+        // Fill each bitmap with a different color for visual verification
+        using (var g1 = System.Drawing.Graphics.FromImage(images[0]))
+            g1.Clear(System.Drawing.Color.Red);
+        using (var g2 = System.Drawing.Graphics.FromImage(images[1]))
+            g2.Clear(System.Drawing.Color.Green);
+        using (var g3 = System.Drawing.Graphics.FromImage(images[2]))
+            g3.Clear(System.Drawing.Color.Blue);
+        using (var g4 = System.Drawing.Graphics.FromImage(images[3]))
+            g4.Clear(System.Drawing.Color.Yellow);
+
+        // Write to a memory stream
+        using (var stream = new System.IO.MemoryStream())
+        {
+            IconFileWriter.WriteIconFile(stream, images);
+
+            // Verify the stream has data
+            Assert.True(stream.Length > 0, "Icon file should have data");
+
+            // Verify the header
+            stream.Seek(0, System.IO.SeekOrigin.Begin);
+            using (var reader = new System.IO.BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
+            {
+                var reserved = reader.ReadUInt16();
+                var type = reader.ReadUInt16();
+                var count = reader.ReadUInt16();
+
+                Assert.Equal(0, reserved);
+                Assert.Equal(1, type); // 1 = icon
+                Assert.Equal(4, count); // 4 images
+            }
+        }
+
+        // Clean up
+        foreach (var image in images)
+        {
+            image.Dispose();
+        }
+    }
+
+    /// <summary>
+    ///     Test creating a cursor file with hotspot information
+    /// </summary>
+    [Fact]
+    public void TestIconFileWriter_WriteCursorFile()
+    {
+        // Create test bitmap for cursor
+        var bitmap = new System.Drawing.Bitmap(32, 32);
+        using (var g = System.Drawing.Graphics.FromImage(bitmap))
+        {
+            g.Clear(System.Drawing.Color.White);
+        }
+
+        var cursorData = new List<(System.Drawing.Image, System.Drawing.Point)>
+        {
+            (bitmap, new System.Drawing.Point(16, 16)) // Hotspot in the center
+        };
+
+        // Write to a memory stream
+        using (var stream = new System.IO.MemoryStream())
+        {
+            IconFileWriter.WriteCursorFile(stream, cursorData);
+
+            // Verify the stream has data
+            Assert.True(stream.Length > 0, "Cursor file should have data");
+
+            // Verify the header
+            stream.Seek(0, System.IO.SeekOrigin.Begin);
+            using (var reader = new System.IO.BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
+            {
+                var reserved = reader.ReadUInt16();
+                var type = reader.ReadUInt16();
+                var count = reader.ReadUInt16();
+
+                Assert.Equal(0, reserved);
+                Assert.Equal(2, type); // 2 = cursor
+                Assert.Equal(1, count);
+            }
+        }
+
+        bitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test IconDir structure creation
+    /// </summary>
+    [Fact]
+    public void TestIconDir_CreateIcon()
+    {
+        var iconDir = Icons.Structs.IconDir.CreateIcon(3);
+
+        Assert.Equal(0, iconDir.Reserved);
+        Assert.Equal(1, iconDir.Type);
+        Assert.Equal(3, iconDir.Count);
+    }
+
+    /// <summary>
+    ///     Test IconDir structure creation for cursor
+    /// </summary>
+    [Fact]
+    public void TestIconDir_CreateCursor()
+    {
+        var iconDir = Icons.Structs.IconDir.CreateCursor(2);
+
+        Assert.Equal(0, iconDir.Reserved);
+        Assert.Equal(2, iconDir.Type);
+        Assert.Equal(2, iconDir.Count);
+    }
+
+    /// <summary>
+    ///     Test IconDirEntry structure creation
+    /// </summary>
+    [Fact]
+    public void TestIconDirEntry_CreateForIcon()
+    {
+        var entry = Icons.Structs.IconDirEntry.CreateForIcon(32, 32, 32, 1024, 128);
+
+        Assert.Equal(32, entry.Width);
+        Assert.Equal(32, entry.Height);
+        Assert.Equal(0, entry.ColorCount);
+        Assert.Equal(0, entry.Reserved);
+        Assert.Equal(0, entry.Planes);
+        Assert.Equal(32, entry.BitCount);
+        Assert.Equal(1024u, entry.BytesInRes);
+        Assert.Equal(128u, entry.ImageOffset);
+    }
+
+    /// <summary>
+    ///     Test IconDirEntry structure creation with 256x256 size (should use 0)
+    /// </summary>
+    [Fact]
+    public void TestIconDirEntry_Create256x256()
+    {
+        var entry = Icons.Structs.IconDirEntry.CreateForIcon(256, 256, 32, 2048, 256);
+
+        Assert.Equal(0, entry.Width);  // 0 represents 256
+        Assert.Equal(0, entry.Height); // 0 represents 256
+    }
+
+    /// <summary>
+    ///     Test GrpIconDir structure creation
+    /// </summary>
+    [Fact]
+    public void TestGrpIconDir_CreateIcon()
+    {
+        var grpIconDir = Icons.Structs.GrpIconDir.CreateIcon(5);
+
+        Assert.Equal(0, grpIconDir.Reserved);
+        Assert.Equal(1, grpIconDir.Type);
+        Assert.Equal(5, grpIconDir.Count);
+    }
+
+    /// <summary>
+    ///     Test GrpIconDirEntry structure creation
+    /// </summary>
+    [Fact]
+    public void TestGrpIconDirEntry_CreateForIcon()
+    {
+        var entry = Icons.Structs.GrpIconDirEntry.CreateForIcon(48, 48, 32, 4096, 1);
+
+        Assert.Equal(48, entry.Width);
+        Assert.Equal(48, entry.Height);
+        Assert.Equal(0, entry.ColorCount);
+        Assert.Equal(0, entry.Reserved);
+        Assert.Equal(0, entry.Planes);
+        Assert.Equal(32, entry.BitCount);
+        Assert.Equal(4096u, entry.BytesInRes);
+        Assert.Equal(1, entry.Id);
+    }
+
+    /// <summary>
+    ///     Test backward compatibility - existing WriteIcon method
+    /// </summary>
+    [Fact]
+    public void TestIconHelper_WriteIcon_BackwardCompatibility()
+    {
+        // Create test bitmap
+        var bitmap = new System.Drawing.Bitmap(32, 32);
+        using (var g = System.Drawing.Graphics.FromImage(bitmap))
+        {
+            g.Clear(System.Drawing.Color.Blue);
+        }
+
+        var images = new List<System.Drawing.Image> { bitmap };
+
+        // Write using the old WriteIcon method (which now delegates to IconFileWriter)
+        using (var stream = new System.IO.MemoryStream())
+        {
+            IconHelper.WriteIcon(stream, images);
+
+            // Verify the stream has data
+            Assert.True(stream.Length > 0, "Icon file should have data");
+
+            // Verify the header
+            stream.Seek(0, System.IO.SeekOrigin.Begin);
+            using (var reader = new System.IO.BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
+            {
+                var reserved = reader.ReadUInt16();
+                var type = reader.ReadUInt16();
+                var count = reader.ReadUInt16();
+
+                Assert.Equal(0, reserved);
+                Assert.Equal(1, type); // 1 = icon
+                Assert.Equal(1, count);
+            }
+        }
+
+        bitmap.Dispose();
     }
 }
