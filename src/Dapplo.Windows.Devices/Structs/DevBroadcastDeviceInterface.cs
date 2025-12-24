@@ -77,23 +77,46 @@ public struct DevBroadcastDeviceInterface
     }
 
     /// <summary>
+    /// Helper method to parse the device name and open the corresponding registry key.
+    /// Returns null if the device name format is invalid or the registry key cannot be opened.
+    /// </summary>
+    /// <param name="name">The device name to parse</param>
+    /// <returns>RegistryKey or null</returns>
+    private static RegistryKey TryOpenDeviceRegistryKey(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return null;
+        }
+
+        string[] parts = name.Split('#');
+        if (parts.Length < 3)
+        {
+            return null;
+        }
+
+        var startIndex = parts[0].IndexOf(@"?\", StringComparison.Ordinal);
+        if (startIndex < 0 || startIndex + 2 >= parts[0].Length)
+        {
+            return null;
+        }
+
+        string devType = parts[0].Substring(startIndex + 2);
+        string deviceInstanceId = parts[1];
+        string deviceUniqueId = parts[2];
+        string regPath = @"SYSTEM\CurrentControlSet\Enum\" + devType + "\\" + deviceInstanceId + "\\" + deviceUniqueId;
+        
+        return Registry.LocalMachine.OpenSubKey(regPath);
+    }
+
+    /// <summary>
     /// Returns a more friendly name for the device
     /// </summary>
     public string FriendlyDeviceName
     {
         get
         {
-            string[] parts = _name.Split('#');
-            if (parts.Length < 3)
-            {
-                return _name;
-            }
-
-            string devType = parts[0].Substring(parts[0].IndexOf(@"?\", StringComparison.Ordinal) + 2);
-            string deviceInstanceId = parts[1];
-            string deviceUniqueId = parts[2];
-            string regPath = @"SYSTEM\CurrentControlSet\Enum\" + devType + "\\" + deviceInstanceId + "\\" + deviceUniqueId;
-            using (var key = Registry.LocalMachine.OpenSubKey(regPath))
+            using (var key = TryOpenDeviceRegistryKey(_name))
             {
                 if (key == null)
                 {
@@ -131,17 +154,7 @@ public struct DevBroadcastDeviceInterface
     {
         get
         {
-            string[] parts = _name.Split('#');
-            if (parts.Length < 3)
-            {
-                return null;
-            }
-
-            string devType = parts[0].Substring(parts[0].IndexOf(@"?\", StringComparison.Ordinal) + 2);
-            string deviceInstanceId = parts[1];
-            string deviceUniqueId = parts[2];
-            string regPath = @"SYSTEM\CurrentControlSet\Enum\" + devType + "\\" + deviceInstanceId + "\\" + deviceUniqueId;
-            using (var key = Registry.LocalMachine.OpenSubKey(regPath))
+            using (var key = TryOpenDeviceRegistryKey(_name))
             {
                 if (key == null)
                 {
