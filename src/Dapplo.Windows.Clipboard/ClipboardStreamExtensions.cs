@@ -95,6 +95,60 @@ public static class ClipboardStreamExtensions
     }
 
     /// <summary>
+    /// Try to retrieve the content for the specified format as a stream.
+    /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
+    /// </summary>
+    /// <param name="clipboardAccessToken">IClipboardLock</param>
+    /// <param name="format">StandardClipboardFormats with the format to retrieve the content for</param>
+    /// <param name="stream">Stream output parameter</param>
+    /// <returns>true if the format can be read as a stream, false otherwise</returns>
+    public static bool TryGetAsStream(this IClipboardAccessToken clipboardAccessToken, StandardClipboardFormats format, out Stream stream)
+    {
+        return clipboardAccessToken.TryGetAsStream((uint)format, out stream);
+    }
+
+    /// <summary>
+    /// Try to retrieve the content for the specified format as a stream.
+    /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
+    /// </summary>
+    /// <param name="clipboardAccessToken">IClipboardLock</param>
+    /// <param name="format">string with the format to retrieve the content for</param>
+    /// <param name="stream">Stream output parameter</param>
+    /// <returns>true if the format can be read as a stream, false otherwise</returns>
+    public static bool TryGetAsStream(this IClipboardAccessToken clipboardAccessToken, string format, out Stream stream)
+    {
+        return clipboardAccessToken.TryGetAsStream(ClipboardFormatExtensions.MapFormatToId(format), out stream);
+    }
+
+    /// <summary>
+    /// Try to retrieve the content for the specified format as a stream.
+    /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
+    /// </summary>
+    /// <param name="clipboardAccessToken">IClipboardLock</param>
+    /// <param name="formatId">uint with the format to retrieve the content for</param>
+    /// <param name="stream">Stream output parameter</param>
+    /// <returns>true if the format can be read as a stream, false otherwise</returns>
+    public static bool TryGetAsStream(this IClipboardAccessToken clipboardAccessToken, uint formatId, out Stream stream)
+    {
+        stream = null;
+        
+        if (!clipboardAccessToken.TryReadInfo(formatId, out var readInfo))
+        {
+            return false;
+        }
+        
+        // return the memory stream, the global unlock is done when the UnmanagedMemoryStreamWrapper is disposed
+        unsafe
+        {
+            var result = new UnmanagedMemoryStreamWrapper((byte*)readInfo.MemoryPtr, readInfo.Size, readInfo.Size, FileAccess.Read);
+            // Make sure the readinfo is disposed when needed
+            result.SetDisposable(readInfo);
+            stream = result;
+            return true;
+        }
+    }
+
+    /// <summary>
     /// Retrieve the content for the specified format.
     /// You will need to "lock" (OpenClipboard) the clipboard before calling this.
     /// </summary>
