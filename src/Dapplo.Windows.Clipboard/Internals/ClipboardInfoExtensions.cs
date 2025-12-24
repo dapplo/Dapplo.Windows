@@ -12,7 +12,7 @@ internal static class ClipboardInfoExtensions
     /// <summary>
     /// Try to create ClipboardNativeInfo to read
     /// </summary>
-    /// <param name="clipboardAccessToken">IClipboardLock</param>
+    /// <param name="clipboardAccessToken">IClipboardAccessToken</param>
     /// <param name="formatId">uint</param>
     /// <param name="readInfo">ClipboardNativeInfo output parameter</param>
     /// <returns>true if the format can be read, false otherwise</returns>
@@ -50,7 +50,7 @@ internal static class ClipboardInfoExtensions
     /// <summary>
     /// Create ClipboardNativeInfo to read
     /// </summary>
-    /// <param name="clipboardAccessToken">IClipboardLock</param>
+    /// <param name="clipboardAccessToken">IClipboardAccessToken</param>
     /// <param name="formatId">uint</param>
     /// <returns>ClipboardNativeInfo</returns>
     public static ClipboardNativeInfo ReadInfo(this IClipboardAccessToken clipboardAccessToken, uint formatId)
@@ -83,7 +83,7 @@ internal static class ClipboardInfoExtensions
     /// <summary>
     /// Factory for the write information
     /// </summary>
-    /// <param name="clipboardAccessToken">IClipboardLock</param>
+    /// <param name="clipboardAccessToken">IClipboardAccessToken</param>
     /// <param name="formatId">uint with the format id</param>
     /// <param name="size">int with the size of the clipboard area</param>
     /// <returns>ClipboardNativeInfo</returns>
