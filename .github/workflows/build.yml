@@ -14,6 +14,11 @@ jobs:
   build:
     runs-on: windows-latest
     
+    permissions:
+      contents: write  # Required for pushing to gh-pages
+      actions: read
+      checks: write
+    
     env:
       SOLUTION: 'src/*.sln'
       BUILD_PLATFORM: 'Any CPU'
@@ -101,6 +106,10 @@ jobs:
     needs: build
     runs-on: windows-latest
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    
+    permissions:
+      contents: read
+    
     environment: 
       name: NuGet
     
