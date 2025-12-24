@@ -46,9 +46,10 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
     /// <summary>
     /// Defines if the handler should trigger when all keys are released instead of when all keys are pressed.
     /// By default (false) the handler triggers when all keys in the combination are down.
-    /// When true, the handler triggers when the last key of the combination is released (key up),
-    /// but only if all keys were previously pressed. This is useful when you need to inject keypresses
-    /// after the user has released the modifier keys to avoid interference.
+    /// When true, the handler triggers when the first key of the combination is released (key up),
+    /// but only if all keys were previously pressed together and no other keys are pressed.
+    /// This is useful when you need to inject keypresses after the user has released the modifier keys
+    /// to avoid interference from still-pressed modifier keys.
     /// </summary>
     public bool TriggerOnKeyUp { get; set; }
 
