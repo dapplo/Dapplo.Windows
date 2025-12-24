@@ -93,7 +93,7 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local core.autocrlf false
         git config --local core.safecrlf false
-        git checkout -b docfx
+        git checkout -B docfx
         del .gitignore
         git add doc/_site
         git commit -m "Generated documentation for ${{ github.run_number }}"
@@ -126,9 +126,29 @@ jobs:
     - name: Push to NuGet
       shell: pwsh
       run: |
-        Get-ChildItem -Path artifacts -Filter "*.nupkg" | ForEach-Object {
-          if ($_.Name -notlike "*.symbols.nupkg") {
-            nuget push $_.FullName -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }} -SkipDuplicate
+        $packages = Get-ChildItem -Path artifacts -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
+        if ($packages.Count -eq 0) {
+          Write-Host "No packages found to publish"
+          exit 0
+        }
+        
+        $failed = 0
+        foreach ($package in $packages) {
+          Write-Host "Pushing $($package.Name)..."
+          $result = & nuget push $package.FullName -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }} -SkipDuplicate 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            if ($result -match "already exists") {
+              Write-Host "Package already exists (skipped): $($package.Name)"
+            } else {
+              Write-Error "Failed to push $($package.Name): $result"
+              $failed++
+            }
+          } else {
+            Write-Host "Successfully pushed: $($package.Name)"
           }
         }
-      continue-on-error: true
+        
+        if ($failed -gt 0) {
+          Write-Error "Failed to push $failed package(s)"
+          exit 1
+        }
