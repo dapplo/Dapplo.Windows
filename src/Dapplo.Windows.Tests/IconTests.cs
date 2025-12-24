@@ -340,6 +340,69 @@ public class IconTests
     }
 
     /// <summary>
+    ///     Test writing GrpIconDir and GrpIconDirEntry structures
+    /// </summary>
+    [Fact]
+    public void TestIconFileWriter_WriteGrpIconStructures()
+    {
+        // Test writing group icon structures for PE resources
+        using (var stream = new System.IO.MemoryStream())
+        using (var writer = new System.IO.BinaryWriter(stream))
+        {
+            // Write group icon directory
+            var grpIconDir = Icons.Structs.GrpIconDir.CreateIcon(2);
+            IconFileWriter.WriteGrpIconDir(writer, grpIconDir);
+
+            // Write group icon directory entries
+            var entry1 = Icons.Structs.GrpIconDirEntry.CreateForIcon(16, 16, 32, 512, 1);
+            var entry2 = Icons.Structs.GrpIconDirEntry.CreateForIcon(32, 32, 32, 2048, 2);
+            IconFileWriter.WriteGrpIconDirEntry(writer, entry1);
+            IconFileWriter.WriteGrpIconDirEntry(writer, entry2);
+
+            writer.Flush();
+
+            // Verify the written data
+            stream.Seek(0, System.IO.SeekOrigin.Begin);
+            using (var reader = new System.IO.BinaryReader(stream))
+            {
+                // Read GRPICONDIR
+                var reserved = reader.ReadUInt16();
+                var type = reader.ReadUInt16();
+                var count = reader.ReadUInt16();
+                Assert.Equal(0, reserved);
+                Assert.Equal(1, type);
+                Assert.Equal(2, count);
+
+                // Read first GRPICONDIRENTRY
+                var width1 = reader.ReadByte();
+                var height1 = reader.ReadByte();
+                reader.ReadByte(); // color count
+                reader.ReadByte(); // reserved
+                reader.ReadUInt16(); // planes
+                reader.ReadUInt16(); // bitcount
+                reader.ReadUInt32(); // bytes in res
+                var id1 = reader.ReadUInt16();
+                Assert.Equal(16, width1);
+                Assert.Equal(16, height1);
+                Assert.Equal(1, id1);
+
+                // Read second GRPICONDIRENTRY
+                var width2 = reader.ReadByte();
+                var height2 = reader.ReadByte();
+                reader.ReadByte(); // color count
+                reader.ReadByte(); // reserved
+                reader.ReadUInt16(); // planes
+                reader.ReadUInt16(); // bitcount
+                reader.ReadUInt32(); // bytes in res
+                var id2 = reader.ReadUInt16();
+                Assert.Equal(32, width2);
+                Assert.Equal(32, height2);
+                Assert.Equal(2, id2);
+            }
+        }
+    }
+
+    /// <summary>
     ///     Test backward compatibility - existing WriteIcon method
     /// </summary>
     [Fact]
