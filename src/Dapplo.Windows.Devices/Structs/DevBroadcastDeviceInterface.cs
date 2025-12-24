@@ -105,7 +105,7 @@ public struct DevBroadcastDeviceInterface
         string deviceInstanceId = parts[1];
         string deviceUniqueId = parts[2];
         
-        // Validate that the parts don't contain invalid characters that could cause issues
+        // Validate that the parts are not empty/whitespace before using them in the registry path
         if (string.IsNullOrWhiteSpace(devType) || string.IsNullOrWhiteSpace(deviceInstanceId) || string.IsNullOrWhiteSpace(deviceUniqueId))
         {
             return null;

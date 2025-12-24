@@ -48,14 +48,18 @@ public class DeviceTests
     public void TestDeviceClassGuids()
     {
         // This test documents the difference between DeviceClassGuid and DeviceSetupClassGuid
+        // Using an NVIDIA Quadro T1000 graphics card as the example device
+        
         // DeviceClassGuid (Device Interface Class GUID): comes from the device notification message
-        // For display device arrival events, this is {1ca05180-a699-450a-9a0c-de4fbe3ddd89}
+        // For display device arrival events, this is the GUID_DISPLAY_DEVICE_ARRIVAL constant
+        const string displayDeviceArrivalGuid = "1ca05180-a699-450a-9a0c-de4fbe3ddd89";
+        
         const string graphicsCard =
             @"\?\PCI#VEN_10DE&DEV_1FB8&SUBSYS_09061028&REV_A1#4&32af3f68&0&0008#{1ca05180-a699-450a-9a0c-de4fbe3ddd89}";
         var devBroadcastDeviceInterface = DevBroadcastDeviceInterface.Test(graphicsCard, DeviceInterfaceClass.DisplayDeviceArrival);
         
         // DeviceClassGuid should be the interface class from the notification
-        Assert.Equal(new Guid("1ca05180-a699-450a-9a0c-de4fbe3ddd89"), devBroadcastDeviceInterface.DeviceClassGuid);
+        Assert.Equal(new Guid(displayDeviceArrivalGuid), devBroadcastDeviceInterface.DeviceClassGuid);
         
         // DeviceSetupClassGuid would be retrieved from registry (e.g., {4d36e968-e325-11ce-bfc1-08002be10318} for Display adapters)
         // In a test environment without the actual registry key, this will be null
