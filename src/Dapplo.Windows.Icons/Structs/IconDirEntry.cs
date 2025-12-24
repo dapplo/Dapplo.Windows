@@ -89,6 +89,36 @@ public struct IconDirEntry
     /// </summary>
     /// <param name="width">Width in pixels (1-256)</param>
     /// <param name="height">Height in pixels (1-256)</param>
+    /// <param name="hotspotX">Horizontal coordinate of the hotspot</param>
+    /// <param name="hotspotY">Vertical coordinate of the hotspot</param>
+    /// <param name="imageSize">Size of the image data in bytes</param>
+    /// <param name="imageOffset">Offset to the image data</param>
+    /// <returns>IconDirEntry structure</returns>
+    /// <remarks>
+    /// For cursors, the Planes and BitCount fields are repurposed to store hotspot coordinates:
+    /// - Planes field stores the horizontal hotspot coordinate (X)
+    /// - BitCount field stores the vertical hotspot coordinate (Y)
+    /// </remarks>
+    public static IconDirEntry CreateForCursor(int width, int height, ushort hotspotX, ushort hotspotY, uint imageSize, uint imageOffset)
+    {
+        return new IconDirEntry
+        {
+            Width = width == 256 ? (byte)0 : (byte)width,
+            Height = height == 256 ? (byte)0 : (byte)height,
+            ColorCount = 0,
+            Reserved = 0,
+            Planes = hotspotX, // For cursors, Planes is hotspot X
+            BitCount = hotspotY, // For cursors, BitCount is hotspot Y
+            BytesInRes = imageSize,
+            ImageOffset = imageOffset
+        };
+    }
+
+    /// <summary>
+    /// Creates a new ICONDIRENTRY for a cursor (with explicit bitCount parameter for API consistency)
+    /// </summary>
+    /// <param name="width">Width in pixels (1-256)</param>
+    /// <param name="height">Height in pixels (1-256)</param>
     /// <param name="hotspotX">Horizontal coordinate of the hotspot (stored in Planes field)</param>
     /// <param name="hotspotY">Vertical coordinate of the hotspot (stored in BitCount field)</param>
     /// <param name="bitCount">This parameter exists for API consistency but is not used for cursors. 
@@ -101,19 +131,11 @@ public struct IconDirEntry
     /// - Planes field stores the horizontal hotspot coordinate (X)
     /// - BitCount field stores the vertical hotspot coordinate (Y)
     /// The bitCount parameter is included for API consistency but is ignored for cursor entries.
+    /// Use the overload without bitCount parameter for clearer code.
     /// </remarks>
     public static IconDirEntry CreateForCursor(int width, int height, ushort hotspotX, ushort hotspotY, ushort bitCount, uint imageSize, uint imageOffset)
     {
-        return new IconDirEntry
-        {
-            Width = width == 256 ? (byte)0 : (byte)width,
-            Height = height == 256 ? (byte)0 : (byte)height,
-            ColorCount = 0,
-            Reserved = 0,
-            Planes = hotspotX, // For cursors, Planes is hotspot X
-            BitCount = hotspotY, // For cursors, BitCount is hotspot Y (bitCount param is ignored)
-            BytesInRes = imageSize,
-            ImageOffset = imageOffset
-        };
+        // Delegate to the simpler overload, ignoring bitCount parameter
+        return CreateForCursor(width, height, hotspotX, hotspotY, imageSize, imageOffset);
     }
 }
