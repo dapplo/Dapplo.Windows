@@ -436,4 +436,227 @@ public static class IconHelper
             }
         }
     }
+
+    /// <summary>
+    ///     Gets the system-preferred width for small icons (SM_CXSMICON).
+    ///     Small icons typically appear in window captions and in small icon view.
+    /// </summary>
+    /// <returns>The recommended width of a small icon, in pixels.</returns>
+    public static int GetSmallIconWidth()
+    {
+        return User32Api.GetSystemMetrics(User32.Enums.SystemMetric.SM_CXSMICON);
+    }
+
+    /// <summary>
+    ///     Gets the system-preferred height for small icons (SM_CYSMICON).
+    ///     Small icons typically appear in window captions and in small icon view.
+    /// </summary>
+    /// <returns>The recommended height of a small icon, in pixels.</returns>
+    public static int GetSmallIconHeight()
+    {
+        return User32Api.GetSystemMetrics(User32.Enums.SystemMetric.SM_CYSMICON);
+    }
+
+    /// <summary>
+    ///     Gets the system-preferred width for large/standard icons (SM_CXICON).
+    ///     This is the default width for large icons.
+    /// </summary>
+    /// <returns>The default width of an icon, in pixels.</returns>
+    public static int GetStandardIconWidth()
+    {
+        return User32Api.GetSystemMetrics(User32.Enums.SystemMetric.SM_CXICON);
+    }
+
+    /// <summary>
+    ///     Gets the system-preferred height for large/standard icons (SM_CYICON).
+    ///     This is the default height for large icons.
+    /// </summary>
+    /// <returns>The default height of an icon, in pixels.</returns>
+    public static int GetStandardIconHeight()
+    {
+        return User32Api.GetSystemMetrics(User32.Enums.SystemMetric.SM_CYICON);
+    }
+
+    /// <summary>
+    ///     Gets the system-preferred width for icon grid spacing (SM_CXICONSPACING).
+    ///     Each item fits into a rectangle of this width when arranged in large icon view.
+    /// </summary>
+    /// <returns>The width of a grid cell for items in large icon view, in pixels.</returns>
+    public static int GetIconSpacingWidth()
+    {
+        return User32Api.GetSystemMetrics(User32.Enums.SystemMetric.SM_CXICONSPACING);
+    }
+
+    /// <summary>
+    ///     Gets the system-preferred height for icon grid spacing (SM_CYICONSPACING).
+    ///     Each item fits into a rectangle of this height when arranged in large icon view.
+    /// </summary>
+    /// <returns>The height of a grid cell for items in large icon view, in pixels.</returns>
+    public static int GetIconSpacingHeight()
+    {
+        return User32Api.GetSystemMetrics(User32.Enums.SystemMetric.SM_CYICONSPACING);
+    }
+
+    /// <summary>
+    ///     Gets the system-preferred size for icons based on the metric size.
+    /// </summary>
+    /// <param name="metricSize">The metric size (SmallIcon or StandardIcon)</param>
+    /// <returns>A Size structure containing the width and height in pixels.</returns>
+    public static System.Drawing.Size GetSystemIconSize(IconMetricSize metricSize)
+    {
+        return metricSize switch
+        {
+            IconMetricSize.SmallIcon => new System.Drawing.Size(GetSmallIconWidth(), GetSmallIconHeight()),
+            IconMetricSize.StandardIcon => new System.Drawing.Size(GetStandardIconWidth(), GetStandardIconHeight()),
+            _ => throw new ArgumentOutOfRangeException(nameof(metricSize))
+        };
+    }
+
+    /// <summary>
+    ///     Loads an icon at the system-preferred size using LoadIconMetric.
+    ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric">LoadIconMetric function</a>
+    /// </summary>
+    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <param name="hInstance">
+    ///     A handle to the module containing the icon resource.
+    ///     Use IntPtr.Zero to load a stock system icon.
+    /// </param>
+    /// <param name="iconName">
+    ///     The name of the icon resource, or an icon identifier for stock system icons.
+    /// </param>
+    /// <param name="metricSize">
+    ///     The metric size to use (SmallIcon for SM_CXSMICON or StandardIcon for SM_CXICON).
+    /// </param>
+    /// <returns>The loaded icon as the specified type, or null if loading failed.</returns>
+    public static TIcon LoadIconWithSystemMetrics<TIcon>(IntPtr hInstance, IntPtr iconName, IconMetricSize metricSize) where TIcon : class
+    {
+        var result = NativeIconMethods.LoadIconMetric(hInstance, iconName, metricSize, out var hIcon);
+        if (result != 0 || hIcon == IntPtr.Zero)
+        {
+            return null;
+        }
+
+        try
+        {
+            return IconHandleTo<TIcon>(hIcon);
+        }
+        finally
+        {
+            if (hIcon != IntPtr.Zero)
+            {
+                NativeIconMethods.DestroyIcon(hIcon);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Loads an icon at the system-preferred size using LoadIconMetric.
+    ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric">LoadIconMetric function</a>
+    /// </summary>
+    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <param name="hInstance">
+    ///     A handle to the module containing the icon resource.
+    ///     Use IntPtr.Zero to load a stock system icon.
+    /// </param>
+    /// <param name="iconName">
+    ///     The name of the icon resource as a string.
+    /// </param>
+    /// <param name="metricSize">
+    ///     The metric size to use (SmallIcon for SM_CXSMICON or StandardIcon for SM_CXICON).
+    /// </param>
+    /// <returns>The loaded icon as the specified type, or null if loading failed.</returns>
+    public static TIcon LoadIconWithSystemMetrics<TIcon>(IntPtr hInstance, string iconName, IconMetricSize metricSize) where TIcon : class
+    {
+        var result = NativeIconMethods.LoadIconMetric(hInstance, iconName, metricSize, out var hIcon);
+        if (result != 0 || hIcon == IntPtr.Zero)
+        {
+            return null;
+        }
+
+        try
+        {
+            return IconHandleTo<TIcon>(hIcon);
+        }
+        finally
+        {
+            if (hIcon != IntPtr.Zero)
+            {
+                NativeIconMethods.DestroyIcon(hIcon);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Loads an icon with automatic scaling using LoadIconWithScaleDown.
+    ///     If the icon is larger than the requested size, it will be scaled down.
+    ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconwithscaledown">LoadIconWithScaleDown function</a>
+    /// </summary>
+    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <param name="hInstance">
+    ///     A handle to the module containing the icon resource.
+    ///     Use IntPtr.Zero to load a stock system icon.
+    /// </param>
+    /// <param name="iconName">
+    ///     The name of the icon resource, or an icon identifier for stock system icons.
+    /// </param>
+    /// <param name="width">The desired width of the icon in pixels.</param>
+    /// <param name="height">The desired height of the icon in pixels.</param>
+    /// <returns>The loaded icon as the specified type, or null if loading failed.</returns>
+    public static TIcon LoadIconWithScaleDown<TIcon>(IntPtr hInstance, IntPtr iconName, int width, int height) where TIcon : class
+    {
+        var result = NativeIconMethods.LoadIconWithScaleDown(hInstance, iconName, width, height, out var hIcon);
+        if (result != 0 || hIcon == IntPtr.Zero)
+        {
+            return null;
+        }
+
+        try
+        {
+            return IconHandleTo<TIcon>(hIcon);
+        }
+        finally
+        {
+            if (hIcon != IntPtr.Zero)
+            {
+                NativeIconMethods.DestroyIcon(hIcon);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Loads an icon with automatic scaling using LoadIconWithScaleDown.
+    ///     If the icon is larger than the requested size, it will be scaled down.
+    ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconwithscaledown">LoadIconWithScaleDown function</a>
+    /// </summary>
+    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <param name="hInstance">
+    ///     A handle to the module containing the icon resource.
+    ///     Use IntPtr.Zero to load a stock system icon.
+    /// </param>
+    /// <param name="iconName">
+    ///     The name of the icon resource as a string.
+    /// </param>
+    /// <param name="width">The desired width of the icon in pixels.</param>
+    /// <param name="height">The desired height of the icon in pixels.</param>
+    /// <returns>The loaded icon as the specified type, or null if loading failed.</returns>
+    public static TIcon LoadIconWithScaleDown<TIcon>(IntPtr hInstance, string iconName, int width, int height) where TIcon : class
+    {
+        var result = NativeIconMethods.LoadIconWithScaleDown(hInstance, iconName, width, height, out var hIcon);
+        if (result != 0 || hIcon == IntPtr.Zero)
+        {
+            return null;
+        }
+
+        try
+        {
+            return IconHandleTo<TIcon>(hIcon);
+        }
+        finally
+        {
+            if (hIcon != IntPtr.Zero)
+            {
+                NativeIconMethods.DestroyIcon(hIcon);
+            }
+        }
+    }
 }
