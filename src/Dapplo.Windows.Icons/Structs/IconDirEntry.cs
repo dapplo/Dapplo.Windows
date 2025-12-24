@@ -91,7 +91,8 @@ public struct IconDirEntry
     /// <param name="height">Height in pixels (1-256)</param>
     /// <param name="hotspotX">Horizontal coordinate of the hotspot (stored in Planes field)</param>
     /// <param name="hotspotY">Vertical coordinate of the hotspot (stored in BitCount field)</param>
-    /// <param name="bitCount">Actual bits per pixel for the cursor image (passed but overridden by hotspot Y in structure)</param>
+    /// <param name="bitCount">This parameter exists for API consistency but is not used for cursors. 
+    /// The BitCount field in the structure stores the hotspot Y coordinate instead.</param>
     /// <param name="imageSize">Size of the image data in bytes</param>
     /// <param name="imageOffset">Offset to the image data</param>
     /// <returns>IconDirEntry structure</returns>
@@ -99,7 +100,7 @@ public struct IconDirEntry
     /// For cursors, the Planes and BitCount fields are repurposed to store hotspot coordinates:
     /// - Planes field stores the horizontal hotspot coordinate (X)
     /// - BitCount field stores the vertical hotspot coordinate (Y)
-    /// The bitCount parameter is ignored for cursor entries as the field is used for hotspot Y.
+    /// The bitCount parameter is included for API consistency but is ignored for cursor entries.
     /// </remarks>
     public static IconDirEntry CreateForCursor(int width, int height, ushort hotspotX, ushort hotspotY, ushort bitCount, uint imageSize, uint imageOffset)
     {
