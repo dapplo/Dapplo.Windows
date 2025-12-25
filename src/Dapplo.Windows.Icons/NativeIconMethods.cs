@@ -16,18 +16,6 @@ namespace Dapplo.Windows.Icons;
 public static class NativeIconMethods
 {
     /// <summary>
-    ///     Get the Icon from a file
-    /// </summary>
-    /// <param name="sFile">string</param>
-    /// <param name="iIndex">int</param>
-    /// <param name="piLargeVersion">IntPtr</param>
-    /// <param name="piSmallVersion">IntPtr</param>
-    /// <param name="amountIcons">int</param>
-    /// <returns></returns>
-    [DllImport("shell32", CharSet = CharSet.Unicode)]
-    public static extern int ExtractIconEx(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
-
-    /// <summary>
     ///     The following is used for Icon handling, and copies a hicon to a new
     /// </summary>
     /// <param name="hIcon">IntPtr</param>

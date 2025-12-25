@@ -30,6 +30,19 @@ public static class Shell32Api
     }
 
     /// <summary>
+    ///     Get the Icon from a file
+    /// </summary>
+    /// <param name="sFile">string</param>
+    /// <param name="iIndex">int</param>
+    /// <param name="piLargeVersion">IntPtr</param>
+    /// <param name="piSmallVersion">IntPtr</param>
+    /// <param name="amountIcons">int</param>
+    /// <returns></returns>
+    [DllImport(Shell32Dll, CharSet = CharSet.Unicode)]
+    public static extern int ExtractIconEx(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
+
+
+    /// <summary>
     /// Sends an appbar message to the system.
     /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb762108.aspx">SHAppBarMessage function</a>
     /// </summary>

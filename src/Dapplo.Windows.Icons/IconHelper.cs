@@ -12,9 +12,7 @@ using Dapplo.Windows.App;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.User32;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Text;
 using Dapplo.Windows.Icons.Enums;
 using Dapplo.Windows.Icons.SafeHandles;
 using Dapplo.Windows.Kernel32;
@@ -207,7 +205,7 @@ public static class IconHelper
         {
             return null;
         }
-        NativeIconMethods.ExtractIconEx(filePath, index, out var large, out var small, 1);
+        Shell32Api.ExtractIconEx(filePath, index, out var large, out var small, 1);
         TIcon returnIcon = null;
         try
         {
@@ -245,7 +243,7 @@ public static class IconHelper
     /// <returns>int with the number of icons in the file</returns>
     public static int CountAssociatedIcons(string location)
     {
-        return NativeIconMethods.ExtractIconEx(location, -1, out _, out _, 0);
+        return Shell32Api.ExtractIconEx(location, -1, out _, out _, 0);
     }
 
     /// <summary>
