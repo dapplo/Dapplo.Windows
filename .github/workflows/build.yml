@@ -18,7 +18,7 @@ jobs:
       checks: write
     
     env:
-      SOLUTION: 'src/*.sln'
+      SOLUTION: 'src/Dapplo.Windows.sln'
       BUILD_PLATFORM: 'Any CPU'
       BUILD_CONFIGURATION: 'Release'
     
