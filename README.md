@@ -8,8 +8,8 @@ Dapplo.Windows is a collection of packages that provide P/Invoke wrappers and hi
 
 ## Build Status & NuGet Packages
 
-[![Build Status](https://dev.azure.com/Dapplo/Dapplo%20framework/_apis/build/status/dapplo.Dapplo.Windows?branchName=master)](https://dev.azure.com/Dapplo/Dapplo%20framework/_build/latest?definitionId=10&branchName=master)
-[![Coverage Status](https://coveralls.io/repos/github/dapplo/Dapplo.Windows/badge.svg?branch=master)](https://coveralls.io/github/dapplo/Dapplo.Windows?branch=master)
+[![Build and Deploy](https://github.com/dapplo/Dapplo.Windows/actions/workflows/build.yml/badge.svg)](https://github.com/dapplo/Dapplo.Windows/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/dapplo/Dapplo.Windows/branch/master/graph/badge.svg)](https://codecov.io/gh/dapplo/Dapplo.Windows)
 
 ### Core Packages
 

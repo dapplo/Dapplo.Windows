@@ -1,0 +1,154 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches-ignore:
+      - 'gh-pages'
+  pull_request:
+    branches-ignore:
+      - 'gh-pages'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    permissions:
+      contents: write  # Required for pushing to gh-pages
+      actions: read
+      checks: write
+    
+    env:
+      SOLUTION: 'src/*.sln'
+      BUILD_PLATFORM: 'Any CPU'
+      BUILD_CONFIGURATION: 'Release'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for GitVersioning
+        persist-credentials: true
+    
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+      with:
+        nuget-version: '7.0.1'
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.101'
+    
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION }}
+    
+    - name: Test
+      run: dotnet test ${{ env.SOLUTION }} --configuration Debug /p:Platform="${{ env.BUILD_PLATFORM }}" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+    
+    - name: Build
+      run: dotnet build ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}"
+    
+    - name: Publish Code Coverage
+      uses: codecov/codecov-action@v4
+      with:
+        files: src/**/coverage.*.xml
+        fail_ci_if_error: false
+      continue-on-error: true
+    
+    - name: Install DocFX
+      run: choco install docfx -y
+    
+    - name: Build Documentation
+      run: docfx doc/docfx.json
+    
+    - name: Copy NuGet packages to artifacts
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Force -Path artifacts
+        Get-ChildItem -Path src -Include "*.nupkg" -Recurse -File | Where-Object { $_.FullName -match "\\bin\\${{ env.BUILD_CONFIGURATION }}\\" } | Copy-Item -Destination artifacts
+    
+    - name: Copy coverage files to artifacts
+      shell: pwsh
+      run: |
+        Get-ChildItem -Path src -Include "coverage.*" -Recurse -File | Copy-Item -Destination artifacts
+      continue-on-error: true
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: artifacts/**/*
+    
+    - name: Upload documentation site
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation-site
+        path: doc/_site/**/*
+    
+    - name: Publish documentation to gh-pages
+      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+      shell: cmd
+      run: |
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local core.autocrlf false
+        git config --local core.safecrlf false
+        git checkout -B docfx
+        del .gitignore
+        git add doc/_site
+        git commit -m "Generated documentation for ${{ github.run_number }}"
+        git subtree split --prefix doc/_site -b gh-pages
+        git push -f origin gh-pages:gh-pages
+
+  deploy:
+    needs: build
+    runs-on: windows-latest
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    
+    permissions:
+      contents: read
+    
+    environment: 
+      name: NuGet
+    
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: artifacts
+    
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+      with:
+        nuget-version: '7.0.1'
+    
+    - name: Push to NuGet
+      shell: pwsh
+      run: |
+        $packages = Get-ChildItem -Path artifacts -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
+        if ($packages.Count -eq 0) {
+          Write-Host "No packages found to publish"
+          exit 0
+        }
+        
+        $failed = 0
+        foreach ($package in $packages) {
+          Write-Host "Pushing $($package.Name)..."
+          $result = & nuget push $package.FullName -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }} -SkipDuplicate 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            if ($result -match "already exists") {
+              Write-Host "Package already exists (skipped): $($package.Name)"
+            } else {
+              Write-Error "Failed to push $($package.Name): $result"
+              $failed++
+            }
+          } else {
+            Write-Host "Successfully pushed: $($package.Name)"
+          }
+        }
+        
+        if ($failed -gt 0) {
+          Write-Error "Failed to push $failed package(s)"
+          exit 1
+        }
