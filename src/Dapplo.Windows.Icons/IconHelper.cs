@@ -449,17 +449,18 @@ public static class IconHelper
     /// </summary>
     /// <param name="metricSize">The metric size (SmallIcon or StandardIcon)</param>
     /// <returns>A Size structure containing the width and height in pixels.</returns>
-    public static System.Drawing.Size GetSystemIconSize(IconMetricSize metricSize)
+    public static Size GetSystemIconSize(IconMetricSize metricSize)
     {
         return metricSize switch
         {
-            IconMetricSize.SmallIcon => new System.Drawing.Size(GetSmallIconWidth(), GetSmallIconHeight()),
-            IconMetricSize.StandardIcon => new System.Drawing.Size(GetStandardIconWidth(), GetStandardIconHeight()),
+            IconMetricSize.SmallIcon => new Size(GetSmallIconWidth(), GetSmallIconHeight()),
+            IconMetricSize.StandardIcon => new Size(GetStandardIconWidth(), GetStandardIconHeight()),
             _ => throw new ArgumentOutOfRangeException(nameof(metricSize))
         };
     }
 
     /// <summary>
+    ///     FYI READ THIS before using: https://learn.microsoft.com/en-us/windows/win32/controls/cookbook-overview#enabling-visual-styles
     ///     Loads an icon at the system-preferred size using LoadIconMetric.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric">LoadIconMetric function</a>
     /// </summary>
@@ -497,6 +498,7 @@ public static class IconHelper
     }
 
     /// <summary>
+    ///     FYI READ THIS before using: https://learn.microsoft.com/en-us/windows/win32/controls/cookbook-overview#enabling-visual-styles
     ///     Loads an icon at the system-preferred size using LoadIconMetric.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric">LoadIconMetric function</a>
     /// </summary>
@@ -534,6 +536,7 @@ public static class IconHelper
     }
 
     /// <summary>
+    ///     FYI READ THIS before using: https://learn.microsoft.com/en-us/windows/win32/controls/cookbook-overview#enabling-visual-styles
     ///     Loads an icon with automatic scaling using LoadIconWithScaleDown.
     ///     If the icon is larger than the requested size, it will be scaled down.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconwithscaledown">LoadIconWithScaleDown function</a>
@@ -571,6 +574,7 @@ public static class IconHelper
     }
 
     /// <summary>
+    ///     FYI READ THIS before using: https://learn.microsoft.com/en-us/windows/win32/controls/cookbook-overview#enabling-visual-styles
     ///     Loads an icon with automatic scaling using LoadIconWithScaleDown.
     ///     If the icon is larger than the requested size, it will be scaled down.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconwithscaledown">LoadIconWithScaleDown function</a>

@@ -91,6 +91,25 @@ public class IconTests
         Assert.True(spacingHeight >= standardHeight, "Icon spacing height should be >= standard icon height");
     }
 
+    [Fact]
+    private void TestIcon_V6Loaded()
+    {
+        try
+        {
+            var idiApplication = new IntPtr(32512);
+            IconHelper.LoadIconWithSystemMetrics<BitmapSource>(IntPtr.Zero, idiApplication, Icons.Enums.IconMetricSize.SmallIcon);
+        } catch {
+            // Just to make sure it's loaded
+        }
+        var comctl32 = Process.GetCurrentProcess()
+            .Modules
+            .OfType<ProcessModule>()
+            .FirstOrDefault(m => m.ModuleName.Equals("comctl32.dll", StringComparison.OrdinalIgnoreCase));
+
+        Assert.NotNull(comctl32);
+        Assert.True(comctl32.FileVersionInfo.FileMajorPart >= 6, "comctl32.dll version should be 6 or higher");
+    }
+
     /// <summary>
     ///     Test getting system icon size using the helper method
     /// </summary>
@@ -114,7 +133,7 @@ public class IconTests
     ///     Test LoadIconMetric with system stock icons
     /// </summary>
     [WpfFact]
-    public void TestIcon_LoadIconMetric()
+    private void TestIcon_LoadIconMetric()
     {
         var idiApplication = new IntPtr(32512);
 
@@ -146,26 +165,19 @@ public class IconTests
     ///     Test LoadIconWithScaleDown with system stock icons
     /// </summary>
     [WpfFact]
-    public void TestIcon_LoadIconWithScaleDown()
+    private void TestIcon_LoadIconWithScaleDown()
     {
         // IDI_QUESTION is 32514
         var idiQuestion = new IntPtr(32514);
 
-        try
-        {
-            // Load icon at a specific size
-            const int targetSize = 24;
-            var icon = IconHelper.LoadIconWithScaleDown<BitmapSource>(IntPtr.Zero, idiQuestion, targetSize, targetSize);
-            Assert.NotNull(icon);
+        // Load icon at a specific size
+        const int targetSize = 24;
+        var icon = IconHelper.LoadIconWithScaleDown<BitmapSource>(IntPtr.Zero, idiQuestion, targetSize, targetSize);
+        Assert.NotNull(icon);
 
-            // The icon should be scaled to the requested size
-            Assert.Equal(targetSize, icon.PixelWidth);
-            Assert.Equal(targetSize, icon.PixelHeight);
-        }
-        catch (EntryPointNotFoundException ex)
-        {
-            // Skip test on systems without LoadIconWithScaleDown API
-        }
+        // The icon should be scaled to the requested size
+        Assert.Equal(targetSize, icon.PixelWidth);
+        Assert.Equal(targetSize, icon.PixelHeight);
     }
 
     /// <summary>

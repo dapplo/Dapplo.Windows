@@ -363,7 +363,7 @@ public class KeyboardHookTests
     /// Test that TriggerOnKeyUp triggers when all keys are released, not when pressed
     /// </summary>
     [Fact]
-    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_SingleKey()
+    private void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_SingleKey()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Print)
         {
@@ -383,7 +383,7 @@ public class KeyboardHookTests
     /// Test that TriggerOnKeyUp works correctly with key combinations
     /// </summary>
     [Fact]
-    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_Combination()
+    private void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_Combination()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyA)
         {
@@ -416,7 +416,7 @@ public class KeyboardHookTests
     /// Test that TriggerOnKeyUp does not trigger if an extra key was pressed
     /// </summary>
     [Fact]
-    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_WithExtraKey()
+    private void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_WithExtraKey()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.KeyA)
         {
@@ -451,7 +451,7 @@ public class KeyboardHookTests
     /// Test that TriggerOnKeyUp does not trigger if not all combination keys were pressed
     /// </summary>
     [Fact]
-    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_PartialPress()
+    private void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_PartialPress()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyA)
         {
