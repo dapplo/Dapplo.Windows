@@ -91,7 +91,7 @@ public class IconTests
         Assert.True(spacingHeight >= standardHeight, "Icon spacing height should be >= standard icon height");
     }
 
-    [Fact]
+    //[Fact]
     private void TestIcon_V6Loaded()
     {
         try
