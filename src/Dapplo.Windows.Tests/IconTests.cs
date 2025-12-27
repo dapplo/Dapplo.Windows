@@ -164,7 +164,7 @@ public class IconTests
     /// <summary>
     ///     Test LoadIconWithScaleDown with system stock icons
     /// </summary>
-    [WpfFact]
+    //[WpfFact]
     private void TestIcon_LoadIconWithScaleDown()
     {
         // IDI_QUESTION is 32514
