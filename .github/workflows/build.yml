@@ -53,6 +53,8 @@ jobs:
       with:
         files: src/**/coverage.*.xml
         fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: dapplo/Dapplo.Windows
       continue-on-error: true
     
     - name: Install DocFX
