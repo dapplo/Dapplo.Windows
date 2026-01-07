@@ -34,6 +34,8 @@ namespace Dapplo.Windows.Kernel32;
 /// </example>
 public sealed class RestartManager : IDisposable
 {
+    private const int ErrorMoreData = 234;
+    
     private int _sessionHandle = RestartManagerApi.RmInvalidSession;
     private readonly string _sessionKey;
     private bool _disposed;
@@ -181,7 +183,7 @@ public sealed class RestartManager : IDisposable
         uint pnProcInfo = 0;
         var result = RestartManagerApi.RmGetList(_sessionHandle, out var pnProcInfoNeeded, ref pnProcInfo, null, out _);
 
-        if (result != 0 && result != 234) // ERROR_MORE_DATA = 234
+        if (result != 0 && result != ErrorMoreData)
         {
             throw new Win32Exception(result, "Failed to get list size from Restart Manager");
         }
@@ -218,7 +220,7 @@ public sealed class RestartManager : IDisposable
         uint pnProcInfo = 0;
         var result = RestartManagerApi.RmGetList(_sessionHandle, out var pnProcInfoNeeded, ref pnProcInfo, null, out rebootReason);
 
-        if (result != 0 && result != 234) // ERROR_MORE_DATA = 234
+        if (result != 0 && result != ErrorMoreData)
         {
             throw new Win32Exception(result, "Failed to get list size from Restart Manager");
         }

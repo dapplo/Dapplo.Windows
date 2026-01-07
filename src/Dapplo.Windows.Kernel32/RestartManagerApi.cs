@@ -18,9 +18,9 @@ public static class RestartManagerApi
     private const string Rstrtmgr = "rstrtmgr.dll";
 
     /// <summary>
-    ///     Maximum length of a session key.
+    ///     Maximum length of a session key string (in characters).
     /// </summary>
-    public const int RmSessionKeyLen = 32; // sizeof(GUID)
+    public const int RmSessionKeyLen = 32;
 
     /// <summary>
     ///     Invalid session value.

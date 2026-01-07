@@ -16,7 +16,7 @@ namespace Dapplo.Windows.Kernel32.Structs;
 public struct RmUniqueProcess
 {
     /// <summary>
-    ///     The product identifier (PID).
+    ///     The process identifier (PID).
     /// </summary>
     public int dwProcessId;
 
