@@ -1,0 +1,404 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Getting Started with Dapplo.Windows | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Getting Started with Dapplo.Windows | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc">
+    <meta property="docfx:tocrel" content="toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="active">
+                    <a href="../articles/intro.html" title="Articles" class="active">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="../api/" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div>
+              <div class="sidefilter">
+                <form class="toc-filter">
+                  <span class="glyphicon glyphicon-filter filter-icon"></span>
+                  <input type="text" id="toc_filter_input" placeholder="Enter here to filter..." onkeypress="if(event.keyCode==13) {return false;}">
+                </form>
+              </div>
+              <div class="sidetoc">
+                <div class="toc" id="toc">
+                  
+                  <ul class="nav level1">
+                    <li class="active">
+                      <a href="intro.html" title="Introduction" class="active">Introduction</a>
+                    </li>
+                    <li class="">
+                      <a href="window-management.html" title="Window Management" class="">Window Management</a>
+                    </li>
+                    <li class="">
+                      <a href="clipboard-usage.html" title="Clipboard Usage" class="">Clipboard Usage</a>
+                    </li>
+                    <li class="">
+                      <a href="dpi-awareness.html" title="DPI Awareness" class="">DPI Awareness</a>
+                    </li>
+                    <li class="">
+                      <a href="input-handling.html" title="Input Handling" class="">Input Handling</a>
+                    </li>
+                    <li class="">
+                      <a href="common-scenarios.html" title="Common Scenarios" class="">Common Scenarios</a>
+                    </li>
+                  </ul>        </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="getting-started-with-dapplowindows">Getting Started with Dapplo.Windows</h1>
+
+<p>This guide will help you get started with Dapplo.Windows and its various packages.</p>
+<h2 id="installation">Installation</h2>
+<p>Dapplo.Windows is distributed as multiple NuGet packages. Install only the packages you need for your application.</p>
+<h3 id="core-packages">Core Packages</h3>
+<pre><code class="lang-powershell"># Main package with window management
+Install-Package Dapplo.Windows
+
+# Clipboard functionality
+Install-Package Dapplo.Windows.Clipboard
+
+# DPI awareness and scaling
+Install-Package Dapplo.Windows.Dpi
+
+# Keyboard and mouse input
+Install-Package Dapplo.Windows.Input
+</code></pre><h3 id="low-level-api-packages">Low-Level API Packages</h3>
+<pre><code class="lang-powershell"># User32 API wrappers
+Install-Package Dapplo.Windows.User32
+
+# GDI32 API wrappers
+Install-Package Dapplo.Windows.Gdi32
+
+# Kernel32 API wrappers
+Install-Package Dapplo.Windows.Kernel32
+</code></pre><h2 id="common-usage-scenarios">Common Usage Scenarios</h2>
+<h3 id="working-with-windows">Working with Windows</h3>
+<p>The main <code>Dapplo.Windows</code> package provides the <code>InteropWindow</code> class for working with windows.</p>
+<h4 id="get-information-about-a-window">Get Information About a Window</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.User32;
+
+// Get the foreground window
+var handle = User32Api.GetForegroundWindow();
+var window = InteropWindow.FromHandle(handle);
+
+// Get window information
+window.Fill(); // Populate all properties
+Console.WriteLine($&quot;Title: {window.Caption}&quot;);
+Console.WriteLine($&quot;Class: {window.Classname}&quot;);
+Console.WriteLine($&quot;Bounds: {window.Bounds}&quot;);
+Console.WriteLine($&quot;Visible: {window.IsVisible()}&quot;);
+</code></pre><h4 id="enumerate-all-windows">Enumerate All Windows</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Enums;
+
+// Get all visible windows
+var windows = InteropWindowQuery.GetTopLevelWindows()
+    .Where(w =&gt; w.IsVisible())
+    .ToList();
+
+foreach (var window in windows)
+{
+    Console.WriteLine($&quot;{window.Caption} ({window.Classname})&quot;);
+}
+</code></pre><h4 id="monitor-window-events">Monitor Window Events</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+// Subscribe to window creation events
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE)
+    .Subscribe(winEvent =&gt;
+    {
+        var window = InteropWindow.FromHandle(winEvent.Handle);
+        Console.WriteLine($&quot;Window created: {window.GetCaption()}&quot;);
+    });
+
+// Don&#39;t forget to dispose when done
+subscription.Dispose();
+</code></pre><h3 id="clipboard-monitoring">Clipboard Monitoring</h3>
+<p>The <code>Dapplo.Windows.Clipboard</code> package uses Reactive Extensions for clipboard monitoring.</p>
+<h4 id="monitor-clipboard-changes">Monitor Clipboard Changes</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Reactive.Linq;
+
+// Subscribe to clipboard updates
+var subscription = ClipboardNative.OnUpdate
+    .Subscribe(info =&gt;
+    {
+        Console.WriteLine($&quot;Clipboard changed. Formats: {string.Join(&quot;, &quot;, info.Formats)}&quot;);
+    });
+</code></pre><h4 id="filter-by-format">Filter by Format</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+// Only react to text clipboard changes
+var subscription = ClipboardNative.OnUpdate
+    .Where(info =&gt; info.Formats.Contains(&quot;Text&quot;))
+    .Subscribe(info =&gt;
+    {
+        using var clipboard = ClipboardNative.Access();
+        var text = clipboard.GetAsString();
+        Console.WriteLine($&quot;Clipboard text: {text}&quot;);
+    });
+</code></pre><h4 id="access-clipboard-content">Access Clipboard Content</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+// Read clipboard content
+using (var clipboard = ClipboardNative.Access())
+{
+    if (clipboard.AvailableFormats().Contains(&quot;Text&quot;))
+    {
+        var text = clipboard.GetAsString();
+        Console.WriteLine(text);
+    }
+}
+
+// Write to clipboard
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString(&quot;Hello, World!&quot;);
+}
+</code></pre><h3 id="dpi-awareness">DPI Awareness</h3>
+<p>The <code>Dapplo.Windows.Dpi</code> package helps create DPI-aware applications.</p>
+<h4 id="windows-forms-dpi-support">Windows Forms DPI Support</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi.Forms;
+
+// Option 1: Extend DpiAwareForm
+public class MyForm : DpiAwareForm
+{
+    public MyForm()
+    {
+        InitializeComponent();
+        // Form will automatically scale with DPI changes
+    }
+}
+
+// Option 2: Use DpiHandler
+public class MyForm : Form
+{
+    private DpiHandler _dpiHandler;
+
+    public MyForm()
+    {
+        InitializeComponent();
+        _dpiHandler = DpiHandler.Create(this);
+        _dpiHandler.OnDpiChanged.Subscribe(dpiInfo =&gt;
+        {
+            // Handle DPI changes manually
+            Console.WriteLine($&quot;DPI changed to {dpiInfo.NewDpi}&quot;);
+        });
+    }
+}
+</code></pre><h4 id="dpi-calculations">DPI Calculations</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+
+// Scale a size with DPI
+var scaledSize = DpiCalculator.ScaleWithDpi(16, 120); // Scale 16px at 120 DPI
+Console.WriteLine(scaledSize); // Output: 20
+
+// Unscale a size
+var originalSize = DpiCalculator.UnscaleWithDpi(20, 120);
+Console.WriteLine(originalSize); // Output: 16
+</code></pre><h3 id="keyboard-and-mouse-input">Keyboard and Mouse Input</h3>
+<p>The <code>Dapplo.Windows.Input</code> package provides input monitoring and generation.</p>
+<h4 id="monitor-keyboard-input">Monitor Keyboard Input</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System.Reactive.Linq;
+
+// Create keyboard hook
+var keyboardHook = KeyboardHook.Create();
+
+// Subscribe to key events
+var subscription = keyboardHook.KeyboardEvents
+    .Where(e =&gt; e.Key == VirtualKeyCode.A &amp;&amp; e.IsDown)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine(&quot;&#39;A&#39; key pressed&quot;);
+    });
+
+// Clean up
+subscription.Dispose();
+keyboardHook.Dispose();
+</code></pre><h4 id="generate-keyboard-input">Generate Keyboard Input</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+
+// Type text
+KeyboardInputGenerator.TypeText(&quot;Hello, World!&quot;);
+
+// Press key combination
+KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Control, VirtualKeyCode.C);
+</code></pre><h4 id="monitor-mouse-input">Monitor Mouse Input</h4>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Mouse;
+
+// Create mouse hook
+var mouseHook = MouseHook.Create();
+
+// Subscribe to mouse events
+var subscription = mouseHook.MouseEvents
+    .Where(e =&gt; e.Button == MouseButtons.Left &amp;&amp; e.IsButtonDown)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine($&quot;Left click at {e.Point}&quot;);
+    });
+</code></pre><h3 id="citrix-detection">Citrix Detection</h3>
+<p>The <code>Dapplo.Windows.Citrix</code> package detects Citrix environments.</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Citrix;
+
+if (WinFrame.IsAvailable)
+{
+    var clientHostname = WinFrame.QuerySessionInformation(InfoClasses.ClientName);
+    Console.WriteLine($&quot;Running in Citrix, client: {clientHostname}&quot;);
+}
+</code></pre><h3 id="embedded-browser">Embedded Browser</h3>
+<p>The <code>Dapplo.Windows.EmbeddedBrowser</code> package provides an enhanced WebBrowser control.</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.EmbeddedBrowser;
+
+// Set IE version for embedded browser
+InternetExplorerVersion.ChangeEmbeddedVersion();
+
+// Use ExtendedWebBrowser control in your forms
+// (Drag and drop from toolbox or instantiate programmatically)
+</code></pre><h2 id="best-practices">Best Practices</h2>
+<h3 id="resource-cleanup">Resource Cleanup</h3>
+<p>Always dispose of subscriptions and hooks when you&#39;re done:</p>
+<pre><code class="lang-csharp">// Use using statements
+using (var clipboard = ClipboardNative.Access())
+{
+    // Work with clipboard
+}
+
+// Or explicit disposal
+var subscription = ClipboardNative.OnUpdate.Subscribe(...);
+// Later...
+subscription.Dispose();
+</code></pre><h3 id="thread-safety">Thread Safety</h3>
+<p>Many Windows APIs must be called from specific threads:</p>
+<pre><code class="lang-csharp">using System.Reactive.Concurrency;
+
+// Ensure UI thread execution
+var subscription = ClipboardNative.OnUpdate
+    .ObserveOn(SynchronizationContext.Current)
+    .Subscribe(info =&gt;
+    {
+        // This runs on the UI thread
+        UpdateUI(info);
+    });
+</code></pre><h3 id="error-handling">Error Handling</h3>
+<p>Windows APIs can fail. Handle errors appropriately:</p>
+<pre><code class="lang-csharp">try
+{
+    using var clipboard = ClipboardNative.Access();
+    var text = clipboard.GetAsString();
+}
+catch (ClipboardAccessDeniedException ex)
+{
+    Console.WriteLine(&quot;Clipboard access denied: &quot; + ex.Message);
+}
+</code></pre><h2 id="next-steps">Next Steps</h2>
+<ul>
+<li>Explore the <a href="../api/index.html">API Reference</a> for detailed class documentation</li>
+<li>Check out the example projects in the source repository</li>
+<li>Review the test projects for more usage examples</li>
+</ul>
+<h2 id="need-help">Need Help?</h2>
+<ul>
+<li><a href="https://github.com/dapplo/Dapplo.Windows/issues">GitHub Issues</a> - Report bugs or request features</li>
+<li><a href="https://github.com/dapplo/Dapplo.Windows">GitHub Repository</a> - View source code and examples</li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/intro.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

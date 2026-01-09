@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Dapplo.Windows API Reference | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Dapplo.Windows API Reference | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc">
+    <meta property="docfx:tocrel" content="../toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="">
+                    <a href="../../articles/intro.html" title="Articles" class="">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="../../api/" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="dapplowindows-api-reference">Dapplo.Windows API Reference</h1>
+
+<p>This section contains the complete API reference documentation for all Dapplo.Windows packages.</p>
+<h2 id="package-overview">Package Overview</h2>
+<p>The API is organized into the following packages:</p>
+<h3 id="core-packages">Core Packages</h3>
+<h4 id="dapplowindows">Dapplo.Windows</h4>
+<p>The main package providing window management and event hooking functionality.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.Desktop</code> - Window querying and manipulation (<code>InteropWindow</code>, <code>WinEventHook</code>)</li>
+<li><code>Dapplo.Windows.App</code> - Application-level functionality</li>
+<li><code>Dapplo.Windows.Extensions</code> - Extension methods for common operations</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>InteropWindow</code> - Represents a window with rich querying and manipulation capabilities</li>
+<li><code>InteropWindowQuery</code> - Query and enumerate windows</li>
+<li><code>WinEventHook</code> - Hook into Windows events (creation, destruction, title changes, etc.)</li>
+</ul>
+<h4 id="dapplowindowsclipboard">Dapplo.Windows.Clipboard</h4>
+<p>Clipboard monitoring and manipulation with a reactive API.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.Clipboard</code> - Clipboard access and monitoring</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>ClipboardNative</code> - Main entry point for clipboard operations</li>
+<li><code>ClipboardMonitor</code> - Monitor clipboard changes (deprecated, use <code>ClipboardNative.OnUpdate</code>)</li>
+<li>Extension methods for various clipboard formats (string, bytes, files, streams)</li>
+</ul>
+<h4 id="dapplowindowsdpi">Dapplo.Windows.Dpi</h4>
+<p>DPI awareness and scaling support for building resolution-independent applications.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.Dpi</code> - Core DPI functionality</li>
+<li><code>Dapplo.Windows.Dpi.Forms</code> - Windows Forms DPI support</li>
+<li><code>Dapplo.Windows.Dpi.Wpf</code> - WPF DPI support</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>DpiHandler</code> - Handles DPI changes for controls and forms</li>
+<li><code>DpiAwareForm</code> - Base form class with automatic DPI scaling</li>
+<li><code>DpiCalculator</code> - DPI scaling calculations</li>
+<li><code>BitmapScaleHandler</code> - Scale bitmaps for different DPI values</li>
+</ul>
+<h4 id="dapplowindowsinput">Dapplo.Windows.Input</h4>
+<p>Keyboard and mouse input monitoring and generation.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.Input.Keyboard</code> - Keyboard input</li>
+<li><code>Dapplo.Windows.Input.Mouse</code> - Mouse input</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>KeyboardHook</code> - Low-level keyboard event hook</li>
+<li><code>KeyboardInputGenerator</code> - Generate keyboard input</li>
+<li><code>MouseHook</code> - Low-level mouse event hook</li>
+<li><code>MouseInputGenerator</code> - Generate mouse input</li>
+</ul>
+<h3 id="low-level-api-packages">Low-Level API Packages</h3>
+<h4 id="dapplowindowsuser32">Dapplo.Windows.User32</h4>
+<p>P/Invoke wrappers for User32.dll functions.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.User32</code> - User32 API functions</li>
+<li><code>Dapplo.Windows.User32.Enums</code> - User32 enumerations</li>
+<li><code>Dapplo.Windows.User32.Structs</code> - User32 structures</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>User32Api</code> - Static class with User32 function declarations</li>
+<li>Various structs: <code>WindowInfo</code>, <code>WindowPlacement</code>, <code>MonitorInfo</code>, etc.</li>
+</ul>
+<h4 id="dapplowindowsgdi32">Dapplo.Windows.Gdi32</h4>
+<p>P/Invoke wrappers for GDI32.dll functions.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.Gdi32</code> - GDI32 API functions</li>
+<li><code>Dapplo.Windows.Gdi32.Enums</code> - GDI32 enumerations</li>
+<li><code>Dapplo.Windows.Gdi32.Structs</code> - GDI32 structures</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>Gdi32Api</code> - Static class with GDI32 function declarations</li>
+<li><code>SafeHandle</code> implementations for GDI objects</li>
+</ul>
+<h4 id="dapplowindowskernel32">Dapplo.Windows.Kernel32</h4>
+<p>P/Invoke wrappers for Kernel32.dll functions.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.Kernel32</code> - Kernel32 API functions</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>Kernel32Api</code> - Static class with Kernel32 function declarations</li>
+<li>Process and module related functionality</li>
+</ul>
+<h3 id="specialized-packages">Specialized Packages</h3>
+<h4 id="dapplowindowsmessages">Dapplo.Windows.Messages</h4>
+<p>Windows message constants and helpers.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.Messages</code> - Message constants and utilities</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>WindowsMessage</code> - Windows message definitions</li>
+<li><code>WinProcHandler</code> - Handle window messages</li>
+</ul>
+<h4 id="dapplowindowscitrix">Dapplo.Windows.Citrix</h4>
+<p>Citrix environment detection and session information.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.Citrix</code> - Citrix detection</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>WinFrame</code> - Detect and query Citrix sessions</li>
+</ul>
+<h4 id="dapplowindowsdesktopwindowsmanager">Dapplo.Windows.DesktopWindowsManager</h4>
+<p>Desktop Window Manager (DWM/Aero) functionality.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.DesktopWindowsManager</code> - DWM API</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>DwmApi</code> - Desktop Window Manager functions</li>
+<li>Thumbnail and Aero effects support</li>
+</ul>
+<h4 id="dapplowindowsembeddedbrowser">Dapplo.Windows.EmbeddedBrowser</h4>
+<p>Enhanced WebBrowser control for Windows Forms.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.EmbeddedBrowser</code> - Enhanced browser control</li>
+</ul>
+<p><strong>Common Classes:</strong></p>
+<ul>
+<li><code>ExtendedWebBrowser</code> - Enhanced WebBrowser control</li>
+<li><code>InternetExplorerVersion</code> - Manage embedded IE version</li>
+</ul>
+<h4 id="dapplowindowscommon">Dapplo.Windows.Common</h4>
+<p>Shared types and utilities used across packages.</p>
+<p><strong>Key Namespaces:</strong></p>
+<ul>
+<li><code>Dapplo.Windows.Common</code> - Common types</li>
+<li><code>Dapplo.Windows.Common.Structs</code> - Shared structures</li>
+</ul>
+<p><strong>Common Types:</strong></p>
+<ul>
+<li><code>NativeRect</code>, <code>NativePoint</code>, <code>NativeSize</code> - Native geometry types</li>
+<li>Extension methods for common operations</li>
+</ul>
+<h2 id="api-documentation">API Documentation</h2>
+<p>The detailed API documentation is generated from the source code XML comments. Use the navigation menu to browse through the namespaces and types.</p>
+<h3 id="conventions">Conventions</h3>
+<ul>
+<li><strong>Extension Methods</strong>: Many packages provide extension methods for easier API usage</li>
+<li><strong>Observable Pattern</strong>: Input and clipboard packages use Reactive Extensions (System.Reactive)</li>
+<li><strong>SafeHandles</strong>: Low-level packages use SafeHandle for proper resource management</li>
+<li><strong>Fluent API</strong>: Many APIs support method chaining for cleaner code</li>
+</ul>
+<h2 id="examples">Examples</h2>
+<p>For usage examples, see the <a href="../articles/intro.html">Getting Started Guide</a>.</p>
+<h2 id="source-code">Source Code</h2>
+<p>The complete source code with additional examples is available on <a href="https://github.com/dapplo/Dapplo.Windows">GitHub</a>.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/api/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
