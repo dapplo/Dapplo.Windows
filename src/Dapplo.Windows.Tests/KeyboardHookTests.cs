@@ -10,7 +10,6 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Keyboard;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 
@@ -261,7 +260,7 @@ public class KeyboardHookTests
         result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Shift));
         Assert.True(sequenceHandler.HasKeysPressed);
         Assert.False(result);
-        await Task.Delay(400);
+        await Task.Delay(400, TestContext.Current.CancellationToken);
         result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyB));
         Assert.True(sequenceHandler.HasKeysPressed);
         Assert.False(result);

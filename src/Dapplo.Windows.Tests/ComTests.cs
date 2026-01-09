@@ -3,11 +3,9 @@
 using System;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
-using Dapplo.Windows.App;
 using Dapplo.Windows.Com;
 using Dapplo.Windows.Tests.ComInterfaces;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 

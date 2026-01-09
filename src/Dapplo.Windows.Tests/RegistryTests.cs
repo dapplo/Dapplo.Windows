@@ -7,7 +7,6 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.Advapi32;
 using Microsoft.Win32;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 
@@ -48,7 +47,7 @@ public class RegistryTests
                     regKey.SetValue(autoConfigUrlKey, autoConfigUrlBullshit);
 
                     // Timeout
-                    var timeoutTask = Task.Delay(1000);
+                    var timeoutTask = Task.Delay(1000, TestContext.Current.CancellationToken);
 
                     // Wait for the value to arrive
                     await Task.WhenAny(timeoutTask, tcs.Task).ConfigureAwait(true);

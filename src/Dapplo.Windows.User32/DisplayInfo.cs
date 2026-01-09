@@ -3,11 +3,14 @@
 
 using System;
 using System.Linq;
-using System.Threading;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
+
+#if !NETSTANDARD2_0
+using System.Threading;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
+#endif
 
 namespace Dapplo.Windows.User32;
 
@@ -18,7 +21,9 @@ public class DisplayInfo
 {
     private static NativeRect? _screenBounds;
     private static DisplayInfo[] _allDisplayInfos;
+#if !NETSTANDARD2_0
     private static IDisposable _displayInfoUpdate;
+#endif
 
     /// <summary>
     ///     Desktop working area

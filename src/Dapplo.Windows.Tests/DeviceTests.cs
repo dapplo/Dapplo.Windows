@@ -6,7 +6,6 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.Devices.Enums;
 using Dapplo.Windows.Devices.Structs;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 

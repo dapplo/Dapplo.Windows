@@ -15,7 +15,6 @@ using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Input.Mouse;
 using Dapplo.Windows.User32;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 
@@ -34,7 +33,7 @@ public class InputTests
     private async Task TestInput_LastInputTimeSpan()
     {
         var initialLastInputTimeSpan = NativeInput.LastInputTimeSpan;
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         var laterLastInputTimeSpan = NativeInput.LastInputTimeSpan;
         Assert.True(laterLastInputTimeSpan > initialLastInputTimeSpan);
     }
@@ -46,7 +45,7 @@ public class InputTests
     private async Task TestInput_LastInputDateTime()
     {
         var initialLastInput = NativeInput.LastInputDateTime;
-        await Task.Delay(1300);
+        await Task.Delay(1300, TestContext.Current.CancellationToken);
         var laterLastInput = NativeInput.LastInputDateTime;
         var deviation = laterLastInput.Subtract(initialLastInput);
         Assert.True(deviation < TimeSpan.FromMilliseconds(100));

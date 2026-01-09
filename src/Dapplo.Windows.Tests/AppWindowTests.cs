@@ -6,7 +6,6 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.App;
 using Xunit;
-using Xunit.Abstractions;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Icons;
 

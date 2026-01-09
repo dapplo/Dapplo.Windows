@@ -5,7 +5,6 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.Kernel32;
 using Dapplo.Windows.Kernel32.Structs;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 

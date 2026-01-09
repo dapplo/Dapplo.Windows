@@ -8,7 +8,6 @@ using Dapplo.Windows.Common.Structs;
 using System.Drawing;
 using System.Windows;
 using Xunit;
-using Xunit.Abstractions;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 

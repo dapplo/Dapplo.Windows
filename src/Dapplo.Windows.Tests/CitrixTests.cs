@@ -3,7 +3,6 @@
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Xunit;
-using Xunit.Abstractions;
 using Dapplo.Windows.Citrix;
 
 namespace Dapplo.Windows.Tests;
