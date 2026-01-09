@@ -53,7 +53,7 @@ jobs:
       with:
         github-token: ${{ secrets.COVERALLS_SECRET }}
         fail-on-error: false
-        file: src/Dapplo.Windows.Tests/coverage.net10.0-windows.info
+        file: src\Dapplo.Windows.Tests\coverage.info
     
     - name: Install DocFX
       run: choco install docfx -y
