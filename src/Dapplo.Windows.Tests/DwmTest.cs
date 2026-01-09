@@ -4,7 +4,6 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.DesktopWindowsManager;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 

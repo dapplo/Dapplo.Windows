@@ -6,7 +6,6 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.Gdi32;
 using Dapplo.Windows.Gdi32.SafeHandles;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 

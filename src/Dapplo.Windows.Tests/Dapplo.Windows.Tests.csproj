@@ -29,22 +29,25 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="System.Reactive" Version="6.1.0" />
     <PackageReference Include="System.ValueTuple" Version="4.6.1" />
-    <PackageReference Include="Dapplo.Log.Loggers" Version="2.0.1" />
-    <PackageReference Include="Dapplo.Log.XUnit" Version="2.0.1" />
+    <PackageReference Include="Dapplo.Log.Loggers" Version="3.0.17" />
+    <PackageReference Include="Dapplo.Log.XUnit" Version="3.0.17" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
-    <PackageReference Include="xunit.analyzers" Version="1.0.0" />
-    <PackageReference Include="xunit.core" Version="2.4.2" />
-    <PackageReference Include="Xunit.StaFact" Version="1.1.11" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
-    <PackageReference Include="xunit.runner.console" Version="2.4.2">
+    <PackageReference Include="xunit.analyzers" Version="1.26.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+	<PackageReference Include="xunit.v3" Version="3.2.1" />
+    <PackageReference Include="Xunit.StaFact" Version="3.0.13" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="xunit.runner.console" Version="2.9.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.msbuild" Version="3.1.2">
+    <PackageReference Include="coverlet.msbuild" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

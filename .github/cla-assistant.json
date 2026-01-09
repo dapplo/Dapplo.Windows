@@ -1,0 +1,7 @@
+{
+  "whitelist": [
+    "github-copilot[bot]",
+    "dependabot[bot]",
+    "github-actions[bot]"
+  ]
+}

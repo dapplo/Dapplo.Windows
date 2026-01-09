@@ -9,7 +9,6 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 

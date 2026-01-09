@@ -14,7 +14,6 @@ using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 

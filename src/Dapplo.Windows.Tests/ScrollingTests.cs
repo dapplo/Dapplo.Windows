@@ -13,7 +13,6 @@ using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 

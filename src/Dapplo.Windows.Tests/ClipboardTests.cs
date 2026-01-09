@@ -12,7 +12,6 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.Clipboard;
 using Dapplo.Windows.Messages;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 
