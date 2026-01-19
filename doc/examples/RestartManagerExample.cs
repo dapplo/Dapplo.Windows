@@ -9,10 +9,96 @@ using Dapplo.Windows.Kernel32.Enums;
 namespace Dapplo.Windows.Examples;
 
 /// <summary>
-///     Example demonstrating the usage of the Restart Manager API
+///     Examples demonstrating the usage of the Restart Manager API for both installers and applications
 /// </summary>
 public static class RestartManagerExample
 {
+    // ========================================
+    // APPLICATION-SIDE EXAMPLES
+    // (For applications that want to be restarted)
+    // ========================================
+
+    /// <summary>
+    ///     Example: Register an application for automatic restart
+    /// </summary>
+    public static void RegisterApplicationForRestart()
+    {
+        Console.WriteLine("Registering application for restart...");
+        
+        try
+        {
+            // Register with command-line arguments to restore state
+            ApplicationRestart.RegisterForRestart("/restore /minimized");
+            
+            Console.WriteLine("Application successfully registered for restart.");
+            Console.WriteLine("If shut down by Restart Manager, it will restart with: /restore /minimized");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to register for restart: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    ///     Example: Check if the application was restarted
+    /// </summary>
+    public static void CheckIfRestarted()
+    {
+        if (ApplicationRestart.IsRestartRequested())
+        {
+            Console.WriteLine("Application was restarted by Restart Manager!");
+            
+            var args = ApplicationRestart.GetRestartCommandLineArgs();
+            Console.WriteLine($"Restart arguments: {string.Join(" ", args)}");
+            
+            // Restore application state here
+            Console.WriteLine("Restoring previous application state...");
+        }
+        else
+        {
+            Console.WriteLine("Normal application start (not restarted)");
+        }
+    }
+
+    /// <summary>
+    ///     Example: Register with flags to control restart behavior
+    /// </summary>
+    public static void RegisterWithFlags()
+    {
+        Console.WriteLine("Registering with custom restart flags...");
+        
+        // Don't restart if the application crashes or hangs
+        ApplicationRestart.RegisterForRestart(
+            commandLineArgs: "/restore",
+            flags: ApplicationRestartFlags.RestartNoCrash | ApplicationRestartFlags.RestartNoHang
+        );
+        
+        Console.WriteLine("Registered: Will restart only for updates, not for crashes/hangs");
+    }
+
+    /// <summary>
+    ///     Example: Unregister from automatic restart
+    /// </summary>
+    public static void UnregisterApplication()
+    {
+        Console.WriteLine("Unregistering from restart...");
+        
+        try
+        {
+            ApplicationRestart.UnregisterForRestart();
+            Console.WriteLine("Application successfully unregistered from restart.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to unregister: {ex.Message}");
+        }
+    }
+
+    // ========================================
+    // INSTALLER/UPDATER EXAMPLES
+    // (For installers that manage other applications)
+    // ========================================
+
     /// <summary>
     ///     Example: Find all processes using a specific file
     /// </summary>
@@ -253,7 +339,39 @@ public static class RestartManagerExample
     {
         try
         {
-            // Example 1: Find processes using a file
+            Console.WriteLine("=== Restart Manager Examples ===");
+            Console.WriteLine();
+            
+            // ========================================
+            // APPLICATION-SIDE EXAMPLES
+            // ========================================
+            Console.WriteLine("--- Application-Side Examples ---");
+            Console.WriteLine();
+            
+            // Example 1: Register for restart
+            RegisterApplicationForRestart();
+            Console.WriteLine();
+            
+            // Example 2: Check if restarted
+            CheckIfRestarted();
+            Console.WriteLine();
+            
+            // Example 3: Register with custom flags
+            // RegisterWithFlags();
+            // Console.WriteLine();
+            
+            // Example 4: Unregister (uncomment if needed)
+            // UnregisterApplication();
+            // Console.WriteLine();
+            
+            Console.WriteLine("--- Installer/Updater Examples ---");
+            Console.WriteLine();
+            
+            // ========================================
+            // INSTALLER/UPDATER EXAMPLES
+            // ========================================
+            
+            // Example 5: Find processes using a file
             // Note: Replace with an actual file path that might be in use
             var testFile = @"C:\Windows\System32\kernel32.dll";
             
@@ -267,19 +385,19 @@ public static class RestartManagerExample
                 Console.WriteLine("Please modify the testFile variable to point to an existing file.");
             }
 
-            // Example 2: Check if reboot is required
+            // Example 6: Check if reboot is required
             // CheckRebootRequired(testFile);
 
-            // Example 3: Get detailed process information
+            // Example 7: Get detailed process information
             // GetDetailedProcessInformation(testFile);
 
-            // Example 4: Find processes using multiple files
+            // Example 8: Find processes using multiple files
             // FindProcessesUsingMultipleFiles(
             //     @"C:\path\to\file1.dll",
             //     @"C:\path\to\file2.dll"
             // );
 
-            // WARNING: Example 5 will actually shut down applications!
+            // WARNING: Example 9 will actually shut down applications!
             // Only uncomment if you understand the consequences
             // ShutdownAndRestartApplications(testFile);
         }

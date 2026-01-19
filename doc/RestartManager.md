@@ -4,10 +4,134 @@ The Restart Manager is a Windows feature that helps minimize application downtim
 
 ## Overview
 
-Dapplo.Windows.Kernel32 provides a comprehensive .NET API for the Windows Restart Manager that abstracts away the low-level P/Invoke details. The main classes you'll work with are:
+Dapplo.Windows.Kernel32 provides a comprehensive .NET API for the Windows Restart Manager that abstracts away the low-level P/Invoke details. There are two perspectives to Restart Manager:
 
-- **`RestartManager`** - High-level helper class that manages Restart Manager sessions
+### For Installers/Updaters
+
+- **`RestartManager`** - High-level helper class that manages Restart Manager sessions for installers
 - **`RestartManagerApi`** - Low-level P/Invoke declarations (for advanced scenarios)
+
+### For Applications
+
+- **`ApplicationRestart`** - High-level helper class for applications to register for automatic restart
+- **`Kernel32Api`** - Contains `RegisterApplicationRestart` and `UnregisterApplicationRestart` P/Invoke declarations
+
+## Application-Side API
+
+If you're developing an application that may be updated or needs to be restarted during system updates, use the `ApplicationRestart` class.
+
+### Registering Your Application for Restart
+
+Applications can register themselves to be automatically restarted by Restart Manager:
+
+```csharp
+using Dapplo.Windows.Kernel32;
+
+// Register for restart with command-line arguments
+ApplicationRestart.RegisterForRestart("/restore /minimized");
+
+// Or register without arguments
+ApplicationRestart.RegisterForRestart();
+```
+
+### When to Register for Restart
+
+The best time to register for restart is during application startup, in your `Main` method or application initialization:
+
+```csharp
+static void Main(string[] args)
+{
+    // Register for restart early in the application lifecycle
+    ApplicationRestart.RegisterForRestart("/restore");
+    
+    // Check if we were restarted by Restart Manager
+    if (ApplicationRestart.IsRestartRequested())
+    {
+        // Restore previous state, show notification, etc.
+        Console.WriteLine("Application was restarted after an update");
+    }
+    
+    // Continue with normal application startup
+    Application.Run(new MainForm());
+}
+```
+
+### Controlling Restart Behavior
+
+You can control when your application should NOT be restarted using flags:
+
+```csharp
+using Dapplo.Windows.Kernel32.Enums;
+
+// Don't restart if the application crashes
+ApplicationRestart.RegisterForRestart(
+    commandLineArgs: "/restore",
+    flags: ApplicationRestartFlags.RestartNoCrash
+);
+
+// Don't restart on crash or hang
+ApplicationRestart.RegisterForRestart(
+    commandLineArgs: "/restore",
+    flags: ApplicationRestartFlags.RestartNoCrash | ApplicationRestartFlags.RestartNoHang
+);
+
+// Don't restart during patches or reboots
+ApplicationRestart.RegisterForRestart(
+    commandLineArgs: null,
+    flags: ApplicationRestartFlags.RestartNoPatch | ApplicationRestartFlags.RestartNoReboot
+);
+```
+
+### Unregistering from Restart
+
+If your application no longer wants to be restarted automatically:
+
+```csharp
+ApplicationRestart.UnregisterForRestart();
+```
+
+### Detecting Restart Manager Shutdown
+
+When your application is being shut down by Restart Manager, it receives normal Windows shutdown messages (WM_QUERYENDSESSION). Handle these appropriately:
+
+```csharp
+// In a Windows Forms application
+protected override void OnFormClosing(FormClosingEventArgs e)
+{
+    if (e.CloseReason == CloseReason.WindowsShutDown)
+    {
+        // Save application state
+        SaveState();
+        
+        // Allow the shutdown to proceed
+        e.Cancel = false;
+    }
+    
+    base.OnFormClosing(e);
+}
+
+// In a WPF application
+protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
+{
+    // Save application state
+    SaveState();
+    
+    // Allow the session to end
+    e.Cancel = false;
+    
+    base.OnSessionEnding(e);
+}
+
+// In a console application
+Console.CancelKeyPress += (sender, e) =>
+{
+    SaveState();
+};
+```
+
+## Installer/Updater API
+
+If you're developing an installer or updater, use the `RestartManager` class to manage other applications.
 
 ## Common Use Cases
 
