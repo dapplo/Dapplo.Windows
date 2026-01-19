@@ -30,8 +30,15 @@ public static class ApplicationRestart
 {
     /// <summary>
     ///     Maximum length for the command line arguments (in characters).
+    ///     This corresponds to the Windows RESTART_MAX_CMD_LINE constant.
     /// </summary>
-    public const int MaxCommandLineLength = 1024;
+    public const int RestartMaxCmdLine = 1024;
+    
+    /// <summary>
+    ///     Maximum length for the command line arguments (in characters).
+    ///     Alias for RestartMaxCmdLine for backward compatibility.
+    /// </summary>
+    public const int MaxCommandLineLength = RestartMaxCmdLine;
 
     /// <summary>
     ///     Registers the current application for automatic restart.
@@ -83,44 +90,47 @@ public static class ApplicationRestart
     ///     This allows the application to detect if it was automatically restarted after an update.
     /// </summary>
     /// <returns>True if the application was restarted by Restart Manager, false otherwise.</returns>
+    /// <remarks>
+    ///     This method checks if the application was started with the command-line arguments
+    ///     that were registered via RegisterForRestart(). Applications should implement their own
+    ///     restart detection based on the command-line arguments they register.
+    ///     
+    ///     For example, if you registered with "/restore", check for that specific argument:
+    ///     <code>
+    ///     var args = Environment.GetCommandLineArgs();
+    ///     bool wasRestarted = args.Contains("/restore");
+    ///     </code>
+    /// </remarks>
     public static bool IsRestartRequested()
     {
-        // When Restart Manager restarts an application, it sets specific command-line arguments
-        // Check if we were started with restart-related command line arguments
+        // When Restart Manager restarts an application, it passes the registered command-line arguments
+        // Since we don't know what arguments the application registered with, we provide a helper
+        // that checks for common restart indicators, but applications should implement their own logic
         var args = Environment.GetCommandLineArgs();
         
-        // Restart Manager typically adds the /restart flag or the application's registered command line
+        // Check for common restart-related arguments
+        // Applications should use their own specific arguments for more reliable detection
         return args.Any(arg => arg.Equals("/restart", StringComparison.OrdinalIgnoreCase) ||
-                               arg.Equals("-restart", StringComparison.OrdinalIgnoreCase));
+                               arg.Equals("-restart", StringComparison.OrdinalIgnoreCase) ||
+                               arg.Equals("--restart", StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
-    ///     Checks if the current process is being shut down by Restart Manager.
-    ///     This method examines the current process to see if it's in the list of processes
-    ///     being managed for restart.
+    ///     Gets the command-line arguments that were passed to the current process.
+    ///     Applications can use this to implement their own restart detection logic
+    ///     based on the specific arguments they registered via RegisterForRestart().
     /// </summary>
-    /// <returns>True if shutdown is being requested by Restart Manager, false otherwise.</returns>
-    /// <remarks>
-    ///     This is a best-effort detection. Applications should also handle normal shutdown events
-    ///     (WM_QUERYENDSESSION, Console.CancelKeyPress, AppDomain.ProcessExit, etc.)
-    /// </remarks>
-    public static bool IsShutdownRequested()
-    {
-        // Check if the process has received a WM_QUERYENDSESSION message
-        // This is typically sent by Restart Manager before shutting down applications
-        // However, this requires message loop integration which we can't do in a static method
-        
-        // Instead, we document that applications should handle normal shutdown events
-        // and use RegisterForRestart to ensure they get restarted
-        return false; // This method is provided for API completeness but has limitations
-    }
-
-    /// <summary>
-    ///     Gets the command-line arguments that were registered for restart.
-    ///     Note: This retrieves the arguments from the current process command line,
-    ///     not from the registration (which is not exposed by the Windows API).
-    /// </summary>
-    /// <returns>Array of command-line arguments.</returns>
+    /// <returns>Array of command-line arguments, excluding the executable path.</returns>
+    /// <example>
+    ///     <code>
+    ///     // If you registered with "/restore", check for it:
+    ///     var args = ApplicationRestart.GetRestartCommandLineArgs();
+    ///     if (args.Contains("/restore"))
+    ///     {
+    ///         // Application was restarted, restore state
+    ///     }
+    ///     </code>
+    /// </example>
     public static string[] GetRestartCommandLineArgs()
     {
         var args = Environment.GetCommandLineArgs();
