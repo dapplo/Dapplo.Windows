@@ -32,11 +32,11 @@
     <PackageReference Include="Dapplo.Log.Loggers" Version="3.0.22" />
     <PackageReference Include="Dapplo.Log.XUnit" Version="3.0.22" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
-    <PackageReference Include="xunit.analyzers" Version="1.26.0">
+    <PackageReference Include="xunit.analyzers" Version="1.27.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-	<PackageReference Include="xunit.v3" Version="3.2.1" />
+	<PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="Xunit.StaFact" Version="3.0.13" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="xunit.runner.console" Version="2.9.3">
