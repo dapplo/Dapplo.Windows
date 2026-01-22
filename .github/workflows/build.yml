@@ -77,12 +77,14 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
+        retention-days: 1
         path: artifacts/**/*
 
     - name: Upload documentation site
       uses: actions/upload-artifact@v4
       with:
         name: documentation-site
+        retention-days: 1
         path: doc/_site/**/*
 
     - name: Publish documentation to gh-pages
