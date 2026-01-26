@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Runtime.InteropServices;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Structs;
+using System;
+using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Icons;
 
@@ -22,4 +23,14 @@ public static class NativeCursorMethods
     [DllImport(User32Api.User32, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool GetCursorInfo(ref CursorInfo cursorInfo);
+
+    [DllImport(User32Api.User32, SetLastError = true)]
+    internal static extern bool DestroyCursor(IntPtr hCursor);
+
+
+    [DllImport(User32Api.User32, SetLastError = true)]
+    internal static extern IntPtr LoadImage(IntPtr hInst, IntPtr name, int type, int cx, int cy, int fuLoad);
+
+    [DllImport(User32Api.User32, SetLastError = true)]
+    internal static extern IntPtr LoadImage(IntPtr hInst, string name, int type, int cx, int cy, int fuLoad);
 }

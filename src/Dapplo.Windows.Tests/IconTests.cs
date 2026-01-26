@@ -1,12 +1,15 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Media.Imaging;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Icons;
 using Dapplo.Windows.User32;
@@ -464,5 +467,27 @@ public class IconTests
         }
 
         bitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test backward compatibility - existing WriteIcon method
+    /// </summary>
+    //[Fact]
+    public void TestCursorHelper_TryGetCurrentCursor()
+    {
+        Bitmap bitmap;
+        NativePoint hotSpot;
+
+        var result = CursorHelper.TryGetCurrentCursor<System.Drawing.Bitmap>(out bitmap, out hotSpot);
+        Assert.True(result);
+
+        Assert.NotNull(bitmap);
+        bitmap.Dispose();
+
+        BitmapSource bitmap2;
+        var result2 = CursorHelper.TryGetCurrentCursor<BitmapSource>(out bitmap2, out hotSpot);
+        Assert.True(result2);
+
+        Assert.NotNull(bitmap2);
     }
 }

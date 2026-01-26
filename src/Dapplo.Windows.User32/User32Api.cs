@@ -24,18 +24,6 @@ namespace Dapplo.Windows.User32;
 /// </summary>
 public static class User32Api
 {
-    /// <summary>
-    /// The DLL Name for the User32 library
-    /// </summary>
-    public const string User32 = "user32";
-
-    /// <summary>
-    ///     Delegate description for the windows enumeration
-    /// </summary>
-    /// <param name="hWnd">IntPtr</param>
-    /// <param name="lParam">IntPtr</param>
-    public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-
     private static readonly LogSource Log = new LogSource();
 
 #if !NETSTANDARD2_0
@@ -93,7 +81,7 @@ public static class User32Api
     /// Get the display info for the specified monitor handle
     /// </summary>
     /// <param name="monitorHandle">IntPtr</param>
-    /// <param name="index"></param>
+    /// <param name="index">int</param>
     /// <returns>DisplayInfo</returns>
     public static DisplayInfo GetDisplayInfo(IntPtr monitorHandle, int index)
     {
@@ -149,7 +137,7 @@ public static class User32Api
     public static List<IntPtr> EnumThreadWindows(int threadId)
     {
         var handles = new List<IntPtr>();
-        EnumThreadWindows(threadId, (hWnd, lParam) =>
+        User32Api.EnumThreadWindows(threadId, (hWnd, lParam) =>
         {
             handles.Add(hWnd);
             return true;
@@ -196,7 +184,7 @@ public static class User32Api
         {
             const int capacity = 260;
             char* classname = stackalloc char[capacity];
-            var characters = GetClassName(hWnd, classname, capacity);
+            var characters = User32Api.GetClassName(hWnd, classname, capacity);
             return characters == 0 ? string.Empty : new string(classname, 0, characters);
         }
     }
@@ -383,14 +371,26 @@ public static class User32Api
     /// <returns>bool true if the SendMessage worked</returns>
     public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, out UIntPtr result, IntPtr lParam = default, uint timeout = 300)
     {
-        var isSuccess = SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung | SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
+        var isSuccess = User32Api.SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung | SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
         if (!isSuccess)
         {
             result = UIntPtr.Zero;
         }
         return isSuccess;
     }
-    private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr dwData);
+
+    /// <summary>
+    /// The DLL Name for the User32 library
+    /// </summary>
+    public const string User32 = "user32";
+
+    /// <summary>
+    ///     Delegate description for the windows enumeration
+    /// </summary>
+    /// <param name="hWnd">IntPtr</param>
+    /// <param name="lParam">IntPtr</param>
+    public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+    internal delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr dwData);
 
     /// <summary>
     /// Determines the visibility state of the specified window.
@@ -530,7 +530,7 @@ public static class User32Api
     /// <param name="capacity">size of the buffer</param>
     /// <returns>int with the size of the caption</returns>
     [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern unsafe int GetWindowText(IntPtr hWnd, char * lpString, int capacity);
+    internal static extern unsafe int GetWindowText(IntPtr hWnd, char* lpString, int capacity);
 
     /// <summary>
     /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633521.aspx">GetWindowTextLength  function</a>
@@ -652,13 +652,13 @@ public static class User32Api
     /// <param name="nMaxCount">max size for the string builder length</param>
     /// <returns>nr of characters returned</returns>
     [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern unsafe int GetClassName(IntPtr hWnd, char* className, int nMaxCount);
+    internal static extern unsafe int GetClassName(IntPtr hWnd, char* className, int nMaxCount);
 
     [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern IntPtr GetClassLong(IntPtr hWnd, ClassLongIndex index);
+    internal static extern IntPtr GetClassLong(IntPtr hWnd, ClassLongIndex index);
 
     [DllImport(User32, SetLastError = true, EntryPoint = "GetClassLongPtr")]
-    private static extern IntPtr GetClassLongPtr(IntPtr hWnd, ClassLongIndex index);
+    internal static extern IntPtr GetClassLongPtr(IntPtr hWnd, ClassLongIndex index);
 
     /// <summary>
     ///     See
@@ -736,7 +736,7 @@ public static class User32Api
     /// <param name="lParam">char *</param>
     /// <returns></returns>
     [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern unsafe IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, char * lParam);
+    internal static extern unsafe IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, char* lParam);
 
     /// <summary>
     ///     Used for WM_SETTEXT or another message where a string needs to be send
@@ -750,10 +750,10 @@ public static class User32Api
     public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
     [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLong")]
-    private static extern IntPtr GetWindowLong(IntPtr hWnd, WindowLongIndex index);
+    internal static extern IntPtr GetWindowLong(IntPtr hWnd, WindowLongIndex index);
 
     [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLongPtr")]
-    private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, WindowLongIndex nIndex);
+    internal static extern IntPtr GetWindowLongPtr(IntPtr hWnd, WindowLongIndex nIndex);
 
     /// <summary>
     /// Changes an attribute of the specified window. The function also sets a value at the specified offset in the extra window memory.
@@ -763,7 +763,7 @@ public static class User32Api
     /// <param name="replacementValue">int</param>
     /// <returns>int with 0 if failed, other value was the previous value</returns>
     [DllImport(User32, SetLastError = true)]
-    private static extern int SetWindowLong(IntPtr hWnd, WindowLongIndex index, int replacementValue);
+    internal static extern int SetWindowLong(IntPtr hWnd, WindowLongIndex index, int replacementValue);
 
     /// <summary>
     /// Changes an attribute of the specified window. The function also sets a value at the specified offset in the extra window memory.
@@ -773,7 +773,7 @@ public static class User32Api
     /// <param name="replacementValue">IntPtr</param>
     /// <returns>IntPtr with 0 if failed, other value was the previous value</returns>
     [DllImport(User32, SetLastError = true, EntryPoint = "SetWindowLongPtr")]
-    private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, WindowLongIndex index, IntPtr replacementValue);
+    internal static extern IntPtr SetWindowLongPtr(IntPtr hWnd, WindowLongIndex index, IntPtr replacementValue);
 
     /// <summary>
     ///     See
@@ -1091,7 +1091,7 @@ public static class User32Api
 
     [DllImport(User32, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetPhysicalCursorPos(out NativePoint cursorLocation);
+    internal static extern bool GetPhysicalCursorPos(out NativePoint cursorLocation);
 
     /// <summary>
     /// The MapWindowPoints function converts (maps) a set of points from a coordinate space relative to one window to a coordinate space relative to another window.
@@ -1151,11 +1151,11 @@ public static class User32Api
     internal static extern bool CloseDesktop(IntPtr hDesktop);
 
     [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
+    internal static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
 
     [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
+    internal static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
 
     /// <summary>
     ///     See
@@ -1228,4 +1228,18 @@ public static class User32Api
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool LockWorkStation();
+
+    /// <summary>
+    ///     See
+    ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648389(v=vs.85).aspx">GetCursorInfo function</a>
+    ///     Retrieves information about the global cursor.
+    /// </summary>
+    /// <param name="cursorInfo">CursorInfo structure to fill</param>
+    /// <returns>bool</returns>
+    [DllImport(User32Api.User32, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetCursorInfo(ref CursorInfo cursorInfo);
+
+    [DllImport(User32Api.User32, SetLastError = true)]
+    internal static extern bool DestroyCursor(IntPtr hCursor);
 }

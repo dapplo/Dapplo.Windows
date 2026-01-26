@@ -50,11 +50,11 @@ public class ScrollingTests
                 {
                     // Find the belonging window, by the process id
                     var notepadWindow = WindowsEnumerator.EnumerateWindows()
-                        .FirstOrDefault(interopWindow =>
+                        .FirstOrDefault((Func<IInteropWindow, bool>)(interopWindow =>
                         {
                             User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var processId);
                             return processId == process.Id;
-                        });
+                        }));
                     Assert.NotNull(notepadWindow);
 
                     // Create a WindowScroller
