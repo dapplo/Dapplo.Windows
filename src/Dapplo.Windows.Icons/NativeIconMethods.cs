@@ -51,11 +51,11 @@ public static class NativeIconMethods
     /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-geticoninfoexw">GetIconInfoEx function</a>
     /// This also describes to get more info on standard icons and cursors
     /// </summary>
-    /// <param name="iconOrCursorHandle">A handle to the icon or cursor.</param>
+    /// <param name="iconOrCursorHandle">A IntPtr handle to the icon or cursor.</param>
     /// <param name="iconInfoEx">A pointer to an ICONINFOEX structure. The function fills in the structure's members.</param>
     /// <returns>bool true if the function succeeds, the return value is in the IconInfo structure.</returns>
     [DllImport(User32Api.User32, SetLastError = true, CharSet = CharSet.Auto)]
-    public static extern bool GetIconInfoEx(SafeCursorHandle iconOrCursorHandle, ref IconInfoEx iconInfoEx);
+    public static extern bool GetIconInfoEx(IntPtr iconOrCursorHandle, ref IconInfoEx iconInfoEx);
 
     /// <summary>
     /// Retrieves information about the specified icon or cursor.

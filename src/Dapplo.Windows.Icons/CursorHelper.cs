@@ -56,8 +56,9 @@ public static class CursorHelper
     /// <summary>
     /// This method will capture the current Cursor by using User32 Code and will try to get the actual size of the cursor as set in Accessibility settings.
     /// </summary>
-    /// <returns>BitmapSource bitmapSource</returns>
-    /// <returns>NativePoint hotSpot</returns>
+    /// <param name="returnBitmap">The cursor image represented by a Bitmap or BitmapSource</param>
+    /// <param name="hotSpot">NativePoint with the hotspot information, this is the offset where the click on the screen happens</param>
+    /// <returns>bool true if it worked</returns>
     public static bool TryGetCurrentCursor<TBitmapType>(out TBitmapType returnBitmap, out NativePoint hotSpot) where TBitmapType : class
     {
         var cursorInfo = CursorInfo.Create();
@@ -68,20 +69,23 @@ public static class CursorHelper
             return false;
         }
 
+        if (!cursorInfo.IsShowing)
+        {
+            return false;
+        }
+
         var iconInfoEx = IconInfoEx.Create();
 
         if (NativeIconMethods.GetIconInfoEx(cursorInfo.CursorHandle, ref iconInfoEx))
         {
             try
             {
-                // 2. CALCULATE TARGET SIZE
                 // Ignore what the handle says. Calculate what it SHOULD be.
                 // "CursorBaseSize" is the raw size (32, 48, 64) set in Accessibility settings.
                 int baseSize = GetCursorBaseSize();
                 uint dpi = NativeDpiMethods.GetDpiForSystem();
                 int targetSize = (int)(baseSize * (dpi / 96.0f));
 
-                // 3. RELOAD THE ASSET
                 // We ask Windows: "Load this specific resource again, but make it exactly [targetSize] pixels."
                 IntPtr hRealCursor = IntPtr.Zero;
                 bool isSharedHandle = false;
@@ -102,11 +106,10 @@ public static class CursorHelper
                 // If reload failed (dynamic cursor), fallback to the original 32px handle
                 if (hRealCursor == IntPtr.Zero)
                 {
-                    hRealCursor = cursorInfo.CursorHandle.DangerousGetHandle();
+                    hRealCursor = cursorInfo.CursorHandle;
                     isSharedHandle = true;
                 }
 
-                // 4. DRAW IT
                 // This renders the (potentially huge) cursor into a transparent bitmap
                 if (targetSize > 0)
                 {
@@ -119,7 +122,7 @@ public static class CursorHelper
                             returnBitmap = Imaging.CreateBitmapSourceFromHIcon(hRealCursor, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()) as TBitmapType;
                         }
                     }
-                    else if (typeof(TBitmapType) == typeof(Bitmap))
+                    else if (typeof(TBitmapType) == typeof(Bitmap) || typeof(TBitmapType) == typeof(Image))
                     {
                         var bmp = new Bitmap(targetSize, targetSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                         using (Graphics g = Graphics.FromImage(bmp))
@@ -134,10 +137,8 @@ public static class CursorHelper
                     {
                         throw new NotSupportedException(typeof(TBitmapType).Name);
                     }
-
                 }
 
-                // 5. SCALE HOTSPOT
                 // The original hotspot is for the 32px version. Scale it up.
                 if (targetSize > 0 && baseSize > 0) // Avoid divide by zero
                 {
@@ -160,7 +161,6 @@ public static class CursorHelper
                 // Cleanup icon
                 iconInfoEx.BitmaskBitmapHandle.Dispose();
                 iconInfoEx.ColorBitmapHandle.Dispose();
-                cursorInfo.CursorHandle.Dispose();
             }
         } else {
             throw new Win32Exception(Marshal.GetLastWin32Error());

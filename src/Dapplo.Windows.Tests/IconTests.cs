@@ -472,7 +472,7 @@ public class IconTests
     /// <summary>
     ///     Test backward compatibility - existing WriteIcon method
     /// </summary>
-    //[Fact]
+    [Fact]
     public void TestCursorHelper_TryGetCurrentCursor()
     {
         Bitmap bitmap;

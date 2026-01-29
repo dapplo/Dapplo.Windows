@@ -5,7 +5,6 @@ using System;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.User32.Enums;
-using Dapplo.Windows.User32.SafeHandles;
 
 namespace Dapplo.Windows.User32.Structs;
 
@@ -33,12 +32,17 @@ public struct CursorInfo
 	/// <summary>
 	/// Handle (IntPtr) to the Cursor
 	/// </summary>
-    public SafeCursorHandle CursorHandle => new SafeCursorHandle(_hCursor);
+    public IntPtr CursorHandle => _hCursor;
 
     /// <summary>
     /// A structure that receives the screen coordinates of the cursor.
     /// </summary>
     public NativePoint Location => _ptScreenPos;
+
+	/// <summary>
+	/// Gets a value indicating whether the cursor is currently visible.
+	/// </summary>
+	public bool IsShowing => _hCursor != IntPtr.Zero && _flags == CursorInfoFlags.Showing;
 
 	/// <summary>
 	/// Factory for the structure
