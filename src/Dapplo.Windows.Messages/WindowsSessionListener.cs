@@ -3,18 +3,46 @@
 
 #if !NETSTANDARD2_0
 using System;
+using System.Runtime.InteropServices;
 using Dapplo.Windows.Messages.Enumerations;
 
 namespace Dapplo.Windows.Messages;
 
 /// <summary>
-///     A listener for Windows session change events (lock/unlock, logon/logoff)
+///     A listener for Windows session change events.
+///     Currently handles lock/unlock and logon/logoff events.
+///     Other session change events (console connect/disconnect, remote connect/disconnect, etc.) are not exposed but can be added in the future.
 /// </summary>
 public class WindowsSessionListener : IDisposable
 {
     private IDisposable _subscription;
-    private bool _isPaused;
-    private bool _isDisposed;
+    private volatile bool _isPaused;
+    private volatile bool _isDisposed;
+    private readonly object _lock = new object();
+
+    /// <summary>
+    ///     Flags for WtsRegisterSessionNotification
+    /// </summary>
+    private const int NOTIFY_FOR_THIS_SESSION = 0;
+
+    /// <summary>
+    /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsregistersessionnotification">WTSRegisterSessionNotification function</a>
+    /// Registers the specified window to receive session change notifications.
+    /// </summary>
+    /// <param name="hWnd">Handle to the window to receive session change notifications</param>
+    /// <param name="dwFlags">Specifies which session notifications to receive</param>
+    /// <returns>Returns true if successful</returns>
+    [DllImport("wtsapi32.dll", SetLastError = true)]
+    private static extern bool WTSRegisterSessionNotification(IntPtr hWnd, int dwFlags);
+
+    /// <summary>
+    /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsunregistersessionnotification">WTSUnRegisterSessionNotification function</a>
+    /// Unregisters the specified window so that it receives no further session change notifications.
+    /// </summary>
+    /// <param name="hWnd">Handle to the window to stop receiving session change notifications</param>
+    /// <returns>Returns true if successful</returns>
+    [DllImport("wtsapi32.dll", SetLastError = true)]
+    private static extern bool WTSUnRegisterSessionNotification(IntPtr hWnd);
 
     /// <summary>
     ///     Event fired when a session lock or unlock occurs
@@ -36,13 +64,29 @@ public class WindowsSessionListener : IDisposable
             throw new ObjectDisposedException(nameof(WindowsSessionListener));
         }
 
-        if (_subscription != null)
+        lock (_lock)
         {
-            return; // Already started
-        }
+            if (_subscription != null)
+            {
+                return; // Already started
+            }
 
-        _isPaused = false;
-        _subscription = WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(HandleSessionChange));
+            if (_isDisposed)
+            {
+                throw new ObjectDisposedException(nameof(WindowsSessionListener));
+            }
+
+            _isPaused = false;
+            
+            // Register to receive session change notifications
+            var handle = WinProcHandler.Instance.Handle;
+            if (!WTSRegisterSessionNotification(handle, NOTIFY_FOR_THIS_SESSION))
+            {
+                throw new InvalidOperationException("Failed to register for session notifications");
+            }
+
+            _subscription = WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(HandleSessionChange));
+        }
     }
 
     /// <summary>
@@ -66,9 +110,19 @@ public class WindowsSessionListener : IDisposable
     /// </summary>
     public void Stop()
     {
-        _subscription?.Dispose();
-        _subscription = null;
-        _isPaused = false;
+        lock (_lock)
+        {
+            if (_subscription != null)
+            {
+                // Unregister from session notifications
+                var handle = WinProcHandler.Instance.Handle;
+                WTSUnRegisterSessionNotification(handle);
+
+                _subscription.Dispose();
+                _subscription = null;
+            }
+            _isPaused = false;
+        }
     }
 
     /// <summary>
@@ -112,8 +166,8 @@ public class WindowsSessionListener : IDisposable
             return;
         }
 
-        Stop();
         _isDisposed = true;
+        Stop();
         GC.SuppressFinalize(this);
     }
 }
