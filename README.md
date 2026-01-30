@@ -68,6 +68,12 @@ Dapplo.Windows is a collection of packages that provide P/Invoke wrappers and hi
 - Bitmap scaling with quality preservation
 - Support for both Windows Forms and WPF
 
+### Session Management
+- Monitor Windows session changes (lock/unlock, logon/logoff)
+- Handle session events with simple event-based API
+- Pause/resume session monitoring
+- Support for all WTS session change events
+
 ### Native API Access
 - Comprehensive User32 API wrappers
 - GDI32 graphics API wrappers
@@ -166,6 +172,51 @@ var keyboardHook = KeyboardHook.Create();
 var subscription = keyboardHook.KeyboardEvents
     .Where(e => e.Key == VirtualKeyCode.A && e.IsDown)
     .Subscribe(e => Console.WriteLine("'A' pressed"));
+```
+
+#### Monitor Session Changes (Lock/Unlock, Logon/Logoff)
+
+```csharp
+using Dapplo.Windows.Messages;
+
+var sessionListener = new WindowsSessionListener();
+
+// Handle lock/unlock events
+sessionListener.SessionLockChange += (sender, args) =>
+{
+    if (args.EventType == WtsSessionChangeEvents.WTS_SESSION_LOCK)
+    {
+        Console.WriteLine("Session locked");
+        // Perform actions when session is locked
+    }
+    else if (args.EventType == WtsSessionChangeEvents.WTS_SESSION_UNLOCK)
+    {
+        Console.WriteLine("Session unlocked");
+        // Perform actions when session is unlocked
+    }
+};
+
+// Handle logon/logoff events
+sessionListener.SessionLogonChange += (sender, args) =>
+{
+    if (args.EventType == WtsSessionChangeEvents.WTS_SESSION_LOGON)
+    {
+        Console.WriteLine("User logged on");
+    }
+    else if (args.EventType == WtsSessionChangeEvents.WTS_SESSION_LOGOFF)
+    {
+        Console.WriteLine("User logged off");
+    }
+};
+
+sessionListener.Start();
+
+// Pause/resume listening
+sessionListener.Pause();
+sessionListener.Resume();
+
+// Clean up when done
+sessionListener.Dispose();
 ```
 
 ## Documentation
