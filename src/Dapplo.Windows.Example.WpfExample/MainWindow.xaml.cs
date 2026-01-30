@@ -17,6 +17,8 @@ namespace Dapplo.Windows.Example.WpfExample;
 /// </summary>
 public partial class MainWindow
 {
+    private WindowsSessionListener _sessionListener;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -37,5 +39,20 @@ public partial class MainWindow
         DeviceNotification.OnDeviceRemoved()
             .Where(deviceInterfaceChangeInfo => deviceInterfaceChangeInfo.Device.Name.Contains("Yubi"))
             .Subscribe(deviceInterfaceChangeInfo => User32Api.LockWorkStation());
+
+        // Example of using WindowsSessionListener to handle session changes
+        _sessionListener = new WindowsSessionListener();
+        _sessionListener.SessionLockChange += (sender, args) =>
+        {
+            Debug.WriteLine($"Session lock/unlock event: {args.EventType}, Session ID: {args.SessionId}");
+        };
+        _sessionListener.SessionLogonChange += (sender, args) =>
+        {
+            Debug.WriteLine($"Session logon/logoff event: {args.EventType}, Session ID: {args.SessionId}");
+        };
+        _sessionListener.Start();
+
+        // Make sure to dispose the listener when the window closes
+        Closing += (sender, args) => _sessionListener?.Dispose();
     }
 }
