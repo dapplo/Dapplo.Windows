@@ -2,10 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #if !NETSTANDARD2_0
-using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Dpi;
-using Dapplo.Windows.Icons.SafeHandles;
 using Dapplo.Windows.Icons.Structs;
 using Dapplo.Windows.Kernel32;
 using Dapplo.Windows.User32.Structs;

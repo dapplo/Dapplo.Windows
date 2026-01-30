@@ -7,7 +7,6 @@ using Dapplo.Log.XUnit;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Dapplo.Windows.Tests;
 
