@@ -47,7 +47,7 @@ public static class Gdi32Api
     /// <param name="source">Rectangle</param>
     /// <param name="destination">Point</param>
     /// <param name="rasterOperations">RasterOperations</param>
-    public static void BitBlt(this Graphics target, Bitmap sourceBitmap, Rectangle source, NativePoint destination, RasterOperations rasterOperations)
+    public static void BitBlt(this Graphics target, System.Drawing.Bitmap sourceBitmap, Rectangle source, NativePoint destination, RasterOperations rasterOperations)
     {
         using (var targetDc = target.GetSafeDeviceContext())
         using (var safeCompatibleDcHandle = CreateCompatibleDC(targetDc))
@@ -232,7 +232,7 @@ public static class Gdi32Api
     /// <param name="source">Rectangle</param>
     /// <param name="destination">Rectangle</param>
     /// <param name="rasterOperation">RasterOperations</param>
-    public static void StretchBlt(this Graphics target, Bitmap sourceBitmap, Rectangle source, Rectangle destination, RasterOperations rasterOperation)
+    public static void StretchBlt(this Graphics target, System.Drawing.Bitmap sourceBitmap, Rectangle source, Rectangle destination, RasterOperations rasterOperation)
     {
         using (var targetDc = target.GetSafeDeviceContext())
         using (var safeCompatibleDcHandle = CreateCompatibleDC(targetDc))
