@@ -13,7 +13,7 @@ using System.Windows.Forms;
 using Dapplo.Log;
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Messages.Enumerations;
+//using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
 
@@ -1012,7 +1012,7 @@ public static class User32Api
     /// <param name="hWndParent">
     /// IntPtr, A handle to the parent window whose child windows are to be searched.
     /// If hWndParent is NULL, the function uses the desktop window as the parent window. The function searches among windows that are child windows of the desktop.
-    /// If hWndParent is HWND_MESSAGE, the function searches all message-only windows.
+    /// If hWndParent is HWND_MESSAGE (-3), the function searches all message-only windows.
     /// </param>
     /// <param name="hWndChildAfter">
     /// IntPtr, a handle to a child window. The search begins with the next child window in the Z order. The child window must be a direct child window of hWndParent, not just a descendant window.

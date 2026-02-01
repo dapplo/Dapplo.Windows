@@ -4,6 +4,7 @@
 #if !NETSTANDARD2_0
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Gdi32;
 using Dapplo.Windows.Icons.Structs;
 using Dapplo.Windows.Kernel32;
 using Dapplo.Windows.User32.Structs;
@@ -78,27 +79,54 @@ public static class CursorHelper
         {
             try
             {
-                // Ignore what the handle says. Calculate what it SHOULD be.
-                // "CursorBaseSize" is the raw size (32, 48, 64) set in Accessibility settings.
-                int baseSize = GetCursorBaseSize();
-                uint dpi = NativeDpiMethods.GetDpiForSystem();
-                int targetSize = (int)(baseSize * (dpi / 96.0f));
-
-                // We ask Windows: "Load this specific resource again, but make it exactly [targetSize] pixels."
-                IntPtr hRealCursor = IntPtr.Zero;
-                bool isSharedHandle = false;
+                int targetWidth = 0;
+                int targetHeight = 0;
+                bool forceSystemScaling = false;
 
                 var moduleName = iconInfoEx.ModuleName;
-                if (iconInfoEx.ResourceId != 0 && !string.IsNullOrEmpty(moduleName))
+                // Check if this is a System Cursor (Windows standard)
+                if (IsSystemCursor(moduleName))
                 {
-                    // It's a System Resource (like the standard Arrow)
-                    IntPtr hModule = Kernel32Api.GetModuleHandle(moduleName);
-                    hRealCursor = NativeCursorMethods.LoadImage(hModule, (IntPtr)iconInfoEx.ResourceId, 2, targetSize, targetSize, 0);
+                    // It is a standard cursor (Arrow, Hand, etc).
+                    // We MUST apply the registry sizing, because Windows might be "faking" the handle size.
+                    // "CursorBaseSize" is the raw size (32, 48, 64) set in Accessibility settings.
+                    int baseSize = GetCursorBaseSize();
+                    uint dpi = NativeDpiMethods.GetDpiForSystem();
+                    // Ignore what the handle says. Calculate what it SHOULD be.
+                    targetWidth = targetHeight = (int)(baseSize * (dpi / 96.0f));
+                    forceSystemScaling = true;
                 }
-                else if (!string.IsNullOrEmpty(moduleName))
+                else
                 {
-                    // It's a Custom File (like a downloaded theme)
-                    hRealCursor = NativeCursorMethods.LoadImage(IntPtr.Zero, moduleName, 2, targetSize, targetSize, 0x0010); // LR_LOADFROMFILE
+                    // It is an App-Specific cursor (Photoshop Brush, Game Crosshair). TRUST THE APP. Do not inflate it.
+                    // We need to read the actual size of the bitmap handle we received.
+                    var bmpInfo = new Gdi32.Structs.Bitmap();
+                    IntPtr hBitmapToMeasure = iconInfoEx.ColorBitmapHandle.IsInvalid ? iconInfoEx.BitmaskBitmapHandle.DangerousGetHandle(): iconInfoEx.ColorBitmapHandle.DangerousGetHandle();
+                    Gdi32Api.GetObject(hBitmapToMeasure, Marshal.SizeOf(typeof(Gdi32.Structs.Bitmap)), ref bmpInfo);
+
+                    targetWidth = bmpInfo.Width;
+                    targetHeight = bmpInfo.Height;
+
+
+                    // If monochrome, height is doubled in the mask
+                    if (iconInfoEx.ColorBitmapHandle.IsInvalid) targetHeight /= 2;
+                }
+
+                IntPtr hRealCursor = IntPtr.Zero;
+                bool isSharedHandle = false;
+                if (forceSystemScaling)
+                {
+                    if (iconInfoEx.ResourceId != 0 && !string.IsNullOrEmpty(moduleName))
+                    {
+                        // It's a System Resource (like the standard Arrow)
+                        IntPtr hModule = Kernel32Api.GetModuleHandle(moduleName);
+                        hRealCursor = NativeCursorMethods.LoadImage(hModule, (IntPtr)iconInfoEx.ResourceId, 2, targetWidth, targetHeight, 0);
+                    }
+                    else if (!string.IsNullOrEmpty(moduleName))
+                    {
+                        // It's a Custom File (like a downloaded theme)
+                        hRealCursor = NativeCursorMethods.LoadImage(IntPtr.Zero, moduleName, 2, targetWidth, targetHeight, 0x0010); // LR_LOADFROMFILE
+                    }
                 }
 
                 // If reload failed (dynamic cursor), fallback to the original 32px handle
@@ -109,24 +137,24 @@ public static class CursorHelper
                 }
 
                 // This renders the (potentially huge) cursor into a transparent bitmap
-                if (targetSize > 0)
+                if (targetWidth > 0 && targetHeight > 0)
                 {
                     if (typeof(TBitmapType) == typeof(BitmapSource) || typeof(TBitmapType) == typeof(ImageSource))
                     {
                         using (iconInfoEx.BitmaskBitmapHandle)
                         using (iconInfoEx.ColorBitmapHandle)
                         {
-                            // Pass the BitmapSource to the called
+                            // Pass the BitmapSource to the caller
                             returnBitmap = Imaging.CreateBitmapSourceFromHIcon(hRealCursor, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()) as TBitmapType;
                         }
                     }
-                    else if (typeof(TBitmapType) == typeof(Bitmap) || typeof(TBitmapType) == typeof(Image))
+                    else if (typeof(TBitmapType) == typeof(System.Drawing.Bitmap) || typeof(TBitmapType) == typeof(Image))
                     {
-                        var bmp = new Bitmap(targetSize, targetSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                        var bmp = new System.Drawing.Bitmap(targetWidth, targetHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                         using (Graphics g = Graphics.FromImage(bmp))
                         {
                             g.Clear(System.Drawing.Color.Transparent);
-                            NativeIconMethods.DrawIconEx(g.GetHdc(), 0, 0, hRealCursor, targetSize, targetSize, 0, IntPtr.Zero, 0x0003); // DI_NORMAL
+                            NativeIconMethods.DrawIconEx(g.GetHdc(), 0, 0, hRealCursor, targetWidth, targetHeight, 0, IntPtr.Zero, 0x0003); // DI_NORMAL
                             g.ReleaseHdc();
                         }
                         // Pass the bitmap to the called
@@ -138,12 +166,9 @@ public static class CursorHelper
                 }
 
                 // The original hotspot is for the 32px version. Scale it up.
-                if (targetSize > 0 && baseSize > 0) // Avoid divide by zero
+                if (forceSystemScaling && targetWidth > 0)
                 {
-                    float scaleFactor = (float)targetSize / 32.0f; // Assuming 32 is standard base
-
-                    // Refine: If we know the original was actually, say, 48, we should use that. 
-                    // But 32 is the standard logical unit for Windows cursors.
+                    float scaleFactor = targetWidth / 32.0f; // Assuming 32 is standard base
                     hotSpot = new NativePoint((int)(iconInfoEx.Hotspot.X * scaleFactor), (int)(iconInfoEx.Hotspot.Y * scaleFactor));
                 }
                 else
@@ -165,6 +190,37 @@ public static class CursorHelper
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Determines whether the specified module name corresponds to a known system cursor provider.
+    /// </summary>
+    /// <remarks>This method checks for common Windows system cursor sources, such as 'user32.dll', the
+    /// Windows cursors directory, and 'main.cpl' (mouse settings).</remarks>
+    /// <param name="moduleName">The name of the module to check. This parameter cannot be null or empty.</param>
+    /// <returns>true if the module name is associated with a standard Windows system cursor provider; otherwise, false.</returns>
+    private static bool IsSystemCursor(string moduleName)
+    {
+        if (string.IsNullOrEmpty(moduleName))
+        {
+            return false;
+        }
+
+        string lower = moduleName.ToLowerInvariant();
+
+        // Standard Windows cursors live here
+        if (lower.Contains("user32.dll"))
+        {
+            return true;
+        }
+
+        if (lower.Contains(@"\windows\cursors\"))
+        {
+            return true;
+        }
+
+        // Sometimes they come from main.cpl (mouse settings)
+        return lower.Contains("main.cpl");
     }
 }
 #endif

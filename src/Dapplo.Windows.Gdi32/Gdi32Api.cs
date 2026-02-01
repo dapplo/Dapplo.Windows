@@ -244,6 +244,22 @@ public static class Gdi32Api
     }
 
     /// <summary>
+    /// Retrieves information about a specified graphics object, such as a bitmap, and copies it into a provided buffer.
+    /// </summary>
+    /// <remarks>This method can be used to obtain details about various types of graphics objects, such as
+    /// bitmaps. Ensure that the buffer size specified in cbBuffer is sufficient for the object type. If the function
+    /// fails, call GetLastError to obtain extended error information.</remarks>
+    /// <param name="hgdiobj">A handle to the graphics object for which information is to be retrieved. This must be a valid handle to an
+    /// object created by a GDI function.</param>
+    /// <param name="cbBuffer">The size, in bytes, of the buffer that receives the information. The buffer must be large enough to hold the
+    /// data for the object type being queried.</param>
+    /// <param name="lpvObject">A reference to a Bitmap structure that receives the information about the graphics object. The structure is
+    /// populated with data if the call succeeds.</param>
+    /// <returns>The number of bytes copied to the buffer if successful; otherwise, zero if the function fails.</returns>
+    [DllImport(GDI32Dll, SetLastError = true)]
+    public static extern int GetObject(IntPtr hgdiobj, int cbBuffer, ref Structs.Bitmap lpvObject);
+
+    /// <summary>
     /// The DeleteObject function deletes a logical pen, brush, font, bitmap, region, or palette, freeing all system resources associated with the object. After the object is deleted, the specified handle is no longer valid.
     /// </summary>
     /// <param name="hObject">A handle to a logical pen, brush, font, bitmap, region, or palette.</param>
