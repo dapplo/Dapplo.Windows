@@ -2,18 +2,19 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Windows.Media.Imaging;
 using Dapplo.Log;
-using Dapplo.Log.XUnit;
-using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Icons;
 using Dapplo.Windows.User32;
 using Xunit;
+using Dapplo.Windows.Common.Structs;
+using System.Windows.Media.Imaging;
+using System.IO;
+using System.Collections.Generic;
+using Dapplo.Log.XUnit;
 
 namespace Dapplo.Windows.Tests;
 
@@ -157,7 +158,7 @@ public class IconTests
             Assert.Equal(expectedStandardSize.Width, standardIcon.PixelWidth);
             Assert.Equal(expectedStandardSize.Height, standardIcon.PixelHeight);
         }
-        catch (EntryPointNotFoundException ex)
+        catch (EntryPointNotFoundException)
         {
             // Skip test on systems without LoadIconMetric API
         }
@@ -189,12 +190,12 @@ public class IconTests
     public void TestIconFileWriter_WriteIconFile()
     {
         // Create test bitmaps of different sizes
-        var images = new List<System.Drawing.Bitmap>
+        var images = new List<Bitmap>
         {
-            new System.Drawing.Bitmap(16, 16),
-            new System.Drawing.Bitmap(32, 32),
-            new System.Drawing.Bitmap(48, 48),
-            new System.Drawing.Bitmap(256, 256)
+            new Bitmap(16, 16),
+            new Bitmap(32, 32),
+            new Bitmap(48, 48),
+            new Bitmap(256, 256)
         };
 
         // Fill each bitmap with a different color for visual verification
@@ -208,7 +209,7 @@ public class IconTests
             g4.Clear(System.Drawing.Color.Yellow);
 
         // Write to a memory stream
-        using (var stream = new System.IO.MemoryStream())
+        using (var stream = new MemoryStream())
         {
             IconFileWriter.WriteIconFile(stream, images);
 
@@ -217,7 +218,7 @@ public class IconTests
 
             // Verify the header
             stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new System.IO.BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
+            using (var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
             {
                 var reserved = reader.ReadUInt16();
                 var type = reader.ReadUInt16();
@@ -243,19 +244,19 @@ public class IconTests
     public void TestIconFileWriter_WriteCursorFile()
     {
         // Create test bitmap for cursor
-        var bitmap = new System.Drawing.Bitmap(32, 32);
+        var bitmap = new Bitmap(32, 32);
         using (var g = System.Drawing.Graphics.FromImage(bitmap))
         {
             g.Clear(System.Drawing.Color.White);
         }
 
-        var cursorData = new List<(System.Drawing.Image, System.Drawing.Point)>
+        var cursorData = new List<(Image, Point)>
         {
-            (bitmap, new System.Drawing.Point(16, 16)) // Hotspot in the center
+            (bitmap, new Point(16, 16)) // Hotspot in the center
         };
 
         // Write to a memory stream
-        using (var stream = new System.IO.MemoryStream())
+        using (var stream = new MemoryStream())
         {
             IconFileWriter.WriteCursorFile(stream, cursorData);
 
@@ -264,7 +265,7 @@ public class IconTests
 
             // Verify the header
             stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new System.IO.BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
+            using (var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
             {
                 var reserved = reader.ReadUInt16();
                 var type = reader.ReadUInt16();
@@ -373,8 +374,8 @@ public class IconTests
     public void TestIconFileWriter_WriteGrpIconStructures()
     {
         // Test writing group icon structures for PE resources
-        using (var stream = new System.IO.MemoryStream())
-        using (var writer = new System.IO.BinaryWriter(stream))
+        using (var stream = new MemoryStream())
+        using (var writer = new BinaryWriter(stream))
         {
             // Write group icon directory
             var grpIconDir = Icons.Structs.GrpIconDir.CreateIcon(2);
@@ -390,7 +391,7 @@ public class IconTests
 
             // Verify the written data
             stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new System.IO.BinaryReader(stream))
+            using (var reader = new BinaryReader(stream))
             {
                 // Read GRPICONDIR
                 var reserved = reader.ReadUInt16();
@@ -436,16 +437,16 @@ public class IconTests
     public void TestIconHelper_WriteIcon_BackwardCompatibility()
     {
         // Create test bitmap
-        var bitmap = new System.Drawing.Bitmap(32, 32);
+        var bitmap = new Bitmap(32, 32);
         using (var g = System.Drawing.Graphics.FromImage(bitmap))
         {
             g.Clear(System.Drawing.Color.Blue);
         }
 
-        var images = new List<System.Drawing.Image> { bitmap };
+        var images = new List<Image> { bitmap };
 
         // Write using the old WriteIcon method (which now delegates to IconFileWriter)
-        using (var stream = new System.IO.MemoryStream())
+        using (var stream = new MemoryStream())
         {
             IconHelper.WriteIcon(stream, images);
 
@@ -454,7 +455,7 @@ public class IconTests
 
             // Verify the header
             stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new System.IO.BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
+            using (var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
             {
                 var reserved = reader.ReadUInt16();
                 var type = reader.ReadUInt16();
@@ -478,7 +479,7 @@ public class IconTests
         Bitmap bitmap;
         NativePoint hotSpot;
 
-        var result = CursorHelper.TryGetCurrentCursor<System.Drawing.Bitmap>(out bitmap, out hotSpot);
+        var result = CursorHelper.TryGetCurrentCursor<Bitmap>(out bitmap, out hotSpot);
         Assert.True(result);
 
         Assert.NotNull(bitmap);

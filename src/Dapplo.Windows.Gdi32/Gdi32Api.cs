@@ -47,7 +47,7 @@ public static class Gdi32Api
     /// <param name="source">Rectangle</param>
     /// <param name="destination">Point</param>
     /// <param name="rasterOperations">RasterOperations</param>
-    public static void BitBlt(this Graphics target, System.Drawing.Bitmap sourceBitmap, Rectangle source, NativePoint destination, RasterOperations rasterOperations)
+    public static void BitBlt(this Graphics target, Bitmap sourceBitmap, Rectangle source, NativePoint destination, RasterOperations rasterOperations)
     {
         using (var targetDc = target.GetSafeDeviceContext())
         using (var safeCompatibleDcHandle = CreateCompatibleDC(targetDc))
@@ -232,7 +232,7 @@ public static class Gdi32Api
     /// <param name="source">Rectangle</param>
     /// <param name="destination">Rectangle</param>
     /// <param name="rasterOperation">RasterOperations</param>
-    public static void StretchBlt(this Graphics target, System.Drawing.Bitmap sourceBitmap, Rectangle source, Rectangle destination, RasterOperations rasterOperation)
+    public static void StretchBlt(this Graphics target, Bitmap sourceBitmap, Rectangle source, Rectangle destination, RasterOperations rasterOperation)
     {
         using (var targetDc = target.GetSafeDeviceContext())
         using (var safeCompatibleDcHandle = CreateCompatibleDC(targetDc))
@@ -257,7 +257,7 @@ public static class Gdi32Api
     /// populated with data if the call succeeds.</param>
     /// <returns>The number of bytes copied to the buffer if successful; otherwise, zero if the function fails.</returns>
     [DllImport(GDI32Dll, SetLastError = true)]
-    public static extern int GetObject(IntPtr hgdiobj, int cbBuffer, ref Structs.Bitmap lpvObject);
+    public static extern int GetObject(IntPtr hgdiobj, int cbBuffer, ref Structs.GdiBitmap lpvObject);
 
     /// <summary>
     /// The DeleteObject function deletes a logical pen, brush, font, bitmap, region, or palette, freeing all system resources associated with the object. After the object is deleted, the specified handle is no longer valid.

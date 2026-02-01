@@ -6,8 +6,14 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Gdi32.Structs;
 
+/// <summary>
+/// Represents a bitmap image, providing properties to access its width and height in pixels.
+/// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmap">BITMAP structure</a>
+/// </summary>
+/// <remarks>This structure is used to define the dimensions of a bitmap image. The width and height can be set to
+/// modify the bitmap's size.</remarks>
 [StructLayout(LayoutKind.Sequential)]
-public struct Bitmap
+public struct GdiBitmap
 {
     private int _bmType;
     private int _bmWidth;

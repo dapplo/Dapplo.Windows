@@ -5,6 +5,7 @@
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Dpi;
 using Dapplo.Windows.Gdi32;
+using Dapplo.Windows.Gdi32.Structs;
 using Dapplo.Windows.Icons.Structs;
 using Dapplo.Windows.Kernel32;
 using Dapplo.Windows.User32.Structs;
@@ -100,9 +101,9 @@ public static class CursorHelper
                 {
                     // It is an App-Specific cursor (Photoshop Brush, Game Crosshair). TRUST THE APP. Do not inflate it.
                     // We need to read the actual size of the bitmap handle we received.
-                    var bmpInfo = new Gdi32.Structs.Bitmap();
+                    var bmpInfo = new GdiBitmap();
                     IntPtr hBitmapToMeasure = iconInfoEx.ColorBitmapHandle.IsInvalid ? iconInfoEx.BitmaskBitmapHandle.DangerousGetHandle(): iconInfoEx.ColorBitmapHandle.DangerousGetHandle();
-                    Gdi32Api.GetObject(hBitmapToMeasure, Marshal.SizeOf(typeof(Gdi32.Structs.Bitmap)), ref bmpInfo);
+                    Gdi32Api.GetObject(hBitmapToMeasure, Marshal.SizeOf(typeof(Gdi32.Structs.GdiBitmap)), ref bmpInfo);
 
                     targetWidth = bmpInfo.Width;
                     targetHeight = bmpInfo.Height;
@@ -148,9 +149,9 @@ public static class CursorHelper
                             returnBitmap = Imaging.CreateBitmapSourceFromHIcon(hRealCursor, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()) as TBitmapType;
                         }
                     }
-                    else if (typeof(TBitmapType) == typeof(System.Drawing.Bitmap) || typeof(TBitmapType) == typeof(Image))
+                    else if (typeof(TBitmapType) == typeof(Bitmap) || typeof(TBitmapType) == typeof(Image))
                     {
-                        var bmp = new System.Drawing.Bitmap(targetWidth, targetHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                        var bmp = new Bitmap(targetWidth, targetHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                         using (Graphics g = Graphics.FromImage(bmp))
                         {
                             g.Clear(System.Drawing.Color.Transparent);
