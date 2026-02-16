@@ -476,19 +476,11 @@ public class IconTests
     [Fact]
     public void TestCursorHelper_TryGetCurrentCursor()
     {
-        Bitmap bitmap;
-        NativePoint hotSpot;
-
-        var result = CursorHelper.TryGetCurrentCursor<Bitmap>(out bitmap, out hotSpot);
+        CapturedCursor capturedCursor;
+        var result = CursorHelper.TryGetCurrentCursor(out capturedCursor);
         Assert.True(result);
 
-        Assert.NotNull(bitmap);
-        bitmap.Dispose();
-
-        BitmapSource bitmap2;
-        var result2 = CursorHelper.TryGetCurrentCursor<BitmapSource>(out bitmap2, out hotSpot);
-        Assert.True(result2);
-
-        Assert.NotNull(bitmap2);
+        Assert.NotNull(capturedCursor);
+        capturedCursor.Dispose();
     }
 }
