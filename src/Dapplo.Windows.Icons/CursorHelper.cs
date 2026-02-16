@@ -2,22 +2,25 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #if !NETSTANDARD2_0
+using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Dpi;
 using Dapplo.Windows.Gdi32;
+using Dapplo.Windows.Gdi32.Enums;
+using Dapplo.Windows.Gdi32.SafeHandles;
 using Dapplo.Windows.Gdi32.Structs;
+using Dapplo.Windows.Icons.Enums;
 using Dapplo.Windows.Icons.Structs;
 using Dapplo.Windows.Kernel32;
+using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Structs;
 using Microsoft.Win32;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace Dapplo.Windows.Icons;
 
@@ -53,144 +56,276 @@ public static class CursorHelper
         return 32; // Default
     }
 
+
     /// <summary>
-    /// This method will capture the current Cursor by using User32 Code and will try to get the actual size of the cursor as set in Accessibility settings.
+    /// Attempts to retrieve information about the current cursor and capture its visual and positional properties.
     /// </summary>
-    /// <param name="returnBitmap">The cursor image represented by a Bitmap or BitmapSource</param>
-    /// <param name="hotSpot">NativePoint with the hotspot information, this is the offset where the click on the screen happens</param>
-    /// <returns>bool true if it worked</returns>
-    public static bool TryGetCurrentCursor<TBitmapType>(out TBitmapType returnBitmap, out NativePoint hotSpot) where TBitmapType : class
+    /// <remarks>This method captures both system and custom cursors, ensuring the cursor is visible before
+    /// extracting its details. For system cursors, it attempts to load a high-DPI version to improve image quality. The
+    /// captured information includes the cursor's size, hotspot, and image layers, which can be used for further
+    /// processing or display.</remarks>
+    /// <param name="result">When this method returns, contains a CapturedCursor instance populated with details about the current cursor,
+    /// including its size, hotspot, and image layers. This parameter is passed uninitialized.</param>
+    /// <returns>true if the current cursor information was successfully retrieved and captured; otherwise, false.</returns>
+    public static bool TryGetCurrentCursor(out CapturedCursor result)
     {
+        result = new CapturedCursor();
         var cursorInfo = CursorInfo.Create();
-        returnBitmap = null;
-        hotSpot = NativePoint.Empty;
-        if (!NativeCursorMethods.GetCursorInfo(ref cursorInfo))
-        {
-            return false;
-        }
 
-        if (!cursorInfo.IsShowing)
-        {
-            return false;
-        }
+        if (!NativeCursorMethods.GetCursorInfo(ref cursorInfo)) return false;
 
-        var iconInfoEx = IconInfoEx.Create();
+        // Skip invisible cursors
+        if (!cursorInfo.IsShowing) return false;
 
-        if (NativeIconMethods.GetIconInfoEx(cursorInfo.CursorHandle, ref iconInfoEx))
+        var iconInfo = IconInfoEx.Create();
+
+        if (!NativeIconMethods.GetIconInfoEx(cursorInfo.CursorHandle, ref iconInfo)) return false;
+
+        try
         {
-            try
+            // A. CALCULATE TARGET SIZE (High-DPI)
+            int baseSize = GetCursorBaseSize();
+            uint dpi = NativeDpiMethods.GetDpiForSystem();
+            int targetWidth = (int)(baseSize * (dpi / 96.0f));
+            int targetHeight = targetWidth;
+            IntPtr hBestCursor = IntPtr.Zero;
+            bool isFreshHandle = true;
+            bool isCursorEnlarged = baseSize > 32;
+
+            // Try to reload System Cursors to get High-DPI versions
+            if (IsSystemCursor(iconInfo.ModuleName))
             {
-                int targetWidth = 0;
-                int targetHeight = 0;
-                bool forceSystemScaling = false;
-
-                var moduleName = iconInfoEx.ModuleName;
-                // Check if this is a System Cursor (Windows standard)
-                if (IsSystemCursor(moduleName))
+                if (!string.IsNullOrEmpty(iconInfo.ModuleName))
                 {
-                    // It is a standard cursor (Arrow, Hand, etc).
-                    // We MUST apply the registry sizing, because Windows might be "faking" the handle size.
-                    // "CursorBaseSize" is the raw size (32, 48, 64) set in Accessibility settings.
-                    int baseSize = GetCursorBaseSize();
-                    uint dpi = NativeDpiMethods.GetDpiForSystem();
-                    // Ignore what the handle says. Calculate what it SHOULD be.
-                    targetWidth = targetHeight = (int)(baseSize * (dpi / 96.0f));
-                    forceSystemScaling = true;
+                    if (iconInfo.ResourceId != 0)
+                    {
+                        // Get the module
+                        IntPtr hModule = Kernel32Api.GetModuleHandle(iconInfo.ModuleName);
+                        // Load from DLL/EXE Resource
+                        hBestCursor = NativeCursorMethods.LoadImage(hModule, (IntPtr)iconInfo.ResourceId, ImageType.IMAGE_CURSOR, targetWidth, targetHeight, LoadImageFlags.LR_DEFAULTCOLOR);
+                    }
+                    else
+                    {
+                        // Load from File (.cur/.ani)
+                        hBestCursor = NativeCursorMethods.LoadImage(IntPtr.Zero, iconInfo.ModuleName, ImageType.IMAGE_CURSOR, targetWidth, targetHeight, LoadImageFlags.LR_LOADFROMFILE);
+                    }
+                }
+            }
+
+            // Fallback to initial handle
+            if (hBestCursor == IntPtr.Zero)
+            {
+                hBestCursor = cursorInfo.CursorHandle;
+                isFreshHandle = false;
+            }
+
+            // Determine native size (For 1:1 Capture)
+            int nativeWidth = targetWidth;
+            int nativeHeight = targetHeight;
+
+            if (!isFreshHandle)
+            {
+                var bmpInfo = new GdiBitmap();
+                var hMeasure = iconInfo.ColorBitmapHandle.IsInvalid ? iconInfo.BitmaskBitmapHandle : iconInfo.ColorBitmapHandle;
+                if (Gdi32Api.GetObject(hMeasure, Marshal.SizeOf(typeof(GdiBitmap)), ref bmpInfo) > 0)
+                {
+                    nativeWidth = bmpInfo.Width;
+                    nativeHeight = bmpInfo.Height;
+                    // If hbmColor is NULL, hbmMask is double-height (AND + XOR) -> Actual cursor height is half.
+                    if (iconInfo.ColorBitmapHandle.IsInvalid)
+                    {
+                        nativeHeight /= 2;
+                    }
+                }
+            }
+
+            bool isCustomCursor = !( nativeWidth == 32 && nativeHeight == 32);
+
+            if (isCursorEnlarged && !isCustomCursor)
+            {
+                // Determine original hotspot relative to the handle's native size
+                // (If nativeW is 32, but target is 48, we scale the hotspot)
+                var maskInfo = new GdiBitmap();
+                int handleWidth = 32;
+                if (Gdi32Api.GetObject(iconInfo.BitmaskBitmapHandle, Marshal.SizeOf(typeof(GdiBitmap)), ref maskInfo) > 0)
+                {
+                    handleWidth = maskInfo.Width;
+                }
+                // Scale the target size and hotspot
+                float scale = (float)targetWidth / (float)handleWidth;
+                result.HotSpot = new NativePoint((int)(iconInfo.Hotspot.X * scale), (int)(iconInfo.Hotspot.Y * scale));
+                result.Size = new Size(targetWidth, targetHeight);
+            } else {
+                // Don't scale, the app specified it's own target size and hotspot or user didn't specify different size
+                result.HotSpot = iconInfo.Hotspot;
+                result.Size = new Size(nativeWidth, nativeHeight);
+            }
+
+            bool isMonochrome = iconInfo.ColorBitmapHandle.IsInvalid;
+            
+            if (isMonochrome)
+            {
+                // Classic XOR (Paint.NET)
+                result.ColorLayer = BitmapFromHIcon(hBestCursor, targetWidth, targetHeight, DrawIconExFlags.DI_IMAGE, PixelFormat.Format24bppRgb);
+                result.MaskLayer = BitmapFromHIcon(hBestCursor, targetWidth, targetHeight, DrawIconExFlags.DI_MASK, PixelFormat.Format24bppRgb);
+            }
+            else
+            {
+                // Color Cursors (Modern Alpha, Paint.NET, Green Arrow)
+                bool hasAlpha;
+
+                // If the extracted bitmap doesn't match the target size, discard it and fallback
+                if (isCustomCursor) {
+                    // Directly dump the raw memory to preserve perfectly scaled Premultiplied Alpha pixels
+                    result.ColorLayer = ExtractRawColorBitmap(iconInfo.ColorBitmapHandle, nativeWidth, nativeHeight, out hasAlpha);
+                    result.HotSpot = iconInfo.Hotspot;
+                    result.Size = new Size(nativeWidth, nativeHeight);
+                }
+                else {
+                    result.ColorLayer = BitmapFromHIcon(hBestCursor, targetWidth, targetHeight, DrawIconExFlags.DI_NORMAL);
+                    hasAlpha = true;
+                }
+
+                if (hasAlpha)
+                {
+                    // Modern Alpha Cursor (Mask is safely ignored)
+                    result.MaskLayer = null;
                 }
                 else
                 {
-                    // It is an App-Specific cursor (Photoshop Brush, Game Crosshair). TRUST THE APP. Do not inflate it.
-                    // We need to read the actual size of the bitmap handle we received.
-                    var bmpInfo = new GdiBitmap();
-                    IntPtr hBitmapToMeasure = iconInfoEx.ColorBitmapHandle.IsInvalid ? iconInfoEx.BitmaskBitmapHandle.DangerousGetHandle(): iconInfoEx.ColorBitmapHandle.DangerousGetHandle();
-                    Gdi32Api.GetObject(hBitmapToMeasure, Marshal.SizeOf(typeof(Gdi32.Structs.GdiBitmap)), ref bmpInfo);
-
-                    targetWidth = bmpInfo.Width;
-                    targetHeight = bmpInfo.Height;
-
-
-                    // If monochrome, height is doubled in the mask
-                    if (iconInfoEx.ColorBitmapHandle.IsInvalid) targetHeight /= 2;
+                    // Legacy Non-Alpha Color Cursor (Needs the mask to cut out the background)
+                    result.MaskLayer = BitmapFromHIcon(hBestCursor, targetWidth, targetHeight, DrawIconExFlags.DI_MASK);
                 }
-
-                IntPtr hRealCursor = IntPtr.Zero;
-                bool isSharedHandle = false;
-                if (forceSystemScaling)
-                {
-                    if (iconInfoEx.ResourceId != 0 && !string.IsNullOrEmpty(moduleName))
-                    {
-                        // It's a System Resource (like the standard Arrow)
-                        IntPtr hModule = Kernel32Api.GetModuleHandle(moduleName);
-                        hRealCursor = NativeCursorMethods.LoadImage(hModule, (IntPtr)iconInfoEx.ResourceId, 2, targetWidth, targetHeight, 0);
-                    }
-                    else if (!string.IsNullOrEmpty(moduleName))
-                    {
-                        // It's a Custom File (like a downloaded theme)
-                        hRealCursor = NativeCursorMethods.LoadImage(IntPtr.Zero, moduleName, 2, targetWidth, targetHeight, 0x0010); // LR_LOADFROMFILE
-                    }
-                }
-
-                // If reload failed (dynamic cursor), fallback to the original 32px handle
-                if (hRealCursor == IntPtr.Zero)
-                {
-                    hRealCursor = cursorInfo.CursorHandle;
-                    isSharedHandle = true;
-                }
-
-                // This renders the (potentially huge) cursor into a transparent bitmap
-                if (targetWidth > 0 && targetHeight > 0)
-                {
-                    if (typeof(TBitmapType) == typeof(BitmapSource) || typeof(TBitmapType) == typeof(ImageSource))
-                    {
-                        using (iconInfoEx.BitmaskBitmapHandle)
-                        using (iconInfoEx.ColorBitmapHandle)
-                        {
-                            // Pass the BitmapSource to the caller
-                            returnBitmap = Imaging.CreateBitmapSourceFromHIcon(hRealCursor, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()) as TBitmapType;
-                        }
-                    }
-                    else if (typeof(TBitmapType) == typeof(Bitmap) || typeof(TBitmapType) == typeof(Image))
-                    {
-                        var bmp = new Bitmap(targetWidth, targetHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        using (Graphics g = Graphics.FromImage(bmp))
-                        {
-                            g.Clear(System.Drawing.Color.Transparent);
-                            NativeIconMethods.DrawIconEx(g.GetHdc(), 0, 0, hRealCursor, targetWidth, targetHeight, 0, IntPtr.Zero, 0x0003); // DI_NORMAL
-                            g.ReleaseHdc();
-                        }
-                        // Pass the bitmap to the called
-                        returnBitmap = bmp as TBitmapType;
-                    } else
-                    {
-                        throw new NotSupportedException(typeof(TBitmapType).Name);
-                    }
-                }
-
-                // The original hotspot is for the 32px version. Scale it up.
-                if (forceSystemScaling && targetWidth > 0)
-                {
-                    float scaleFactor = targetWidth / 32.0f; // Assuming 32 is standard base
-                    hotSpot = new NativePoint((int)(iconInfoEx.Hotspot.X * scaleFactor), (int)(iconInfoEx.Hotspot.Y * scaleFactor));
-                }
-                else
-                {
-                    hotSpot = iconInfoEx.Hotspot;
-                }
-
-                // Cleanup cursor, but only if it's not a shared handle (in the other case. we clean up elsewhere)
-                if (!isSharedHandle && hRealCursor != IntPtr.Zero) NativeCursorMethods.DestroyCursor(hRealCursor);
             }
-            finally
+
+            if (isFreshHandle)
             {
-                // Cleanup icon
-                iconInfoEx.BitmaskBitmapHandle.Dispose();
-                iconInfoEx.ColorBitmapHandle.Dispose();
+                NativeCursorMethods.DestroyCursor(hBestCursor);
             }
+
+            return true;
+
+        }
+        finally
+        {
+            // Always cleanup the GDI objects from GetIconInfoEx
+            iconInfo.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Extracts a 32-bit color bitmap from a native handle and determines whether the bitmap contains an alpha channel.
+    /// </summary>
+    /// <remarks>The returned bitmap uses premultiplied alpha format to prevent color distortion. If the
+    /// source bitmap does not contain an alpha channel, the method forces all pixels to be fully opaque.</remarks>
+    /// <param name="hbmColor">A handle to the native color bitmap to extract. Must not be zero.</param>
+    /// <param name="width">The width, in pixels, of the bitmap to extract. Must be greater than zero.</param>
+    /// <param name="height">The height, in pixels, of the bitmap to extract. Must be greater than zero.</param>
+    /// <param name="hasAlpha">When the method returns, contains a value indicating whether the extracted bitmap includes an alpha channel.</param>
+    /// <returns>A 32-bit color bitmap representing the extracted image, or null if extraction fails or the parameters are
+    /// invalid.</returns>
+    private static Bitmap ExtractRawColorBitmap(SafeHBitmapHandle hbmColor, int width, int height, out bool hasAlpha)
+    {
+        hasAlpha = false;
+        if (hbmColor.IsInvalid || width <= 0 || height <= 0) return null;
+
+        // Using PArgb (Premultiplied) prevents .NET from artificially darkening white edges
+        Bitmap bmp = new Bitmap(width, height, PixelFormat.Format32bppPArgb);
+        BitmapData data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
+
+        BitmapInfoHeader bitmapInfoHeader = BitmapInfoHeader.Create(width, -height, 32);
+        bitmapInfoHeader.SizeImage = 0;
+
+        IntPtr hdc = User32Api.GetDC(IntPtr.Zero);
+        int result = Gdi32Api.GetDIBits(hdc, hbmColor, 0, (uint)height, data.Scan0, ref bitmapInfoHeader, 0);
+        User32Api.ReleaseDC(IntPtr.Zero, hdc);
+
+        if (result == 0)
+        {
+            bmp.UnlockBits(data);
+            bmp.Dispose();
+            return null;
+        }
+
+        unsafe
+        {
+            byte* ptr = (byte*)data.Scan0;
+            int bytes = width * height * 4;
+
+            // Scan to see if an alpha channel actually exists
+            for (int i = 3; i < bytes; i += 4)
+            {
+                if (ptr[i] != 0)
+                {
+                    hasAlpha = true;
+                    break;
+                }
+            }
+
+            // If it's a legacy cursor with no alpha channel, force it to opaque
+            if (!hasAlpha)
+            {
+                for (int i = 3; i < bytes; i += 4)
+                {
+                    ptr[i] = 255;
+                }
+            }
+        }
+
+        bmp.UnlockBits(data);
+        return bmp;
+    }
+
+    /// <summary>
+    /// Creates a bitmap image from the specified Windows icon handle at the given size.
+    /// </summary>
+    /// <remarks>The resulting bitmap is initialized with a transparent background before the icon is drawn.
+    /// Ensure that the provided icon handle is valid and that the size parameter is appropriate for the intended
+    /// use.</remarks>
+    /// <param name="hIcon">A handle to the icon to convert. This parameter must not be zero or invalid.</param>
+    /// <param name="width">The width, in pixels, of the resulting bitmap. Must be a positive integer.</param>
+    /// <param name="height">The height, in pixels, of the resulting bitmap. Must be a positive integer.</param>
+    /// <param name="flags">int with 0x0003 = DI_NORMAL (Draw Image + Draw Mask), 0x0002 = DI_IMAGE (Draw Image Only), 0x0001 = DI_MASK (Draw Mask Only)</param>
+    /// <param name="pixelFormat">PixelFormat</param>
+    /// <returns>A Bitmap object that represents the icon specified by the hIcon parameter, rendered at the specified size.</returns>
+    public static Bitmap BitmapFromHIcon(IntPtr hIcon, int width, int height, DrawIconExFlags flags = DrawIconExFlags.DI_NORMAL, PixelFormat pixelFormat = PixelFormat.Undefined)
+    {
+        PixelFormat format;
+        if (pixelFormat != PixelFormat.Undefined) {
+            format = pixelFormat;
         } else {
-            throw new Win32Exception(Marshal.GetLastWin32Error());
+            format = (flags == DrawIconExFlags.DI_MASK || flags == DrawIconExFlags.DI_IMAGE) ? PixelFormat.Format24bppRgb : PixelFormat.Format32bppArgb;
         }
+        Bitmap bmp = new Bitmap(width, height, format);
+        using (Graphics g = Graphics.FromImage(bmp))
+        {
+            // Check what background color we need based on the type of icon and pixel format:
+            if (format == PixelFormat.Format24bppRgb)
+            {
+                if (flags == DrawIconExFlags.DI_MASK)
+                {
+                    // For DI_MASK: We want the "Background" to be Transparent (White in GDI mask logic).
+                    // So SRCAND leaves the screenshot alone in empty areas.
+                    // If we used Black (Transparent), the whole box would become Opaque.
+                    g.Clear(Color.White);
+                }
+                else
+                {
+                    // For DI_IMAGE: We want the "Background" to be Neutral (Black in XOR logic).
+                    // So SRCINVERT doesn't change the screenshot in empty areas.
+                    g.Clear(Color.Black);
+                }
+            }
+            else
+            {
+                // For 32-bit standard transparent is fine.
+                g.Clear(Color.Transparent);
+            }
 
-        return true;
+            NativeIconMethods.DrawIconEx(g.GetHdc(), 0, 0, hIcon, width, height, 0, IntPtr.Zero, flags);
+            g.ReleaseHdc();
+        }
+        return bmp;
     }
 
     /// <summary>
@@ -210,7 +345,7 @@ public static class CursorHelper
         string lower = moduleName.ToLowerInvariant();
 
         // Standard Windows cursors live here
-        if (lower.Contains("user32.dll"))
+        if (lower.Contains("user32"))
         {
             return true;
         }
@@ -223,5 +358,103 @@ public static class CursorHelper
         // Sometimes they come from main.cpl (mouse settings)
         return lower.Contains("main.cpl");
     }
+
+    /// <summary>
+    /// Draws the specified cursor image onto the provided graphics context at the given position, applying appropriate
+    /// blending techniques based on the cursor type.
+    /// </summary>
+    /// <remarks>This method supports both modern system cursors and legacy XOR/mask cursors, utilizing
+    /// different drawing strategies based on the cursor's properties. It handles transparency and blending
+    /// appropriately for each case.</remarks>
+    /// <param name="targetGraphics">The graphics context where the cursor will be drawn. This must not be null.</param>
+    /// <param name="cursor">The cursor to be drawn, represented as a CapturedCursor containing the color and mask layers. This must not be
+    /// null, and the ColorLayer must be available.</param>
+    /// <param name="position">The position on the graphics context where the cursor will be drawn, specified as a NativePoint. The cursor will
+    /// be offset by its hot spot.</param>
+    /// <param name="destinationSize">NativeSize</param>
+    public static void DrawCursorOnGraphics(Graphics targetGraphics, CapturedCursor cursor, NativePoint position, NativeSize destinationSize = default)
+    {
+        if (cursor == null || cursor.ColorLayer == null) return;
+
+        // Calculate target position
+        int x = position.X;// - cursor.HotSpot.X;
+        int y = position.Y;// - cursor.HotSpot.Y;
+
+        int sourceWidth = cursor.Size.Width;
+        int sourceHeight = cursor.Size.Height;
+        if (destinationSize.IsEmpty)
+        {
+            destinationSize = new NativeSize(sourceWidth, sourceHeight);
+        }
+
+        // If it's a modern cursor, standard GDI+ drawing is sufficient and supports transparency best.
+        if (cursor.MaskLayer == null)
+        {
+            var state = targetGraphics.Save();
+            targetGraphics.SmoothingMode = SmoothingMode.HighQuality;
+            targetGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            targetGraphics.CompositingQuality = CompositingQuality.HighQuality;
+            targetGraphics.PixelOffsetMode = PixelOffsetMode.Half;
+            using (ImageAttributes wrapMode = new ImageAttributes())
+            {
+                wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                Rectangle destRect = new Rectangle(x, y, destinationSize.Width, destinationSize.Height);
+                targetGraphics.DrawImage(cursor.ColorLayer,destRect, 0, 0, sourceWidth, sourceWidth, GraphicsUnit.Pixel, wrapMode);
+            }
+            targetGraphics.Restore(state);
+            return;
+        }
+
+        Point[] pts = { new Point(position.X, position.Y) };
+        targetGraphics.TransformPoints(CoordinateSpace.Device, CoordinateSpace.World, pts);
+        position = new NativePoint(pts[0].X,  pts[0].Y);
+
+        // We need BitBlt to perform bitwise operations (AND / XOR).
+
+        // Get the handle to the destination device context (The screenshot)
+        using var hdcDest = SafeGraphicsDcHandle.FromGraphics(targetGraphics);
+
+        // Create a memory DC to hold our source bitmaps temporarily
+        using var hdcSrc = Gdi32Api.CreateCompatibleDC(hdcDest);
+
+        // Convert GDI+ Bitmaps to GDI Handles (HBITMAP)
+        // We need raw handles for BitBlt/StretchBlt. 
+        // Note: GetHbitmap() creates a copy, so we must delete it after.
+        using var hbmMask = new SafeHBitmapHandle(cursor.MaskLayer.GetHbitmap());
+
+        // Apply mask, by selecting the Mask into the source DC
+        var hbmOld = Gdi32Api.SelectObject(hdcSrc, hbmMask);
+        if (hbmOld.IsInvalid)
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+        // Operation: SRCAND (0x008800C6)
+        // Logic: Dest = Dest AND Source
+        // Result: 
+        // - Where Mask is White (1), Dest stays Dest. (Transparent area)
+        // - Where Mask is Black (0), Dest becomes Black. (Cutout for cursor)
+        if (!Gdi32Api.StretchBlt(hdcDest, x, y, destinationSize.Width, destinationSize.Height, hdcSrc, 0, 0, sourceWidth, sourceHeight, RasterOperations.SourceAnd))
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        using var hbmColor = new SafeHBitmapHandle(cursor.ColorLayer.GetHbitmap());
+        // Apply image by select the image into the source DC
+        Gdi32Api.SelectObject(hdcSrc, hbmColor);
+
+        // Operation: SRCINVERT (0x00660046) -> This is XOR
+        // Logic: Dest = Dest XOR Source
+        // Result:
+        // - In the "Cutout" (Black): 0 XOR Color = Color. (Normal drawing)
+        // - In the "Transparent" (Background): Dest XOR White = Inverted Dest. (XOR effect)
+        if (!Gdi32Api.StretchBlt(hdcDest, x, y, destinationSize.Width, destinationSize.Height, hdcSrc, 0, 0, sourceWidth, sourceHeight, RasterOperations.SourceInvert))
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        // Restore cleanup
+        Gdi32Api.SelectObject(hdcSrc, hbmOld);
+    }
+
 }
 #endif

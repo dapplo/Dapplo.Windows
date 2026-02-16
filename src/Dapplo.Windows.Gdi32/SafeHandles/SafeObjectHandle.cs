@@ -20,7 +20,7 @@ public abstract class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
     }
 
     /// <summary>
-    ///     Call DeleteObject
+    ///     Calls DeleteObject
     /// </summary>
     /// <returns>true if this worked</returns>
     protected override bool ReleaseHandle()

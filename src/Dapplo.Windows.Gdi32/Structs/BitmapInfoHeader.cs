@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Gdi32.Enums;
 
@@ -202,14 +203,14 @@ public struct BitmapInfoHeader
         return new BitmapInfoHeader
         {
             // BITMAPINFOHEADER < DIBV5 is 40 bytes
-            _biSize = (uint) Marshal.SizeOf(typeof(BitmapV4Header)),
+            _biSize = (uint) Marshal.SizeOf(typeof(BitmapInfoHeader)),
             // Should always be 1
             _biPlanes = 1,
             _biCompression = BitmapCompressionMethods.BI_RGB,
             _biWidth = width,
             _biHeight = height,
             _biBitCount = bpp,
-            _biSizeImage = (uint) (width * height * (bpp >> 3)),
+            _biSizeImage = (uint) (width * Math.Abs(height) * (bpp >> 3)),
             _biXPelsPerMeter = 0,
             _biYPelsPerMeter = 0,
             _biClrUsed = 0,

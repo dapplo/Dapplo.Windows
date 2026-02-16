@@ -1,12 +1,9 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Gdi32;
 using Dapplo.Windows.Gdi32.SafeHandles;
-using Dapplo.Windows.User32;
 using System;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
 
 namespace Dapplo.Windows.Icons.Structs;
 
@@ -17,16 +14,18 @@ namespace Dapplo.Windows.Icons.Structs;
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
 public unsafe struct IconInfoEx
 {
-	private int _cbSize;
-	private bool _fIcon;
-	private int _xHotspot;
-	private int _yHotspot;
-	private readonly IntPtr _hbmMask;
-	private readonly IntPtr _hbmColor;
-	private readonly ushort _wResID;
+    private uint _cbSize;
+    private bool _fIcon;
+    private int _xHotspot;
+    private int _yHotspot;
+    private readonly IntPtr _hbmMask;
+    private readonly IntPtr _hbmColor;
+    private readonly ushort _wResID;
 
-    private fixed char _szModName[260];
-    private fixed char _szResName[260];
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+    private string _szModName;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+    private string _szResName;
 
     /// <summary>
     /// Specifies whether this structure defines an icon or a cursor.
@@ -79,32 +78,12 @@ public unsafe struct IconInfoEx
     ///     Name of the module from which an icon or a cursor was loaded.
     ///     You can use GetModuleHandle function to convert it to the module handle compatible with the resource-management functions.
     /// </summary>
-    public string ModuleName
-    {
-        get
-        {
-            fixed (char* moduleName = _szModName)
-            {
-                return new string(moduleName);
-            }
-
-        }
-    }
+    public string ModuleName => _szModName;
 
     /// <summary>
     ///     Resource name of the resource in ModuleName module.
     /// </summary>
-    public string ResourceName
-    {
-        get
-        {
-            fixed (char* resourceName = _szResName)
-            {
-                return new string(resourceName);
-            }
-
-        }
-    }
+    public string ResourceName => _szResName;
 
     /// <summary>
     ///     Create a IconInfoEx with defaults
@@ -113,7 +92,18 @@ public unsafe struct IconInfoEx
     {
         return new IconInfoEx
         {
-            _cbSize = Marshal.SizeOf(typeof(IconInfoEx))
+            _cbSize = (uint)Marshal.SizeOf(typeof(IconInfoEx))
         };
+    }
+
+    /// <summary>
+    /// Releases all resources used by the current instance of the class.
+    /// </summary>
+    /// <remarks>Call this method when the object is no longer needed to ensure that all unmanaged resources
+    /// are properly released. Failing to call Dispose may result in resource leaks.</remarks>
+    public void Dispose()
+    {
+        ColorBitmapHandle.Dispose();
+        BitmaskBitmapHandle.Dispose();
     }
 }

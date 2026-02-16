@@ -1240,6 +1240,22 @@ public static class User32Api
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool GetCursorInfo(ref CursorInfo cursorInfo);
 
+    /// <summary>
+    /// Destroys the specified cursor and releases any resources associated with it.
+    /// </summary>
+    /// <param name="hCursor">A handle to the cursor to be destroyed. The handle must have been created by the application.</param>
+    /// <returns>true if the cursor was successfully destroyed; otherwise, false.</returns>
     [DllImport(User32Api.User32, SetLastError = true)]
     internal static extern bool DestroyCursor(IntPtr hCursor);
+
+
+    /// <summary>
+    /// Fills a rectangle by using the specified brush and logical device context.
+    /// </summary>
+    /// <param name="hDC">A handle to the device context in which the rectangle is to be filled.</param>
+    /// <param name="lprc">A reference to a NativeRect structure that specifies the logical coordinates of the rectangle to be filled.</param>
+    /// <param name="hbr">A handle to the brush used to fill the rectangle.</param>
+    /// <returns>If the function succeeds, the return value is nonzero. If the function fails, the return value is zero.</returns>
+    [DllImport(User32Api.User32, SetLastError = true)]
+    public static extern int FillRect(IntPtr hDC, [In] ref NativeRect lprc, IntPtr hbr);
 }

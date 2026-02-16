@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dapplo.Windows.Gdi32.Enums;
 using Dapplo.Windows.Icons.Enums;
 using Dapplo.Windows.Icons.SafeHandles;
 using Dapplo.Windows.Icons.Structs;
@@ -24,6 +25,14 @@ public static class NativeIconMethods
     /// <returns>SafeIconHandle</returns>
     [DllImport(User32Api.User32, SetLastError = true)]
     public static extern SafeIconHandle CopyIcon(SafeIconHandle hIcon);
+
+    /// <summary>
+    ///     The following is used for Icon handling, and copies a hicon to a new
+    /// </summary>
+    /// <param name="hIcon">SafeIconHandle</param>
+    /// <returns>IntPtr</returns>
+    [DllImport(User32Api.User32, SetLastError = true)]
+    public static extern SafeIconHandle CopyIcon(IntPtr hIcon);
 
     /// <summary>
     /// Destroys an icon and frees any memory the icon occupied.
@@ -174,5 +183,5 @@ public static class NativeIconMethods
 
 
     [DllImport(User32Api.User32, SetLastError = true)]
-    internal static extern bool DrawIconEx(IntPtr hdc, int xLeft, int yTop, IntPtr hIcon, int cxWidth, int cyWidth, int istepIfAniCur, IntPtr hbrFlickerFreeDraw, int diFlags);
+    internal static extern bool DrawIconEx(IntPtr hdc, int xLeft, int yTop, IntPtr hIcon, int cxWidth, int cyWidth, int istepIfAniCur, IntPtr hbrFlickerFreeDraw, DrawIconExFlags diFlags);
 }
