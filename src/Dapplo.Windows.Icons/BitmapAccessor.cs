@@ -17,6 +17,44 @@ namespace Dapplo.Windows.Icons;
 /// This class provides a safe abstraction for accessing bitmap pixel data using modern Span&lt;&gt; types.
 /// It supports both 32-bit ARGB and 24-bit RGB formats. The bitmap is locked during access to prevent
 /// corruption, and automatically unlocked when disposed.
+/// 
+/// <example>
+/// Basic usage with manual row access:
+/// <code>
+/// var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+/// using (var accessor = new BitmapAccessor(bitmap, readOnly: false))
+/// {
+///     for (int y = 0; y &lt; accessor.Height; y++)
+///     {
+///         var row = accessor.GetRowSpan(y);
+///         for (int x = 0; x &lt; accessor.Width; x++)
+///         {
+///             int offset = x * accessor.BytesPerPixel;
+///             row[offset] = blue;      // B
+///             row[offset + 1] = green; // G
+///             row[offset + 2] = red;   // R
+///             row[offset + 3] = alpha; // A
+///         }
+///     }
+/// }
+/// </code>
+/// 
+/// Using ProcessRows for simpler iteration:
+/// <code>
+/// bitmap.ProcessPixelRows(accessor =>
+/// {
+///     accessor.ProcessRows((y, row) =>
+///     {
+///         // Process each row
+///         for (int x = 0; x &lt; accessor.Width; x++)
+///         {
+///             int offset = x * accessor.BytesPerPixel;
+///             // Modify pixels...
+///         }
+///     });
+/// });
+/// </code>
+/// </example>
 /// </remarks>
 public sealed class BitmapAccessor : IDisposable
 {

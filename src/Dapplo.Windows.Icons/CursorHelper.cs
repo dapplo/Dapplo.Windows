@@ -464,6 +464,26 @@ public static class CursorHelper
     /// This method uses Span-based pixel access for efficient bitmap manipulation and supports both
     /// modern alpha-blended cursors and legacy XOR/mask cursors. For legacy cursors, it properly applies
     /// the AND mask followed by the XOR operation to achieve the correct visual effect.
+    /// 
+    /// <example>
+    /// Basic usage:
+    /// <code>
+    /// // Capture the current cursor
+    /// if (CursorHelper.TryGetCurrentCursor(out var cursor))
+    /// {
+    ///     // Create or use an existing bitmap
+    ///     var bitmap = new Bitmap(800, 600, PixelFormat.Format32bppArgb);
+    ///     
+    ///     // Draw the cursor at position (100, 100)
+    ///     CursorHelper.DrawCursorOnBitmap(bitmap, cursor, new NativePoint(100, 100));
+    ///     
+    ///     // Optionally scale the cursor
+    ///     CursorHelper.DrawCursorOnBitmap(bitmap, cursor, new NativePoint(200, 200), new NativeSize(64, 64));
+    ///     
+    ///     cursor.Dispose();
+    /// }
+    /// </code>
+    /// </example>
     /// </remarks>
     /// <param name="targetBitmap">The bitmap to draw the cursor onto.</param>
     /// <param name="cursor">The captured cursor data to draw.</param>
