@@ -72,5 +72,35 @@ public struct Bgra32 : IEquatable<Bgra32>
 
     /// <inheritdoc/>
     public override string ToString() => $"Bgra32({R}, {G}, {B}, {A})";
+
+    /// <summary>
+    /// Alpha blends a source pixel onto this target pixel.
+    /// </summary>
+    /// <param name="target">The target pixel to blend onto (modified in place).</param>
+    /// <param name="source">The source pixel to blend from.</param>
+    public static void AlphaBlend(ref Bgra32 target, in Bgra32 source)
+    {
+        if (source.A == 0)
+        {
+            // Fully transparent, no change
+            return;
+        }
+
+        if (source.A == 255)
+        {
+            // Fully opaque, direct copy
+            target = source;
+        }
+        else
+        {
+            // Alpha blending
+            int alpha = source.A;
+            int invAlpha = 255 - alpha;
+            target.B = (byte)((source.B * alpha + target.B * invAlpha) / 255);
+            target.G = (byte)((source.G * alpha + target.G * invAlpha) / 255);
+            target.R = (byte)((source.R * alpha + target.R * invAlpha) / 255);
+            target.A = 255; // Result is opaque
+        }
+    }
 }
 #endif

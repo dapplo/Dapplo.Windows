@@ -65,5 +65,37 @@ public struct Bgr24 : IEquatable<Bgr24>
 
     /// <inheritdoc/>
     public override string ToString() => $"Bgr24({R}, {G}, {B})";
+
+    /// <summary>
+    /// Alpha blends a source pixel with alpha channel onto this target pixel.
+    /// Since Bgr24 has no alpha channel, the result is always opaque.
+    /// </summary>
+    /// <param name="target">The target pixel to blend onto (modified in place).</param>
+    /// <param name="source">The source pixel to blend from (with alpha channel).</param>
+    public static void AlphaBlend(ref Bgr24 target, in Bgra32 source)
+    {
+        if (source.A == 0)
+        {
+            // Fully transparent, no change
+            return;
+        }
+
+        if (source.A == 255)
+        {
+            // Fully opaque, direct copy (without alpha)
+            target.R = source.R;
+            target.G = source.G;
+            target.B = source.B;
+        }
+        else
+        {
+            // Alpha blending onto opaque background
+            int alpha = source.A;
+            int invAlpha = 255 - alpha;
+            target.B = (byte)((source.B * alpha + target.B * invAlpha) / 255);
+            target.G = (byte)((source.G * alpha + target.G * invAlpha) / 255);
+            target.R = (byte)((source.R * alpha + target.R * invAlpha) / 255);
+        }
+    }
 }
 #endif

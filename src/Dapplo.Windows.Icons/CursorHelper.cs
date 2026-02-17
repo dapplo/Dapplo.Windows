@@ -645,55 +645,14 @@ public static class CursorHelper
                 if (typeof(TTarget) == typeof(Bgra32))
                 {
                     ref var targetPixel = ref Unsafe.As<TTarget, Bgra32>(ref targetRow[tx]);
-                    AlphaBlendBgra32(ref targetPixel, in cursorPixel);
+                    Bgra32.AlphaBlend(ref targetPixel, in cursorPixel);
                 }
                 else // Bgr24
                 {
                     ref var targetPixel = ref Unsafe.As<TTarget, Bgr24>(ref targetRow[tx]);
-                    AlphaBlendBgr24(ref targetPixel, in cursorPixel);
+                    Bgr24.AlphaBlend(ref targetPixel, in cursorPixel);
                 }
             }
-        }
-    }
-
-    /// <summary>
-    /// Alpha blend a cursor pixel onto a Bgra32 target pixel.
-    /// </summary>
-    private static void AlphaBlendBgra32(ref Bgra32 target, in Bgra32 source)
-    {
-        if (source.A == 255)
-        {
-            target = source;
-        }
-        else
-        {
-            int alpha = source.A;
-            int invAlpha = 255 - alpha;
-            target.B = (byte)((source.B * alpha + target.B * invAlpha) / 255);
-            target.G = (byte)((source.G * alpha + target.G * invAlpha) / 255);
-            target.R = (byte)((source.R * alpha + target.R * invAlpha) / 255);
-            target.A = 255;
-        }
-    }
-
-    /// <summary>
-    /// Alpha blend a cursor pixel onto a Bgr24 target pixel.
-    /// </summary>
-    private static void AlphaBlendBgr24(ref Bgr24 target, in Bgra32 source)
-    {
-        if (source.A == 255)
-        {
-            target.R = source.R;
-            target.G = source.G;
-            target.B = source.B;
-        }
-        else
-        {
-            int alpha = source.A;
-            int invAlpha = 255 - alpha;
-            target.B = (byte)((source.B * alpha + target.B * invAlpha) / 255);
-            target.G = (byte)((source.G * alpha + target.G * invAlpha) / 255);
-            target.R = (byte)((source.R * alpha + target.R * invAlpha) / 255);
         }
     }
 
