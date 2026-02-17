@@ -555,21 +555,24 @@ public static class CursorHelper
     /// </summary>
     private static void DrawAlphaCursorOnBitmap(Bitmap targetBitmap, Bitmap cursorBitmap, int x, int y)
     {
-        // Ensure the cursor bitmap has alpha channel
-        if (cursorBitmap.PixelFormat != PixelFormat.Format32bppArgb &&
-            cursorBitmap.PixelFormat != PixelFormat.Format32bppPArgb)
+        Bitmap convertedBitmap = null;
+        try
         {
-            // Convert to ARGB if needed
-            var converted = new Bitmap(cursorBitmap.Width, cursorBitmap.Height, PixelFormat.Format32bppArgb);
-            using (var g = Graphics.FromImage(converted))
+            // Ensure the cursor bitmap has alpha channel
+            if (cursorBitmap.PixelFormat != PixelFormat.Format32bppArgb &&
+                cursorBitmap.PixelFormat != PixelFormat.Format32bppPArgb)
             {
-                g.DrawImage(cursorBitmap, 0, 0, cursorBitmap.Width, cursorBitmap.Height);
+                // Convert to ARGB if needed
+                convertedBitmap = new Bitmap(cursorBitmap.Width, cursorBitmap.Height, PixelFormat.Format32bppArgb);
+                using (var g = Graphics.FromImage(convertedBitmap))
+                {
+                    g.DrawImage(cursorBitmap, 0, 0, cursorBitmap.Width, cursorBitmap.Height);
+                }
+                cursorBitmap = convertedBitmap;
             }
-            cursorBitmap = converted;
-        }
 
-        using var targetAccessor = new BitmapAccessor(targetBitmap, readOnly: false);
-        using var cursorAccessor = new BitmapAccessor(cursorBitmap, readOnly: true);
+            using var targetAccessor = new BitmapAccessor(targetBitmap, readOnly: false);
+            using var cursorAccessor = new BitmapAccessor(cursorBitmap, readOnly: true);
 
         int cursorWidth = cursorBitmap.Width;
         int cursorHeight = cursorBitmap.Height;
@@ -652,6 +655,11 @@ public static class CursorHelper
                     }
                 }
             }
+        }
+        }
+        finally
+        {
+            convertedBitmap?.Dispose();
         }
     }
 

@@ -63,6 +63,11 @@ public sealed class BitmapAccessor : IDisposable
     }
 
     /// <summary>
+    /// Gets the number of bytes required to store pixel data for one row (excluding padding).
+    /// </summary>
+    public int RowWidthInBytes => Width * BytesPerPixel;
+
+    /// <summary>
     /// Initializes a new instance of the BitmapAccessor class.
     /// </summary>
     /// <param name="bitmap">The bitmap to access.</param>
@@ -91,6 +96,11 @@ public sealed class BitmapAccessor : IDisposable
     /// <summary>
     /// Gets a span representing a single row of pixel data.
     /// </summary>
+    /// <remarks>
+    /// The returned span includes the full stride, which may contain padding bytes after the pixel data.
+    /// This method correctly handles both top-down and bottom-up bitmaps (negative stride).
+    /// For pixel access, use offsets calculated as: pixelIndex * BytesPerPixel.
+    /// </remarks>
     /// <param name="y">The zero-based row index.</param>
     /// <returns>A span of bytes representing the pixel data for the specified row.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when y is outside the bounds of the bitmap.</exception>
@@ -101,6 +111,10 @@ public sealed class BitmapAccessor : IDisposable
             throw new ArgumentOutOfRangeException(nameof(y), $"Row index {y} is out of range [0, {Height}).");
         }
 
+        // Note: _bitmapData.Stride can be negative for bottom-up bitmaps.
+        // The pointer arithmetic correctly handles both cases:
+        // - Top-down: Scan0 is row 0, positive stride moves down
+        // - Bottom-up: Scan0 is last row, negative stride moves up
         var ptr = (byte*)_bitmapData.Scan0 + (y * _bitmapData.Stride);
         return new Span<byte>(ptr, Stride);
     }
