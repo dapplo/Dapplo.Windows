@@ -456,5 +456,281 @@ public static class CursorHelper
         Gdi32Api.SelectObject(hdcSrc, hbmOld);
     }
 
+    /// <summary>
+    /// Draws a captured cursor onto a bitmap at the specified position using pixel-level bitmap operations.
+    /// This method is more reliable than DrawCursorOnGraphics when working directly with Bitmap objects.
+    /// </summary>
+    /// <remarks>
+    /// This method uses Span-based pixel access for efficient bitmap manipulation and supports both
+    /// modern alpha-blended cursors and legacy XOR/mask cursors. For legacy cursors, it properly applies
+    /// the AND mask followed by the XOR operation to achieve the correct visual effect.
+    /// </remarks>
+    /// <param name="targetBitmap">The bitmap to draw the cursor onto.</param>
+    /// <param name="cursor">The captured cursor data to draw.</param>
+    /// <param name="position">The position at which to draw the cursor (typically mouse coordinates).</param>
+    /// <param name="destinationSize">Optional size to scale the cursor. If empty, uses the cursor's natural size.</param>
+    /// <exception cref="ArgumentNullException">Thrown when targetBitmap or cursor is null.</exception>
+    /// <exception cref="NotSupportedException">Thrown when the target bitmap's pixel format is not supported.</exception>
+    public static void DrawCursorOnBitmap(Bitmap targetBitmap, CapturedCursor cursor, NativePoint position, NativeSize destinationSize = default)
+    {
+        if (targetBitmap == null)
+        {
+            throw new ArgumentNullException(nameof(targetBitmap));
+        }
+        if (cursor == null || cursor.ColorLayer == null)
+        {
+            return;
+        }
+
+        // Calculate target position
+        int x = position.X;
+        int y = position.Y;
+
+        int sourceWidth = cursor.Size.Width;
+        int sourceHeight = cursor.Size.Height;
+        if (destinationSize.IsEmpty)
+        {
+            destinationSize = new NativeSize(sourceWidth, sourceHeight);
+        }
+
+        // Determine if we need to scale
+        bool needsScaling = destinationSize.Width != sourceWidth || destinationSize.Height != sourceHeight;
+
+        // For modern cursors (no mask), use standard alpha blending
+        if (cursor.MaskLayer == null)
+        {
+            // Scale if needed
+            Bitmap cursorToUse = cursor.ColorLayer;
+            if (needsScaling)
+            {
+                cursorToUse = new Bitmap(cursor.ColorLayer, destinationSize.Width, destinationSize.Height);
+            }
+
+            try
+            {
+                DrawAlphaCursorOnBitmap(targetBitmap, cursorToUse, x, y);
+            }
+            finally
+            {
+                if (needsScaling && cursorToUse != cursor.ColorLayer)
+                {
+                    cursorToUse.Dispose();
+                }
+            }
+            return;
+        }
+
+        // For legacy cursors with mask, apply AND/XOR operations
+        Bitmap scaledColor = cursor.ColorLayer;
+        Bitmap scaledMask = cursor.MaskLayer;
+
+        if (needsScaling)
+        {
+            scaledColor = new Bitmap(cursor.ColorLayer, destinationSize.Width, destinationSize.Height);
+            scaledMask = new Bitmap(cursor.MaskLayer, destinationSize.Width, destinationSize.Height);
+        }
+
+        try
+        {
+            DrawMaskedCursorOnBitmap(targetBitmap, scaledColor, scaledMask, x, y);
+        }
+        finally
+        {
+            if (needsScaling)
+            {
+                if (scaledColor != cursor.ColorLayer)
+                {
+                    scaledColor.Dispose();
+                }
+                if (scaledMask != cursor.MaskLayer)
+                {
+                    scaledMask.Dispose();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Draws a modern alpha-blended cursor onto a bitmap.
+    /// </summary>
+    private static void DrawAlphaCursorOnBitmap(Bitmap targetBitmap, Bitmap cursorBitmap, int x, int y)
+    {
+        // Ensure the cursor bitmap has alpha channel
+        if (cursorBitmap.PixelFormat != PixelFormat.Format32bppArgb &&
+            cursorBitmap.PixelFormat != PixelFormat.Format32bppPArgb)
+        {
+            // Convert to ARGB if needed
+            var converted = new Bitmap(cursorBitmap.Width, cursorBitmap.Height, PixelFormat.Format32bppArgb);
+            using (var g = Graphics.FromImage(converted))
+            {
+                g.DrawImage(cursorBitmap, 0, 0, cursorBitmap.Width, cursorBitmap.Height);
+            }
+            cursorBitmap = converted;
+        }
+
+        using var targetAccessor = new BitmapAccessor(targetBitmap, readOnly: false);
+        using var cursorAccessor = new BitmapAccessor(cursorBitmap, readOnly: true);
+
+        int cursorWidth = cursorBitmap.Width;
+        int cursorHeight = cursorBitmap.Height;
+
+        for (int cy = 0; cy < cursorHeight; cy++)
+        {
+            int ty = y + cy;
+            if (ty < 0 || ty >= targetAccessor.Height) continue;
+
+            var targetRow = targetAccessor.GetRowSpan(ty);
+            var cursorRow = cursorAccessor.GetRowSpan(cy);
+
+            for (int cx = 0; cx < cursorWidth; cx++)
+            {
+                int tx = x + cx;
+                if (tx < 0 || tx >= targetAccessor.Width) continue;
+
+                int cursorOffset = cx * 4; // ARGB = 4 bytes per pixel
+                int targetOffset = tx * targetAccessor.BytesPerPixel;
+
+                byte cursorB = cursorRow[cursorOffset];
+                byte cursorG = cursorRow[cursorOffset + 1];
+                byte cursorR = cursorRow[cursorOffset + 2];
+                byte cursorA = cursorRow[cursorOffset + 3];
+
+                if (cursorA == 0)
+                {
+                    // Fully transparent, skip
+                    continue;
+                }
+
+                if (targetAccessor.BytesPerPixel == 4)
+                {
+                    // 32-bit target: Alpha blend
+                    if (cursorA == 255)
+                    {
+                        // Fully opaque, direct copy
+                        targetRow[targetOffset] = cursorB;
+                        targetRow[targetOffset + 1] = cursorG;
+                        targetRow[targetOffset + 2] = cursorR;
+                        targetRow[targetOffset + 3] = 255;
+                    }
+                    else
+                    {
+                        // Alpha blending
+                        byte targetB = targetRow[targetOffset];
+                        byte targetG = targetRow[targetOffset + 1];
+                        byte targetR = targetRow[targetOffset + 2];
+
+                        int alpha = cursorA;
+                        int invAlpha = 255 - alpha;
+
+                        targetRow[targetOffset] = (byte)((cursorB * alpha + targetB * invAlpha) / 255);
+                        targetRow[targetOffset + 1] = (byte)((cursorG * alpha + targetG * invAlpha) / 255);
+                        targetRow[targetOffset + 2] = (byte)((cursorR * alpha + targetR * invAlpha) / 255);
+                        targetRow[targetOffset + 3] = 255;
+                    }
+                }
+                else // 24-bit target
+                {
+                    // For 24-bit, we need to blend assuming opaque background
+                    if (cursorA == 255)
+                    {
+                        targetRow[targetOffset] = cursorB;
+                        targetRow[targetOffset + 1] = cursorG;
+                        targetRow[targetOffset + 2] = cursorR;
+                    }
+                    else
+                    {
+                        byte targetB = targetRow[targetOffset];
+                        byte targetG = targetRow[targetOffset + 1];
+                        byte targetR = targetRow[targetOffset + 2];
+
+                        int alpha = cursorA;
+                        int invAlpha = 255 - alpha;
+
+                        targetRow[targetOffset] = (byte)((cursorB * alpha + targetB * invAlpha) / 255);
+                        targetRow[targetOffset + 1] = (byte)((cursorG * alpha + targetG * invAlpha) / 255);
+                        targetRow[targetOffset + 2] = (byte)((cursorR * alpha + targetR * invAlpha) / 255);
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Draws a legacy cursor with mask using AND/XOR operations.
+    /// </summary>
+    private static void DrawMaskedCursorOnBitmap(Bitmap targetBitmap, Bitmap colorBitmap, Bitmap maskBitmap, int x, int y)
+    {
+        using var targetAccessor = new BitmapAccessor(targetBitmap, readOnly: false);
+        using var colorAccessor = new BitmapAccessor(colorBitmap, readOnly: true);
+        using var maskAccessor = new BitmapAccessor(maskBitmap, readOnly: true);
+
+        int cursorWidth = colorBitmap.Width;
+        int cursorHeight = colorBitmap.Height;
+
+        for (int cy = 0; cy < cursorHeight; cy++)
+        {
+            int ty = y + cy;
+            if (ty < 0 || ty >= targetAccessor.Height) continue;
+
+            var targetRow = targetAccessor.GetRowSpan(ty);
+            var colorRow = colorAccessor.GetRowSpan(cy);
+            var maskRow = maskAccessor.GetRowSpan(cy);
+
+            for (int cx = 0; cx < cursorWidth; cx++)
+            {
+                int tx = x + cx;
+                if (tx < 0 || tx >= targetAccessor.Width) continue;
+
+                int colorOffset = cx * colorAccessor.BytesPerPixel;
+                int maskOffset = cx * maskAccessor.BytesPerPixel;
+                int targetOffset = tx * targetAccessor.BytesPerPixel;
+
+                // Read mask pixel (assuming grayscale or all channels same)
+                byte maskValue = maskRow[maskOffset];
+
+                // Read color pixel
+                byte colorB, colorG, colorR;
+                if (colorAccessor.BytesPerPixel == 4)
+                {
+                    colorB = colorRow[colorOffset];
+                    colorG = colorRow[colorOffset + 1];
+                    colorR = colorRow[colorOffset + 2];
+                }
+                else // 24-bit
+                {
+                    colorB = colorRow[colorOffset];
+                    colorG = colorRow[colorOffset + 1];
+                    colorR = colorRow[colorOffset + 2];
+                }
+
+                // Read target pixel
+                byte targetB = targetRow[targetOffset];
+                byte targetG = targetRow[targetOffset + 1];
+                byte targetR = targetRow[targetOffset + 2];
+
+                // Apply AND operation with mask
+                // Where mask is white (255), target stays as is
+                // Where mask is black (0), target becomes black
+                targetB = (byte)(targetB & maskValue);
+                targetG = (byte)(targetG & maskValue);
+                targetR = (byte)(targetR & maskValue);
+
+                // Apply XOR operation with color
+                targetB = (byte)(targetB ^ colorB);
+                targetG = (byte)(targetG ^ colorG);
+                targetR = (byte)(targetR ^ colorR);
+
+                // Write back
+                targetRow[targetOffset] = targetB;
+                targetRow[targetOffset + 1] = targetG;
+                targetRow[targetOffset + 2] = targetR;
+                if (targetAccessor.BytesPerPixel == 4)
+                {
+                    targetRow[targetOffset + 3] = 255; // Ensure alpha is opaque
+                }
+            }
+        }
+    }
+
 }
 #endif
