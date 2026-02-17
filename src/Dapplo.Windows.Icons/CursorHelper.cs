@@ -2,8 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #if !NETSTANDARD2_0
+using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Common.Structs.PixelFormats;
 using Dapplo.Windows.Dpi;
 using Dapplo.Windows.Gdi32;
 using Dapplo.Windows.Gdi32.Enums;
@@ -20,6 +22,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Icons;

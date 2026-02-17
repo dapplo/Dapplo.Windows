@@ -7,61 +7,23 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Dapplo.Windows.Common.Structs.PixelFormats;
 
-namespace Dapplo.Windows.Icons;
+namespace Dapplo.Windows.Common;
 
 /// <summary>
 /// Provides pixel-level access to a bitmap using typed pixel structs for efficient row-based operations.
 /// This is a shim that mimics ImageSharp's ProcessPixelRows API for easier migration.
+/// See BitmapAccessor.md for detailed documentation and examples.
 /// </summary>
-/// <remarks>
-/// This class provides a safe abstraction for accessing bitmap pixel data using typed pixel structs.
-/// It supports both 32-bit ARGB (Bgra32) and 24-bit RGB (Bgr24) formats. The bitmap is locked during access
-/// to prevent corruption, and automatically unlocked when disposed.
-/// 
-/// <example>
-/// Basic usage with typed pixel access:
-/// <code>
-/// var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-/// using (var accessor = new BitmapAccessor&lt;Bgra32&gt;(bitmap))
-/// {
-///     for (int y = 0; y &lt; accessor.Height; y++)
-///     {
-///         var row = accessor.GetRowSpan(y);
-///         for (int x = 0; x &lt; accessor.Width; x++)
-///         {
-///             row[x] = new Bgra32(red, green, blue, alpha);
-///         }
-///     }
-/// }
-/// </code>
-/// 
-/// Using ProcessRows for simpler iteration:
-/// <code>
-/// bitmap.ProcessPixelRows&lt;Bgra32&gt;(accessor =>
-/// {
-///     accessor.ProcessRows((y, row) =>
-///     {
-///         for (int x = 0; x &lt; accessor.Width; x++)
-///         {
-///             ref var pixel = ref row[x];
-///             pixel.R = 255;
-///             pixel.G = 0;
-///             pixel.B = 0;
-///             pixel.A = 255;
-///         }
-///     });
-/// });
-/// </code>
-/// </example>
-/// </remarks>
-/// <typeparam name="TPixel">The pixel type (Bgra32 for 32-bit, Bgr24 for 24-bit).</typeparam>
+/// <typeparam name="TPixel">The pixel type (Bgra32 for 32-bit, Bgr24 for 24-bit, Indexed8 for 8-bit indexed).</typeparam>
 public sealed class BitmapAccessor<TPixel> : IDisposable
     where TPixel : struct
 {
     private readonly Bitmap _bitmap;
     private readonly BitmapData _bitmapData;
     private readonly bool _readOnly;
+    private Bgra32[] _paletteCache;
 
     /// <summary>
     /// Gets the width of the bitmap in pixels.
@@ -101,6 +63,37 @@ public sealed class BitmapAccessor<TPixel> : IDisposable
         var flags = readOnly ? ImageLockMode.ReadOnly : ImageLockMode.ReadWrite;
         var rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
         _bitmapData = bitmap.LockBits(rect, flags, bitmap.PixelFormat);
+
+        // For indexed formats, cache the palette
+        if (typeof(TPixel) == typeof(Indexed8))
+        {
+            CachePalette();
+        }
+    }
+
+    private void CachePalette()
+    {
+        var palette = _bitmap.Palette;
+        _paletteCache = new Bgra32[palette.Entries.Length];
+        for (int i = 0; i < palette.Entries.Length; i++)
+        {
+            var color = palette.Entries[i];
+            _paletteCache[i] = new Bgra32(color.R, color.G, color.B, color.A);
+        }
+    }
+
+    private void ApplyPalette()
+    {
+        if (_paletteCache == null || _readOnly)
+            return;
+
+        var palette = _bitmap.Palette;
+        for (int i = 0; i < _paletteCache.Length && i < palette.Entries.Length; i++)
+        {
+            var bgra = _paletteCache[i];
+            palette.Entries[i] = Color.FromArgb(bgra.A, bgra.R, bgra.G, bgra.B);
+        }
+        _bitmap.Palette = palette;
     }
 
     private static void ValidatePixelFormat(PixelFormat pixelFormat)
@@ -132,9 +125,20 @@ public sealed class BitmapAccessor<TPixel> : IDisposable
                 throw new NotSupportedException($"Bgr24 must be 3 bytes, but is {pixelSize} bytes.");
             }
         }
+        else if (pixelType == typeof(Indexed8))
+        {
+            if (pixelFormat != PixelFormat.Format8bppIndexed)
+            {
+                throw new NotSupportedException($"Pixel format {pixelFormat} is not compatible with {pixelType.Name}. Use Format8bppIndexed.");
+            }
+            if (pixelSize != 1)
+            {
+                throw new NotSupportedException($"Indexed8 must be 1 byte, but is {pixelSize} bytes.");
+            }
+        }
         else
         {
-            throw new NotSupportedException($"Pixel type {pixelType.Name} is not supported. Use Bgra32 or Bgr24.");
+            throw new NotSupportedException($"Pixel type {pixelType.Name} is not supported. Use Bgra32, Bgr24, or Indexed8.");
         }
     }
 
@@ -164,6 +168,26 @@ public sealed class BitmapAccessor<TPixel> : IDisposable
     }
 
     /// <summary>
+    /// Gets the palette as a span of Bgra32 colors for indexed formats.
+    /// </summary>
+    /// <returns>A span of Bgra32 representing the palette colors.</returns>
+    /// <exception cref="NotSupportedException">Thrown when the pixel format is not indexed.</exception>
+    public Span<Bgra32> GetPaletteSpan()
+    {
+        if (typeof(TPixel) != typeof(Indexed8))
+        {
+            throw new NotSupportedException("GetPaletteSpan is only supported for Indexed8 pixel format.");
+        }
+
+        if (_paletteCache == null)
+        {
+            throw new InvalidOperationException("Palette cache is not initialized.");
+        }
+
+        return new Span<Bgra32>(_paletteCache);
+    }
+
+    /// <summary>
     /// Processes all rows of the bitmap using the provided action.
     /// </summary>
     /// <param name="processRow">An action that processes each row. The action receives the row index and a span of typed pixels.</param>
@@ -184,9 +208,11 @@ public sealed class BitmapAccessor<TPixel> : IDisposable
 
     /// <summary>
     /// Releases the bitmap lock and frees resources.
+    /// For indexed formats, applies palette changes back to the bitmap.
     /// </summary>
     public void Dispose()
     {
+        ApplyPalette();
         _bitmap.UnlockBits(_bitmapData);
     }
 }
@@ -199,7 +225,7 @@ public static class BitmapAccessorExtensions
     /// <summary>
     /// Processes pixel rows of two bitmaps simultaneously, providing typed access to both as source and target.
     /// </summary>
-    /// <typeparam name="TPixel">The pixel type (Bgra32 for 32-bit, Bgr24 for 24-bit).</typeparam>
+    /// <typeparam name="TPixel">The pixel type (Bgra32 for 32-bit, Bgr24 for 24-bit, Indexed8 for 8-bit indexed).</typeparam>
     /// <param name="targetBitmap">The target bitmap to write to.</param>
     /// <param name="sourceBitmap">The source bitmap to read from.</param>
     /// <param name="processRows">An action that processes each pair of rows.</param>
@@ -235,7 +261,7 @@ public static class BitmapAccessorExtensions
     /// <summary>
     /// Processes pixel rows of a single bitmap with typed pixel access.
     /// </summary>
-    /// <typeparam name="TPixel">The pixel type (Bgra32 for 32-bit, Bgr24 for 24-bit).</typeparam>
+    /// <typeparam name="TPixel">The pixel type (Bgra32 for 32-bit, Bgr24 for 24-bit, Indexed8 for 8-bit indexed).</typeparam>
     /// <param name="bitmap">The bitmap to process.</param>
     /// <param name="processRows">An action that processes the bitmap rows.</param>
     /// <exception cref="ArgumentNullException">Thrown when any parameter is null.</exception>
