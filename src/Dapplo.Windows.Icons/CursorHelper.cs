@@ -572,6 +572,10 @@ public static class CursorHelper
             }
         }
     }
+    private static bool Is32BitFormat(PixelFormat format) =>
+        format == PixelFormat.Format32bppArgb ||
+        format == PixelFormat.Format32bppRgb ||
+        format == PixelFormat.Format32bppPArgb;
 
     /// <summary>
     /// Draws a modern alpha-blended cursor onto a bitmap.
@@ -585,7 +589,6 @@ public static class CursorHelper
             if (cursorBitmap.PixelFormat != PixelFormat.Format32bppArgb &&
                 cursorBitmap.PixelFormat != PixelFormat.Format32bppPArgb)
             {
-                // Convert to ARGB if needed
                 convertedBitmap = new Bitmap(cursorBitmap.Width, cursorBitmap.Height, PixelFormat.Format32bppArgb);
                 using (var g = Graphics.FromImage(convertedBitmap))
                 {
@@ -594,16 +597,14 @@ public static class CursorHelper
                 cursorBitmap = convertedBitmap;
             }
 
-            // Determine target pixel format and dispatch to appropriate handler
-            if (targetBitmap.PixelFormat == PixelFormat.Format32bppArgb ||
-                targetBitmap.PixelFormat == PixelFormat.Format32bppRgb ||
-                targetBitmap.PixelFormat == PixelFormat.Format32bppPArgb)
+            // Dispatch based on target format
+            if (Is32BitFormat(targetBitmap.PixelFormat))
             {
-                DrawAlphaCursorOnBitmap_Bgra32(targetBitmap, cursorBitmap, x, y);
+                DrawAlphaCursor<Bgra32>(targetBitmap, cursorBitmap, x, y);
             }
             else if (targetBitmap.PixelFormat == PixelFormat.Format24bppRgb)
             {
-                DrawAlphaCursorOnBitmap_Bgr24(targetBitmap, cursorBitmap, x, y);
+                DrawAlphaCursor<Bgr24>(targetBitmap, cursorBitmap, x, y);
             }
             else
             {
@@ -617,17 +618,15 @@ public static class CursorHelper
     }
 
     /// <summary>
-    /// Draws a modern alpha-blended cursor onto a 32-bit BGRA bitmap.
+    /// Generic implementation for alpha-blended cursor drawing.
     /// </summary>
-    private static void DrawAlphaCursorOnBitmap_Bgra32(Bitmap targetBitmap, Bitmap cursorBitmap, int x, int y)
+    private static void DrawAlphaCursor<TTarget>(Bitmap targetBitmap, Bitmap cursorBitmap, int x, int y)
+        where TTarget : struct
     {
-        using var targetAccessor = new BitmapAccessor<Bgra32>(targetBitmap, readOnly: false);
+        using var targetAccessor = new BitmapAccessor<TTarget>(targetBitmap, readOnly: false);
         using var cursorAccessor = new BitmapAccessor<Bgra32>(cursorBitmap, readOnly: true);
 
-        int cursorWidth = cursorBitmap.Width;
-        int cursorHeight = cursorBitmap.Height;
-
-        for (int cy = 0; cy < cursorHeight; cy++)
+        for (int cy = 0; cy < cursorBitmap.Height; cy++)
         {
             int ty = y + cy;
             if (ty < 0 || ty >= targetAccessor.Height) continue;
@@ -635,91 +634,66 @@ public static class CursorHelper
             var targetRow = targetAccessor.GetRowSpan(ty);
             var cursorRow = cursorAccessor.GetRowSpan(cy);
 
-            for (int cx = 0; cx < cursorWidth; cx++)
+            for (int cx = 0; cx < cursorBitmap.Width; cx++)
             {
                 int tx = x + cx;
                 if (tx < 0 || tx >= targetAccessor.Width) continue;
 
-                ref var cursorPixel = ref cursorRow[cx];
-                ref var targetPixel = ref targetRow[tx];
+                ref readonly var cursorPixel = ref cursorRow[cx];
+                if (cursorPixel.A == 0) continue;
 
-                if (cursorPixel.A == 0)
+                if (typeof(TTarget) == typeof(Bgra32))
                 {
-                    // Fully transparent, skip
-                    continue;
+                    ref var targetPixel = ref Unsafe.As<TTarget, Bgra32>(ref targetRow[tx]);
+                    AlphaBlendBgra32(ref targetPixel, in cursorPixel);
                 }
-
-                if (cursorPixel.A == 255)
+                else // Bgr24
                 {
-                    // Fully opaque, direct copy
-                    targetPixel = cursorPixel;
-                }
-                else
-                {
-                    // Alpha blending
-                    int alpha = cursorPixel.A;
-                    int invAlpha = 255 - alpha;
-
-                    targetPixel.B = (byte)((cursorPixel.B * alpha + targetPixel.B * invAlpha) / 255);
-                    targetPixel.G = (byte)((cursorPixel.G * alpha + targetPixel.G * invAlpha) / 255);
-                    targetPixel.R = (byte)((cursorPixel.R * alpha + targetPixel.R * invAlpha) / 255);
-                    targetPixel.A = 255;
+                    ref var targetPixel = ref Unsafe.As<TTarget, Bgr24>(ref targetRow[tx]);
+                    AlphaBlendBgr24(ref targetPixel, in cursorPixel);
                 }
             }
         }
     }
 
     /// <summary>
-    /// Draws a modern alpha-blended cursor onto a 24-bit BGR bitmap.
+    /// Alpha blend a cursor pixel onto a Bgra32 target pixel.
     /// </summary>
-    private static void DrawAlphaCursorOnBitmap_Bgr24(Bitmap targetBitmap, Bitmap cursorBitmap, int x, int y)
+    private static void AlphaBlendBgra32(ref Bgra32 target, in Bgra32 source)
     {
-        using var targetAccessor = new BitmapAccessor<Bgr24>(targetBitmap, readOnly: false);
-        using var cursorAccessor = new BitmapAccessor<Bgra32>(cursorBitmap, readOnly: true);
-
-        int cursorWidth = cursorBitmap.Width;
-        int cursorHeight = cursorBitmap.Height;
-
-        for (int cy = 0; cy < cursorHeight; cy++)
+        if (source.A == 255)
         {
-            int ty = y + cy;
-            if (ty < 0 || ty >= targetAccessor.Height) continue;
+            target = source;
+        }
+        else
+        {
+            int alpha = source.A;
+            int invAlpha = 255 - alpha;
+            target.B = (byte)((source.B * alpha + target.B * invAlpha) / 255);
+            target.G = (byte)((source.G * alpha + target.G * invAlpha) / 255);
+            target.R = (byte)((source.R * alpha + target.R * invAlpha) / 255);
+            target.A = 255;
+        }
+    }
 
-            var targetRow = targetAccessor.GetRowSpan(ty);
-            var cursorRow = cursorAccessor.GetRowSpan(cy);
-
-            for (int cx = 0; cx < cursorWidth; cx++)
-            {
-                int tx = x + cx;
-                if (tx < 0 || tx >= targetAccessor.Width) continue;
-
-                ref var cursorPixel = ref cursorRow[cx];
-                ref var targetPixel = ref targetRow[tx];
-
-                if (cursorPixel.A == 0)
-                {
-                    // Fully transparent, skip
-                    continue;
-                }
-
-                if (cursorPixel.A == 255)
-                {
-                    // Fully opaque, direct copy (no alpha in target)
-                    targetPixel.B = cursorPixel.B;
-                    targetPixel.G = cursorPixel.G;
-                    targetPixel.R = cursorPixel.R;
-                }
-                else
-                {
-                    // Alpha blending onto opaque background
-                    int alpha = cursorPixel.A;
-                    int invAlpha = 255 - alpha;
-
-                    targetPixel.B = (byte)((cursorPixel.B * alpha + targetPixel.B * invAlpha) / 255);
-                    targetPixel.G = (byte)((cursorPixel.G * alpha + targetPixel.G * invAlpha) / 255);
-                    targetPixel.R = (byte)((cursorPixel.R * alpha + targetPixel.R * invAlpha) / 255);
-                }
-            }
+    /// <summary>
+    /// Alpha blend a cursor pixel onto a Bgr24 target pixel.
+    /// </summary>
+    private static void AlphaBlendBgr24(ref Bgr24 target, in Bgra32 source)
+    {
+        if (source.A == 255)
+        {
+            target.R = source.R;
+            target.G = source.G;
+            target.B = source.B;
+        }
+        else
+        {
+            int alpha = source.A;
+            int invAlpha = 255 - alpha;
+            target.B = (byte)((source.B * alpha + target.B * invAlpha) / 255);
+            target.G = (byte)((source.G * alpha + target.G * invAlpha) / 255);
+            target.R = (byte)((source.R * alpha + target.R * invAlpha) / 255);
         }
     }
 
@@ -728,16 +702,13 @@ public static class CursorHelper
     /// </summary>
     private static void DrawMaskedCursorOnBitmap(Bitmap targetBitmap, Bitmap colorBitmap, Bitmap maskBitmap, int x, int y)
     {
-        // Determine target pixel format and dispatch to appropriate handler
-        if (targetBitmap.PixelFormat == PixelFormat.Format32bppArgb ||
-            targetBitmap.PixelFormat == PixelFormat.Format32bppRgb ||
-            targetBitmap.PixelFormat == PixelFormat.Format32bppPArgb)
+        if (Is32BitFormat(targetBitmap.PixelFormat))
         {
-            DrawMaskedCursorOnBitmap_Bgra32(targetBitmap, colorBitmap, maskBitmap, x, y);
+            DrawMaskedCursor<Bgra32>(targetBitmap, colorBitmap, maskBitmap, x, y);
         }
         else if (targetBitmap.PixelFormat == PixelFormat.Format24bppRgb)
         {
-            DrawMaskedCursorOnBitmap_Bgr24(targetBitmap, colorBitmap, maskBitmap, x, y);
+            DrawMaskedCursor<Bgr24>(targetBitmap, colorBitmap, maskBitmap, x, y);
         }
         else
         {
@@ -746,171 +717,40 @@ public static class CursorHelper
     }
 
     /// <summary>
-    /// Draws a legacy cursor with mask using AND/XOR operations on a 32-bit BGRA bitmap.
+    /// Generic implementation for masked cursor drawing with AND/XOR operations.
     /// </summary>
-    private static void DrawMaskedCursorOnBitmap_Bgra32(Bitmap targetBitmap, Bitmap colorBitmap, Bitmap maskBitmap, int x, int y)
+    private static void DrawMaskedCursor<TTarget>(Bitmap targetBitmap, Bitmap colorBitmap, Bitmap maskBitmap, int x, int y)
+        where TTarget : struct
     {
-        using var targetAccessor = new BitmapAccessor<Bgra32>(targetBitmap, readOnly: false);
-        
-        // Color and mask can be either 32-bit or 24-bit
-        bool isColor32 = colorBitmap.PixelFormat == PixelFormat.Format32bppArgb ||
-                         colorBitmap.PixelFormat == PixelFormat.Format32bppRgb ||
-                         colorBitmap.PixelFormat == PixelFormat.Format32bppPArgb;
-        bool isMask32 = maskBitmap.PixelFormat == PixelFormat.Format32bppArgb ||
-                        maskBitmap.PixelFormat == PixelFormat.Format32bppRgb ||
-                        maskBitmap.PixelFormat == PixelFormat.Format32bppPArgb;
+        using var targetAccessor = new BitmapAccessor<TTarget>(targetBitmap, readOnly: false);
 
-        if (isColor32 && isMask32)
+        // Handle both 32-bit and 24-bit color/mask bitmaps
+        if (Is32BitFormat(colorBitmap.PixelFormat))
         {
             using var colorAccessor = new BitmapAccessor<Bgra32>(colorBitmap, readOnly: true);
             using var maskAccessor = new BitmapAccessor<Bgra32>(maskBitmap, readOnly: true);
-            DrawMaskedCursorOnBitmap_Bgra32_Impl(targetAccessor, colorAccessor, maskAccessor, x, y);
-        }
-        else if (!isColor32 && !isMask32)
-        {
-            using var colorAccessor = new BitmapAccessor<Bgr24>(colorBitmap, readOnly: true);
-            using var maskAccessor = new BitmapAccessor<Bgr24>(maskBitmap, readOnly: true);
-            DrawMaskedCursorOnBitmap_Bgra32_Impl24(targetAccessor, colorAccessor, maskAccessor, x, y);
+            ApplyMask<TTarget, Bgra32>(targetAccessor, colorAccessor, maskAccessor, x, y);
         }
         else
         {
-            throw new NotSupportedException("Color and mask bitmaps must have the same bit depth.");
-        }
-    }
-
-    private static void DrawMaskedCursorOnBitmap_Bgra32_Impl(
-        BitmapAccessor<Bgra32> targetAccessor,
-        BitmapAccessor<Bgra32> colorAccessor,
-        BitmapAccessor<Bgra32> maskAccessor,
-        int x, int y)
-    {
-        int cursorWidth = colorAccessor.Width;
-        int cursorHeight = colorAccessor.Height;
-
-        for (int cy = 0; cy < cursorHeight; cy++)
-        {
-            int ty = y + cy;
-            if (ty < 0 || ty >= targetAccessor.Height) continue;
-
-            var targetRow = targetAccessor.GetRowSpan(ty);
-            var colorRow = colorAccessor.GetRowSpan(cy);
-            var maskRow = maskAccessor.GetRowSpan(cy);
-
-            for (int cx = 0; cx < cursorWidth; cx++)
-            {
-                int tx = x + cx;
-                if (tx < 0 || tx >= targetAccessor.Width) continue;
-
-                ref var targetPixel = ref targetRow[tx];
-                ref readonly var colorPixel = ref colorRow[cx];
-                ref readonly var maskPixel = ref maskRow[cx];
-
-                // Read mask value (assuming grayscale or all channels same)
-                byte maskValue = maskPixel.B;
-
-                // Apply AND operation with mask
-                // Where mask is white (255), target stays as is
-                // Where mask is black (0), target becomes black
-                targetPixel.B = (byte)(targetPixel.B & maskValue);
-                targetPixel.G = (byte)(targetPixel.G & maskValue);
-                targetPixel.R = (byte)(targetPixel.R & maskValue);
-
-                // Apply XOR operation with color
-                targetPixel.B = (byte)(targetPixel.B ^ colorPixel.B);
-                targetPixel.G = (byte)(targetPixel.G ^ colorPixel.G);
-                targetPixel.R = (byte)(targetPixel.R ^ colorPixel.R);
-                targetPixel.A = 255; // Ensure alpha is opaque
-            }
-        }
-    }
-
-    private static void DrawMaskedCursorOnBitmap_Bgra32_Impl24(
-        BitmapAccessor<Bgra32> targetAccessor,
-        BitmapAccessor<Bgr24> colorAccessor,
-        BitmapAccessor<Bgr24> maskAccessor,
-        int x, int y)
-    {
-        int cursorWidth = colorAccessor.Width;
-        int cursorHeight = colorAccessor.Height;
-
-        for (int cy = 0; cy < cursorHeight; cy++)
-        {
-            int ty = y + cy;
-            if (ty < 0 || ty >= targetAccessor.Height) continue;
-
-            var targetRow = targetAccessor.GetRowSpan(ty);
-            var colorRow = colorAccessor.GetRowSpan(cy);
-            var maskRow = maskAccessor.GetRowSpan(cy);
-
-            for (int cx = 0; cx < cursorWidth; cx++)
-            {
-                int tx = x + cx;
-                if (tx < 0 || tx >= targetAccessor.Width) continue;
-
-                ref var targetPixel = ref targetRow[tx];
-                ref readonly var colorPixel = ref colorRow[cx];
-                ref readonly var maskPixel = ref maskRow[cx];
-
-                // Read mask value (assuming grayscale or all channels same)
-                byte maskValue = maskPixel.B;
-
-                // Apply AND operation with mask
-                targetPixel.B = (byte)(targetPixel.B & maskValue);
-                targetPixel.G = (byte)(targetPixel.G & maskValue);
-                targetPixel.R = (byte)(targetPixel.R & maskValue);
-
-                // Apply XOR operation with color
-                targetPixel.B = (byte)(targetPixel.B ^ colorPixel.B);
-                targetPixel.G = (byte)(targetPixel.G ^ colorPixel.G);
-                targetPixel.R = (byte)(targetPixel.R ^ colorPixel.R);
-                targetPixel.A = 255; // Ensure alpha is opaque
-            }
+            using var colorAccessor = new BitmapAccessor<Bgr24>(colorBitmap, readOnly: true);
+            using var maskAccessor = new BitmapAccessor<Bgr24>(maskBitmap, readOnly: true);
+            ApplyMask<TTarget, Bgr24>(targetAccessor, colorAccessor, maskAccessor, x, y);
         }
     }
 
     /// <summary>
-    /// Draws a legacy cursor with mask using AND/XOR operations on a 24-bit BGR bitmap.
+    /// Applies mask using AND/XOR operations.
     /// </summary>
-    private static void DrawMaskedCursorOnBitmap_Bgr24(Bitmap targetBitmap, Bitmap colorBitmap, Bitmap maskBitmap, int x, int y)
-    {
-        using var targetAccessor = new BitmapAccessor<Bgr24>(targetBitmap, readOnly: false);
-        
-        // Color and mask can be either 32-bit or 24-bit
-        bool isColor32 = colorBitmap.PixelFormat == PixelFormat.Format32bppArgb ||
-                         colorBitmap.PixelFormat == PixelFormat.Format32bppRgb ||
-                         colorBitmap.PixelFormat == PixelFormat.Format32bppPArgb;
-        bool isMask32 = maskBitmap.PixelFormat == PixelFormat.Format32bppArgb ||
-                        maskBitmap.PixelFormat == PixelFormat.Format32bppRgb ||
-                        maskBitmap.PixelFormat == PixelFormat.Format32bppPArgb;
-
-        if (isColor32 && isMask32)
-        {
-            using var colorAccessor = new BitmapAccessor<Bgra32>(colorBitmap, readOnly: true);
-            using var maskAccessor = new BitmapAccessor<Bgra32>(maskBitmap, readOnly: true);
-            DrawMaskedCursorOnBitmap_Bgr24_Impl32(targetAccessor, colorAccessor, maskAccessor, x, y);
-        }
-        else if (!isColor32 && !isMask32)
-        {
-            using var colorAccessor = new BitmapAccessor<Bgr24>(colorBitmap, readOnly: true);
-            using var maskAccessor = new BitmapAccessor<Bgr24>(maskBitmap, readOnly: true);
-            DrawMaskedCursorOnBitmap_Bgr24_Impl(targetAccessor, colorAccessor, maskAccessor, x, y);
-        }
-        else
-        {
-            throw new NotSupportedException("Color and mask bitmaps must have the same bit depth.");
-        }
-    }
-
-    private static void DrawMaskedCursorOnBitmap_Bgr24_Impl32(
-        BitmapAccessor<Bgr24> targetAccessor,
-        BitmapAccessor<Bgra32> colorAccessor,
-        BitmapAccessor<Bgra32> maskAccessor,
+    private static void ApplyMask<TTarget, TSource>(
+        BitmapAccessor<TTarget> targetAccessor,
+        BitmapAccessor<TSource> colorAccessor,
+        BitmapAccessor<TSource> maskAccessor,
         int x, int y)
+        where TTarget : struct
+        where TSource : struct
     {
-        int cursorWidth = colorAccessor.Width;
-        int cursorHeight = colorAccessor.Height;
-
-        for (int cy = 0; cy < cursorHeight; cy++)
+        for (int cy = 0; cy < colorAccessor.Height; cy++)
         {
             int ty = y + cy;
             if (ty < 0 || ty >= targetAccessor.Height) continue;
@@ -919,73 +759,51 @@ public static class CursorHelper
             var colorRow = colorAccessor.GetRowSpan(cy);
             var maskRow = maskAccessor.GetRowSpan(cy);
 
-            for (int cx = 0; cx < cursorWidth; cx++)
+            for (int cx = 0; cx < colorAccessor.Width; cx++)
             {
                 int tx = x + cx;
                 if (tx < 0 || tx >= targetAccessor.Width) continue;
 
-                ref var targetPixel = ref targetRow[tx];
-                ref readonly var colorPixel = ref colorRow[cx];
-                ref readonly var maskPixel = ref maskRow[cx];
+                // Extract RGB components from color and mask (use B channel for mask value)
+                byte maskValue, colorR, colorG, colorB;
+                
+                if (typeof(TSource) == typeof(Bgra32))
+                {
+                    ref readonly var mask = ref Unsafe.As<TSource, Bgra32>(ref maskRow[cx]);
+                    ref readonly var color = ref Unsafe.As<TSource, Bgra32>(ref colorRow[cx]);
+                    maskValue = mask.B;
+                    colorR = color.R;
+                    colorG = color.G;
+                    colorB = color.B;
+                }
+                else // Bgr24
+                {
+                    ref readonly var mask = ref Unsafe.As<TSource, Bgr24>(ref maskRow[cx]);
+                    ref readonly var color = ref Unsafe.As<TSource, Bgr24>(ref colorRow[cx]);
+                    maskValue = mask.B;
+                    colorR = color.R;
+                    colorG = color.G;
+                    colorB = color.B;
+                }
 
-                // Read mask value (assuming grayscale or all channels same)
-                byte maskValue = maskPixel.B;
-
-                // Apply AND operation with mask
-                targetPixel.B = (byte)(targetPixel.B & maskValue);
-                targetPixel.G = (byte)(targetPixel.G & maskValue);
-                targetPixel.R = (byte)(targetPixel.R & maskValue);
-
-                // Apply XOR operation with color
-                targetPixel.B = (byte)(targetPixel.B ^ colorPixel.B);
-                targetPixel.G = (byte)(targetPixel.G ^ colorPixel.G);
-                targetPixel.R = (byte)(targetPixel.R ^ colorPixel.R);
+                // Apply AND/XOR operations to target
+                if (typeof(TTarget) == typeof(Bgra32))
+                {
+                    ref var target = ref Unsafe.As<TTarget, Bgra32>(ref targetRow[tx]);
+                    target.B = (byte)((target.B & maskValue) ^ colorB);
+                    target.G = (byte)((target.G & maskValue) ^ colorG);
+                    target.R = (byte)((target.R & maskValue) ^ colorR);
+                    target.A = 255;
+                }
+                else // Bgr24
+                {
+                    ref var target = ref Unsafe.As<TTarget, Bgr24>(ref targetRow[tx]);
+                    target.B = (byte)((target.B & maskValue) ^ colorB);
+                    target.G = (byte)((target.G & maskValue) ^ colorG);
+                    target.R = (byte)((target.R & maskValue) ^ colorR);
+                }
             }
         }
-    }
-
-    private static void DrawMaskedCursorOnBitmap_Bgr24_Impl(
-        BitmapAccessor<Bgr24> targetAccessor,
-        BitmapAccessor<Bgr24> colorAccessor,
-        BitmapAccessor<Bgr24> maskAccessor,
-        int x, int y)
-    {
-        int cursorWidth = colorAccessor.Width;
-        int cursorHeight = colorAccessor.Height;
-
-        for (int cy = 0; cy < cursorHeight; cy++)
-        {
-            int ty = y + cy;
-            if (ty < 0 || ty >= targetAccessor.Height) continue;
-
-            var targetRow = targetAccessor.GetRowSpan(ty);
-            var colorRow = colorAccessor.GetRowSpan(cy);
-            var maskRow = maskAccessor.GetRowSpan(cy);
-
-            for (int cx = 0; cx < cursorWidth; cx++)
-            {
-                int tx = x + cx;
-                if (tx < 0 || tx >= targetAccessor.Width) continue;
-
-                ref var targetPixel = ref targetRow[tx];
-                ref readonly var colorPixel = ref colorRow[cx];
-                ref readonly var maskPixel = ref maskRow[cx];
-
-                // Read mask value (assuming grayscale or all channels same)
-                byte maskValue = maskPixel.B;
-
-                // Apply AND operation with mask
-                targetPixel.B = (byte)(targetPixel.B & maskValue);
-                targetPixel.G = (byte)(targetPixel.G & maskValue);
-                targetPixel.R = (byte)(targetPixel.R & maskValue);
-
-                // Apply XOR operation with color
-                targetPixel.B = (byte)(targetPixel.B ^ colorPixel.B);
-                targetPixel.G = (byte)(targetPixel.G ^ colorPixel.G);
-                targetPixel.R = (byte)(targetPixel.R ^ colorPixel.R);
-            }
-        }
-    }
     }
 
 }
