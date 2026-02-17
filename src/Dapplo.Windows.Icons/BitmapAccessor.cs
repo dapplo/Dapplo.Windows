@@ -5,35 +5,32 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Icons;
 
 /// <summary>
-/// Provides pixel-level access to a bitmap using Span&lt;byte&gt; for efficient row-based operations.
+/// Provides pixel-level access to a bitmap using typed pixel structs for efficient row-based operations.
 /// This is a shim that mimics ImageSharp's ProcessPixelRows API for easier migration.
 /// </summary>
 /// <remarks>
-/// This class provides a safe abstraction for accessing bitmap pixel data using modern Span&lt;&gt; types.
-/// It supports both 32-bit ARGB and 24-bit RGB formats. The bitmap is locked during access to prevent
-/// corruption, and automatically unlocked when disposed.
+/// This class provides a safe abstraction for accessing bitmap pixel data using typed pixel structs.
+/// It supports both 32-bit ARGB (Bgra32) and 24-bit RGB (Bgr24) formats. The bitmap is locked during access
+/// to prevent corruption, and automatically unlocked when disposed.
 /// 
 /// <example>
-/// Basic usage with manual row access:
+/// Basic usage with typed pixel access:
 /// <code>
 /// var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-/// using (var accessor = new BitmapAccessor(bitmap, readOnly: false))
+/// using (var accessor = new BitmapAccessor&lt;Bgra32&gt;(bitmap))
 /// {
 ///     for (int y = 0; y &lt; accessor.Height; y++)
 ///     {
 ///         var row = accessor.GetRowSpan(y);
 ///         for (int x = 0; x &lt; accessor.Width; x++)
 ///         {
-///             int offset = x * accessor.BytesPerPixel;
-///             row[offset] = blue;      // B
-///             row[offset + 1] = green; // G
-///             row[offset + 2] = red;   // R
-///             row[offset + 3] = alpha; // A
+///             row[x] = new Bgra32(red, green, blue, alpha);
 ///         }
 ///     }
 /// }
@@ -41,22 +38,26 @@ namespace Dapplo.Windows.Icons;
 /// 
 /// Using ProcessRows for simpler iteration:
 /// <code>
-/// bitmap.ProcessPixelRows(accessor =>
+/// bitmap.ProcessPixelRows&lt;Bgra32&gt;(accessor =>
 /// {
 ///     accessor.ProcessRows((y, row) =>
 ///     {
-///         // Process each row
 ///         for (int x = 0; x &lt; accessor.Width; x++)
 ///         {
-///             int offset = x * accessor.BytesPerPixel;
-///             // Modify pixels...
+///             ref var pixel = ref row[x];
+///             pixel.R = 255;
+///             pixel.G = 0;
+///             pixel.B = 0;
+///             pixel.A = 255;
 ///         }
 ///     });
 /// });
 /// </code>
 /// </example>
 /// </remarks>
-public sealed class BitmapAccessor : IDisposable
+/// <typeparam name="TPixel">The pixel type (Bgra32 for 32-bit, Bgr24 for 24-bit).</typeparam>
+public sealed class BitmapAccessor<TPixel> : IDisposable
+    where TPixel : struct
 {
     private readonly Bitmap _bitmap;
     private readonly BitmapData _bitmapData;
@@ -83,66 +84,71 @@ public sealed class BitmapAccessor : IDisposable
     public PixelFormat PixelFormat => _bitmapData.PixelFormat;
 
     /// <summary>
-    /// Gets the number of bytes per pixel for the current pixel format.
-    /// </summary>
-    public int BytesPerPixel
-    {
-        get
-        {
-            return PixelFormat switch
-            {
-                PixelFormat.Format32bppArgb => 4,
-                PixelFormat.Format32bppRgb => 4,
-                PixelFormat.Format32bppPArgb => 4,
-                PixelFormat.Format24bppRgb => 3,
-                _ => throw new NotSupportedException($"Pixel format {PixelFormat} is not supported.")
-            };
-        }
-    }
-
-    /// <summary>
-    /// Gets the number of bytes required to store pixel data for one row (excluding padding).
-    /// </summary>
-    public int RowWidthInBytes => Width * BytesPerPixel;
-
-    /// <summary>
     /// Initializes a new instance of the BitmapAccessor class.
     /// </summary>
     /// <param name="bitmap">The bitmap to access.</param>
     /// <param name="readOnly">If true, the bitmap is locked for read-only access; otherwise, it's locked for read-write access.</param>
     /// <exception cref="ArgumentNullException">Thrown when bitmap is null.</exception>
-    /// <exception cref="NotSupportedException">Thrown when the bitmap's pixel format is not supported.</exception>
+    /// <exception cref="NotSupportedException">Thrown when the bitmap's pixel format doesn't match TPixel.</exception>
     public BitmapAccessor(Bitmap bitmap, bool readOnly = false)
     {
         _bitmap = bitmap ?? throw new ArgumentNullException(nameof(bitmap));
         _readOnly = readOnly;
 
-        // Validate pixel format
-        if (bitmap.PixelFormat != PixelFormat.Format32bppArgb &&
-            bitmap.PixelFormat != PixelFormat.Format32bppRgb &&
-            bitmap.PixelFormat != PixelFormat.Format32bppPArgb &&
-            bitmap.PixelFormat != PixelFormat.Format24bppRgb)
-        {
-            throw new NotSupportedException($"Pixel format {bitmap.PixelFormat} is not supported. Only 32-bit ARGB and 24-bit RGB formats are supported.");
-        }
+        // Validate pixel format matches TPixel
+        ValidatePixelFormat(bitmap.PixelFormat);
 
         var flags = readOnly ? ImageLockMode.ReadOnly : ImageLockMode.ReadWrite;
         var rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
         _bitmapData = bitmap.LockBits(rect, flags, bitmap.PixelFormat);
     }
 
+    private static void ValidatePixelFormat(PixelFormat pixelFormat)
+    {
+        var pixelType = typeof(TPixel);
+        var pixelSize = Unsafe.SizeOf<TPixel>();
+
+        if (pixelType == typeof(Bgra32))
+        {
+            if (pixelFormat != PixelFormat.Format32bppArgb &&
+                pixelFormat != PixelFormat.Format32bppRgb &&
+                pixelFormat != PixelFormat.Format32bppPArgb)
+            {
+                throw new NotSupportedException($"Pixel format {pixelFormat} is not compatible with {pixelType.Name}. Use Format32bppArgb, Format32bppRgb, or Format32bppPArgb.");
+            }
+            if (pixelSize != 4)
+            {
+                throw new NotSupportedException($"Bgra32 must be 4 bytes, but is {pixelSize} bytes.");
+            }
+        }
+        else if (pixelType == typeof(Bgr24))
+        {
+            if (pixelFormat != PixelFormat.Format24bppRgb)
+            {
+                throw new NotSupportedException($"Pixel format {pixelFormat} is not compatible with {pixelType.Name}. Use Format24bppRgb.");
+            }
+            if (pixelSize != 3)
+            {
+                throw new NotSupportedException($"Bgr24 must be 3 bytes, but is {pixelSize} bytes.");
+            }
+        }
+        else
+        {
+            throw new NotSupportedException($"Pixel type {pixelType.Name} is not supported. Use Bgra32 or Bgr24.");
+        }
+    }
+
     /// <summary>
-    /// Gets a span representing a single row of pixel data.
+    /// Gets a span representing a single row of typed pixel data.
     /// </summary>
     /// <remarks>
-    /// The returned span includes the full stride, which may contain padding bytes after the pixel data.
     /// This method correctly handles both top-down and bottom-up bitmaps (negative stride).
-    /// For pixel access, use offsets calculated as: pixelIndex * BytesPerPixel.
+    /// The returned span contains typed pixels, allowing direct manipulation of pixel components.
     /// </remarks>
     /// <param name="y">The zero-based row index.</param>
-    /// <returns>A span of bytes representing the pixel data for the specified row.</returns>
+    /// <returns>A span of pixels representing the specified row.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when y is outside the bounds of the bitmap.</exception>
-    public unsafe Span<byte> GetRowSpan(int y)
+    public unsafe Span<TPixel> GetRowSpan(int y)
     {
         if (y < 0 || y >= Height)
         {
@@ -154,15 +160,15 @@ public sealed class BitmapAccessor : IDisposable
         // - Top-down: Scan0 is row 0, positive stride moves down
         // - Bottom-up: Scan0 is last row, negative stride moves up
         var ptr = (byte*)_bitmapData.Scan0 + (y * _bitmapData.Stride);
-        return new Span<byte>(ptr, Stride);
+        return new Span<TPixel>(ptr, Width);
     }
 
     /// <summary>
     /// Processes all rows of the bitmap using the provided action.
     /// </summary>
-    /// <param name="processRow">An action that processes each row. The action receives the row index and a span of the row data.</param>
+    /// <param name="processRow">An action that processes each row. The action receives the row index and a span of typed pixels.</param>
     /// <exception cref="ArgumentNullException">Thrown when processRow is null.</exception>
-    public void ProcessRows(Action<int, Span<byte>> processRow)
+    public void ProcessRows(Action<int, Span<TPixel>> processRow)
     {
         if (processRow == null)
         {
@@ -186,19 +192,21 @@ public sealed class BitmapAccessor : IDisposable
 }
 
 /// <summary>
-/// Provides extension methods for Bitmap to enable Span-based pixel access.
+/// Provides extension methods for Bitmap to enable typed Span-based pixel access.
 /// </summary>
 public static class BitmapAccessorExtensions
 {
     /// <summary>
-    /// Processes pixel rows of two bitmaps simultaneously, providing access to both as source and target.
+    /// Processes pixel rows of two bitmaps simultaneously, providing typed access to both as source and target.
     /// </summary>
+    /// <typeparam name="TPixel">The pixel type (Bgra32 for 32-bit, Bgr24 for 24-bit).</typeparam>
     /// <param name="targetBitmap">The target bitmap to write to.</param>
     /// <param name="sourceBitmap">The source bitmap to read from.</param>
     /// <param name="processRows">An action that processes each pair of rows.</param>
     /// <exception cref="ArgumentNullException">Thrown when any parameter is null.</exception>
     /// <exception cref="ArgumentException">Thrown when bitmaps have different dimensions.</exception>
-    public static void ProcessPixelRows(this Bitmap targetBitmap, Bitmap sourceBitmap, Action<BitmapAccessor, BitmapAccessor> processRows)
+    public static void ProcessPixelRows<TPixel>(this Bitmap targetBitmap, Bitmap sourceBitmap, Action<BitmapAccessor<TPixel>, BitmapAccessor<TPixel>> processRows)
+        where TPixel : struct
     {
         if (targetBitmap == null)
         {
@@ -218,19 +226,21 @@ public static class BitmapAccessorExtensions
             throw new ArgumentException("Source and target bitmaps must have the same dimensions.");
         }
 
-        using var targetAccessor = new BitmapAccessor(targetBitmap, readOnly: false);
-        using var sourceAccessor = new BitmapAccessor(sourceBitmap, readOnly: true);
+        using var targetAccessor = new BitmapAccessor<TPixel>(targetBitmap, readOnly: false);
+        using var sourceAccessor = new BitmapAccessor<TPixel>(sourceBitmap, readOnly: true);
 
         processRows(targetAccessor, sourceAccessor);
     }
 
     /// <summary>
-    /// Processes pixel rows of a single bitmap.
+    /// Processes pixel rows of a single bitmap with typed pixel access.
     /// </summary>
+    /// <typeparam name="TPixel">The pixel type (Bgra32 for 32-bit, Bgr24 for 24-bit).</typeparam>
     /// <param name="bitmap">The bitmap to process.</param>
     /// <param name="processRows">An action that processes the bitmap rows.</param>
     /// <exception cref="ArgumentNullException">Thrown when any parameter is null.</exception>
-    public static void ProcessPixelRows(this Bitmap bitmap, Action<BitmapAccessor> processRows)
+    public static void ProcessPixelRows<TPixel>(this Bitmap bitmap, Action<BitmapAccessor<TPixel>> processRows)
+        where TPixel : struct
     {
         if (bitmap == null)
         {
@@ -241,7 +251,7 @@ public static class BitmapAccessorExtensions
             throw new ArgumentNullException(nameof(processRows));
         }
 
-        using var accessor = new BitmapAccessor(bitmap, readOnly: false);
+        using var accessor = new BitmapAccessor<TPixel>(bitmap, readOnly: false);
         processRows(accessor);
     }
 }

@@ -492,29 +492,25 @@ public class IconTests
     {
         var bitmap = new Bitmap(10, 10, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
         
-        using (var accessor = new BitmapAccessor(bitmap, readOnly: false))
+        using (var accessor = new BitmapAccessor<Bgra32>(bitmap, readOnly: false))
         {
             Assert.Equal(10, accessor.Width);
             Assert.Equal(10, accessor.Height);
-            Assert.Equal(4, accessor.BytesPerPixel);
             Assert.Equal(System.Drawing.Imaging.PixelFormat.Format32bppArgb, accessor.PixelFormat);
             
             // Test getting a row span
             var row = accessor.GetRowSpan(0);
-            Assert.True(row.Length >= 40); // At least 10 pixels * 4 bytes
+            Assert.Equal(10, row.Length); // 10 pixels of type Bgra32
             
-            // Test setting a pixel value
-            row[0] = 255; // Blue
-            row[1] = 0;   // Green
-            row[2] = 0;   // Red
-            row[3] = 255; // Alpha
+            // Test setting a pixel value using typed access
+            row[0] = new Bgra32(0, 0, 255, 255); // Red pixel with full alpha
         }
         
         // Verify the pixel was set correctly
         var color = bitmap.GetPixel(0, 0);
-        Assert.Equal(255, color.B);
+        Assert.Equal(255, color.R);
         Assert.Equal(0, color.G);
-        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.B);
         Assert.Equal(255, color.A);
         
         bitmap.Dispose();
@@ -528,16 +524,15 @@ public class IconTests
     {
         var bitmap = new Bitmap(10, 10, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
         
-        using (var accessor = new BitmapAccessor(bitmap, readOnly: false))
+        using (var accessor = new BitmapAccessor<Bgr24>(bitmap, readOnly: false))
         {
             Assert.Equal(10, accessor.Width);
             Assert.Equal(10, accessor.Height);
-            Assert.Equal(3, accessor.BytesPerPixel);
             Assert.Equal(System.Drawing.Imaging.PixelFormat.Format24bppRgb, accessor.PixelFormat);
             
             // Test getting a row span
             var row = accessor.GetRowSpan(5);
-            Assert.True(row.Length >= 30); // At least 10 pixels * 3 bytes
+            Assert.Equal(10, row.Length); // 10 pixels of type Bgr24
         }
         
         bitmap.Dispose();
@@ -551,20 +546,16 @@ public class IconTests
     {
         var bitmap = new Bitmap(5, 5, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
         
-        using (var accessor = new BitmapAccessor(bitmap, readOnly: false))
+        using (var accessor = new BitmapAccessor<Bgra32>(bitmap, readOnly: false))
         {
             int rowsProcessed = 0;
             accessor.ProcessRows((y, row) =>
             {
                 rowsProcessed++;
-                // Set all pixels in this row to red
+                // Set all pixels in this row to red using typed access
                 for (int x = 0; x < 5; x++)
                 {
-                    int offset = x * 4;
-                    row[offset] = 0;     // Blue
-                    row[offset + 1] = 0; // Green
-                    row[offset + 2] = 255; // Red
-                    row[offset + 3] = 255; // Alpha
+                    row[x] = new Bgra32(255, 0, 0, 255); // Red with full alpha
                 }
             });
             
@@ -789,7 +780,7 @@ public class IconTests
         
         Assert.Throws<NotSupportedException>(() =>
         {
-            var accessor = new BitmapAccessor(bitmap, readOnly: true);
+            var accessor = new BitmapAccessor<Bgra32>(bitmap, readOnly: true);
         });
 
         bitmap.Dispose();
