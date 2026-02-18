@@ -69,7 +69,7 @@ public static class DpiApi
     /// <param name="exStyle">ExtendedWindowStyleFlags The extended window style of the window.</param>
     /// <param name="hWnd">IntPtr Handle to the window. The DPI of this window will be used for scaling.</param>
     /// <returns>NativeRect? The calculated window rectangle, or null if the function fails.</returns>
-    public static NativeRect? AdjustWindowRectForWindow(NativeRect clientRect, WindowStyleFlags style, bool hasMenu, ExtendedWindowStyleFlags exStyle, IntPtr hWnd)
+    public static NativeRect? AdjustWindowRectForWindow(NativeRect clientRect, WindowStyleFlags style, IntPtr hWnd, bool hasMenu = false, ExtendedWindowStyleFlags exStyle = ExtendedWindowStyleFlags.WS_NONE)
     {
         var dpi = (uint)NativeDpiMethods.GetDpi(hWnd);
         var rect = clientRect;
@@ -91,20 +91,7 @@ public static class DpiApi
     public static T? GetSystemParametersInfo<T>(SystemParametersInfoActions action, uint? dpi = null) where T : struct
     {
         var effectiveDpi = dpi ?? NativeDpiMethods.GetDpiForSystem();
-        var size = System.Runtime.InteropServices.Marshal.SizeOf<T>();
-        var ptr = System.Runtime.InteropServices.Marshal.AllocHGlobal(size);
-        try
-        {
-            if (NativeDpiMethods.SystemParametersInfoForDpi(action, (uint)size, ptr, SystemParametersInfoBehaviors.None, effectiveDpi))
-            {
-                return System.Runtime.InteropServices.Marshal.PtrToStructure<T>(ptr);
-            }
-            return null;
-        }
-        finally
-        {
-            System.Runtime.InteropServices.Marshal.FreeHGlobal(ptr);
-        }
+        return GetSystemParametersInfoInternal<T>(action, effectiveDpi);
     }
 
     /// <summary>
@@ -118,6 +105,14 @@ public static class DpiApi
     public static T? GetSystemParametersInfoForWindow<T>(SystemParametersInfoActions action, IntPtr hWnd) where T : struct
     {
         var dpi = (uint)NativeDpiMethods.GetDpi(hWnd);
+        return GetSystemParametersInfoInternal<T>(action, dpi);
+    }
+
+    /// <summary>
+    /// Internal helper method to retrieve system parameters information.
+    /// </summary>
+    private static T? GetSystemParametersInfoInternal<T>(SystemParametersInfoActions action, uint dpi) where T : struct
+    {
         var size = System.Runtime.InteropServices.Marshal.SizeOf<T>();
         var ptr = System.Runtime.InteropServices.Marshal.AllocHGlobal(size);
         try
