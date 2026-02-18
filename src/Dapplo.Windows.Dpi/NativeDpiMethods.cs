@@ -403,4 +403,28 @@ public static class NativeDpiMethods
     /// <returns>DialogScalingBehaviors</returns>
     [DllImport(User32Api.User32)]
     public static extern DialogScalingBehaviors GetDialogControlDpiChangeBehavior(IntPtr hWnd);
+
+    /// <summary>
+    /// Retrieves the value of one of the system-wide parameters, taking into account the provided DPI value.
+    /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmetricsfordpi">GetSystemMetricsForDpi function</a>
+    /// </summary>
+    /// <param name="nIndex">SystemMetric The system metric or configuration setting to be retrieved.</param>
+    /// <param name="dpi">uint The DPI to use for scaling the metric.</param>
+    /// <returns>int The requested system metric or configuration setting.</returns>
+    [DllImport(User32Api.User32)]
+    public static extern int GetSystemMetricsForDpi(SystemMetric nIndex, uint dpi);
+
+    /// <summary>
+    /// Calculates the required size of the window rectangle, based on the desired size of the client rectangle and the provided DPI.
+    /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-adjustwindowrectexfordpi">AdjustWindowRectExForDpi function</a>
+    /// </summary>
+    /// <param name="lpRect">ref NativeRect A pointer to a RECT structure that contains the coordinates of the top-left and bottom-right corners of the desired client area. When the function returns, the structure contains the coordinates of the top-left and bottom-right corners of the window to accommodate the desired client area.</param>
+    /// <param name="dwStyle">WindowStyleFlags The window style of the window whose required size is to be calculated. Note that you cannot specify the WS_OVERLAPPED style.</param>
+    /// <param name="bMenu">bool Indicates whether the window has a menu.</param>
+    /// <param name="dwExStyle">ExtendedWindowStyleFlags The extended window style of the window whose required size is to be calculated.</param>
+    /// <param name="dpi">uint The DPI to use for scaling.</param>
+    /// <returns>bool If the function succeeds, the return value is true. If the function fails, the return value is false.</returns>
+    [DllImport(User32Api.User32, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool AdjustWindowRectExForDpi(ref NativeRect lpRect, WindowStyleFlags dwStyle, [MarshalAs(UnmanagedType.Bool)] bool bMenu, ExtendedWindowStyleFlags dwExStyle, uint dpi);
 }
