@@ -2,8 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #if !NETSTANDARD2_0
+using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Common.Structs.PixelFormats;
 using Dapplo.Windows.Dpi;
 using Dapplo.Windows.Gdi32;
 using Dapplo.Windows.Gdi32.Enums;
@@ -20,6 +22,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Icons;
@@ -454,6 +457,312 @@ public static class CursorHelper
 
         // Restore cleanup
         Gdi32Api.SelectObject(hdcSrc, hbmOld);
+    }
+
+    /// <summary>
+    /// Draws a captured cursor onto a bitmap at the specified position using pixel-level bitmap operations.
+    /// This method is more reliable than DrawCursorOnGraphics when working directly with Bitmap objects.
+    /// </summary>
+    /// <remarks>
+    /// This method uses typed Span-based pixel access (Bgra32/Bgr24) for efficient and readable bitmap manipulation.
+    /// It supports both modern alpha-blended cursors and legacy XOR/mask cursors. For legacy cursors, it properly 
+    /// applies the AND mask followed by the XOR operation to achieve the correct visual effect.
+    /// 
+    /// <example>
+    /// Basic usage:
+    /// <code>
+    /// // Capture the current cursor
+    /// if (CursorHelper.TryGetCurrentCursor(out var cursor))
+    /// {
+    ///     // Create or use an existing bitmap
+    ///     var bitmap = new Bitmap(800, 600, PixelFormat.Format32bppArgb);
+    ///     
+    ///     // Draw the cursor at position (100, 100)
+    ///     CursorHelper.DrawCursorOnBitmap(bitmap, cursor, new NativePoint(100, 100));
+    ///     
+    ///     // Optionally scale the cursor
+    ///     CursorHelper.DrawCursorOnBitmap(bitmap, cursor, new NativePoint(200, 200), new NativeSize(64, 64));
+    ///     
+    ///     cursor.Dispose();
+    /// }
+    /// </code>
+    /// </example>
+    /// </remarks>
+    /// <param name="targetBitmap">The bitmap to draw the cursor onto.</param>
+    /// <param name="cursor">The captured cursor data to draw.</param>
+    /// <param name="position">The position at which to draw the cursor (typically mouse coordinates).</param>
+    /// <param name="destinationSize">Optional size to scale the cursor. If empty, uses the cursor's natural size.</param>
+    /// <exception cref="ArgumentNullException">Thrown when targetBitmap or cursor is null.</exception>
+    /// <exception cref="NotSupportedException">Thrown when the target bitmap's pixel format is not supported.</exception>
+    public static void DrawCursorOnBitmap(Bitmap targetBitmap, CapturedCursor cursor, NativePoint position, NativeSize destinationSize = default)
+    {
+        if (targetBitmap == null)
+        {
+            throw new ArgumentNullException(nameof(targetBitmap));
+        }
+        if (cursor == null || cursor.ColorLayer == null)
+        {
+            return;
+        }
+
+        // Calculate target position
+        int x = position.X;
+        int y = position.Y;
+
+        int sourceWidth = cursor.Size.Width;
+        int sourceHeight = cursor.Size.Height;
+        if (destinationSize.IsEmpty)
+        {
+            destinationSize = new NativeSize(sourceWidth, sourceHeight);
+        }
+
+        // Determine if we need to scale
+        bool needsScaling = destinationSize.Width != sourceWidth || destinationSize.Height != sourceHeight;
+
+        // For modern cursors (no mask), use standard alpha blending
+        if (cursor.MaskLayer == null)
+        {
+            // Scale if needed
+            Bitmap cursorToUse = cursor.ColorLayer;
+            if (needsScaling)
+            {
+                cursorToUse = new Bitmap(cursor.ColorLayer, destinationSize.Width, destinationSize.Height);
+            }
+
+            try
+            {
+                DrawAlphaCursorOnBitmap(targetBitmap, cursorToUse, x, y);
+            }
+            finally
+            {
+                if (needsScaling && cursorToUse != cursor.ColorLayer)
+                {
+                    cursorToUse.Dispose();
+                }
+            }
+            return;
+        }
+
+        // For legacy cursors with mask, apply AND/XOR operations
+        Bitmap scaledColor = cursor.ColorLayer;
+        Bitmap scaledMask = cursor.MaskLayer;
+
+        if (needsScaling)
+        {
+            scaledColor = new Bitmap(cursor.ColorLayer, destinationSize.Width, destinationSize.Height);
+            scaledMask = new Bitmap(cursor.MaskLayer, destinationSize.Width, destinationSize.Height);
+        }
+
+        try
+        {
+            DrawMaskedCursorOnBitmap(targetBitmap, scaledColor, scaledMask, x, y);
+        }
+        finally
+        {
+            if (needsScaling)
+            {
+                if (scaledColor != cursor.ColorLayer)
+                {
+                    scaledColor.Dispose();
+                }
+                if (scaledMask != cursor.MaskLayer)
+                {
+                    scaledMask.Dispose();
+                }
+            }
+        }
+    }
+    private static bool Is32BitFormat(PixelFormat format) =>
+        format == PixelFormat.Format32bppArgb ||
+        format == PixelFormat.Format32bppRgb ||
+        format == PixelFormat.Format32bppPArgb;
+
+    /// <summary>
+    /// Draws a modern alpha-blended cursor onto a bitmap.
+    /// </summary>
+    private static void DrawAlphaCursorOnBitmap(Bitmap targetBitmap, Bitmap cursorBitmap, int x, int y)
+    {
+        Bitmap convertedBitmap = null;
+        try
+        {
+            // Ensure the cursor bitmap has alpha channel
+            if (cursorBitmap.PixelFormat != PixelFormat.Format32bppArgb &&
+                cursorBitmap.PixelFormat != PixelFormat.Format32bppPArgb)
+            {
+                convertedBitmap = new Bitmap(cursorBitmap.Width, cursorBitmap.Height, PixelFormat.Format32bppArgb);
+                using (var g = Graphics.FromImage(convertedBitmap))
+                {
+                    g.DrawImage(cursorBitmap, 0, 0, cursorBitmap.Width, cursorBitmap.Height);
+                }
+                cursorBitmap = convertedBitmap;
+            }
+
+            // Dispatch based on target format
+            if (Is32BitFormat(targetBitmap.PixelFormat))
+            {
+                DrawAlphaCursor<Bgra32>(targetBitmap, cursorBitmap, x, y);
+            }
+            else if (targetBitmap.PixelFormat == PixelFormat.Format24bppRgb)
+            {
+                DrawAlphaCursor<Bgr24>(targetBitmap, cursorBitmap, x, y);
+            }
+            else
+            {
+                throw new NotSupportedException($"Target bitmap format {targetBitmap.PixelFormat} is not supported.");
+            }
+        }
+        finally
+        {
+            convertedBitmap?.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Generic implementation for alpha-blended cursor drawing.
+    /// </summary>
+    private static void DrawAlphaCursor<TTarget>(Bitmap targetBitmap, Bitmap cursorBitmap, int x, int y)
+        where TTarget : struct
+    {
+        using var targetAccessor = new BitmapAccessor<TTarget>(targetBitmap, readOnly: false);
+        using var cursorAccessor = new BitmapAccessor<Bgra32>(cursorBitmap, readOnly: true);
+
+        for (int cy = 0; cy < cursorBitmap.Height; cy++)
+        {
+            int ty = y + cy;
+            if (ty < 0 || ty >= targetAccessor.Height) continue;
+
+            var targetRow = targetAccessor.GetRowSpan(ty);
+            var cursorRow = cursorAccessor.GetRowSpan(cy);
+
+            for (int cx = 0; cx < cursorBitmap.Width; cx++)
+            {
+                int tx = x + cx;
+                if (tx < 0 || tx >= targetAccessor.Width) continue;
+
+                ref readonly var cursorPixel = ref cursorRow[cx];
+                if (cursorPixel.A == 0) continue;
+
+                if (typeof(TTarget) == typeof(Bgra32))
+                {
+                    ref var targetPixel = ref Unsafe.As<TTarget, Bgra32>(ref targetRow[tx]);
+                    Bgra32.AlphaBlend(ref targetPixel, in cursorPixel);
+                }
+                else // Bgr24
+                {
+                    ref var targetPixel = ref Unsafe.As<TTarget, Bgr24>(ref targetRow[tx]);
+                    Bgr24.AlphaBlend(ref targetPixel, in cursorPixel);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Draws a legacy cursor with mask using AND/XOR operations.
+    /// </summary>
+    private static void DrawMaskedCursorOnBitmap(Bitmap targetBitmap, Bitmap colorBitmap, Bitmap maskBitmap, int x, int y)
+    {
+        if (Is32BitFormat(targetBitmap.PixelFormat))
+        {
+            DrawMaskedCursor<Bgra32>(targetBitmap, colorBitmap, maskBitmap, x, y);
+        }
+        else if (targetBitmap.PixelFormat == PixelFormat.Format24bppRgb)
+        {
+            DrawMaskedCursor<Bgr24>(targetBitmap, colorBitmap, maskBitmap, x, y);
+        }
+        else
+        {
+            throw new NotSupportedException($"Target bitmap format {targetBitmap.PixelFormat} is not supported.");
+        }
+    }
+
+    /// <summary>
+    /// Generic implementation for masked cursor drawing with AND/XOR operations.
+    /// </summary>
+    private static void DrawMaskedCursor<TTarget>(Bitmap targetBitmap, Bitmap colorBitmap, Bitmap maskBitmap, int x, int y)
+        where TTarget : struct
+    {
+        using var targetAccessor = new BitmapAccessor<TTarget>(targetBitmap, readOnly: false);
+
+        // Handle both 32-bit and 24-bit color/mask bitmaps
+        if (Is32BitFormat(colorBitmap.PixelFormat))
+        {
+            using var colorAccessor = new BitmapAccessor<Bgra32>(colorBitmap, readOnly: true);
+            using var maskAccessor = new BitmapAccessor<Bgra32>(maskBitmap, readOnly: true);
+            ApplyMask<TTarget, Bgra32>(targetAccessor, colorAccessor, maskAccessor, x, y);
+        }
+        else
+        {
+            using var colorAccessor = new BitmapAccessor<Bgr24>(colorBitmap, readOnly: true);
+            using var maskAccessor = new BitmapAccessor<Bgr24>(maskBitmap, readOnly: true);
+            ApplyMask<TTarget, Bgr24>(targetAccessor, colorAccessor, maskAccessor, x, y);
+        }
+    }
+
+    /// <summary>
+    /// Applies mask using AND/XOR operations.
+    /// </summary>
+    private static void ApplyMask<TTarget, TSource>(
+        BitmapAccessor<TTarget> targetAccessor,
+        BitmapAccessor<TSource> colorAccessor,
+        BitmapAccessor<TSource> maskAccessor,
+        int x, int y)
+        where TTarget : struct
+        where TSource : struct
+    {
+        for (int cy = 0; cy < colorAccessor.Height; cy++)
+        {
+            int ty = y + cy;
+            if (ty < 0 || ty >= targetAccessor.Height) continue;
+
+            var targetRow = targetAccessor.GetRowSpan(ty);
+            var colorRow = colorAccessor.GetRowSpan(cy);
+            var maskRow = maskAccessor.GetRowSpan(cy);
+
+            for (int cx = 0; cx < colorAccessor.Width; cx++)
+            {
+                int tx = x + cx;
+                if (tx < 0 || tx >= targetAccessor.Width) continue;
+
+                // Extract RGB components from color and mask (use B channel for mask value)
+                byte maskValue, colorR, colorG, colorB;
+                
+                if (typeof(TSource) == typeof(Bgra32))
+                {
+                    ref readonly var mask = ref Unsafe.As<TSource, Bgra32>(ref maskRow[cx]);
+                    ref readonly var color = ref Unsafe.As<TSource, Bgra32>(ref colorRow[cx]);
+                    maskValue = mask.B;
+                    colorR = color.R;
+                    colorG = color.G;
+                    colorB = color.B;
+                }
+                else // Bgr24
+                {
+                    ref readonly var mask = ref Unsafe.As<TSource, Bgr24>(ref maskRow[cx]);
+                    ref readonly var color = ref Unsafe.As<TSource, Bgr24>(ref colorRow[cx]);
+                    maskValue = mask.B;
+                    colorR = color.R;
+                    colorG = color.G;
+                    colorB = color.B;
+                }
+
+                // Apply AND/XOR operations to target
+                if (typeof(TTarget) == typeof(Bgra32))
+                {
+                    ref var target = ref Unsafe.As<TTarget, Bgra32>(ref targetRow[tx]);
+                    target.B = (byte)((target.B & maskValue) ^ colorB);
+                    target.G = (byte)((target.G & maskValue) ^ colorG);
+                    target.R = (byte)((target.R & maskValue) ^ colorR);
+                    target.A = 255;
+                }
+                else // Bgr24
+                {
+                    ref var target = ref Unsafe.As<TTarget, Bgr24>(ref targetRow[tx]);
+                    target.B = (byte)((target.B & maskValue) ^ colorB);
+                    target.G = (byte)((target.G & maskValue) ^ colorG);
+                    target.R = (byte)((target.R & maskValue) ^ colorR);
+                }
+            }
+        }
     }
 
 }

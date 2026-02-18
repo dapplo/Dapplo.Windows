@@ -6,11 +6,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using Dapplo.Log;
+using Dapplo.Windows.Common;
+using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Common.Structs.PixelFormats;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Icons;
 using Dapplo.Windows.User32;
 using Xunit;
-using Dapplo.Windows.Common.Structs;
 using System.Windows.Media.Imaging;
 using System.IO;
 using System.Collections.Generic;
@@ -482,5 +484,307 @@ public class IconTests
 
         Assert.NotNull(capturedCursor);
         capturedCursor.Dispose();
+    }
+
+    /// <summary>
+    ///     Test BitmapAccessor with 32-bit ARGB format
+    /// </summary>
+    [Fact]
+    public void TestBitmapAccessor_32bppArgb()
+    {
+        var bitmap = new Bitmap(10, 10, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        
+        using (var accessor = new BitmapAccessor<Bgra32>(bitmap, readOnly: false))
+        {
+            Assert.Equal(10, accessor.Width);
+            Assert.Equal(10, accessor.Height);
+            Assert.Equal(System.Drawing.Imaging.PixelFormat.Format32bppArgb, accessor.PixelFormat);
+            
+            // Test getting a row span
+            var row = accessor.GetRowSpan(0);
+            Assert.Equal(10, row.Length); // 10 pixels of type Bgra32
+            
+            // Test setting a pixel value using typed access
+            row[0] = new Bgra32(0, 0, 255, 255); // Red pixel with full alpha
+        }
+        
+        // Verify the pixel was set correctly
+        var color = bitmap.GetPixel(0, 0);
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(255, color.A);
+        
+        bitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test BitmapAccessor with 24-bit RGB format
+    /// </summary>
+    [Fact]
+    public void TestBitmapAccessor_24bppRgb()
+    {
+        var bitmap = new Bitmap(10, 10, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+        
+        using (var accessor = new BitmapAccessor<Bgr24>(bitmap, readOnly: false))
+        {
+            Assert.Equal(10, accessor.Width);
+            Assert.Equal(10, accessor.Height);
+            Assert.Equal(System.Drawing.Imaging.PixelFormat.Format24bppRgb, accessor.PixelFormat);
+            
+            // Test getting a row span
+            var row = accessor.GetRowSpan(5);
+            Assert.Equal(10, row.Length); // 10 pixels of type Bgr24
+        }
+        
+        bitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test BitmapAccessor ProcessRows method
+    /// </summary>
+    [Fact]
+    public void TestBitmapAccessor_ProcessRows()
+    {
+        var bitmap = new Bitmap(5, 5, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        
+        using (var accessor = new BitmapAccessor<Bgra32>(bitmap, readOnly: false))
+        {
+            int rowsProcessed = 0;
+            accessor.ProcessRows((y, row) =>
+            {
+                rowsProcessed++;
+                // Set all pixels in this row to red using typed access
+                for (int x = 0; x < 5; x++)
+                {
+                    row[x] = new Bgra32(255, 0, 0, 255); // Red with full alpha
+                }
+            });
+            
+            Assert.Equal(5, rowsProcessed);
+        }
+        
+        // Verify all pixels are red
+        for (int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                var color = bitmap.GetPixel(x, y);
+                Assert.Equal(255, color.R);
+                Assert.Equal(0, color.G);
+                Assert.Equal(0, color.B);
+            }
+        }
+        
+        bitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test DrawCursorOnBitmap with a modern alpha cursor
+    /// </summary>
+    [Fact]
+    public void TestCursorHelper_DrawCursorOnBitmap_ModernCursor()
+    {
+        // Create a target bitmap
+        var targetBitmap = new Bitmap(100, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        {
+            g.Clear(System.Drawing.Color.White);
+        }
+
+        // Create a cursor with alpha channel (modern cursor, no mask)
+        var cursorBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        {
+            g.Clear(System.Drawing.Color.Transparent);
+            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(128, 255, 0, 0)))
+            {
+                g.FillEllipse(brush, 0, 0, 32, 32);
+            }
+        }
+
+        var cursor = new CapturedCursor
+        {
+            ColorLayer = cursorBitmap,
+            MaskLayer = null, // Modern cursor
+            HotSpot = new NativePoint(16, 16),
+            Size = new NativeSize(32, 32)
+        };
+
+        // Draw cursor at position (10, 10)
+        CursorHelper.DrawCursorOnBitmap(targetBitmap, cursor, new NativePoint(10, 10));
+
+        // Verify that the cursor was drawn
+        // The center of the cursor should have some red color
+        var centerColor = targetBitmap.GetPixel(26, 26); // 10 + 16 (center of cursor)
+        Assert.True(centerColor.R > 100, "Center of cursor should have red color");
+        
+        // Corners should still be white (cursor is transparent there)
+        var cornerColor = targetBitmap.GetPixel(0, 0);
+        Assert.Equal(255, cornerColor.R);
+        Assert.Equal(255, cornerColor.G);
+        Assert.Equal(255, cornerColor.B);
+
+        cursor.Dispose();
+        targetBitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test DrawCursorOnBitmap with a legacy cursor with mask
+    /// </summary>
+    [Fact]
+    public void TestCursorHelper_DrawCursorOnBitmap_LegacyCursor()
+    {
+        // Create a target bitmap
+        var targetBitmap = new Bitmap(100, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        {
+            g.Clear(System.Drawing.Color.White);
+        }
+
+        // Create a cursor color layer
+        var cursorBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        {
+            g.Clear(System.Drawing.Color.Black);
+            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.White))
+            {
+                g.FillRectangle(brush, 8, 8, 16, 16);
+            }
+        }
+
+        // Create a mask layer
+        var maskBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(maskBitmap))
+        {
+            g.Clear(System.Drawing.Color.White); // White = transparent area
+            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.Black))
+            {
+                g.FillRectangle(brush, 8, 8, 16, 16); // Black = cutout area
+            }
+        }
+
+        var cursor = new CapturedCursor
+        {
+            ColorLayer = cursorBitmap,
+            MaskLayer = maskBitmap, // Legacy cursor with mask
+            HotSpot = new NativePoint(16, 16),
+            Size = new NativeSize(32, 32)
+        };
+
+        // Draw cursor at position (20, 20)
+        CursorHelper.DrawCursorOnBitmap(targetBitmap, cursor, new NativePoint(20, 20));
+
+        // Verify that the cursor was drawn
+        // The center of the cursor (where the white square is) should be modified
+        var centerColor = targetBitmap.GetPixel(36, 36); // 20 + 16 (center of white square)
+        // Due to XOR operation, white on white should invert to black or at least be different
+        Assert.True(centerColor.R < 255 || centerColor.G < 255 || centerColor.B < 255, 
+            "Center should be affected by cursor drawing");
+
+        cursor.Dispose();
+        targetBitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test DrawCursorOnBitmap with scaling
+    /// </summary>
+    [Fact]
+    public void TestCursorHelper_DrawCursorOnBitmap_WithScaling()
+    {
+        // Create a target bitmap
+        var targetBitmap = new Bitmap(200, 200, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        {
+            g.Clear(System.Drawing.Color.White);
+        }
+
+        // Create a small cursor
+        var cursorBitmap = new Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        {
+            g.Clear(System.Drawing.Color.Transparent);
+            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 0, 0, 255)))
+            {
+                g.FillRectangle(brush, 0, 0, 16, 16);
+            }
+        }
+
+        var cursor = new CapturedCursor
+        {
+            ColorLayer = cursorBitmap,
+            MaskLayer = null,
+            HotSpot = new NativePoint(8, 8),
+            Size = new NativeSize(16, 16)
+        };
+
+        // Draw cursor at position (50, 50) scaled to 64x64
+        CursorHelper.DrawCursorOnBitmap(targetBitmap, cursor, new NativePoint(50, 50), new NativeSize(64, 64));
+
+        // Verify that the cursor was drawn and scaled
+        var centerColor = targetBitmap.GetPixel(82, 82); // 50 + 32 (center of scaled cursor)
+        Assert.True(centerColor.B > 200, "Center of cursor should have blue color");
+
+        cursor.Dispose();
+        targetBitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test DrawCursorOnBitmap on 24-bit RGB bitmap
+    /// </summary>
+    [Fact]
+    public void TestCursorHelper_DrawCursorOnBitmap_24bppTarget()
+    {
+        // Create a 24-bit target bitmap
+        var targetBitmap = new Bitmap(100, 100, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        {
+            g.Clear(System.Drawing.Color.White);
+        }
+
+        // Create a cursor with alpha channel
+        var cursorBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        {
+            g.Clear(System.Drawing.Color.Transparent);
+            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 0, 255, 0)))
+            {
+                g.FillEllipse(brush, 0, 0, 32, 32);
+            }
+        }
+
+        var cursor = new CapturedCursor
+        {
+            ColorLayer = cursorBitmap,
+            MaskLayer = null,
+            HotSpot = new NativePoint(16, 16),
+            Size = new NativeSize(32, 32)
+        };
+
+        // Draw cursor at position (10, 10)
+        CursorHelper.DrawCursorOnBitmap(targetBitmap, cursor, new NativePoint(10, 10));
+
+        // Verify that the cursor was drawn
+        var centerColor = targetBitmap.GetPixel(26, 26);
+        Assert.True(centerColor.G > 200, "Center of cursor should have green color");
+
+        cursor.Dispose();
+        targetBitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test BitmapAccessor with unsupported format throws exception
+    /// </summary>
+    [Fact]
+    public void TestBitmapAccessor_UnsupportedFormat_ThrowsException()
+    {
+        var bitmap = new Bitmap(10, 10, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+        
+        Assert.Throws<NotSupportedException>(() =>
+        {
+            var accessor = new BitmapAccessor<Bgra32>(bitmap, readOnly: true);
+        });
+
+        bitmap.Dispose();
     }
 }
