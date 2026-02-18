@@ -12,5 +12,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="WindowsBase" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
+    <PackageReference Include="System.Memory" Version="4.6.3" />
   </ItemGroup>
 </Project>

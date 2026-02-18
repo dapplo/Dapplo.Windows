@@ -188,11 +188,19 @@ public sealed class BitmapAccessor<TPixel> : IDisposable
     }
 
     /// <summary>
+    /// Delegate for processing a single row of pixel data.
+    /// </summary>
+    /// <typeparam name="TRowPixel">The pixel type.</typeparam>
+    /// <param name="rowIndex">The zero-based row index.</param>
+    /// <param name="rowSpan">A span of pixels representing the row.</param>
+    public delegate void ProcessRowDelegate<TRowPixel>(int rowIndex, Span<TRowPixel> rowSpan) where TRowPixel : struct;
+
+    /// <summary>
     /// Processes all rows of the bitmap using the provided action.
     /// </summary>
     /// <param name="processRow">An action that processes each row. The action receives the row index and a span of typed pixels.</param>
     /// <exception cref="ArgumentNullException">Thrown when processRow is null.</exception>
-    public void ProcessRows(Action<int, Span<TPixel>> processRow)
+    public void ProcessRows(ProcessRowDelegate<TPixel> processRow)
     {
         if (processRow == null)
         {
