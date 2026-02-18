@@ -13,12 +13,12 @@ namespace Dapplo.Windows.Dpi;
 public static class DpiApi
 {
     /// <summary>
-    /// Retrieves the value of one of the system-wide parameters, taking into account the provided DPI value.
+    /// Retrieves the value of one of the system metrics, taking into account the provided DPI value.
     /// This is a convenient wrapper around the GetSystemMetricsForDpi Win32 API.
     /// </summary>
-    /// <param name="metric">SystemMetric The system metric or configuration setting to be retrieved.</param>
-    /// <param name="dpi">uint The DPI to use for scaling the metric. If not provided, uses the system DPI.</param>
-    /// <returns>int The requested system metric or configuration setting scaled for the specified DPI.</returns>
+    /// <param name="metric">The system metric or configuration setting to be retrieved.</param>
+    /// <param name="dpi">The DPI to use for scaling the metric. If not provided, uses the system DPI.</param>
+    /// <returns>The requested system metric or configuration setting scaled for the specified DPI.</returns>
     public static int GetSystemMetrics(SystemMetric metric, uint? dpi = null)
     {
         var effectiveDpi = dpi ?? NativeDpiMethods.GetDpiForSystem();
@@ -26,12 +26,12 @@ public static class DpiApi
     }
 
     /// <summary>
-    /// Retrieves the value of one of the system-wide parameters for a specific window, taking into account the window's DPI.
+    /// Retrieves the value of one of the system metrics for a specific window, taking into account the window's DPI.
     /// This is a convenient wrapper around the GetSystemMetricsForDpi Win32 API.
     /// </summary>
-    /// <param name="metric">SystemMetric The system metric or configuration setting to be retrieved.</param>
-    /// <param name="hWnd">IntPtr Handle to the window. The DPI of this window will be used for scaling.</param>
-    /// <returns>int The requested system metric or configuration setting scaled for the window's DPI.</returns>
+    /// <param name="metric">The system metric or configuration setting to be retrieved.</param>
+    /// <param name="hWnd">Handle to the window. The DPI of this window will be used for scaling.</param>
+    /// <returns>The requested system metric or configuration setting scaled for the window's DPI.</returns>
     public static int GetSystemMetricsForWindow(SystemMetric metric, IntPtr hWnd)
     {
         var dpi = (uint)NativeDpiMethods.GetDpi(hWnd);
@@ -42,12 +42,12 @@ public static class DpiApi
     /// Calculates the required size of the window rectangle, based on the desired size of the client rectangle and the provided DPI.
     /// This is a convenient wrapper around the AdjustWindowRectExForDpi Win32 API.
     /// </summary>
-    /// <param name="clientRect">NativeRect The desired client rectangle.</param>
-    /// <param name="style">WindowStyleFlags The window style of the window.</param>
-    /// <param name="hasMenu">bool Indicates whether the window has a menu.</param>
-    /// <param name="exStyle">ExtendedWindowStyleFlags The extended window style of the window.</param>
-    /// <param name="dpi">uint The DPI to use for scaling. If not provided, uses the system DPI.</param>
-    /// <returns>NativeRect? The calculated window rectangle, or null if the function fails.</returns>
+    /// <param name="clientRect">The desired client rectangle.</param>
+    /// <param name="style">The window style of the window.</param>
+    /// <param name="hasMenu">Indicates whether the window has a menu.</param>
+    /// <param name="exStyle">The extended window style of the window.</param>
+    /// <param name="dpi">The DPI to use for scaling. If not provided, uses the system DPI.</param>
+    /// <returns>The calculated window rectangle, or null if the function fails.</returns>
     public static NativeRect? AdjustWindowRect(NativeRect clientRect, WindowStyleFlags style, bool hasMenu = false, ExtendedWindowStyleFlags exStyle = ExtendedWindowStyleFlags.WS_NONE, uint? dpi = null)
     {
         var effectiveDpi = dpi ?? NativeDpiMethods.GetDpiForSystem();
@@ -63,12 +63,12 @@ public static class DpiApi
     /// Calculates the required size of the window rectangle for a specific window, based on the desired size of the client rectangle and the window's DPI.
     /// This is a convenient wrapper around the AdjustWindowRectExForDpi Win32 API.
     /// </summary>
-    /// <param name="clientRect">NativeRect The desired client rectangle.</param>
-    /// <param name="style">WindowStyleFlags The window style of the window.</param>
-    /// <param name="hasMenu">bool Indicates whether the window has a menu.</param>
-    /// <param name="exStyle">ExtendedWindowStyleFlags The extended window style of the window.</param>
-    /// <param name="hWnd">IntPtr Handle to the window. The DPI of this window will be used for scaling.</param>
-    /// <returns>NativeRect? The calculated window rectangle, or null if the function fails.</returns>
+    /// <param name="clientRect">The desired client rectangle.</param>
+    /// <param name="style">The window style of the window.</param>
+    /// <param name="hasMenu">Indicates whether the window has a menu.</param>
+    /// <param name="exStyle">The extended window style of the window.</param>
+    /// <param name="hWnd">Handle to the window. The DPI of this window will be used for scaling.</param>
+    /// <returns>The calculated window rectangle, or null if the function fails.</returns>
     public static NativeRect? AdjustWindowRectForWindow(NativeRect clientRect, WindowStyleFlags style, bool hasMenu, ExtendedWindowStyleFlags exStyle, IntPtr hWnd)
     {
         var dpi = (uint)NativeDpiMethods.GetDpi(hWnd);
@@ -85,9 +85,9 @@ public static class DpiApi
     /// This is a convenient wrapper around the SystemParametersInfoForDpi Win32 API.
     /// </summary>
     /// <typeparam name="T">The type of the parameter structure.</typeparam>
-    /// <param name="action">SystemParametersInfoActions The system parameter to query.</param>
-    /// <param name="dpi">uint The DPI to use for scaling. If not provided, uses the system DPI.</param>
-    /// <returns>T? The requested system parameter, or null if the function fails.</returns>
+    /// <param name="action">The system parameter to query.</param>
+    /// <param name="dpi">The DPI to use for scaling. If not provided, uses the system DPI.</param>
+    /// <returns>The requested system parameter, or null if the function fails.</returns>
     public static T? GetSystemParametersInfo<T>(SystemParametersInfoActions action, uint? dpi = null) where T : struct
     {
         var effectiveDpi = dpi ?? NativeDpiMethods.GetDpiForSystem();
@@ -99,9 +99,9 @@ public static class DpiApi
     /// This is a convenient wrapper around the SystemParametersInfoForDpi Win32 API.
     /// </summary>
     /// <typeparam name="T">The type of the parameter structure.</typeparam>
-    /// <param name="action">SystemParametersInfoActions The system parameter to query.</param>
-    /// <param name="hWnd">IntPtr Handle to the window. The DPI of this window will be used for scaling.</param>
-    /// <returns>T? The requested system parameter, or null if the function fails.</returns>
+    /// <param name="action">The system parameter to query.</param>
+    /// <param name="hWnd">Handle to the window. The DPI of this window will be used for scaling.</param>
+    /// <returns>The requested system parameter, or null if the function fails.</returns>
     public static T? GetSystemParametersInfoForWindow<T>(SystemParametersInfoActions action, IntPtr hWnd) where T : struct
     {
         var dpi = (uint)NativeDpiMethods.GetDpi(hWnd);
