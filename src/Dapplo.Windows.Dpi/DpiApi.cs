@@ -69,7 +69,7 @@ public static class DpiApi
     /// <param name="exStyle">ExtendedWindowStyleFlags The extended window style of the window.</param>
     /// <param name="hWnd">IntPtr Handle to the window. The DPI of this window will be used for scaling.</param>
     /// <returns>NativeRect? The calculated window rectangle, or null if the function fails.</returns>
-    public static NativeRect? AdjustWindowRectForWindow(NativeRect clientRect, WindowStyleFlags style, IntPtr hWnd, bool hasMenu = false, ExtendedWindowStyleFlags exStyle = ExtendedWindowStyleFlags.WS_NONE)
+    public static NativeRect? AdjustWindowRectForWindow(NativeRect clientRect, WindowStyleFlags style, bool hasMenu, ExtendedWindowStyleFlags exStyle, IntPtr hWnd)
     {
         var dpi = (uint)NativeDpiMethods.GetDpi(hWnd);
         var rect = clientRect;
