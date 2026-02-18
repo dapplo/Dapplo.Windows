@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.User32.Enums;
 
@@ -113,19 +114,19 @@ public static class DpiApi
     /// </summary>
     private static T? GetSystemParametersInfoInternal<T>(SystemParametersInfoActions action, uint dpi) where T : struct
     {
-        var size = System.Runtime.InteropServices.Marshal.SizeOf<T>();
-        var ptr = System.Runtime.InteropServices.Marshal.AllocHGlobal(size);
+        var size = Marshal.SizeOf<T>();
+        var ptr = Marshal.AllocHGlobal(size);
         try
         {
             if (NativeDpiMethods.SystemParametersInfoForDpi(action, (uint)size, ptr, SystemParametersInfoBehaviors.None, dpi))
             {
-                return System.Runtime.InteropServices.Marshal.PtrToStructure<T>(ptr);
+                return Marshal.PtrToStructure<T>(ptr);
             }
             return null;
         }
         finally
         {
-            System.Runtime.InteropServices.Marshal.FreeHGlobal(ptr);
+            Marshal.FreeHGlobal(ptr);
         }
     }
 }
