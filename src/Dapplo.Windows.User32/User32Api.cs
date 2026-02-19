@@ -1256,6 +1256,6 @@ public static class User32Api
     /// <param name="lprc">A reference to a NativeRect structure that specifies the logical coordinates of the rectangle to be filled.</param>
     /// <param name="hbr">A handle to the brush used to fill the rectangle.</param>
     /// <returns>If the function succeeds, the return value is nonzero. If the function fails, the return value is zero.</returns>
-    [DllImport(User32Api.User32, SetLastError = true)]
+    [DllImport(User32Api.User32, SetLastError = true, CharSet = CharSet.Auto)]
     public static extern int FillRect(IntPtr hDC, [In] ref NativeRect lprc, IntPtr hbr);
 }
