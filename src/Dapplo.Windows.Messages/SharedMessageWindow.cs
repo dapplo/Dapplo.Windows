@@ -62,6 +62,11 @@ public static class SharedMessageWindow
     private static readonly BehaviorSubject<nint> _handleSubject = new(0);
 
     /// <summary>
+    /// Gets the current handle of the message window, or zero if no window is currently active.
+    /// </summary>
+    public static nint Handle => _handleSubject.Value;
+
+    /// <summary>
     /// Gets an observable sequence of all window messages received by the application.
     /// </summary>
     /// <remarks>The returned observable is shared among all subscribers. Subscribing to this property allows

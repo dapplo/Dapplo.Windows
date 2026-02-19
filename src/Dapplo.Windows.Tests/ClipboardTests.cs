@@ -18,29 +18,13 @@ namespace Dapplo.Windows.Tests;
 /// <summary>
 /// All clipboard related tests
 /// </summary>
-public class ClipboardTests : IDisposable
+public class ClipboardTests
 {
     private static readonly LogSource Log = new LogSource();
 
     public ClipboardTests(ITestOutputHelper testOutputHelper)
     {
         LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-
-        static IntPtr WinProcClipboardHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            // We can use the GetClipboardFormatName to get the string for the windows message... weird but it works
-            Log.Verbose().WriteLine("WinProc {0}, {1}", hWnd, WindowsMessage.GetWindowsMessage((uint)msg));
-            return IntPtr.Zero;
-        }
-
-        WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(WinProcClipboardHandler));
-    }
-
-    /// <inheritdoc cref="IDisposable"/>
-    public void Dispose()
-    {
-        // Normally not needed, but every test is more or less it's own application and we need to make sure this cleanup is done
-        WinProcHandler.Instance.MessageHandlerWindow.Dispose();
     }
 
     /// <summary>

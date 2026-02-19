@@ -13,20 +13,13 @@ namespace Dapplo.Windows.Tests;
 /// <summary>
 /// Tests for WindowsSessionListener
 /// </summary>
-public class WindowsSessionListenerTests : IDisposable
+public class WindowsSessionListenerTests
 {
     private static readonly LogSource Log = new LogSource();
 
     public WindowsSessionListenerTests(ITestOutputHelper testOutputHelper)
     {
         LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-    }
-
-    /// <inheritdoc cref="IDisposable"/>
-    public void Dispose()
-    {
-        // Normally not needed, but every test is more or less its own application and we need to make sure this cleanup is done
-        WinProcHandler.Instance.MessageHandlerWindow.Dispose();
     }
 
     /// <summary>

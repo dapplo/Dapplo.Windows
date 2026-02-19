@@ -10,7 +10,8 @@ using Dapplo.Windows.Input.Structs;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive.Subjects;
-using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Native;
+using Dapplo.Windows.Messages.Structs;
 
 namespace Dapplo.Windows.Input
 {
@@ -25,7 +26,7 @@ namespace Dapplo.Windows.Input
 
         static RawInputMonitor()
         {
-            WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(HandleRawInputMessages));
+            SharedMessageWindow.Messages.Subscribe(HandleRawInputMessages);
         }
 
         /// <summary>
@@ -46,21 +47,14 @@ namespace Dapplo.Windows.Input
         /// <summary>
         /// A local function which handles the RawInput messages
         /// </summary>
-        /// <param name="hWnd">IntPtr</param>
-        /// <param name="msg">int</param>
-        /// <param name="wParam">IntPtr</param>
-        /// <param name="lParam">IntPtr</param>
-        /// <param name="handled">ref bool</param>
-        /// <returns>IntPtr</returns>
-        private static IntPtr HandleRawInputMessages(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        /// <param name="m">WindowMessage</param>
+        private static void HandleRawInputMessages(WindowMessage m)
         {
-            var windowsMessage = (WindowsMessages)msg;
-
-            switch (windowsMessage)
+            switch ((WindowsMessages)m.Msg)
             {
                 case WindowsMessages.WM_INPUT_DEVICE_CHANGE:
-                    bool isNew = wParam.ToInt64() == 1;
-                    IntPtr deviceHandle = lParam;
+                    bool isNew = (int)m.WParam == 1;
+                    IntPtr deviceHandle = (IntPtr)m.LParam;
                     // Add to cache
                     if (isNew)
                     {
@@ -81,18 +75,17 @@ namespace Dapplo.Windows.Input
                     int outSize;
                     int size = Marshal.SizeOf(typeof(RawInput));
 
-                    outSize = RawInputApi.GetRawInputData(lParam, RawInputDataCommands.Input, out var rawInput, ref size, Marshal.SizeOf(typeof(RawInputHeader)));
+                    outSize = RawInputApi.GetRawInputData((IntPtr)m.LParam, RawInputDataCommands.Input, out var rawInput, ref size, Marshal.SizeOf(typeof(RawInputHeader)));
                     if (outSize != -1)
                     {
                         RawInputSubject.OnNext(new RawInputEventArgs
                         {
-                            IsForeground = wParam.ToInt64() == 0,
+                            IsForeground = (int)m.WParam == 0,
                             RawInput = rawInput
                         });
                     }
                     break;
             }
-            return IntPtr.Zero;
         }
 
         /// <summary>
@@ -100,7 +93,7 @@ namespace Dapplo.Windows.Input
         /// </summary>
         public static IObservable<RawInputEventArgs> MonitorRawInput(params RawInputDevices[] devices)
         {
-            RawInputApi.RegisterRawInput(WinProcHandler.Instance.Handle, RawInputDeviceFlags.InputSink | RawInputDeviceFlags.DeviceNotify, devices);
+            RawInputApi.RegisterRawInput((IntPtr)SharedMessageWindow.Handle, RawInputDeviceFlags.InputSink | RawInputDeviceFlags.DeviceNotify, devices);
             return OnRawInput;
         }
 
@@ -109,7 +102,7 @@ namespace Dapplo.Windows.Input
         /// </summary>
         public static IObservable<RawInputDeviceChangeEventArgs> MonitorRawInputDeviceChanges(params RawInputDevices[] devices)
         {
-            RawInputApi.RegisterRawInput(WinProcHandler.Instance.Handle, RawInputDeviceFlags.DeviceNotify, devices);
+            RawInputApi.RegisterRawInput((IntPtr)SharedMessageWindow.Handle, RawInputDeviceFlags.DeviceNotify, devices);
             return OnDeviceChanges;
         }
     }

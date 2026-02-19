@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Messages;
 using Dapplo.Windows.User32;
 using Xunit;
 
@@ -30,8 +29,6 @@ public class WinEventHookTests
     [StaFact]
     private async Task TestWinEventHook()
     {
-        // This takes care of having a WinProc handler, to make sure the messages arrive
-        var winProcHandler = WinProcHandler.Instance;
         // This buffers the observable
         var replaySubject = new ReplaySubject<IInteropWindow>();
 
