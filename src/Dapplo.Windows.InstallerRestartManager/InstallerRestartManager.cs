@@ -321,7 +321,7 @@ public sealed class InstallerRestartManager : IDisposable
     {
         if (_disposed)
         {
-            throw new ObjectDisposedException(nameof(RestartManager));
+            throw new ObjectDisposedException(nameof(InstallerRestartManager));
         }
     }
 
