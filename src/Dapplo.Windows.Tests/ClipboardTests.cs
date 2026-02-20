@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -216,6 +217,41 @@ public class ClipboardTests  : IDisposable
         using var clipboardAccessToken = ClipboardNative.Access();
         var fileNames = clipboardAccessToken.GetFileNames();
         Assert.True(fileNames.Any());
+    }
+
+    /// <summary>
+    ///     Test setting file names on the clipboard and reading them back
+    /// </summary>
+    [WpfFact]
+    public async Task TestClipboard_SetFileNames()
+    {
+        // Note: DROPFILES stores file name strings in the clipboard buffer without
+        // needing the files to actually exist on disk. The paths are stored as-is.
+        var testFiles = new List<string>
+        {
+            @"C:\path\to\file1.txt",
+            @"C:\path\to\file2.txt"
+        };
+
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            Assert.False(clipboardAccessToken.IsLockTimeout);
+            clipboardAccessToken.ClearContents();
+            clipboardAccessToken.SetFileNames(testFiles);
+        }
+
+        await Task.Delay(100);
+
+        using (var clipboardAccessToken = await ClipboardNative.AccessAsync())
+        {
+            Assert.True(clipboardAccessToken.CanAccess);
+            Assert.False(clipboardAccessToken.IsLockTimeout);
+            var result = clipboardAccessToken.GetFileNames().ToList();
+            Assert.Equal(testFiles.Count, result.Count);
+            Assert.Equal(testFiles[0], result[0]);
+            Assert.Equal(testFiles[1], result[1]);
+        }
     }
 
     /// <summary>
