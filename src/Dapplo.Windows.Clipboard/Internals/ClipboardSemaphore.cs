@@ -16,6 +16,8 @@ internal sealed class ClipboardSemaphore : IDisposable
 {
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(200);
     private static readonly TimeSpan DefaultRetryInterval = TimeSpan.FromMilliseconds(100);
+    private const int WindowHandlePollingIntervalMs = 10;
+    private const int WindowHandleMaxRetries = 50;
     private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
     // To detect redundant calls
     private bool _disposedValue;
@@ -37,8 +39,13 @@ internal sealed class ClipboardSemaphore : IDisposable
 
         if (hWnd == IntPtr.Zero)
         {
-            // Take the default
+            // Take the default, waiting briefly if the window is still being created
             hWnd = (IntPtr)SharedMessageWindow.Handle;
+            for (var i = 0; hWnd == IntPtr.Zero && i < WindowHandleMaxRetries; i++)
+            {
+                Thread.Sleep(WindowHandlePollingIntervalMs);
+                hWnd = (IntPtr)SharedMessageWindow.Handle;
+            }
         }
 
         // If a timeout is passed, use this in the wait
@@ -103,8 +110,13 @@ internal sealed class ClipboardSemaphore : IDisposable
 
         if (hWnd == IntPtr.Zero)
         {
-            // Take the default
+            // Take the default, waiting briefly if the window is still being created
             hWnd = (IntPtr)SharedMessageWindow.Handle;
+            for (var i = 0; hWnd == IntPtr.Zero && i < WindowHandleMaxRetries; i++)
+            {
+                await Task.Delay(WindowHandlePollingIntervalMs, cancellationToken).ConfigureAwait(false);
+                hWnd = (IntPtr)SharedMessageWindow.Handle;
+            }
         }
 
         // Await the semaphore, until the timeout is triggered
