@@ -10,7 +10,7 @@ using Dapplo.Windows.Messages.Enumerations;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Native;
 #endif
 
 namespace Dapplo.Windows.Clipboard
@@ -41,16 +41,25 @@ namespace Dapplo.Windows.Clipboard
             {
                 return _onUpdate ??= Observable.Create<ClipboardUpdateInformation>(observer =>
                     {
-                        // This handles the message
-                        IntPtr WinProcClipboardMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-                        {
-                            var windowsMessage = (WindowsMessages)msg;
-                            if (windowsMessage != WindowsMessages.WM_CLIPBOARDUPDATE)
+                        return SharedMessageWindow.Listen(
+                            onSetup: hwnd =>
                             {
-                                return IntPtr.Zero;
-                            }
-
-                            var clipboardUpdateInformationInfo = ClipboardUpdateInformation.Create(hWnd);
+                                if (!NativeMethods.AddClipboardFormatListener((IntPtr)hwnd))
+                                {
+                                    observer.OnError(new Win32Exception());
+                                }
+                                else
+                                {
+                                    // Make sure the current contents are always published
+                                    observer.OnNext(ClipboardUpdateInformation.Create((IntPtr)hwnd));
+                                }
+                            },
+                            onTeardown: hwnd => NativeMethods.RemoveClipboardFormatListener((IntPtr)hwnd)
+                        )
+                        .Where(m => m.Msg == (uint)WindowsMessages.WM_CLIPBOARDUPDATE)
+                        .Subscribe(m =>
+                        {
+                            var clipboardUpdateInformationInfo = ClipboardUpdateInformation.Create((IntPtr)m.Hwnd);
 
                             // Make sure we don't trigger multiple times, this happened while developing.
                             if (clipboardUpdateInformationInfo.Id > _previousSequence)
@@ -58,27 +67,7 @@ namespace Dapplo.Windows.Clipboard
                                 _previousSequence = clipboardUpdateInformationInfo.Id;
                                 observer.OnNext(clipboardUpdateInformationInfo);
                             }
-
-                            return IntPtr.Zero;
-                        }
-
-                        var hook = new WinProcHandlerHook(WinProcClipboardMessageHandler);
-                        var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
-                        if (!NativeMethods.AddClipboardFormatListener(WinProcHandler.Instance.Handle))
-                        {
-                            observer.OnError(new Win32Exception());
-                        }
-                        else
-                        {
-                            // Make sure the current contents are always published
-                            observer.OnNext(ClipboardUpdateInformation.Create());
-                        }
-
-                        return hook.Disposable = Disposable.Create(() =>
-                        {
-                            NativeMethods.RemoveClipboardFormatListener(WinProcHandler.Instance.Handle);
-                            hookSubscription.Dispose();
-                        });
+                        }, observer.OnError, observer.OnCompleted);
                     })
                     // Make sure there is always a value produced when connecting
                     .Publish()
@@ -97,51 +86,43 @@ namespace Dapplo.Windows.Clipboard
             {
                 return _onRenderFormat ??= Observable.Create<ClipboardRenderFormatRequest>(observer =>
                 {
-                    // This handles the message
-                    IntPtr WinProcClipboardRenderFormatHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-                    {
-                        var windowsMessage = (WindowsMessages)msg;
-                        switch (windowsMessage)
+                    return SharedMessageWindow.Listen()
+                        .Where(m => m.Msg == (uint)WindowsMessages.WM_RENDERALLFORMATS ||
+                                    m.Msg == (uint)WindowsMessages.WM_RENDERFORMAT ||
+                                    m.Msg == (uint)WindowsMessages.WM_DESTROYCLIPBOARD)
+                        .Subscribe(m =>
                         {
-                            case WindowsMessages.WM_RENDERALLFORMATS:
-                                var requestRenderFormat = new ClipboardRenderFormatRequest
-                                {
-                                    AccessToken = Access()
-                                };
-                                observer.OnNext(requestRenderFormat);
-                                break;
-                            case WindowsMessages.WM_RENDERFORMAT:
-                                var clipboardFormatId = (uint)wParam.ToInt32();
-                                var requestSingleFormat = new ClipboardRenderFormatRequest
-                                {
-                                    RequestedFormatId = clipboardFormatId,
-                                    // According to https://docs.microsoft.com/en-us/windows/win32/dataxchg/wm-renderformat the clipboard must not be open
-                                    AccessToken = new ClipboardAccessToken {
-                                        CanAccess = true,
-                                        IsLockTimeout = true
-                                    }
-                                };
-                                observer.OnNext(requestSingleFormat);
-                                break;
-                            case WindowsMessages.WM_DESTROYCLIPBOARD:
-                                var requestDestroyClipboard = new ClipboardRenderFormatRequest
-                                {
-                                    IsDestroyClipboard = true
-                                };
-                                observer.OnNext(requestDestroyClipboard);
-                                break;
-                        }
-
-                        return IntPtr.Zero;
-                    }
-
-                    var hook = new WinProcHandlerHook(WinProcClipboardRenderFormatHandler);
-                    var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
-
-                    return hook.Disposable = Disposable.Create(() =>
-                    {
-                        hookSubscription.Dispose();
-                    });
+                            switch ((WindowsMessages)m.Msg)
+                            {
+                                case WindowsMessages.WM_RENDERALLFORMATS:
+                                    var requestRenderFormat = new ClipboardRenderFormatRequest
+                                    {
+                                        AccessToken = Access()
+                                    };
+                                    observer.OnNext(requestRenderFormat);
+                                    break;
+                                case WindowsMessages.WM_RENDERFORMAT:
+                                    var clipboardFormatId = (uint)m.WParam;
+                                    var requestSingleFormat = new ClipboardRenderFormatRequest
+                                    {
+                                        RequestedFormatId = clipboardFormatId,
+                                        // According to https://docs.microsoft.com/en-us/windows/win32/dataxchg/wm-renderformat the clipboard must not be open
+                                        AccessToken = new ClipboardAccessToken {
+                                            CanAccess = true,
+                                            IsLockTimeout = true
+                                        }
+                                    };
+                                    observer.OnNext(requestSingleFormat);
+                                    break;
+                                case WindowsMessages.WM_DESTROYCLIPBOARD:
+                                    var requestDestroyClipboard = new ClipboardRenderFormatRequest
+                                    {
+                                        IsDestroyClipboard = true
+                                    };
+                                    observer.OnNext(requestDestroyClipboard);
+                                    break;
+                            }
+                        }, observer.OnError, observer.OnCompleted);
                 })
                 // Make sure there is always a value produced when connecting
                 .Publish()

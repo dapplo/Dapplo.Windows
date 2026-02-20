@@ -34,12 +34,17 @@ public class IconTests
     public void TestIcon_GetIcon()
     {
         // Start a process to test against
-        using (var process = Process.Start("notepad.exe"))
+        using (var process = Process.Start("charmap.exe"))
         {
             // Make sure it's started
             Assert.NotNull(process);
             // Wait until the process started it's message pump (listening for input)
-            process.WaitForInputIdle();
+            if (!process.WaitForInputIdle(2000))
+            {
+                Assert.Fail("Test-Process didn't get ready.");
+                return;
+            }
+
             User32Api.SetWindowText(process.MainWindowHandle, "TestIcon_GetIcon");
 
             var window = InteropWindowQuery.GetTopLevelWindows().First();

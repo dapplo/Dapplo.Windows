@@ -5,6 +5,7 @@
 using System;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Native;
 
 namespace Dapplo.Windows.Messages;
 
@@ -77,15 +78,42 @@ public class WindowsSessionListener : IDisposable
             }
 
             _isPaused = false;
-            
-            // Register to receive session change notifications
-            var handle = WinProcHandler.Instance.Handle;
-            if (!WTSRegisterSessionNotification(handle, NOTIFY_FOR_THIS_SESSION))
-            {
-                throw new InvalidOperationException("Failed to register for session notifications");
-            }
 
-            _subscription = WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(HandleSessionChange));
+            _subscription = SharedMessageWindow.Listen(
+                onSetup: hwnd =>
+                {
+                    if (!WTSRegisterSessionNotification((IntPtr)hwnd, NOTIFY_FOR_THIS_SESSION))
+                    {
+                        throw new InvalidOperationException("Failed to register for session notifications");
+                    }
+                },
+                onTeardown: hwnd => WTSUnRegisterSessionNotification((IntPtr)hwnd)
+            )
+            .Subscribe(m =>
+            {
+                if (_isPaused || m.Msg != (uint)WindowsMessages.WM_WTSSESSION_CHANGE)
+                {
+                    return;
+                }
+
+                var eventType = (WtsSessionChangeEvents)(int)m.WParam;
+                var sessionId = (int)m.LParam;
+
+                var args = new SessionChangeEventArgs(eventType, sessionId);
+
+                switch (eventType)
+                {
+                    case WtsSessionChangeEvents.WTS_SESSION_LOCK:
+                    case WtsSessionChangeEvents.WTS_SESSION_UNLOCK:
+                        SessionLockChange?.Invoke(this, args);
+                        break;
+
+                    case WtsSessionChangeEvents.WTS_SESSION_LOGON:
+                    case WtsSessionChangeEvents.WTS_SESSION_LOGOFF:
+                        SessionLogonChange?.Invoke(this, args);
+                        break;
+                }
+            });
         }
     }
 
@@ -114,46 +142,11 @@ public class WindowsSessionListener : IDisposable
         {
             if (_subscription != null)
             {
-                // Unregister from session notifications
-                var handle = WinProcHandler.Instance.Handle;
-                WTSUnRegisterSessionNotification(handle);
-
                 _subscription.Dispose();
                 _subscription = null;
             }
             _isPaused = false;
         }
-    }
-
-    /// <summary>
-    ///     Handles the WM_WTSSESSION_CHANGE message
-    /// </summary>
-    private IntPtr HandleSessionChange(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled)
-    {
-        if (_isPaused || (uint)msg != (uint)WindowsMessages.WM_WTSSESSION_CHANGE)
-        {
-            return IntPtr.Zero;
-        }
-
-        var eventType = (WtsSessionChangeEvents)wparam.ToInt32();
-        var sessionId = lparam.ToInt32();
-
-        var args = new SessionChangeEventArgs(eventType, sessionId);
-
-        switch (eventType)
-        {
-            case WtsSessionChangeEvents.WTS_SESSION_LOCK:
-            case WtsSessionChangeEvents.WTS_SESSION_UNLOCK:
-                SessionLockChange?.Invoke(this, args);
-                break;
-
-            case WtsSessionChangeEvents.WTS_SESSION_LOGON:
-            case WtsSessionChangeEvents.WTS_SESSION_LOGOFF:
-                SessionLogonChange?.Invoke(this, args);
-                break;
-        }
-
-        return IntPtr.Zero;
     }
 
     /// <summary>

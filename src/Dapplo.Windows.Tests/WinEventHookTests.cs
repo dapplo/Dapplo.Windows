@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Messages;
 using Dapplo.Windows.User32;
 using Xunit;
 
@@ -30,8 +29,6 @@ public class WinEventHookTests
     [StaFact]
     private async Task TestWinEventHook()
     {
-        // This takes care of having a WinProc handler, to make sure the messages arrive
-        var winProcHandler = WinProcHandler.Instance;
         // This buffers the observable
         var replaySubject = new ReplaySubject<IInteropWindow>();
 
@@ -45,24 +42,29 @@ public class WinEventHookTests
             }, exception => Log.Error().WriteLine("An error occured", exception));
         await Task.Delay(100);
         // Start a process to test against
-        using (var process = Process.Start("notepad.exe"))
+        using (var process = Process.Start("charmap.exe"))
         {
             try
             {
                 // Make sure it's started
                 Assert.NotNull(process);
+
                 // Wait until the process started it's message pump (listening for input)
-                process.WaitForInputIdle();
+                if (!process.WaitForInputIdle(2000))
+                {
+                    Assert.Fail("Process wasn't ready for input.");
+                    return;
+                }
                 User32Api.SetWindowText(process.MainWindowHandle, "TestWinEventHook - Test");
 
                 // Find the belonging window
-                var notepadWindow = await replaySubject.Where(info => info != null && info.ProcessId == process.Id).FirstAsync();
-                Assert.Equal(process.Id, notepadWindow?.ProcessId);
+                var testWindow = await replaySubject.Where(info => info != null && info.ProcessId == process.Id).FirstAsync();
+                Assert.Equal(process.Id, testWindow?.ProcessId);
             }
             finally
             {
-                winEventObservable.Dispose();
                 process?.Kill();
+                winEventObservable.Dispose();
             }
         }
     }

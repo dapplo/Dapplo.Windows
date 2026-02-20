@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Native;
 
 namespace Dapplo.Windows.Clipboard;
 
@@ -54,12 +54,10 @@ public class ClipboardUpdateInformation
     /// <returns>ClipboardUpdateInformation</returns>
     public static ClipboardUpdateInformation Create(IntPtr hWnd = default)
     {
-#if !NETSTANDARD2_0
         if (hWnd == IntPtr.Zero)
         {
-            hWnd = WinProcHandler.Instance.Handle;
+            hWnd = (IntPtr)SharedMessageWindow.Handle;
         }
-#endif
         using var clipboard = ClipboardNative.Access(hWnd);
         return new ClipboardUpdateInformation(clipboard);
     }
