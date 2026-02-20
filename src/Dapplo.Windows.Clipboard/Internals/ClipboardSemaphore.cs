@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,8 +17,6 @@ internal sealed class ClipboardSemaphore : IDisposable
 {
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(200);
     private static readonly TimeSpan DefaultRetryInterval = TimeSpan.FromMilliseconds(100);
-    private const int WindowHandlePollingIntervalMs = 10;
-    private const int WindowHandleMaxRetries = 50;
     private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
     // To detect redundant calls
     private bool _disposedValue;
@@ -39,13 +38,8 @@ internal sealed class ClipboardSemaphore : IDisposable
 
         if (hWnd == IntPtr.Zero)
         {
-            // Take the default, waiting briefly if the window is still being created
-            hWnd = (IntPtr)SharedMessageWindow.Handle;
-            for (var i = 0; hWnd == IntPtr.Zero && i < WindowHandleMaxRetries; i++)
-            {
-                Thread.Sleep(WindowHandlePollingIntervalMs);
-                hWnd = (IntPtr)SharedMessageWindow.Handle;
-            }
+            // Take the default; if the window is still being created, wait for it reactively
+            hWnd = (IntPtr)SharedMessageWindow.WhenHandleAvailable.First();
         }
 
         // If a timeout is passed, use this in the wait
@@ -110,13 +104,8 @@ internal sealed class ClipboardSemaphore : IDisposable
 
         if (hWnd == IntPtr.Zero)
         {
-            // Take the default, waiting briefly if the window is still being created
-            hWnd = (IntPtr)SharedMessageWindow.Handle;
-            for (var i = 0; hWnd == IntPtr.Zero && i < WindowHandleMaxRetries; i++)
-            {
-                await Task.Delay(WindowHandlePollingIntervalMs, cancellationToken).ConfigureAwait(false);
-                hWnd = (IntPtr)SharedMessageWindow.Handle;
-            }
+            // Take the default; if the window is still being created, wait for it reactively
+            hWnd = (IntPtr)await SharedMessageWindow.WhenHandleAvailable.FirstAsync().ToTask(cancellationToken);
         }
 
         // Await the semaphore, until the timeout is triggered

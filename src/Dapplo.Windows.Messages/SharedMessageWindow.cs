@@ -67,6 +67,15 @@ public static class SharedMessageWindow
     public static nint Handle => _handleSubject.Value;
 
     /// <summary>
+    /// Gets an observable sequence that emits whenever the window handle is non-zero.
+    /// If the handle is already non-zero when subscribed, it emits immediately.
+    /// Use <see cref="System.Reactive.Linq.Observable.First{TSource}"/> or
+    /// <see cref="System.Reactive.Linq.Observable.FirstAsync{TSource}(IObservable{TSource})"/>
+    /// to obtain only the first available handle.
+    /// </summary>
+    public static IObservable<nint> WhenHandleAvailable => _handleSubject.Where(h => h != 0);
+
+    /// <summary>
     /// Gets an observable sequence of all window messages received by the application.
     /// </summary>
     /// <remarks>The returned observable is shared among all subscribers. Subscribing to this property allows
