@@ -4,34 +4,36 @@ The Restart Manager is a Windows feature that helps minimize application downtim
 
 ## Overview
 
-Dapplo.Windows.Kernel32 provides a comprehensive .NET API for the Windows Restart Manager that abstracts away the low-level P/Invoke details. There are two perspectives to Restart Manager:
+Dapplo.Windows provides a comprehensive .NET API for the Windows Restart Manager split into two separate projects for better separation of concerns:
 
 ### For Installers/Updaters
 
-- **`RestartManager`** - High-level helper class that manages Restart Manager sessions for installers
-- **`RestartManagerApi`** - Low-level P/Invoke declarations (for advanced scenarios)
+- **`Dapplo.Windows.InstallerRestartManager`** - Package for installers
+  - **`InstallerRestartManager`** - High-level helper class that manages Restart Manager sessions
+  - **`RestartManagerApi`** (in Kernel32) - Low-level P/Invoke declarations (for advanced scenarios)
 
 ### For Applications
 
-- **`ApplicationRestart`** - High-level helper class for applications to register for automatic restart
-- **`Kernel32Api`** - Contains `RegisterApplicationRestart` and `UnregisterApplicationRestart` P/Invoke declarations
+- **`Dapplo.Windows.AppRestartManager`** - Package for applications
+  - **`RestartManager`** - High-level helper class for applications to register for automatic restart
+  - **`Kernel32Api`** (in Kernel32) - Contains `RegisterApplicationRestart` and `UnregisterApplicationRestart` P/Invoke declarations
 
 ## Application-Side API
 
-If you're developing an application that may be updated or needs to be restarted during system updates, use the `ApplicationRestart` class.
+If you're developing an application that may be updated or needs to be restarted during system updates, use the `RestartManager` class from the `Dapplo.Windows.AppRestartManager` package.
 
 ### Registering Your Application for Restart
 
 Applications can register themselves to be automatically restarted by Restart Manager:
 
 ```csharp
-using Dapplo.Windows.Kernel32;
+using Dapplo.Windows.AppRestartManager;
 
 // Register for restart with command-line arguments
-ApplicationRestart.RegisterForRestart("/restore /minimized");
+RestartManager.RegisterForRestart("/restore /minimized");
 
 // Or register without arguments
-ApplicationRestart.RegisterForRestart();
+RestartManager.RegisterForRestart();
 ```
 
 ### When to Register for Restart
@@ -39,13 +41,15 @@ ApplicationRestart.RegisterForRestart();
 The best time to register for restart is during application startup, in your `Main` method or application initialization:
 
 ```csharp
+using Dapplo.Windows.AppRestartManager;
+
 static void Main(string[] args)
 {
     // Register for restart early in the application lifecycle
-    ApplicationRestart.RegisterForRestart("/restore");
+    RestartManager.RegisterForRestart("/restore");
     
     // Check if we were restarted by Restart Manager
-    if (ApplicationRestart.IsRestartRequested())
+    if (RestartManager.WasRestartRequested())
     {
         // Restore previous state, show notification, etc.
         Console.WriteLine("Application was restarted after an update");
@@ -61,22 +65,23 @@ static void Main(string[] args)
 You can control when your application should NOT be restarted using flags:
 
 ```csharp
+using Dapplo.Windows.AppRestartManager;
 using Dapplo.Windows.Kernel32.Enums;
 
 // Don't restart if the application crashes
-ApplicationRestart.RegisterForRestart(
+RestartManager.RegisterForRestart(
     commandLineArgs: "/restore",
     flags: ApplicationRestartFlags.RestartNoCrash
 );
 
 // Don't restart on crash or hang
-ApplicationRestart.RegisterForRestart(
+RestartManager.RegisterForRestart(
     commandLineArgs: "/restore",
     flags: ApplicationRestartFlags.RestartNoCrash | ApplicationRestartFlags.RestartNoHang
 );
 
 // Don't restart during patches or reboots
-ApplicationRestart.RegisterForRestart(
+RestartManager.RegisterForRestart(
     commandLineArgs: null,
     flags: ApplicationRestartFlags.RestartNoPatch | ApplicationRestartFlags.RestartNoReboot
 );
@@ -87,12 +92,130 @@ ApplicationRestart.RegisterForRestart(
 If your application no longer wants to be restarted automatically:
 
 ```csharp
-ApplicationRestart.UnregisterForRestart();
+RestartManager.UnregisterForRestart();
 ```
 
-### Detecting Restart Manager Shutdown
+### Listening for Shutdown Events
 
-When your application is being shut down by Restart Manager, it receives normal Windows shutdown messages (WM_QUERYENDSESSION). Handle these appropriately:
+The `RestartManager.ListenForEndSession()` method provides an observable stream that listens for `WM_QUERYENDSESSION` and `WM_ENDSESSION` Windows messages. This allows your application to be notified when the system is shutting down or when Restart Manager is requesting a shutdown:
+
+```csharp
+using Dapplo.Windows.AppRestartManager;
+using Dapplo.Windows.AppRestartManager.Enums;
+using System.Reactive.Linq;
+
+// Listen for shutdown requests
+var subscription = RestartManager.ListenForEndSession()
+    .Subscribe(reason =>
+    {
+        Console.WriteLine($"Shutdown requested: {reason}");
+        
+        if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+        {
+            // Application is being closed for an update
+            SaveApplicationState();
+            Console.WriteLine("Saved state - application will be restarted");
+        }
+        else if (reason.HasFlag(EndSessionReasons.ENDSESSION_LOGOFF))
+        {
+            // User is logging off
+            SaveUserSettings();
+            Console.WriteLine("User logging off");
+        }
+        else if (reason.HasFlag(EndSessionReasons.ENDSESSION_CRITICAL))
+        {
+            // Critical shutdown
+            PerformEmergencySave();
+        }
+    });
+
+// Don't forget to dispose when your application exits
+subscription.Dispose();
+```
+
+#### EndSession Reasons
+
+The `EndSessionReasons` enum provides flags indicating why the session is ending:
+
+- **`ENDSESSION_CLOSEAPP` (0x00000001)** - The application is using a file that must be replaced, the system is being serviced, or system resources are exhausted
+- **`ENDSESSION_CRITICAL` (0x40000000)** - The application is forced to shut down because a system component is being updated or a critical system event requires the application to close
+- **`ENDSESSION_LOGOFF` (0x80000000)** - The user is logging off
+
+### Complete Application Example
+
+Here's a complete example showing how an application should integrate with Restart Manager:
+
+```csharp
+using System;
+using System.Windows.Forms;
+using Dapplo.Windows.AppRestartManager;
+using Dapplo.Windows.AppRestartManager.Enums;
+using System.Reactive.Linq;
+
+public class MyApplication
+{
+    private IDisposable _endSessionSubscription;
+    
+    static void Main(string[] args)
+    {
+        var app = new MyApplication();
+        app.Run(args);
+    }
+    
+    public void Run(string[] args)
+    {
+        // Register for restart with command-line arguments
+        RestartManager.RegisterForRestart("/restore");
+        
+        // Check if we were restarted
+        if (RestartManager.WasRestartRequested())
+        {
+            var cmdArgs = RestartManager.GetRestartCommandLineArgs();
+            if (cmdArgs.Contains("/restore"))
+            {
+                RestoreApplicationState();
+            }
+        }
+        
+        // Listen for shutdown events
+        _endSessionSubscription = RestartManager.ListenForEndSession()
+            .Subscribe(reason =>
+            {
+                HandleShutdown(reason);
+            });
+        
+        // Run the application
+        Application.Run(new MainForm());
+        
+        // Clean up
+        _endSessionSubscription?.Dispose();
+    }
+    
+    private void RestoreApplicationState()
+    {
+        Console.WriteLine("Restoring state after restart");
+        // Load saved state...
+    }
+    
+    private void HandleShutdown(EndSessionReasons reason)
+    {
+        if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+        {
+            SaveApplicationState();
+        }
+    }
+    
+    private void SaveApplicationState()
+    {
+        Console.WriteLine("Saving application state");
+        // Save state...
+    }
+}
+```
+
+### Detecting Restart Manager Shutdown (Alternative Methods)
+
+When your application is being shut down by Restart Manager, it also receives normal Windows shutdown messages (WM_QUERYENDSESSION). You can handle these in traditional ways as well:
 
 ```csharp
 // In a Windows Forms application
@@ -131,7 +254,7 @@ Console.CancelKeyPress += (sender, e) =>
 
 ## Installer/Updater API
 
-If you're developing an installer or updater, use the `RestartManager` class to manage other applications.
+If you're developing an installer or updater, use the `InstallerRestartManager` class from the `Dapplo.Windows.InstallerRestartManager` package to manage other applications.
 
 ## Common Use Cases
 
@@ -141,10 +264,10 @@ One of the most common use cases is finding out which processes are locking a sp
 
 ```csharp
 using System;
-using Dapplo.Windows.Kernel32;
+using Dapplo.Windows.InstallerRestartManager;
 
 // Find processes using a file
-using (var session = RestartManager.CreateSession())
+using (var session = InstallerRestartManager.CreateSession())
 {
     session.RegisterFile(@"C:\path\to\locked\file.dll");
     var processes = session.GetProcessesUsingResources();
@@ -165,7 +288,7 @@ using (var session = RestartManager.CreateSession())
 You can also register multiple files at once:
 
 ```csharp
-using (var session = RestartManager.CreateSession())
+using (var session = InstallerRestartManager.CreateSession())
 {
     session.RegisterFiles(
         @"C:\path\to\file1.dll",
@@ -192,7 +315,7 @@ using (var session = RestartManager.CreateSession())
 Before installing updates, you might want to check if a system reboot would be required:
 
 ```csharp
-using (var session = RestartManager.CreateSession())
+using (var session = InstallerRestartManager.CreateSession())
 {
     // Register the files you plan to update
     session.RegisterFiles(@"C:\Windows\System32\somedriver.sys");
@@ -223,7 +346,7 @@ using (var session = RestartManager.CreateSession())
 For installer scenarios, you can shut down applications using the registered resources and restart them later:
 
 ```csharp
-using (var session = RestartManager.CreateSession())
+using (var session = InstallerRestartManager.CreateSession())
 {
     // Register the files you need to update
     session.RegisterFiles(@"C:\Program Files\MyApp\MyApp.exe");
@@ -258,7 +381,7 @@ using (var session = RestartManager.CreateSession())
 You can also register Windows services:
 
 ```csharp
-using (var session = RestartManager.CreateSession())
+using (var session = InstallerRestartManager.CreateSession())
 {
     // Register services by their short names
     session.RegisterServices("MyService", "AnotherService");
@@ -332,7 +455,7 @@ using Dapplo.Windows.Kernel32;
 
 try
 {
-    using (var session = RestartManager.CreateSession())
+    using (var session = InstallerRestartManager.CreateSession())
     {
         session.RegisterFile(@"C:\path\to\file.dll");
         

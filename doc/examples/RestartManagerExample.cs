@@ -3,7 +3,10 @@
 
 using System;
 using System.IO;
-using Dapplo.Windows.Kernel32;
+using System.Reactive.Linq;
+using Dapplo.Windows.AppRestartManager;
+using Dapplo.Windows.AppRestartManager.Enums;
+using Dapplo.Windows.InstallerRestartManager;
 using Dapplo.Windows.Kernel32.Enums;
 
 namespace Dapplo.Windows.Examples;
@@ -28,7 +31,7 @@ public static class RestartManagerExample
         try
         {
             // Register with command-line arguments to restore state
-            ApplicationRestart.RegisterForRestart("/restore /minimized");
+            AppRestartManager.RestartManager.RegisterForRestart("/restore /minimized");
             
             Console.WriteLine("Application successfully registered for restart.");
             Console.WriteLine("If shut down by Restart Manager, it will restart with: /restore /minimized");
@@ -44,11 +47,11 @@ public static class RestartManagerExample
     /// </summary>
     public static void CheckIfRestarted()
     {
-        if (ApplicationRestart.IsRestartRequested())
+        if (AppRestartManager.RestartManager.WasRestartRequested())
         {
             Console.WriteLine("Application was restarted by Restart Manager!");
             
-            var args = ApplicationRestart.GetRestartCommandLineArgs();
+            var args = AppRestartManager.RestartManager.GetRestartCommandLineArgs();
             Console.WriteLine($"Restart arguments: {string.Join(" ", args)}");
             
             // Restore application state here
@@ -68,7 +71,7 @@ public static class RestartManagerExample
         Console.WriteLine("Registering with custom restart flags...");
         
         // Don't restart if the application crashes or hangs
-        ApplicationRestart.RegisterForRestart(
+        AppRestartManager.RestartManager.RegisterForRestart(
             commandLineArgs: "/restore",
             flags: ApplicationRestartFlags.RestartNoCrash | ApplicationRestartFlags.RestartNoHang
         );
@@ -85,13 +88,96 @@ public static class RestartManagerExample
         
         try
         {
-            ApplicationRestart.UnregisterForRestart();
+            AppRestartManager.RestartManager.UnregisterForRestart();
             Console.WriteLine("Application successfully unregistered from restart.");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to unregister: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    ///     Example: Listen for shutdown/end session events
+    /// </summary>
+    public static IDisposable ListenForShutdownEvents()
+    {
+        Console.WriteLine("Starting to listen for shutdown events...");
+        
+        var subscription = AppRestartManager.RestartManager.ListenForEndSession()
+            .Subscribe(reason =>
+            {
+                Console.WriteLine($"Shutdown event received: {reason}");
+                
+                if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+                {
+                    Console.WriteLine("  -> Application is being closed for an update");
+                    Console.WriteLine("  -> Saving application state...");
+                    // SaveApplicationState();
+                }
+                else if (reason.HasFlag(EndSessionReasons.ENDSESSION_LOGOFF))
+                {
+                    Console.WriteLine("  -> User is logging off");
+                    Console.WriteLine("  -> Saving user settings...");
+                    // SaveUserSettings();
+                }
+                else if (reason.HasFlag(EndSessionReasons.ENDSESSION_CRITICAL))
+                {
+                    Console.WriteLine("  -> Critical shutdown event");
+                    Console.WriteLine("  -> Performing emergency save...");
+                    // PerformEmergencySave();
+                }
+            });
+        
+        Console.WriteLine("Listening for shutdown events. Press any key to stop...");
+        return subscription;
+    }
+
+    /// <summary>
+    ///     Example: Complete application integration with Restart Manager
+    /// </summary>
+    public static void CompleteApplicationExample()
+    {
+        Console.WriteLine("=== Complete Application Example ===");
+        Console.WriteLine();
+        
+        // Step 1: Register for restart
+        Console.WriteLine("Step 1: Registering for restart...");
+        AppRestartManager.RestartManager.RegisterForRestart("/restore");
+        Console.WriteLine("  Registered!");
+        Console.WriteLine();
+        
+        // Step 2: Check if restarted
+        Console.WriteLine("Step 2: Checking if app was restarted...");
+        if (AppRestartManager.RestartManager.WasRestartRequested())
+        {
+            Console.WriteLine("  Yes, restoring state...");
+            var args = AppRestartManager.RestartManager.GetRestartCommandLineArgs();
+            Console.WriteLine($"  Command-line args: {string.Join(" ", args)}");
+        }
+        else
+        {
+            Console.WriteLine("  No, normal startup");
+        }
+        Console.WriteLine();
+        
+        // Step 3: Listen for shutdown events
+        Console.WriteLine("Step 3: Setting up shutdown event listener...");
+        var subscription = AppRestartManager.RestartManager.ListenForEndSession()
+            .Subscribe(reason =>
+            {
+                Console.WriteLine($"  Shutdown event: {reason}");
+            });
+        Console.WriteLine("  Listener active!");
+        Console.WriteLine();
+        
+        Console.WriteLine("Application is now fully integrated with Restart Manager");
+        Console.WriteLine("Press any key to cleanup and exit...");
+        Console.ReadKey();
+        
+        // Clean up
+        subscription.Dispose();
+        Console.WriteLine("Cleaned up!");
     }
 
     // ========================================
@@ -107,7 +193,7 @@ public static class RestartManagerExample
         Console.WriteLine($"Finding processes using: {filePath}");
         Console.WriteLine();
 
-        using (var session = RestartManager.CreateSession())
+        using (var session = InstallerRestartManager.CreateSession())
         {
             session.RegisterFile(filePath);
             var processes = session.GetProcessesUsingResources(out var rebootReason);
@@ -152,7 +238,7 @@ public static class RestartManagerExample
         Console.WriteLine($"Finding processes using {filePaths.Length} file(s)...");
         Console.WriteLine();
 
-        using (var session = RestartManager.CreateSession())
+        using (var session = InstallerRestartManager.CreateSession())
         {
             session.RegisterFiles(filePaths);
             var processes = session.GetProcessesUsingResources();
@@ -178,7 +264,7 @@ public static class RestartManagerExample
     {
         Console.WriteLine($"Checking if reboot is required to update: {filePath}");
         
-        using (var session = RestartManager.CreateSession())
+        using (var session = InstallerRestartManager.CreateSession())
         {
             session.RegisterFile(filePath);
             
@@ -223,7 +309,7 @@ public static class RestartManagerExample
         Console.WriteLine($"Preparing to shutdown applications using: {filePath}");
         Console.WriteLine("WARNING: This will shut down applications!");
         
-        using (var session = RestartManager.CreateSession())
+        using (var session = InstallerRestartManager.CreateSession())
         {
             session.RegisterFile(filePath);
             
@@ -285,7 +371,7 @@ public static class RestartManagerExample
         Console.WriteLine($"Getting detailed information for processes using: {filePath}");
         Console.WriteLine();
 
-        using (var session = RestartManager.CreateSession())
+        using (var session = InstallerRestartManager.CreateSession())
         {
             session.RegisterFile(filePath);
             var processes = session.GetProcessesUsingResources();
@@ -356,11 +442,22 @@ public static class RestartManagerExample
             CheckIfRestarted();
             Console.WriteLine();
             
-            // Example 3: Register with custom flags
+            // Example 3: Listen for shutdown events
+            // Uncomment to test - this will block until a key is pressed
+            // var subscription = ListenForShutdownEvents();
+            // Console.ReadKey();
+            // subscription.Dispose();
+            // Console.WriteLine();
+            
+            // Example 4: Complete application integration
+            // CompleteApplicationExample();
+            // Console.WriteLine();
+            
+            // Example 5: Register with custom flags
             // RegisterWithFlags();
             // Console.WriteLine();
             
-            // Example 4: Unregister (uncomment if needed)
+            // Example 6: Unregister (uncomment if needed)
             // UnregisterApplication();
             // Console.WriteLine();
             
@@ -371,7 +468,7 @@ public static class RestartManagerExample
             // INSTALLER/UPDATER EXAMPLES
             // ========================================
             
-            // Example 5: Find processes using a file
+            // Example 7: Find processes using a file
             // Note: Replace with an actual file path that might be in use
             var testFile = @"C:\Windows\System32\kernel32.dll";
             
@@ -385,19 +482,19 @@ public static class RestartManagerExample
                 Console.WriteLine("Please modify the testFile variable to point to an existing file.");
             }
 
-            // Example 6: Check if reboot is required
+            // Example 8: Check if reboot is required
             // CheckRebootRequired(testFile);
 
-            // Example 7: Get detailed process information
+            // Example 9: Get detailed process information
             // GetDetailedProcessInformation(testFile);
 
-            // Example 8: Find processes using multiple files
+            // Example 10: Find processes using multiple files
             // FindProcessesUsingMultipleFiles(
             //     @"C:\path\to\file1.dll",
             //     @"C:\path\to\file2.dll"
             // );
 
-            // WARNING: Example 9 will actually shut down applications!
+            // WARNING: Example 11 will actually shut down applications!
             // Only uncomment if you understand the consequences
             // ShutdownAndRestartApplications(testFile);
         }
