@@ -42,24 +42,29 @@ public class WinEventHookTests
             }, exception => Log.Error().WriteLine("An error occured", exception));
         await Task.Delay(100);
         // Start a process to test against
-        using (var process = Process.Start("notepad.exe"))
+        using (var process = Process.Start("charmap.exe"))
         {
             try
             {
                 // Make sure it's started
                 Assert.NotNull(process);
+
                 // Wait until the process started it's message pump (listening for input)
-                process.WaitForInputIdle();
+                if (!process.WaitForInputIdle(2000))
+                {
+                    Assert.Fail("Process wasn't ready for input.");
+                    return;
+                }
                 User32Api.SetWindowText(process.MainWindowHandle, "TestWinEventHook - Test");
 
                 // Find the belonging window
-                var notepadWindow = await replaySubject.Where(info => info != null && info.ProcessId == process.Id).FirstAsync();
-                Assert.Equal(process.Id, notepadWindow?.ProcessId);
+                var testWindow = await replaySubject.Where(info => info != null && info.ProcessId == process.Id).FirstAsync();
+                Assert.Equal(process.Id, testWindow?.ProcessId);
             }
             finally
             {
-                winEventObservable.Dispose();
                 process?.Kill();
+                winEventObservable.Dispose();
             }
         }
     }

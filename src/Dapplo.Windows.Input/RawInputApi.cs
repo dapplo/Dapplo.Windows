@@ -136,17 +136,21 @@ public static class RawInputApi
                 if (!string.IsNullOrEmpty(result.DeviceName) && result.DeviceName.Length > 4)
                 {
                     string[] split = result.DeviceName.Substring(4).Split('#');
-                    string classCode = split[0];
-                    string subclassCode = split[1];
-                    string protocolCode = split[2];
-                    using (var registryKey = Registry.LocalMachine.OpenSubKey($@"System\CurrentControlSet\Enum\{classCode}\{subclassCode}\{protocolCode}"))
-                    {
-                        var deviceDescription = (string)registryKey?.GetValue("DeviceDesc");
-                        var startOfDisplayName = deviceDescription?.LastIndexOf(";", StringComparison.Ordinal);
-                        if (startOfDisplayName >= 0)
+                    if (split.Length > 2) {
+                        string classCode = split[0];
+                        string subclassCode = split[1];
+                        string protocolCode = split[2];
+                        using (var registryKey = Registry.LocalMachine.OpenSubKey($@"System\CurrentControlSet\Enum\{classCode}\{subclassCode}\{protocolCode}"))
                         {
-                            result.DisplayName = deviceDescription.Substring(startOfDisplayName.Value +1);
+                            var deviceDescription = (string)registryKey?.GetValue("DeviceDesc");
+                            var startOfDisplayName = deviceDescription?.LastIndexOf(";", StringComparison.Ordinal);
+                            if (startOfDisplayName >= 0)
+                            {
+                                result.DisplayName = deviceDescription.Substring(startOfDisplayName.Value + 1);
+                            }
                         }
+                    } else {
+                        result.DisplayName = result.DeviceName;
                     }
                 }
             }
