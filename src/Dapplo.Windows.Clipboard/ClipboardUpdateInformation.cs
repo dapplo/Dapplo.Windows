@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dapplo.Windows.Messages.Native;
+using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Clipboard;
 

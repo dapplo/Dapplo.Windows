@@ -5,10 +5,11 @@ using System;
 using System.Linq;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
+using System.Reactive.Linq;
+using Dapplo.Windows.Messages;
 
 #if !NETSTANDARD2_0
 using System.Threading;
-using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 #endif
 
@@ -112,24 +113,15 @@ public class DisplayInfo
 
 #if !NETSTANDARD2_0
 
-            IntPtr WinProcDisplayChangeHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-            {
-                var windowsMessage = (WindowsMessages) msg;
-                if (windowsMessage != WindowsMessages.WM_DISPLAYCHANGE)
-                {
-                    return IntPtr.Zero;
-                }
-
-                _allDisplayInfos = null;
-                _screenBounds = null;
-
-                return IntPtr.Zero;
-            }
-
             // Subscribe to display changes, but only when we didn't yet
             if (_displayInfoUpdate == null && Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
             {
-                _displayInfoUpdate = WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(WinProcDisplayChangeHandler));
+                _displayInfoUpdate = SharedMessageWindow.Listen().Where(m => m.Msg == (uint)WindowsMessages.WM_DISPLAYCHANGE)
+                        .Subscribe(m =>
+                        {
+                            _allDisplayInfos = null;
+                            _screenBounds = null;
+                        });
             }
 #endif
             return _allDisplayInfos;

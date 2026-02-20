@@ -2,11 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages;
+
 #if !NETSTANDARD2_0
 using System;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Messages.Native;
 using Dapplo.Windows.User32.Enums;
 
 namespace Dapplo.Windows.Desktop

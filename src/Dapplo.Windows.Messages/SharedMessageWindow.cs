@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Native;
 using Dapplo.Windows.Messages.Structs;
 using System;
 using System.Reactive.Disposables;
@@ -10,7 +11,7 @@ using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Dapplo.Windows.Messages.Native;
+namespace Dapplo.Windows.Messages;
 
 /// <summary>
 /// Provides functionality to create an observable stream of Windows messages using a message-only window on a dedicated thread.

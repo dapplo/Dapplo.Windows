@@ -6,11 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Windows.Clipboard.Internals;
 using Dapplo.Windows.Messages.Enumerations;
+
 #if !NETSTANDARD2_0
 using System.ComponentModel;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Dapplo.Windows.Messages.Native;
+using Dapplo.Windows.Messages;
 #endif
 
 namespace Dapplo.Windows.Clipboard
