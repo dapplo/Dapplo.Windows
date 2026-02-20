@@ -31,7 +31,7 @@ public static class RestartManagerExample
         try
         {
             // Register with command-line arguments to restore state
-            AppRestartManager.RestartManager.RegisterForRestart("/restore /minimized");
+            RestartManager.RegisterForRestart("/restore /minimized");
             
             Console.WriteLine("Application successfully registered for restart.");
             Console.WriteLine("If shut down by Restart Manager, it will restart with: /restore /minimized");
@@ -47,11 +47,11 @@ public static class RestartManagerExample
     /// </summary>
     public static void CheckIfRestarted()
     {
-        if (AppRestartManager.RestartManager.WasRestartRequested())
+        if (RestartManager.WasRestartRequested())
         {
             Console.WriteLine("Application was restarted by Restart Manager!");
             
-            var args = AppRestartManager.RestartManager.GetRestartCommandLineArgs();
+            var args = RestartManager.GetRestartCommandLineArgs();
             Console.WriteLine($"Restart arguments: {string.Join(" ", args)}");
             
             // Restore application state here
@@ -71,7 +71,7 @@ public static class RestartManagerExample
         Console.WriteLine("Registering with custom restart flags...");
         
         // Don't restart if the application crashes or hangs
-        AppRestartManager.RestartManager.RegisterForRestart(
+        RestartManager.RegisterForRestart(
             commandLineArgs: "/restore",
             flags: ApplicationRestartFlags.RestartNoCrash | ApplicationRestartFlags.RestartNoHang
         );
@@ -88,7 +88,7 @@ public static class RestartManagerExample
         
         try
         {
-            AppRestartManager.RestartManager.UnregisterForRestart();
+            RestartManager.UnregisterForRestart();
             Console.WriteLine("Application successfully unregistered from restart.");
         }
         catch (Exception ex)
@@ -104,7 +104,7 @@ public static class RestartManagerExample
     {
         Console.WriteLine("Starting to listen for shutdown events...");
         
-        var subscription = AppRestartManager.RestartManager.ListenForEndSession()
+        var subscription = RestartManager.ListenForEndSession()
             .Subscribe(reason =>
             {
                 Console.WriteLine($"Shutdown event received: {reason}");
@@ -143,16 +143,16 @@ public static class RestartManagerExample
         
         // Step 1: Register for restart
         Console.WriteLine("Step 1: Registering for restart...");
-        AppRestartManager.RestartManager.RegisterForRestart("/restore");
+        RestartManager.RegisterForRestart("/restore");
         Console.WriteLine("  Registered!");
         Console.WriteLine();
         
         // Step 2: Check if restarted
         Console.WriteLine("Step 2: Checking if app was restarted...");
-        if (AppRestartManager.RestartManager.WasRestartRequested())
+        if (RestartManager.WasRestartRequested())
         {
             Console.WriteLine("  Yes, restoring state...");
-            var args = AppRestartManager.RestartManager.GetRestartCommandLineArgs();
+            var args = RestartManager.GetRestartCommandLineArgs();
             Console.WriteLine($"  Command-line args: {string.Join(" ", args)}");
         }
         else
@@ -163,7 +163,7 @@ public static class RestartManagerExample
         
         // Step 3: Listen for shutdown events
         Console.WriteLine("Step 3: Setting up shutdown event listener...");
-        var subscription = AppRestartManager.RestartManager.ListenForEndSession()
+        var subscription = RestartManager.ListenForEndSession()
             .Subscribe(reason =>
             {
                 Console.WriteLine($"  Shutdown event: {reason}");
