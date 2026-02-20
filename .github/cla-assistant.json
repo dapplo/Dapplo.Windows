@@ -2,6 +2,7 @@
   "whitelist": [
     "github-copilot[bot]",
     "dependabot[bot]",
-    "github-actions[bot]"
+    "github-actions[bot]",
+    "copilot[bot]"
   ]
 }

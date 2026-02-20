@@ -16,7 +16,7 @@ jobs:
       contents: write  # Required for pushing to gh-pages
       actions: read
       checks: write
-    
+
     env:
       SOLUTION: 'src/Dapplo.Windows.sln'
       BUILD_PLATFORM: 'Any CPU'
@@ -26,8 +26,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Fetch all history for GitVersioning
-        persist-credentials: true
+        fetch-depth: 0
     
     - name: Setup NuGet
       uses: nuget/setup-nuget@v2
@@ -42,20 +41,19 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION }}
     
-    - name: Test
-      run: dotnet test ${{ env.SOLUTION }} --configuration Debug /p:Platform="${{ env.BUILD_PLATFORM }}" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
-    
     - name: Build
-      run: dotnet build ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}"
+      run: dotnet build ${{ env.solution }} --configuration ${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}" --no-restore
     
-    - name: Publish Code Coverage
-      uses: codecov/codecov-action@v4
+    - name: Test
+      run: dotnet test ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM}}" --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
+    
+    - name: Upload coverage to Coveralls
+      if: github.event_name != 'pull_request'
+      uses: coverallsapp/github-action@v2
       with:
-        files: src/**/coverage.*.xml
-        fail_ci_if_error: false
-        token: ${{ secrets.CODECOV_TOKEN }}
-        slug: dapplo/Dapplo.Windows
-      continue-on-error: true
+        github-token: ${{ secrets.COVERALLS_SECRET }}
+        fail-on-error: false
+        file: src\Dapplo.Windows.Tests\coverage.info
     
     - name: Install DocFX
       run: choco install docfx -y
@@ -67,7 +65,7 @@ jobs:
       shell: pwsh
       run: |
         New-Item -ItemType Directory -Force -Path artifacts
-        Get-ChildItem -Path src -Include "*.nupkg" -Recurse -File | Where-Object { $_.FullName -match "\\bin\\${{ env.BUILD_CONFIGURATION }}\\" } | Copy-Item -Destination artifacts
+        Get-ChildItem -Path src -Include "*nupkg" -Recurse -File | Where-Object { $_.FullName -match "\\bin\\${{ env.BUILD_CONFIGURATION }}\\" } | Copy-Item -Destination artifacts
     
     - name: Copy coverage files to artifacts
       shell: pwsh
@@ -79,14 +77,16 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
+        retention-days: 1
         path: artifacts/**/*
-    
+
     - name: Upload documentation site
       uses: actions/upload-artifact@v4
       with:
         name: documentation-site
+        retention-days: 1
         path: doc/_site/**/*
-    
+
     - name: Publish documentation to gh-pages
       if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
       shell: cmd
@@ -103,10 +103,9 @@ jobs:
         git push -f origin gh-pages:gh-pages
 
   deploy:
-    needs: build
     runs-on: windows-latest
+    needs: build
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-    
     permissions:
       contents: read
     
@@ -119,16 +118,16 @@ jobs:
       with:
         name: build-artifacts
         path: artifacts
-    
+
     - name: Setup NuGet
-      uses: nuget/setup-nuget@v2
+      uses: NuGet/setup-nuget@v2
       with:
         nuget-version: '7.0.1'
     
     - name: Push to NuGet
       shell: pwsh
       run: |
-        $packages = Get-ChildItem -Path artifacts -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
+        $packages = Get-ChildItem -Path artifacts -Filter "*nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
         if ($packages.Count -eq 0) {
           Write-Host "No packages found to publish"
           exit 0

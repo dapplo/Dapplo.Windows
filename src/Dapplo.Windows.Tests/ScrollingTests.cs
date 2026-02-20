@@ -44,17 +44,21 @@ public class ScrollingTests
                 // Make sure it's started
                 Assert.NotNull(process);
                 // Wait until the process started it's message pump (listening for input)
-                process.WaitForInputIdle();
+                if (!process.WaitForInputIdle(2000))
+                {
+                    Assert.Fail("Test-Process didn't get ready.");
+                    return;
+                }
 
                 try
                 {
                     // Find the belonging window, by the process id
                     var notepadWindow = WindowsEnumerator.EnumerateWindows()
-                        .FirstOrDefault(interopWindow =>
+                        .FirstOrDefault((Func<IInteropWindow, bool>)(interopWindow =>
                         {
-                            User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var processId);
-                            return processId == process.Id;
-                        });
+                            interopWindow.Fill();
+                            return interopWindow.Classname == "Notepad";
+                        }));
                     Assert.NotNull(notepadWindow);
 
                     // Create a WindowScroller

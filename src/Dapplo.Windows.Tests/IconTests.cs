@@ -1,16 +1,22 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
-using System.Windows.Media.Imaging;
 using Dapplo.Log;
-using Dapplo.Log.XUnit;
+using Dapplo.Windows.Common;
+using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Common.Structs.PixelFormats;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Icons;
 using Dapplo.Windows.User32;
 using Xunit;
+using System.Windows.Media.Imaging;
+using System.IO;
+using System.Collections.Generic;
+using Dapplo.Log.XUnit;
 
 namespace Dapplo.Windows.Tests;
 
@@ -28,12 +34,17 @@ public class IconTests
     public void TestIcon_GetIcon()
     {
         // Start a process to test against
-        using (var process = Process.Start("notepad.exe"))
+        using (var process = Process.Start("charmap.exe"))
         {
             // Make sure it's started
             Assert.NotNull(process);
             // Wait until the process started it's message pump (listening for input)
-            process.WaitForInputIdle();
+            if (!process.WaitForInputIdle(2000))
+            {
+                Assert.Fail("Test-Process didn't get ready.");
+                return;
+            }
+
             User32Api.SetWindowText(process.MainWindowHandle, "TestIcon_GetIcon");
 
             var window = InteropWindowQuery.GetTopLevelWindows().First();
@@ -154,7 +165,7 @@ public class IconTests
             Assert.Equal(expectedStandardSize.Width, standardIcon.PixelWidth);
             Assert.Equal(expectedStandardSize.Height, standardIcon.PixelHeight);
         }
-        catch (EntryPointNotFoundException ex)
+        catch (EntryPointNotFoundException)
         {
             // Skip test on systems without LoadIconMetric API
         }
@@ -186,12 +197,12 @@ public class IconTests
     public void TestIconFileWriter_WriteIconFile()
     {
         // Create test bitmaps of different sizes
-        var images = new List<System.Drawing.Bitmap>
+        var images = new List<Bitmap>
         {
-            new System.Drawing.Bitmap(16, 16),
-            new System.Drawing.Bitmap(32, 32),
-            new System.Drawing.Bitmap(48, 48),
-            new System.Drawing.Bitmap(256, 256)
+            new Bitmap(16, 16),
+            new Bitmap(32, 32),
+            new Bitmap(48, 48),
+            new Bitmap(256, 256)
         };
 
         // Fill each bitmap with a different color for visual verification
@@ -205,7 +216,7 @@ public class IconTests
             g4.Clear(System.Drawing.Color.Yellow);
 
         // Write to a memory stream
-        using (var stream = new System.IO.MemoryStream())
+        using (var stream = new MemoryStream())
         {
             IconFileWriter.WriteIconFile(stream, images);
 
@@ -214,7 +225,7 @@ public class IconTests
 
             // Verify the header
             stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new System.IO.BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
+            using (var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
             {
                 var reserved = reader.ReadUInt16();
                 var type = reader.ReadUInt16();
@@ -240,19 +251,19 @@ public class IconTests
     public void TestIconFileWriter_WriteCursorFile()
     {
         // Create test bitmap for cursor
-        var bitmap = new System.Drawing.Bitmap(32, 32);
+        var bitmap = new Bitmap(32, 32);
         using (var g = System.Drawing.Graphics.FromImage(bitmap))
         {
             g.Clear(System.Drawing.Color.White);
         }
 
-        var cursorData = new List<(System.Drawing.Image, System.Drawing.Point)>
+        var cursorData = new List<(Image, Point)>
         {
-            (bitmap, new System.Drawing.Point(16, 16)) // Hotspot in the center
+            (bitmap, new Point(16, 16)) // Hotspot in the center
         };
 
         // Write to a memory stream
-        using (var stream = new System.IO.MemoryStream())
+        using (var stream = new MemoryStream())
         {
             IconFileWriter.WriteCursorFile(stream, cursorData);
 
@@ -261,7 +272,7 @@ public class IconTests
 
             // Verify the header
             stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new System.IO.BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
+            using (var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
             {
                 var reserved = reader.ReadUInt16();
                 var type = reader.ReadUInt16();
@@ -370,8 +381,8 @@ public class IconTests
     public void TestIconFileWriter_WriteGrpIconStructures()
     {
         // Test writing group icon structures for PE resources
-        using (var stream = new System.IO.MemoryStream())
-        using (var writer = new System.IO.BinaryWriter(stream))
+        using (var stream = new MemoryStream())
+        using (var writer = new BinaryWriter(stream))
         {
             // Write group icon directory
             var grpIconDir = Icons.Structs.GrpIconDir.CreateIcon(2);
@@ -387,7 +398,7 @@ public class IconTests
 
             // Verify the written data
             stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new System.IO.BinaryReader(stream))
+            using (var reader = new BinaryReader(stream))
             {
                 // Read GRPICONDIR
                 var reserved = reader.ReadUInt16();
@@ -433,16 +444,16 @@ public class IconTests
     public void TestIconHelper_WriteIcon_BackwardCompatibility()
     {
         // Create test bitmap
-        var bitmap = new System.Drawing.Bitmap(32, 32);
+        var bitmap = new Bitmap(32, 32);
         using (var g = System.Drawing.Graphics.FromImage(bitmap))
         {
             g.Clear(System.Drawing.Color.Blue);
         }
 
-        var images = new List<System.Drawing.Image> { bitmap };
+        var images = new List<Image> { bitmap };
 
         // Write using the old WriteIcon method (which now delegates to IconFileWriter)
-        using (var stream = new System.IO.MemoryStream())
+        using (var stream = new MemoryStream())
         {
             IconHelper.WriteIcon(stream, images);
 
@@ -451,7 +462,7 @@ public class IconTests
 
             // Verify the header
             stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new System.IO.BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
+            using (var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
             {
                 var reserved = reader.ReadUInt16();
                 var type = reader.ReadUInt16();
@@ -465,4 +476,216 @@ public class IconTests
 
         bitmap.Dispose();
     }
+
+    /// <summary>
+    ///     Test TryGetCurrentCursor method
+    /// </summary>
+    [Fact]
+    public void TestCursorHelper_TryGetCurrentCursor()
+    {
+        CapturedCursor capturedCursor;
+        var result = CursorHelper.TryGetCurrentCursor(out capturedCursor);
+        
+        // In some environments (CI, headless), cursor may not be available
+        // So we just verify the method returns a boolean and doesn't crash
+        if (result)
+        {
+            Assert.NotNull(capturedCursor);
+            capturedCursor.Dispose();
+        }
+    }
+
+    /// <summary>
+    ///     Test DrawCursorOnBitmap with a modern alpha cursor
+    /// </summary>
+    [Fact]
+    public void TestCursorHelper_DrawCursorOnBitmap_ModernCursor()
+    {
+        // Create a target bitmap
+        var targetBitmap = new Bitmap(100, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        {
+            g.Clear(System.Drawing.Color.White);
+        }
+
+        // Create a cursor with alpha channel (modern cursor, no mask)
+        var cursorBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        {
+            g.Clear(System.Drawing.Color.Transparent);
+            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(128, 255, 0, 0)))
+            {
+                g.FillEllipse(brush, 0, 0, 32, 32);
+            }
+        }
+
+        var cursor = new CapturedCursor
+        {
+            ColorLayer = cursorBitmap,
+            MaskLayer = null, // Modern cursor
+            HotSpot = new NativePoint(16, 16),
+            Size = new NativeSize(32, 32)
+        };
+
+        // Draw cursor at position (10, 10)
+        CursorHelper.DrawCursorOnBitmap(targetBitmap, cursor, new NativePoint(10, 10));
+
+        // Verify that the cursor was drawn
+        // The center of the cursor should have some red color
+        var centerColor = targetBitmap.GetPixel(26, 26); // 10 + 16 (center of cursor)
+        Assert.True(centerColor.R > 100, "Center of cursor should have red color");
+        
+        // Corners should still be white (cursor is transparent there)
+        var cornerColor = targetBitmap.GetPixel(0, 0);
+        Assert.Equal(255, cornerColor.R);
+        Assert.Equal(255, cornerColor.G);
+        Assert.Equal(255, cornerColor.B);
+
+        cursor.Dispose();
+        targetBitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test DrawCursorOnBitmap with a legacy cursor with mask
+    /// </summary>
+    [Fact]
+    public void TestCursorHelper_DrawCursorOnBitmap_LegacyCursor()
+    {
+        // Create a target bitmap
+        var targetBitmap = new Bitmap(100, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        {
+            g.Clear(System.Drawing.Color.White);
+        }
+
+        // Create a cursor color layer
+        var cursorBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        {
+            g.Clear(System.Drawing.Color.Black);
+            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.White))
+            {
+                g.FillRectangle(brush, 8, 8, 16, 16);
+            }
+        }
+
+        // Create a mask layer
+        var maskBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(maskBitmap))
+        {
+            g.Clear(System.Drawing.Color.Black); // Black = transparent area
+            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.White))
+            {
+                g.FillRectangle(brush, 8, 8, 16, 16); // White = opaque area for XOR
+            }
+        }
+
+        var cursor = new CapturedCursor
+        {
+            ColorLayer = cursorBitmap,
+            MaskLayer = maskBitmap, // Legacy cursor with mask
+            HotSpot = new NativePoint(16, 16),
+            Size = new NativeSize(32, 32)
+        };
+
+        // Draw cursor at position (20, 20)
+        CursorHelper.DrawCursorOnBitmap(targetBitmap, cursor, new NativePoint(20, 20));
+
+        // Verify that the cursor was drawn
+        // The center of the cursor (where the white square is) should be modified
+        var centerColor = targetBitmap.GetPixel(36, 36); // 20 + 16 (center of white square)
+        // With white mask and white color on white background: (255 & 255) ^ 255 = 0 (black - inverted!)
+        Assert.True(centerColor.R < 255 || centerColor.G < 255 || centerColor.B < 255, 
+            "Center should be affected by cursor drawing (XOR should invert white to black)");
+
+        cursor.Dispose();
+        targetBitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test DrawCursorOnBitmap with scaling
+    /// </summary>
+    [Fact]
+    public void TestCursorHelper_DrawCursorOnBitmap_WithScaling()
+    {
+        // Create a target bitmap
+        var targetBitmap = new Bitmap(200, 200, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        {
+            g.Clear(System.Drawing.Color.White);
+        }
+
+        // Create a small cursor
+        var cursorBitmap = new Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        {
+            g.Clear(System.Drawing.Color.Transparent);
+            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 0, 0, 255)))
+            {
+                g.FillRectangle(brush, 0, 0, 16, 16);
+            }
+        }
+
+        var cursor = new CapturedCursor
+        {
+            ColorLayer = cursorBitmap,
+            MaskLayer = null,
+            HotSpot = new NativePoint(8, 8),
+            Size = new NativeSize(16, 16)
+        };
+
+        // Draw cursor at position (50, 50) scaled to 64x64
+        CursorHelper.DrawCursorOnBitmap(targetBitmap, cursor, new NativePoint(50, 50), new NativeSize(64, 64));
+
+        // Verify that the cursor was drawn and scaled
+        var centerColor = targetBitmap.GetPixel(82, 82); // 50 + 32 (center of scaled cursor)
+        Assert.True(centerColor.B > 200, "Center of cursor should have blue color");
+
+        cursor.Dispose();
+        targetBitmap.Dispose();
+    }
+
+    /// <summary>
+    ///     Test DrawCursorOnBitmap on 24-bit RGB bitmap
+    /// </summary>
+    [Fact]
+    public void TestCursorHelper_DrawCursorOnBitmap_24bppTarget()
+    {
+        // Create a 24-bit target bitmap
+        var targetBitmap = new Bitmap(100, 100, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        {
+            g.Clear(System.Drawing.Color.White);
+        }
+
+        // Create a cursor with alpha channel
+        var cursorBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        {
+            g.Clear(System.Drawing.Color.Transparent);
+            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 0, 255, 0)))
+            {
+                g.FillEllipse(brush, 0, 0, 32, 32);
+            }
+        }
+
+        var cursor = new CapturedCursor
+        {
+            ColorLayer = cursorBitmap,
+            MaskLayer = null,
+            HotSpot = new NativePoint(16, 16),
+            Size = new NativeSize(32, 32)
+        };
+
+        // Draw cursor at position (10, 10)
+        CursorHelper.DrawCursorOnBitmap(targetBitmap, cursor, new NativePoint(10, 10));
+
+        // Verify that the cursor was drawn
+        var centerColor = targetBitmap.GetPixel(26, 26);
+        Assert.True(centerColor.G > 200, "Center of cursor should have green color");
+
+        cursor.Dispose();
+        targetBitmap.Dispose();
+    }
+
 }

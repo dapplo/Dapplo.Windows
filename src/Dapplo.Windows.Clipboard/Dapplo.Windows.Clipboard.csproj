@@ -2,17 +2,15 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Clipboard is a library for accessing the clipboard in a more modern way.</Description>
     <PackageTags>windows native clipboard</PackageTags>
-    <TargetFrameworks>net481;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
+    <TargetFrameworks>net480;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <UseWindowsForms>true</UseWindowsForms>
-    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dapplo.Log" Version="3.0.17" />
+    <PackageReference Include="Dapplo.Log" Version="3.0.22" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Reactive" Version="6.1.0" />
     <PackageReference Include="System.ValueTuple" Version="4.6.1" />
@@ -23,8 +21,5 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
 </Project>

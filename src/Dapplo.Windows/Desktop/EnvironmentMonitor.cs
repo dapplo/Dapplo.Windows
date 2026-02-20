@@ -6,7 +6,7 @@ using Dapplo.Windows.Messages.Enumerations;
 using System;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Native;
 using Dapplo.Windows.User32.Enums;
 
 namespace Dapplo.Windows.Desktop
@@ -31,24 +31,13 @@ namespace Dapplo.Windows.Desktop
         /// </summary>
         private EnvironmentMonitor()
         {
-            _environmentObservable = Observable.Create<EnvironmentChangedEventArgs>(observer =>
+            _environmentObservable = SharedMessageWindow.Messages
+                .Where(m => m.Msg == (uint)WindowsMessages.WM_SETTINGCHANGE)
+                .Select(m =>
                 {
-                    // This handles the message
-                    IntPtr WinProcSettingsChangeHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-                    {
-                        var windowsMessage = (WindowsMessages) msg;
-                        if (windowsMessage != WindowsMessages.WM_SETTINGCHANGE)
-                        {
-                            return IntPtr.Zero;
-                        }
-
-                        var action = (SystemParametersInfoActions) wParam.ToInt32();
-                        var area = Marshal.PtrToStringAuto(lParam);
-                        observer.OnNext(EnvironmentChangedEventArgs.Create(action, area));
-                        return IntPtr.Zero;
-                    }
-
-                    return WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(WinProcSettingsChangeHandler));
+                    var action = (SystemParametersInfoActions)(int)m.WParam;
+                    var area = Marshal.PtrToStringAuto((IntPtr)m.LParam);
+                    return EnvironmentChangedEventArgs.Create(action, area);
                 })
                 .Publish()
                 .RefCount();

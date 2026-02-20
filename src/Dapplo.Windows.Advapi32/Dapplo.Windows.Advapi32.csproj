@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Advapi32 is a library for accessing the Advanced Windows 32 Base API</Description>
     <PackageTags>windows native Advapi32</PackageTags>
-    <TargetFrameworks>net481;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
+    <TargetFrameworks>net480;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -11,7 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Reactive" Version="6.1.0" />
-    <PackageReference Include="Dapplo.Log" Version="3.0.17" />
+    <PackageReference Include="Dapplo.Log" Version="3.0.22" />
     <PackageReference Include="System.ValueTuple" Version="4.6.1" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">

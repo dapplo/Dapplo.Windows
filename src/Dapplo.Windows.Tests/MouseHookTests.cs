@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Input.Mouse;
-using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Xunit.Abstractions;
 
@@ -24,9 +23,6 @@ public class MouseHookTests
     //[StaFact]
     private async Task Test_LeftMouseDownAsync()
     {
-        // This takes care of having a WinProc handler, to make sure the messages arrive
-        // ReSharper disable once UnusedVariable
-        var winProcHandler = WinProcHandler.Instance;
         await MouseHook.MouseEvents.Where(args => args.WindowsMessage == WindowsMessages.WM_LBUTTONDOWN).FirstAsync();
     }
 }

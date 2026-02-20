@@ -3,13 +3,12 @@
 
 using System;
 using System.ComponentModel;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Devices.Enums;
 using Dapplo.Windows.Devices.Structs;
-using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Native;
 
 #if !NETSTANDARD2_0
 
@@ -81,34 +80,24 @@ namespace Dapplo.Windows.Devices
                         deviceNotifyFlags |= DeviceNotifyFlags.AllInterfaceClasses;
                     }
 
-                    var deviceNotificationHandle = RegisterDeviceNotification(WinProcHandler.Instance.Handle, devBroadcastDeviceInterface, deviceNotifyFlags);
+                    IntPtr deviceNotificationHandle = IntPtr.Zero;
 
-                    if (deviceNotificationHandle == IntPtr.Zero)
-                    {
-                        observer.OnError(new Win32Exception());
-                    }
-
-                    // This handles the message
-                    IntPtr WinProcDeviceChangeMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-                    {
-                        var windowsMessage = (WindowsMessages)msg;
-                        if (windowsMessage != WindowsMessages.WM_DEVICECHANGE || lParam == IntPtr.Zero)
+                    return SharedMessageWindow.Listen(
+                        onSetup: hwnd =>
                         {
-                            return IntPtr.Zero;
-                        }
-
-                        observer.OnNext(new DeviceNotificationEvent(wParam, lParam));
-
-                        return IntPtr.Zero;
-                    }
-
-                    var hook = new WinProcHandlerHook(WinProcDeviceChangeMessageHandler);
-                    var hookSubscription = WinProcHandler.Instance.Subscribe(hook);
-                    return hook.Disposable = Disposable.Create(() =>
+                            deviceNotificationHandle = RegisterDeviceNotification((IntPtr)hwnd, devBroadcastDeviceInterface, deviceNotifyFlags);
+                            if (deviceNotificationHandle == IntPtr.Zero)
+                            {
+                                observer.OnError(new Win32Exception());
+                            }
+                        },
+                        onTeardown: hwnd => UnregisterDeviceNotification(deviceNotificationHandle)
+                    )
+                    .Where(m => m.Msg == (uint)WindowsMessages.WM_DEVICECHANGE && m.LParam != 0)
+                    .Subscribe(m =>
                     {
-                        UnregisterDeviceNotification(deviceNotificationHandle);
-                        hookSubscription.Dispose();
-                    });
+                        observer.OnNext(new DeviceNotificationEvent((IntPtr)m.WParam, (IntPtr)m.LParam));
+                    }, observer.OnError, observer.OnCompleted);
                 })
                 // Make sure there is always a value produced when connecting
                 .Publish()

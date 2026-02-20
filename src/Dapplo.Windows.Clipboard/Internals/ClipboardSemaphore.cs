@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Native;
 
 namespace Dapplo.Windows.Clipboard.Internals;
 
@@ -35,13 +35,11 @@ internal sealed class ClipboardSemaphore : IDisposable
         // Set default timeout interval
         timeout ??= DefaultTimeout;
 
-#if !NETSTANDARD2_0
         if (hWnd == IntPtr.Zero)
         {
             // Take the default
-            hWnd = WinProcHandler.Instance.Handle;
+            hWnd = (IntPtr)SharedMessageWindow.Handle;
         }
-#endif
 
         // If a timeout is passed, use this in the wait
         if (!_semaphoreSlim.Wait(timeout.Value))
@@ -103,13 +101,11 @@ internal sealed class ClipboardSemaphore : IDisposable
         // Set default timeout interval
         timeout ??= DefaultTimeout;
 
-#if !NETSTANDARD2_0
         if (hWnd == IntPtr.Zero)
         {
             // Take the default
-            hWnd = WinProcHandler.Instance.Handle;
+            hWnd = (IntPtr)SharedMessageWindow.Handle;
         }
-#endif
 
         // Await the semaphore, until the timeout is triggered
         if (!await _semaphoreSlim.WaitAsync(timeout.Value, cancellationToken).ConfigureAwait(false))

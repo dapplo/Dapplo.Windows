@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Drawing;
-using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Gdi32.Enums;
 using Dapplo.Windows.Gdi32.SafeHandles;
 using Dapplo.Windows.Gdi32.Structs;
+using System;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace Dapplo.Windows.Gdi32;
 
@@ -196,7 +197,7 @@ public static class Gdi32Api
     ///     NULLREGION	Region is empty.
     /// </returns>
     [DllImport(GDI32Dll, SetLastError = true)]
-    public static extern IntPtr SelectObject(SafeHandle hDc, SafeHandle hObject);
+    public static extern SafeNonDisposableObjectHandle SelectObject(SafeDcHandle hDc, SafeObjectHandle hObject);
 
     /// <summary>
     ///     See
@@ -244,6 +245,22 @@ public static class Gdi32Api
     }
 
     /// <summary>
+    /// Retrieves information about a specified graphics object, such as a bitmap, and copies it into a provided buffer.
+    /// </summary>
+    /// <remarks>This method can be used to obtain details about various types of graphics objects, such as
+    /// bitmaps. Ensure that the buffer size specified in cbBuffer is sufficient for the object type. If the function
+    /// fails, call GetLastError to obtain extended error information.</remarks>
+    /// <param name="hgdiobj">A handle to the graphics object for which information is to be retrieved. This must be a valid handle to an
+    /// object created by a GDI function.</param>
+    /// <param name="cbBuffer">The size, in bytes, of the buffer that receives the information. The buffer must be large enough to hold the
+    /// data for the object type being queried.</param>
+    /// <param name="lpvObject">A reference to a Bitmap structure that receives the information about the graphics object. The structure is
+    /// populated with data if the call succeeds.</param>
+    /// <returns>The number of bytes copied to the buffer if successful; otherwise, zero if the function fails.</returns>
+    [DllImport(GDI32Dll, SetLastError = true)]
+    public static extern int GetObject(SafeHBitmapHandle hgdiobj, int cbBuffer, ref Structs.GdiBitmap lpvObject);
+
+    /// <summary>
     /// The DeleteObject function deletes a logical pen, brush, font, bitmap, region, or palette, freeing all system resources associated with the object. After the object is deleted, the specified handle is no longer valid.
     /// </summary>
     /// <param name="hObject">A handle to a logical pen, brush, font, bitmap, region, or palette.</param>
@@ -251,4 +268,35 @@ public static class Gdi32Api
     [DllImport(GDI32Dll, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool DeleteObject(IntPtr hObject);
+
+    /// <summary>
+    /// Creates a logical brush with a solid color for use in GDI drawing operations.
+    /// </summary>
+    /// <param name="crColor">The color of the brush, specified as a COLORREF value. The low-order byte contains the red component, the next
+    /// byte contains the green component, and the third byte contains the blue component.</param>
+    /// <returns>A handle to the created logical brush, or IntPtr.Zero if the function fails.</returns>
+    [DllImport(GDI32Dll, SetLastError = true)]
+    public static extern IntPtr CreateSolidBrush(uint crColor);
+
+    /// <summary>
+    /// Retrieves the bits of a device-independent bitmap (DIB) and copies them into a buffer, using the specified device context and bitmap handle.
+    /// </summary>
+    /// <remarks>This method is a P/Invoke wrapper for the native GDI GetDIBits function. The caller is
+    /// responsible for ensuring that the buffer pointed to by lpvBits is large enough to hold the requested bitmap
+    /// data. If lpvBits is null, the function fills the bmi structure with information about the bitmap without copying
+    /// any bits.</remarks>
+    /// <param name="hdc">A handle to the device context used for the operation. This must be compatible with the bitmap specified by the
+    /// hbm parameter.</param>
+    /// <param name="hbm">A handle to the bitmap whose bits are to be retrieved.</param>
+    /// <param name="start">The starting scan line index, zero-based, from which to begin retrieving bitmap data.</param>
+    /// <param name="cLines">The number of scan lines to retrieve from the bitmap, beginning at the start parameter.</param>
+    /// <param name="lpvBits">A pointer to the buffer that receives the bitmap bits. If this parameter is null, the function fills the bmi
+    /// structure with information about the bitmap.</param>
+    /// <param name="bmi">A reference to a BitmapInfoHeader structure that specifies the desired format for the DIB and receives
+    /// information about the bitmap.</param>
+    /// <param name="usage">Specifies whether the bmi colors are provided as a color table or as direct RGB values. Typically set to
+    /// DIB_RGB_COLORS or DIB_PAL_COLORS.</param>
+    /// <returns>The number of scan lines copied into the buffer, or zero if the operation fails.</returns>
+    [DllImport(GDI32Dll, SetLastError = true)]
+    public static extern int GetDIBits(IntPtr hdc, SafeHBitmapHandle hbm, uint start, uint cLines, IntPtr lpvBits, ref BitmapInfoHeader bmi, DibColors usage);
 }

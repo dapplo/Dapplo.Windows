@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.Com is a library which has com supporting code</Description>
-    <TargetFrameworks>net481;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
+    <TargetFrameworks>net480;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
     <PackageTags>windows native Com</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Dapplo.Log" Version="3.0.17" />
+    <PackageReference Include="Dapplo.Log" Version="3.0.22" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="CustomMarshalers" />

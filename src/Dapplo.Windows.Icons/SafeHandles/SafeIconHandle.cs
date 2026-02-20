@@ -4,8 +4,18 @@
 using System;
 using System.Drawing;
 using System.Security;
-using System.Security.Permissions;
 using Microsoft.Win32.SafeHandles;
+using Dapplo.Windows.Gdi32.SafeHandles;
+
+using Dapplo.Windows.User32;
+using Dapplo.Windows.User32.Structs;
+using Dapplo.Windows.User32.Enums;
+
+
+
+#if !NET6_0_OR_GREATER
+using System.Security.Permissions;
+#endif
 
 namespace Dapplo.Windows.Icons.SafeHandles;
 

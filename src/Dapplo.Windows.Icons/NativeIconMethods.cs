@@ -1,12 +1,15 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Runtime.InteropServices;
+using Dapplo.Windows.Gdi32.Enums;
 using Dapplo.Windows.Icons.Enums;
 using Dapplo.Windows.Icons.SafeHandles;
 using Dapplo.Windows.Icons.Structs;
 using Dapplo.Windows.User32;
+using Dapplo.Windows.User32.SafeHandles;
+using Microsoft.Win32.SafeHandles;
+using System;
+using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Icons;
 
@@ -18,8 +21,16 @@ public static class NativeIconMethods
     /// <summary>
     ///     The following is used for Icon handling, and copies a hicon to a new
     /// </summary>
-    /// <param name="hIcon">IntPtr</param>
+    /// <param name="hIcon">SafeIconHandle</param>
     /// <returns>SafeIconHandle</returns>
+    [DllImport(User32Api.User32, SetLastError = true)]
+    public static extern SafeIconHandle CopyIcon(SafeIconHandle hIcon);
+
+    /// <summary>
+    ///     The following is used for Icon handling, and copies a hicon to a new
+    /// </summary>
+    /// <param name="hIcon">SafeIconHandle</param>
+    /// <returns>IntPtr</returns>
     [DllImport(User32Api.User32, SetLastError = true)]
     public static extern SafeIconHandle CopyIcon(IntPtr hIcon);
 
@@ -41,8 +52,30 @@ public static class NativeIconMethods
     /// <param name="iconHandle">A handle to the icon or cursor.</param>
     /// <param name="iconInfo">A pointer to an ICONINFO structure. The function fills in the structure's members.</param>
     /// <returns>bool true if the function succeeds, the return value is in the IconInfo structure.</returns>
-    [DllImport(User32Api.User32, SetLastError = true)]
+    [DllImport(User32Api.User32, SetLastError = true, CharSet = CharSet.Auto)]
     public static extern bool GetIconInfo(SafeIconHandle iconHandle, out IconInfo iconInfo);
+
+    /// <summary>
+    /// Retrieves information about the specified icon or cursor.
+    /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-geticoninfoexw">GetIconInfoEx function</a>
+    /// This also describes to get more info on standard icons and cursors
+    /// </summary>
+    /// <param name="iconOrCursorHandle">A IntPtr handle to the icon or cursor.</param>
+    /// <param name="iconInfoEx">A pointer to an ICONINFOEX structure. The function fills in the structure's members.</param>
+    /// <returns>bool true if the function succeeds, the return value is in the IconInfo structure.</returns>
+    [DllImport(User32Api.User32, SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern bool GetIconInfoEx(IntPtr iconOrCursorHandle, ref IconInfoEx iconInfoEx);
+
+    /// <summary>
+    /// Retrieves information about the specified icon or cursor.
+    /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-geticoninfoexw">GetIconInfoEx function</a>
+    /// This also describes to get more info on standard icons and cursors
+    /// </summary>
+    /// <param name="iconOrCursorHandle">A handle to the icon or cursor.</param>
+    /// <param name="iconInfoEx">A pointer to an ICONINFOEX structure. The function fills in the structure's members.</param>
+    /// <returns>bool true if the function succeeds, the return value is in the IconInfo structure.</returns>
+    [DllImport(User32Api.User32, SetLastError = true)]
+    public static extern bool GetIconInfoEx(SafeIconHandle iconOrCursorHandle, ref IconInfoEx iconInfoEx);
 
     /// <summary>
     /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648062(v=vs.85).aspx">CreateIconIndirect function</a>
@@ -147,4 +180,8 @@ public static class NativeIconMethods
     /// </returns>
     [DllImport("comctl32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int LoadIconWithScaleDown(IntPtr hInstance, string pszIconName, int cx, int cy, out IntPtr hIcon);
+
+
+    [DllImport(User32Api.User32, SetLastError = true)]
+    internal static extern bool DrawIconEx(IntPtr hdc, int xLeft, int yTop, IntPtr hIcon, int cxWidth, int cyWidth, int istepIfAniCur, IntPtr hbrFlickerFreeDraw, DrawIconExFlags diFlags);
 }
