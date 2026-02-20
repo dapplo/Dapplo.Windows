@@ -2,13 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Dapplo.Windows.Messages.Native;
+using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Clipboard.Internals;
 
@@ -41,7 +38,7 @@ internal sealed class ClipboardSemaphore : IDisposable
         if (hWnd == IntPtr.Zero)
         {
             // Take the default; if the window is still being created, wait for it reactively
-            hWnd = SharedMessageWindow.WhenHandleAvailable.FirstAsync().ToTask().GetAwaiter().GetResult();
+            hWnd = SharedMessageWindow.Handle;
         }
 
         // If a timeout is passed, use this in the wait
@@ -107,7 +104,7 @@ internal sealed class ClipboardSemaphore : IDisposable
         if (hWnd == IntPtr.Zero)
         {
             // Take the default; if the window is still being created, wait for it reactively
-            hWnd = await SharedMessageWindow.WhenHandleAvailable.FirstAsync().ToTask(cancellationToken);
+            hWnd = SharedMessageWindow.Handle;
         }
 
         // Await the semaphore, until the timeout is triggered

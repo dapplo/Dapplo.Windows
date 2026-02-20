@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using Dapplo.Windows.Clipboard;
 using Dapplo.Windows.Messages;
+using System.Reactive;
 
 namespace Dapplo.Windows.Tests.Benchmarks;
 
@@ -13,13 +14,24 @@ namespace Dapplo.Windows.Tests.Benchmarks;
 /// Benchmarks for accessing the clipboard
 /// </summary>
 [MinColumn, MaxColumn, MemoryDiagnoser]
-public class ClipboardBenchmarks
+public class ClipboardBenchmarks : IDisposable
 {
-    private readonly IntPtr _handle = WinProcHandler.Instance.Handle;
+    private IDisposable observable;
+
+    public ClipboardBenchmarks()
+    {
+        observable = SharedMessageWindow.Listen().Subscribe();
+    }
+
+    public void Dispose()
+    {
+        observable?.Dispose();
+    }
+
     [Benchmark, STAThread]
     public async Task LockClipboard()
     {
-        using (await ClipboardNative.AccessAsync(_handle))
+        using (await ClipboardNative.AccessAsync())
         {
         }
     }

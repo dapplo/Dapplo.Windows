@@ -18,13 +18,15 @@ namespace Dapplo.Windows.Tests;
 /// <summary>
 /// All clipboard related tests
 /// </summary>
-public class ClipboardTests
+public class ClipboardTests  : IDisposable
 {
     private static readonly LogSource Log = new LogSource();
+    private readonly IDisposable subscription;
 
     public ClipboardTests(ITestOutputHelper testOutputHelper)
     {
         LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        subscription = SharedMessageWindow.Listen().Subscribe();
     }
 
     /// <summary>
@@ -486,5 +488,10 @@ public class ClipboardTests
             Assert.False(success);
             Assert.Null(stream);
         }
+    }
+
+    public void Dispose()
+    {
+        subscription.Dispose();
     }
 }
