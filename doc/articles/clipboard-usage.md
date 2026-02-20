@@ -40,7 +40,7 @@ using System.Reactive.Linq;
 
 // Only react to text changes
 var textSubscription = ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains("Text") || info.Formats.Contains("UnicodeText"))
+    .Where(info => info.Formats.Contains("CF_TEXT") || info.Formats.Contains("CF_UNICODETEXT"))
     .Subscribe(info =>
     {
         Console.WriteLine("Text copied to clipboard");
@@ -48,7 +48,7 @@ var textSubscription = ClipboardNative.OnUpdate
 
 // Only react to image changes
 var imageSubscription = ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains("PNG") || info.Formats.Contains("Bitmap"))
+    .Where(info => info.Formats.Contains("PNG") || info.Formats.Contains("CF_BITMAP"))
     .Subscribe(info =>
     {
         Console.WriteLine("Image copied to clipboard");
@@ -56,7 +56,7 @@ var imageSubscription = ClipboardNative.OnUpdate
 
 // Only react to files
 var fileSubscription = ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains("FileDrop"))
+    .Where(info => info.Formats.Contains("CF_HDROP"))
     .Subscribe(info =>
     {
         Console.WriteLine("Files copied to clipboard");
@@ -107,9 +107,9 @@ using Dapplo.Windows.Clipboard;
 
 using (var clipboard = ClipboardNative.Access())
 {
-    if (clipboard.AvailableFormats().Contains("Text"))
+    if (clipboard.AvailableFormats().Contains("CF_UNICODETEXT"))
     {
-        string text = clipboard.GetAsString();
+        string text = clipboard.GetAsUnicodeString();
         Console.WriteLine($"Clipboard text: {text}");
     }
 }
@@ -123,9 +123,9 @@ using System.Collections.Generic;
 
 using (var clipboard = ClipboardNative.Access())
 {
-    if (clipboard.AvailableFormats().Contains("FileDrop"))
+    if (clipboard.AvailableFormats().Contains("CF_HDROP"))
     {
-        IEnumerable<string> files = clipboard.GetAsFileNames();
+        IEnumerable<string> files = clipboard.GetFileNames();
         foreach (var file in files)
         {
             Console.WriteLine($"File: {file}");
@@ -153,10 +153,10 @@ using (var clipboard = ClipboardNative.Access())
     }
 
     // Read as bitmap
-    if (clipboard.AvailableFormats().Contains("Bitmap"))
+    if (clipboard.AvailableFormats().Contains("CF_BITMAP"))
     {
         // Note: Direct bitmap reading may require additional code
-        using var stream = clipboard.GetAsStream("Bitmap");
+        using var stream = clipboard.GetAsStream("CF_BITMAP");
         // Process bitmap stream
     }
 }
@@ -200,21 +200,7 @@ using (var clipboard = ClipboardNative.Access())
 
 ### Set Files
 
-```csharp
-using Dapplo.Windows.Clipboard;
-using System.Collections.Generic;
-
-var files = new List<string>
-{
-    @"C:\path\to\file1.txt",
-    @"C:\path\to\file2.txt"
-};
-
-using (var clipboard = ClipboardNative.Access())
-{
-    clipboard.SetAsFileNames(files);
-}
-```
+Setting file names on the clipboard requires constructing a native `DROPFILES` structure (CF_HDROP), which is not directly provided by this library. To read file names that were placed on the clipboard by other applications, use `GetFileNames()` as shown in [Read Files](#read-files).
 
 ### Set Custom Format
 
@@ -227,7 +213,7 @@ using (var clipboard = ClipboardNative.Access())
     string customFormat = "MyApplication.CustomFormat";
     byte[] data = Encoding.UTF8.GetBytes("Custom clipboard data");
     
-    clipboard.SetAsBytes(customFormat, data);
+    clipboard.SetAsBytes(data, customFormat);
 }
 ```
 
@@ -247,7 +233,7 @@ using (var clipboard = ClipboardNative.Access())
     clipboard.SetAsUnicodeString(text);
     
     string html = $"<html><body>{text}</body></html>";
-    clipboard.SetAsBytes("HTML Format", Encoding.UTF8.GetBytes(html));
+    clipboard.SetAsBytes(Encoding.UTF8.GetBytes(html), "HTML Format");
 }
 ```
 
@@ -276,15 +262,14 @@ var renderSubscription = ClipboardNative.OnRenderFormat.Subscribe(request =>
         return;
     }
 
-    // Render specific format on demand
+    // Render specific format on demand.
+    // Note: When responding to WM_RENDERFORMAT, the clipboard is already open.
+    // Use the AccessToken provided in the request - do NOT call ClipboardNative.Access().
     switch (request.RequestedFormat)
     {
         case "MyFormat":
-            using (var clipboard = ClipboardNative.Access())
-            {
-                byte[] data = GenerateLargeData(); // Only generate when needed
-                clipboard.SetAsBytes("MyFormat", data);
-            }
+            byte[] data = GenerateLargeData(); // Only generate when needed
+            request.AccessToken.SetAsBytes(data, "MyFormat");
             break;
     }
 });
@@ -292,7 +277,8 @@ var renderSubscription = ClipboardNative.OnRenderFormat.Subscribe(request =>
 // Set clipboard with delayed rendering
 using (var clipboard = ClipboardNative.Access())
 {
-    clipboard.SetAsDelayedRenderer("MyFormat");
+    clipboard.ClearContents();
+    clipboard.SetDelayedRenderedContent("MyFormat");
 }
 ```
 
@@ -303,7 +289,7 @@ using Dapplo.Windows.Clipboard;
 
 using (var clipboard = ClipboardNative.Access())
 {
-    clipboard.Clear();
+    clipboard.ClearContents();
 }
 ```
 
@@ -315,12 +301,12 @@ using System;
 using System.Reactive.Linq;
 
 var subscription = ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains("Text"))
+    .Where(info => info.Formats.Contains("CF_UNICODETEXT"))
     .Throttle(TimeSpan.FromMilliseconds(500)) // Avoid rapid updates
     .Subscribe(info =>
     {
         using var clipboard = ClipboardNative.Access();
-        var text = clipboard.GetAsString();
+        var text = clipboard.GetAsUnicodeString();
         ProcessClipboardText(text);
     });
 ```
@@ -521,16 +507,16 @@ using (var clipboard = ClipboardNative.Access())
 
 ## Common Clipboard Formats
 
-Standard Windows clipboard formats:
+Standard Windows clipboard formats (as reported by this library):
 
-- **Text** - ANSI text
-- **UnicodeText** - Unicode text
-- **Bitmap** - Bitmap image
-- **PNG** - PNG image format
-- **FileDrop** - List of file paths
-- **HTML Format** - HTML content
-- **Rich Text Format** - RTF content
-- **Csv** - Comma-separated values
+- **CF_TEXT** - ANSI text
+- **CF_UNICODETEXT** - Unicode text
+- **CF_BITMAP** - Bitmap image
+- **PNG** - PNG image format (registered by applications)
+- **CF_HDROP** - List of file paths
+- **HTML Format** - HTML content (registered by applications)
+- **Rich Text Format** - RTF content (registered by applications)
+- **Csv** - Comma-separated values (registered by applications)
 
 You can also check available formats:
 
