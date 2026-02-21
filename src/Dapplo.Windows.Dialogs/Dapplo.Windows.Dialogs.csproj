@@ -5,7 +5,7 @@
     <PackageTags>windows native dialogs file-dialog folder-picker</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows.Com\Dapplo.Windows.Com.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System" />
