@@ -120,7 +120,7 @@ internal static class NativeMethods
     /// If the index value is 0xFFFFFFFF, the return value is a count of the dropped files. Note that the index variable itself returns unchanged, and therefore remains 0xFFFFFFFF.
     /// If the index value is between zero and the total number of dropped files, and the lpszFile buffer address is NULL, the return value is the required size, in characters, of the buffer, not including the terminating null character.
     /// </returns>
-    [DllImport("shell32")]
+    [DllImport("shell32", CharSet = CharSet.Unicode)]
     internal static extern unsafe int DragQueryFile(IntPtr hDrop, uint iFile, [Out] char* lpszFile, int cch);
 
     /// <summary>
