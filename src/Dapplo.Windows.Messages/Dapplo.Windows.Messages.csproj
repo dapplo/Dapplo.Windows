@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.Messages is a library with the Windows messages and a WinProc helper.</Description>
     <PackageTags>windows messages</PackageTags>

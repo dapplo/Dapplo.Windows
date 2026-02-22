@@ -12,7 +12,13 @@ using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.AppRestartManager;
 
-
+/// <summary>
+/// Provides methods for registering and unregistering the current application for automatic restart using Windows
+/// Restart Manager, as well as utilities for detecting restart events and handling system shutdown notifications.
+/// </summary>
+/// <remarks>Use this class to enable your application to be automatically restarted after system updates or
+/// shutdowns managed by Windows Restart Manager. It also provides helper methods for detecting restart conditions and
+/// responding to session end events, allowing applications to preserve state and handle shutdowns gracefully.</remarks>
 public static class RestartManager
 {
 

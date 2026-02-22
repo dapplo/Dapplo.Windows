@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.AppRestartManager provides APIs for applications to register for automatic restart with Windows Restart Manager.</Description>
     <PackageTags>windows native restart-manager application</PackageTags>

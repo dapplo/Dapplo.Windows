@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.Clipboard is a library for accessing the clipboard in a more modern way.</Description>
     <PackageTags>windows native clipboard</PackageTags>
