@@ -1,45 +1,51 @@
 // Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dapplo.Windows.AppRestartManager.Enums;
+using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Enumerations;
 using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
-using Dapplo.Windows.AppRestartManager.Enums;
-using Dapplo.Windows.Kernel32;
-using Dapplo.Windows.Kernel32.Enums;
-using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.AppRestartManager;
 
-/// <summary>
-///     High-level helper class for applications that want to participate in Restart Manager.
-///     This allows applications to be gracefully shut down and automatically restarted during updates.
-/// </summary>
-/// <example>
-///     Example usage to register an application for restart:
-///     <code>
-///     // Register the application to restart with command-line arguments
-///     RestartManager.RegisterForRestart("/restore");
-///     
-///     // Later, check if restarted
-///     if (RestartManager.WasRestartRequested())
-///     {
-///         // Save state, prepare for restart
-///     }
-///     
-///     // Listen for shutdown requests
-///     RestartManager.ListenForEndSession()
-///         .Subscribe(reason =>
-///         {
-///             Console.WriteLine($"Shutdown requested: {reason}");
-///             // Save state, prepare for shutdown
-///         });
-///     </code>
-/// </example>
+
 public static class RestartManager
 {
+
+    /// <summary>
+    ///     Registers the active instance of an application for restart.
+    ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registerapplicationrestart">RegisterApplicationRestart function</a>
+    /// </summary>
+    /// <param name="pwzCommandline">
+    ///     A pointer to a Unicode string that specifies the command-line arguments for the application when it is restarted.
+    ///     The maximum size of the command line that you can specify is RESTART_MAX_CMD_LINE characters.
+    ///     Do not include the name of the executable in the command line; this function adds it for you.
+    ///     If this parameter is NULL or an empty string, the previously registered command line is removed.
+    ///     If the argument contains spaces, use quotes around the argument.
+    /// </param>
+    /// <param name="dwFlags">
+    ///     This parameter can be 0 or one or more of the ApplicationRestartFlags values.
+    /// </param>
+    /// <returns>
+    ///     Returns S_OK (0) on success, or an error value on failure.
+    /// </returns>
+    [DllImport("user32", CharSet = CharSet.Unicode)]
+    private static extern int RegisterApplicationRestart(string pwzCommandline, ApplicationRestartFlags dwFlags);
+
+    /// <summary>
+    ///     Removes the active instance of an application from the restart list.
+    ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-unregisterapplicationrestart">UnregisterApplicationRestart function</a>
+    /// </summary>
+    /// <returns>
+    ///     Returns S_OK (0) on success, or an error value on failure.
+    /// </returns>
+    [DllImport("user32")]
+    private static extern int UnregisterApplicationRestart();
+
     /// <summary>
     ///     Maximum length for the command line arguments (in characters).
     ///     This corresponds to the Windows RESTART_MAX_CMD_LINE constant.
@@ -74,7 +80,7 @@ public static class RestartManager
             throw new ArgumentException($"Command line arguments cannot exceed {MaxCommandLineLength} characters", nameof(commandLineArgs));
         }
 
-        var result = Kernel32Api.RegisterApplicationRestart(commandLineArgs, flags);
+        var result = RegisterApplicationRestart(commandLineArgs, flags);
 
         if (result != 0)
         {
@@ -89,7 +95,7 @@ public static class RestartManager
     /// <exception cref="Win32Exception">Thrown when unregistration fails.</exception>
     public static void UnregisterForRestart()
     {
-        var result = Kernel32Api.UnregisterApplicationRestart();
+        var result = UnregisterApplicationRestart();
 
         if (result != 0)
         {

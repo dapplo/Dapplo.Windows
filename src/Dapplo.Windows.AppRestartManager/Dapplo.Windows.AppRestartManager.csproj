@@ -6,7 +6,6 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
   </ItemGroup>
   <ItemGroup>

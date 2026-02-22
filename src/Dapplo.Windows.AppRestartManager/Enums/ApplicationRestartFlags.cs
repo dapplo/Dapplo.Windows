@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dapplo.Windows.Kernel32.Enums;
+namespace Dapplo.Windows.AppRestartManager.Enums;
 
 /// <summary>
 ///     Flags for the RegisterApplicationRestart function.

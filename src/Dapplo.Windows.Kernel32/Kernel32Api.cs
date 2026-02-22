@@ -443,34 +443,4 @@ public static class Kernel32Api
     /// <returns>int</returns>
     [DllImport(Kernel32Dll, SetLastError = true, CharSet = CharSet.Auto)]
     public static extern int GetPackageFullName(IntPtr hProcess, ref Int32 packageFullNameLength, StringBuilder fullName);
-
-    /// <summary>
-    ///     Registers the active instance of an application for restart.
-    ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registerapplicationrestart">RegisterApplicationRestart function</a>
-    /// </summary>
-    /// <param name="pwzCommandline">
-    ///     A pointer to a Unicode string that specifies the command-line arguments for the application when it is restarted.
-    ///     The maximum size of the command line that you can specify is RESTART_MAX_CMD_LINE characters.
-    ///     Do not include the name of the executable in the command line; this function adds it for you.
-    ///     If this parameter is NULL or an empty string, the previously registered command line is removed.
-    ///     If the argument contains spaces, use quotes around the argument.
-    /// </param>
-    /// <param name="dwFlags">
-    ///     This parameter can be 0 or one or more of the ApplicationRestartFlags values.
-    /// </param>
-    /// <returns>
-    ///     Returns S_OK (0) on success, or an error value on failure.
-    /// </returns>
-    [DllImport(Kernel32Dll, CharSet = CharSet.Unicode)]
-    public static extern int RegisterApplicationRestart(string pwzCommandline, ApplicationRestartFlags dwFlags);
-
-    /// <summary>
-    ///     Removes the active instance of an application from the restart list.
-    ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-unregisterapplicationrestart">UnregisterApplicationRestart function</a>
-    /// </summary>
-    /// <returns>
-    ///     Returns S_OK (0) on success, or an error value on failure.
-    /// </returns>
-    [DllImport(Kernel32Dll)]
-    public static extern int UnregisterApplicationRestart();
 }
