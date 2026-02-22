@@ -15,10 +15,10 @@
   <ItemGroup>
     <PackageReference Include="Dapplo.Log.Loggers" Version="3.0.22" />
     <PackageReference Include="System.Reactive" Version="6.1.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.2" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <PackageReference Include="System.Resources.Extensions" Version="10.0.2" />
+    <PackageReference Include="System.Resources.Extensions" Version="10.0.3" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="System" />

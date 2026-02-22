@@ -28,7 +28,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="System.Reactive" Version="6.1.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.2" />
     <PackageReference Include="Dapplo.Log.Loggers" Version="3.0.22" />
     <PackageReference Include="Dapplo.Log.XUnit" Version="3.0.22" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
@@ -47,7 +47,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.msbuild" Version="6.0.4">
+    <PackageReference Include="coverlet.msbuild" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

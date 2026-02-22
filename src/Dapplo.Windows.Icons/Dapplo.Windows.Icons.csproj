@@ -18,7 +18,7 @@
 	<ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
-    <PackageReference Include="System.Drawing.Common" Version="10.0.2" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.3" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="PresentationCore" />
