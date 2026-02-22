@@ -15,12 +15,12 @@ Dapplo.Windows provides a comprehensive .NET API for the Windows Restart Manager
 ### For Applications
 
 - **`Dapplo.Windows.AppRestartManager`** - Package for applications
-  - **`RestartManager`** - High-level helper class for applications to register for automatic restart
-  - **`Kernel32Api`** (in Kernel32) - Contains `RegisterApplicationRestart` and `UnregisterApplicationRestart` P/Invoke declarations
+  - **`ApplicationRestartManager`** - High-level helper class for applications to register for automatic restart
+  - **Contains `RegisterApplicationRestart` and `UnregisterApplicationRestart` P/Invoke declarations
 
 ## Application-Side API
 
-If you're developing an application that may be updated or needs to be restarted during system updates, use the `RestartManager` class from the `Dapplo.Windows.AppRestartManager` package.
+If you're developing an application that may be updated or needs to be restarted during system updates, use the `ApplicationRestartManager` class from the `Dapplo.Windows.AppRestartManager` package.
 
 ### Registering Your Application for Restart
 
@@ -30,10 +30,10 @@ Applications can register themselves to be automatically restarted by Restart Ma
 using Dapplo.Windows.AppRestartManager;
 
 // Register for restart with command-line arguments
-RestartManager.RegisterForRestart("/restore /minimized");
+ApplicationRestartManager.RegisterForRestart("/restore /minimized");
 
 // Or register without arguments
-RestartManager.RegisterForRestart();
+ApplicationRestartManager.RegisterForRestart();
 ```
 
 ### When to Register for Restart
@@ -46,17 +46,17 @@ using Dapplo.Windows.AppRestartManager;
 static void Main(string[] args)
 {
     // Register for restart early in the application lifecycle
-    RestartManager.RegisterForRestart("/restore");
+    ApplicationRestartManager.RegisterForRestart("/restore");
     
     // Check if we were restarted by Restart Manager
-    if (RestartManager.WasRestartRequested())
+    if (ApplicationRestartManager.WasRestartRequested())
     {
         // Restore previous state, show notification, etc.
         Console.WriteLine("Application was restarted after an update");
     }
     
     // Continue with normal application startup
-    Application.Run(new MainForm());
+    ApplicationRestartManager.Run(new MainForm());
 }
 ```
 
@@ -69,19 +69,19 @@ using Dapplo.Windows.AppRestartManager;
 using Dapplo.Windows.Kernel32.Enums;
 
 // Don't restart if the application crashes
-RestartManager.RegisterForRestart(
+ApplicationRestartManager.RegisterForRestart(
     commandLineArgs: "/restore",
     flags: ApplicationRestartFlags.RestartNoCrash
 );
 
 // Don't restart on crash or hang
-RestartManager.RegisterForRestart(
+ApplicationRestartManager.RegisterForRestart(
     commandLineArgs: "/restore",
     flags: ApplicationRestartFlags.RestartNoCrash | ApplicationRestartFlags.RestartNoHang
 );
 
 // Don't restart during patches or reboots
-RestartManager.RegisterForRestart(
+ApplicationRestartManager.RegisterForRestart(
     commandLineArgs: null,
     flags: ApplicationRestartFlags.RestartNoPatch | ApplicationRestartFlags.RestartNoReboot
 );
@@ -92,12 +92,12 @@ RestartManager.RegisterForRestart(
 If your application no longer wants to be restarted automatically:
 
 ```csharp
-RestartManager.UnregisterForRestart();
+ApplicationRestartManager.UnregisterForRestart();
 ```
 
 ### Listening for Shutdown Events
 
-The `RestartManager.ListenForEndSession()` method provides an observable stream that listens for `WM_QUERYENDSESSION` and `WM_ENDSESSION` Windows messages. This allows your application to be notified when the system is shutting down or when Restart Manager is requesting a shutdown:
+The `ApplicationRestartManager.ListenForEndSession()` method provides an observable stream that listens for `WM_QUERYENDSESSION` and `WM_ENDSESSION` Windows messages. This allows your application to be notified when the system is shutting down or when Restart Manager is requesting a shutdown:
 
 ```csharp
 using Dapplo.Windows.AppRestartManager;
@@ -105,7 +105,7 @@ using Dapplo.Windows.AppRestartManager.Enums;
 using System.Reactive.Linq;
 
 // Listen for shutdown requests
-var subscription = RestartManager.ListenForEndSession()
+var subscription = ApplicationRestartManager.ListenForEndSession()
     .Subscribe(reason =>
     {
         Console.WriteLine($"Shutdown requested: {reason}");
@@ -165,12 +165,12 @@ public class MyApplication
     public void Run(string[] args)
     {
         // Register for restart with command-line arguments
-        RestartManager.RegisterForRestart("/restore");
+        ApplicationRestartManager.RegisterForRestart("/restore");
         
         // Check if we were restarted
-        if (RestartManager.WasRestartRequested())
+        if (ApplicationRestartManager.WasRestartRequested())
         {
-            var cmdArgs = RestartManager.GetRestartCommandLineArgs();
+            var cmdArgs = ApplicationRestartManager.GetRestartCommandLineArgs();
             if (cmdArgs.Contains("/restore"))
             {
                 RestoreApplicationState();
@@ -178,7 +178,7 @@ public class MyApplication
         }
         
         // Listen for shutdown events
-        _endSessionSubscription = RestartManager.ListenForEndSession()
+        _endSessionSubscription = ApplicationRestartManager.ListenForEndSession()
             .Subscribe(reason =>
             {
                 HandleShutdown(reason);

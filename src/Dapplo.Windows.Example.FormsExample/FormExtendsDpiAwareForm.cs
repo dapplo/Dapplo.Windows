@@ -1,14 +1,16 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dapplo.Log;
+using Dapplo.Windows.AppRestartManager;
+using Dapplo.Windows.AppRestartManager.Enums;
+using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Dpi.Forms;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using Dapplo.Log;
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Dpi;
-using Dapplo.Windows.Dpi.Forms;
 
 namespace Dapplo.Windows.Example.FormsExample;
 
@@ -21,6 +23,23 @@ public partial class FormExtendsDpiAwareForm : DpiAwareForm
 
     public FormExtendsDpiAwareForm()
     {
+        var subscription = ApplicationRestartManager.ListenForEndSession().Subscribe(reason => {
+            if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+            {
+                // Application is being closed for an update
+            }
+            else if (reason.HasFlag(EndSessionReasons.ENDSESSION_LOGOFF))
+            {
+                // User is logging off
+            }
+            else if (reason.HasFlag(EndSessionReasons.ENDSESSION_CRITICAL))
+            {
+                // Critical shutdown
+                // ?? Not sure if we can do anything here, but let's try to save state just in case
+            }
+            Application.Exit();
+        });
+
         InitializeComponent();
 
         _contextMenuDpiHandler = contextMenuStrip1.AttachDpiHandler();
