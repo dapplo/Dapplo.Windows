@@ -34,26 +34,24 @@ public class IconTests
     public void TestIcon_GetIcon()
     {
         // Start a process to test against
-        using (var process = Process.Start("charmap.exe"))
+        using var process = Process.Start("charmap.exe");
+        // Make sure it's started
+        Assert.NotNull(process);
+        // Wait until the process started it's message pump (listening for input)
+        if (!process.WaitForInputIdle(4000))
         {
-            // Make sure it's started
-            Assert.NotNull(process);
-            // Wait until the process started it's message pump (listening for input)
-            if (!process.WaitForInputIdle(4000))
-            {
-                Assert.Fail("Test-Process didn't get ready.");
-                return;
-            }
-
-            User32Api.SetWindowText(process.MainWindowHandle, "TestIcon_GetIcon");
-
-            var window = InteropWindowQuery.GetTopLevelWindows().First();
-            var icon = window.GetIcon<BitmapSource>();
-            Assert.NotNull(icon);
-
-            // Kill the process
-            process.Kill();
+            Assert.Fail("Test-Process didn't get ready.");
+            return;
         }
+
+        _ = User32Api.SetWindowText(process.MainWindowHandle, "TestIcon_GetIcon");
+
+        var window = InteropWindowQuery.GetTopLevelWindows().First();
+        var icon = window.GetIcon<BitmapSource>();
+        Assert.NotNull(icon);
+
+        // Kill the process
+        process.Kill();
     }
 
     /// <summary>
@@ -199,21 +197,21 @@ public class IconTests
         // Create test bitmaps of different sizes
         var images = new List<Bitmap>
         {
-            new Bitmap(16, 16),
-            new Bitmap(32, 32),
-            new Bitmap(48, 48),
-            new Bitmap(256, 256)
+            new(16, 16),
+            new(32, 32),
+            new(48, 48),
+            new(256, 256)
         };
 
         // Fill each bitmap with a different color for visual verification
-        using (var g1 = System.Drawing.Graphics.FromImage(images[0]))
-            g1.Clear(System.Drawing.Color.Red);
-        using (var g2 = System.Drawing.Graphics.FromImage(images[1]))
-            g2.Clear(System.Drawing.Color.Green);
-        using (var g3 = System.Drawing.Graphics.FromImage(images[2]))
-            g3.Clear(System.Drawing.Color.Blue);
-        using (var g4 = System.Drawing.Graphics.FromImage(images[3]))
-            g4.Clear(System.Drawing.Color.Yellow);
+        using (var g1 = Graphics.FromImage(images[0]))
+            g1.Clear(Color.Red);
+        using (var g2 = Graphics.FromImage(images[1]))
+            g2.Clear(Color.Green);
+        using (var g3 = Graphics.FromImage(images[2]))
+            g3.Clear(Color.Blue);
+        using (var g4 = Graphics.FromImage(images[3]))
+            g4.Clear(Color.Yellow);
 
         // Write to a memory stream
         using (var stream = new MemoryStream())
@@ -224,17 +222,15 @@ public class IconTests
             Assert.True(stream.Length > 0, "Icon file should have data");
 
             // Verify the header
-            stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
-            {
-                var reserved = reader.ReadUInt16();
-                var type = reader.ReadUInt16();
-                var count = reader.ReadUInt16();
+            stream.Seek(0, SeekOrigin.Begin);
+            using var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true);
+            var reserved = reader.ReadUInt16();
+            var type = reader.ReadUInt16();
+            var count = reader.ReadUInt16();
 
-                Assert.Equal(0, reserved);
-                Assert.Equal(1, type); // 1 = icon
-                Assert.Equal(4, count); // 4 images
-            }
+            Assert.Equal(0, reserved);
+            Assert.Equal(1, type); // 1 = icon
+            Assert.Equal(4, count); // 4 images
         }
 
         // Clean up
@@ -252,9 +248,9 @@ public class IconTests
     {
         // Create test bitmap for cursor
         var bitmap = new Bitmap(32, 32);
-        using (var g = System.Drawing.Graphics.FromImage(bitmap))
+        using (var g = Graphics.FromImage(bitmap))
         {
-            g.Clear(System.Drawing.Color.White);
+            g.Clear(Color.White);
         }
 
         var cursorData = new List<(Image, Point)>
@@ -271,17 +267,15 @@ public class IconTests
             Assert.True(stream.Length > 0, "Cursor file should have data");
 
             // Verify the header
-            stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
-            {
-                var reserved = reader.ReadUInt16();
-                var type = reader.ReadUInt16();
-                var count = reader.ReadUInt16();
+            stream.Seek(0, SeekOrigin.Begin);
+            using var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true);
+            var reserved = reader.ReadUInt16();
+            var type = reader.ReadUInt16();
+            var count = reader.ReadUInt16();
 
-                Assert.Equal(0, reserved);
-                Assert.Equal(2, type); // 2 = cursor
-                Assert.Equal(1, count);
-            }
+            Assert.Equal(0, reserved);
+            Assert.Equal(2, type); // 2 = cursor
+            Assert.Equal(1, count);
         }
 
         bitmap.Dispose();
@@ -381,60 +375,56 @@ public class IconTests
     public void TestIconFileWriter_WriteGrpIconStructures()
     {
         // Test writing group icon structures for PE resources
-        using (var stream = new MemoryStream())
-        using (var writer = new BinaryWriter(stream))
-        {
-            // Write group icon directory
-            var grpIconDir = Icons.Structs.GrpIconDir.CreateIcon(2);
-            IconFileWriter.WriteGrpIconDir(writer, grpIconDir);
+        using var stream = new MemoryStream();
+        using var writer = new BinaryWriter(stream);
+        // Write group icon directory
+        var grpIconDir = Icons.Structs.GrpIconDir.CreateIcon(2);
+        IconFileWriter.WriteGrpIconDir(writer, grpIconDir);
 
-            // Write group icon directory entries
-            var entry1 = Icons.Structs.GrpIconDirEntry.CreateForIcon(16, 16, 32, 512, 1);
-            var entry2 = Icons.Structs.GrpIconDirEntry.CreateForIcon(32, 32, 32, 2048, 2);
-            IconFileWriter.WriteGrpIconDirEntry(writer, entry1);
-            IconFileWriter.WriteGrpIconDirEntry(writer, entry2);
+        // Write group icon directory entries
+        var entry1 = Icons.Structs.GrpIconDirEntry.CreateForIcon(16, 16, 32, 512, 1);
+        var entry2 = Icons.Structs.GrpIconDirEntry.CreateForIcon(32, 32, 32, 2048, 2);
+        IconFileWriter.WriteGrpIconDirEntry(writer, entry1);
+        IconFileWriter.WriteGrpIconDirEntry(writer, entry2);
 
-            writer.Flush();
+        writer.Flush();
 
-            // Verify the written data
-            stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new BinaryReader(stream))
-            {
-                // Read GRPICONDIR
-                var reserved = reader.ReadUInt16();
-                var type = reader.ReadUInt16();
-                var count = reader.ReadUInt16();
-                Assert.Equal(0, reserved);
-                Assert.Equal(1, type);
-                Assert.Equal(2, count);
+        // Verify the written data
+        stream.Seek(0, SeekOrigin.Begin);
+        using var reader = new BinaryReader(stream);
+        // Read GRPICONDIR
+        var reserved = reader.ReadUInt16();
+        var type = reader.ReadUInt16();
+        var count = reader.ReadUInt16();
+        Assert.Equal(0, reserved);
+        Assert.Equal(1, type);
+        Assert.Equal(2, count);
 
-                // Read first GRPICONDIRENTRY
-                var width1 = reader.ReadByte();
-                var height1 = reader.ReadByte();
-                reader.ReadByte(); // color count
-                reader.ReadByte(); // reserved
-                reader.ReadUInt16(); // planes
-                reader.ReadUInt16(); // bitcount
-                reader.ReadUInt32(); // bytes in res
-                var id1 = reader.ReadUInt16();
-                Assert.Equal(16, width1);
-                Assert.Equal(16, height1);
-                Assert.Equal(1, id1);
+        // Read first GRPICONDIRENTRY
+        var width1 = reader.ReadByte();
+        var height1 = reader.ReadByte();
+        reader.ReadByte(); // color count
+        reader.ReadByte(); // reserved
+        reader.ReadUInt16(); // planes
+        reader.ReadUInt16(); // bitcount
+        reader.ReadUInt32(); // bytes in res
+        var id1 = reader.ReadUInt16();
+        Assert.Equal(16, width1);
+        Assert.Equal(16, height1);
+        Assert.Equal(1, id1);
 
-                // Read second GRPICONDIRENTRY
-                var width2 = reader.ReadByte();
-                var height2 = reader.ReadByte();
-                reader.ReadByte(); // color count
-                reader.ReadByte(); // reserved
-                reader.ReadUInt16(); // planes
-                reader.ReadUInt16(); // bitcount
-                reader.ReadUInt32(); // bytes in res
-                var id2 = reader.ReadUInt16();
-                Assert.Equal(32, width2);
-                Assert.Equal(32, height2);
-                Assert.Equal(2, id2);
-            }
-        }
+        // Read second GRPICONDIRENTRY
+        var width2 = reader.ReadByte();
+        var height2 = reader.ReadByte();
+        reader.ReadByte(); // color count
+        reader.ReadByte(); // reserved
+        reader.ReadUInt16(); // planes
+        reader.ReadUInt16(); // bitcount
+        reader.ReadUInt32(); // bytes in res
+        var id2 = reader.ReadUInt16();
+        Assert.Equal(32, width2);
+        Assert.Equal(32, height2);
+        Assert.Equal(2, id2);
     }
 
     /// <summary>
@@ -445,9 +435,9 @@ public class IconTests
     {
         // Create test bitmap
         var bitmap = new Bitmap(32, 32);
-        using (var g = System.Drawing.Graphics.FromImage(bitmap))
+        using (var g = Graphics.FromImage(bitmap))
         {
-            g.Clear(System.Drawing.Color.Blue);
+            g.Clear(Color.Blue);
         }
 
         var images = new List<Image> { bitmap };
@@ -461,17 +451,15 @@ public class IconTests
             Assert.True(stream.Length > 0, "Icon file should have data");
 
             // Verify the header
-            stream.Seek(0, System.IO.SeekOrigin.Begin);
-            using (var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true))
-            {
-                var reserved = reader.ReadUInt16();
-                var type = reader.ReadUInt16();
-                var count = reader.ReadUInt16();
+            stream.Seek(0, SeekOrigin.Begin);
+            using var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true);
+            var reserved = reader.ReadUInt16();
+            var type = reader.ReadUInt16();
+            var count = reader.ReadUInt16();
 
-                Assert.Equal(0, reserved);
-                Assert.Equal(1, type); // 1 = icon
-                Assert.Equal(1, count);
-            }
+            Assert.Equal(0, reserved);
+            Assert.Equal(1, type); // 1 = icon
+            Assert.Equal(1, count);
         }
 
         bitmap.Dispose();
@@ -483,9 +471,8 @@ public class IconTests
     [Fact]
     public void TestCursorHelper_TryGetCurrentCursor()
     {
-        CapturedCursor capturedCursor;
-        var result = CursorHelper.TryGetCurrentCursor(out capturedCursor);
-        
+        var result = CursorHelper.TryGetCurrentCursor(out CapturedCursor capturedCursor);
+
         // In some environments (CI, headless), cursor may not be available
         // So we just verify the method returns a boolean and doesn't crash
         if (result)
@@ -503,20 +490,18 @@ public class IconTests
     {
         // Create a target bitmap
         var targetBitmap = new Bitmap(100, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        using (var g = Graphics.FromImage(targetBitmap))
         {
-            g.Clear(System.Drawing.Color.White);
+            g.Clear(Color.White);
         }
 
         // Create a cursor with alpha channel (modern cursor, no mask)
         var cursorBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        using (var g = Graphics.FromImage(cursorBitmap))
         {
-            g.Clear(System.Drawing.Color.Transparent);
-            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(128, 255, 0, 0)))
-            {
-                g.FillEllipse(brush, 0, 0, 32, 32);
-            }
+            g.Clear(Color.Transparent);
+            using var brush = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
+            g.FillEllipse(brush, 0, 0, 32, 32);
         }
 
         var cursor = new CapturedCursor
@@ -553,31 +538,27 @@ public class IconTests
     {
         // Create a target bitmap
         var targetBitmap = new Bitmap(100, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        using (var g = Graphics.FromImage(targetBitmap))
         {
-            g.Clear(System.Drawing.Color.White);
+            g.Clear(Color.White);
         }
 
         // Create a cursor color layer
         var cursorBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        using (var g = Graphics.FromImage(cursorBitmap))
         {
-            g.Clear(System.Drawing.Color.Black);
-            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.White))
-            {
-                g.FillRectangle(brush, 8, 8, 16, 16);
-            }
+            g.Clear(Color.Black);
+            using var brush = new SolidBrush(Color.White);
+            g.FillRectangle(brush, 8, 8, 16, 16);
         }
 
         // Create a mask layer
         var maskBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-        using (var g = System.Drawing.Graphics.FromImage(maskBitmap))
+        using (var g = Graphics.FromImage(maskBitmap))
         {
-            g.Clear(System.Drawing.Color.Black); // Black = transparent area
-            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.White))
-            {
-                g.FillRectangle(brush, 8, 8, 16, 16); // White = opaque area for XOR
-            }
+            g.Clear(Color.Black); // Black = transparent area
+            using var brush = new SolidBrush(Color.White);
+            g.FillRectangle(brush, 8, 8, 16, 16); // White = opaque area for XOR
         }
 
         var cursor = new CapturedCursor
@@ -610,20 +591,18 @@ public class IconTests
     {
         // Create a target bitmap
         var targetBitmap = new Bitmap(200, 200, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        using (var g = Graphics.FromImage(targetBitmap))
         {
-            g.Clear(System.Drawing.Color.White);
+            g.Clear(Color.White);
         }
 
         // Create a small cursor
         var cursorBitmap = new Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        using (var g = Graphics.FromImage(cursorBitmap))
         {
-            g.Clear(System.Drawing.Color.Transparent);
-            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 0, 0, 255)))
-            {
-                g.FillRectangle(brush, 0, 0, 16, 16);
-            }
+            g.Clear(Color.Transparent);
+            using var brush = new SolidBrush(Color.FromArgb(255, 0, 0, 255));
+            g.FillRectangle(brush, 0, 0, 16, 16);
         }
 
         var cursor = new CapturedCursor
@@ -653,20 +632,18 @@ public class IconTests
     {
         // Create a 24-bit target bitmap
         var targetBitmap = new Bitmap(100, 100, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-        using (var g = System.Drawing.Graphics.FromImage(targetBitmap))
+        using (var g = Graphics.FromImage(targetBitmap))
         {
-            g.Clear(System.Drawing.Color.White);
+            g.Clear(Color.White);
         }
 
         // Create a cursor with alpha channel
         var cursorBitmap = new Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-        using (var g = System.Drawing.Graphics.FromImage(cursorBitmap))
+        using (var g = Graphics.FromImage(cursorBitmap))
         {
-            g.Clear(System.Drawing.Color.Transparent);
-            using (var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 0, 255, 0)))
-            {
-                g.FillEllipse(brush, 0, 0, 32, 32);
-            }
+            g.Clear(Color.Transparent);
+            using var brush = new SolidBrush(Color.FromArgb(255, 0, 255, 0));
+            g.FillEllipse(brush, 0, 0, 32, 32);
         }
 
         var cursor = new CapturedCursor

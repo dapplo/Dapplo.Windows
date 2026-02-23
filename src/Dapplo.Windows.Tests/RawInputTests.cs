@@ -47,7 +47,7 @@ public class RawInputTests
     //[WpfFact]
     public async Task Test_RawInput_DeviceChanges_KeyboardRemoved()
     {
-        var device = await RawInputMonitor.MonitorRawInputDeviceChanges(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
+        var device = await RawInputDeviceMonitor.Listen(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
         Assert.False(device.Added);
         Assert.Equal(RawInputDeviceTypes.Keyboard, device.DeviceInformation.DeviceInfo.Type);
     }
@@ -55,7 +55,7 @@ public class RawInputTests
     //[WpfFact]
     public async Task Test_RawInput_Left()
     {
-        var rawInputObservable = RawInputMonitor.MonitorRawInput(RawInputDevices.Keyboard);
+        var rawInputObservable = RawInputMonitor.Listen(RawInputDevices.Keyboard);
 
         using (rawInputObservable.Subscribe(ri =>
                {

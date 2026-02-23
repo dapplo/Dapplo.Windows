@@ -3,6 +3,13 @@ namespace Dapplo.Windows.User32.Enums;
 
 using System;
 
+/// <summary>
+/// Specifies window class style flags used when registering a window class in the Windows API.
+/// </summary>
+/// <remarks>These flags control various behaviors and characteristics of windows created with the associated
+/// class, such as redraw behavior, device context allocation, and special effects. Multiple values can be combined
+/// using a bitwise OR operation. These styles correspond to the CS_* constants used in native Win32
+/// programming.</remarks>
 [Flags]
 public enum WindowsClassStyles : uint
 {

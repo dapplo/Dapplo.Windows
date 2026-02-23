@@ -2,10 +2,22 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 #pragma warning disable 1591
 
 namespace Dapplo.Windows.Messages.Enumerations;
+
+/// <summary>
+/// Provides extension methods for evaluating Windows message values.
+/// </summary>
+public static class WindowsMessagesExtension
+{
+    public static bool IsIn(this WindowsMessages message, params WindowsMessages[]values)
+    {
+        return values.Contains(message);
+    }
+}
 
 /// <summary>
 ///     All possible windows messages

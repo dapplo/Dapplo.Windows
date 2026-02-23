@@ -94,7 +94,7 @@ namespace Dapplo.Windows.Devices
                         },
                         onTeardown: hwnd => UnregisterDeviceNotification(deviceNotificationHandle)
                     )
-                    .Where(m => m.Msg == (uint)WindowsMessages.WM_DEVICECHANGE && m.LParam != 0)
+                    .Where(m => m.Msg == WindowsMessages.WM_DEVICECHANGE && m.LParam != 0)
                     .Subscribe(m =>
                     {
                         observer.OnNext(new DeviceNotificationEvent((IntPtr)m.WParam, (IntPtr)m.LParam));

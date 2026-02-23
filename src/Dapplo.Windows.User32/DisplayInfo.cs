@@ -109,20 +109,17 @@ public class DisplayInfo
                 return _allDisplayInfos;
             }
 
-            _allDisplayInfos = User32Api.EnumDisplays().ToArray();
+            _allDisplayInfos = User32Api.EnumDisplays()?.ToArray();
 
 #if !NETSTANDARD2_0
 
             // Subscribe to display changes, but only when we didn't yet
-            if (_displayInfoUpdate == null && Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
-            {
-                _displayInfoUpdate = SharedMessageWindow.Listen().Where(m => m.Msg == (uint)WindowsMessages.WM_DISPLAYCHANGE)
+            _displayInfoUpdate ??= SharedMessageWindow.Listen().Where(m => m.Msg == WindowsMessages.WM_DISPLAYCHANGE)
                         .Subscribe(m =>
                         {
                             _allDisplayInfos = null;
                             _screenBounds = null;
                         });
-            }
 #endif
             return _allDisplayInfos;
         }

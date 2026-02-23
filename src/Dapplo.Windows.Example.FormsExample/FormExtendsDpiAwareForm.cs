@@ -7,6 +7,7 @@ using Dapplo.Windows.AppRestartManager.Enums;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Dpi;
 using Dapplo.Windows.Dpi.Forms;
+using Dapplo.Windows.Messages.Enumerations;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -23,21 +24,32 @@ public partial class FormExtendsDpiAwareForm : DpiAwareForm
 
     public FormExtendsDpiAwareForm()
     {
-        var subscription = ApplicationRestartManager.ListenForEndSession().Subscribe(reason => {
-            if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+        // Handle restart manager messages to gracefully exit the application when the session is ending
+        var subscription = ApplicationRestartManager.ListenForEndSession().Subscribe(endSessionMessage => {
+            switch(endSessionMessage.Msg)
             {
-                // Application is being closed for an update
+                case WindowsMessages.WM_ENDSESSION:
+                    switch (endSessionMessage.EndSessionReason)
+                    {
+                        case EndSessionReasons.ENDSESSION_CLOSEAPP:
+                            // Application is being closed for an update
+                            Application.Exit();
+                            break;
+                        case EndSessionReasons.ENDSESSION_LOGOFF:
+                            // User is logging off
+                            Application.Exit();
+                            break;
+                        case EndSessionReasons.ENDSESSION_CRITICAL:
+                            // Critical shutdown
+                            Application.Exit();
+                            break;
+                    }
+                    break;
+                case WindowsMessages.WM_QUERYENDSESSION:
+                    // Return true to indicate that we can handle the session end, or false to cancel it
+                    endSessionMessage.Handled = true;
+                    break;
             }
-            else if (reason.HasFlag(EndSessionReasons.ENDSESSION_LOGOFF))
-            {
-                // User is logging off
-            }
-            else if (reason.HasFlag(EndSessionReasons.ENDSESSION_CRITICAL))
-            {
-                // Critical shutdown
-                // ?? Not sure if we can do anything here, but let's try to save state just in case
-            }
-            Application.Exit();
         });
 
         InitializeComponent();

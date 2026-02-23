@@ -21,7 +21,7 @@ namespace Dapplo.Windows.Clipboard
     public static class ClipboardNative
     {
         // "Global" clipboard lock
-        private static readonly ClipboardSemaphore ClipboardLockProvider = new ClipboardSemaphore();
+        private static readonly ClipboardSemaphore ClipboardLockProvider = new();
 
 #if !NETSTANDARD2_0
         // for now this is not supported in netstandard 2.0
@@ -56,7 +56,7 @@ namespace Dapplo.Windows.Clipboard
                             },
                             onTeardown: hwnd => NativeMethods.RemoveClipboardFormatListener((IntPtr)hwnd)
                         )
-                        .Where(m => m.Msg == (uint)WindowsMessages.WM_CLIPBOARDUPDATE)
+                        .Where(m => m.Msg == WindowsMessages.WM_CLIPBOARDUPDATE)
                         .Subscribe(m =>
                         {
                             var clipboardUpdateInformationInfo = ClipboardUpdateInformation.Create((IntPtr)m.Hwnd);
@@ -87,12 +87,12 @@ namespace Dapplo.Windows.Clipboard
                 return _onRenderFormat ??= Observable.Create<ClipboardRenderFormatRequest>(observer =>
                 {
                     return SharedMessageWindow.Listen()
-                        .Where(m => m.Msg == (uint)WindowsMessages.WM_RENDERALLFORMATS ||
-                                    m.Msg == (uint)WindowsMessages.WM_RENDERFORMAT ||
-                                    m.Msg == (uint)WindowsMessages.WM_DESTROYCLIPBOARD)
+                        .Where(m => m.Msg == WindowsMessages.WM_RENDERALLFORMATS ||
+                                    m.Msg == WindowsMessages.WM_RENDERFORMAT ||
+                                    m.Msg == WindowsMessages.WM_DESTROYCLIPBOARD)
                         .Subscribe(m =>
                         {
-                            switch ((WindowsMessages)m.Msg)
+                            switch (m.Msg)
                             {
                                 case WindowsMessages.WM_RENDERALLFORMATS:
                                     var requestRenderFormat = new ClipboardRenderFormatRequest

@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dapplo.Windows.Messages.Enumerations;
-using Dapplo.Windows.Messages;
-
 #if !NETSTANDARD2_0
 using System;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.User32.Enums;
+using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Desktop
 {
@@ -20,7 +19,7 @@ namespace Dapplo.Windows.Desktop
         /// <summary>
         ///     The singleton of the KeyboardHook
         /// </summary>
-        private static readonly Lazy<EnvironmentMonitor> Singleton = new Lazy<EnvironmentMonitor>(() => new EnvironmentMonitor());
+        private static readonly Lazy<EnvironmentMonitor> Singleton = new(() => new EnvironmentMonitor());
 
         /// <summary>
         ///     Used to store the observable
@@ -33,7 +32,7 @@ namespace Dapplo.Windows.Desktop
         private EnvironmentMonitor()
         {
             _environmentObservable = SharedMessageWindow.Messages
-                .Where(m => m.Msg == (uint)WindowsMessages.WM_SETTINGCHANGE)
+                .Where(m => m.Msg == WindowsMessages.WM_SETTINGCHANGE)
                 .Select(m =>
                 {
                     var action = (SystemParametersInfoActions)(int)m.WParam;

@@ -5,7 +5,6 @@
 using System;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Messages.Enumerations;
-using Dapplo.Windows.Messages.Native;
 
 namespace Dapplo.Windows.Messages;
 
@@ -82,16 +81,16 @@ public class WindowsSessionListener : IDisposable
             _subscription = SharedMessageWindow.Listen(
                 onSetup: hwnd =>
                 {
-                    if (!WTSRegisterSessionNotification((IntPtr)hwnd, NOTIFY_FOR_THIS_SESSION))
+                    if (!WTSRegisterSessionNotification(hwnd, NOTIFY_FOR_THIS_SESSION))
                     {
                         throw new InvalidOperationException("Failed to register for session notifications");
                     }
                 },
-                onTeardown: hwnd => WTSUnRegisterSessionNotification((IntPtr)hwnd)
+                onTeardown: hwnd => WTSUnRegisterSessionNotification(hwnd)
             )
             .Subscribe(m =>
             {
-                if (_isPaused || m.Msg != (uint)WindowsMessages.WM_WTSSESSION_CHANGE)
+                if (_isPaused || m.Msg != WindowsMessages.WM_WTSSESSION_CHANGE)
                 {
                     return;
                 }

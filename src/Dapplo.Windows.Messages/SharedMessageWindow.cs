@@ -38,7 +38,7 @@ public static class SharedMessageWindow
     private static extern nint DispatchMessage(ref Msg lpMsg);
 
     [DllImport("user32")]
-    private static extern nint DefWindowProc(nint hWnd, uint msg, nint wParam, nint lParam);
+    private static extern nint DefWindowProc(nint hWnd, WindowsMessages msg, nint wParam, nint lParam);
 
     [DllImport("user32")]
     private static extern void PostQuitMessage(int nExitCode);
@@ -47,7 +47,7 @@ public static class SharedMessageWindow
     private static extern bool PostMessage(nint hWnd, uint Msg, nint wParam, nint lParam);
 
     [DllImport("kernel32")]
-    private static extern nint GetModuleHandle(string? lpModuleName);
+    private static extern nint GetModuleHandle(string lpModuleName);
     #endregion
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
@@ -58,7 +58,7 @@ public static class SharedMessageWindow
         public nint hbrBackground; public string lpszMenuName; public string lpszClassName; public nint hIconSm;
     }
 
-    private static IObservable<WindowMessage>? _sharedStream;
+    private static IObservable<WindowMessage> _sharedStream;
     private static readonly object _lock = new();
     private static readonly BehaviorSubject<nint> _handleSubject = new(0);
 
@@ -152,7 +152,6 @@ public static class SharedMessageWindow
     /// <remarks>The window is created on a dedicated background thread with a single-threaded apartment
     /// state. Disposal of the returned observable triggers destruction of the window and completion of the sequence.
     /// This method is useful for scenarios requiring low-level message processing without a visible UI window.</remarks>
-    /// Can be null if no callback is needed.</param>
     /// <returns>An observable sequence of Windows messages received by the created message-only window. The sequence completes when the window is destroyed.</returns>
     private static IObservable<WindowMessage> CreateBaseStream()
     {
@@ -160,19 +159,25 @@ public static class SharedMessageWindow
         {
             nint hwnd = 0;
             string className = "MsgLoop_" + Guid.NewGuid().ToString("N");
-            WndProc? wndProcDelegate = null;
+            WndProc wndProcDelegate = null;
 
             var thread = new Thread(() =>
             {
                 wndProcDelegate = (hWnd, msg, wParam, lParam) =>
                 {
-                    if (msg == (uint)WindowsMessages.WM_DESTROY)
+                    if (msg == WindowsMessages.WM_DESTROY)
                     {
                         PostQuitMessage(0);
                         return 0;
                     }
 
-                    observer.OnNext(new WindowMessage(hWnd, msg, wParam, lParam));
+                    var windowMessage = new WindowMessage(hWnd, msg, wParam, lParam);
+                    observer.OnNext(windowMessage);
+                    // Check if any subscriber claimed the message
+                    if (windowMessage.Handled)
+                    {
+                        return windowMessage.Result; // Return the custom value defined by the listener
+                    }
                     return DefWindowProc(hWnd, msg, wParam, lParam);
                 };
 

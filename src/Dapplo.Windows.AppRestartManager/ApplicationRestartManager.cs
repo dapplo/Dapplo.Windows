@@ -4,9 +4,11 @@
 using Dapplo.Windows.AppRestartManager.Enums;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Structs;
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 
@@ -21,6 +23,7 @@ namespace Dapplo.Windows.AppRestartManager;
 /// responding to session end events, allowing applications to preserve state and handle shutdowns gracefully.</remarks>
 public static class ApplicationRestartManager
 {
+    private static IObservable<EndSessionMessage> _endSessionObservable;
 
     /// <summary>
     ///     Registers the active instance of an application for restart.
@@ -167,43 +170,40 @@ public static class ApplicationRestartManager
     ///     This allows applications to be notified when the system is about to shut down or restart.
     /// </summary>
     /// <returns>
-    ///     An observable stream that emits EndSessionReasons values when a session end event occurs.
+    ///     An observable stream that emits EndSessionMessage values when a session end event occurs.
     ///     Subscribe to this observable to handle shutdown requests gracefully.
     /// </returns>
-    /// <example>
-    ///     <code>
-    ///     // Listen for shutdown requests
-    ///     var subscription = RestartManager.ListenForEndSession()
-    ///         .Subscribe(reason =>
-    ///         {
-    ///             Console.WriteLine($"Shutdown requested: {reason}");
-    ///             
-    ///             if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
-    ///             {
-    ///                 // Application is being closed for an update
-    ///                 SaveApplicationState();
-    ///             }
-    ///             else if (reason.HasFlag(EndSessionReasons.ENDSESSION_LOGOFF))
-    ///             {
-    ///                 // User is logging off
-    ///                 SaveUserSettings();
-    ///             }
-    ///         });
-    ///     
-    ///     // Don't forget to dispose when done
-    ///     subscription.Dispose();
-    ///     </code>
-    /// </example>
-    public static IObservable<EndSessionReasons> ListenForEndSession()
+    public static IObservable<EndSessionMessage> ListenForEndSession()
     {
-        return SharedMessageWindow.Messages
-            .Where(msg => msg.Msg == (uint)WindowsMessages.WM_QUERYENDSESSION || 
-                         msg.Msg == (uint)WindowsMessages.WM_ENDSESSION)
-            .Select(msg =>
+        return _endSessionObservable ??= Observable.Create<EndSessionMessage>(observer =>
+        {
+            // Subscribe to the SharedMessageWindow for handling the WM_INPUT
+            var messageSubscription = SharedMessageWindow.Messages
+                .Where(windowsMessage => windowsMessage.Msg.IsIn(WindowsMessages.WM_QUERYENDSESSION, WindowsMessages.WM_ENDSESSION)) // filter for raw input
+                .Subscribe(windowsMessage =>
+                {
+                    var endSessionMessage = new EndSessionMessage(windowsMessage.Msg, (EndSessionReasons)windowsMessage.LParam);
+                    observer.OnNext(endSessionMessage);
+                    if (endSessionMessage.Handled)
+                    {
+                        windowsMessage.Handled = true;
+                    }
+                });
+
+            // Return the disposal logic
+            return Disposable.Create(() =>
             {
-                // The lParam contains flags indicating the reason for the session end
-                var lParam = (long)msg.LParam;
-                return (EndSessionReasons)lParam;
+                // Clear the cached observable so it can be recreated if Listen() is called again.
+                _endSessionObservable = null; 
+                // Dispose the SharedMessageWindow subscription
+                messageSubscription.Dispose();
             });
+        })
+        // This is the magic part:
+        // .Publish() multicasts the observable to all subscribers.
+        // .RefCount() keeps track of subscribers and automatically disposes 
+        // the inner subscription when the count reaches 0.
+        .Publish()
+        .RefCount();
     }
 }
