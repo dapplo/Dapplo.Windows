@@ -25,6 +25,6 @@ public record struct WindowMessage(nint Hwnd, WindowsMessages Msg, nint WParam, 
     /// This property can be set to a specific value to indicate the result of processing the message.
     /// The meaning of this value depends on the message being processed and is typically used to provide feedback to the system or other applications about how the message was handled.
     /// </summary>
-    public nint Result { get; set; } = 0;
+    public nuint Result { get; set; } = 0;
 }
 

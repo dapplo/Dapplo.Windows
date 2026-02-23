@@ -187,6 +187,7 @@ public static class ApplicationRestartManager
                     if (endSessionMessage.Handled)
                     {
                         windowsMessage.Handled = true;
+                        windowsMessage.Result = endSessionMessage.Result;
                     }
                 });
 

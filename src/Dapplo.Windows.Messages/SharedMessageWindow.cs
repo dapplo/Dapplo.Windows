@@ -38,7 +38,7 @@ public static class SharedMessageWindow
     private static extern nint DispatchMessage(ref Msg lpMsg);
 
     [DllImport("user32")]
-    private static extern nint DefWindowProc(nint hWnd, WindowsMessages msg, nint wParam, nint lParam);
+    private static extern nuint DefWindowProc(nint hWnd, WindowsMessages msg, nint wParam, nint lParam);
 
     [DllImport("user32")]
     private static extern void PostQuitMessage(int nExitCode);
@@ -176,7 +176,7 @@ public static class SharedMessageWindow
                     // Check if any subscriber claimed the message
                     if (windowMessage.Handled)
                     {
-                        return windowMessage.Result; // Return the custom value defined by the listener
+                        return (nuint)windowMessage.Result; // Return the custom value defined by the listener
                     }
                     return DefWindowProc(hWnd, msg, wParam, lParam);
                 };

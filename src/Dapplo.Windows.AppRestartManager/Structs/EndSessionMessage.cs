@@ -19,5 +19,10 @@ public record struct EndSessionMessage(WindowsMessages Msg, EndSessionReasons En
     /// This has to be set to true to indicate that the message has been handled and should not be processed further by the default window procedure.
     /// </summary>
     public bool Handled { get; set; } = false;
+
+    /// <summary>
+    /// This result is passed back to the system to indicate the outcome of processing the session end message.
+    /// </summary>
+    public nuint Result { get; set; } = 0;
 }
 
