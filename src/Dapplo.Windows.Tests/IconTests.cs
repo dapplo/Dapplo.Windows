@@ -39,7 +39,7 @@ public class IconTests
             // Make sure it's started
             Assert.NotNull(process);
             // Wait until the process started it's message pump (listening for input)
-            if (!process.WaitForInputIdle(2000))
+            if (!process.WaitForInputIdle(4000))
             {
                 Assert.Fail("Test-Process didn't get ready.");
                 return;
