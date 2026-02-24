@@ -70,6 +70,11 @@ public sealed class InstallerRestartManager : IDisposable
     public string SessionKey => _sessionKey;
 
     /// <summary>
+    /// Gets the unique identifier for the current session.
+    /// </summary>
+    public int SessionHandle => _sessionHandle;
+
+    /// <summary>
     ///     Registers one or more files with the Restart Manager session.
     /// </summary>
     /// <param name="filenames">Full paths to the files to register.</param>

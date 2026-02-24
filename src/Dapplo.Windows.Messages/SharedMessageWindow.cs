@@ -192,7 +192,7 @@ public static class SharedMessageWindow
 
                 RegisterClassEx(ref wndClass);
 
-                hwnd = CreateWindowEx(0, className, "NativeMessageWindow", 0, 0, 0, 0, 0, -3, 0, wndClass.hInstance, 0);
+                hwnd = CreateWindowEx(0, className, "MsgWnd", 0, 0, 0, 0, 0, 0, 0, wndClass.hInstance, 0);
 
                 // Trigger External Registrations
                 if (hwnd != 0)
