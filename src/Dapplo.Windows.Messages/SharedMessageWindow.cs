@@ -181,18 +181,35 @@ public static class SharedMessageWindow
                     return DefWindowProc(hWnd, msg, wParam, lParam);
                 };
 
+                var hInstance = GetModuleHandle(null);
                 // Register Class
                 var wndClass = new WNDCLASSEX
                 {
                     cbSize = (uint)Marshal.SizeOf<WNDCLASSEX>(),
                     lpfnWndProc = wndProcDelegate,
-                    hInstance = GetModuleHandle(null),
+                    hInstance = hInstance,
                     lpszClassName = className
                 };
 
                 RegisterClassEx(ref wndClass);
 
-                hwnd = CreateWindowEx(0, className, "MsgWnd", 0, 0, 0, 0, 0, 0, 0, wndClass.hInstance, 0);
+                // Create a message-only window (invisible, no UI, but receives messages)
+                // APPWINDOW ensures it is recognized by some processes, TOOLWINDOW hides it from ALT+TAB.
+                // Together they create a hidden but functional message loop.
+                const uint WS_EX_TOOLWINDOW = 0x00000080;
+                const uint WS_EX_APPWINDOW = 0x00040000;
+                const uint WS_POPUP = 0x80000000;
+
+                hwnd = CreateWindowEx(
+                    WS_EX_APPWINDOW | WS_EX_TOOLWINDOW, // Extended Styles
+                    className,
+                    "MsgWnd",       // A title helps with debugging
+                    WS_POPUP,       // Basic Style, POPUP creates a window without borders or controls
+                    0, 0, 0, 0,     // Position/Size
+                    0,              // NULL Parent (CRITICAL for functioning)
+                    0,              // No Menu
+                    hInstance, // A handle to the instance of the module to be associated with the window.
+                    0);
 
                 // Trigger External Registrations
                 if (hwnd != 0)
@@ -212,7 +229,7 @@ public static class SharedMessageWindow
                     _handleSubject.OnNext(0);
                 }
                 
-                UnregisterClass(className, wndClass.hInstance);
+                UnregisterClass(className, hInstance);
             });
 
             thread.SetApartmentState(ApartmentState.STA);
