@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29123.88
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11513.90 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows", "Dapplo.Windows\Dapplo.Windows.csproj", "{8AA469BB-856A-4330-96CE-2BB75A014070}"
 EndProject
@@ -52,6 +52,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.AppRestartManager", "Dapplo.Windows.AppRestartManager\Dapplo.Windows.AppRestartManager.csproj", "{6F27E81E-CBA1-4B19-997E-C977EE860261}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Dialogs", "Dapplo.Windows.Dialogs\Dapplo.Windows.Dialogs.csproj", "{3E5D9A6C-7B84-4F21-A9C3-2E0D81F5B374}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.InstallerRestartManager", "..\..\Dapplo.Windows\src\Dapplo.Windows.InstallerRestartManager\Dapplo.Windows.InstallerRestartManager.csproj", "{9B6C2EBA-101B-F323-0E50-74213F675EF0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{61832675-C53B-4283-8C44-EF99FD26AD3B} = {61832675-C53B-4283-8C44-EF99FD26AD3B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -363,6 +368,18 @@ Global
 		{3E5D9A6C-7B84-4F21-A9C3-2E0D81F5B374}.Release|x64.Build.0 = Release|Any CPU
 		{3E5D9A6C-7B84-4F21-A9C3-2E0D81F5B374}.Release|x86.ActiveCfg = Release|Any CPU
 		{3E5D9A6C-7B84-4F21-A9C3-2E0D81F5B374}.Release|x86.Build.0 = Release|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Debug|x64.Build.0 = Debug|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Debug|x86.Build.0 = Debug|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Release|x64.ActiveCfg = Release|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Release|x64.Build.0 = Release|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Release|x86.ActiveCfg = Release|Any CPU
+		{9B6C2EBA-101B-F323-0E50-74213F675EF0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
