@@ -49,11 +49,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Tests", "Dap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Devices", "Dapplo.Windows.Devices\Dapplo.Windows.Devices.csproj", "{AE4F7436-3100-443B-BAB5-F281E55F1840}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.AppRestartManager", "Dapplo.Windows.AppRestartManager\Dapplo.Windows.AppRestartManager.csproj", "{6F27E81E-CBA1-4B19-997E-C977EE860261}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.AppRestartManager", "Dapplo.Windows.AppRestartManager\Dapplo.Windows.AppRestartManager.csproj", "{6F27E81E-CBA1-4B19-997E-C977EE860261}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Dialogs", "Dapplo.Windows.Dialogs\Dapplo.Windows.Dialogs.csproj", "{3E5D9A6C-7B84-4F21-A9C3-2E0D81F5B374}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Windows.InstallerManager", "Dapplo.Windows.InstallerManager\Dapplo.Windows.InstallerManager.csproj", "{2C18C280-2659-1467-16B0-CCEB0B7F52A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.InstallerManager", "Dapplo.Windows.InstallerManager\Dapplo.Windows.InstallerManager.csproj", "{2C18C280-2659-1467-16B0-CCEB0B7F52A0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Windows.Example.InstallerExample", "Dapplo.Windows.Example.InstallerExample\Dapplo.Windows.Example.InstallerExample.csproj", "{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -377,6 +379,18 @@ Global
 		{2C18C280-2659-1467-16B0-CCEB0B7F52A0}.Release|x64.Build.0 = Release|Any CPU
 		{2C18C280-2659-1467-16B0-CCEB0B7F52A0}.Release|x86.ActiveCfg = Release|Any CPU
 		{2C18C280-2659-1467-16B0-CCEB0B7F52A0}.Release|x86.Build.0 = Release|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Debug|x64.Build.0 = Debug|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Debug|x86.Build.0 = Debug|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Release|x64.ActiveCfg = Release|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Release|x64.Build.0 = Release|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Release|x86.ActiveCfg = Release|Any CPU
+		{8E2AE2A4-875F-47E7-A347-DC4253F24DCB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

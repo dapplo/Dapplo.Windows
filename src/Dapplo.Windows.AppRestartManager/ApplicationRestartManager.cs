@@ -42,7 +42,7 @@ public static class ApplicationRestartManager
     /// <returns>
     ///     Returns S_OK (0) on success, or an error value on failure.
     /// </returns>
-    [DllImport("kernel32", CharSet = CharSet.Unicode)]
+    [DllImport("Rstrtmgr", CharSet = CharSet.Unicode)]
     private static extern int RegisterApplicationRestart(string pwzCommandline, ApplicationRestartFlags dwFlags);
 
     /// <summary>
@@ -52,7 +52,7 @@ public static class ApplicationRestartManager
     /// <returns>
     ///     Returns S_OK (0) on success, or an error value on failure.
     /// </returns>
-    [DllImport("kernel32")]
+    [DllImport("Rstrtmgr")]
     private static extern int UnregisterApplicationRestart();
 
     /// <summary>

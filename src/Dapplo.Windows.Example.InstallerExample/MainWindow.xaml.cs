@@ -26,7 +26,7 @@ namespace Dapplo.Windows.Example.InstallerExample
             using var session = InstallerRestartManager.CreateSession();
             session.RegisterFile(@"D:\code\greenshot-restartmanager\src\Greenshot\bin\Debug\net480\Greenshot.exe");
             var processes = session.GetProcessesUsingResources();
-
+            
             foreach (var process in processes)
             {
                 Debug.WriteLine($"Process {process.strAppName} (PID: {process.Process.dwProcessId}) is using the file, status: {process.AppStatus}");
