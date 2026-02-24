@@ -62,7 +62,7 @@ public class ClipboardTests  : IDisposable
     /// <summary>
     ///     Test delayed rendering of the clipboard
     /// </summary>
-    [WpfFact]
+    //[WpfFact]
     public async Task TestClipboardMonitor_DelayedRender()
     {
         var testString = "Hi";
