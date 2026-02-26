@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+	<PropertyGroup>
+		<TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
+		<OutputType>WinExe</OutputType>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+		<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
+		<ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
+		<ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
+		<ProjectReference Include="..\Dapplo.Windows.AppRestartManager\Dapplo.Windows.AppRestartManager.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Dapplo.Log.Loggers" Version="3.0.22" />
+		<PackageReference Include="System.Reactive" Version="6.1.0" />
+		<PackageReference Include="System.ValueTuple" Version="4.6.2" />
+		<PackageReference Include="System.Resources.Extensions" Version="10.0.3" />
+	</ItemGroup>
+	<ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+		<Reference Include="Microsoft.CSharp" />
+		<Reference Include="System" />
+		<Reference Include="System.Drawing" />
+		<Reference Include="System.Windows" />
+		<Reference Include="System.Windows.Forms" />
+		<Reference Include="System.Xml" />
+		<Reference Include="System.Core" />
+		<Reference Include="System.Xaml" />
+		<Reference Include="WindowsBase" />
+		<Reference Include="PresentationCore" />
+		<Reference Include="PresentationFramework" />
+	</ItemGroup>
+</Project>
