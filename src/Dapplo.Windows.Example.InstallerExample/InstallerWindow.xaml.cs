@@ -1,5 +1,6 @@
 ﻿using Dapplo.Windows.InstallerManager;
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Documents;
@@ -12,11 +13,12 @@ namespace Dapplo.Windows.Example.InstallerExample
     {
         [DllImport("user32")]
         private static extern bool PostMessage(nint hWnd, uint Msg, nint wParam, nint lParam);
-
+        private const string ExeToInstall = @"..\..\..\..\Dapplo.Windows.Example.FormsExample\bin\Debug\net480\Dapplo.Windows.Example.FormsExample.exe";
         public InstallerWindow()
         {
             InitializeComponent();
             this.DataContext = this;
+            Start.IsEnabled = File.Exists(ExeToInstall);
         }
 
         private void AddLine(string line)
@@ -28,7 +30,7 @@ namespace Dapplo.Windows.Example.InstallerExample
         private void TryRestart()
         {
             using var session = InstallerRestartManager.CreateSession();
-            session.RegisterFile(@"..\..\..\..\Dapplo.Windows.Example.InstalleeExample\bin\Debug\net480\Dapplo.Windows.Example.InstalleeExample.exe");
+            session.RegisterFile(ExeToInstall);
             var processes = session.GetProcessesUsingResources();
             
             foreach (var process in processes)
@@ -39,7 +41,10 @@ namespace Dapplo.Windows.Example.InstallerExample
             {
                 session.Shutdown(Kernel32.Enums.RmShutdownType.RmShutdownOnlyRegistered, (progress) =>
                 {
-                    AddLine($"Shutdown progress {progress}");
+                    this.Dispatcher.BeginInvoke(() =>
+                    {
+                        AddLine($"Shutdown progress {progress}");
+                    });
                 });
             }
             catch (Exception ex)
@@ -53,7 +58,10 @@ namespace Dapplo.Windows.Example.InstallerExample
             }
             session.Restart((progress) =>
             {
-                AddLine($"Restart progress {progress}");
+                this.Dispatcher.BeginInvoke(() =>
+                {
+                    AddLine($"Restart progress {progress}");
+                });
             });
         }
 

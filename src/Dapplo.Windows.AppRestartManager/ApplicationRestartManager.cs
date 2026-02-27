@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dapplo.Windows.AppRestartManager.Enums;
+using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.Messages.Structs;
@@ -169,11 +170,13 @@ public static class ApplicationRestartManager
     ///     Creates an observable stream that listens for WM_QUERYENDSESSION and WM_ENDSESSION messages.
     ///     This allows applications to be notified when the system is about to shut down or restart.
     /// </summary>
+    /// <param name="onQuerySession">This function will be called when a WM_QUERYENDSESSION message is received. Return true to indicate that the session end can proceed, or false to block it. If null, the message will be passed to the observable stream for handling by subscribers.</param>
+    /// <param name="onEndSession">This function will be called when a WM_ENDSESSION message is received. Return true to indicate that the session end can proceed, or false to block it. If null, the message will be passed to the observable stream for handling by subscribers.</param>
     /// <returns>
     ///     An observable stream that emits EndSessionMessage values when a session end event occurs.
     ///     Subscribe to this observable to handle shutdown requests gracefully.
     /// </returns>
-    public static IObservable<EndSessionMessage> ListenForEndSession()
+    public static IObservable<EndSessionMessage> ListenForEndSession(Func<EndSessionReasons, bool> onQuerySession = null, Func<EndSessionReasons, bool> onEndSession = null)
     {
         return _endSessionObservable ??= Observable.Create<EndSessionMessage>(observer =>
         {
@@ -182,19 +185,44 @@ public static class ApplicationRestartManager
                 .Where(windowsMessage => windowsMessage.Msg.IsIn(WindowsMessages.WM_QUERYENDSESSION, WindowsMessages.WM_ENDSESSION)) // filter for raw input
                 .Subscribe(windowsMessage =>
                 {
-                    var endSessionMessage = new EndSessionMessage(windowsMessage.Msg, (EndSessionReasons)windowsMessage.LParam);
-                    observer.OnNext(endSessionMessage);
-                    if (endSessionMessage.Handled)
+                    var endSessionReason = (EndSessionReasons)windowsMessage.LParam;
+                    // Call the supplied functions before the messages are handled
+                    switch (windowsMessage.Msg)
                     {
-                        windowsMessage.Handled = true;
-                        windowsMessage.Result = endSessionMessage.Result;
+                        case WindowsMessages.WM_QUERYENDSESSION:
+                            if (onQuerySession != null)
+                            {
+                                var canEndSession = onQuerySession(endSessionReason);
+                                windowsMessage.Result = canEndSession ? (nuint)HResult.S_OK : (nuint)HResult.S_FALSE;
+                                windowsMessage.Handled = true;
+                            }
+                            break;
+                        case WindowsMessages.WM_ENDSESSION:
+                            if (onEndSession != null)
+                            {
+                                var canEndSession = onEndSession(endSessionReason);
+                                windowsMessage.Result = canEndSession ? (nuint)HResult.S_OK : (nuint)HResult.S_FALSE;
+                                windowsMessage.Handled = true;
+                            }
+                            break;
+                    }
+                    // If the message was not handled by the supplied functions, pass it to the observable stream
+                    if (!windowsMessage.Handled)
+                    {
+                        var endSessionMessage = new EndSessionMessage(windowsMessage.Msg, endSessionReason);
+                        observer.OnNext(endSessionMessage);
+                        if (endSessionMessage.Handled)
+                        {
+                            windowsMessage.Handled = true;
+                            windowsMessage.Result = endSessionMessage.Result;
+                        }
                     }
                 });
 
             // Return the disposal logic
             return Disposable.Create(() =>
             {
-                // Clear the cached observable so it can be recreated if Listen() is called again.
+                // Clear the cached observable so it must be recreated if Listen() is called again.
                 _endSessionObservable = null; 
                 // Dispose the SharedMessageWindow subscription
                 messageSubscription.Dispose();

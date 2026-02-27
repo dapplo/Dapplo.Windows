@@ -2,12 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dapplo.Log;
-using Dapplo.Windows.AppRestartManager;
-using Dapplo.Windows.AppRestartManager.Enums;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Dpi;
 using Dapplo.Windows.Dpi.Forms;
-using Dapplo.Windows.Messages.Enumerations;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -24,34 +21,6 @@ public partial class FormExtendsDpiAwareForm : DpiAwareForm
 
     public FormExtendsDpiAwareForm()
     {
-        // Handle restart manager messages to gracefully exit the application when the session is ending
-        var subscription = ApplicationRestartManager.ListenForEndSession().Subscribe(endSessionMessage => {
-            switch(endSessionMessage.Msg)
-            {
-                case WindowsMessages.WM_ENDSESSION:
-                    switch (endSessionMessage.EndSessionReason)
-                    {
-                        case EndSessionReasons.ENDSESSION_CLOSEAPP:
-                            // Application is being closed for an update
-                            Application.Exit();
-                            break;
-                        case EndSessionReasons.ENDSESSION_LOGOFF:
-                            // User is logging off
-                            Application.Exit();
-                            break;
-                        case EndSessionReasons.ENDSESSION_CRITICAL:
-                            // Critical shutdown
-                            Application.Exit();
-                            break;
-                    }
-                    break;
-                case WindowsMessages.WM_QUERYENDSESSION:
-                    // Return true to indicate that we can handle the session end, or false to cancel it
-                    endSessionMessage.Handled = true;
-                    break;
-            }
-        });
-
         InitializeComponent();
 
         _contextMenuDpiHandler = contextMenuStrip1.AttachDpiHandler();

@@ -194,7 +194,7 @@ public static class SharedMessageWindow
                 RegisterClassEx(ref wndClass);
 
                 // Create a message-only window (invisible, no UI, but receives messages)
-                // APPWINDOW ensures it is recognized by some processes, TOOLWINDOW hides it from ALT+TAB.
+                // WS_EX_APPWINDOW ensures it is recognized by some processes, TOOLWINDOW hides it from ALT+TAB.
                 // Together they create a hidden but functional message loop.
                 const uint WS_EX_TOOLWINDOW = 0x00000080;
                 const uint WS_EX_APPWINDOW = 0x00040000;
@@ -203,10 +203,10 @@ public static class SharedMessageWindow
                 hwnd = CreateWindowEx(
                     WS_EX_APPWINDOW | WS_EX_TOOLWINDOW, // Extended Styles
                     className,
-                    "MsgWnd",       // A title helps with debugging
+                    "DapploMsgWin",       // A title helps with debugging
                     WS_POPUP,       // Basic Style, POPUP creates a window without borders or controls
                     0, 0, 0, 0,     // Position/Size
-                    0,              // NULL Parent (CRITICAL for functioning)
+                    0,              // NULL Parent (CRITICAL for functioning), don't use -3 (HWND_MESSAGE) as it can cause issues with some message types
                     0,              // No Menu
                     hInstance, // A handle to the instance of the module to be associated with the window.
                     0);

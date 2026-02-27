@@ -19,6 +19,6 @@
                    Grid.Column="0"
                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                    TextWrapping="Wrap"/>
-        <Button Content="Install" Grid.Row="1" Margin="5" Click="Button_Click"/>
+        <Button Name="Start" Content="Install" Grid.Row="1" Margin="5" Click="Button_Click"/>
     </Grid>
 </Window>
