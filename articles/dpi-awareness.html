@@ -1,0 +1,531 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>DPI Awareness Guide | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="DPI Awareness Guide | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc">
+    <meta property="docfx:tocrel" content="toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="active">
+                    <a href="../articles/intro.html" title="Articles" class="active">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="../api/" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div>
+              <div class="sidefilter">
+                <form class="toc-filter">
+                  <span class="glyphicon glyphicon-filter filter-icon"></span>
+                  <input type="text" id="toc_filter_input" placeholder="Enter here to filter..." onkeypress="if(event.keyCode==13) {return false;}">
+                </form>
+              </div>
+              <div class="sidetoc">
+                <div class="toc" id="toc">
+                  
+                  <ul class="nav level1">
+                    <li class="">
+                      <a href="intro.html" title="Introduction" class="">Introduction</a>
+                    </li>
+                    <li class="">
+                      <a href="window-management.html" title="Window Management" class="">Window Management</a>
+                    </li>
+                    <li class="">
+                      <a href="clipboard-usage.html" title="Clipboard Usage" class="">Clipboard Usage</a>
+                    </li>
+                    <li class="active">
+                      <a href="dpi-awareness.html" title="DPI Awareness" class="active">DPI Awareness</a>
+                    </li>
+                    <li class="">
+                      <a href="input-handling.html" title="Input Handling" class="">Input Handling</a>
+                    </li>
+                    <li class="">
+                      <a href="common-scenarios.html" title="Common Scenarios" class="">Common Scenarios</a>
+                    </li>
+                  </ul>        </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="dpi-awareness-guide">DPI Awareness Guide</h1>
+
+<p>This guide covers building DPI-aware applications using the <code>Dapplo.Windows.Dpi</code> package.</p>
+<h2 id="overview">Overview</h2>
+<p>The DPI package helps you create applications that properly scale on high-DPI displays. It provides support for both Windows Forms and WPF applications.</p>
+<h2 id="installation">Installation</h2>
+<pre><code class="lang-powershell">Install-Package Dapplo.Windows.Dpi
+</code></pre><h2 id="windows-forms-dpi-support">Windows Forms DPI Support</h2>
+<h3 id="option-1-dpi-aware-form-recommended">Option 1: DPI-Aware Form (Recommended)</h3>
+<p>The easiest way to add DPI awareness is to extend <code>DpiAwareForm</code>:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi.Forms;
+
+public class MyForm : DpiAwareForm
+{
+    public MyForm()
+    {
+        InitializeComponent();
+        // Form automatically scales with DPI changes
+    }
+}
+</code></pre><p>This provides:</p>
+<ul>
+<li>Automatic scaling when DPI changes</li>
+<li>Bitmap scaling support</li>
+<li>Font scaling</li>
+<li>Control repositioning</li>
+</ul>
+<h3 id="option-2-dpi-unaware-form">Option 2: DPI-Unaware Form</h3>
+<p>If you want the system to handle scaling (bitmap stretching):</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi.Forms;
+
+public class MyForm : DpiUnawareForm
+{
+    public MyForm()
+    {
+        InitializeComponent();
+        // System handles scaling via bitmap stretching
+    }
+}
+</code></pre><h3 id="option-3-manual-dpi-handling">Option 3: Manual DPI Handling</h3>
+<p>For more control, use a <code>DpiHandler</code>:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Dpi.Forms;
+using System.Windows.Forms;
+
+public class MyForm : Form
+{
+    private DpiHandler _dpiHandler;
+
+    public MyForm()
+    {
+        InitializeComponent();
+
+        // Create DPI handler for this form
+        _dpiHandler = DpiHandler.Create(this);
+
+        // Subscribe to DPI change events
+        _dpiHandler.OnDpiChanged.Subscribe(dpiChangeInfo =&gt;
+        {
+            HandleDpiChange(dpiChangeInfo);
+        });
+    }
+
+    private void HandleDpiChange(DpiChangeInfo dpiChangeInfo)
+    {
+        Console.WriteLine($&quot;DPI changed from {dpiChangeInfo.OldDpi} to {dpiChangeInfo.NewDpi}&quot;);
+
+        // Scale custom elements
+        ScaleCustomControls(dpiChangeInfo);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _dpiHandler?.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+}
+</code></pre><h2 id="wpf-dpi-support">WPF DPI Support</h2>
+<h3 id="window-dpi-extensions">Window DPI Extensions</h3>
+<p>WPF has built-in DPI support, but you can enhance it:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi.Wpf;
+using System.Windows;
+
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+
+        // Get current DPI
+        var dpi = this.GetDpi();
+        Console.WriteLine($&quot;Current DPI: {dpi}&quot;);
+
+        // Subscribe to DPI changes
+        var dpiHandler = this.AttachDpiHandler();
+        dpiHandler.OnDpiChanged.Subscribe(dpiInfo =&gt;
+        {
+            Console.WriteLine($&quot;DPI changed to {dpiInfo.NewDpi}&quot;);
+        });
+    }
+}
+</code></pre><h2 id="dpi-calculations">DPI Calculations</h2>
+<h3 id="scale-values">Scale Values</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+
+// Scale a value from 96 DPI to current DPI
+int size96 = 16; // Original size at 96 DPI
+int currentDpi = 120;
+
+int scaledSize = DpiCalculator.ScaleWithDpi(size96, currentDpi);
+Console.WriteLine($&quot;Scaled size: {scaledSize}&quot;); // Output: 20
+</code></pre><h3 id="unscale-values">Unscale Values</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+
+// Convert a scaled value back to 96 DPI
+int scaledSize = 20;
+int currentDpi = 120;
+
+int originalSize = DpiCalculator.UnscaleWithDpi(scaledSize, currentDpi);
+Console.WriteLine($&quot;Original size: {originalSize}&quot;); // Output: 16
+</code></pre><h3 id="scale-structures">Scale Structures</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Common.Structs;
+
+int currentDpi = 144;
+
+// Scale NativeSize
+var size = new NativeSize(16, 16);
+var scaledSize = DpiCalculator.ScaleWithDpi(size, currentDpi);
+Console.WriteLine($&quot;Scaled: {scaledSize.Width}x{scaledSize.Height}&quot;); // 24x24
+
+// Scale NativeRect
+var rect = new NativeRect(0, 0, 100, 100);
+var scaledRect = DpiCalculator.ScaleWithDpi(rect, currentDpi);
+</code></pre><h3 id="calculate-dpi-from-scale-factor">Calculate DPI from Scale Factor</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+
+// 150% scaling = 144 DPI
+int dpi = DpiCalculator.DpiFromScaleFactor(1.5);
+Console.WriteLine($&quot;DPI: {dpi}&quot;); // Output: 144
+
+// Reverse: Get scale factor from DPI
+double scaleFactor = DpiCalculator.ScaleFactorFromDpi(144);
+Console.WriteLine($&quot;Scale factor: {scaleFactor}&quot;); // Output: 1.5
+</code></pre><h2 id="bitmap-scaling">Bitmap Scaling</h2>
+<h3 id="scale-bitmaps-with-quality">Scale Bitmaps with Quality</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+using System.Drawing;
+
+// Create bitmap scale handler
+var scaleHandler = BitmapScaleHandler.Create&lt;Bitmap&gt;(
+    source =&gt; (Bitmap)source.Clone(),
+    (source, size, interpolationMode) =&gt; 
+    {
+        var scaled = new Bitmap(size.Width, size.Height);
+        using (var graphics = Graphics.FromImage(scaled))
+        {
+            graphics.InterpolationMode = interpolationMode;
+            graphics.DrawImage(source, 0, 0, size.Width, size.Height);
+        }
+        return scaled;
+    },
+    bitmap =&gt; bitmap.Dispose()
+);
+
+// Original bitmap at 96 DPI
+var originalBitmap = new Bitmap(&quot;icon_16x16.png&quot;);
+
+// Scale for 144 DPI
+var scaledBitmap = scaleHandler.ScaleWithDpi(originalBitmap, 144);
+</code></pre><h3 id="automatic-bitmap-scaling-in-forms">Automatic Bitmap Scaling in Forms</h3>
+<p>When using <code>DpiAwareForm</code>, bitmaps in ImageLists are automatically scaled:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi.Forms;
+using System.Windows.Forms;
+
+public class MyForm : DpiAwareForm
+{
+    private ImageList _imageList;
+
+    public MyForm()
+    {
+        InitializeComponent();
+
+        // Add images at 96 DPI
+        _imageList = new ImageList { ImageSize = new Size(16, 16) };
+        _imageList.Images.Add(Image.FromFile(&quot;icon_16x16.png&quot;));
+
+        // Images will automatically scale when DPI changes
+    }
+}
+</code></pre><h2 id="working-with-different-dpi-contexts">Working with Different DPI Contexts</h2>
+<h3 id="set-process-dpi-awareness">Set Process DPI Awareness</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Dpi.Enums;
+
+// Set DPI awareness for the entire process (call early in Main)
+DpiHandler.SetProcessDpiAwareness(DpiAwareness.PerMonitorAwareV2);
+</code></pre><h3 id="dpi-awareness-levels">DPI Awareness Levels</h3>
+<ul>
+<li><strong>Unaware</strong>: Application is scaled by the system (bitmap stretching)</li>
+<li><strong>SystemAware</strong>: Single DPI for all monitors</li>
+<li><strong>PerMonitorAware</strong>: Different DPI per monitor (Windows 8.1+)</li>
+<li><strong>PerMonitorAwareV2</strong>: Enhanced per-monitor DPI (Windows 10 1703+)</li>
+</ul>
+<h3 id="check-current-dpi">Check Current DPI</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+using Dapplo.Windows.User32;
+
+// Get DPI for specific monitor
+var monitor = User32Api.MonitorFromWindow(windowHandle, MonitorFrom.DefaultToNearest);
+uint dpiX, dpiY;
+DpiHandler.GetDpiForMonitor(monitor, MonitorDpiType.EffectiveDpi, out dpiX, out dpiY);
+
+Console.WriteLine($&quot;Monitor DPI: {dpiX}x{dpiY}&quot;);
+</code></pre><h2 id="dpi-change-events">DPI Change Events</h2>
+<h3 id="subscribe-to-changes">Subscribe to Changes</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+
+var dpiHandler = DpiHandler.Create(control);
+
+var subscription = dpiHandler.OnDpiChanged.Subscribe(dpiChangeInfo =&gt;
+{
+    Console.WriteLine($&quot;Old DPI: {dpiChangeInfo.OldDpi}&quot;);
+    Console.WriteLine($&quot;New DPI: {dpiChangeInfo.NewDpi}&quot;);
+    Console.WriteLine($&quot;Scale Factor: {dpiChangeInfo.ScaleFactor}&quot;);
+
+    // Update UI elements
+    UpdateFonts(dpiChangeInfo);
+    UpdateImages(dpiChangeInfo);
+});
+
+// Don&#39;t forget to dispose
+subscription.Dispose();
+</code></pre><h3 id="handling-dpi-changes-in-custom-controls">Handling DPI Changes in Custom Controls</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+using System.Windows.Forms;
+
+public class DpiAwareButton : Button
+{
+    private DpiHandler _dpiHandler;
+    private int _baseFontSize = 9;
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+
+        _dpiHandler = DpiHandler.Create(this);
+        _dpiHandler.OnDpiChanged.Subscribe(dpiInfo =&gt;
+        {
+            // Scale font
+            float newSize = DpiCalculator.ScaleWithDpi(_baseFontSize, dpiInfo.NewDpi);
+            Font = new Font(Font.FontFamily, newSize);
+        });
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _dpiHandler?.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+}
+</code></pre><h2 id="common-dpi-values">Common DPI Values</h2>
+<table>
+<thead>
+<tr>
+<th>DPI</th>
+<th>Scale Factor</th>
+<th>Common Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>96</td>
+<td>100%</td>
+<td>Standard</td>
+</tr>
+<tr>
+<td>120</td>
+<td>125%</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>144</td>
+<td>150%</td>
+<td>Large</td>
+</tr>
+<tr>
+<td>192</td>
+<td>200%</td>
+<td>Extra Large</td>
+</tr>
+</tbody>
+</table>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-set-dpi-awareness-early">1. Set DPI Awareness Early</h3>
+<p>Call <code>SetProcessDpiAwareness</code> as early as possible in your application:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Dpi.Enums;
+
+static class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        // Set DPI awareness before any UI is created
+        DpiHandler.SetProcessDpiAwareness(DpiAwareness.PerMonitorAwareV2);
+
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+        Application.Run(new MainForm());
+    }
+}
+</code></pre><h3 id="2-use-vector-graphics-when-possible">2. Use Vector Graphics When Possible</h3>
+<p>Vector graphics scale better than bitmaps:</p>
+<pre><code class="lang-csharp">// Prefer fonts/text over bitmap icons
+// Use SVG or drawing APIs instead of fixed-size images
+</code></pre><h3 id="3-provide-multiple-bitmap-sizes">3. Provide Multiple Bitmap Sizes</h3>
+<p>For best quality, provide bitmaps at multiple DPI levels:</p>
+<pre><code class="lang-csharp">// icon_16x16.png  (96 DPI)
+// icon_20x20.png  (120 DPI)
+// icon_24x24.png  (144 DPI)
+// icon_32x32.png  (192 DPI)
+</code></pre><h3 id="4-test-at-different-dpi-settings">4. Test at Different DPI Settings</h3>
+<p>Test your application at various DPI settings:</p>
+<ul>
+<li>100% (96 DPI)</li>
+<li>125% (120 DPI)</li>
+<li>150% (144 DPI)</li>
+<li>200% (192 DPI)</li>
+</ul>
+<h3 id="5-handle-dpi-changes-gracefully">5. Handle DPI Changes Gracefully</h3>
+<p>Users can change DPI without restarting:</p>
+<pre><code class="lang-csharp">_dpiHandler.OnDpiChanged.Subscribe(dpiInfo =&gt;
+{
+    // Reload images at new DPI
+    // Recalculate layouts
+    // Update font sizes
+    // Refresh UI
+});
+</code></pre><h2 id="application-manifest">Application Manifest</h2>
+<p>Add DPI awareness to your app.manifest:</p>
+<pre><code class="lang-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;assembly manifestVersion=&quot;1.0&quot; xmlns=&quot;urn:schemas-microsoft-com:asm.v1&quot;&gt;
+  &lt;application xmlns=&quot;urn:schemas-microsoft-com:asm.v3&quot;&gt;
+    &lt;windowsSettings&gt;
+      &lt;dpiAware xmlns=&quot;http://schemas.microsoft.com/SMI/2005/WindowsSettings&quot;&gt;true/pm&lt;/dpiAware&gt;
+      &lt;dpiAwareness xmlns=&quot;http://schemas.microsoft.com/SMI/2016/WindowsSettings&quot;&gt;PerMonitorV2, PerMonitor&lt;/dpiAwareness&gt;
+    &lt;/windowsSettings&gt;
+  &lt;/application&gt;
+&lt;/assembly&gt;
+</code></pre><h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="blurry-text-or-controls">Blurry Text or Controls</h3>
+<p>If controls appear blurry, ensure:</p>
+<ol>
+<li>DPI awareness is set correctly</li>
+<li>You&#39;re inheriting from <code>DpiAwareForm</code></li>
+<li>The application manifest is configured</li>
+</ol>
+<h3 id="incorrect-scaling">Incorrect Scaling</h3>
+<p>If scaling is incorrect:</p>
+<ol>
+<li>Check the base DPI (should be 96)</li>
+<li>Verify DPI calculations</li>
+<li>Ensure events are properly subscribed</li>
+</ol>
+<h3 id="performance-issues">Performance Issues</h3>
+<p>If DPI changes are slow:</p>
+<ol>
+<li>Cache scaled resources</li>
+<li>Use async loading for images</li>
+<li>Optimize layout calculations</li>
+</ol>
+<h2 id="see-also">See Also</h2>
+<ul>
+<li><a href="../api/index.html">API Reference</a></li>
+<li><a href="intro.html">Getting Started</a></li>
+<li><a href="https://github.com/dapplo/Dapplo.Windows/tree/master/src/Dapplo.Windows.Example.FormsExample">Windows Forms Examples</a></li>
+<li><a href="https://docs.microsoft.com/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows">Microsoft DPI Documentation</a></li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/dpi-awareness.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

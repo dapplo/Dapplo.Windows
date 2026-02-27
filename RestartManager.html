@@ -1,0 +1,540 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Restart Manager | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Restart Manager | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="styles/docfx.vendor.css">
+    <link rel="stylesheet" href="styles/docfx.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta property="docfx:navrel" content="toc">
+    <meta property="docfx:tocrel" content="toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="">
+                    <a href="articles/intro.html" title="Articles" class="">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="api/" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="restart-manager">Restart Manager</h1>
+
+<p>The Restart Manager is a Windows feature that helps minimize application downtime during software installations and updates. It identifies which applications are using locked files, allows you to shut them down gracefully, and then restart them after the update is complete.</p>
+<h2 id="overview">Overview</h2>
+<p>Dapplo.Windows provides a comprehensive .NET API for the Windows Restart Manager split into two separate projects for better separation of concerns:</p>
+<h3 id="for-installersupdaters">For Installers/Updaters</h3>
+<ul>
+<li><strong><code>Dapplo.Windows.InstallerRestartManager</code></strong> - Package for installers<ul>
+<li><strong><code>InstallerRestartManager</code></strong> - High-level helper class that manages Restart Manager sessions</li>
+<li><strong><code>RestartManagerApi</code></strong> (in Kernel32) - Low-level P/Invoke declarations (for advanced scenarios)</li>
+</ul>
+</li>
+</ul>
+<h3 id="for-applications">For Applications</h3>
+<ul>
+<li><strong><code>Dapplo.Windows.AppRestartManager</code></strong> - Package for applications<ul>
+<li><strong><code>ApplicationRestartManager</code></strong> - High-level helper class for applications to register for automatic restart</li>
+<li>**Contains <code>RegisterApplicationRestart</code> and <code>UnregisterApplicationRestart</code> P/Invoke declarations</li>
+</ul>
+</li>
+</ul>
+<h2 id="application-side-api">Application-Side API</h2>
+<p>If you&#39;re developing an application that may be updated or needs to be restarted during system updates, use the <code>ApplicationRestartManager</code> class from the <code>Dapplo.Windows.AppRestartManager</code> package.</p>
+<h3 id="registering-your-application-for-restart">Registering Your Application for Restart</h3>
+<p>Applications can register themselves to be automatically restarted by Restart Manager:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.AppRestartManager;
+
+// Register for restart with command-line arguments
+ApplicationRestartManager.RegisterForRestart(&quot;/restore /minimized&quot;);
+
+// Or register without arguments
+ApplicationRestartManager.RegisterForRestart();
+</code></pre><h3 id="when-to-register-for-restart">When to Register for Restart</h3>
+<p>The best time to register for restart is during application startup, in your <code>Main</code> method or application initialization:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.AppRestartManager;
+
+static void Main(string[] args)
+{
+    // Register for restart early in the application lifecycle
+    ApplicationRestartManager.RegisterForRestart(&quot;/restore&quot;);
+
+    // Check if we were restarted by Restart Manager
+    if (ApplicationRestartManager.WasRestartRequested())
+    {
+        // Restore previous state, show notification, etc.
+        Console.WriteLine(&quot;Application was restarted after an update&quot;);
+    }
+
+    // Continue with normal application startup
+    ApplicationRestartManager.Run(new MainForm());
+}
+</code></pre><h3 id="controlling-restart-behavior">Controlling Restart Behavior</h3>
+<p>You can control when your application should NOT be restarted using flags:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.AppRestartManager;
+using Dapplo.Windows.Kernel32.Enums;
+
+// Don&#39;t restart if the application crashes
+ApplicationRestartManager.RegisterForRestart(
+    commandLineArgs: &quot;/restore&quot;,
+    flags: ApplicationRestartFlags.RestartNoCrash
+);
+
+// Don&#39;t restart on crash or hang
+ApplicationRestartManager.RegisterForRestart(
+    commandLineArgs: &quot;/restore&quot;,
+    flags: ApplicationRestartFlags.RestartNoCrash | ApplicationRestartFlags.RestartNoHang
+);
+
+// Don&#39;t restart during patches or reboots
+ApplicationRestartManager.RegisterForRestart(
+    commandLineArgs: null,
+    flags: ApplicationRestartFlags.RestartNoPatch | ApplicationRestartFlags.RestartNoReboot
+);
+</code></pre><h3 id="unregistering-from-restart">Unregistering from Restart</h3>
+<p>If your application no longer wants to be restarted automatically:</p>
+<pre><code class="lang-csharp">ApplicationRestartManager.UnregisterForRestart();
+</code></pre><h3 id="listening-for-shutdown-events">Listening for Shutdown Events</h3>
+<p>The <code>ApplicationRestartManager.ListenForEndSession()</code> method provides an observable stream that listens for <code>WM_QUERYENDSESSION</code> and <code>WM_ENDSESSION</code> Windows messages. This allows your application to be notified when the system is shutting down or when Restart Manager is requesting a shutdown:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.AppRestartManager;
+using Dapplo.Windows.AppRestartManager.Enums;
+using System.Reactive.Linq;
+
+// Listen for shutdown requests
+var subscription = ApplicationRestartManager.ListenForEndSession()
+    .Subscribe(reason =&gt;
+    {
+        Console.WriteLine($&quot;Shutdown requested: {reason}&quot;);
+
+        if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+        {
+            // Application is being closed for an update
+            SaveApplicationState();
+            Console.WriteLine(&quot;Saved state - application will be restarted&quot;);
+        }
+        else if (reason.HasFlag(EndSessionReasons.ENDSESSION_LOGOFF))
+        {
+            // User is logging off
+            SaveUserSettings();
+            Console.WriteLine(&quot;User logging off&quot;);
+        }
+        else if (reason.HasFlag(EndSessionReasons.ENDSESSION_CRITICAL))
+        {
+            // Critical shutdown
+            PerformEmergencySave();
+        }
+    });
+
+// Don&#39;t forget to dispose when your application exits
+subscription.Dispose();
+</code></pre><h4 id="endsession-reasons">EndSession Reasons</h4>
+<p>The <code>EndSessionReasons</code> enum provides flags indicating why the session is ending:</p>
+<ul>
+<li><strong><code>ENDSESSION_CLOSEAPP</code> (0x00000001)</strong> - The application is using a file that must be replaced, the system is being serviced, or system resources are exhausted</li>
+<li><strong><code>ENDSESSION_CRITICAL</code> (0x40000000)</strong> - The application is forced to shut down because a system component is being updated or a critical system event requires the application to close</li>
+<li><strong><code>ENDSESSION_LOGOFF</code> (0x80000000)</strong> - The user is logging off</li>
+</ul>
+<h3 id="complete-application-example">Complete Application Example</h3>
+<p>Here&#39;s a complete example showing how an application should integrate with Restart Manager:</p>
+<pre><code class="lang-csharp">using System;
+using System.Windows.Forms;
+using Dapplo.Windows.AppRestartManager;
+using Dapplo.Windows.AppRestartManager.Enums;
+using System.Reactive.Linq;
+
+public class MyApplication
+{
+    private IDisposable _endSessionSubscription;
+
+    static void Main(string[] args)
+    {
+        var app = new MyApplication();
+        app.Run(args);
+    }
+
+    public void Run(string[] args)
+    {
+        // Register for restart with command-line arguments
+        ApplicationRestartManager.RegisterForRestart(&quot;/restore&quot;);
+
+        // Check if we were restarted
+        if (ApplicationRestartManager.WasRestartRequested())
+        {
+            var cmdArgs = ApplicationRestartManager.GetRestartCommandLineArgs();
+            if (cmdArgs.Contains(&quot;/restore&quot;))
+            {
+                RestoreApplicationState();
+            }
+        }
+
+        // Listen for shutdown events
+        _endSessionSubscription = ApplicationRestartManager.ListenForEndSession()
+            .Subscribe(reason =&gt;
+            {
+                HandleShutdown(reason);
+            });
+
+        // Run the application
+        Application.Run(new MainForm());
+
+        // Clean up
+        _endSessionSubscription?.Dispose();
+    }
+
+    private void RestoreApplicationState()
+    {
+        Console.WriteLine(&quot;Restoring state after restart&quot;);
+        // Load saved state...
+    }
+
+    private void HandleShutdown(EndSessionReasons reason)
+    {
+        if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+        {
+            SaveApplicationState();
+        }
+    }
+
+    private void SaveApplicationState()
+    {
+        Console.WriteLine(&quot;Saving application state&quot;);
+        // Save state...
+    }
+}
+</code></pre><h3 id="detecting-restart-manager-shutdown-alternative-methods">Detecting Restart Manager Shutdown (Alternative Methods)</h3>
+<p>When your application is being shut down by Restart Manager, it also receives normal Windows shutdown messages (WM_QUERYENDSESSION). You can handle these in traditional ways as well:</p>
+<pre><code class="lang-csharp">// In a Windows Forms application
+protected override void OnFormClosing(FormClosingEventArgs e)
+{
+    if (e.CloseReason == CloseReason.WindowsShutDown)
+    {
+        // Save application state
+        SaveState();
+
+        // Allow the shutdown to proceed
+        e.Cancel = false;
+    }
+
+    base.OnFormClosing(e);
+}
+
+// In a WPF application
+protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
+{
+    // Save application state
+    SaveState();
+
+    // Allow the session to end
+    e.Cancel = false;
+
+    base.OnSessionEnding(e);
+}
+
+// In a console application
+Console.CancelKeyPress += (sender, e) =&gt;
+{
+    SaveState();
+};
+</code></pre><h2 id="installerupdater-api">Installer/Updater API</h2>
+<p>If you&#39;re developing an installer or updater, use the <code>InstallerRestartManager</code> class from the <code>Dapplo.Windows.InstallerRestartManager</code> package to manage other applications.</p>
+<h2 id="common-use-cases">Common Use Cases</h2>
+<h3 id="finding-processes-using-a-file">Finding Processes Using a File</h3>
+<p>One of the most common use cases is finding out which processes are locking a specific file:</p>
+<pre><code class="lang-csharp">using System;
+using Dapplo.Windows.InstallerRestartManager;
+
+// Find processes using a file
+using (var session = InstallerRestartManager.CreateSession())
+{
+    session.RegisterFile(@&quot;C:\path\to\locked\file.dll&quot;);
+    var processes = session.GetProcessesUsingResources();
+
+    foreach (var process in processes)
+    {
+        Console.WriteLine($&quot;Process: {process.strAppName}&quot;);
+        Console.WriteLine($&quot;  PID: {process.Process.dwProcessId}&quot;);
+        Console.WriteLine($&quot;  Type: {process.ApplicationType}&quot;);
+        Console.WriteLine($&quot;  Restartable: {process.bRestartable}&quot;);
+        Console.WriteLine();
+    }
+}
+</code></pre><h3 id="finding-processes-using-multiple-files">Finding Processes Using Multiple Files</h3>
+<p>You can also register multiple files at once:</p>
+<pre><code class="lang-csharp">using (var session = InstallerRestartManager.CreateSession())
+{
+    session.RegisterFiles(
+        @&quot;C:\path\to\file1.dll&quot;,
+        @&quot;C:\path\to\file2.dll&quot;,
+        @&quot;C:\path\to\file3.exe&quot;
+    );
+
+    var processes = session.GetProcessesUsingResources(out var rebootReason);
+
+    if (rebootReason != RmRebootReason.RmRebootReasonNone)
+    {
+        Console.WriteLine($&quot;Reboot required: {rebootReason}&quot;);
+    }
+
+    foreach (var process in processes)
+    {
+        Console.WriteLine($&quot;{process.strAppName} is using one or more registered files&quot;);
+    }
+}
+</code></pre><h3 id="checking-if-reboot-is-required">Checking if Reboot is Required</h3>
+<p>Before installing updates, you might want to check if a system reboot would be required:</p>
+<pre><code class="lang-csharp">using (var session = InstallerRestartManager.CreateSession())
+{
+    // Register the files you plan to update
+    session.RegisterFiles(@&quot;C:\Windows\System32\somedriver.sys&quot;);
+
+    if (session.IsRebootRequired())
+    {
+        var reason = session.GetRebootReason();
+        Console.WriteLine($&quot;Reboot will be required: {reason}&quot;);
+
+        if (reason.HasFlag(RmRebootReason.RmRebootReasonCriticalProcess))
+        {
+            Console.WriteLine(&quot;A critical process is using the file&quot;);
+        }
+        if (reason.HasFlag(RmRebootReason.RmRebootReasonCriticalService))
+        {
+            Console.WriteLine(&quot;A critical service is using the file&quot;);
+        }
+    }
+    else
+    {
+        Console.WriteLine(&quot;No reboot required - all processes can be restarted&quot;);
+    }
+}
+</code></pre><h3 id="shutting-down-and-restarting-applications">Shutting Down and Restarting Applications</h3>
+<p>For installer scenarios, you can shut down applications using the registered resources and restart them later:</p>
+<pre><code class="lang-csharp">using (var session = InstallerRestartManager.CreateSession())
+{
+    // Register the files you need to update
+    session.RegisterFiles(@&quot;C:\Program Files\MyApp\MyApp.exe&quot;);
+
+    var processes = session.GetProcessesUsingResources();
+
+    if (processes.Count &gt; 0)
+    {
+        Console.WriteLine(&quot;Shutting down applications...&quot;);
+
+        // Shut down with progress callback
+        session.Shutdown(
+            RmShutdownType.RmForceShutdown,
+            progress =&gt; Console.WriteLine($&quot;Shutdown progress: {progress}%&quot;)
+        );
+
+        // Now you can safely update the files
+        Console.WriteLine(&quot;Files are no longer locked. Performing update...&quot;);
+        // ... perform your file operations ...
+
+        // Restart the applications
+        Console.WriteLine(&quot;Restarting applications...&quot;);
+        session.Restart(
+            progress =&gt; Console.WriteLine($&quot;Restart progress: {progress}%&quot;)
+        );
+    }
+}
+</code></pre><h3 id="working-with-services">Working with Services</h3>
+<p>You can also register Windows services:</p>
+<pre><code class="lang-csharp">using (var session = InstallerRestartManager.CreateSession())
+{
+    // Register services by their short names
+    session.RegisterServices(&quot;MyService&quot;, &quot;AnotherService&quot;);
+
+    var processes = session.GetProcessesUsingResources();
+
+    foreach (var process in processes)
+    {
+        if (process.ApplicationType == RmAppType.RmService)
+        {
+            Console.WriteLine($&quot;Service: {process.strServiceShortName}&quot;);
+            Console.WriteLine($&quot;  Display Name: {process.strAppName}&quot;);
+        }
+    }
+}
+</code></pre><h2 id="understanding-process-information">Understanding Process Information</h2>
+<p>The <code>RmProcessInfo</code> structure provides detailed information about each process:</p>
+<ul>
+<li><strong><code>Process</code></strong> - Contains the process ID and start time (as <code>RmUniqueProcess</code>)</li>
+<li><strong><code>strAppName</code></strong> - User-friendly application name or service display name</li>
+<li><strong><code>strServiceShortName</code></strong> - Short service name (for services only)</li>
+<li><strong><code>ApplicationType</code></strong> - Type of application (service, main window, console, etc.)</li>
+<li><strong><code>AppStatus</code></strong> - Current status (running, stopped, restarted, etc.)</li>
+<li><strong><code>TSSessionId</code></strong> - Terminal Services session ID</li>
+<li><strong><code>bRestartable</code></strong> - Whether the application can be automatically restarted</li>
+</ul>
+<h2 id="application-types">Application Types</h2>
+<p>The <code>RmAppType</code> enumeration describes different types of applications:</p>
+<ul>
+<li><strong><code>RmUnknownApp</code></strong> - Cannot be classified; requires forced shutdown</li>
+<li><strong><code>RmMainWindow</code></strong> - Stand-alone application with a top-level window</li>
+<li><strong><code>RmOtherWindow</code></strong> - Application without a top-level window</li>
+<li><strong><code>RmService</code></strong> - Windows service</li>
+<li><strong><code>RmExplorer</code></strong> - Windows Explorer</li>
+<li><strong><code>RmConsole</code></strong> - Console application</li>
+<li><strong><code>RmCritical</code></strong> - Critical process; system restart required</li>
+</ul>
+<h2 id="reboot-reasons">Reboot Reasons</h2>
+<p>The <code>RmRebootReason</code> flags indicate why a system restart might be needed:</p>
+<ul>
+<li><strong><code>RmRebootReasonNone</code></strong> - No restart required</li>
+<li><strong><code>RmRebootReasonPermissionDenied</code></strong> - Insufficient privileges to shut down processes</li>
+<li><strong><code>RmRebootReasonSessionMismatch</code></strong> - Processes in different Terminal Services sessions</li>
+<li><strong><code>RmRebootReasonCriticalProcess</code></strong> - Critical processes need to be shut down</li>
+<li><strong><code>RmRebootReasonCriticalService</code></strong> - Critical services need to be shut down</li>
+<li><strong><code>RmRebootReasonDetectedSelf</code></strong> - The current process needs to be shut down</li>
+</ul>
+<h2 id="best-practices">Best Practices</h2>
+<ol>
+<li><p><strong>Always use <code>using</code> statements</strong> - The <code>RestartManager</code> class implements <code>IDisposable</code> and will properly clean up the session when disposed.</p>
+</li>
+<li><p><strong>Check reboot requirements first</strong> - Before attempting shutdown/restart, check if a reboot would be required to avoid unexpected results.</p>
+</li>
+<li><p><strong>Handle exceptions</strong> - The Restart Manager can throw <code>Win32Exception</code> for various error conditions. Always wrap calls in try-catch blocks in production code.</p>
+</li>
+<li><p><strong>Use appropriate shutdown types</strong> - Choose between <code>RmForceShutdown</code> (force unresponsive apps) and <code>RmShutdownOnlyRegistered</code> (only shutdown apps registered for restart).</p>
+</li>
+<li><p><strong>Test with elevated privileges</strong> - Some operations may require administrator privileges to shut down certain processes or services.</p>
+</li>
+</ol>
+<h2 id="error-handling-example">Error Handling Example</h2>
+<pre><code class="lang-csharp">using System;
+using System.ComponentModel;
+using Dapplo.Windows.Kernel32;
+
+try
+{
+    using (var session = InstallerRestartManager.CreateSession())
+    {
+        session.RegisterFile(@&quot;C:\path\to\file.dll&quot;);
+
+        var processes = session.GetProcessesUsingResources();
+        // Process the results...
+    }
+}
+catch (Win32Exception ex)
+{
+    Console.WriteLine($&quot;Restart Manager error: {ex.Message} (Error code: {ex.NativeErrorCode})&quot;);
+}
+catch (ObjectDisposedException)
+{
+    Console.WriteLine(&quot;Session has already been disposed&quot;);
+}
+</code></pre><h2 id="advanced-using-low-level-api">Advanced: Using Low-Level API</h2>
+<p>For advanced scenarios, you can use the low-level <code>RestartManagerApi</code> class directly:</p>
+<pre><code class="lang-csharp">using System.Text;
+using Dapplo.Windows.Kernel32;
+
+var sessionKey = new StringBuilder(RestartManagerApi.RmSessionKeyLen + 1);
+var result = RestartManagerApi.RmStartSession(out var sessionHandle, 0, sessionKey);
+
+if (result == 0)
+{
+    try
+    {
+        // Use RestartManagerApi functions directly...
+        string[] files = { @&quot;C:\path\to\file.dll&quot; };
+        result = RestartManagerApi.RmRegisterResources(sessionHandle, 1, files, 0, null, 0, null);
+        // ... more operations ...
+    }
+    finally
+    {
+        RestartManagerApi.RmEndSession(sessionHandle);
+    }
+}
+</code></pre><h2 id="additional-resources">Additional Resources</h2>
+<ul>
+<li><a href="https://docs.microsoft.com/en-us/windows/win32/rstmgr/restart-manager-portal">Microsoft Restart Manager Documentation</a></li>
+<li><a href="https://docs.microsoft.com/en-us/windows/win32/rstmgr/restart-manager-reference">Restart Manager API Reference</a></li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/RestartManager.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>

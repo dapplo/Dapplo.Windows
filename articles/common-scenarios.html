@@ -1,0 +1,615 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Common Scenarios | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Common Scenarios | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc">
+    <meta property="docfx:tocrel" content="toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="active">
+                    <a href="../articles/intro.html" title="Articles" class="active">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="../api/" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div>
+              <div class="sidefilter">
+                <form class="toc-filter">
+                  <span class="glyphicon glyphicon-filter filter-icon"></span>
+                  <input type="text" id="toc_filter_input" placeholder="Enter here to filter..." onkeypress="if(event.keyCode==13) {return false;}">
+                </form>
+              </div>
+              <div class="sidetoc">
+                <div class="toc" id="toc">
+                  
+                  <ul class="nav level1">
+                    <li class="">
+                      <a href="intro.html" title="Introduction" class="">Introduction</a>
+                    </li>
+                    <li class="">
+                      <a href="window-management.html" title="Window Management" class="">Window Management</a>
+                    </li>
+                    <li class="">
+                      <a href="clipboard-usage.html" title="Clipboard Usage" class="">Clipboard Usage</a>
+                    </li>
+                    <li class="">
+                      <a href="dpi-awareness.html" title="DPI Awareness" class="">DPI Awareness</a>
+                    </li>
+                    <li class="">
+                      <a href="input-handling.html" title="Input Handling" class="">Input Handling</a>
+                    </li>
+                    <li class="active">
+                      <a href="common-scenarios.html" title="Common Scenarios" class="active">Common Scenarios</a>
+                    </li>
+                  </ul>        </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="common-scenarios">Common Scenarios</h1>
+
+<p>This guide provides examples of common scenarios and use cases for Dapplo.Windows.</p>
+<h2 id="application-monitoring">Application Monitoring</h2>
+<h3 id="monitor-when-a-specific-application-starts">Monitor When a Specific Application Starts</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using System.Reactive.Linq;
+
+// Monitor for Notepad windows
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE)
+    .Where(e =&gt; 
+    {
+        var window = InteropWindow.FromHandle(e.Handle);
+        var processPath = window.GetProcessPath();
+        return processPath?.Contains(&quot;notepad.exe&quot;) ?? false;
+    })
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine(&quot;Notepad started!&quot;);
+    });
+</code></pre><h3 id="track-active-window">Track Active Window</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+string currentApp = &quot;&quot;;
+
+var subscription = WinEventHook.Create(WinEvents.EVENT_SYSTEM_FOREGROUND)
+    .Subscribe(e =&gt;
+    {
+        var window = InteropWindow.FromHandle(e.Handle);
+        string appName = window.GetCaption();
+
+        if (appName != currentApp)
+        {
+            currentApp = appName;
+            Console.WriteLine($&quot;Switched to: {currentApp}&quot;);
+
+            // Track time spent in each app
+            LogAppUsage(currentApp);
+        }
+    });
+</code></pre><h3 id="detect-when-screen-locks">Detect When Screen Locks</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Messages;
+using System;
+
+WinProcHandler.Instance.Subscribe(new WinProcHandlerHook((hwnd, msg, wparam, lparam, ref handled) =&gt;
+{
+    if ((uint)msg == WindowsMessages.WM_WTSSESSION_CHANGE)
+    {
+        const int WTS_SESSION_LOCK = 0x7;
+        const int WTS_SESSION_UNLOCK = 0x8;
+
+        if (wparam.ToInt32() == WTS_SESSION_LOCK)
+        {
+            Console.WriteLine(&quot;Screen locked&quot;);
+        }
+        else if (wparam.ToInt32() == WTS_SESSION_UNLOCK)
+        {
+            Console.WriteLine(&quot;Screen unlocked&quot;);
+        }
+    }
+
+    return IntPtr.Zero;
+}));
+</code></pre><h2 id="clipboard-automation">Clipboard Automation</h2>
+<h3 id="auto-save-clipboard-history">Auto-Save Clipboard History</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Collections.Generic;
+using System.Reactive.Linq;
+
+var clipboardHistory = new List&lt;string&gt;();
+
+var subscription = ClipboardNative.OnUpdate
+    .Where(info =&gt; info.Formats.Contains(&quot;UnicodeText&quot;))
+    .Subscribe(info =&gt;
+    {
+        using var clipboard = ClipboardNative.Access();
+        var text = clipboard.GetAsString();
+
+        if (!string.IsNullOrEmpty(text) &amp;&amp; !clipboardHistory.Contains(text))
+        {
+            clipboardHistory.Add(text);
+            Console.WriteLine($&quot;Saved to history: {text.Substring(0, Math.Min(50, text.Length))}...&quot;);
+
+            // Keep only last 100 items
+            if (clipboardHistory.Count &gt; 100)
+            {
+                clipboardHistory.RemoveAt(0);
+            }
+        }
+    });
+</code></pre><h3 id="auto-format-clipboard-text">Auto-Format Clipboard Text</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Reactive.Linq;
+using System.Text.RegularExpressions;
+
+// Automatically clean up clipboard text
+var subscription = ClipboardNative.OnUpdate
+    .Where(info =&gt; info.Formats.Contains(&quot;UnicodeText&quot;))
+    .Throttle(TimeSpan.FromMilliseconds(100)) // Avoid rapid changes
+    .Subscribe(info =&gt;
+    {
+        using var clipboard = ClipboardNative.Access();
+        var text = clipboard.GetAsString();
+
+        // Remove multiple spaces, clean up line breaks
+        var cleaned = Regex.Replace(text, @&quot;\s+&quot;, &quot; &quot;).Trim();
+
+        if (cleaned != text)
+        {
+            clipboard.SetAsUnicodeString(cleaned);
+            Console.WriteLine(&quot;Cleaned clipboard text&quot;);
+        }
+    });
+</code></pre><h3 id="save-clipboard-images-automatically">Save Clipboard Images Automatically</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System;
+using System.IO;
+using System.Reactive.Linq;
+
+var subscription = ClipboardNative.OnUpdate
+    .Where(info =&gt; info.Formats.Contains(&quot;PNG&quot;) || info.Formats.Contains(&quot;Bitmap&quot;))
+    .Subscribe(info =&gt;
+    {
+        using var clipboard = ClipboardNative.Access();
+
+        if (clipboard.AvailableFormats().Contains(&quot;PNG&quot;))
+        {
+            var filename = $&quot;clipboard_{DateTime.Now:yyyyMMdd_HHmmss}.png&quot;;
+            using var stream = clipboard.GetAsStream(&quot;PNG&quot;);
+            using var fileStream = File.Create(filename);
+            stream.CopyTo(fileStream);
+
+            Console.WriteLine($&quot;Saved clipboard image: {filename}&quot;);
+        }
+    });
+</code></pre><h2 id="window-management-automation">Window Management Automation</h2>
+<h3 id="auto-tile-windows">Auto-Tile Windows</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.User32;
+using System.Linq;
+
+void TileWindows()
+{
+    var windows = InteropWindowQuery.GetTopLevelWindows()
+        .Where(w =&gt; w.IsVisible() &amp;&amp; w.IsAppWindow())
+        .ToList();
+
+    if (windows.Count == 0) return;
+
+    var screen = User32Api.GetWorkArea();
+    int windowsPerRow = (int)Math.Ceiling(Math.Sqrt(windows.Count));
+    int windowWidth = screen.Width / windowsPerRow;
+    int windowHeight = screen.Height / ((windows.Count + windowsPerRow - 1) / windowsPerRow);
+
+    for (int i = 0; i &lt; windows.Count; i++)
+    {
+        int row = i / windowsPerRow;
+        int col = i % windowsPerRow;
+
+        var bounds = new NativeRect(
+            col * windowWidth,
+            row * windowHeight,
+            (col + 1) * windowWidth,
+            (row + 1) * windowHeight
+        );
+
+        windows[i].SetPlacement(bounds);
+    }
+}
+</code></pre><h3 id="minimize-all-except-active">Minimize All Except Active</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.User32;
+using System.Linq;
+
+void MinimizeAllExceptActive()
+{
+    var activeWindow = User32Api.GetForegroundWindow();
+
+    var windows = InteropWindowQuery.GetTopLevelWindows()
+        .Where(w =&gt; w.Handle != activeWindow &amp;&amp; w.IsVisible())
+        .ToList();
+
+    foreach (var window in windows)
+    {
+        window.Minimize();
+    }
+}
+</code></pre><h3 id="always-on-top-toggle">Always On Top Toggle</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.User32;
+using Dapplo.Windows.User32.Enums;
+
+void ToggleAlwaysOnTop(IntPtr windowHandle)
+{
+    var window = InteropWindow.FromHandle(windowHandle);
+    window.Fill(InteropWindowRetrieveSettings.ExtendedWindowStyle);
+
+    bool isTopMost = (window.ExtendedWindowStyleFlags &amp; ExtendedWindowStyleFlags.TopMost) != 0;
+
+    User32Api.SetWindowPos(
+        windowHandle,
+        isTopMost ? User32Api.HWND_NOTOPMOST : User32Api.HWND_TOPMOST,
+        0, 0, 0, 0,
+        WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE
+    );
+
+    Console.WriteLine($&quot;Always on top: {!isTopMost}&quot;);
+}
+</code></pre><h2 id="dpi-aware-screenshot-tool">DPI-Aware Screenshot Tool</h2>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Gdi32;
+using System.Drawing;
+using System.Drawing.Imaging;
+
+Bitmap TakeDpiAwareScreenshot()
+{
+    var window = User32Api.GetForegroundWindow();
+    var interopWindow = InteropWindow.FromHandle(window);
+    interopWindow.Fill(InteropWindowRetrieveSettings.Info);
+
+    // Get window DPI
+    var dpi = DpiHandler.GetDpiForWindow(window);
+
+    // Capture window
+    var bitmap = interopWindow.Capture();
+
+    // Set DPI metadata
+    bitmap.SetResolution(dpi, dpi);
+
+    return bitmap;
+}
+</code></pre><h2 id="input-automation">Input Automation</h2>
+<h3 id="auto-fill-form">Auto-Fill Form</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System.Threading.Tasks;
+
+async Task FillForm(string name, string email, string message)
+{
+    // Focus first field (assuming it&#39;s already focused)
+    KeyboardInputGenerator.TypeText(name);
+
+    // Move to next field
+    KeyboardInputGenerator.KeyPress(VirtualKeyCode.Tab);
+    await Task.Delay(100);
+
+    // Fill email
+    KeyboardInputGenerator.TypeText(email);
+
+    // Move to next field
+    KeyboardInputGenerator.KeyPress(VirtualKeyCode.Tab);
+    await Task.Delay(100);
+
+    // Fill message
+    KeyboardInputGenerator.TypeText(message);
+
+    // Submit
+    KeyboardInputGenerator.KeyPress(VirtualKeyCode.Return);
+}
+</code></pre><h3 id="screenshot-hotkey">Screenshot Hotkey</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using Dapplo.Windows.Desktop;
+using System.Reactive.Linq;
+using System.Drawing.Imaging;
+
+var keyboardHook = KeyboardHook.Create();
+
+var subscription = keyboardHook.KeyboardEvents
+    .Where(e =&gt; e.IsDown &amp;&amp; e.Key == VirtualKeyCode.PrintScreen)
+    .Subscribe(e =&gt;
+    {
+        var window = User32Api.GetForegroundWindow();
+        var interopWindow = InteropWindow.FromHandle(window);
+
+        using var bitmap = interopWindow.Capture();
+        var filename = $&quot;screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png&quot;;
+        bitmap.Save(filename, ImageFormat.Png);
+
+        Console.WriteLine($&quot;Screenshot saved: {filename}&quot;);
+
+        // Suppress the default print screen behavior
+        e.Handled = true;
+    });
+</code></pre><h3 id="text-expansion">Text Expansion</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System.Collections.Generic;
+using System.Reactive.Linq;
+
+var keyboardHook = KeyboardHook.Create();
+var typedText = &quot;&quot;;
+
+var expansions = new Dictionary&lt;string, string&gt;
+{
+    [&quot;btw&quot;] = &quot;by the way&quot;,
+    [&quot;brb&quot;] = &quot;be right back&quot;,
+    [&quot;thx&quot;] = &quot;thanks&quot;
+};
+
+var subscription = keyboardHook.KeyboardEvents
+    .Where(e =&gt; e.IsDown)
+    .Subscribe(e =&gt;
+    {
+        if (e.Key &gt;= VirtualKeyCode.A &amp;&amp; e.Key &lt;= VirtualKeyCode.Z)
+        {
+            typedText += ((char)(&#39;a&#39; + (e.Key - VirtualKeyCode.A))).ToString();
+        }
+        else if (e.Key == VirtualKeyCode.Space)
+        {
+            if (expansions.ContainsKey(typedText.ToLower()))
+            {
+                // Delete typed text
+                for (int i = 0; i &lt; typedText.Length; i++)
+                {
+                    KeyboardInputGenerator.KeyPress(VirtualKeyCode.Back);
+                }
+
+                // Type expansion
+                KeyboardInputGenerator.TypeText(expansions[typedText.ToLower()]);
+            }
+
+            typedText = &quot;&quot;;
+        }
+        else if (e.Key == VirtualKeyCode.Back &amp;&amp; typedText.Length &gt; 0)
+        {
+            typedText = typedText.Substring(0, typedText.Length - 1);
+        }
+    });
+</code></pre><h2 id="system-integration">System Integration</h2>
+<h3 id="detect-citrix-session">Detect Citrix Session</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Citrix;
+
+void CheckCitrixEnvironment()
+{
+    if (WinFrame.IsAvailable)
+    {
+        var clientName = WinFrame.QuerySessionInformation(InfoClasses.ClientName);
+        var clientAddress = WinFrame.QuerySessionInformation(InfoClasses.ClientAddress);
+
+        Console.WriteLine($&quot;Running in Citrix&quot;);
+        Console.WriteLine($&quot;Client: {clientName}&quot;);
+        Console.WriteLine($&quot;Address: {clientAddress}&quot;);
+
+        // Adjust behavior for Citrix
+        EnableCitrixOptimizations();
+    }
+    else
+    {
+        Console.WriteLine(&quot;Not running in Citrix&quot;);
+    }
+}
+</code></pre><h3 id="list-installed-software">List Installed Software</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Shell32;
+using System;
+
+void ListInstalledSoftware()
+{
+    var software = SoftwareInventory.GetInstalledSoftware();
+
+    foreach (var app in software.OrderBy(s =&gt; s.DisplayName))
+    {
+        Console.WriteLine($&quot;{app.DisplayName} - {app.DisplayVersion}&quot;);
+    }
+}
+</code></pre><h3 id="monitor-display-changes">Monitor Display Changes</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Messages;
+using System;
+
+WinProcHandler.Instance.Subscribe(new WinProcHandlerHook((hwnd, msg, wparam, lparam, ref handled) =&gt;
+{
+    if ((uint)msg == WindowsMessages.WM_DISPLAYCHANGE)
+    {
+        Console.WriteLine(&quot;Display configuration changed&quot;);
+
+        // Reposition windows or adjust layouts
+        HandleDisplayChange();
+    }
+
+    return IntPtr.Zero;
+}));
+</code></pre><h2 id="performance-optimization">Performance Optimization</h2>
+<h3 id="debounce-high-frequency-events">Debounce High-Frequency Events</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using System.Reactive.Linq;
+
+// Debounce window location changes
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_LOCATIONCHANGE)
+    .Throttle(TimeSpan.FromMilliseconds(100))
+    .Subscribe(e =&gt;
+    {
+        // Only process after 100ms of no changes
+        UpdateWindowLayout(e.Handle);
+    });
+</code></pre><h3 id="batch-processing">Batch Processing</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Reactive.Linq;
+
+// Batch clipboard changes
+var subscription = ClipboardNative.OnUpdate
+    .Buffer(TimeSpan.FromSeconds(5))
+    .Where(batch =&gt; batch.Count &gt; 0)
+    .Subscribe(batch =&gt;
+    {
+        Console.WriteLine($&quot;Processed {batch.Count} clipboard changes&quot;);
+        // Save batch to database, etc.
+    });
+</code></pre><h2 id="error-handling-patterns">Error Handling Patterns</h2>
+<h3 id="retry-logic">Retry Logic</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System;
+using System.Threading;
+
+T RetryOperation&lt;T&gt;(Func&lt;T&gt; operation, int maxRetries = 3, int delayMs = 100)
+{
+    for (int i = 0; i &lt; maxRetries; i++)
+    {
+        try
+        {
+            return operation();
+        }
+        catch (ClipboardAccessDeniedException) when (i &lt; maxRetries - 1)
+        {
+            Thread.Sleep(delayMs);
+        }
+    }
+
+    throw new InvalidOperationException(&quot;Operation failed after retries&quot;);
+}
+
+// Usage
+var text = RetryOperation(() =&gt;
+{
+    using var clipboard = ClipboardNative.Access();
+    return clipboard.GetAsString();
+});
+</code></pre><h3 id="graceful-degradation">Graceful Degradation</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using System;
+
+void SafeWindowOperation(IntPtr handle)
+{
+    try
+    {
+        var window = InteropWindow.FromHandle(handle);
+
+        if (!window.Exists())
+        {
+            Console.WriteLine(&quot;Window no longer exists&quot;);
+            return;
+        }
+
+        window.Fill();
+        Console.WriteLine(window.Caption);
+    }
+    catch (Win32Exception ex)
+    {
+        Console.WriteLine($&quot;Window operation failed: {ex.Message}&quot;);
+        // Continue without crashing
+    }
+}
+</code></pre><h2 id="see-also">See Also</h2>
+<ul>
+<li><a href="window-management.html">Window Management Guide</a></li>
+<li><a href="clipboard-usage.html">Clipboard Usage Guide</a></li>
+<li><a href="dpi-awareness.html">DPI Awareness Guide</a></li>
+<li><a href="input-handling.html">Input Handling Guide</a></li>
+<li><a href="../api/index.html">API Reference</a></li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/common-scenarios.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

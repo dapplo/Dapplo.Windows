@@ -1,0 +1,280 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Icon File Creation API | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Icon File Creation API | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="styles/docfx.vendor.css">
+    <link rel="stylesheet" href="styles/docfx.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta property="docfx:navrel" content="toc">
+    <meta property="docfx:tocrel" content="toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="">
+                    <a href="articles/intro.html" title="Articles" class="">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="api/" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="icon-file-creation-api">Icon File Creation API</h1>
+
+<p>This document demonstrates how to use the new icon file creation APIs added to <code>Dapplo.Windows.Icons</code>.</p>
+<h2 id="overview">Overview</h2>
+<p>The new API provides structures and helper methods to create ICO and CUR files using the proper file format specifications, as documented in <a href="https://devblogs.microsoft.com/oldnewthing/20101018-00/?p=12513">Raymond Chen&#39;s blog</a> and the <a href="https://en.wikipedia.org/wiki/ICO_(file_format)">ICO file format specification</a>.</p>
+<h2 id="key-components">Key Components</h2>
+<h3 id="structures">Structures</h3>
+<ul>
+<li><strong><code>IconDir</code></strong> - Represents the ICONDIR header in an ICO file</li>
+<li><strong><code>IconDirEntry</code></strong> - Represents individual ICONDIRENTRY structures for each image</li>
+<li><strong><code>GrpIconDir</code></strong> - Represents the GRPICONDIR header used in resource files</li>
+<li><strong><code>GrpIconDirEntry</code></strong> - Represents individual GRPICONDIRENTRY structures for resource entries</li>
+</ul>
+<h3 id="helper-classes">Helper Classes</h3>
+<ul>
+<li><strong><code>IconFileWriter</code></strong> - Provides static methods to create icon and cursor files</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="creating-a-multi-resolution-icon-file">Creating a Multi-Resolution Icon File</h3>
+<pre><code class="lang-csharp">using System.Drawing;
+using System.Collections.Generic;
+using Dapplo.Windows.Icons;
+
+// Create images at different resolutions
+var images = new List&lt;Bitmap&gt;
+{
+    new Bitmap(16, 16),
+    new Bitmap(32, 32),
+    new Bitmap(48, 48),
+    new Bitmap(256, 256)
+};
+
+// Fill images with your icon graphics
+// ... (draw your icon content)
+
+// Write to an icon file
+IconFileWriter.WriteIconFile(&quot;myicon.ico&quot;, images);
+
+// Or write to a stream
+using (var stream = new FileStream(&quot;myicon.ico&quot;, FileMode.Create))
+{
+    IconFileWriter.WriteIconFile(stream, images);
+}
+
+// Clean up
+foreach (var image in images)
+{
+    image.Dispose();
+}
+</code></pre><h3 id="creating-a-cursor-file">Creating a Cursor File</h3>
+<pre><code class="lang-csharp">using System.Drawing;
+using Dapplo.Windows.Icons;
+
+// Create a cursor bitmap
+var cursorBitmap = new Bitmap(32, 32);
+
+// Draw your cursor graphics
+// ... (draw your cursor content)
+
+// Define cursor data with hotspot (center of cursor)
+var cursorData = new List&lt;(Image image, Point hotspot)&gt;
+{
+    (cursorBitmap, new Point(16, 16))
+};
+
+// Write to a cursor file
+IconFileWriter.WriteCursorFile(&quot;mycursor.cur&quot;, cursorData);
+
+cursorBitmap.Dispose();
+</code></pre><h3 id="using-the-structures-directly">Using the Structures Directly</h3>
+<pre><code class="lang-csharp">using System.IO;
+using Dapplo.Windows.Icons.Structs;
+
+// Create an icon directory header
+var iconDir = IconDir.CreateIcon(count: 3);
+
+// Create icon directory entries
+var entry1 = IconDirEntry.CreateForIcon(
+    width: 16, 
+    height: 16, 
+    bitCount: 32, 
+    imageSize: 1024, 
+    imageOffset: 22);
+
+var entry2 = IconDirEntry.CreateForIcon(
+    width: 32, 
+    height: 32, 
+    bitCount: 32, 
+    imageSize: 4096, 
+    imageOffset: 1046);
+
+// Write structures to a stream using BinaryWriter
+using (var stream = new FileStream(&quot;custom.ico&quot;, FileMode.Create))
+using (var writer = new BinaryWriter(stream))
+{
+    // Write icon directory header
+    writer.Write(iconDir.Reserved);
+    writer.Write(iconDir.Type);
+    writer.Write(iconDir.Count);
+
+    // Write entries
+    // ... (write entry fields)
+
+    // Write image data
+    // ... (write PNG data)
+}
+</code></pre><h3 id="creating-resource-format-structures">Creating Resource Format Structures</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Icons.Structs;
+
+// Create a group icon directory for resources
+var grpIconDir = GrpIconDir.CreateIcon(count: 2);
+
+// Create group icon directory entries
+var grpEntry = GrpIconDirEntry.CreateForIcon(
+    width: 48, 
+    height: 48, 
+    bitCount: 32, 
+    imageSize: 4096, 
+    resourceId: 1);
+
+// These structures are useful when working with PE resource files
+</code></pre><h2 id="backward-compatibility">Backward Compatibility</h2>
+<p>The existing <code>IconHelper.WriteIcon</code> method has been refactored to use the new structures internally, but maintains full backward compatibility:</p>
+<pre><code class="lang-csharp">using System.Drawing;
+using System.Collections.Generic;
+using Dapplo.Windows.Icons;
+
+var images = new List&lt;Image&gt; { /* your images */ };
+
+// This still works exactly as before
+using (var stream = new MemoryStream())
+{
+    IconHelper.WriteIcon(stream, images);
+}
+</code></pre><h2 id="technical-details">Technical Details</h2>
+<h3 id="ico-file-format">ICO File Format</h3>
+<p>An ICO file consists of:</p>
+<ol>
+<li><p><strong>ICONDIR header</strong> (6 bytes)</p>
+<ul>
+<li>Reserved (2 bytes) - always 0</li>
+<li>Type (2 bytes) - 1 for icons, 2 for cursors</li>
+<li>Count (2 bytes) - number of images</li>
+</ul>
+</li>
+<li><p><strong>ICONDIRENTRY array</strong> (16 bytes per entry)</p>
+<ul>
+<li>Width, Height (1 byte each) - 0 means 256</li>
+<li>ColorCount (1 byte) - 0 for modern formats</li>
+<li>Reserved (1 byte)</li>
+<li>Planes (2 bytes) - 0 or 1 for icons</li>
+<li>BitCount (2 bytes) - bits per pixel</li>
+<li>BytesInRes (4 bytes) - size of image data</li>
+<li>ImageOffset (4 bytes) - offset to image data</li>
+</ul>
+</li>
+<li><p><strong>Image data</strong> - PNG or BMP data for each image</p>
+</li>
+</ol>
+<h3 id="resource-format">Resource Format</h3>
+<p>Resource files use GRPICONDIR and GRPICONDIRENTRY structures which are similar to their ICO counterparts, except:</p>
+<ul>
+<li>GRPICONDIRENTRY uses a resource ID (2 bytes) instead of a file offset (4 bytes)</li>
+<li>Total size is 14 bytes instead of 16 bytes per entry</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://devblogs.microsoft.com/oldnewthing/20101018-00/?p=12513">The format of icon resources - Raymond Chen</a></li>
+<li><a href="https://en.wikipedia.org/wiki/ICO_(file_format)">ICO file format - Wikipedia</a></li>
+<li><a href="https://stackoverflow.com/questions/46805/custom-cursor-in-wpf">Custom cursor in WPF - Stack Overflow</a></li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/IconFileCreation.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,210 @@
+{
+  "homepages": [],
+  "source_base_path": "D:/a/Dapplo.Windows/Dapplo.Windows/doc",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Conceptual",
+      "source_relative_path": "IconFileCreation.md",
+      "output": {
+        ".html": {
+          "relative_path": "IconFileCreation.html",
+          "hash": "99V0SDYiG24cWR2Eo9+ZnDony3fYDbXN6/psqkFYl/c="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "RestartManager.md",
+      "output": {
+        ".html": {
+          "relative_path": "RestartManager.html",
+          "hash": "NoeynxlLr28V1VYImqTerHdQHzkUDoC1xKeYETUXc88="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html",
+          "hash": "tX7gyhU884+Rntz/YBYKCQFIIPTLae8nxrNjyG9J7sQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/clipboard-usage.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/clipboard-usage.html",
+          "hash": "52gl5Ec5P9MMo/Jr3sLCRV7LhHPNbBLPc0++l1jV4Sw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/common-scenarios.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/common-scenarios.html",
+          "hash": "IuxaKbbG1U+0OU9Qaatv1NKqDW8BTA8VEaGNF+0oLBo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/dpi-awareness.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/dpi-awareness.html",
+          "hash": "ZM7ayax4mpDBn0BEjMqgRk8JKQTMuP41qo3QM+bgvmo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/input-handling.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/input-handling.html",
+          "hash": "qTjF0hp7VDleKgvPSJKXYMY/WHZK6y2SYPkZMW99yJE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/intro.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/intro.html",
+          "hash": "1OU6xvCy+KRO+pAXvVmzrjgoncAZHbtaNH908kpMi58="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/window-management.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/window-management.html",
+          "hash": "M6g0ef6rgxLqu/ucdTnSrzf5BXPx0UcYQ8bQDnbRo/8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/d.svg",
+      "output": {
+        "resource": {
+          "relative_path": "images/d.svg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/favicon.ico",
+      "output": {
+        "resource": {
+          "relative_path": "images/favicon.ico"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/logo.svg",
+      "output": {
+        "resource": {
+          "relative_path": "images/logo.svg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html",
+          "hash": "R61FaDB5Rf4sVZpJB1wA98v1d3uRqmY9yVOgU5kMuqY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    }
+  ],
+  "incremental_info": [
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot build incrementally because last build info is missing.",
+        "incrementalPhase": "build",
+        "total_file_count": 0,
+        "skipped_file_count": 0,
+        "full_build_reason_code": "NoAvailableBuildCache"
+      },
+      "processors": {
+        "ConceptualDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 10,
+          "skipped_file_count": 0
+        },
+        "ResourceDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor ResourceDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        },
+        "TocDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        }
+      }
+    },
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot support incremental post processing, the reason is: last post processor info is null.",
+        "incrementalPhase": "postProcessing",
+        "total_file_count": 0,
+        "skipped_file_count": 0
+      },
+      "processors": {}
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

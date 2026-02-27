@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Dapplo.Windows | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Dapplo.Windows | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="styles/docfx.vendor.css">
+    <link rel="stylesheet" href="styles/docfx.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta property="docfx:navrel" content="toc">
+    <meta property="docfx:tocrel" content="toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="">
+                    <a href="articles/intro.html" title="Articles" class="">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="api/" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="dapplowindows">Dapplo.Windows</h1>
+
+<p>A comprehensive library providing Windows-specific functionality for .NET Framework and .NET Core applications.</p>
+<h2 id="overview">Overview</h2>
+<p>Dapplo.Windows is a collection of packages that provide P/Invoke wrappers and higher-level abstractions for Windows API functionality. Originally developed for <a href="https://getgreenshot.org/">Greenshot</a>, this library makes it easy to interact with Windows features from managed code.</p>
+<h2 id="key-features">Key Features</h2>
+<ul>
+<li><strong>Window Management</strong>: Query and manipulate windows, monitor window events</li>
+<li><strong>Input Handling</strong>: Hook keyboard and mouse events, generate input events</li>
+<li><strong>Clipboard Access</strong>: Monitor and manipulate clipboard content with a reactive API</li>
+<li><strong>DPI Awareness</strong>: Build DPI-aware applications with automatic scaling</li>
+<li><strong>GDI/User32 Interop</strong>: Access to native Windows API functions and structures</li>
+<li><strong>Citrix Support</strong>: Detect and interact with Citrix environments</li>
+<li><strong>Desktop Window Manager</strong>: Access DWM (Aero) functionality</li>
+</ul>
+<h2 id="package-structure">Package Structure</h2>
+<p>The library is split into focused packages for better modularity:</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dapplo.Windows</strong></td>
+<td>Main package with window management and event hooking</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Clipboard</strong></td>
+<td>Clipboard monitoring and manipulation</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Dpi</strong></td>
+<td>DPI awareness and scaling support</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Input</strong></td>
+<td>Keyboard and mouse input handling</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.User32</strong></td>
+<td>User32.dll API wrappers</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Gdi32</strong></td>
+<td>GDI32.dll API wrappers</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Kernel32</strong></td>
+<td>Kernel32.dll API wrappers</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Messages</strong></td>
+<td>Windows message definitions</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Citrix</strong></td>
+<td>Citrix environment detection</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.DesktopWindowsManager</strong></td>
+<td>DWM API access</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.EmbeddedBrowser</strong></td>
+<td>Enhanced WebBrowser control</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Com</strong></td>
+<td>COM interop helpers</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Common</strong></td>
+<td>Shared types and utilities</td>
+</tr>
+</tbody>
+</table>
+<h2 id="getting-started">Getting Started</h2>
+<p>Install the packages you need via NuGet:</p>
+<pre><code class="lang-powershell"># For window management and event hooking
+Install-Package Dapplo.Windows
+
+# For clipboard functionality
+Install-Package Dapplo.Windows.Clipboard
+
+# For DPI awareness
+Install-Package Dapplo.Windows.Dpi
+
+# For input handling
+Install-Package Dapplo.Windows.Input
+</code></pre><h2 id="quick-examples">Quick Examples</h2>
+<h3 id="monitor-window-events">Monitor Window Events</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+// Subscribe to window title changes
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_NAMECHANGE)
+    .Subscribe(winEvent =&gt;
+    {
+        var window = InteropWindow.FromHandle(winEvent.Handle);
+        Console.WriteLine($&quot;Window title changed: {window.GetCaption()}&quot;);
+    });
+</code></pre><h3 id="monitor-clipboard">Monitor Clipboard</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+// Subscribe to clipboard updates
+var subscription = ClipboardNative.OnUpdate
+    .Where(info =&gt; info.Formats.Contains(&quot;Text&quot;))
+    .Subscribe(info =&gt;
+    {
+        using var clipboard = ClipboardNative.Access();
+        var text = clipboard.GetAsString();
+        Console.WriteLine($&quot;Clipboard text: {text}&quot;);
+    });
+</code></pre><h3 id="handle-dpi-changes">Handle DPI Changes</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Dpi.Forms;
+
+// Extend DpiAwareForm for automatic DPI scaling
+public class MyForm : DpiAwareForm
+{
+    public MyForm()
+    {
+        InitializeComponent();
+    }
+}
+</code></pre><h2 id="documentation">Documentation</h2>
+<ul>
+<li><a href="articles/intro.html">Getting Started Guide</a></li>
+<li><a href="api/index.html">API Reference</a></li>
+<li><a href="https://github.com/dapplo/Dapplo.Windows">GitHub Repository</a></li>
+</ul>
+<h2 id="build-status">Build Status</h2>
+<p><a href="https://dev.azure.com/Dapplo/Dapplo%20framework/_build/latest?definitionId=10&amp;branchName=master"><img src="https://dev.azure.com/Dapplo/Dapplo%20framework/_apis/build/status/dapplo.Dapplo.Windows?branchName=master" alt="Build Status"></a>
+<a href="https://coveralls.io/github/dapplo/Dapplo.Windows?branch=master"><img src="https://coveralls.io/repos/github/dapplo/Dapplo.Windows/badge.svg?branch=master" alt="Coverage Status"></a></p>
+<h2 id="license">License</h2>
+<p>This project is licensed under the MIT License - see the <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/LICENSE">LICENSE</a> file for details.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>

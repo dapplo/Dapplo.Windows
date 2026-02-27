@@ -1,0 +1,643 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Clipboard Usage Guide | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Clipboard Usage Guide | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc">
+    <meta property="docfx:tocrel" content="toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="active">
+                    <a href="../articles/intro.html" title="Articles" class="active">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="../api/" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div>
+              <div class="sidefilter">
+                <form class="toc-filter">
+                  <span class="glyphicon glyphicon-filter filter-icon"></span>
+                  <input type="text" id="toc_filter_input" placeholder="Enter here to filter..." onkeypress="if(event.keyCode==13) {return false;}">
+                </form>
+              </div>
+              <div class="sidetoc">
+                <div class="toc" id="toc">
+                  
+                  <ul class="nav level1">
+                    <li class="">
+                      <a href="intro.html" title="Introduction" class="">Introduction</a>
+                    </li>
+                    <li class="">
+                      <a href="window-management.html" title="Window Management" class="">Window Management</a>
+                    </li>
+                    <li class="active">
+                      <a href="clipboard-usage.html" title="Clipboard Usage" class="active">Clipboard Usage</a>
+                    </li>
+                    <li class="">
+                      <a href="dpi-awareness.html" title="DPI Awareness" class="">DPI Awareness</a>
+                    </li>
+                    <li class="">
+                      <a href="input-handling.html" title="Input Handling" class="">Input Handling</a>
+                    </li>
+                    <li class="">
+                      <a href="common-scenarios.html" title="Common Scenarios" class="">Common Scenarios</a>
+                    </li>
+                  </ul>        </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="clipboard-usage-guide">Clipboard Usage Guide</h1>
+
+<p>This guide covers clipboard monitoring and manipulation using the <code>Dapplo.Windows.Clipboard</code> package.</p>
+<h2 id="overview">Overview</h2>
+<p>The Clipboard package provides a reactive API for monitoring and manipulating the Windows clipboard. It uses <a href="https://github.com/dotnet/reactive">Reactive Extensions</a> (System.Reactive) for event handling.</p>
+<h2 id="installation">Installation</h2>
+<pre><code class="lang-powershell">Install-Package Dapplo.Windows.Clipboard
+</code></pre><h2 id="monitoring-clipboard-changes">Monitoring Clipboard Changes</h2>
+<h3 id="basic-monitoring">Basic Monitoring</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System;
+
+// Subscribe to all clipboard changes
+var subscription = ClipboardNative.OnUpdate.Subscribe(info =&gt;
+{
+    Console.WriteLine($&quot;Clipboard changed!&quot;);
+    Console.WriteLine($&quot;Available formats: {string.Join(&quot;, &quot;, info.Formats)}&quot;);
+    Console.WriteLine($&quot;Sequence ID: {info.Id}&quot;);
+});
+
+// Dispose when done
+subscription.Dispose();
+</code></pre><h3 id="filter-by-format">Filter by Format</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Reactive.Linq;
+
+// Only react to text changes
+var textSubscription = ClipboardNative.OnUpdate
+    .Where(info =&gt; info.Formats.Contains(StandardClipboardFormats.Text.AsString()) || info.Formats.Contains(StandardClipboardFormats.UnicodeText.AsString()))
+    .Subscribe(info =&gt;
+    {
+        Console.WriteLine(&quot;Text copied to clipboard&quot;);
+    });
+
+// Only react to image changes
+var imageSubscription = ClipboardNative.OnUpdate
+    .Where(info =&gt; info.Formats.Contains(&quot;PNG&quot;) || info.Formats.Contains(StandardClipboardFormats.Bitmap.AsString()))
+    .Subscribe(info =&gt;
+    {
+        Console.WriteLine(&quot;Image copied to clipboard&quot;);
+    });
+
+// Only react to files
+var fileSubscription = ClipboardNative.OnUpdate
+    .Where(info =&gt; info.Formats.Contains(StandardClipboardFormats.Drop.AsString()))
+    .Subscribe(info =&gt;
+    {
+        Console.WriteLine(&quot;Files copied to clipboard&quot;);
+    });
+</code></pre><h3 id="thread-synchronization">Thread Synchronization</h3>
+<p>Ensure clipboard operations run on the correct thread:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Reactive.Linq;
+using System.Reactive.Concurrency;
+
+// In a WPF or Windows Forms application
+var subscription = ClipboardNative.OnUpdate
+    .ObserveOn(SynchronizationContext.Current) // Run on UI thread
+    .Subscribe(info =&gt;
+    {
+        // Safe to update UI here
+        UpdateClipboardStatus(info.Formats);
+    });
+</code></pre><h2 id="reading-clipboard-content">Reading Clipboard Content</h2>
+<h3 id="access-clipboard">Access Clipboard</h3>
+<p>Always use the <code>Access()</code> method to safely access the clipboard:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    // Clipboard is now locked for your exclusive use
+    var formats = clipboard.AvailableFormats();
+    Console.WriteLine($&quot;Available formats: {string.Join(&quot;, &quot;, formats)}&quot;);
+}
+// Clipboard is automatically released
+</code></pre><h3 id="read-text">Read Text</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    if (ClipboardNative.HasFormat(StandardClipboardFormats.UnicodeText))
+    {
+        string text = clipboard.GetAsUnicodeString();
+        Console.WriteLine($&quot;Clipboard text: {text}&quot;);
+    }
+}
+</code></pre><h3 id="read-files">Read Files</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Collections.Generic;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    if (ClipboardNative.HasFormat(StandardClipboardFormats.Drop))
+    {
+        IEnumerable&lt;string&gt; files = clipboard.GetFileNames();
+        foreach (var file in files)
+        {
+            Console.WriteLine($&quot;File: {file}&quot;);
+        }
+    }
+}
+</code></pre><h3 id="read-images">Read Images</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    // Read as stream (PNG format)
+    if (clipboard.AvailableFormats().Contains(&quot;PNG&quot;))
+    {
+        using var stream = clipboard.GetAsStream(&quot;PNG&quot;);
+        using var fileStream = File.Create(&quot;clipboard_image.png&quot;);
+        stream.CopyTo(fileStream);
+    }
+
+    // Read as bitmap
+    if (ClipboardNative.HasFormat(StandardClipboardFormats.Bitmap))
+    {
+        // Note: Direct bitmap reading may require additional code
+        using var stream = clipboard.GetAsStream(StandardClipboardFormats.Bitmap);
+        // Process bitmap stream
+    }
+}
+</code></pre><h3 id="read-custom-formats">Read Custom Formats</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.IO;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    string customFormat = &quot;MyApplication.CustomFormat&quot;;
+
+    if (clipboard.AvailableFormats().Contains(customFormat))
+    {
+        // Read as stream
+        using var stream = clipboard.GetAsStream(customFormat);
+
+        // Read as bytes
+        byte[] data = clipboard.GetAsBytes(customFormat);
+
+        Console.WriteLine($&quot;Custom data size: {data.Length} bytes&quot;);
+    }
+}
+</code></pre><h2 id="writing-to-clipboard">Writing to Clipboard</h2>
+<h3 id="set-text">Set Text</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString(&quot;Hello, World!&quot;);
+}
+</code></pre><h3 id="set-files">Set Files</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Collections.Generic;
+
+var files = new List&lt;string&gt;
+{
+    @&quot;C:\path\to\file1.txt&quot;,
+    @&quot;C:\path\to\file2.txt&quot;
+};
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.ClearContents();
+    clipboard.SetFileNames(files);
+}
+</code></pre><h3 id="set-custom-format">Set Custom Format</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Text;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    string customFormat = &quot;MyApplication.CustomFormat&quot;;
+    byte[] data = Encoding.UTF8.GetBytes(&quot;Custom clipboard data&quot;);
+
+    clipboard.SetAsBytes(data, customFormat);
+}
+</code></pre><h3 id="set-multiple-formats">Set Multiple Formats</h3>
+<p>You can set multiple formats at once:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Text;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    string text = &quot;Hello, World!&quot;;
+
+    // Set as both Unicode text and HTML
+    clipboard.SetAsUnicodeString(text);
+
+    string html = $&quot;&lt;html&gt;&lt;body&gt;{text}&lt;/body&gt;&lt;/html&gt;&quot;;
+    clipboard.SetAsBytes(Encoding.UTF8.GetBytes(html), &quot;HTML Format&quot;);
+}
+</code></pre><h2 id="advanced-scenarios">Advanced Scenarios</h2>
+<h3 id="delayed-rendering">Delayed Rendering</h3>
+<p>Delayed rendering allows you to provide clipboard data only when it&#39;s actually requested:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System;
+
+// Subscribe to render requests
+var renderSubscription = ClipboardNative.OnRenderFormat.Subscribe(request =&gt;
+{
+    if (request.IsDestroyClipboard)
+    {
+        // Clean up any delayed rendering resources
+        return;
+    }
+
+    if (request.RenderAllFormats)
+    {
+        // Render all delayed formats
+        return;
+    }
+
+    // Render specific format on demand.
+    // Note: When responding to WM_RENDERFORMAT, the clipboard is already open.
+    // Use the AccessToken provided in the request - do NOT call ClipboardNative.Access().
+    switch (request.RequestedFormat)
+    {
+        case &quot;MyFormat&quot;:
+            byte[] data = GenerateLargeData(); // Only generate when needed
+            request.AccessToken.SetAsBytes(data, &quot;MyFormat&quot;);
+            break;
+    }
+});
+
+// Set clipboard with delayed rendering
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.ClearContents();
+    clipboard.SetDelayedRenderedContent(&quot;MyFormat&quot;);
+}
+</code></pre><h3 id="clear-clipboard">Clear Clipboard</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.ClearContents();
+}
+</code></pre><h3 id="monitor-clipboard-in-reactive-pipeline">Monitor Clipboard in Reactive Pipeline</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System;
+using System.Reactive.Linq;
+
+var subscription = ClipboardNative.OnUpdate
+    .Where(info =&gt; info.Formats.Contains(StandardClipboardFormats.UnicodeText.AsString()))
+    .Throttle(TimeSpan.FromMilliseconds(500)) // Avoid rapid updates
+    .Subscribe(info =&gt;
+    {
+        using var clipboard = ClipboardNative.Access();
+        var text = clipboard.GetAsUnicodeString();
+        ProcessClipboardText(text);
+    });
+</code></pre><h3 id="get-clipboard-owner">Get Clipboard Owner</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+var subscription = ClipboardNative.OnUpdate.Subscribe(info =&gt;
+{
+    Console.WriteLine($&quot;Clipboard owner handle: {info.OwnerHandle}&quot;);
+});
+</code></pre><h2 id="error-handling">Error Handling</h2>
+<h3 id="handle-access-denied">Handle Access Denied</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+try
+{
+    using var clipboard = ClipboardNative.Access();
+    var text = clipboard.GetAsUnicodeString();
+}
+catch (ClipboardAccessDeniedException ex)
+{
+    Console.WriteLine($&quot;Clipboard access denied: {ex.Message}&quot;);
+    // Another application is currently using the clipboard
+}
+</code></pre><h3 id="retry-logic">Retry Logic</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System;
+using System.Threading;
+
+int maxRetries = 3;
+int retryDelay = 100; // milliseconds
+
+for (int i = 0; i &lt; maxRetries; i++)
+{
+    try
+    {
+        using var clipboard = ClipboardNative.Access();
+        clipboard.SetAsUnicodeString(&quot;Hello, World!&quot;);
+        break; // Success
+    }
+    catch (ClipboardAccessDeniedException)
+    {
+        if (i == maxRetries - 1)
+        {
+            throw; // Give up after max retries
+        }
+        Thread.Sleep(retryDelay);
+    }
+}
+</code></pre><h2 id="cloud-clipboard-and-clipboard-history">Cloud Clipboard and Clipboard History</h2>
+<p>Windows 10 and later versions support cloud clipboard synchronization and clipboard history. You can control how your clipboard content interacts with these features using the cloud clipboard extensions.</p>
+<h3 id="what-are-cloud-clipboard-options">What are Cloud Clipboard Options?</h3>
+<p>The cloud clipboard formats allow you to control three aspects of clipboard behavior:</p>
+<ol>
+<li><strong>CanIncludeInClipboardHistory</strong> - Controls whether the content appears in Windows clipboard history (Win+V)</li>
+<li><strong>CanUploadToCloudClipboard</strong> - Controls whether the content syncs across devices via cloud</li>
+<li><strong>ExcludeClipboardContentFromMonitorProcessing</strong> - Controls whether clipboard monitoring apps can process the content</li>
+</ol>
+<h3 id="setting-cloud-clipboard-options">Setting Cloud Clipboard Options</h3>
+<p>The simplest way to control cloud clipboard behavior is using the <code>SetCloudClipboardOptions</code> method:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    // Set your clipboard content
+    clipboard.SetAsUnicodeString(&quot;Sensitive information&quot;);
+
+    // Prevent from being stored in history or synced to cloud
+    clipboard.SetCloudClipboardOptions(
+        canIncludeInHistory: false,
+        canUploadToCloud: false,
+        excludeFromMonitoring: true
+    );
+}
+</code></pre><h3 id="use-cases">Use Cases</h3>
+<h4 id="privatesensitive-content">Private/Sensitive Content</h4>
+<p>Prevent sensitive data from being stored in history or synced:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString(&quot;MyPassword123!&quot;);
+
+    // Disable history and cloud sync for sensitive data
+    clipboard.SetCloudClipboardOptions(
+        canIncludeInHistory: false,
+        canUploadToCloud: false
+    );
+}
+</code></pre><h4 id="temporary-content">Temporary Content</h4>
+<p>For temporary clipboard content that shouldn&#39;t clutter history:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString(&quot;Temporary data&quot;);
+
+    // Don&#39;t include in history, but allow cloud sync
+    clipboard.SetCloudClipboardOptions(
+        canIncludeInHistory: false,
+        canUploadToCloud: true
+    );
+}
+</code></pre><h4 id="normal-content-default">Normal Content (Default)</h4>
+<p>For normal content that should be available in history and cloud:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString(&quot;Normal clipboard content&quot;);
+
+    // Use defaults - allows history and cloud
+    clipboard.SetCloudClipboardOptions();
+}
+</code></pre><h3 id="individual-option-methods">Individual Option Methods</h3>
+<p>You can also set each option individually:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    clipboard.SetAsUnicodeString(&quot;My content&quot;);
+
+    // Set options individually
+    clipboard.SetCanIncludeInClipboardHistory(false);
+    clipboard.SetCanUploadToCloudClipboard(true);
+    clipboard.SetExcludeClipboardContentFromMonitorProcessing(true);
+}
+</code></pre><h3 id="checking-cloud-clipboard-formats">Checking Cloud Clipboard Formats</h3>
+<p>You can check if cloud clipboard formats are present:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+using System.Linq;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    var formats = clipboard.AvailableFormats().ToList();
+
+    bool hasHistoryFormat = formats.Contains(
+        ClipboardCloudExtensions.CanIncludeInClipboardHistoryFormat);
+    bool hasCloudFormat = formats.Contains(
+        ClipboardCloudExtensions.CanUploadToCloudClipboardFormat);
+    bool hasMonitorFormat = formats.Contains(
+        ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat);
+}
+</code></pre><h3 id="best-practices-for-cloud-clipboard">Best Practices for Cloud Clipboard</h3>
+<ol>
+<li><strong>Always set cloud options after setting content</strong> - The cloud formats should be set in the same clipboard access session as your content</li>
+<li><strong>Default to allowing</strong> - Unless you have a specific reason, use the defaults which allow history and cloud sync</li>
+<li><strong>Be consistent</strong> - If you disable history, you probably want to disable cloud sync too</li>
+<li><strong>Consider user privacy</strong> - For passwords and sensitive data, always disable history and cloud sync</li>
+</ol>
+<h2 id="common-clipboard-formats">Common Clipboard Formats</h2>
+<p>Standard Windows clipboard formats. Use the <code>StandardClipboardFormats</code> enum with format-specific methods:</p>
+<table>
+<thead>
+<tr>
+<th>Enum value</th>
+<th>String name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>StandardClipboardFormats.Text</code></td>
+<td><code>CF_TEXT</code></td>
+<td>ANSI text</td>
+</tr>
+<tr>
+<td><code>StandardClipboardFormats.UnicodeText</code></td>
+<td><code>CF_UNICODETEXT</code></td>
+<td>Unicode text</td>
+</tr>
+<tr>
+<td><code>StandardClipboardFormats.Bitmap</code></td>
+<td><code>CF_BITMAP</code></td>
+<td>Bitmap image</td>
+</tr>
+<tr>
+<td><code>StandardClipboardFormats.Drop</code></td>
+<td><code>CF_HDROP</code></td>
+<td>List of file paths</td>
+</tr>
+<tr>
+<td><em>(registered by apps)</em></td>
+<td><code>PNG</code></td>
+<td>PNG image format</td>
+</tr>
+<tr>
+<td><em>(registered by apps)</em></td>
+<td><code>HTML Format</code></td>
+<td>HTML content</td>
+</tr>
+<tr>
+<td><em>(registered by apps)</em></td>
+<td><code>Rich Text Format</code></td>
+<td>RTF content</td>
+</tr>
+</tbody>
+</table>
+<p>You can also check available formats:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Clipboard;
+
+using (var clipboard = ClipboardNative.Access())
+{
+    var formats = clipboard.AvailableFormats();
+    foreach (var format in formats)
+    {
+        Console.WriteLine($&quot;Format: {format}&quot;);
+    }
+}
+</code></pre><h2 id="best-practices">Best Practices</h2>
+<h3 id="1-always-use-using-statements">1. Always Use <code>using</code> Statements</h3>
+<p>This ensures the clipboard is properly released:</p>
+<pre><code class="lang-csharp">using (var clipboard = ClipboardNative.Access())
+{
+    // Use clipboard
+} // Automatically released
+</code></pre><h3 id="2-dispose-subscriptions">2. Dispose Subscriptions</h3>
+<p>Clean up event subscriptions when done:</p>
+<pre><code class="lang-csharp">var subscription = ClipboardNative.OnUpdate.Subscribe(...);
+
+// Later
+subscription.Dispose();
+</code></pre><h3 id="3-handle-concurrency">3. Handle Concurrency</h3>
+<p>The clipboard is a shared resource. Use appropriate error handling:</p>
+<pre><code class="lang-csharp">try
+{
+    using var clipboard = ClipboardNative.Access();
+    // Use clipboard
+}
+catch (ClipboardAccessDeniedException)
+{
+    // Handle gracefully
+}
+</code></pre><h3 id="4-use-reactive-operators">4. Use Reactive Operators</h3>
+<p>Leverage Rx operators for better control:</p>
+<pre><code class="lang-csharp">var subscription = ClipboardNative.OnUpdate
+    .Throttle(TimeSpan.FromMilliseconds(500))  // Debounce rapid changes
+    .DistinctUntilChanged(info =&gt; info.Id)      // Skip duplicates
+    .ObserveOn(SynchronizationContext.Current)  // UI thread
+    .Subscribe(info =&gt; { /* Handle */ });
+</code></pre><h2 id="see-also">See Also</h2>
+<ul>
+<li><a href="../api/index.html">API Reference</a></li>
+<li><a href="intro.html">Getting Started</a></li>
+<li><a href="common-scenarios.html">Common Scenarios</a></li>
+<li><a href="http://reactivex.io/">Reactive Extensions Documentation</a></li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/clipboard-usage.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

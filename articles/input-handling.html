@@ -1,0 +1,641 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Input Handling Guide | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Input Handling Guide | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc">
+    <meta property="docfx:tocrel" content="toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="active">
+                    <a href="../articles/intro.html" title="Articles" class="active">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="../api/" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div>
+              <div class="sidefilter">
+                <form class="toc-filter">
+                  <span class="glyphicon glyphicon-filter filter-icon"></span>
+                  <input type="text" id="toc_filter_input" placeholder="Enter here to filter..." onkeypress="if(event.keyCode==13) {return false;}">
+                </form>
+              </div>
+              <div class="sidetoc">
+                <div class="toc" id="toc">
+                  
+                  <ul class="nav level1">
+                    <li class="">
+                      <a href="intro.html" title="Introduction" class="">Introduction</a>
+                    </li>
+                    <li class="">
+                      <a href="window-management.html" title="Window Management" class="">Window Management</a>
+                    </li>
+                    <li class="">
+                      <a href="clipboard-usage.html" title="Clipboard Usage" class="">Clipboard Usage</a>
+                    </li>
+                    <li class="">
+                      <a href="dpi-awareness.html" title="DPI Awareness" class="">DPI Awareness</a>
+                    </li>
+                    <li class="active">
+                      <a href="input-handling.html" title="Input Handling" class="active">Input Handling</a>
+                    </li>
+                    <li class="">
+                      <a href="common-scenarios.html" title="Common Scenarios" class="">Common Scenarios</a>
+                    </li>
+                  </ul>        </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="input-handling-guide">Input Handling Guide</h1>
+
+<p>This guide covers keyboard and mouse input monitoring and generation using the <code>Dapplo.Windows.Input</code> package.</p>
+<h2 id="overview">Overview</h2>
+<p>The Input package provides:</p>
+<ul>
+<li>Low-level keyboard and mouse hooks</li>
+<li>Reactive Extensions (Rx) based event handling</li>
+<li>Input generation (simulating keyboard and mouse events)</li>
+<li>Key combination and sequence handlers</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<pre><code class="lang-powershell">Install-Package Dapplo.Windows.Input
+</code></pre><h2 id="keyboard-input">Keyboard Input</h2>
+<h3 id="keyboard-hook">Keyboard Hook</h3>
+<p>Create a keyboard hook to monitor keyboard events:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System;
+
+// Create keyboard hook
+var keyboardHook = KeyboardHook.Create();
+
+// Subscribe to keyboard events
+var subscription = keyboardHook.KeyboardEvents.Subscribe(keyEvent =&gt;
+{
+    Console.WriteLine($&quot;Key: {keyEvent.Key}, IsDown: {keyEvent.IsDown}&quot;);
+});
+
+// Clean up when done
+subscription.Dispose();
+keyboardHook.Dispose();
+</code></pre><h3 id="filter-keyboard-events">Filter Keyboard Events</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System.Reactive.Linq;
+
+var keyboardHook = KeyboardHook.Create();
+
+// Only react to key presses (not releases)
+var subscription = keyboardHook.KeyboardEvents
+    .Where(e =&gt; e.IsDown)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine($&quot;Key pressed: {e.Key}&quot;);
+    });
+
+// Monitor specific key
+var escSubscription = keyboardHook.KeyboardEvents
+    .Where(e =&gt; e.Key == VirtualKeyCode.Escape &amp;&amp; e.IsDown)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine(&quot;ESC pressed&quot;);
+    });
+</code></pre><h3 id="key-combinations">Key Combinations</h3>
+<p>Detect key combinations like Ctrl+C:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System.Reactive.Linq;
+
+var keyboardHook = KeyboardHook.Create();
+
+// Detect Ctrl+C
+var ctrlCSubscription = keyboardHook.KeyboardEvents
+    .Where(e =&gt; e.IsDown &amp;&amp; e.Key == VirtualKeyCode.C &amp;&amp; e.IsControlPressed)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine(&quot;Ctrl+C pressed&quot;);
+    });
+
+// Detect Ctrl+Shift+A
+var complexComboSubscription = keyboardHook.KeyboardEvents
+    .Where(e =&gt; e.IsDown &amp;&amp; 
+                e.Key == VirtualKeyCode.A &amp;&amp; 
+                e.IsControlPressed &amp;&amp; 
+                e.IsShiftPressed)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine(&quot;Ctrl+Shift+A pressed&quot;);
+    });
+</code></pre><h3 id="advanced-key-combination-handling">Advanced Key Combination Handling</h3>
+<p>Use <code>KeyCombinationHandler</code> for more sophisticated key combination detection:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System.Reactive.Linq;
+
+var keyboardHook = KeyboardHook.Create();
+
+// Create a handler for Ctrl+Alt+T
+var keyCombinationHandler = new KeyCombinationHandler(
+    VirtualKeyCode.Control,
+    VirtualKeyCode.Menu,  // Alt key
+    VirtualKeyCode.T
+);
+
+// Subscribe to the combination
+var subscription = keyboardHook.KeyboardEvents
+    .Where(keyCombinationHandler)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine(&quot;Ctrl+Alt+T pressed&quot;);
+        e.Handled = true; // Prevent other apps from seeing it
+    });
+</code></pre><h3 id="trigger-on-key-release">Trigger on Key Release</h3>
+<p>When you need to inject keypresses after a key combination, use <code>TriggerOnKeyUp</code> to ensure all modifier keys are released before your handler runs. This prevents the injected keys from being modified by still-pressed modifier keys:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System;
+using System.Reactive.Linq;
+
+var keyboardHook = KeyboardHook.Create();
+
+// Create a handler that triggers when keys are RELEASED
+var keyCombinationHandler = new KeyCombinationHandler(
+    VirtualKeyCode.Control,
+    VirtualKeyCode.Menu,      // Alt key
+    VirtualKeyCode.LeftWin,   // Windows key
+    VirtualKeyCode.T
+)
+{
+    TriggerOnKeyUp = true,    // Trigger when keys are released, not pressed
+    IgnoreInjected = false    // Allow processing of injected keys if needed
+};
+
+var subscription = keyboardHook.KeyboardEvents
+    .Where(keyCombinationHandler)
+    .Subscribe(e =&gt;
+    {
+        // This runs AFTER all keys are released
+        // So injected keypresses won&#39;t be affected by modifier keys
+        var timestamp = DateTime.Now.ToString(&quot;yyyy-MM-dd--HH-mm-ss&quot;);
+
+        // Type the timestamp safely without modifier interference
+        KeyboardInputGenerator.TypeText(timestamp);
+
+        e.Handled = true;
+    });
+</code></pre><p>This is especially useful when replacing AutoHotKey scripts or implementing text expansion features where modifier keys in the trigger combination could interfere with the text being typed.</p>
+<h3 id="key-sequence-detection">Key Sequence Detection</h3>
+<p>Detect a sequence of keys (like vim commands):</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System;
+using System.Reactive.Linq;
+using System.Collections.Generic;
+
+var keyboardHook = KeyboardHook.Create();
+var keySequence = new List&lt;VirtualKeyCode&gt;();
+
+var subscription = keyboardHook.KeyboardEvents
+    .Where(e =&gt; e.IsDown)
+    .Subscribe(e =&gt;
+    {
+        keySequence.Add(e.Key);
+
+        // Keep only last 3 keys
+        if (keySequence.Count &gt; 3)
+        {
+            keySequence.RemoveAt(0);
+        }
+
+        // Check for sequence: G, G, O
+        if (keySequence.Count == 3 &amp;&amp;
+            keySequence[0] == VirtualKeyCode.G &amp;&amp;
+            keySequence[1] == VirtualKeyCode.G &amp;&amp;
+            keySequence[2] == VirtualKeyCode.O)
+        {
+            Console.WriteLine(&quot;GGO sequence detected!&quot;);
+            keySequence.Clear();
+        }
+    });
+</code></pre><h3 id="suppress-key-events">Suppress Key Events</h3>
+<p>Prevent key events from reaching other applications:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+
+var keyboardHook = KeyboardHook.Create();
+
+var subscription = keyboardHook.KeyboardEvents
+    .Subscribe(e =&gt;
+    {
+        if (e.Key == VirtualKeyCode.PrintScreen &amp;&amp; e.IsDown)
+        {
+            // Handle screenshot yourself
+            TakeScreenshot();
+
+            // Suppress the key so system doesn&#39;t handle it
+            e.Handled = true;
+        }
+    });
+</code></pre><h2 id="generating-keyboard-input">Generating Keyboard Input</h2>
+<h3 id="type-text">Type Text</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+
+// Type text
+KeyboardInputGenerator.TypeText(&quot;Hello, World!&quot;);
+
+// Type with delay between characters
+KeyboardInputGenerator.TypeText(&quot;Slow typing&quot;, 100); // 100ms delay
+</code></pre><h3 id="press-keys">Press Keys</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+
+// Press and release a single key
+KeyboardInputGenerator.KeyPress(VirtualKeyCode.Return);
+
+// Press multiple keys
+KeyboardInputGenerator.KeyPress(VirtualKeyCode.A);
+KeyboardInputGenerator.KeyPress(VirtualKeyCode.B);
+KeyboardInputGenerator.KeyPress(VirtualKeyCode.C);
+</code></pre><h3 id="key-combinations-1">Key Combinations</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+
+// Press Ctrl+C
+KeyboardInputGenerator.KeyCombinationPress(
+    VirtualKeyCode.Control, 
+    VirtualKeyCode.C
+);
+
+// Press Ctrl+Shift+S
+KeyboardInputGenerator.KeyCombinationPress(
+    VirtualKeyCode.Control,
+    VirtualKeyCode.Shift,
+    VirtualKeyCode.S
+);
+
+// Alt+Tab
+KeyboardInputGenerator.KeyCombinationPress(
+    VirtualKeyCode.Alt,
+    VirtualKeyCode.Tab
+);
+</code></pre><h3 id="advanced-key-control">Advanced Key Control</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+
+// Key down
+KeyboardInputGenerator.KeyDown(VirtualKeyCode.Shift);
+
+// Type while shift is held
+KeyboardInputGenerator.KeyPress(VirtualKeyCode.A);
+KeyboardInputGenerator.KeyPress(VirtualKeyCode.B);
+
+// Key up
+KeyboardInputGenerator.KeyUp(VirtualKeyCode.Shift);
+</code></pre><h2 id="mouse-input">Mouse Input</h2>
+<h3 id="mouse-hook">Mouse Hook</h3>
+<p>Monitor mouse events:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Mouse;
+using System;
+
+// Create mouse hook
+var mouseHook = MouseHook.Create();
+
+// Subscribe to mouse events
+var subscription = mouseHook.MouseEvents.Subscribe(mouseEvent =&gt;
+{
+    Console.WriteLine($&quot;Mouse: {mouseEvent.Button} at ({mouseEvent.Point.X}, {mouseEvent.Point.Y})&quot;);
+});
+
+// Clean up
+subscription.Dispose();
+mouseHook.Dispose();
+</code></pre><h3 id="filter-mouse-events">Filter Mouse Events</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Mouse;
+using System.Reactive.Linq;
+
+var mouseHook = MouseHook.Create();
+
+// Only left clicks
+var leftClickSubscription = mouseHook.MouseEvents
+    .Where(e =&gt; e.Button == MouseButtons.Left &amp;&amp; e.IsButtonDown)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine($&quot;Left click at ({e.Point.X}, {e.Point.Y})&quot;);
+    });
+
+// Only right clicks
+var rightClickSubscription = mouseHook.MouseEvents
+    .Where(e =&gt; e.Button == MouseButtons.Right &amp;&amp; e.IsButtonDown)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine($&quot;Right click at ({e.Point.X}, {e.Point.Y})&quot;);
+    });
+
+// Mouse wheel
+var wheelSubscription = mouseHook.MouseEvents
+    .Where(e =&gt; e.Delta != 0)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine($&quot;Mouse wheel: {e.Delta}&quot;);
+    });
+</code></pre><h3 id="mouse-movement">Mouse Movement</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Mouse;
+using System.Reactive.Linq;
+using System;
+
+var mouseHook = MouseHook.Create();
+
+// Track mouse movement
+var moveSubscription = mouseHook.MouseEvents
+    .Where(e =&gt; e.IsMouseMove)
+    .Throttle(TimeSpan.FromMilliseconds(100)) // Limit update rate
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine($&quot;Mouse at ({e.Point.X}, {e.Point.Y})&quot;);
+    });
+</code></pre><h3 id="detect-click-patterns">Detect Click Patterns</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Mouse;
+using System.Reactive.Linq;
+using System;
+
+var mouseHook = MouseHook.Create();
+
+// Double-click detection
+var doubleClickSubscription = mouseHook.MouseEvents
+    .Where(e =&gt; e.Button == MouseButtons.Left &amp;&amp; e.IsButtonDown)
+    .Buffer(TimeSpan.FromMilliseconds(500), 2) // Two clicks within 500ms
+    .Where(clicks =&gt; clicks.Count == 2)
+    .Subscribe(clicks =&gt;
+    {
+        Console.WriteLine(&quot;Double-click detected!&quot;);
+    });
+</code></pre><h2 id="generating-mouse-input">Generating Mouse Input</h2>
+<h3 id="move-mouse">Move Mouse</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Mouse;
+using Dapplo.Windows.Common.Structs;
+
+// Move to absolute position
+MouseInputGenerator.MoveMouse(new NativePoint(100, 100));
+
+// Move relative to current position
+var currentPos = MouseInputGenerator.GetMousePosition();
+MouseInputGenerator.MoveMouse(new NativePoint(currentPos.X + 10, currentPos.Y + 10));
+</code></pre><h3 id="click-mouse">Click Mouse</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Mouse;
+
+// Left click
+MouseInputGenerator.Click();
+
+// Right click
+MouseInputGenerator.RightClick();
+
+// Middle click
+MouseInputGenerator.MiddleClick();
+
+// Double click
+MouseInputGenerator.DoubleClick();
+</code></pre><h3 id="advanced-mouse-control">Advanced Mouse Control</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Mouse;
+using Dapplo.Windows.Common.Structs;
+
+// Press button down
+MouseInputGenerator.MouseDown(MouseButtons.Left);
+
+// Move while button is down (drag)
+MouseInputGenerator.MoveMouse(new NativePoint(200, 200));
+
+// Release button
+MouseInputGenerator.MouseUp(MouseButtons.Left);
+</code></pre><h3 id="mouse-wheel">Mouse Wheel</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Mouse;
+
+// Scroll up (positive value)
+MouseInputGenerator.MouseWheel(120);
+
+// Scroll down (negative value)
+MouseInputGenerator.MouseWheel(-120);
+</code></pre><h2 id="raw-input-monitoring">Raw Input Monitoring</h2>
+<p>Monitor raw input devices (keyboards, mice, HID devices):</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input;
+using System;
+
+// Create raw input monitor
+var rawInputMonitor = RawInputMonitor.Create();
+
+// Subscribe to raw input events
+var subscription = rawInputMonitor.RawInputEvents.Subscribe(rawEvent =&gt;
+{
+    Console.WriteLine($&quot;Raw input from device: {rawEvent.DeviceHandle}&quot;);
+
+    if (rawEvent.Device == RawInputDeviceType.Keyboard)
+    {
+        Console.WriteLine($&quot;Keyboard: {rawEvent.VirtualKey}&quot;);
+    }
+    else if (rawEvent.Device == RawInputDeviceType.Mouse)
+    {
+        Console.WriteLine($&quot;Mouse: {rawEvent.Mouse}&quot;);
+    }
+});
+
+// Clean up
+subscription.Dispose();
+rawInputMonitor.Dispose();
+</code></pre><h2 id="common-patterns">Common Patterns</h2>
+<h3 id="global-hotkey">Global Hotkey</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System.Reactive.Linq;
+
+var keyboardHook = KeyboardHook.Create();
+
+// Ctrl+Alt+H hotkey
+var hotkeySubscription = keyboardHook.KeyboardEvents
+    .Where(e =&gt; e.IsDown &amp;&amp; 
+                e.Key == VirtualKeyCode.H &amp;&amp; 
+                e.IsControlPressed &amp;&amp; 
+                e.IsAltPressed)
+    .Subscribe(e =&gt;
+    {
+        Console.WriteLine(&quot;Global hotkey activated!&quot;);
+        e.Handled = true; // Prevent other apps from seeing it
+    });
+</code></pre><h3 id="auto-clicker">Auto-Clicker</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Mouse;
+using System.Threading;
+using System.Threading.Tasks;
+
+async Task AutoClick(int intervalMs, int count)
+{
+    for (int i = 0; i &lt; count; i++)
+    {
+        MouseInputGenerator.Click();
+        await Task.Delay(intervalMs);
+    }
+}
+
+// Click 10 times with 1 second interval
+await AutoClick(1000, 10);
+</code></pre><h3 id="keyboard-macro">Keyboard Macro</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Input.Keyboard;
+using System.Threading.Tasks;
+
+async Task PlayMacro()
+{
+    // Type username
+    KeyboardInputGenerator.TypeText(&quot;myusername&quot;);
+
+    // Press Tab
+    KeyboardInputGenerator.KeyPress(VirtualKeyCode.Tab);
+
+    await Task.Delay(100);
+
+    // Type password
+    KeyboardInputGenerator.TypeText(&quot;mypassword&quot;);
+
+    // Press Enter
+    KeyboardInputGenerator.KeyPress(VirtualKeyCode.Return);
+}
+</code></pre><h2 id="best-practices">Best Practices</h2>
+<h3 id="1-dispose-hooks">1. Dispose Hooks</h3>
+<p>Always dispose hooks when done:</p>
+<pre><code class="lang-csharp">using (var keyboardHook = KeyboardHook.Create())
+{
+    // Use hook
+} // Automatically disposed
+</code></pre><h3 id="2-handle-errors">2. Handle Errors</h3>
+<p>Input operations can fail:</p>
+<pre><code class="lang-csharp">try
+{
+    KeyboardInputGenerator.KeyPress(VirtualKeyCode.A);
+}
+catch (Win32Exception ex)
+{
+    Console.WriteLine($&quot;Input failed: {ex.Message}&quot;);
+}
+</code></pre><h3 id="3-throttle-events">3. Throttle Events</h3>
+<p>Limit high-frequency events:</p>
+<pre><code class="lang-csharp">var subscription = mouseHook.MouseEvents
+    .Where(e =&gt; e.IsMouseMove)
+    .Throttle(TimeSpan.FromMilliseconds(50))
+    .Subscribe(e =&gt; UpdateUI(e.Point));
+</code></pre><h3 id="4-clean-up-subscriptions">4. Clean Up Subscriptions</h3>
+<pre><code class="lang-csharp">var subscription = keyboardHook.KeyboardEvents.Subscribe(...);
+
+// Later
+subscription.Dispose();
+</code></pre><h3 id="5-test-input-generation">5. Test Input Generation</h3>
+<p>Always test generated input:</p>
+<ul>
+<li>Verify correct keys are sent</li>
+<li>Check timing between inputs</li>
+<li>Test with target applications</li>
+<li>Handle focus issues</li>
+</ul>
+<h2 id="security-considerations">Security Considerations</h2>
+<h3 id="administrator-privileges">Administrator Privileges</h3>
+<p>Low-level hooks may require administrator privileges:</p>
+<ul>
+<li>Keyboard/mouse hooks work in standard user mode</li>
+<li>Some input generation may need elevation</li>
+<li>Consider UAC implications</li>
+</ul>
+<h3 id="input-injection">Input Injection</h3>
+<p>Be careful with input generation:</p>
+<ul>
+<li>Never inject sensitive data (passwords) programmatically in production</li>
+<li>Validate and sanitize any text being typed</li>
+<li>Consider security implications of automated input</li>
+</ul>
+<h2 id="see-also">See Also</h2>
+<ul>
+<li><a href="../api/index.html">API Reference</a></li>
+<li><a href="intro.html">Getting Started</a></li>
+<li><a href="common-scenarios.html">Common Scenarios</a></li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/input-handling.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

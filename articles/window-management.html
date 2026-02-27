@@ -1,0 +1,443 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Window Management Guide | Dapplo.Windows </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Window Management Guide | Dapplo.Windows ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc">
+    <meta property="docfx:tocrel" content="toc">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/d.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+                <ul class="nav level1 navbar-nav">
+                  <li class="active">
+                    <a href="../articles/intro.html" title="Articles" class="active">Articles</a>
+                  </li>
+                  <li class="">
+                    <a href="../api/" title="Api Documentation" class="">Api Documentation</a>
+                  </li>
+                </ul>
+            </div>
+          </div>
+        </nav>        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div>
+              <div class="sidefilter">
+                <form class="toc-filter">
+                  <span class="glyphicon glyphicon-filter filter-icon"></span>
+                  <input type="text" id="toc_filter_input" placeholder="Enter here to filter..." onkeypress="if(event.keyCode==13) {return false;}">
+                </form>
+              </div>
+              <div class="sidetoc">
+                <div class="toc" id="toc">
+                  
+                  <ul class="nav level1">
+                    <li class="">
+                      <a href="intro.html" title="Introduction" class="">Introduction</a>
+                    </li>
+                    <li class="active">
+                      <a href="window-management.html" title="Window Management" class="active">Window Management</a>
+                    </li>
+                    <li class="">
+                      <a href="clipboard-usage.html" title="Clipboard Usage" class="">Clipboard Usage</a>
+                    </li>
+                    <li class="">
+                      <a href="dpi-awareness.html" title="DPI Awareness" class="">DPI Awareness</a>
+                    </li>
+                    <li class="">
+                      <a href="input-handling.html" title="Input Handling" class="">Input Handling</a>
+                    </li>
+                    <li class="">
+                      <a href="common-scenarios.html" title="Common Scenarios" class="">Common Scenarios</a>
+                    </li>
+                  </ul>        </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="window-management-guide">Window Management Guide</h1>
+
+<p>This guide covers working with windows using the <code>Dapplo.Windows</code> package.</p>
+<h2 id="overview">Overview</h2>
+<p>The <code>Dapplo.Windows</code> package provides the <code>InteropWindow</code> class, which represents a Windows window and provides methods for querying and manipulating it.</p>
+<h2 id="getting-window-information">Getting Window Information</h2>
+<h3 id="from-window-handle">From Window Handle</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.User32;
+
+// Get the foreground window
+IntPtr handle = User32Api.GetForegroundWindow();
+IInteropWindow window = InteropWindow.FromHandle(handle);
+
+// Populate all window properties
+window.Fill();
+
+// Access properties
+Console.WriteLine($&quot;Title: {window.Caption}&quot;);
+Console.WriteLine($&quot;Class: {window.Classname}&quot;);
+Console.WriteLine($&quot;Process ID: {window.ProcessId}&quot;);
+Console.WriteLine($&quot;Bounds: {window.Bounds}&quot;);
+</code></pre><h3 id="selective-property-loading">Selective Property Loading</h3>
+<p>For better performance, load only the properties you need:</p>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Enums;
+
+var window = InteropWindow.FromHandle(handle);
+
+// Load only caption and bounds
+window.Fill(InteropWindowRetrieveSettings.Caption | 
+            InteropWindowRetrieveSettings.Info);
+
+Console.WriteLine($&quot;{window.Caption} at {window.Bounds}&quot;);
+</code></pre><h2 id="enumerating-windows">Enumerating Windows</h2>
+<h3 id="get-all-top-level-windows">Get All Top-Level Windows</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using System.Linq;
+
+var windows = InteropWindowQuery.GetTopLevelWindows();
+
+foreach (var window in windows)
+{
+    Console.WriteLine($&quot;{window.Caption} ({window.Classname})&quot;);
+}
+</code></pre><h3 id="filter-windows">Filter Windows</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+// Get all visible windows
+var visibleWindows = InteropWindowQuery.GetTopLevelWindows()
+    .Where(w =&gt; w.IsVisible())
+    .ToList();
+
+// Get windows by process name
+var notepadWindows = InteropWindowQuery.GetTopLevelWindows()
+    .Where(w =&gt; w.GetProcessPath()?.Contains(&quot;notepad.exe&quot;) ?? false)
+    .ToList();
+
+// Get windows by class name
+var explorerWindows = InteropWindowQuery.GetTopLevelWindows()
+    .Where(w =&gt; w.GetClassname() == &quot;CabinetWClass&quot;)
+    .ToList();
+</code></pre><h3 id="get-child-windows">Get Child Windows</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+var parentWindow = InteropWindow.FromHandle(handle);
+parentWindow.Fill(InteropWindowRetrieveSettings.Children);
+
+foreach (var child in parentWindow.Children)
+{
+    Console.WriteLine($&quot;Child: {child.Caption} ({child.Classname})&quot;);
+}
+</code></pre><h2 id="window-manipulation">Window Manipulation</h2>
+<h3 id="showhide-windows">Show/Hide Windows</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.User32.Enums;
+
+var window = InteropWindow.FromHandle(handle);
+
+// Show the window
+window.Show();
+
+// Hide the window
+window.Hide();
+
+// Minimize
+window.Minimize();
+
+// Maximize
+window.Maximize();
+
+// Restore (unmaximize/unminimize)
+window.Restore();
+</code></pre><h3 id="move-and-resize">Move and Resize</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Common.Structs;
+
+var window = InteropWindow.FromHandle(handle);
+
+// Move window
+window.MoveTo(new NativePoint(100, 100));
+
+// Resize window
+window.Resize(new NativeSize(800, 600));
+
+// Move and resize together
+window.SetPlacement(new NativeRect(100, 100, 900, 700));
+</code></pre><h3 id="bring-to-front">Bring to Front</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+var window = InteropWindow.FromHandle(handle);
+
+// Bring window to foreground
+window.ToForeground();
+
+// Flash window in taskbar
+window.Flash();
+</code></pre><h2 id="monitoring-window-events">Monitoring Window Events</h2>
+<h3 id="window-creation-and-destruction">Window Creation and Destruction</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using System;
+
+// Monitor window creation
+var creationSubscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE)
+    .Subscribe(winEvent =&gt;
+    {
+        var window = InteropWindow.FromHandle(winEvent.Handle);
+        Console.WriteLine($&quot;Window created: {window.GetCaption()}&quot;);
+    });
+
+// Monitor window destruction
+var destructionSubscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_DESTROY)
+    .Subscribe(winEvent =&gt;
+    {
+        Console.WriteLine($&quot;Window destroyed: {winEvent.Handle}&quot;);
+    });
+
+// Clean up when done
+creationSubscription.Dispose();
+destructionSubscription.Dispose();
+</code></pre><h3 id="window-title-changes">Window Title Changes</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_NAMECHANGE)
+    .Subscribe(winEvent =&gt;
+    {
+        var window = InteropWindow.FromHandle(winEvent.Handle);
+        Console.WriteLine($&quot;Title changed: {window.GetCaption()}&quot;);
+    });
+</code></pre><h3 id="foreground-window-changes">Foreground Window Changes</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+var subscription = WinEventHook.Create(WinEvents.EVENT_SYSTEM_FOREGROUND)
+    .Subscribe(winEvent =&gt;
+    {
+        var window = InteropWindow.FromHandle(winEvent.Handle);
+        Console.WriteLine($&quot;Foreground window: {window.GetCaption()}&quot;);
+    });
+</code></pre><h3 id="window-locationsize-changes">Window Location/Size Changes</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_LOCATIONCHANGE)
+    .Subscribe(winEvent =&gt;
+    {
+        var window = InteropWindow.FromHandle(winEvent.Handle);
+        window.Fill(InteropWindowRetrieveSettings.Info);
+        Console.WriteLine($&quot;Window moved/resized: {window.Caption} at {window.Bounds}&quot;);
+    });
+</code></pre><h3 id="filter-events-by-process-or-window">Filter Events by Process or Window</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using System.Reactive.Linq;
+
+// Only monitor specific window
+var targetHandle = /* your window handle */;
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_NAMECHANGE)
+    .Where(winEvent =&gt; winEvent.Handle == targetHandle)
+    .Subscribe(winEvent =&gt;
+    {
+        Console.WriteLine(&quot;Target window title changed&quot;);
+    });
+
+// Only monitor windows from specific process
+var targetProcessId = /* your process ID */;
+var processSubscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE)
+    .Where(winEvent =&gt; 
+    {
+        var window = InteropWindow.FromHandle(winEvent.Handle);
+        return window.GetProcessId() == targetProcessId;
+    })
+    .Subscribe(winEvent =&gt;
+    {
+        Console.WriteLine(&quot;Window created in target process&quot;);
+    });
+</code></pre><h2 id="advanced-scenarios">Advanced Scenarios</h2>
+<h3 id="find-window-by-title">Find Window by Title</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using System.Linq;
+
+string targetTitle = &quot;Notepad&quot;;
+var window = InteropWindowQuery.GetTopLevelWindows()
+    .FirstOrDefault(w =&gt; w.GetCaption()?.Contains(targetTitle) ?? false);
+
+if (window != null)
+{
+    Console.WriteLine($&quot;Found window: {window.Caption}&quot;);
+}
+</code></pre><h3 id="get-windows-stacking-order-z-order">Get Windows Stacking Order (Z-Order)</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+var desktop = InteropWindow.GetDesktopWindow();
+desktop.Fill(InteropWindowRetrieveSettings.ZOrderedChildren);
+
+Console.WriteLine(&quot;Windows in Z-order (top to bottom):&quot;);
+foreach (var window in desktop.ZOrderedChildren.Where(w =&gt; w.IsVisible()))
+{
+    Console.WriteLine($&quot;  {window.Caption}&quot;);
+}
+</code></pre><h3 id="window-screenshots">Window Screenshots</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Gdi32;
+using System.Drawing;
+using System.Drawing.Imaging;
+
+var window = InteropWindow.FromHandle(handle);
+window.Fill(InteropWindowRetrieveSettings.Info);
+
+// Capture window content
+using (var bitmap = window.Capture())
+{
+    bitmap.Save(&quot;window_capture.png&quot;, ImageFormat.Png);
+}
+</code></pre><h3 id="check-window-state">Check Window State</h3>
+<pre><code class="lang-csharp">using Dapplo.Windows.Desktop;
+
+var window = InteropWindow.FromHandle(handle);
+
+if (window.IsVisible())
+{
+    Console.WriteLine(&quot;Window is visible&quot;);
+}
+
+if (window.IsMinimized())
+{
+    Console.WriteLine(&quot;Window is minimized&quot;);
+}
+
+if (window.IsMaximized())
+{
+    Console.WriteLine(&quot;Window is maximized&quot;);
+}
+
+if (window.IsAppWindow())
+{
+    Console.WriteLine(&quot;Window is an application window&quot;);
+}
+</code></pre><h2 id="best-practices">Best Practices</h2>
+<h3 id="1-check-window-validity">1. Check Window Validity</h3>
+<p>Always check if a window still exists before using it:</p>
+<pre><code class="lang-csharp">var window = InteropWindow.FromHandle(handle);
+
+if (window.Exists())
+{
+    // Safe to use the window
+    Console.WriteLine(window.GetCaption());
+}
+</code></pre><h3 id="2-dispose-subscriptions">2. Dispose Subscriptions</h3>
+<p>Always dispose of event subscriptions when done:</p>
+<pre><code class="lang-csharp">var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE)
+    .Subscribe(HandleWindowCreated);
+
+// Later, when cleaning up
+subscription.Dispose();
+</code></pre><h3 id="3-handle-exceptions">3. Handle Exceptions</h3>
+<p>Windows can be destroyed or become invalid:</p>
+<pre><code class="lang-csharp">try
+{
+    var caption = window.GetCaption();
+}
+catch (Win32Exception ex)
+{
+    Console.WriteLine($&quot;Error accessing window: {ex.Message}&quot;);
+}
+</code></pre><h3 id="4-cache-window-information">4. Cache Window Information</h3>
+<p>If you&#39;re repeatedly accessing window properties, cache them:</p>
+<pre><code class="lang-csharp">var window = InteropWindow.FromHandle(handle);
+window.Fill(); // Load all properties at once
+
+// Now properties are cached
+var caption = window.Caption;
+var bounds = window.Bounds;
+var processId = window.ProcessId;
+</code></pre><h2 id="see-also">See Also</h2>
+<ul>
+<li><a href="../api/index.html">API Reference</a></li>
+<li><a href="intro.html">Getting Started</a></li>
+<li><a href="common-scenarios.html">Common Scenarios</a></li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/window-management.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2017 Dapplo
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
