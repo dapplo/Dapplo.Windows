@@ -72,6 +72,7 @@ See the [[Getting-Started]] page for code examples and setup instructions.
 | [[Restart-Manager]] | Registering applications with Windows Restart Manager |
 | [[Icon-Creation]] | Extracting and working with icons |
 | [[Common-Scenarios]] | Multi-package recipes for common real-world tasks |
+| [[SharedMessageWindow]] | The hidden message window powering clipboard, input, devices, sessions, and more |
 
 ## Requirements
 

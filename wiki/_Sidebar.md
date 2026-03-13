@@ -12,6 +12,11 @@
 
 ---
 
+**Internals**
+- [[SharedMessageWindow]]
+
+---
+
 **Guides**
 - [[Getting-Started]]
 - [[Common-Scenarios]]
