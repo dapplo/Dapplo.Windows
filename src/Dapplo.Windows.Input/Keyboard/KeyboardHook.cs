@@ -68,10 +68,6 @@ public sealed class KeyboardHook
                     _callback = null;
                 });
             })
-            // Make sure the key presses come in sequentially
-            .Synchronize()
-            // Make sure the subscribed logic runs on the current thread, so we can process the "handled" property
-            .ObserveOn(Scheduler.CurrentThread)
             .Publish()
             .RefCount();
     }
