@@ -102,6 +102,41 @@ jobs:
         git subtree split --prefix doc/_site -b gh-pages
         git push -f origin gh-pages:gh-pages
 
+    - name: Publish wiki to GitHub Wiki
+      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        $wikiUrl = "https://x-access-token:$env:GH_TOKEN@github.com/${{ github.repository }}.wiki.git"
+        $wikiDir = "${{ runner.temp }}/wiki"
+
+        git clone $wikiUrl $wikiDir 2>&1
+        if ($LASTEXITCODE -ne 0) {
+          # Wiki not yet initialised — create the directory and init a new repo
+          New-Item -ItemType Directory -Force -Path $wikiDir | Out-Null
+          Set-Location $wikiDir
+          git init
+          git remote add origin $wikiUrl
+        } else {
+          Set-Location $wikiDir
+        }
+
+        git config user.name  "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        # Copy wiki pages, overwriting existing ones
+        Copy-Item -Path "${{ github.workspace }}/wiki/*" -Destination $wikiDir -Force
+
+        git add -A
+        $status = git status --porcelain
+        if ($status) {
+          git commit -m "Update wiki for run ${{ github.run_number }}"
+          git push origin HEAD:master
+        } else {
+          Write-Host "No wiki changes to publish."
+        }
+
   deploy:
     runs-on: windows-latest
     needs: build
