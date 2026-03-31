@@ -6,6 +6,8 @@ using System.Reactive.Linq;
 using System.Windows;
 using Dapplo.Windows.Devices;
 using Dapplo.Windows.Dpi.Wpf;
+using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.User32;
@@ -28,6 +30,13 @@ public partial class MainWindow
             .Where(m => m.Message == WindowsMessages.WM_DESTROY)
             .Subscribe(m => { MessageBox.Show($"{m.Message}"); });
 
+        KeyboardHook.KeyboardEvents.Subscribe((args) =>
+        {
+            if (args.IsKeyDown && args.Key == VirtualKeyCode.PrintScreen)
+            {
+                args.Handled = true; // Prevent the Print Screen key from being processed by the system
+            }
+        });
         DeviceNotification.OnVolumeAdded().Subscribe(volumeInfo => Debug.WriteLine($"Drives {volumeInfo.Volume.Drives} were added"));
         DeviceNotification.OnVolumeRemoved().Subscribe(volumeInfo => Debug.WriteLine($"Drives {volumeInfo.Volume.Drives} were removed"));
 
@@ -54,5 +63,13 @@ public partial class MainWindow
 
         // Make sure to dispose the listener when the window closes
         Closing += (sender, args) => _sessionListener?.Dispose();
+    }
+
+    private void HandleKeyboardEvent(KeyboardHookEventArgs args)
+    {
+        if (args.IsKeyDown && args.Key == VirtualKeyCode.PrintScreen)
+        {
+            args.Handled = true; // Prevent the Print Screen key from being processed by the system
+        }
     }
 }

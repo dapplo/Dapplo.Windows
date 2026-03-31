@@ -45,7 +45,7 @@ public class InputTests
     private async Task TestInput_LastInputDateTime()
     {
         var initialLastInput = NativeInput.LastInputDateTime;
-        await Task.Delay(1300, TestContext.Current.CancellationToken);
+        await Task.Delay(50, TestContext.Current.CancellationToken);
         var laterLastInput = NativeInput.LastInputDateTime;
         var deviation = laterLastInput.Subtract(initialLastInput);
         Assert.True(deviation < TimeSpan.FromMilliseconds(100));

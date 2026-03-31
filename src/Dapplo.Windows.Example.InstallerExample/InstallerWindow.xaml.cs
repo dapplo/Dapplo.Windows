@@ -47,7 +47,7 @@ namespace Dapplo.Windows.Example.InstallerExample
                     });
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 processes = session.GetProcessesUsingResources();
                 foreach (var process in processes)
