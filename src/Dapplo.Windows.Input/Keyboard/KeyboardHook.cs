@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
@@ -40,9 +39,6 @@ public sealed class KeyboardHook
     {
         _keyObservable = Observable.Create<KeyboardHookEventArgs>(observer =>
             {
-                // Make sure the current state of the lock keys is retrieved
-                SyncLockState();
-
                 var hookId = IntPtr.Zero;
                 // Need to hold onto this callback, otherwise it will get garbage collected as it is an un-manged callback
                 _callback = (nCode, wParam, lParam) =>
@@ -86,80 +82,84 @@ public sealed class KeyboardHook
     private static KeyboardHookEventArgs CreateKeyboardEventArgs(IntPtr wParam, IntPtr lParam)
     {
         var isKeyDown = wParam == (IntPtr) WmKeyDown || wParam == (IntPtr) WmSysKeyDown;
-
         var keyboardLowLevelHookStruct = (KeyboardLowLevelHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardLowLevelHookStruct));
-        bool isModifier = keyboardLowLevelHookStruct.VirtualKeyCode.IsModifier();
+        var key = keyboardLowLevelHookStruct.VirtualKeyCode;
 
-        // Check the key to find if there any modifiers, store these in the global values.
-        switch (keyboardLowLevelHookStruct.VirtualKeyCode)
+        // Query the current state of modifiers
+        var leftShift = (GetAsyncKeyState(VirtualKeyCode.LeftShift) & 0x8000) != 0;
+        var rightShift = (GetAsyncKeyState(VirtualKeyCode.RightShift) & 0x8000) != 0;
+        var leftCtrl = (GetAsyncKeyState(VirtualKeyCode.LeftControl) & 0x8000) != 0;
+        var rightCtrl = (GetAsyncKeyState(VirtualKeyCode.RightControl) & 0x8000) != 0;
+        var leftAlt = (GetAsyncKeyState(VirtualKeyCode.LeftMenu) & 0x8000) != 0;
+        var rightAlt = (GetAsyncKeyState(VirtualKeyCode.RightMenu) & 0x8000) != 0;
+        var leftWin = (GetAsyncKeyState(VirtualKeyCode.LeftWin) & 0x8000) != 0;
+        var rightWin = (GetAsyncKeyState(VirtualKeyCode.RightWin) & 0x8000) != 0;
+
+        // Query the current state of lock keys
+        var capsLock = (GetKeyState(VirtualKeyCode.Capital) & 1) != 0;
+        var numLock = (GetKeyState(VirtualKeyCode.NumLock) & 1) != 0;
+        var scrollLock = (GetKeyState(VirtualKeyCode.Scroll) & 1) != 0;
+
+        // Override the state for the current key to ensure accuracy even if the OS state hasn't updated yet
+        switch (key)
         {
-            case VirtualKeyCode.Capital:
-                if (isKeyDown)
-                {
-                    _capsLock = !_capsLock;
-                }
-                break;
-            case VirtualKeyCode.NumLock:
-                if (isKeyDown)
-                {
-                    _numLock = !_numLock;
-                }
-                break;
-            case VirtualKeyCode.Scroll:
-                if (isKeyDown)
-                {
-                    _scrollLock = !_scrollLock;
-                }
-                break;
             case VirtualKeyCode.LeftShift:
-                _leftShift = isKeyDown;
+                leftShift = isKeyDown;
                 break;
             case VirtualKeyCode.RightShift:
-                _rightShift = isKeyDown;
+                rightShift = isKeyDown;
                 break;
             case VirtualKeyCode.LeftControl:
-                _leftCtrl = isKeyDown;
+                leftCtrl = isKeyDown;
                 break;
             case VirtualKeyCode.RightControl:
-                _rightCtrl = isKeyDown;
+                rightCtrl = isKeyDown;
                 break;
             case VirtualKeyCode.LeftMenu:
-                _leftAlt = isKeyDown;
+                leftAlt = isKeyDown;
                 break;
             case VirtualKeyCode.RightMenu:
-                _rightAlt = isKeyDown;
+                rightAlt = isKeyDown;
                 break;
             case VirtualKeyCode.LeftWin:
-                _leftWin = isKeyDown;
+                leftWin = isKeyDown;
                 break;
             case VirtualKeyCode.RightWin:
-                _rightWin = isKeyDown;
+                rightWin = isKeyDown;
+                break;
+            case VirtualKeyCode.Capital:
+                if (isKeyDown) capsLock = !capsLock;
+                break;
+            case VirtualKeyCode.NumLock:
+                if (isKeyDown) numLock = !numLock;
+                break;
+            case VirtualKeyCode.Scroll:
+                if (isKeyDown) scrollLock = !scrollLock;
                 break;
         }
 
         var keyEventArgs = new KeyboardHookEventArgs
         {
             TimeStamp = keyboardLowLevelHookStruct.TimeStamp,
-            Key = keyboardLowLevelHookStruct.VirtualKeyCode,
+            Key = key,
             Flags = keyboardLowLevelHookStruct.Flags,
-            IsModifier = isModifier,
+            IsModifier = key.IsModifier(),
             IsKeyDown = isKeyDown,
-            IsLeftShift = _leftShift,
-            IsRightShift = _rightShift,
-            IsLeftAlt = _leftAlt,
-            IsRightAlt = _rightAlt,
-            IsLeftControl = _leftCtrl,
-            IsRightControl = _rightCtrl,
-            IsLeftWindows = _leftWin,
-            IsRightWindows = _rightWin,
-            IsScrollLockActive = _scrollLock,
-            IsNumLockActive = _numLock,
-            IsCapsLockActive = _capsLock
+            IsLeftShift = leftShift,
+            IsRightShift = rightShift,
+            IsLeftAlt = leftAlt,
+            IsRightAlt = rightAlt,
+            IsLeftControl = leftCtrl,
+            IsRightControl = rightCtrl,
+            IsLeftWindows = leftWin,
+            IsRightWindows = rightWin,
+            IsScrollLockActive = scrollLock,
+            IsNumLockActive = numLock,
+            IsCapsLockActive = capsLock
         };
 
-        // Do we need this??
-        //http://msdn.microsoft.com/en-us/library/windows/desktop/ms646286(v=vs.85).aspx
-        if (!keyEventArgs.IsAlt && (wParam == (IntPtr) WmSysKeyDown || wParam == (IntPtr)WmSysKeyUp))
+        // Handle system keys (Alt combinations)
+        if (!keyEventArgs.IsAlt && (wParam == (IntPtr) WmSysKeyDown || wParam == (IntPtr) WmSysKeyUp))
         {
             keyEventArgs.IsLeftAlt = true;
             keyEventArgs.IsSystemKey = true;
@@ -167,38 +167,17 @@ public sealed class KeyboardHook
         return keyEventArgs;
     }
 
-    /// <summary>
-    ///     Flags for the current state
-    /// </summary>
-    private static bool _leftShift;
-
-    private static bool _rightShift;
-    private static bool _leftAlt;
-    private static bool _rightAlt;
-    private static bool _leftCtrl;
-    private static bool _rightCtrl;
-    private static bool _leftWin;
-    private static bool _rightWin;
-
-    // Flags for the lock keys, initialize the locking keys state one time, these will be updated later
-    private static bool _capsLock;
-
-    private static bool _numLock;
-    private static bool _scrollLock;
-
-    /// <summary>
-    ///     Sync the lock key state
-    /// </summary>
-    private static void SyncLockState()
-    {
-        _capsLock = GetKeyState(VirtualKeyCode.Capital) > 0;
-        _numLock = GetKeyState(VirtualKeyCode.NumLock) > 0;
-        _scrollLock = GetKeyState(VirtualKeyCode.Scroll) > 0;
-    }
-
     private const int WmKeyDown = 256;
     private const int WmSysKeyUp = 261;
     private const int WmSysKeyDown = 260;
+
+    /// <summary>
+    ///     Retrieve the state of a key (async)
+    /// </summary>
+    /// <param name="keyCode"></param>
+    /// <returns></returns>
+    [DllImport("user32.dll", ExactSpelling = true)]
+    private static extern short GetAsyncKeyState(VirtualKeyCode keyCode);
 
     /// <summary>
     ///     Retrieve the state of a key
@@ -207,7 +186,7 @@ public sealed class KeyboardHook
     /// <returns></returns>
     [DllImport("user32.dll", ExactSpelling = true)]
     [ResourceExposure(ResourceScope.None)]
-    private static extern ushort GetKeyState(VirtualKeyCode keyCode);
+    private static extern short GetKeyState(VirtualKeyCode keyCode);
 
     /// <summary>
     ///     The actual delegate for the p
