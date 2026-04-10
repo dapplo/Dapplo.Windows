@@ -24,6 +24,7 @@
     <ProjectReference Include="..\Dapplo.Windows.Shell32\Dapplo.Windows.Shell32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.SystemState\Dapplo.Windows.SystemState.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />

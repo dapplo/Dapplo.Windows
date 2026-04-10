@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Dapplo.Windows.SystemState is a library for managing and monitoring Windows system power state</Description>
+    <PackageTags>windows power suspend hibernate shutdown sleep lock systemstate</PackageTags>
+    <TargetFrameworks>net480;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.2" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+</Project>
