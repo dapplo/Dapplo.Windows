@@ -8,5 +8,7 @@
   href: dpi-awareness.md
 - name: Input Handling
   href: input-handling.md
+- name: System State
+  href: system-state.md
 - name: Common Scenarios
   href: common-scenarios.md

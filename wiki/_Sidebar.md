@@ -8,6 +8,7 @@
 - [[Input-Handling]]
 - [[DPI-Awareness]]
 - [[Restart-Manager]]
+- [[System-State]]
 - [[Icon-Creation]]
 
 ---
