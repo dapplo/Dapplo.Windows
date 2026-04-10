@@ -155,7 +155,21 @@ SharedMessageWindow.Messages
 
 **User-facing API:** [[Restart-Manager]]
 
-### Environment Changes — `WM_SETTINGCHANGE`
+### Power State Changes — `WM_POWERBROADCAST`
+
+`PowerBroadcastListener` in `Dapplo.Windows.SystemState` exposes power state changes (suspend, resume, battery status) as `IObservable<PowerBroadcastEvent>` streams:
+
+```csharp
+// Inside Dapplo.Windows.SystemState
+SharedMessageWindow.Messages
+    .Where(m => m.Msg == WindowsMessages.WM_POWERBROADCAST)
+    .Select(m => (PowerBroadcastEvent)(uint)m.WParam)
+    .Publish().RefCount();
+```
+
+**User-facing API:** [[System-State]]
+
+
 
 `EnvironmentMonitor.EnvironmentUpdateEvents` detects system-wide setting changes (theme, fonts, locale, etc.):
 
@@ -252,4 +266,5 @@ SharedMessageWindow.Messages
 - [[Clipboard]] — built on `WM_CLIPBOARDUPDATE`
 - [[Input-Handling]] — raw input via `WM_INPUT`
 - [[Restart-Manager]] — session/shutdown via `WM_QUERYENDSESSION` / `WM_ENDSESSION`
+- [[System-State]] — power events via `WM_POWERBROADCAST`
 - [[Getting-Started]]

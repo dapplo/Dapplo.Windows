@@ -25,6 +25,7 @@ The library is intentionally split into focused, independent NuGet packages so y
 | [Dapplo.Windows.Multimedia](https://www.nuget.org/packages/Dapplo.Windows.Multimedia) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.Multimedia.svg)](https://www.nuget.org/packages/Dapplo.Windows.Multimedia) | Windows Multimedia (WinMM) wrappers |
 | [Dapplo.Windows.AppRestartManager](https://www.nuget.org/packages/Dapplo.Windows.AppRestartManager) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.AppRestartManager.svg)](https://www.nuget.org/packages/Dapplo.Windows.AppRestartManager) | Automatic restart registration with Windows Restart Manager |
 | [Dapplo.Windows.InstallerManager](https://www.nuget.org/packages/Dapplo.Windows.InstallerManager) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.InstallerManager.svg)](https://www.nuget.org/packages/Dapplo.Windows.InstallerManager) | Installer-specific Restart Manager APIs |
+| [Dapplo.Windows.SystemState](https://www.nuget.org/packages/Dapplo.Windows.SystemState) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.SystemState.svg)](https://www.nuget.org/packages/Dapplo.Windows.SystemState) | Power state management: sleep, hibernate, shutdown, wake timers, and power event monitoring |
 
 ### Specialized Feature Packages
 
@@ -70,6 +71,7 @@ See the [[Getting-Started]] page for code examples and setup instructions.
 | [[Input-Handling]] | Keyboard and mouse hooks and input generation |
 | [[DPI-Awareness]] | Building DPI-aware Windows applications |
 | [[Restart-Manager]] | Registering applications with Windows Restart Manager |
+| [[System-State]] | Sleep, hibernate, shutdown, wake timers, and power event monitoring |
 | [[Icon-Creation]] | Extracting and working with icons |
 | [[Common-Scenarios]] | Multi-package recipes for common real-world tasks |
 | [[SharedMessageWindow]] | The hidden message window powering clipboard, input, devices, sessions, and more |
