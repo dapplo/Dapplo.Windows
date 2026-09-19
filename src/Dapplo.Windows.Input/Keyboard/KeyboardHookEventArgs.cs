@@ -1,4 +1,4 @@
-﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Text;
@@ -46,10 +46,21 @@ public class KeyboardHookEventArgs : EventArgs
     /// </summary>
     public bool Handled { get; set; }
 
+    private bool? _isModifier;
+
     /// <summary>
     /// Specifies if this event is for a modifier key (shift, control, alt etc)
     /// </summary>
-    public bool IsModifier { get; internal set; }
+    public bool IsModifier
+    {
+        get => _isModifier ?? Key.IsModifier();
+        internal set => _isModifier = value;
+    }
+
+    /// <summary>
+    /// Returns true if the key is a lock/toggle key (CapsLock, NumLock, ScrollLock).
+    /// </summary>
+    public bool IsToggleKey => Key.IsToggleKey();
 
     /// <summary>
     ///     True if Alt key is pressed

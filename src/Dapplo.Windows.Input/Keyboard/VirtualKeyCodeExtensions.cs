@@ -1,4 +1,4 @@
-﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using Dapplo.Windows.Input.Enums;
 
@@ -19,9 +19,6 @@ public static class VirtualKeyCodeExtensions
         bool isModifier = false;
         switch (virtualKeyCode)
         {
-            case VirtualKeyCode.Capital:
-            case VirtualKeyCode.NumLock:
-            case VirtualKeyCode.Scroll:
             case VirtualKeyCode.LeftShift:
             case VirtualKeyCode.Shift:
             case VirtualKeyCode.RightShift:
@@ -39,4 +36,14 @@ public static class VirtualKeyCodeExtensions
 
         return isModifier;
     }
-}
+
+    /// <summary>
+    /// Test if the VirtualKeyCode is a toggle/lock key (CapsLock, NumLock, ScrollLock)
+    /// </summary>
+    /// <param name="virtualKeyCode">VirtualKeyCode</param>
+    /// <returns>bool</returns>
+    public static bool IsToggleKey(this VirtualKeyCode virtualKeyCode)
+    {
+        return virtualKeyCode is VirtualKeyCode.Capital or VirtualKeyCode.NumLock or VirtualKeyCode.Scroll;
+    }
+}

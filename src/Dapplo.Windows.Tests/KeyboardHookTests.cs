@@ -1,4 +1,4 @@
-﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Linq;
@@ -471,4 +471,98 @@ public class KeyboardHookTests
         result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Control));
         Assert.False(result);
     }
-}
+
+    [Fact]
+    public void TestVirtualKeyCodeExtensions_IsModifier()
+    {
+        var pureModifiers = new[]
+        {
+            VirtualKeyCode.Shift, VirtualKeyCode.LeftShift, VirtualKeyCode.RightShift,
+            VirtualKeyCode.Control, VirtualKeyCode.LeftControl, VirtualKeyCode.RightControl,
+            VirtualKeyCode.Menu, VirtualKeyCode.LeftMenu, VirtualKeyCode.RightMenu,
+            VirtualKeyCode.LeftWin, VirtualKeyCode.RightWin
+        };
+
+        foreach (var key in pureModifiers)
+        {
+            Assert.True(key.IsModifier(), $"{key} should be a modifier");
+            Assert.False(key.IsToggleKey(), $"{key} should not be a toggle key");
+        }
+
+        var toggleKeys = new[]
+        {
+            VirtualKeyCode.Capital,
+            VirtualKeyCode.NumLock,
+            VirtualKeyCode.Scroll
+        };
+
+        foreach (var key in toggleKeys)
+        {
+            Assert.False(key.IsModifier(), $"{key} should NOT be a modifier");
+            Assert.True(key.IsToggleKey(), $"{key} should be a toggle key");
+        }
+
+        var ordinaryKeys = new[]
+        {
+            VirtualKeyCode.KeyA,
+            VirtualKeyCode.Space,
+            VirtualKeyCode.Return,
+            VirtualKeyCode.Print,
+            VirtualKeyCode.Pause
+        };
+
+        foreach (var key in ordinaryKeys)
+        {
+            Assert.False(key.IsModifier(), $"{key} should NOT be a modifier");
+            Assert.False(key.IsToggleKey(), $"{key} should NOT be a toggle key");
+        }
+    }
+
+    [Fact]
+    public void TestKeyboardHookEventArgs_ModifiersAndToggleKeys()
+    {
+        var scrollDown = KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Scroll);
+        Assert.False(scrollDown.IsModifier);
+        Assert.True(scrollDown.IsToggleKey);
+
+        var capsUp = KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Capital);
+        Assert.False(capsUp.IsModifier);
+        Assert.True(capsUp.IsToggleKey);
+
+        var numDown = KeyboardHookEventArgs.KeyDown(VirtualKeyCode.NumLock);
+        Assert.False(numDown.IsModifier);
+        Assert.True(numDown.IsToggleKey);
+
+        var shiftDown = KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Shift);
+        Assert.True(shiftDown.IsModifier);
+        Assert.False(shiftDown.IsToggleKey);
+
+        var aDown = KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyA);
+        Assert.False(aDown.IsModifier);
+        Assert.False(aDown.IsToggleKey);
+    }
+
+    [Fact]
+    public void TestKeySequenceHandler_ScrollLockSequence()
+    {
+        var sequenceHandler = new KeySequenceHandler(
+            new KeyCombinationHandler(VirtualKeyCode.Scroll),
+            new KeyCombinationHandler(VirtualKeyCode.KeyC))
+        {
+            Timeout = null
+        };
+
+        // Press and release ScrollLock
+        var result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Scroll));
+        Assert.False(result);
+        result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Scroll));
+        Assert.False(result);
+
+        // Press and release C
+        result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyC));
+        Assert.True(result);
+        result = sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyC));
+        Assert.False(result);
+        Assert.False(sequenceHandler.HasKeysPressed);
+    }
+}
