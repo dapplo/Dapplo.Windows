@@ -50,16 +50,29 @@ public struct DevBroadcastDeviceInterface
     public string Name => _name;
 
     /// <summary>
-    /// The name of the device.
+    /// The device instance path of the device, e.g. USB\VID_05AC&amp;PID_1294&amp;MI_00\0 for the name \\?\USB#VID_05AC&amp;PID_1294&amp;MI_00#0#{6bdd1fc6-810f-11d0-bec7-08002be2092f}
     /// </summary>
     public string DisplayName {
         get
         {
-            var displayName = _name.Substring(3);
-            displayName = displayName.Substring(0,displayName.LastIndexOf("#{", StringComparison.Ordinal));
-            displayName = displayName.Replace('#', '\\');
-
-            return displayName;
+            var displayName = _name;
+            if (string.IsNullOrEmpty(displayName))
+            {
+                return displayName;
+            }
+            // Remove the \\?\ prefix
+            var prefixIndex = displayName.IndexOf(@"?\", StringComparison.Ordinal);
+            if (prefixIndex >= 0)
+            {
+                displayName = displayName.Substring(prefixIndex + 2);
+            }
+            // Remove the trailing interface class GUID, if there is one
+            var interfaceClassIndex = displayName.LastIndexOf("#{", StringComparison.Ordinal);
+            if (interfaceClassIndex >= 0)
+            {
+                displayName = displayName.Substring(0, interfaceClassIndex);
+            }
+            return displayName.Replace('#', '\\');
         }
     }
 
@@ -74,6 +87,49 @@ public struct DevBroadcastDeviceInterface
             _deviceType = DeviceBroadcastDeviceType.DeviceInterface,
             _size = Marshal.SizeOf(typeof(DevBroadcastDeviceInterface))
         };
+    }
+
+    /// <summary>
+    /// Offset of the dbcc_name field in the native DEV_BROADCAST_DEVICEINTERFACE_W structure (3 DWORDs and a GUID)
+    /// </summary>
+    private const int NameOffset = 3 * sizeof(int) + 16;
+
+    /// <summary>
+    /// Copy a DEV_BROADCAST_DEVICEINTERFACE_W from native memory, including the complete (variable length) name.
+    /// This must be called while the native memory is valid, e.g. synchronously while processing WM_DEVICECHANGE.
+    /// </summary>
+    /// <param name="devBroadcastPtr">IntPtr to a DEV_BROADCAST_DEVICEINTERFACE_W</param>
+    /// <returns>DevBroadcastDeviceInterface</returns>
+    internal static DevBroadcastDeviceInterface FromNative(IntPtr devBroadcastPtr)
+    {
+        var size = Marshal.ReadInt32(devBroadcastPtr);
+        var classGuid = Marshal.PtrToStructure<Guid>(IntPtr.Add(devBroadcastPtr, 3 * sizeof(int)));
+        return new DevBroadcastDeviceInterface
+        {
+            _size = size,
+            _deviceType = DeviceBroadcastDeviceType.DeviceInterface,
+            _classGuid = classGuid,
+            _name = ReadNativeString(devBroadcastPtr, NameOffset, size)
+        };
+    }
+
+    /// <summary>
+    /// Read a variable length, zero terminated, unicode string which starts at the offset of a DEV_BROADCAST_* structure with the specified size.
+    /// </summary>
+    /// <param name="devBroadcastPtr">IntPtr to the structure</param>
+    /// <param name="offset">int with the offset of the string</param>
+    /// <param name="size">int with the size of the complete structure, in bytes</param>
+    /// <returns>string, can be empty</returns>
+    internal static string ReadNativeString(IntPtr devBroadcastPtr, int offset, int size)
+    {
+        var maxChars = (size - offset) / sizeof(char);
+        if (maxChars <= 0)
+        {
+            return string.Empty;
+        }
+        var value = Marshal.PtrToStringUni(IntPtr.Add(devBroadcastPtr, offset), maxChars);
+        var terminatorIndex = value.IndexOf('\0');
+        return terminatorIndex >= 0 ? value.Substring(0, terminatorIndex) : value;
     }
 
     /// <summary>
@@ -187,8 +243,8 @@ public struct DevBroadcastDeviceInterface
     {
         get
         {
-            var match = DeviceTypeRegex.Match(_name);
-            return match.Groups.Count != 2 ? null : match.Groups[1].Value;
+            var match = DeviceTypeRegex.Match(_name ?? string.Empty);
+            return match.Success ? match.Groups[1].Value : null;
         }
     }
 
@@ -209,8 +265,8 @@ public struct DevBroadcastDeviceInterface
     {
         get
         {
-            var match = DeviceIdRegex.Match(_name);
-            return match.Groups.Count != 2 ? null : match.Groups[1].Value;
+            var match = DeviceIdRegex.Match(_name ?? string.Empty);
+            return match.Success ? match.Groups[1].Value : null;
         }
     }
 
@@ -221,8 +277,8 @@ public struct DevBroadcastDeviceInterface
     {
         get
         {
-            var match = VendorRegex.Match(_name);
-            return match.Groups.Count != 3 ? null : match.Groups[2].Value;
+            var match = VendorRegex.Match(_name ?? string.Empty);
+            return match.Success ? match.Groups[2].Value : null;
         }
     }
 
@@ -233,8 +289,8 @@ public struct DevBroadcastDeviceInterface
     {
         get
         {
-            var match = ProductRegex.Match(_name);
-            return match.Groups.Count != 2 ? null : match.Groups[1].Value;
+            var match = ProductRegex.Match(_name ?? string.Empty);
+            return match.Success ? match.Groups[1].Value : null;
         }
     }
 

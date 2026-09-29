@@ -6,7 +6,7 @@ using System;
 namespace Dapplo.Windows.AppRestartManager.Enums;
 
 /// <summary>
-///     Flags for the WM_ENDSESSION message indicating the type of session end event.
+///     Flags (lParam) of the WM_QUERYENDSESSION and WM_ENDSESSION messages indicating the type of session end event.
 ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/shutdown/wm-endsession">WM_ENDSESSION message</a>
 /// </summary>
 [Flags]
@@ -19,7 +19,7 @@ public enum EndSessionReasons : uint
 
     /// <summary>
     ///     The application is using a file that must be replaced, the system is being serviced, or system resources are exhausted.
-    ///     This flag is set when the ENDSESSION_CLOSEAPP flag is set.
+    ///     This is what the Restart Manager sends when it wants the application to close.
     /// </summary>
     ENDSESSION_CLOSEAPP = 0x00000001,
 

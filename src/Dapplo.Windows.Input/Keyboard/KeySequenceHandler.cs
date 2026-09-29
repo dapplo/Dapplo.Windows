@@ -64,6 +64,11 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
     }
 
     /// <summary>
+    /// True if the time between the stages of the sequence expired
+    /// </summary>
+    private bool IsExpired => _expireAfter.HasValue && _expireAfter.Value < DateTimeOffset.Now;
+
+    /// <summary>
     /// Get the current handler
     /// </summary>
     private IKeyboardHookEventHandler CurrentHandler => _keyboardHookEventHandlers[_offset];
@@ -87,6 +92,12 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
     /// <param name="keyboardHookEventArgs">KeyboardHookEventArgs</param>
     public bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
     {
+        // Check the timeout before dispatching, so after a timeout this key press starts the sequence from the beginning, instead of being consumed by the stale stage
+        if (IsExpired && !CurrentHandler.HasKeysPressed)
+        {
+            Reset();
+        }
+
         var currentHandled = CurrentHandler.Handle(keyboardHookEventArgs);
         var currentNotPressed = !CurrentHandler.HasKeysPressed;
         if (currentHandled)
@@ -99,17 +110,13 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
         }
 
         // Check if timeout passed, to reset the sequence
-        if (_expireAfter.HasValue)
+        if (IsExpired)
         {
-            var isExpired = _expireAfter.Value < DateTimeOffset.Now;
-            if (isExpired)
+            if (currentNotPressed)
             {
-                if (currentNotPressed)
-                {
-                    Reset();
-                }
-                return false;
+                Reset();
             }
+            return false;
         }
 
         var allHandled = _isHandled.All(b => b);

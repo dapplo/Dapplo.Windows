@@ -3,7 +3,6 @@
 
 using Dapplo.Windows.Messages.Enumerations;
 #if !NETSTANDARD2_0
-using System.Reactive;
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -15,14 +14,23 @@ namespace Dapplo.Windows.Messages
     /// <summary>
     ///     A monitor for window messages
     /// </summary>
+    /// <remarks>
+    ///     Setting <see cref="WindowMessageInfo.Handled"/> and <see cref="WindowMessageInfo.Result"/> synchronously in OnNext (on the UI thread)
+    ///     returns the result to Windows, and stops the following hooks and the default window procedure from processing it.
+    ///     The HwndSource is never disposed by these extensions, the sequence completes when the HwndSource is disposed.
+    /// </remarks>
     public static class WinProcWindowsExtensions
     {
         /// <summary>
-        ///     Create an observable for the specified window
+        ///     Create an observable for the specified window, if the window has no handle yet the hook is added when the source is initialized.
         /// </summary>
         public static IObservable<WindowMessageInfo> WinProcMessages(this Window window)
         {
-            return WinProcMessages<Unit>(window, null);
+            if (window == null)
+            {
+                throw new ArgumentNullException(nameof(window));
+            }
+            return CreateWinProcMessages(window, null);
         }
 
         /// <summary>
@@ -30,92 +38,106 @@ namespace Dapplo.Windows.Messages
         /// </summary>
         public static IObservable<WindowMessageInfo> WinProcMessages(this HwndSource hWndSource)
         {
-            return WinProcMessages<Unit>(null, hWndSource);
+            if (hWndSource == null)
+            {
+                throw new ArgumentNullException(nameof(hWndSource));
+            }
+            return CreateWinProcMessages(null, hWndSource);
         }
 
         /// <summary>
         /// Create an observable for the specified window or HwndSource
         /// </summary>
         /// <param name="window">Window</param>
-        /// <param name="hWndSource">HwndSource</param>
-        /// <param name="before">Func which does something as soon as the observable is created</param>
-        /// <param name="disposeAction">Action which disposes something when the observable is disposed</param>
+        /// <param name="suppliedHwndSource">HwndSource</param>
         /// <returns>IObservable</returns>
-        internal static IObservable<WindowMessageInfo> WinProcMessages<TState>(Window window, HwndSource hWndSource, Func<IntPtr, TState> before = null, Action<TState> disposeAction = null)
+        private static IObservable<WindowMessageInfo> CreateWinProcMessages(Window window, HwndSource suppliedHwndSource)
         {
-            if (window == null && hWndSource == null)
-            {
-                throw new NotSupportedException("One of Window or HwndSource must be supplied");
-            }
-
             return Observable.Create<WindowMessageInfo>(observer =>
+            {
+                HwndSource hWndSource = null;
+                var isDisposed = false;
+
+                // This handles the message, and generates the observable OnNext
+                IntPtr WindowMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                 {
-                    // This handles the message, and generates the observable OnNext
-                    IntPtr WindowMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+                    var message = WindowMessageInfo.Create(hWnd, msg, wParam, lParam);
+                    observer.OnNext(message);
+                    if (!message.Handled)
                     {
-                        observer.OnNext(WindowMessageInfo.Create(hWnd, msg, wParam, lParam));
-                        // ReSharper disable once AccessToDisposedClosure
-                        if (hWndSource.IsDisposed)
-                        {
-                            observer.OnCompleted();
-                        }
                         return IntPtr.Zero;
                     }
+                    handled = true;
+                    return message.Result;
+                }
 
-                    TState state = default;
+                void HwndSourceDisposedHandle(object sender, EventArgs e)
+                {
+                    observer.OnCompleted();
+                }
 
-                    void HwndSourceDisposedHandle(object sender, EventArgs e)
+                void RegisterHwndSource(HwndSource source)
+                {
+                    hWndSource = source;
+                    hWndSource.Disposed += HwndSourceDisposedHandle;
+                    hWndSource.AddHook(WindowMessageHandler);
+                }
+
+                void SourceInitialized(object sender, EventArgs args)
+                {
+                    window.SourceInitialized -= SourceInitialized;
+                    var source = window.ToHwndSource();
+                    if (isDisposed || source == null)
+                    {
+                        return;
+                    }
+                    RegisterHwndSource(source);
+                    // Simulate the WM_NCCREATE
+                    observer.OnNext(WindowMessageInfo.Create(source.Handle, (int)WindowsMessages.WM_NCCREATE, IntPtr.Zero, IntPtr.Zero));
+                }
+
+                var initialSource = suppliedHwndSource ?? window?.ToHwndSource();
+                if (initialSource != null)
+                {
+                    if (initialSource.IsDisposed)
                     {
                         observer.OnCompleted();
+                        return Disposable.Empty;
                     }
-                    
-                    void RegisterHwndSource()
-                    {
-                        if (before != null)
-                        {
-                            state = before(hWndSource.Handle);
-                        }
-                        hWndSource.Disposed += HwndSourceDisposedHandle;
-                        hWndSource.AddHook(WindowMessageHandler);
-                    }
+                    RegisterHwndSource(initialSource);
+                }
+                else if (window != null)
+                {
+                    // No handle yet, try to get it later
+                    window.SourceInitialized += SourceInitialized;
+                }
 
+                return Disposable.Create(() =>
+                {
+                    isDisposed = true;
                     if (window != null)
                     {
-                        hWndSource = window.ToHwndSource();
+                        window.SourceInitialized -= SourceInitialized;
                     }
-                    if (hWndSource != null) { 
-                        RegisterHwndSource();
-                    }
-                    else if (window != null)
+                    if (hWndSource == null)
                     {
-                        // No, try to get it later
-                        window.SourceInitialized += (sender, args) =>
-                        {
-                            hWndSource = window.ToHwndSource();
-                            RegisterHwndSource();
-                            // Simulate the WM_NCCREATE
-                            observer.OnNext(WindowMessageInfo.Create(hWndSource.Handle, (int)WindowsMessages.WM_NCCREATE, IntPtr.Zero, IntPtr.Zero));
-                        };
+                        return;
                     }
-
-                    return Disposable.Create(() =>
+                    hWndSource.Disposed -= HwndSourceDisposedHandle;
+                    // Only remove our hook: the HwndSource belongs to the window (or to the caller), it's not ours to dispose
+                    if (!hWndSource.IsDisposed)
                     {
-                        disposeAction?.Invoke(state);
-                        hWndSource.Disposed -= HwndSourceDisposedHandle;
                         hWndSource.RemoveHook(WindowMessageHandler);
-                        hWndSource.Dispose();
-                    });
-                })
-                // Make sure there is always a value produced when connecting
-                .Publish()
-                .RefCount();
+                    }
+                });
+            });
         }
 
         /// <summary>
-        /// Create a HwndSource for the specified Window
+        /// Get the (existing) HwndSource of the specified Window
         /// </summary>
         /// <param name="window">Window</param>
-        /// <returns>HwndSource</returns>
+        /// <returns>HwndSource or null when the window has no handle yet</returns>
         private static HwndSource ToHwndSource(this Window window)
         {
             IntPtr windowHandle = new WindowInteropHelper(window).Handle;

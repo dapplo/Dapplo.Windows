@@ -23,6 +23,10 @@ public static class ClipboardFileExtensions
         clipboardAccessToken.ThrowWhenNoAccess();
 
         var hDrop = NativeMethods.GetClipboardData((uint)StandardClipboardFormats.Drop);
+        if (hDrop == System.IntPtr.Zero)
+        {
+            return Enumerable.Empty<string>();
+        }
 
         unsafe
         {
@@ -33,16 +37,24 @@ public static class ClipboardFileExtensions
             }
 
             var result = new List<string>();
-            const int capacity = 260;
-            var filename = stackalloc char[capacity];
             for (uint i = 0; i < files; i++)
             {
-                var nrCharacters = NativeMethods.DragQueryFile(hDrop, i, filename, capacity);
-                if (nrCharacters == 0)
+                // Retrieve the needed size first, so long paths are not truncated
+                var length = NativeMethods.DragQueryFile(hDrop, i, null, 0);
+                if (length <= 0)
                 {
                     continue;
                 }
-                result.Add(new string(filename, 0, nrCharacters));
+                var buffer = new char[length + 1];
+                fixed (char* filename = buffer)
+                {
+                    var nrCharacters = NativeMethods.DragQueryFile(hDrop, i, filename, buffer.Length);
+                    if (nrCharacters == 0)
+                    {
+                        continue;
+                    }
+                    result.Add(new string(filename, 0, nrCharacters));
+                }
             }
 
             return result;
@@ -90,5 +102,6 @@ public static class ClipboardFileExtensions
             offset += fileBytes.Length;
         }
         // Final null terminator (2 bytes) is already zeroed by GlobalAlloc with ZeroInit
+        writeInfo.Commit();
     }
 }

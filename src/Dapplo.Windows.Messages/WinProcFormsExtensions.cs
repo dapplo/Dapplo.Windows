@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dapplo.Windows.Messages.Enumerations;
 #if !NETSTANDARD2_0
 using System;
 using System.Reactive.Disposables;
@@ -16,36 +15,48 @@ namespace Dapplo.Windows.Messages
     public static class WinProcFormsExtensions
     {
         /// <summary>
-        ///     Create an observable for the specified Control (Form)
+        ///     Create an observable for the messages of the specified Control (Form).
+        ///     Every subscription subclasses the control's window, and follows it when the handle is recreated.
+        ///     The sequence completes when the control is disposed.
         /// </summary>
+        /// <remarks>
+        ///     Setting <see cref="WindowMessageInfo.Handled"/> and <see cref="WindowMessageInfo.Result"/> synchronously in OnNext (on the UI thread)
+        ///     returns the result to Windows instead of calling the original window procedure.
+        /// </remarks>
         public static IObservable<WindowMessageInfo> WinProcFormsMessages(this Control control)
         {
-            var winProcListener = new WinProcListener(control);
+            if (control == null)
+            {
+                throw new ArgumentNullException(nameof(control));
+            }
 
             return Observable.Create<WindowMessageInfo>(observer =>
             {
-                winProcListener.AddHook(WindowMessageHandler);
+                var winProcListener = new WinProcListener(control);
+
                 // This handles the message, and generates the observable OnNext
                 IntPtr WindowMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                 {
                     var message = WindowMessageInfo.Create(hWnd, msg, wParam, lParam);
                     observer.OnNext(message);
-                    // ReSharper disable once AccessToDisposedClosure
-                    if (winProcListener.IsDisposed || message.Message == WindowsMessages.WM_DESTROY)
-                    {
-                        observer.OnCompleted();
-                    }
-                    return IntPtr.Zero;
+                    handled = message.Handled;
+                    return message.Result;
                 }
+
+                void ControlDisposed(object sender, EventArgs e)
+                {
+                    observer.OnCompleted();
+                }
+
+                winProcListener.AddHook(WindowMessageHandler);
+                control.Disposed += ControlDisposed;
 
                 return Disposable.Create(() =>
                 {
+                    control.Disposed -= ControlDisposed;
                     winProcListener.Dispose();
                 });
-            })
-            // Make sure there is always a value produced when connecting
-            .Publish()
-            .RefCount();
+            });
         }
     }
 }

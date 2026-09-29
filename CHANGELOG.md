@@ -32,6 +32,20 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - **Breaking:** `NativeDpiMethods.GetWindowDpiHostingBehavior` takes the window handle it requires (D-13).
 - **Breaking:** `DialogDpiChangeBehaviors.DisableControlRelayout` is 4 (D-14).
 - **Breaking:** `NativeDpiMethods.EnableNonClientDpiScaling` returns `bool` instead of `HResult` (D-15).
+- **Breaking:** `WindowMessage` is a sealed class, so `Handled` and `Result` set by a subscriber reach Windows. `Result` is `nint` (signed LRESULT) and `WndProc` returns `nint` (B-01).
+- **Breaking:** `SharedMessageWindow` is created on first use and lives for the whole process. `Handle` blocks until the window exists and never returns 0; new `Invoke`, `IsWindowThread` and `SubscriberErrors`. `Listen(onSetup, onTeardown)` runs both callbacks on the window thread (B-02, B-16, B-17, D-02).
+- **Breaking:** `EndSessionMessage` is a class in `Dapplo.Windows.AppRestartManager` that answers WM_QUERYENDSESSION through `CanEndSession` / `Veto(reason)`. `ListenForEndSession()` takes no callbacks and works for every subscriber (E-01, E-02, E-03).
+- **Breaking:** `ApplicationRestartManager.WasRestartRequested(string restartArgument)` checks the argument you registered (E-17).
+- **Breaking:** `KeyboardHook` and `MouseHook` are static classes whose hooks run on their own message-loop thread; subscribers are called on that thread. New `SubscriberErrors`, `KeyboardEventsNonBlocking` and `MouseEventsNonBlocking` (B-06, B-09).
+- **Breaking:** new pseudo key `VirtualKeyCode.Win` matches either Windows key in key combinations; `"win"` parses to it; `KeyboardHookEventArgs.IsModifier` is computed from `Key` (B-22).
+- **Breaking:** `RawHID` is the 8-byte header only; HID reports are in `RawInputEventArgs.HidData`, read with `RawInputApi.TryGetRawInputData` (B-08).
+- **Breaking:** clipboard delayed rendering uses `ClipboardNative.RegisterDelayedRenderer(format, renderer)`; `OnRenderFormat` is removed. WM_RENDERFORMAT is answered on the window thread without opening the clipboard, WM_RENDERALLFORMATS checks ownership first (D-06).
+- **Breaking:** `ClipboardNative.OnUpdate` no longer opens the clipboard; `ClipboardUpdateInformation.Create()` has no hWnd parameter and every subscriber gets the current state first (D-04).
+- **Breaking:** `AccessAsync()` opens the clipboard on the thread that continues after the `await`; a token used on another thread reports no access. Cancelling throws `OperationCanceledException` (D-03).
+- **Breaking:** `SetCloudClipboardOptions(bool? canIncludeInHistory, bool? canUploadToCloud, bool excludeFromMonitoring)` places only the options you pass; `SetExcludeClipboardContentFromMonitorProcessing` is replaced by `ExcludeFromMonitorProcessing()` (D-05).
+- **Breaking:** `SystemStateApi.PreventSleep()` / `PreventSystemSleep()` return a disposable `SleepBlocker` (a power request that works across threads); `AllowSleep()` is removed (E-13).
+- `WinEventHook`, raw input and session-notification registrations happen on the SharedMessageWindow thread, so events arrive there (A-12, B-02, B-11).
+- `RawInputMonitor` and `RawInputDeviceMonitor` are available for netstandard2.0 too (B-31).
 - With `KeyCombinationHandler.TriggerOnKeyUp = true`, key events are never marked as handled, so `IsPassThrough` has no effect in that mode (B-05).
 - Tests that send input, replace the clipboard or write to the registry are tagged `Category=Interactive` and are excluded from default runs (F-06).
 
@@ -44,6 +58,10 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - `NativeDpiMethods.AreDpiAwarenessContextsEqual`, `GetWindowDpiAwarenessContext`, `SetDialogDpiChangeBehavior`, `GetDialogDpiChangeBehavior`, `DpiAwarenessContext.UnawareGdiScaled`.
 - `DpiCalculator.ScaleWithDpi` / `UnscaleWithDpi` overloads for `NativePointFloat`.
 - `WindowScroller.CreateScrollWParam`.
+- `WindowMessageInfo.Handled` / `Result`, `ClipboardNative.RegisterDelayedRenderer`, `HasFormat(StandardClipboardFormats)`.
+- `RawInputApi.TryGetRawInputData`, `TryParseRawInput`, `GetRegisteredDevices`; `KeyCombinationHandler.KeyStateVerifier`.
+- Keyboard hook args: `ScanCode`, `IsExtended`, `IsFromKeyboardHook`; mouse hook args: `MouseData`, `WheelDelta`, `XButton`, `Flags`, `IsInjectedByProcess`, `IsInjectedByLowerIntegrityLevelProcess`, `TimeStamp`.
+- `WindowsSessionListener.IsRegistered` and `RegistrationFailed`; `DevBroadcastDeviceInterface.TryGetDevBroadcastPort` / `TryGetDevBroadcastHandle`; `PowerManagementApi.EnableShutdownPrivilege()`.
 
 ### Fixed
 - Reading a window's text (`GetTextFromWindow`, `GetText()`, `Fill()`) no longer crashes the process with a StackOverflowException when a control holds a very large text; texts over 1M characters are truncated (A-03).
@@ -79,4 +97,19 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - Creating a `DpiAwareForm` or `DpiHandler`, or calling `AttachDpiHandler`, no longer leaves the UI thread in Per Monitor v2 awareness (D-08).
 - `NativeDpiMethods.EnableDpiAware` falls back to Per Monitor v1 and `SetProcessDpiAwareness`, and returns whether the process is actually DPI aware (D-09).
 - `DpiHandler.TryEnableNonClientDpiScaling` reports failures and no longer throws on Windows 10 before 1607 (D-15).
+- An exception in a SharedMessageWindow, keyboard-hook or mouse-hook subscriber no longer crashes the process; it is published on `SubscriberErrors` (B-06).
+- Disposing a `Window.WinProcMessages()` subscription no longer destroys the WPF window (B-07).
+- `WinProcListener` returns the handling hook's result to Windows; `WinProcFormsMessages` survives handle recreation and completes when the control is disposed (B-10, B-18).
+- `WinProcHandler` no longer recreates its window during disposal (B-25); `MessageLoop.ProcessMessages` throws on a `GetMessage` error (B-26).
+- Raw-input monitors register when you subscribe and unregister when you dispose, and no longer overwrite each other's registrations (B-02, B-13); `RawInputDeviceMonitor` no longer throws for unknown devices (B-12).
+- F10 and the Alt key-up no longer report a phantom Alt (B-14); lock-key state is not flipped by auto-repeat (B-23).
+- `KeyHelper` display names are correct for extended keys and no longer throw for numpad * and / (B-19).
+- Key combinations no longer stay blocked after a missed key-up (B-20); after a `KeySequenceHandler` timeout the first press restarts the sequence (B-21).
+- The clipboard is no longer left with partial data or leaked memory after a failed write (D-16); format-name caches are thread-safe and case-insensitive (D-17); `GetAsUnicodeString` has no trailing garbage (D-18); `GetFileNames` supports long paths (D-19); read errors are reported correctly (D-27); `SetAsStream` honours `size` (D-35).
+- `WindowsSessionListener` no longer crashes when `WTSRegisterSessionNotification` fails early at logon; it retries (B-11).
+- Device notification events can be used after `ObserveOn` and have full-length names (E-07, E-25); `DisplayName` is fixed (E-10); `DeviceInterfaceClass.Keyboard` / `BluetoothLeDevice` GUIDs are correct (E-11); `DevBroadcastHandle` has the native layout (E-24).
+- `PowerManagementApi.Shutdown()` / `Restart()` work for normal desktop apps, `Shutdown` powers off, and the event log records a planned shutdown (E-14).
+- `RegistryMonitor` no longer fires phantom notifications and reports the real error (E-12).
+- `WinEventHook` works when subscribed from any thread, unhooks reliably and traces subscriber exceptions (A-12).
+- `DisplayInfo.AllDisplayInfos` never returns null and follows display, work-area and DPI changes (A-19).
 - `DpiHandler.ScaleWithCurrentDpi(NativePointFloat)` / `UnscaleWithCurrentDpi(NativePointFloat)` no longer round to integers, and unscaling no longer scales.

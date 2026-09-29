@@ -7,24 +7,72 @@ namespace Dapplo.Windows.Messages.Structs;
 
 /// <summary>
 /// Represents a Windows message, including its window handle, message identifier, and associated parameters.
+/// Subscribers can mark the message as handled and supply the LRESULT which is returned to Windows.
 /// </summary>
-/// <remarks>This struct is commonly used when processing Windows messages in low-level window procedures or
-/// interop scenarios. The meaning of the parameters depends on the specific message identified by Msg.</remarks>
-/// <param name="Hwnd">The handle to the window that receives the message.</param>
-/// <param name="Msg">WindowsMessages enum value</param>
-/// <param name="WParam">The additional message-specific information provided as the first parameter.</param>
-/// <param name="LParam">The additional message-specific information provided as the second parameter.</param>
-public record struct WindowMessage(nint Hwnd, WindowsMessages Msg, nint WParam, nint LParam)
+/// <remarks>
+/// This is a class (reference type), so every subscriber sees the same instance and <see cref="Handled"/> and <see cref="Result"/>
+/// set by one subscriber are visible to the window procedure and to later subscribers.
+/// <para>
+/// <see cref="Handled"/> and <see cref="Result"/> are only honoured when they are set synchronously inside <c>OnNext</c>, on the thread of the window
+/// which received the message. As soon as there is an <c>ObserveOn</c>, <c>SubscribeOn</c>, <c>Throttle</c>, <c>Delay</c>, an <c>await</c> or any other
+/// thread or time hop, the window procedure has already returned and the reply has already been sent to Windows.
+/// </para>
+/// The meaning of the parameters depends on the specific message identified by <see cref="Msg"/>.
+/// </remarks>
+public sealed class WindowMessage
 {
     /// <summary>
-    /// This has to be set to true to indicate that the message has been handled and should not be processed further by the default window procedure.
+    /// Create a WindowMessage
     /// </summary>
-    public bool Handled { get; set; } = false;
+    /// <param name="hwnd">The handle to the window that receives the message.</param>
+    /// <param name="msg">WindowsMessages enum value</param>
+    /// <param name="wParam">The additional message-specific information provided as the first parameter.</param>
+    /// <param name="lParam">The additional message-specific information provided as the second parameter.</param>
+    public WindowMessage(nint hwnd, WindowsMessages msg, nint wParam, nint lParam)
+    {
+        Hwnd = hwnd;
+        Msg = msg;
+        WParam = wParam;
+        LParam = lParam;
+    }
 
     /// <summary>
-    /// This property can be set to a specific value to indicate the result of processing the message.
-    /// The meaning of this value depends on the message being processed and is typically used to provide feedback to the system or other applications about how the message was handled.
+    /// The handle to the window that receives the message.
     /// </summary>
-    public nuint Result { get; set; } = 0;
-}
+    public nint Hwnd { get; }
 
+    /// <summary>
+    /// The message identifier.
+    /// </summary>
+    public WindowsMessages Msg { get; }
+
+    /// <summary>
+    /// The additional message-specific information provided as the first parameter.
+    /// </summary>
+    public nint WParam { get; }
+
+    /// <summary>
+    /// The additional message-specific information provided as the second parameter.
+    /// </summary>
+    public nint LParam { get; }
+
+    /// <summary>
+    /// Set this to true to indicate that the message has been handled: the window procedure then returns <see cref="Result"/>
+    /// instead of calling the default window procedure.
+    /// Only honoured when set synchronously inside OnNext on the window thread.
+    /// </summary>
+    public bool Handled { get; set; }
+
+    /// <summary>
+    /// The LRESULT which is returned to Windows when <see cref="Handled"/> is true. LRESULT is a signed pointer sized value (LONG_PTR),
+    /// its meaning depends on the message being processed.
+    /// Only honoured when set synchronously inside OnNext on the window thread.
+    /// </summary>
+    public nint Result { get; set; }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $"WindowMessage {{ Hwnd = 0x{((long)Hwnd):X}, Msg = {Msg}, WParam = 0x{((long)WParam):X}, LParam = 0x{((long)LParam):X}, Handled = {Handled}, Result = {(long)Result} }}";
+    }
+}

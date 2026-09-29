@@ -2,12 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Enums;
+using Dapplo.Windows.Messages;
 using Dapplo.Windows.Structs;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
@@ -17,11 +18,18 @@ namespace Dapplo.Windows.Desktop;
 /// <summary>
 ///     The WinEventHook can register handlers to become important windows events
 ///     This makes it possible to know a.o. when a window is created, moved, updated and closed.
-///     Make sure you have a message pump running (WinProc), otherwise the behavior is sporadic / none.
 /// </summary>
+/// <remarks>
+///     The hooks are installed and removed on the thread of the <see cref="SharedMessageWindow"/>, which runs a message loop.
+///     This is needed as out-of-context events are delivered to the thread which installed the hook, and UnhookWinEvent must be called on that thread.
+///     The events are therefore produced on the thread of the SharedMessageWindow: don't block in OnNext, use ObserveOn to process them elsewhere.
+///     An exception thrown by a subscriber ends its subscription (and removes the hook when it was the last subscriber).
+///     Every call of <see cref="Create"/> installs its own hook when subscribed, subscribers of the same returned observable share one hook.
+/// </remarks>
 public static class WinEventHook
 {
-    private static readonly Dictionary<IntPtr, WinEventDelegate> Delegates = new Dictionary<IntPtr, WinEventDelegate>();
+    // Keeps a reference to the delegates, as long as the hook is installed, otherwise they are GC'ed while Windows still calls them
+    private static readonly ConcurrentDictionary<IntPtr, WinEventDelegate> Delegates = new ConcurrentDictionary<IntPtr, WinEventDelegate>();
 
     /// <summary>
     ///     Create a WinEventHook as observable
@@ -37,23 +45,66 @@ public static class WinEventHook
             {
                 void WinEventHookDelegate(IntPtr eventHook, WinEvents winEvent, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime)
                 {
-                    observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hWnd, idObject, idChild, eventThread, eventTime));
+                    // Exceptions must never propagate into the native callback
+                    try
+                    {
+                        observer.OnNext(WinEventInfo.Create(eventHook, winEvent, hWnd, idObject, idChild, eventThread, eventTime));
+                    }
+                    catch (Exception ex)
+                    {
+                        // A throwing subscriber is detached by Rx (which also removes the hook), OnError might not reach anyone, so trace it
+                        System.Diagnostics.Trace.TraceError("WinEventHook: a subscriber threw an exception, the subscription ends: {0}", ex);
+                        try
+                        {
+                            observer.OnError(ex);
+                        }
+                        catch
+                        {
+                            // Nothing more we can do, the exception must not reach Windows
+                        }
+                    }
                 }
 
                 WinEventDelegate winEventDelegate = WinEventHookDelegate;
-                var hookPtr = SetWinEventHook(winEventStart, winEventEnd ?? winEventStart, IntPtr.Zero, winEventDelegate, process, thread, WinEventHookFlags.OutOfContext);
+                var hookPtr = IntPtr.Zero;
+                var error = 0;
+                // Install the hook on the thread of the SharedMessageWindow, which pumps messages
+                SharedMessageWindow.Invoke(_ =>
+                {
+                    hookPtr = SetWinEventHook(winEventStart, winEventEnd ?? winEventStart, IntPtr.Zero, winEventDelegate, process, thread, WinEventHookFlags.OutOfContext);
+                    if (hookPtr == IntPtr.Zero)
+                    {
+                        error = Marshal.GetLastWin32Error();
+                        return;
+                    }
+                    // Store to keep a reference to it, otherwise it's GC'ed
+                    Delegates[hookPtr] = winEventDelegate;
+                });
                 if (hookPtr == IntPtr.Zero)
                 {
-                    observer.OnError(new Win32Exception("Can't hook."));
+                    observer.OnError(new Win32Exception(error, "SetWinEventHook failed"));
                     return Disposable.Empty;
                 }
-                // Store to keep a reference to it, otherwise it's GC'ed
-                Delegates[hookPtr] = winEventDelegate;
 
                 return Disposable.Create(() =>
                 {
-                    UnhookWinEvent(hookPtr);
-                    Delegates.Remove(hookPtr);
+                    // UnhookWinEvent must be called on the thread which called SetWinEventHook
+                    try
+                    {
+                        SharedMessageWindow.Invoke(_ =>
+                        {
+                            // If unhooking fails, the delegate is kept alive, as Windows might still call it
+                            if (UnhookWinEvent(hookPtr))
+                            {
+                                Delegates.TryRemove(hookPtr, out var _);
+                            }
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        // Dispose must not throw
+                        System.Diagnostics.Trace.TraceError("WinEventHook: removing the hook failed: {0}", ex);
+                    }
                 });
             })
             .Publish()
@@ -89,6 +140,7 @@ public static class WinEventHook
     /// <param name="hWinEventHook">IntPtr with the win event hook handle from SetWinEventHook</param>
     /// <returns>bool</returns>
     [DllImport(User32Api.User32, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
     /// <summary>
@@ -118,7 +170,7 @@ public static class WinEventHook
     /// </param>
     /// <param name="winEventHookFlags">WinEventHookFlags</param>
     /// <returns>IntPtr with the hook id</returns>
-    [DllImport(User32Api.User32)]
+    [DllImport(User32Api.User32, SetLastError = true)]
     private static extern IntPtr SetWinEventHook(WinEvents eventMin, WinEvents eventMax, IntPtr hmodWinEventProc, WinEventDelegate eventProc, int idProcess, int idThread, WinEventHookFlags winEventHookFlags);
 
     /// <summary>

@@ -371,13 +371,14 @@ static class Program
         // Register so Windows Restart Manager can restart us after an update
         ApplicationRestartManager.RegisterForRestart("/restore");
 
-        if (ApplicationRestartManager.WasRestartRequested())
+        if (ApplicationRestartManager.WasRestartRequested("/restore"))
             RestorePreviousState();
 
+        // Runs synchronously on the SharedMessageWindow thread: save (or endSession.Veto("reason")) inside OnNext
         var shutdownSub = ApplicationRestartManager.ListenForEndSession()
-            .Subscribe(reason =>
+            .Subscribe(endSession =>
             {
-                if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+                if (endSession.IsQuery && endSession.EndSessionReason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
                     SaveApplicationState();
             });
 

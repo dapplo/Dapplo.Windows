@@ -130,8 +130,9 @@ SharedMessageWindow.Listen(
 
 ```csharp
 // Inside Dapplo.Windows.Messages
+// A failed registration (e.g. early at logon) is retried with a timer and finally reported with the RegistrationFailed event, it never throws on the window thread
 SharedMessageWindow.Listen(
-    onSetup:    hwnd => WTSRegisterSessionNotification(hwnd, NOTIFY_FOR_THIS_SESSION),
+    onSetup:    hwnd => TryRegister(hwnd),
     onTeardown: hwnd => WTSUnRegisterSessionNotification(hwnd))
 .Where(m => m.Msg == WindowsMessages.WM_WTSSESSION_CHANGE)
 .Subscribe(m => DispatchSessionEvent(m));
@@ -144,13 +145,9 @@ SharedMessageWindow.Listen(
 ```csharp
 // Inside Dapplo.Windows.AppRestartManager
 SharedMessageWindow.Messages
-    .Where(m => m.Msg.IsIn(WindowsMessages.WM_QUERYENDSESSION, WindowsMessages.WM_ENDSESSION))
-    .Subscribe(m =>
-    {
-        var reason = (EndSessionReasons)m.LParam;
-        // optionally set m.Result and m.Handled to control the OS response
-        observer.OnNext(new EndSessionMessage(m.Msg, reason));
-    });
+    .Where(m => m.Msg == WindowsMessages.WM_QUERYENDSESSION || m.Msg == WindowsMessages.WM_ENDSESSION)
+    // EndSessionMessage writes CanEndSession / Veto directly to the WindowMessage (Handled + Result 1/0), synchronously on the window thread
+    .Select(m => new EndSessionMessage(m));
 ```
 
 **User-facing API:** [[Restart-Manager]]

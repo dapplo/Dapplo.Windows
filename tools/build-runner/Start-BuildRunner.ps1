@@ -15,6 +15,9 @@
     Tests marked [Trait("Category", "Interactive")] change the real desktop (they send input, replace the clipboard
     or write to the registry). They are excluded unless the request sets "interactive": true.
 
+    Before each request, leftover processes started from the repository's src\*\bin folders (e.g. a test host that
+    survived a killed run) are stopped, because they lock the build output.
+
     A running request is cancelled (process tree killed) when the file <repo>\.build-runner\cancel exists or after
     -TimeoutMinutes. Tests that hang longer than -TestHangTimeout are aborted by dotnet test (--blame-hang), the log
     then names the hanging test. When this script file changes, the runner restarts itself with the new version.
@@ -71,6 +74,8 @@ function Invoke-Step {
             break
         }
     }
+    # A test host that outlived dotnet test (e.g. after a blame-hang abort) still holds the redirected output files
+    Stop-StaleRepoProcesses -Log $Log
     if ($stopReason) {
         Remove-Item -Path $CancelFile -Force -ErrorAction SilentlyContinue
         Add-Content -Path $Log -Encoding UTF8 -Value "==== $Name $stopReason"
@@ -80,12 +85,34 @@ function Invoke-Step {
     }
     foreach ($f in @($out, $err)) {
         if (Test-Path $f) {
-            Get-Content -Path $f -Encoding UTF8 | Add-Content -Path $Log -Encoding UTF8
-            Remove-Item $f -Force
+            for ($attempt = 1; $attempt -le 10; $attempt++) {
+                try {
+                    Get-Content -Path $f -Encoding UTF8 -ErrorAction Stop | Add-Content -Path $Log -Encoding UTF8
+                    Remove-Item $f -Force -ErrorAction Stop
+                    break
+                } catch {
+                    if ($attempt -eq 10) { Add-Content -Path $Log -Encoding UTF8 -Value "==== could not collect $f : $($_.Exception.Message)" }
+                    Start-Sleep -Seconds 2
+                }
+            }
         }
     }
     Add-Content -Path $Log -Encoding UTF8 -Value "==== $Name exit code: $code"
     return $code
+}
+
+function Stop-StaleRepoProcesses {
+    param([string]$Log)
+    # Test hosts left behind by a killed or hung run keep files in bin\ locked (MSB3021). Only processes whose
+    # executable lives inside this repository's src\*\bin folders are stopped.
+    $binRoot = Join-Path $RepoRoot 'src'
+    $stale = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
+        $_.ExecutablePath -and $_.ExecutablePath.StartsWith($binRoot, [StringComparison]::OrdinalIgnoreCase) -and $_.ExecutablePath -match '\\bin\\'
+    })
+    foreach ($p in $stale) {
+        Add-Content -Path $Log -Encoding UTF8 -Value ("==== stopping stale process {0} (PID {1})" -f $p.ExecutablePath, $p.ProcessId)
+        & taskkill.exe /T /F /PID $p.ProcessId 2>&1 | Out-Null
+    }
 }
 
 function Get-TrxCounts {
@@ -128,6 +155,7 @@ function Invoke-Request {
 
     $summary = [ordered]@{ id = $id; action = $action; configuration = $configuration; framework = $framework; filter = $filter; started = (Get-Date).ToString('o') }
     if (-not $Dotnet) { throw 'dotnet not found.' }
+    Stop-StaleRepoProcesses -Log $log
 
     if ($action -in @('build', 'verify')) {
         $buildArgs = @('build', "`"$Solution`"", '-c', $configuration, '--nologo', '-v:minimal', '-clp:Summary;ErrorsOnly;WarningsOnly')

@@ -20,7 +20,10 @@ PowerManagementApi.Hibernate();
 
 ## Shutdown, Restart, and Logoff
 
-> Shutdown and reboot require the `SE_SHUTDOWN_NAME` privilege.
+> `Shutdown` and `Restart` enable the `SE_SHUTDOWN_NAME` privilege of the process (interactive users hold it, but it is disabled by default),
+> `Shutdown` powers off (`EWX_POWEROFF`), and both log a planned shutdown (`ShutdownReasonPlannedOther`). Without `force` hung applications are
+> terminated after a timeout (`EWX_FORCEIFHUNG`); `force: true` uses `EWX_FORCE`, which can lose data. When calling `ExitWindowsEx` directly,
+> call `PowerManagementApi.EnableShutdownPrivilege()` first.
 
 ```csharp
 using Dapplo.Windows.SystemState;
@@ -31,21 +34,30 @@ PowerManagementApi.Restart();
 PowerManagementApi.LockWorkStation();
 ```
 
-## Thread Execution State — Preventing Sleep
+## Preventing Sleep
 
 ```csharp
 using Dapplo.Windows.SystemState;
 
-// Prevent both system and display from sleeping
-SystemStateApi.PreventSleep();
-DoLongRunningWork();
-SystemStateApi.AllowSleep(); // always restore when done
+// Prevent the system AND the screen from sleeping while a task runs, until the blocker is disposed
+using (SystemStateApi.PreventSleep("Rendering video"))
+{
+    await DoLongRunningWorkAsync();
+}
 
 // Prevent only the system from sleeping (screen may still turn off)
-SystemStateApi.PreventSystemSleep();
-DoBackgroundSync();
-SystemStateApi.AllowSleep();
+using (SystemStateApi.PreventSystemSleep("Synchronizing files"))
+{
+    await DoBackgroundSyncAsync();
+}
 ```
+
+`PreventSleep` / `PreventSystemSleep` return a `SleepBlocker` which uses a power request (`PowerCreateRequest` / `PowerSetRequest`).
+Unlike `SetThreadExecutionState`, a power request is not bound to a thread: it can be created and disposed on different threads (e.g. around an `await`),
+several blockers can be active at the same time, and the reason is shown by `powercfg /requests`. The system can sleep again when all blockers are disposed or the process exits.
+
+`SystemStateApi.SetThreadExecutionState` is still available, but note that a state set with `ES_CONTINUOUS` belongs to the calling thread:
+it is only reset by a call on the same thread and it ends when that thread exits, so don't use it from thread-pool threads or async code.
 
 ## WaitableTimer — Scheduled Wake-Up
 

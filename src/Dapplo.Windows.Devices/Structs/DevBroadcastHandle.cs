@@ -22,9 +22,30 @@ public struct DevBroadcastHandle
     private readonly IntPtr _hdevnotify;
     // The GUID for the custom event. For more information, see Device Events. Valid only for DBT_CUSTOMEVENT.
     private readonly Guid _eventguid;
-    private readonly ulong _nameoffset;
+    // LONG dbch_nameoffset: the offset of an optional string buffer in dbch_data, -1 when there is none
+    private readonly int _nameoffset;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
     private readonly byte[] dbch_data;
+
+    /// <summary>
+    /// The handle of the device (file system handle) to be checked.
+    /// </summary>
+    public IntPtr Handle => _handle;
+
+    /// <summary>
+    /// The handle to the device notification, as returned by RegisterDeviceNotification.
+    /// </summary>
+    public IntPtr DeviceNotificationHandle => _hdevnotify;
+
+    /// <summary>
+    /// The GUID for the custom event, only valid for DBT_CUSTOMEVENT.
+    /// </summary>
+    public Guid EventGuid => _eventguid;
+
+    /// <summary>
+    /// The offset of an optional string buffer in the custom event data (only DBT_CUSTOMEVENT), -1 when there is none.
+    /// </summary>
+    public int NameOffset => _nameoffset;
 
     /// <summary>
     /// Factory for an empty DevBroadcastHandle

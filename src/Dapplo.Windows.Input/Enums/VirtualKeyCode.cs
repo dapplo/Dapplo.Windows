@@ -881,5 +881,13 @@ public enum VirtualKeyCode : ushort
     /// <summary>
     ///     Clear key
     /// </summary>
-    OemClear = 0xFE
+    OemClear = 0xFE,
+
+    /// <summary>
+    ///     Pseudo key code, this is NOT a Windows virtual-key code: either Windows key (LeftWin or RightWin).
+    ///     Use this in key combinations, e.g. with the KeyCombinationHandler, to match both Windows keys like Shift, Control and Menu do for their left and right variants.
+    ///     Windows never reports this code, when it's used with the KeyboardInputGenerator LeftWin is sent.
+    ///     The value is outside of the range of the real virtual-key codes (1-254), so it can never collide with one.
+    /// </summary>
+    Win = 0x0100
 }

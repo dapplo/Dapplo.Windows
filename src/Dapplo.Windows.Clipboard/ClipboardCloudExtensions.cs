@@ -30,66 +30,76 @@ public static class ClipboardCloudExtensions
 
     /// <summary>
     /// Sets cloud clipboard options on the clipboard to control clipboard history and cloud sync behavior.
-    /// This is a simplified method that sets all three cloud clipboard formats at once.
+    /// Only the formats for the options which are specified are placed on the clipboard, without any option the Windows defaults apply.
+    /// Call this after placing the content, with the same access token.
     /// </summary>
     /// <param name="clipboardAccessToken">The IClipboardAccessToken</param>
     /// <param name="canIncludeInHistory">
-    /// When true (default), allows the clipboard content to be included in clipboard history.
-    /// When false, prevents the content from appearing in clipboard history.
+    /// null (default) doesn't place the CanIncludeInClipboardHistory format.
+    /// true explicitly allows the content to be included in the clipboard history, false prevents it.
     /// </param>
     /// <param name="canUploadToCloud">
-    /// When true (default), allows the clipboard content to be uploaded to the cloud clipboard.
-    /// When false, prevents the content from being synced to cloud.
+    /// null (default) doesn't place the CanUploadToCloudClipboard format.
+    /// true explicitly allows the content to be synced to other devices, false prevents it.
     /// </param>
     /// <param name="excludeFromMonitoring">
-    /// When true, excludes the clipboard content from being processed by clipboard monitoring applications.
-    /// When false (default), allows monitoring applications to process the content.
+    /// When true, the ExcludeClipboardContentFromMonitorProcessing format is placed, this excludes the content from clipboard history, cloud sync and clipboard monitoring applications.
+    /// When false (default), the format is not placed (the mere presence of this format excludes the content, whatever its value).
     /// </param>
     public static void SetCloudClipboardOptions(
         this IClipboardAccessToken clipboardAccessToken,
-        bool canIncludeInHistory = true,
-        bool canUploadToCloud = true,
+        bool? canIncludeInHistory = null,
+        bool? canUploadToCloud = null,
         bool excludeFromMonitoring = false)
     {
         clipboardAccessToken.ThrowWhenNoAccess();
 
-        // Set the three cloud clipboard formats as DWORD values (0 or 1)
-        SetDWordFormat(clipboardAccessToken, CanIncludeInClipboardHistoryFormat, canIncludeInHistory ? 1u : 0u);
-        SetDWordFormat(clipboardAccessToken, CanUploadToCloudClipboardFormat, canUploadToCloud ? 1u : 0u);
-        SetDWordFormat(clipboardAccessToken, ExcludeClipboardContentFromMonitorProcessingFormat, excludeFromMonitoring ? 1u : 0u);
+        if (canIncludeInHistory.HasValue)
+        {
+            SetDWordFormat(clipboardAccessToken, CanIncludeInClipboardHistoryFormat, canIncludeInHistory.Value ? 1u : 0u);
+        }
+        if (canUploadToCloud.HasValue)
+        {
+            SetDWordFormat(clipboardAccessToken, CanUploadToCloudClipboardFormat, canUploadToCloud.Value ? 1u : 0u);
+        }
+        if (excludeFromMonitoring)
+        {
+            ExcludeFromMonitorProcessing(clipboardAccessToken);
+        }
     }
 
     /// <summary>
-    /// Sets whether clipboard content can be included in clipboard history.
+    /// Sets whether clipboard content can be included in clipboard history, this places the CanIncludeInClipboardHistory format with a DWORD 1 or 0.
     /// </summary>
     /// <param name="clipboardAccessToken">The IClipboardAccessToken</param>
-    /// <param name="canInclude">True to allow inclusion in history, false to prevent it.</param>
-    public static void SetCanIncludeInClipboardHistory(this IClipboardAccessToken clipboardAccessToken, bool canInclude = true)
+    /// <param name="canInclude">True to explicitly allow inclusion in history, false to prevent it.</param>
+    public static void SetCanIncludeInClipboardHistory(this IClipboardAccessToken clipboardAccessToken, bool canInclude)
     {
         clipboardAccessToken.ThrowWhenNoAccess();
         SetDWordFormat(clipboardAccessToken, CanIncludeInClipboardHistoryFormat, canInclude ? 1u : 0u);
     }
 
     /// <summary>
-    /// Sets whether clipboard content can be uploaded to cloud clipboard.
+    /// Sets whether clipboard content can be uploaded to cloud clipboard, this places the CanUploadToCloudClipboard format with a DWORD 1 or 0.
     /// </summary>
     /// <param name="clipboardAccessToken">The IClipboardAccessToken</param>
-    /// <param name="canUpload">True to allow cloud upload, false to prevent it.</param>
-    public static void SetCanUploadToCloudClipboard(this IClipboardAccessToken clipboardAccessToken, bool canUpload = true)
+    /// <param name="canUpload">True to explicitly allow cloud upload, false to prevent it.</param>
+    public static void SetCanUploadToCloudClipboard(this IClipboardAccessToken clipboardAccessToken, bool canUpload)
     {
         clipboardAccessToken.ThrowWhenNoAccess();
         SetDWordFormat(clipboardAccessToken, CanUploadToCloudClipboardFormat, canUpload ? 1u : 0u);
     }
 
     /// <summary>
-    /// Sets whether clipboard content should be excluded from clipboard monitor processing.
+    /// Excludes the clipboard content from clipboard history, cloud sync and clipboard monitoring applications,
+    /// by placing the ExcludeClipboardContentFromMonitorProcessing format (its presence is what counts).
+    /// Use this e.g. for passwords.
     /// </summary>
     /// <param name="clipboardAccessToken">The IClipboardAccessToken</param>
-    /// <param name="exclude">True to exclude from monitoring, false to allow monitoring.</param>
-    public static void SetExcludeClipboardContentFromMonitorProcessing(this IClipboardAccessToken clipboardAccessToken, bool exclude = true)
+    public static void ExcludeFromMonitorProcessing(this IClipboardAccessToken clipboardAccessToken)
     {
         clipboardAccessToken.ThrowWhenNoAccess();
-        SetDWordFormat(clipboardAccessToken, ExcludeClipboardContentFromMonitorProcessingFormat, exclude ? 1u : 0u);
+        SetDWordFormat(clipboardAccessToken, ExcludeClipboardContentFromMonitorProcessingFormat, 0u);
     }
 
     /// <summary>
@@ -109,5 +119,6 @@ public static class ClipboardCloudExtensions
         
         // Write the DWORD value to the memory
         Marshal.WriteInt32(writeInfo.MemoryPtr, (int)value);
+        writeInfo.Commit();
     }
 }

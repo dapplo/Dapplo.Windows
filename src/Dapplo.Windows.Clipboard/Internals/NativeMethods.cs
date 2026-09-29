@@ -63,7 +63,59 @@ internal static class NativeMethods
     /// <param name="memory">IntPtr to the memory area</param>
     /// <returns>IntPtr with handle or IntPtr.Zero when an error occurred</returns>
     [DllImport("user32", SetLastError = true)]
-    private static extern IntPtr SetClipboardData(uint format, IntPtr memory);
+    internal static extern IntPtr SetClipboardData(uint format, IntPtr memory);
+
+    /// <summary>
+    /// Frees the specified global memory object and invalidates its handle.
+    /// </summary>
+    /// <param name="hMem">IntPtr with the handle to the global memory object</param>
+    /// <returns>IntPtr.Zero if the function succeeds, otherwise the handle</returns>
+    [DllImport("kernel32", SetLastError = true)]
+    internal static extern IntPtr GlobalFree(IntPtr hMem);
+
+    /// <summary>
+    /// Retrieves the currently supported clipboard formats, this does not need the clipboard to be opened.
+    /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getupdatedclipboardformats">GetUpdatedClipboardFormats function</a>
+    /// </summary>
+    /// <param name="lpuiFormats">array which receives the formats</param>
+    /// <param name="cFormats">number of entries in lpuiFormats</param>
+    /// <param name="pcFormatsOut">the number of formats</param>
+    /// <returns>true if successful</returns>
+    [DllImport("user32", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetUpdatedClipboardFormats([Out] uint[] lpuiFormats, uint cFormats, out uint pcFormatsOut);
+
+    /// <summary>
+    /// Retrieve the currently supported clipboard formats, without opening the clipboard.
+    /// </summary>
+    /// <returns>array with the format IDs</returns>
+    /// <exception cref="Win32Exception">When the formats could not be retrieved</exception>
+    internal static uint[] GetUpdatedClipboardFormats()
+    {
+        const int errorInsufficientBuffer = 122;
+        var buffer = new uint[32];
+        // The number of formats can change between calls, so retry a few times
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            if (GetUpdatedClipboardFormats(buffer, (uint)buffer.Length, out var count))
+            {
+                if (count >= buffer.Length)
+                {
+                    return buffer;
+                }
+                var result = new uint[count];
+                Array.Copy(buffer, result, (int)count);
+                return result;
+            }
+            var error = Marshal.GetLastWin32Error();
+            if (error != errorInsufficientBuffer)
+            {
+                throw new Win32Exception(error);
+            }
+            buffer = new uint[Math.Max((int)count, buffer.Length * 2)];
+        }
+        throw new Win32Exception(errorInsufficientBuffer);
+    }
 
     /// <summary>
     ///     See
@@ -150,21 +202,4 @@ internal static class NativeMethods
     [DllImport("user32", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool RemoveClipboardFormatListener(IntPtr hWnd);
-
-
-    /// <summary>
-    /// Places data on the clipboard in a specified clipboard format.
-    /// The window must be the current clipboard owner, and the application must have called the OpenClipboard function.
-    /// (When responding to the WM_RENDERFORMAT and WM_RENDERALLFORMATS messages, the clipboard owner must not call OpenClipboard before calling SetClipboardData.)
-    /// </summary>
-    /// <param name="format">uint</param>
-    /// <param name="memory">IntPtr</param>
-    public static void SetClipboardDataWithErrorHandling(uint format, IntPtr memory)
-    {
-        var result = SetClipboardData(format, memory);
-        if (result == IntPtr.Zero && memory != IntPtr.Zero)
-        {
-            throw new Win32Exception();
-        }
-    }
 }

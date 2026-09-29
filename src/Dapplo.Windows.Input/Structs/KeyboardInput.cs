@@ -91,6 +91,11 @@ public struct KeyboardInput
     /// <returns>KeyboardInput</returns>
     public static KeyboardInput ForKeyDown(VirtualKeyCode virtualKeyCode, uint? timestamp = null)
     {
+        // The generic Win is a pseudo key code, send the left Windows key
+        if (virtualKeyCode == VirtualKeyCode.Win)
+        {
+            virtualKeyCode = VirtualKeyCode.LeftWin;
+        }
         return new KeyboardInput
         {
             VirtualKeyCode = virtualKeyCode,
@@ -108,6 +113,11 @@ public struct KeyboardInput
     /// <returns>KeyboardInput</returns>
     public static KeyboardInput ForKeyUp(VirtualKeyCode virtualKeyCode, uint? timestamp = null)
     {
+        // The generic Win is a pseudo key code, send the left Windows key
+        if (virtualKeyCode == VirtualKeyCode.Win)
+        {
+            virtualKeyCode = VirtualKeyCode.LeftWin;
+        }
         var keyEventFlags = KeyEventFlags.KeyUp;
         if (IsExtendedKey(virtualKeyCode))
         {
@@ -147,6 +157,7 @@ public struct KeyboardInput
             case VirtualKeyCode.Delete:
             case VirtualKeyCode.LeftWin:
             case VirtualKeyCode.RightWin:
+            case VirtualKeyCode.Win:
             case VirtualKeyCode.Apps:
             case VirtualKeyCode.Sleep:
             case VirtualKeyCode.Divide:

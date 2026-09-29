@@ -3,7 +3,11 @@
 
 #if !NETSTANDARD2_0
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Dapplo.Windows.Messages.Enumerations;
 
 namespace Dapplo.Windows.Messages;
@@ -15,10 +19,17 @@ namespace Dapplo.Windows.Messages;
 /// </summary>
 public class WindowsSessionListener : IDisposable
 {
+    private const int RegistrationRetryIntervalMilliseconds = 2000;
+    private const int MaxRegistrationAttempts = 60;
     private IDisposable _subscription;
     private volatile bool _isPaused;
     private volatile bool _isDisposed;
     private readonly object _lock = new object();
+    // The following fields are only used on the thread of the SharedMessageWindow
+    private bool _isActive;
+    private volatile bool _isRegistered;
+    private int _registrationAttempts;
+    private Timer _retryTimer;
 
     /// <summary>
     ///     Flags for WtsRegisterSessionNotification
@@ -33,6 +44,7 @@ public class WindowsSessionListener : IDisposable
     /// <param name="dwFlags">Specifies which session notifications to receive</param>
     /// <returns>Returns true if successful</returns>
     [DllImport("wtsapi32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool WTSRegisterSessionNotification(IntPtr hWnd, int dwFlags);
 
     /// <summary>
@@ -42,6 +54,7 @@ public class WindowsSessionListener : IDisposable
     /// <param name="hWnd">Handle to the window to stop receiving session change notifications</param>
     /// <returns>Returns true if successful</returns>
     [DllImport("wtsapi32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool WTSUnRegisterSessionNotification(IntPtr hWnd);
 
     /// <summary>
@@ -53,6 +66,19 @@ public class WindowsSessionListener : IDisposable
     ///     Event fired when a session logon or logoff occurs
     /// </summary>
     public event EventHandler<SessionChangeEventArgs> SessionLogonChange;
+
+    /// <summary>
+    ///     Event fired when registering for session notifications (WTSRegisterSessionNotification) finally failed.
+    ///     Registration can fail early at logon (RPC_S_INVALID_BINDING) when the Remote Desktop Services are not started yet,
+    ///     therefore a failed registration is retried every 2 seconds for about 2 minutes before this event is raised.
+    ///     The event is raised on the thread of the SharedMessageWindow, the exception is a <see cref="Win32Exception"/>.
+    /// </summary>
+    public event EventHandler<ErrorEventArgs> RegistrationFailed;
+
+    /// <summary>
+    ///     True when the listener is registered for session notifications.
+    /// </summary>
+    public bool IsRegistered => _isRegistered;
 
     /// <summary>
     ///     Starts listening for session change events
@@ -81,12 +107,21 @@ public class WindowsSessionListener : IDisposable
             _subscription = SharedMessageWindow.Listen(
                 onSetup: hwnd =>
                 {
-                    if (!WTSRegisterSessionNotification(hwnd, NOTIFY_FOR_THIS_SESSION))
-                    {
-                        throw new InvalidOperationException("Failed to register for session notifications");
-                    }
+                    _isActive = true;
+                    _registrationAttempts = 0;
+                    TryRegister(hwnd);
                 },
-                onTeardown: hwnd => WTSUnRegisterSessionNotification(hwnd)
+                onTeardown: hwnd =>
+                {
+                    _isActive = false;
+                    _retryTimer?.Dispose();
+                    _retryTimer = null;
+                    if (_isRegistered)
+                    {
+                        _isRegistered = false;
+                        WTSUnRegisterSessionNotification(hwnd);
+                    }
+                }
             )
             .Subscribe(m =>
             {
@@ -113,6 +148,58 @@ public class WindowsSessionListener : IDisposable
                         break;
                 }
             });
+        }
+    }
+
+    /// <summary>
+    ///     Register for session notifications, runs on the thread of the SharedMessageWindow and never throws.
+    ///     A failure is retried with a timer, and reported with RegistrationFailed after the last attempt.
+    /// </summary>
+    /// <param name="hwnd">The handle of the SharedMessageWindow</param>
+    private void TryRegister(nint hwnd)
+    {
+        if (!_isActive || _isRegistered)
+        {
+            return;
+        }
+        _registrationAttempts++;
+        if (WTSRegisterSessionNotification(hwnd, NOTIFY_FOR_THIS_SESSION))
+        {
+            _isRegistered = true;
+            return;
+        }
+        var error = Marshal.GetLastWin32Error();
+        if (_registrationAttempts < MaxRegistrationAttempts)
+        {
+            _retryTimer?.Dispose();
+            _retryTimer = new Timer(_ => RetryRegistration(), null, RegistrationRetryIntervalMilliseconds, Timeout.Infinite);
+            return;
+        }
+
+        var exception = new Win32Exception(error, $"WTSRegisterSessionNotification failed after {_registrationAttempts} attempts (error {error}): {new Win32Exception(error).Message}");
+        try
+        {
+            RegistrationFailed?.Invoke(this, new ErrorEventArgs(exception));
+        }
+        catch (Exception ex)
+        {
+            // Never throw on the window thread
+            Trace.TraceError("WindowsSessionListener: a RegistrationFailed handler threw an exception: {0}", ex);
+        }
+    }
+
+    /// <summary>
+    ///     Called from the retry timer (thread pool), marshals the registration to the window thread
+    /// </summary>
+    private void RetryRegistration()
+    {
+        try
+        {
+            SharedMessageWindow.Invoke(TryRegister);
+        }
+        catch (Exception ex)
+        {
+            Trace.TraceError("WindowsSessionListener: retrying the session notification registration failed: {0}", ex);
         }
     }
 

@@ -90,7 +90,7 @@ public enum DeviceInterfaceClass
     BluetoothDevice,
 
     /// <summary>The GUID_BLUETOOTHLE_DEVICE_INTERFACE device interface class is defined for Bluetooth LE devices.</summary>
-    [Description("00F40965-E89D-4487-9890-87C3ABB211F4")]
+    [Description("781AEE18-7733-4CE4-ADD0-91F41C67B592")]
     BluetoothLeDevice,
 
     /// <summary>
@@ -149,7 +149,7 @@ public enum DeviceInterfaceClass
     Hid,
 
     /// <summary>The GUID_DEVINTERFACE_KEYBOARD device interface class is defined for keyboard devices.</summary>
-    [Description("4D1E55B2-F16F-11CF-88CB-001111000030")]
+    [Description("884B96C3-56EF-11D1-BC8C-00A0C91405DD")]
     Keyboard,
 
     /// <summary>The GUID_DEVINTERFACE_MOUSE device interface class is defined for mouse devices.</summary>

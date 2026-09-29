@@ -1,14 +1,12 @@
-// Copyright (c) Dapplo and contributors. All rights reserved.
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dapplo.Windows.AppRestartManager.Enums;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
-using Dapplo.Windows.Messages.Structs;
 using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 
@@ -23,8 +21,6 @@ namespace Dapplo.Windows.AppRestartManager;
 /// responding to session end events, allowing applications to preserve state and handle shutdowns gracefully.</remarks>
 public static class ApplicationRestartManager
 {
-    private static IObservable<EndSessionMessage> _endSessionObservable;
-
     /// <summary>
     ///     Registers the active instance of an application for restart.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-registerapplicationrestart">RegisterApplicationRestart function</a>
@@ -71,6 +67,9 @@ public static class ApplicationRestartManager
     ///     Registers the current application for automatic restart.
     ///     When the Restart Manager shuts down the application during an update, it will be automatically restarted afterwards.
     /// </summary>
+    /// <remarks>
+    ///     A restart after a crash or hang (unless <see cref="ApplicationRestartFlags"/> excludes it) only happens when the process was running for at least 60 seconds.
+    /// </remarks>
     /// <param name="commandLineArgs">
     ///     Command-line arguments to pass to the application when it is restarted.
     ///     Do not include the executable name - it will be added automatically.
@@ -113,33 +112,23 @@ public static class ApplicationRestartManager
     }
 
     /// <summary>
-    ///     Checks if the current process was started by Restart Manager.
-    ///     This allows the application to detect if it was automatically restarted after an update.
+    ///     Checks if the current process was started with the specified command-line argument.
+    ///     Register for restart with an argument which is only used for this, e.g. <c>RegisterForRestart("/restore")</c>,
+    ///     and check for that argument on startup with <c>WasRestartRequested("/restore")</c>.
     /// </summary>
-    /// <returns>True if the application was restarted by Restart Manager, false otherwise.</returns>
+    /// <param name="restartArgument">One of the arguments which were passed to <see cref="RegisterForRestart"/>, compared case-insensitive</param>
+    /// <returns>True if the current process was started with the argument</returns>
     /// <remarks>
-    ///     This method checks if the application was started with the command-line arguments
-    ///     that were registered via RegisterForRestart(). Applications should implement their own
-    ///     restart detection based on the command-line arguments they register.
-    ///     
-    ///     For example, if you registered with "/restore", check for that specific argument:
-    ///     <code>
-    ///     var args = Environment.GetCommandLineArgs();
-    ///     bool wasRestarted = args.Contains("/restore");
-    ///     </code>
+    ///     Windows cannot tell a process that it was restarted, this only checks the command line: a manual start with the same argument also returns true.
     /// </remarks>
-    public static bool WasRestartRequested()
+    /// <exception cref="ArgumentException">When restartArgument is null or empty</exception>
+    public static bool WasRestartRequested(string restartArgument)
     {
-        // When Restart Manager restarts an application, it passes the registered command-line arguments
-        // Since we don't know what arguments the application registered with, we provide a helper
-        // that checks for common restart indicators, but applications should implement their own logic
-        var args = Environment.GetCommandLineArgs();
-        
-        // Check for common restart-related arguments
-        // Applications should use their own specific arguments for more reliable detection
-        return args.Any(arg => arg.Equals("/restart", StringComparison.OrdinalIgnoreCase) ||
-                               arg.Equals("-restart", StringComparison.OrdinalIgnoreCase) ||
-                               arg.Equals("--restart", StringComparison.OrdinalIgnoreCase));
+        if (string.IsNullOrEmpty(restartArgument))
+        {
+            throw new ArgumentException("The restart argument must be specified", nameof(restartArgument));
+        }
+        return GetRestartCommandLineArgs().Any(arg => arg.Equals(restartArgument, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -151,7 +140,7 @@ public static class ApplicationRestartManager
     /// <example>
     ///     <code>
     ///     // If you registered with "/restore", check for it:
-    ///     var args = RestartManager.GetRestartCommandLineArgs();
+    ///     var args = ApplicationRestartManager.GetRestartCommandLineArgs();
     ///     if (args.Contains("/restore"))
     ///     {
     ///         // Application was restarted, restore state
@@ -166,74 +155,30 @@ public static class ApplicationRestartManager
     }
 
     /// <summary>
-    ///     Creates an observable stream that listens for WM_QUERYENDSESSION and WM_ENDSESSION messages.
-    ///     This allows applications to be notified when the system is about to shut down or restart.
+    ///     An observable stream of the WM_QUERYENDSESSION and WM_ENDSESSION messages which the shared message window receives,
+    ///     this allows applications to be notified when the session ends (shutdown, restart, log off) or the Restart Manager wants the application to close.
     /// </summary>
-    /// <param name="onQuerySession">This function will be called when a WM_QUERYENDSESSION message is received. Return true to indicate that the session end can proceed, or false to block it. If null, the message will be passed to the observable stream for handling by subscribers.</param>
-    /// <param name="onEndSession">This function will be called when a WM_ENDSESSION message is received. The session is ending at that point and cannot be blocked anymore, the return value is ignored (the message is answered with 0). If null, the message will be passed to the observable stream for handling by subscribers.</param>
-    /// <returns>
-    ///     An observable stream that emits EndSessionMessage values when a session end event occurs.
-    ///     Subscribe to this observable to handle shutdown requests gracefully.
-    /// </returns>
-    public static IObservable<EndSessionMessage> ListenForEndSession(Func<EndSessionReasons, bool> onQuerySession = null, Func<EndSessionReasons, bool> onEndSession = null)
+    /// <remarks>
+    ///     Every call returns an independent subscription source, all subscribers see every message.
+    ///     OnNext is called synchronously on the thread of the shared message window, WM_QUERYENDSESSION can be answered with
+    ///     <see cref="EndSessionMessage.CanEndSession"/> or <see cref="EndSessionMessage.Veto"/> from within OnNext.
+    ///     If nobody answers, the session end is allowed.
+    ///     For WM_ENDSESSION with <see cref="EndSessionMessage.IsSessionEnding"/> the process can be terminated at any time after OnNext returned,
+    ///     save state synchronously and do not rely on marshalling to the UI thread.
+    /// </remarks>
+    /// <returns>IObservable of EndSessionMessage</returns>
+    public static IObservable<EndSessionMessage> ListenForEndSession()
     {
-        return _endSessionObservable ??= Observable.Create<EndSessionMessage>(observer =>
-        {
-            // Subscribe to the SharedMessageWindow for handling the WM_INPUT
-            var messageSubscription = SharedMessageWindow.Messages
-                .Where(windowsMessage => windowsMessage.Msg.IsIn(WindowsMessages.WM_QUERYENDSESSION, WindowsMessages.WM_ENDSESSION)) // filter for raw input
-                .Subscribe(windowsMessage =>
-                {
-                    var endSessionReason = (EndSessionReasons)windowsMessage.LParam;
-                    // Call the supplied functions before the messages are handled
-                    switch (windowsMessage.Msg)
-                    {
-                        case WindowsMessages.WM_QUERYENDSESSION:
-                            if (onQuerySession != null)
-                            {
-                                var canEndSession = onQuerySession(endSessionReason);
-                                // WM_QUERYENDSESSION is not an HRESULT message: TRUE (1) allows the session to end, FALSE (0) blocks it
-                                windowsMessage.Result = canEndSession ? (nuint)1 : 0;
-                                windowsMessage.Handled = true;
-                            }
-                            break;
-                        case WindowsMessages.WM_ENDSESSION:
-                            if (onEndSession != null)
-                            {
-                                onEndSession(endSessionReason);
-                                // An application that processes WM_ENDSESSION must return zero
-                                windowsMessage.Result = 0;
-                                windowsMessage.Handled = true;
-                            }
-                            break;
-                    }
-                    // If the message was not handled by the supplied functions, pass it to the observable stream
-                    if (!windowsMessage.Handled)
-                    {
-                        var endSessionMessage = new EndSessionMessage(windowsMessage.Msg, endSessionReason);
-                        observer.OnNext(endSessionMessage);
-                        if (endSessionMessage.Handled)
-                        {
-                            windowsMessage.Handled = true;
-                            windowsMessage.Result = endSessionMessage.Result;
-                        }
-                    }
-                });
-
-            // Return the disposal logic
-            return Disposable.Create(() =>
+        return SharedMessageWindow.Messages
+            .Where(windowMessage => windowMessage.Msg == WindowsMessages.WM_QUERYENDSESSION || windowMessage.Msg == WindowsMessages.WM_ENDSESSION)
+            .Select(windowMessage =>
             {
-                // Clear the cached observable so it must be recreated if Listen() is called again.
-                _endSessionObservable = null; 
-                // Dispose the SharedMessageWindow subscription
-                messageSubscription.Dispose();
+                if (windowMessage.Msg == WindowsMessages.WM_ENDSESSION)
+                {
+                    // The query is over (it was either cancelled or the session ends), remove a block reason which was set by EndSessionMessage.Veto
+                    EndSessionMessage.RemoveBlockReason(windowMessage.Hwnd);
+                }
+                return new EndSessionMessage(windowMessage);
             });
-        })
-        // This is the magic part:
-        // .Publish() multicasts the observable to all subscribers.
-        // .RefCount() keeps track of subscribers and automatically disposes 
-        // the inner subscription when the count reaches 0.
-        .Publish()
-        .RefCount();
     }
 }

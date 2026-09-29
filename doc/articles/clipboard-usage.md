@@ -32,6 +32,8 @@ var subscription = ClipboardNative.OnUpdate.Subscribe(info =>
 subscription.Dispose();
 ```
 
+Every subscriber first receives the current state, then one update per clipboard change. The information (`Id`, `OwnerHandle`, `Formats`/`FormatIds`) is collected without opening the clipboard (GetClipboardSequenceNumber, GetClipboardOwner, GetUpdatedClipboardFormats), so it never blocks or fails when another application holds the clipboard.
+
 ### Filter by Format
 
 ```csharp
@@ -65,7 +67,7 @@ var fileSubscription = ClipboardNative.OnUpdate
 
 ### Thread Synchronization
 
-Ensure clipboard operations run on the correct thread:
+`OnUpdate` publishes on the thread of the SharedMessageWindow. Keep handlers short, and use `ObserveOn` before doing real work, especially before opening the clipboard with `ClipboardNative.Access()`:
 
 ```csharp
 using Dapplo.Windows.Clipboard;
@@ -86,7 +88,10 @@ var subscription = ClipboardNative.OnUpdate
 
 ### Access Clipboard
 
-Always use the `Access()` method to safely access the clipboard:
+Always use the `Access()` method (or `await AccessAsync()`) to safely access the clipboard.
+Windows ties an opened clipboard to the thread which opened it: use and dispose the token on that thread, and don't `await` while holding it
+(`AccessAsync()` only waits asynchronously, the clipboard is opened on the thread which continues after the `await`).
+On another thread `CanAccess` is `false` and the extension methods throw a `ClipboardAccessDeniedException`.
 
 ```csharp
 using Dapplo.Windows.Clipboard;
@@ -147,6 +152,7 @@ using (var clipboard = ClipboardNative.Access())
     // Read as stream (PNG format)
     if (clipboard.AvailableFormats().Contains("PNG"))
     {
+        // The stream reads the clipboard memory directly, use it inside the using block of the access token
         using var stream = clipboard.GetAsStream("PNG");
         using var fileStream = File.Create("clipboard_image.png");
         stream.CopyTo(fileStream);
@@ -177,7 +183,7 @@ using (var clipboard = ClipboardNative.Access())
         // Read as stream
         using var stream = clipboard.GetAsStream(customFormat);
         
-        // Read as bytes
+        // Read as bytes, note: this is the complete memory block, which can be larger than the data which was placed
         byte[] data = clipboard.GetAsBytes(customFormat);
         
         Console.WriteLine($"Custom data size: {data.Length} bytes");
@@ -187,6 +193,9 @@ using (var clipboard = ClipboardNative.Access())
 
 ## Writing to Clipboard
 
+Call `ClearContents()` before placing new content: this removes the formats of the previous owner (otherwise they are mixed with yours)
+and makes the window of the token (by default the SharedMessageWindow) the clipboard owner.
+
 ### Set Text
 
 ```csharp
@@ -194,6 +203,7 @@ using Dapplo.Windows.Clipboard;
 
 using (var clipboard = ClipboardNative.Access())
 {
+    clipboard.ClearContents();
     clipboard.SetAsUnicodeString("Hello, World!");
 }
 ```
@@ -227,7 +237,8 @@ using (var clipboard = ClipboardNative.Access())
 {
     string customFormat = "MyApplication.CustomFormat";
     byte[] data = Encoding.UTF8.GetBytes("Custom clipboard data");
-    
+
+    clipboard.ClearContents();
     clipboard.SetAsBytes(data, customFormat);
 }
 ```
@@ -243,59 +254,50 @@ using System.Text;
 using (var clipboard = ClipboardNative.Access())
 {
     string text = "Hello, World!";
-    
-    // Set as both Unicode text and HTML
+
+    clipboard.ClearContents();
+    // Set as both Unicode text and RTF
     clipboard.SetAsUnicodeString(text);
-    
-    string html = $"<html><body>{text}</body></html>";
-    clipboard.SetAsBytes(Encoding.UTF8.GetBytes(html), "HTML Format");
+    clipboard.SetAsBytes(Encoding.ASCII.GetBytes(@"{\rtf1\ansi Hello, World!}"), "Rich Text Format");
 }
 ```
+
+Note: "HTML Format" (CF_HTML) is not plain HTML, it needs a header with `Version`, `StartHTML`, `EndHTML`, `StartFragment` and `EndFragment` byte offsets,
+see [HTML Clipboard Format](https://learn.microsoft.com/en-us/windows/win32/dataxchg/html-clipboard-format).
 
 ## Advanced Scenarios
 
 ### Delayed Rendering
 
-Delayed rendering allows you to provide clipboard data only when it's actually requested:
+Delayed rendering allows you to provide clipboard data only when it's actually requested.
+Register a renderer for the format first, then advertise the format:
 
 ```csharp
 using Dapplo.Windows.Clipboard;
 using System;
 
-// Subscribe to render requests
-var renderSubscription = ClipboardNative.OnRenderFormat.Subscribe(request =>
+// Keep the registration as long as the content can be requested, dispose it afterwards
+IDisposable renderer = ClipboardNative.RegisterDelayedRenderer("MyFormat", request =>
 {
-    if (request.IsDestroyClipboard)
-    {
-        // Clean up any delayed rendering resources
-        return;
-    }
-
-    if (request.RenderAllFormats)
-    {
-        // Render all delayed formats
-        return;
-    }
-
-    // Render specific format on demand.
-    // Note: When responding to WM_RENDERFORMAT, the clipboard is already open.
-    // Use the AccessToken provided in the request - do NOT call ClipboardNative.Access().
-    switch (request.RequestedFormat)
-    {
-        case "MyFormat":
-            byte[] data = GenerateLargeData(); // Only generate when needed
-            request.AccessToken.SetAsBytes(data, "MyFormat");
-            break;
-    }
+    // Called synchronously on the SharedMessageWindow thread, Windows needs the data before this returns.
+    // Use the AccessToken of the request, it's only valid during this call:
+    // do NOT call ClipboardNative.Access(), await or ObserveOn here.
+    // request.RenderAllFormats is true when the owner window is destroyed and all not yet requested formats must be rendered.
+    byte[] data = GenerateLargeData(); // Only generate when needed
+    request.AccessToken.SetAsBytes(data, request.RequestedFormatId);
 });
 
-// Set clipboard with delayed rendering
+// Set clipboard with delayed rendering, ClearContents makes the SharedMessageWindow the owner which receives the requests
 using (var clipboard = ClipboardNative.Access())
 {
     clipboard.ClearContents();
     clipboard.SetDelayedRenderedContent("MyFormat");
 }
 ```
+
+`SetDelayedRenderedContent` throws an `InvalidOperationException` if no renderer is registered for the format, or if the clipboard isn't owned by the window of the token (call `ClearContents()` first).
+The library answers WM_RENDERFORMAT without opening the clipboard, and opens/closes the clipboard itself for WM_RENDERALLFORMATS.
+Exceptions thrown by a renderer are written to `System.Diagnostics.Trace`.
 
 ### Clear Clipboard
 
@@ -395,7 +397,10 @@ The cloud clipboard formats allow you to control three aspects of clipboard beha
 
 1. **CanIncludeInClipboardHistory** - Controls whether the content appears in Windows clipboard history (Win+V)
 2. **CanUploadToCloudClipboard** - Controls whether the content syncs across devices via cloud
-3. **ExcludeClipboardContentFromMonitorProcessing** - Controls whether clipboard monitoring apps can process the content
+3. **ExcludeClipboardContentFromMonitorProcessing** - When present (whatever the value), the content is excluded from history, cloud sync and clipboard monitoring apps
+
+`SetCloudClipboardOptions` only places the formats for the options which are specified: `canIncludeInHistory` and `canUploadToCloud` are `bool?` (null = don't place the format, true = DWORD 1, false = DWORD 0),
+and the exclusion format is only placed for `excludeFromMonitoring: true`. Without options nothing is placed and the Windows defaults apply.
 
 ### Setting Cloud Clipboard Options
 
@@ -407,6 +412,7 @@ using Dapplo.Windows.Clipboard;
 using (var clipboard = ClipboardNative.Access())
 {
     // Set your clipboard content
+    clipboard.ClearContents();
     clipboard.SetAsUnicodeString("Sensitive information");
     
     // Prevent from being stored in history or synced to cloud
@@ -429,6 +435,7 @@ using Dapplo.Windows.Clipboard;
 
 using (var clipboard = ClipboardNative.Access())
 {
+    clipboard.ClearContents();
     clipboard.SetAsUnicodeString("MyPassword123!");
     
     // Disable history and cloud sync for sensitive data
@@ -448,6 +455,7 @@ using Dapplo.Windows.Clipboard;
 
 using (var clipboard = ClipboardNative.Access())
 {
+    clipboard.ClearContents();
     clipboard.SetAsUnicodeString("Temporary data");
     
     // Don't include in history, but allow cloud sync
@@ -460,17 +468,19 @@ using (var clipboard = ClipboardNative.Access())
 
 #### Normal Content (Default)
 
-For normal content that should be available in history and cloud:
+For normal content nothing needs to be placed, the Windows defaults (history and cloud sync as configured by the user) apply.
+To explicitly allow both:
 
 ```csharp
 using Dapplo.Windows.Clipboard;
 
 using (var clipboard = ClipboardNative.Access())
 {
+    clipboard.ClearContents();
     clipboard.SetAsUnicodeString("Normal clipboard content");
-    
-    // Use defaults - allows history and cloud
-    clipboard.SetCloudClipboardOptions();
+
+    // Explicitly allow history and cloud sync, this doesn't place the exclusion format
+    clipboard.SetCloudClipboardOptions(canIncludeInHistory: true, canUploadToCloud: true);
 }
 ```
 
@@ -483,12 +493,14 @@ using Dapplo.Windows.Clipboard;
 
 using (var clipboard = ClipboardNative.Access())
 {
+    clipboard.ClearContents();
     clipboard.SetAsUnicodeString("My content");
-    
+
     // Set options individually
     clipboard.SetCanIncludeInClipboardHistory(false);
     clipboard.SetCanUploadToCloudClipboard(true);
-    clipboard.SetExcludeClipboardContentFromMonitorProcessing(true);
+    // Or exclude the content from history, cloud sync and monitoring applications completely
+    clipboard.ExcludeFromMonitorProcessing();
 }
 ```
 
@@ -516,7 +528,7 @@ using (var clipboard = ClipboardNative.Access())
 ### Best Practices for Cloud Clipboard
 
 1. **Always set cloud options after setting content** - The cloud formats should be set in the same clipboard access session as your content
-2. **Default to allowing** - Unless you have a specific reason, use the defaults which allow history and cloud sync
+2. **Default to the Windows defaults** - Unless you have a specific reason, don't place any of these formats
 3. **Be consistent** - If you disable history, you probably want to disable cloud sync too
 4. **Consider user privacy** - For passwords and sensitive data, always disable history and cloud sync
 
@@ -551,9 +563,9 @@ using (var clipboard = ClipboardNative.Access())
 
 ## Best Practices
 
-### 1. Always Use `using` Statements
+### 1. Always Use `using` Statements, Short and on One Thread
 
-This ensures the clipboard is properly released:
+This ensures the clipboard is properly released. Don't `await` or switch threads while holding the token, and keep the block short: no other application can use the clipboard meanwhile.
 
 ```csharp
 using (var clipboard = ClipboardNative.Access())

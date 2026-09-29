@@ -12,7 +12,7 @@ Targets: `net480`, `netstandard2.0`, `net8.0-windows`, `net10.0-windows`
 - [Putting the System to Sleep or Hibernate](#putting-the-system-to-sleep-or-hibernate)
 - [Shutdown, Restart, and Logoff](#shutdown-restart-and-logoff)
 - [Locking the Workstation](#locking-the-workstation)
-- [Thread Execution State (Preventing Sleep)](#thread-execution-state-preventing-sleep)
+- [Preventing Sleep](#preventing-sleep)
 - [Waitable Timers (Scheduled Wake-Up)](#waitable-timers-scheduled-wake-up)
   - [One-Shot Timer (Relative)](#one-shot-timer-relative)
   - [One-Shot Timer (Absolute UTC Time)](#one-shot-timer-absolute-utc-time)
@@ -65,7 +65,10 @@ PowerManagementApi.SetSuspendState(hibernate: false, forceCritical: false, disab
 
 `PowerManagementApi` wraps `ExitWindowsEx` from `user32.dll`.
 
-> **Privilege note:** Shutdown and reboot require the `SE_SHUTDOWN_NAME` privilege. Logoff does not.
+> `Shutdown` and `Restart` enable the `SE_SHUTDOWN_NAME` privilege of the process (interactive users hold it, but it is disabled by default),
+> `Shutdown` powers off (`EWX_POWEROFF`), and both log a planned shutdown (`ShutdownReasonPlannedOther`). Without `force` hung applications are
+> terminated after a timeout (`EWX_FORCEIFHUNG`); `force: true` uses `EWX_FORCE`, which can lose data. When calling `ExitWindowsEx` directly,
+> call `PowerManagementApi.EnableShutdownPrivilege()` first.
 
 ```csharp
 using Dapplo.Windows.SystemState;
@@ -79,14 +82,15 @@ PowerManagementApi.Shutdown();
 // Restart
 PowerManagementApi.Restart();
 
-// Force close hung applications before shutting down
+// Force applications to close before shutting down (they can lose data)
 PowerManagementApi.Shutdown(force: true);
 
 // Raw call with explicit flags
 using Dapplo.Windows.SystemState.Enums;
 
+PowerManagementApi.EnableShutdownPrivilege();
 PowerManagementApi.ExitWindowsEx(
-    ExitWindowsFlags.EWX_SHUTDOWN | ExitWindowsFlags.EWX_FORCEIFHUNG);
+    ExitWindowsFlags.EWX_POWEROFF | ExitWindowsFlags.EWX_FORCEIFHUNG, PowerManagementApi.ShutdownReasonPlannedOther);
 ```
 
 ---
@@ -104,38 +108,30 @@ PowerManagementApi.LockWorkStation();
 
 ---
 
-## Thread Execution State (Preventing Sleep)
-
-Use `SystemStateApi` which wraps `SetThreadExecutionState` from `kernel32.dll`.
+## Preventing Sleep
 
 ```csharp
 using Dapplo.Windows.SystemState;
 
-// Prevent the system AND the display from sleeping while a long task runs
-SystemStateApi.PreventSleep();
-
-DoLongRunningWork();
-
-// Re-enable normal sleep behavior when done
-SystemStateApi.AllowSleep();
+// Prevent the system AND the screen from sleeping while a task runs, until the blocker is disposed
+using (SystemStateApi.PreventSleep("Rendering video"))
+{
+    await DoLongRunningWorkAsync();
+}
 
 // Prevent only the system from sleeping (screen may still turn off)
-SystemStateApi.PreventSystemSleep();
-DoBackgroundWork();
-SystemStateApi.AllowSleep();
-
-// One-shot: reset the system idle timer without persistent prevention
-using Dapplo.Windows.SystemState.Enums;
-SystemStateApi.SetThreadExecutionState(ThreadExecutionStateFlags.ES_SYSTEM_REQUIRED);
+using (SystemStateApi.PreventSystemSleep("Synchronizing files"))
+{
+    await DoBackgroundSyncAsync();
+}
 ```
 
-| Convenience method | What it does |
-|---|---|
-| `PreventSleep()` | Keeps both system and display awake (`ES_CONTINUOUS \| ES_SYSTEM_REQUIRED \| ES_DISPLAY_REQUIRED`) |
-| `PreventSystemSleep()` | Keeps only the system awake, screen may still turn off (`ES_CONTINUOUS \| ES_SYSTEM_REQUIRED`) |
-| `AllowSleep()` | Clears the continuous flag, restoring default sleep behavior (`ES_CONTINUOUS`) |
+`PreventSleep` / `PreventSystemSleep` return a `SleepBlocker` which uses a power request (`PowerCreateRequest` / `PowerSetRequest`).
+Unlike `SetThreadExecutionState`, a power request is not bound to a thread: it can be created and disposed on different threads (e.g. around an `await`),
+several blockers can be active at the same time, and the reason is shown by `powercfg /requests`. The system can sleep again when all blockers are disposed or the process exits.
 
-> **Important:** Always call `AllowSleep()` (or `ES_CONTINUOUS` on its own) when the work is complete. Forgetting to restore the state will prevent the system from sleeping until the process exits.
+`SystemStateApi.SetThreadExecutionState` is still available, but note that a state set with `ES_CONTINUOUS` belongs to the calling thread:
+it is only reset by a call on the same thread and it ends when that thread exits, so don't use it from thread-pool threads or async code.
 
 ---
 

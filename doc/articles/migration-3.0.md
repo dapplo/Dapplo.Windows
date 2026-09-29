@@ -150,6 +150,93 @@ The members are static properties, so they can't be used in `case` labels or as 
 now returns `System.Runtime.InteropServices.ComTypes.ITypeInfo` on every target, and `Invoke` reports the argument
 error as `out uint`.
 
+## Messages and SharedMessageWindow
+
+`WindowMessage` is a sealed class. Set `Handled` and `Result` synchronously inside `OnNext`; after `ObserveOn` the
+reply has already been sent.
+
+```csharp
+// 2.x (had no effect, the struct was a copy)
+SharedMessageWindow.Messages.Subscribe(m => { m.Result = (nuint)1; m.Handled = true; });
+// 3.0
+SharedMessageWindow.Messages.Subscribe(m => { m.Result = 1; m.Handled = true; });
+```
+
+The window now exists for the whole process after first use. `Handle` never returns 0, so drop any "wait until the
+window exists" code. Registrations that need the window go into `Listen(onSetup, onTeardown)`, which runs both on the
+window thread. Use `SharedMessageWindow.Invoke(hwnd => ...)` to run other code there.
+
+## End of session
+
+```csharp
+// 2.x
+ApplicationRestartManager.ListenForEndSession(onQuerySession: reason => canClose, onEndSession: reason => Save()).Subscribe();
+// 3.0: answer synchronously inside OnNext
+ApplicationRestartManager.ListenForEndSession().Subscribe(m =>
+{
+    if (m.IsQuery)
+    {
+        if (!canClose) m.Veto("Unsaved captures");
+    }
+    else if (m.IsSessionEnding)
+    {
+        Save();
+    }
+});
+```
+
+`EndSessionMessage` moved from `Dapplo.Windows.Messages.Structs` to `Dapplo.Windows.AppRestartManager`.
+`WasRestartRequested()` becomes `WasRestartRequested("/restore")` with the argument you registered.
+
+## Keyboard and mouse hooks
+
+`KeyboardHook` and `MouseHook` run on their own thread, so subscribers are no longer called on the UI thread. Decide
+`Handled` quickly and synchronously, and move UI work to the UI thread:
+
+```csharp
+KeyboardHook.KeyboardEvents
+    .Where(handler)                              // sets Handled synchronously
+    .ObserveOn(SynchronizationContext.Current)   // then do the slow work on the UI thread
+    .Subscribe(args => OnHotkey());
+```
+
+For listeners that never set `Handled`, use `KeyboardEventsNonBlocking` / `MouseEventsNonBlocking`.
+
+`"win"` parses to the new `VirtualKeyCode.Win`, which matches either Windows key. Use `LeftWin` to require the left key.
+
+## Raw input
+
+`args.RawInput.Device.HID.GetData()` becomes `args.HidData`. `RawInputApi.GetRawInputData(…)` becomes
+`RawInputApi.TryGetRawInputData(lParam, out var rawInput, out var hidData)`.
+
+## Clipboard
+
+- Delayed rendering: register the renderer before `SetDelayedRenderedContent`.
+
+  ```csharp
+  // 2.x
+  ClipboardNative.OnRenderFormat.Subscribe(r => r.AccessToken.SetAsUnicodeString(text, r.RequestedFormatId));
+  // 3.0
+  using var registration = ClipboardNative.RegisterDelayedRenderer(StandardClipboardFormats.UnicodeText,
+      r => r.AccessToken.SetAsUnicodeString(text, r.RequestedFormatId));
+  ```
+
+- `ClipboardUpdateInformation.Create(hWnd)` becomes `Create()`. `OnUpdate` no longer reads content; call `Access()`
+  after `ObserveOn` to read it.
+- Keep an access token on one thread and don't `await` while holding it. Cancelling `AccessAsync` throws
+  `OperationCanceledException` instead of returning a token with `IsOpenTimeout`.
+- `SetCloudClipboardOptions()` without arguments now places nothing. `SetExcludeClipboardContentFromMonitorProcessing(true)`
+  becomes `ExcludeFromMonitorProcessing()`.
+
+## System state
+
+```csharp
+// 2.x
+SystemStateApi.PreventSleep(); /* ... */ SystemStateApi.AllowSleep();
+// 3.0
+using (SystemStateApi.PreventSleep("Recording")) { /* ... */ }
+```
+
 ## Kernel32
 
 `ProcessAccessRights.QueryLimitedInformation` had the value of `QueryInformation` (0x400). It is now 0x1000, which also

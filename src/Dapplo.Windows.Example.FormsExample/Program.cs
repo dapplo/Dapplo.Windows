@@ -9,6 +9,7 @@ using Dapplo.Windows.Messages.Enumerations;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Dapplo.Windows.Example.FormsExample;
@@ -31,21 +32,6 @@ internal static class Program
             Debug.WriteLine($"Received windows message {message.Msg}");
         });
         ApplicationRestartManager.RegisterForRestart("--restart");
-        ApplicationRestartManager.ListenForEndSession(
-                onQuerySession: (endSessionReason) => {
-                    return true;
-                },
-                onEndSession: (endSessionReason) =>
-                {
-                    Debug.WriteLine($"Shutting down application due to {endSessionReason}");
-                    Application.Exit();
-                    return true;
-                }
-                ).Subscribe(endSessionMessage =>
-                {
-                    Debug.WriteLine($"{endSessionMessage.Msg} with session reason: {endSessionMessage.EndSessionReason}");
-                });
-
         LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Verbose);
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
@@ -57,6 +43,25 @@ internal static class Program
         formExtendsDpiAwareForm.Show();
         var webBrowserForm = new WebBrowserForm();
         webBrowserForm.Show();
+
+        // The end session messages arrive on the thread of the shared message window, not on the UI thread
+        var uiContext = SynchronizationContext.Current;
+        ApplicationRestartManager.ListenForEndSession().Subscribe(endSessionMessage =>
+        {
+            Debug.WriteLine($"Received {endSessionMessage}");
+            if (endSessionMessage.IsQuery)
+            {
+                // Answer synchronously, this is the default and could be left out. Use endSessionMessage.Veto("reason") to block.
+                endSessionMessage.CanEndSession = true;
+                return;
+            }
+            if (endSessionMessage.IsSessionEnding)
+            {
+                // Save state here, synchronously: the process can be terminated as soon as this returns
+                Debug.WriteLine($"Shutting down application due to {endSessionMessage.EndSessionReason}");
+                uiContext?.Post(_ => Application.Exit(), null);
+            }
+        });
         Application.Run();
     }
 }

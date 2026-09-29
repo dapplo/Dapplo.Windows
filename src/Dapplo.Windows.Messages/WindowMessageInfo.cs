@@ -32,6 +32,18 @@ public class WindowMessageInfo
     public IntPtr LongParam { get; private set; }
 
     /// <summary>
+    /// Set this to true to indicate that the message has been handled, the window procedure then returns <see cref="Result"/> to Windows.
+    /// Only honoured when set synchronously inside OnNext on the UI thread.
+    /// </summary>
+    public bool Handled { get; set; }
+
+    /// <summary>
+    /// The LRESULT which is returned to Windows when <see cref="Handled"/> is true.
+    /// Only honoured when set synchronously inside OnNext on the UI thread.
+    /// </summary>
+    public IntPtr Result { get; set; }
+
+    /// <summary>
     /// Factory method for the Window Message Info
     /// </summary>
     /// <param name="hWnd">IntPtr with the Handle of the window</param>

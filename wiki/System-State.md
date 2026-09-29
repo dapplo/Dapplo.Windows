@@ -15,7 +15,7 @@ Install-Package Dapplo.Windows.SystemState
 - [Putting the System to Sleep or Hibernate](#putting-the-system-to-sleep-or-hibernate)
 - [Shutdown, Restart, and Logoff](#shutdown-restart-and-logoff)
 - [Locking the Workstation](#locking-the-workstation)
-- [Thread Execution State — Preventing Sleep](#thread-execution-state--preventing-sleep)
+- [Preventing Sleep](#preventing-sleep)
 - [WaitableTimer — Scheduled Wake-Up](#waitabletimer--scheduled-wake-up)
 - [PowerBroadcastListener — Reacting to Power Events](#powerbroadcastlistener--reacting-to-power-events)
 - [Combining Wake Timers with Power Events](#combining-wake-timers-with-power-events)
@@ -45,7 +45,10 @@ PowerManagementApi.Sleep(disableWakeEvent: true);
 
 `PowerManagementApi` wraps `ExitWindowsEx` from `user32.dll`.
 
-> Shutdown and reboot require the `SE_SHUTDOWN_NAME` privilege.
+> `Shutdown` and `Restart` enable the `SE_SHUTDOWN_NAME` privilege of the process (interactive users hold it, but it is disabled by default),
+> `Shutdown` powers off (`EWX_POWEROFF`), and both log a planned shutdown (`ShutdownReasonPlannedOther`). Without `force` hung applications are
+> terminated after a timeout (`EWX_FORCEIFHUNG`); `force: true` uses `EWX_FORCE`, which can lose data. When calling `ExitWindowsEx` directly,
+> call `PowerManagementApi.EnableShutdownPrivilege()` first.
 
 ```csharp
 using Dapplo.Windows.SystemState;
@@ -54,14 +57,15 @@ PowerManagementApi.LogOff();
 PowerManagementApi.Shutdown();
 PowerManagementApi.Restart();
 
-// Force close hung applications before shutting down
+// Force applications to close before shutting down (they can lose data)
 PowerManagementApi.Shutdown(force: true);
 
 // Raw call with explicit flags
 using Dapplo.Windows.SystemState.Enums;
 
+PowerManagementApi.EnableShutdownPrivilege();
 PowerManagementApi.ExitWindowsEx(
-    ExitWindowsFlags.EWX_SHUTDOWN | ExitWindowsFlags.EWX_FORCEIFHUNG);
+    ExitWindowsFlags.EWX_POWEROFF | ExitWindowsFlags.EWX_FORCEIFHUNG, PowerManagementApi.ShutdownReasonPlannedOther);
 ```
 
 ---
@@ -77,31 +81,30 @@ PowerManagementApi.LockWorkStation();
 
 ---
 
-## Thread Execution State — Preventing Sleep
-
-`SystemStateApi` wraps `SetThreadExecutionState` from `kernel32.dll`.
+## Preventing Sleep
 
 ```csharp
 using Dapplo.Windows.SystemState;
 
-// Prevent the system AND screen from sleeping while a task runs
-SystemStateApi.PreventSleep();
-DoLongRunningWork();
-SystemStateApi.AllowSleep(); // always restore when done
+// Prevent the system AND the screen from sleeping while a task runs, until the blocker is disposed
+using (SystemStateApi.PreventSleep("Rendering video"))
+{
+    await DoLongRunningWorkAsync();
+}
 
 // Prevent only the system from sleeping (screen may still turn off)
-SystemStateApi.PreventSystemSleep();
-DoBackgroundSync();
-SystemStateApi.AllowSleep();
+using (SystemStateApi.PreventSystemSleep("Synchronizing files"))
+{
+    await DoBackgroundSyncAsync();
+}
 ```
 
-| Method | Flags Set |
-|---|---|
-| `PreventSleep()` | `ES_CONTINUOUS \| ES_SYSTEM_REQUIRED \| ES_DISPLAY_REQUIRED` |
-| `PreventSystemSleep()` | `ES_CONTINUOUS \| ES_SYSTEM_REQUIRED` |
-| `AllowSleep()` | `ES_CONTINUOUS` (clears all other flags) |
+`PreventSleep` / `PreventSystemSleep` return a `SleepBlocker` which uses a power request (`PowerCreateRequest` / `PowerSetRequest`).
+Unlike `SetThreadExecutionState`, a power request is not bound to a thread: it can be created and disposed on different threads (e.g. around an `await`),
+several blockers can be active at the same time, and the reason is shown by `powercfg /requests`. The system can sleep again when all blockers are disposed or the process exits.
 
-> Always call `AllowSleep()` when finished — if you forget, the system will not sleep until your process exits.
+`SystemStateApi.SetThreadExecutionState` is still available, but note that a state set with `ES_CONTINUOUS` belongs to the calling thread:
+it is only reset by a call on the same thread and it ends when that thread exits, so don't use it from thread-pool threads or async code.
 
 ---
 

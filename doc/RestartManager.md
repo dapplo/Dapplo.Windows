@@ -8,7 +8,7 @@ Dapplo.Windows provides a comprehensive .NET API for the Windows Restart Manager
 
 ### For Installers/Updaters
 
-- **`Dapplo.Windows.InstallerRestartManager`** - Package for installers
+- **`Dapplo.Windows.InstallerManager`** - Package for installers
   - **`InstallerRestartManager`** - High-level helper class that manages Restart Manager sessions
   - **`RestartManagerApi`** (in Kernel32) - Low-level P/Invoke declarations (for advanced scenarios)
 
@@ -29,34 +29,38 @@ Applications can register themselves to be automatically restarted by Restart Ma
 ```csharp
 using Dapplo.Windows.AppRestartManager;
 
-// Register for restart with command-line arguments
+// Register with command-line arguments that restore the previous state
 ApplicationRestartManager.RegisterForRestart("/restore /minimized");
 
-// Or register without arguments
+// Register without arguments
 ApplicationRestartManager.RegisterForRestart();
 ```
 
+A restart after a crash or a hang only happens when the process was running for at least 60 seconds.
+
 ### When to Register for Restart
 
-The best time to register for restart is during application startup, in your `Main` method or application initialization:
+The best time to register for restart is during application startup, in your `Main` method or application initialization.
+
+Windows does not tell a process that it was restarted: the restarted instance only gets the command line you registered.
+Register an argument that you use only for this, and check for it with `WasRestartRequested(argument)`
+(a manual start with the same argument also returns true):
 
 ```csharp
 using Dapplo.Windows.AppRestartManager;
 
 static void Main(string[] args)
 {
-    // Register for restart early in the application lifecycle
+    // Register early; these arguments are passed to the restarted instance
     ApplicationRestartManager.RegisterForRestart("/restore");
-    
-    // Check if we were restarted by Restart Manager
-    if (ApplicationRestartManager.WasRestartRequested())
+
+    if (ApplicationRestartManager.WasRestartRequested("/restore"))
     {
-        // Restore previous state, show notification, etc.
-        Console.WriteLine("Application was restarted after an update");
+        Console.WriteLine("Restarted after an update, restoring the previous state.");
+        RestorePreviousState();
     }
-    
-    // Continue with normal application startup
-    ApplicationRestartManager.Run(new MainForm());
+
+    Application.Run(new MainForm());
 }
 ```
 
@@ -66,25 +70,12 @@ You can control when your application should NOT be restarted using flags:
 
 ```csharp
 using Dapplo.Windows.AppRestartManager;
-using Dapplo.Windows.Kernel32.Enums;
+using Dapplo.Windows.AppRestartManager.Enums;
 
-// Don't restart if the application crashes
 ApplicationRestartManager.RegisterForRestart(
     commandLineArgs: "/restore",
-    flags: ApplicationRestartFlags.RestartNoCrash
-);
-
-// Don't restart on crash or hang
-ApplicationRestartManager.RegisterForRestart(
-    commandLineArgs: "/restore",
-    flags: ApplicationRestartFlags.RestartNoCrash | ApplicationRestartFlags.RestartNoHang
-);
-
-// Don't restart during patches or reboots
-ApplicationRestartManager.RegisterForRestart(
-    commandLineArgs: null,
-    flags: ApplicationRestartFlags.RestartNoPatch | ApplicationRestartFlags.RestartNoReboot
-);
+    flags: ApplicationRestartFlags.RestartNoCrash   // do not restart on crash
+          | ApplicationRestartFlags.RestartNoHang); // do not restart on hang
 ```
 
 ### Unregistering from Restart
@@ -97,39 +88,50 @@ ApplicationRestartManager.UnregisterForRestart();
 
 ### Listening for Shutdown Events
 
-The `ApplicationRestartManager.ListenForEndSession()` method provides an observable stream that listens for `WM_QUERYENDSESSION` and `WM_ENDSESSION` Windows messages. This allows your application to be notified when the system is shutting down or when Restart Manager is requesting a shutdown:
+`ApplicationRestartManager.ListenForEndSession()` returns an `IObservable<EndSessionMessage>` which produces a message for every
+`WM_QUERYENDSESSION` (the system or the Restart Manager asks whether the session may end) and `WM_ENDSESSION` (the outcome).
+Every subscriber sees every message, independent subscriptions are fine.
+
+- `Msg`, `IsQuery`: which of the two messages it is.
+- `EndSessionReason`: the `EndSessionReasons` flags (lParam), e.g. `ENDSESSION_CLOSEAPP` when the Restart Manager wants the application to close.
+- `CanEndSession` / `Veto(reason)`: answer a query. The default is to allow the session to end. `Veto` blocks it and, when a reason is given,
+  shows that text in the Windows shutdown UI (ShutdownBlockReasonCreate). The user can still choose to shut down anyway.
+- `IsSessionEnding`: for `WM_ENDSESSION`, true when the session really ends, false when the shutdown was cancelled.
+
+The messages are delivered synchronously on the thread of the `SharedMessageWindow`. Answer and save **inside** `OnNext`:
+after an `ObserveOn`, `await` or any other thread hop the reply has already been sent to Windows. After `WM_ENDSESSION` with
+`IsSessionEnding` the process can be terminated as soon as `OnNext` returns, so don't rely on marshalling work to the UI thread.
 
 ```csharp
 using Dapplo.Windows.AppRestartManager;
 using Dapplo.Windows.AppRestartManager.Enums;
-using System.Reactive.Linq;
 
-// Listen for shutdown requests
 var subscription = ApplicationRestartManager.ListenForEndSession()
-    .Subscribe(reason =>
+    .Subscribe(endSession =>
     {
-        Console.WriteLine($"Shutdown requested: {reason}");
-        
-        if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+        if (endSession.IsQuery)
         {
-            // Application is being closed for an update
-            SaveApplicationState();
-            Console.WriteLine("Saved state - application will be restarted");
+            if (endSession.EndSessionReason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+            {
+                // The Restart Manager closes us for an update, we will be restarted: save and allow
+                SaveApplicationState();
+            }
+            else if (HasUnsavedDocuments())
+            {
+                // Block the shutdown / log off and tell the user why
+                endSession.Veto("There are unsaved documents");
+            }
+            return;
         }
-        else if (reason.HasFlag(EndSessionReasons.ENDSESSION_LOGOFF))
+
+        if (endSession.IsSessionEnding)
         {
-            // User is logging off
+            // The session really ends: save now, synchronously
             SaveUserSettings();
-            Console.WriteLine("User logging off");
-        }
-        else if (reason.HasFlag(EndSessionReasons.ENDSESSION_CRITICAL))
-        {
-            // Critical shutdown
-            PerformEmergencySave();
         }
     });
 
-// Don't forget to dispose when your application exits
+// Dispose on application exit
 subscription.Dispose();
 ```
 
@@ -137,9 +139,12 @@ subscription.Dispose();
 
 The `EndSessionReasons` enum provides flags indicating why the session is ending:
 
-- **`ENDSESSION_CLOSEAPP` (0x00000001)** - The application is using a file that must be replaced, the system is being serviced, or system resources are exhausted
-- **`ENDSESSION_CRITICAL` (0x40000000)** - The application is forced to shut down because a system component is being updated or a critical system event requires the application to close
-- **`ENDSESSION_LOGOFF` (0x80000000)** - The user is logging off
+| Flag | Value | Description |
+|------|-------|-------------|
+| `None` | `0x0` | The system is shutting down or restarting |
+| `ENDSESSION_CLOSEAPP` | `0x1` | The Restart Manager closes the application, e.g. so a locked file can be replaced |
+| `ENDSESSION_CRITICAL` | `0x40000000` | The application is forced to shut down |
+| `ENDSESSION_LOGOFF` | `0x80000000` | The user is logging off |
 
 ### Complete Application Example
 
@@ -150,65 +155,35 @@ using System;
 using System.Windows.Forms;
 using Dapplo.Windows.AppRestartManager;
 using Dapplo.Windows.AppRestartManager.Enums;
-using System.Reactive.Linq;
 
-public class MyApplication
+static class Program
 {
-    private IDisposable _endSessionSubscription;
-    
+    [STAThread]
     static void Main(string[] args)
     {
-        var app = new MyApplication();
-        app.Run(args);
-    }
-    
-    public void Run(string[] args)
-    {
-        // Register for restart with command-line arguments
+        // 1. Register early
         ApplicationRestartManager.RegisterForRestart("/restore");
-        
-        // Check if we were restarted
-        if (ApplicationRestartManager.WasRestartRequested())
+
+        // 2. Check if we were restarted
+        if (ApplicationRestartManager.WasRestartRequested("/restore"))
         {
-            var cmdArgs = ApplicationRestartManager.GetRestartCommandLineArgs();
-            if (cmdArgs.Contains("/restore"))
-            {
-                RestoreApplicationState();
-            }
+            RestorePreviousState();
         }
-        
-        // Listen for shutdown events
-        _endSessionSubscription = ApplicationRestartManager.ListenForEndSession()
-            .Subscribe(reason =>
+
+        // 3. Listen for shutdown, this runs on the SharedMessageWindow thread
+        var shutdownSubscription = ApplicationRestartManager.ListenForEndSession()
+            .Subscribe(endSession =>
             {
-                HandleShutdown(reason);
+                if (endSession.IsQuery && endSession.EndSessionReason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+                {
+                    SaveApplicationState();
+                }
             });
-        
-        // Run the application
+
         Application.Run(new MainForm());
-        
-        // Clean up
-        _endSessionSubscription?.Dispose();
-    }
-    
-    private void RestoreApplicationState()
-    {
-        Console.WriteLine("Restoring state after restart");
-        // Load saved state...
-    }
-    
-    private void HandleShutdown(EndSessionReasons reason)
-    {
-        if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
-        {
-            SaveApplicationState();
-        }
-    }
-    
-    private void SaveApplicationState()
-    {
-        Console.WriteLine("Saving application state");
-        // Save state...
+
+        shutdownSubscription.Dispose();
+        ApplicationRestartManager.UnregisterForRestart();
     }
 }
 ```
@@ -254,7 +229,7 @@ Console.CancelKeyPress += (sender, e) =>
 
 ## Installer/Updater API
 
-If you're developing an installer or updater, use the `InstallerRestartManager` class from the `Dapplo.Windows.InstallerRestartManager` package to manage other applications.
+If you're developing an installer or updater, use the `InstallerRestartManager` class from the `Dapplo.Windows.InstallerManager` package to manage other applications.
 
 ## Common Use Cases
 
@@ -264,7 +239,8 @@ One of the most common use cases is finding out which processes are locking a sp
 
 ```csharp
 using System;
-using Dapplo.Windows.InstallerRestartManager;
+using Dapplo.Windows.InstallerManager;
+using Dapplo.Windows.Kernel32.Enums;
 
 // Find processes using a file
 using (var session = InstallerRestartManager.CreateSession())
@@ -436,7 +412,7 @@ The `RmRebootReason` flags indicate why a system restart might be needed:
 
 ## Best Practices
 
-1. **Always use `using` statements** - The `RestartManager` class implements `IDisposable` and will properly clean up the session when disposed.
+1. **Always use `using` statements** - The `InstallerRestartManager` class implements `IDisposable` and will properly clean up the session when disposed.
 
 2. **Check reboot requirements first** - Before attempting shutdown/restart, check if a reboot would be required to avoid unexpected results.
 
@@ -451,7 +427,7 @@ The `RmRebootReason` flags indicate why a system restart might be needed:
 ```csharp
 using System;
 using System.ComponentModel;
-using Dapplo.Windows.Kernel32;
+using Dapplo.Windows.InstallerManager;
 
 try
 {

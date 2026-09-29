@@ -104,7 +104,7 @@ public static class Advapi32Api
     /// <param name="hEvent"></param>
     /// <param name="asynchronous">If this parameter is TRUE, the function returns immediately and reports changes by signaling the specified event. If this parameter is FALSE, the function does not return until a change has occurred.</param>
     /// <returns></returns>
-    [DllImport("advapi32", SetLastError = true)]
+    [DllImport("advapi32")]
     public static extern int RegNotifyChangeKeyValue(IntPtr hKey, bool watchSubtree, RegistryNotifyFilter notifyFilter, IntPtr hEvent, bool asynchronous);
 
     /// <summary>
@@ -122,7 +122,7 @@ public static class Advapi32Api
     /// <param name="samDesired">RegistryKeySecurityAccessRights</param>
     /// <param name="hOpenedKey">UIntPtr a handle to the registry key</param>
     /// <returns></returns>
-    [DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
+    [DllImport("advapi32", EntryPoint = "RegOpenKeyExW", CharSet = CharSet.Unicode)]
     public static extern int RegOpenKeyEx(IntPtr hKey, string subKey, RegistryOpenOptions ulOptions, RegistryKeySecurityAccessRights samDesired, out IntPtr hOpenedKey);
 
     /// <summary>
@@ -130,6 +130,6 @@ public static class Advapi32Api
     /// </summary>
     /// <param name="hKey">UIntPtr a handle to the registry key</param>
     /// <returns></returns>
-    [DllImport("advapi32", SetLastError = true)]
+    [DllImport("advapi32")]
     public static extern int RegCloseKey(IntPtr hKey);
 }

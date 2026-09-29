@@ -9,6 +9,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Advapi32\Dapplo.Windows.Advapi32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.AppRestartManager\Dapplo.Windows.AppRestartManager.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Citrix\Dapplo.Windows.Citrix.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Clipboard\Dapplo.Windows.Clipboard.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />

@@ -21,8 +21,7 @@ public class KeyboardHookEventArgs : EventArgs
         return new KeyboardHookEventArgs
         {
             Key = virtualKeyCode,
-            IsKeyDown = true,
-            IsModifier = virtualKeyCode.IsModifier()
+            IsKeyDown = true
         };
     }
 
@@ -36,26 +35,22 @@ public class KeyboardHookEventArgs : EventArgs
         return new KeyboardHookEventArgs
         {
             Key = virtualKeyCode,
-            IsKeyDown = false,
-            IsModifier = virtualKeyCode.IsModifier()
+            IsKeyDown = false
         };
     }
 
     /// <summary>
-    ///     Set this to true if the event is handled, other event-handlers in the chain will not be called
+    ///     Set this to true to swallow the key event, other applications will not see it.
+    ///     Only honoured when set synchronously in a subscriber of <see cref="KeyboardHook.KeyboardEvents"/>, on the hook thread.
     /// </summary>
     public bool Handled { get; set; }
 
-    private bool? _isModifier;
-
     /// <summary>
-    /// Specifies if this event is for a modifier key (shift, control, alt etc)
+    /// Specifies if this event is for a modifier key: Shift, Control, Alt (Menu) or Windows, left, right or generic.
+    /// The lock/toggle keys (CapsLock, NumLock, ScrollLock) are not modifiers, see <see cref="IsToggleKey"/>.
+    /// This is computed from <see cref="Key"/>.
     /// </summary>
-    public bool IsModifier
-    {
-        get => _isModifier ?? Key.IsModifier();
-        internal set => _isModifier = value;
-    }
+    public bool IsModifier => Key.IsModifier();
 
     /// <summary>
     /// Returns true if the key is a lock/toggle key (CapsLock, NumLock, ScrollLock).
@@ -138,12 +133,13 @@ public class KeyboardHookEventArgs : EventArgs
     public bool IsShift => IsLeftShift || IsRightShift;
 
     /// <summary>
-    ///     Is this a system key
+    ///     Is this a system key: the event came as WM_SYSKEYDOWN or WM_SYSKEYUP, which happens for F10 and for keys pressed while Alt is down.
+    ///     This does not change the Alt state, use <see cref="IsAlt"/> or <see cref="Flags"/> (<see cref="ExtendedKeyFlags.AltDown"/>) for that.
     /// </summary>
     public bool IsSystemKey { get; internal set; }
 
     /// <summary>
-    ///     True if shift is pressed
+    ///     True if a windows key is pressed
     /// </summary>
     public bool IsWindows => IsLeftWindows || IsRightWindows;
 
@@ -151,6 +147,21 @@ public class KeyboardHookEventArgs : EventArgs
     ///     The key code itself
     /// </summary>
     public VirtualKeyCode Key { get; internal set; } = VirtualKeyCode.None;
+
+    /// <summary>
+    ///     The hardware scan code of the key, together with <see cref="IsExtended"/> this distinguishes e.g. Enter from NumpadEnter or the arrow keys from the numpad arrows.
+    /// </summary>
+    public ScanCodes ScanCode { get; internal set; }
+
+    /// <summary>
+    ///     True if this is an extended key (the scan code has an E0 prefix), e.g. NumpadEnter, RightControl or the arrow keys which are not on the numpad.
+    /// </summary>
+    public bool IsExtended => (Flags & ExtendedKeyFlags.Extended) != 0;
+
+    /// <summary>
+    ///     True if this event was created by the <see cref="KeyboardHook"/>, false for synthetic events (e.g. created with <see cref="KeyDown"/> or <see cref="KeyUp"/>).
+    /// </summary>
+    public bool IsFromKeyboardHook { get; internal set; }
 
     /// <summary>
     /// Timestamp of the event, a DateTime can be calculated by using EventTime instead

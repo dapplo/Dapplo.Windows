@@ -25,7 +25,8 @@ public static class PowerBroadcastListener
     {
         _powerBroadcastEvents = SharedMessageWindow.Messages
             .Where(m => m.Msg == WindowsMessages.WM_POWERBROADCAST)
-            .Select(m => (PowerBroadcastEvent)(uint)m.WParam)
+            // Only the event type is passed on: lParam (e.g. the POWERBROADCAST_SETTING of PBT_POWERSETTINGCHANGE) is only valid during the message
+            .Select(m => unchecked((PowerBroadcastEvent)(uint)m.WParam))
             .Publish()
             .RefCount();
     }
@@ -34,6 +35,8 @@ public static class PowerBroadcastListener
     /// Gets an observable sequence of power broadcast events.
     /// Subscribe to this to be notified of system power state changes such as
     /// suspend, resume, battery status changes, etc.
+    /// The events are produced on the thread of the SharedMessageWindow, while WM_POWERBROADCAST is processed.
+    /// For PBT_APMSUSPEND the system waits (max. about 2 seconds) until the subscribers return, so save state synchronously.
     /// </summary>
     /// <example>
     /// <code>

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dapplo.Windows.Input.Enums;
@@ -20,6 +21,11 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
     /// An array with all the current available keys, the locations represent the TriggerCombination array.
     /// </summary>
     protected bool[] AvailableKeys;
+
+    /// <summary>
+    /// The actual keys which are pressed for the entries in AvailableKeys, e.g. LeftShift for a Shift in the TriggerCombination.
+    /// </summary>
+    private VirtualKeyCode[] _pressedKeys;
 
     /// <summary>
     /// Get the VirtualKeyCodes which trigger the combination
@@ -56,6 +62,16 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
     public bool TriggerOnKeyUp { get; set; }
 
     /// <summary>
+    /// Used to verify, on every key-down, that the keys which this handler considers pressed are really still down, keys which are reported as up are forgotten.
+    /// This recovers from missed key-ups, which would otherwise block the combination until the key is pressed and released again:
+    /// a key released on the secure desktop (Win+L, UAC, Ctrl+Alt+Del), a key-up swallowed by another hook, or the hook being removed temporarily by Windows.
+    /// When null (the default) the physical key state (GetAsyncKeyState) is used, but only for events which come from the <see cref="KeyboardHook"/>
+    /// (<see cref="KeyboardHookEventArgs.IsFromKeyboardHook"/>), synthetic events are not verified.
+    /// When set, the function is used for all events, return true for keys which are pressed. Use <c>_ => true</c> to disable the verification.
+    /// </summary>
+    public Func<VirtualKeyCode, bool> KeyStateVerifier { get; set; }
+
+    /// <summary>
     /// Create a KeyCombinationHandler for the specified VirtualKeyCodes
     /// </summary>
     /// <param name="keyCombination">IEnumerable with VirtualKeyCodes</param>
@@ -72,6 +88,7 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
     {
         TriggerCombination = keyCombination.Distinct().ToArray();
         AvailableKeys = new bool[TriggerCombination.Length];
+        _pressedKeys = new VirtualKeyCode[TriggerCombination.Length];
         OtherPressedKeys.Clear();
     }
 
@@ -95,6 +112,11 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
             return false;
         }
 
+        if (keyboardHookEventArgs.IsKeyDown)
+        {
+            ForgetReleasedKeys(keyboardHookEventArgs);
+        }
+
         bool keyMatched = false;
         bool isRepeat = false;
         bool wasAllKeysDown = AvailableKeys.All(b => b);
@@ -109,6 +131,7 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
             // Only a key-down for a key which is already down is a repeat, a key-up never is
             isRepeat = keyboardHookEventArgs.IsKeyDown && AvailableKeys[i];
             AvailableKeys[i] = keyboardHookEventArgs.IsKeyDown;
+            _pressedKeys[i] = keyboardHookEventArgs.IsKeyDown ? keyboardHookEventArgs.Key : VirtualKeyCode.None;
             keyMatched = true;
             break;
         }
@@ -158,24 +181,71 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
     public bool HasKeysPressed => OtherPressedKeys.Count > 0 || AvailableKeys.Any(b => b);
 
     /// <summary>
+    /// Forget the keys which are considered pressed, but are not down anymore according to the <see cref="KeyStateVerifier"/> (or the physical key state).
+    /// The key of the current event is never checked, its state is not yet updated when a low-level hook is called.
+    /// </summary>
+    /// <param name="keyboardHookEventArgs">KeyboardHookEventArgs of the current key-down</param>
+    private void ForgetReleasedKeys(KeyboardHookEventArgs keyboardHookEventArgs)
+    {
+        var isKeyPressed = KeyStateVerifier;
+        if (isKeyPressed == null)
+        {
+            if (!keyboardHookEventArgs.IsFromKeyboardHook)
+            {
+                return;
+            }
+            isKeyPressed = IsPhysicallyPressed;
+        }
+
+        var currentKey = keyboardHookEventArgs.Key;
+        if (OtherPressedKeys.Count > 0)
+        {
+            foreach (var otherKey in OtherPressedKeys.ToList())
+            {
+                if (otherKey != currentKey && !isKeyPressed(otherKey))
+                {
+                    OtherPressedKeys.Remove(otherKey);
+                }
+            }
+        }
+
+        for (int i = 0; i < AvailableKeys.Length; i++)
+        {
+            if (!AvailableKeys[i])
+            {
+                continue;
+            }
+            var pressedKey = _pressedKeys[i] == VirtualKeyCode.None ? TriggerCombination[i] : _pressedKeys[i];
+            if (pressedKey != currentKey && !isKeyPressed(pressedKey))
+            {
+                AvailableKeys[i] = false;
+                _pressedKeys[i] = VirtualKeyCode.None;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Check the physical state of the key
+    /// </summary>
+    /// <param name="virtualKeyCode">VirtualKeyCode</param>
+    /// <returns>bool true if the key is down</returns>
+    private static bool IsPhysicallyPressed(VirtualKeyCode virtualKeyCode)
+    {
+        if (virtualKeyCode == VirtualKeyCode.Win)
+        {
+            return IsPhysicallyPressed(VirtualKeyCode.LeftWin) || IsPhysicallyPressed(VirtualKeyCode.RightWin);
+        }
+        return (KeyboardHook.GetAsyncKeyState(virtualKeyCode) & 0x8000) != 0;
+    }
+
+    /// <summary>
     /// Helper method to compare VirtualKeyCode
     /// </summary>
     /// <param name="current">VirtualKeyCode</param>
-    /// <param name="expected">VirtualKeyCode</param>
+    /// <param name="expected">VirtualKeyCode, a generic Shift, Control, Menu or Win matches the left and right variant</param>
     /// <returns>bool true if match</returns>
     protected virtual bool CompareVirtualKeyCode(VirtualKeyCode current, VirtualKeyCode expected)
     {
-        if (current == expected)
-        {
-            return true;
-        }
-
-        return expected switch
-        {
-            VirtualKeyCode.Shift => current is VirtualKeyCode.LeftShift or VirtualKeyCode.RightShift,
-            VirtualKeyCode.Control => current is VirtualKeyCode.LeftControl or VirtualKeyCode.RightControl,
-            VirtualKeyCode.Menu => current is VirtualKeyCode.LeftMenu or VirtualKeyCode.RightMenu,
-            _ => false
-        };
+        return current.Matches(expected);
     }
 }

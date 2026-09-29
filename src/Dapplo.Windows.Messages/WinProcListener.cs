@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Permissions;
 using System.Windows.Forms;
 using System.Windows.Interop;
@@ -13,11 +12,14 @@ using System.Windows.Interop;
 namespace Dapplo.Windows.Messages
 {
     /// <summary>
-    ///     This is a Listener for WinProc messages
+    ///     This is a Listener for WinProc messages of a Control, it subclasses the window of the control.
+    ///     It follows the handle of the control: when the handle is recreated (e.g. by changing ShowInTaskbar, RightToLeft or FormBorderStyle) the new handle is subclassed.
     /// </summary>
     public sealed class WinProcListener : NativeWindow, IDisposable
     {
-        private List<HwndSourceHook> _hooks = new List<HwndSourceHook>();
+        private readonly object _lock = new object();
+        private readonly Control _control;
+        private HwndSourceHook[] _hooks = Array.Empty<HwndSourceHook>();
 
         /// <summary>
         /// Is the WinProcListener already disposed?
@@ -30,23 +32,34 @@ namespace Dapplo.Windows.Messages
         /// <param name="control">Control to listen to</param>
         public WinProcListener(Control control)
         {
-            if (control.IsHandleCreated && Handle == IntPtr.Zero)
+            _control = control ?? throw new ArgumentNullException(nameof(control));
+            // Always follow the handle, also when it already exists, so a recreated handle is subclassed again
+            _control.HandleCreated += OnHandleCreated;
+            _control.HandleDestroyed += OnHandleDestroyed;
+            if (_control.IsHandleCreated)
             {
-                AssignHandle(control.Handle);
+                AssignHandle(_control.Handle);
             }
-            else
-            {
-                control.HandleCreated += OnHandleCreated;
-            }
-            control.HandleDestroyed += OnHandleDestroyed;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+            if (IsDisposed)
+            {
+                return;
+            }
             IsDisposed = true;
-            _hooks = null;
-            ReleaseHandle();
+            _control.HandleCreated -= OnHandleCreated;
+            _control.HandleDestroyed -= OnHandleDestroyed;
+            lock (_lock)
+            {
+                _hooks = Array.Empty<HwndSourceHook>();
+            }
+            if (Handle != IntPtr.Zero)
+            {
+                ReleaseHandle();
+            }
         }
 
         /// <summary>
@@ -55,33 +68,15 @@ namespace Dapplo.Windows.Messages
         /// <param name="hook">HwndSourceHook</param>
         public void AddHook(HwndSourceHook hook)
         {
-            var newHooks = _hooks.ToList();
-            newHooks.Add(hook);
-            _hooks = newHooks;
-        }
-
-        /// <summary>
-        ///     Listen for the control's window creation and then hook into it.
-        /// </summary>
-        /// <param name="sender">object</param>
-        /// <param name="e">EventArgs</param>
-        private void OnHandleCreated(object sender, EventArgs e)
-        {
-            var handle = ((Control) sender).Handle;
-            // control is now created, assign handle to NativeWindow.
-            AssignHandle(handle);
-        }
-
-        /// <summary>
-        ///     Remove the handle
-        /// </summary>
-        /// <param name="sender">object</param>
-        /// <param name="e">EventArgs</param>
-        private void OnHandleDestroyed(object sender, EventArgs e)
-        {
-            // Window was destroyed, release hook.
-            ReleaseHandle();
-             _hooks = null;
+            if (hook == null)
+            {
+                throw new ArgumentNullException(nameof(hook));
+            }
+            lock (_lock)
+            {
+                var newHooks = new List<HwndSourceHook>(_hooks) { hook };
+                _hooks = newHooks.ToArray();
+            }
         }
 
         /// <summary>
@@ -90,9 +85,43 @@ namespace Dapplo.Windows.Messages
         /// <param name="hook">HwndSourceHook, The event handler to remove.</param>
         public void RemoveHook(HwndSourceHook hook)
         {
-            var newHooks = _hooks.ToList();
-            newHooks.Remove(hook);
-            _hooks = newHooks;
+            lock (_lock)
+            {
+                var newHooks = new List<HwndSourceHook>(_hooks);
+                newHooks.Remove(hook);
+                _hooks = newHooks.ToArray();
+            }
+        }
+
+        /// <summary>
+        ///     The control's window was (re)created, subclass it.
+        /// </summary>
+        /// <param name="sender">object</param>
+        /// <param name="e">EventArgs</param>
+        private void OnHandleCreated(object sender, EventArgs e)
+        {
+            if (IsDisposed)
+            {
+                return;
+            }
+            if (Handle != IntPtr.Zero)
+            {
+                ReleaseHandle();
+            }
+            AssignHandle(((Control)sender).Handle);
+        }
+
+        /// <summary>
+        ///     The control's window is destroyed, release it. The hooks are kept, so they work again when the handle is recreated.
+        /// </summary>
+        /// <param name="sender">object</param>
+        /// <param name="e">EventArgs</param>
+        private void OnHandleDestroyed(object sender, EventArgs e)
+        {
+            if (Handle != IntPtr.Zero)
+            {
+                ReleaseHandle();
+            }
         }
 
         /// <inheritdoc />
@@ -101,33 +130,26 @@ namespace Dapplo.Windows.Messages
 #endif
         protected override void WndProc(ref Message m)
         {
-            if (IsDisposed)
-            {
-                return;
-            }
-            if (!ProcessMessage(m))
+            if (IsDisposed || !ProcessMessage(ref m))
             {
                 base.WndProc(ref m);
             }
         }
 
         /// <summary>
-        /// Helper class to process the message
+        /// Helper method to process the message, the result of the handling hook is stored in the message.
         /// </summary>
         /// <param name="message">Message</param>
         /// <returns>bool if the message was handled</returns>
-        private bool ProcessMessage(Message message)
+        private bool ProcessMessage(ref Message message)
         {
             bool handled = false;
-            foreach (var hWndSourceHook in _hooks ?? Enumerable.Empty<HwndSourceHook>())
+            foreach (var hWndSourceHook in _hooks)
             {
-                if (IsDisposed)
-                {
-                    break;
-                }
-                message.Result = hWndSourceHook.Invoke(message.HWnd, message.Msg, message.WParam, message.LParam, ref handled);
+                var result = hWndSourceHook.Invoke(message.HWnd, message.Msg, message.WParam, message.LParam, ref handled);
                 if (handled)
                 {
+                    message.Result = result;
                     break;
                 }
             }
