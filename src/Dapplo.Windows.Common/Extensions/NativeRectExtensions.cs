@@ -233,24 +233,6 @@ public static class NativeRectExtensions
     /// <param name="rect2">NativeRect</param>
     /// <returns>NativeRect which is the intersection of rect1 and rect2</returns>
     [Pure]
-    public static NativeRect Intersect2(this NativeRect rect1, NativeRect rect2)
-    {
-        rect1 = rect1.Normalize();
-        rect2 = rect2.Normalize();
-        var left = Math.Max(rect1.Left, rect2.Left);
-        var right = Math.Min(rect1.Right, rect2.Right);
-        var bottom = Math.Max(rect1.Bottom, rect2.Bottom);
-        var top = Math.Min(rect1.Top, rect2.Top);
-        return new NativeRect(left, top, right-left, bottom-top);
-    }
-
-    /// <summary>
-    /// Creates a new NativeRect which is the intersection of rect1 and rect2
-    /// </summary>
-    /// <param name="rect1">NativeRect</param>
-    /// <param name="rect2">NativeRect</param>
-    /// <returns>NativeRect which is the intersection of rect1 and rect2</returns>
-    [Pure]
     public static NativeRect Intersect(this NativeRect rect1, NativeRect rect2)
     {
         // gives bottom-left point of intersection rectangle

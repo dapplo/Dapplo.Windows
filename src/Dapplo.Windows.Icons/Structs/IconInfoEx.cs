@@ -11,7 +11,7 @@ namespace Dapplo.Windows.Icons.Structs;
 /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-iconinfoexw">ICONINFOEX structure</a>
 /// Contains information about an icon or a cursor.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 public unsafe struct IconInfoEx
 {
     private uint _cbSize;

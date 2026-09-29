@@ -39,10 +39,10 @@ public static class KeyboardInputGenerator
         {
             keyboardInputs[index++] = KeyboardInput.ForKeyDown(virtualKeyCode);
         }
-        // all up
-        foreach (var virtualKeyCode in keycodes)
+        // all up, in reverse order
+        for (var i = keycodes.Length - 1; i >= 0; i--)
         {
-            keyboardInputs[index++] = KeyboardInput.ForKeyUp(virtualKeyCode);
+            keyboardInputs[index++] = KeyboardInput.ForKeyUp(keycodes[i]);
         }
 
         return NativeInput.SendInput(Structs.Input.CreateKeyboardInputs(keyboardInputs));

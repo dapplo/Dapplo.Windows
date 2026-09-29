@@ -40,16 +40,18 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
     /// <summary>
     /// Defines if the key press needs to be passed through to other applications.
     /// By default (false) a keypress which is specified is marked as handled and will not be seen by others
+    /// This has no effect when <see cref="TriggerOnKeyUp"/> is true, as the key-downs were already passed to other applications.
     /// </summary>
     public bool IsPassThrough { get; set; }
 
     /// <summary>
-    /// Defines if the handler should trigger when all keys are released instead of when all keys are pressed.
+    /// Defines if the handler should trigger on the release of the combination instead of when all keys are pressed.
     /// By default (false) the handler triggers when all keys in the combination are down.
     /// When true, the handler triggers when the first key of the combination is released (key up),
     /// but only if all keys were previously pressed together and no other keys are pressed.
-    /// This is useful when you need to inject keypresses after the user has released the modifier keys
-    /// to avoid interference from still-pressed modifier keys.
+    /// Note that the other keys of the combination may still be down at that moment.
+    /// In this mode the key events are never marked as handled, the key-downs were already seen by other applications
+    /// and swallowing the key-up would leave the key stuck.
     /// </summary>
     public bool TriggerOnKeyUp { get; set; }
 
@@ -104,7 +106,8 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
                 continue;
             }
 
-            isRepeat = AvailableKeys[i];
+            // Only a key-down for a key which is already down is a repeat, a key-up never is
+            isRepeat = keyboardHookEventArgs.IsKeyDown && AvailableKeys[i];
             AvailableKeys[i] = keyboardHookEventArgs.IsKeyDown;
             keyMatched = true;
             break;
@@ -135,8 +138,10 @@ public class KeyCombinationHandler : IKeyboardHookEventHandler
             isHandled = keyboardHookEventArgs.IsKeyDown && OtherPressedKeys.Count == 0 && AvailableKeys.All(b => b);
         }
 
-        // Mark as handled if the key combination is handled and we don't have pass-through
-        if (isHandled && !IsPassThrough)
+        // Mark as handled if the key combination is handled and we don't have pass-through.
+        // A repeated key-down is also marked as handled (but doesn't trigger), as the original key-down was swallowed too.
+        // In TriggerOnKeyUp mode the key-downs were passed through, swallowing only the key-up would leave a stuck key.
+        if (isHandled && !IsPassThrough && !TriggerOnKeyUp)
         {
             keyboardHookEventArgs.Handled = true;
         }

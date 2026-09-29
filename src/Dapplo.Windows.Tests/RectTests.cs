@@ -190,6 +190,26 @@ public class RectTests
     }
 
     [Fact]
+    public void Intersect_PartialOverlap()
+    {
+        var rect1 = new NativeRect(0, 0, 10, 10);
+        var rect2 = new NativeRect(5, 5, 10, 10);
+
+        var expected = new NativeRect(5, 5, 5, 5);
+        Assert.Equal(expected, rect1.Intersect(rect2));
+        Assert.Equal(expected, rect2.Intersect(rect1));
+    }
+
+    [Fact]
+    public void Intersect_NoOverlap()
+    {
+        var rect1 = new NativeRect(0, 0, 10, 10);
+        var rect2 = new NativeRect(20, 20, 10, 10);
+
+        Assert.Equal(NativeRect.Empty, rect1.Intersect(rect2));
+    }
+
+    [Fact]
     public void Union()
     {
         var rect1 = new NativeRect(100, 100, new NativeSize(100, 100));

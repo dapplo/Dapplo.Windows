@@ -363,8 +363,8 @@ public class KeyboardHookTests
     /// <summary>
     /// Test that TriggerOnKeyUp triggers when all keys are released, not when pressed
     /// </summary>
-    //[Fact]
-    private void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_SingleKey()
+    [Fact]
+    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_SingleKey()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Print)
         {
@@ -372,19 +372,65 @@ public class KeyboardHookTests
         };
 
         // Key down should not trigger
-        var result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print));
+        var keyDown = KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print);
+        var result = keyCombinationHandler.Handle(keyDown);
         Assert.False(result);
-        
-        // Key up should trigger
-        result = keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Print));
+        Assert.False(keyDown.Handled);
+
+        // Key up should trigger, but must not be swallowed as the key down was passed through
+        var keyUp = KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Print);
+        result = keyCombinationHandler.Handle(keyUp);
         Assert.True(result);
+        Assert.False(keyUp.Handled);
+    }
+
+    /// <summary>
+    /// Test that TriggerOnKeyUp still triggers when the key was auto-repeated before it was released (CanRepeat is false by default)
+    /// </summary>
+    [Fact]
+    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_AfterAutoRepeat()
+    {
+        var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.KeyT)
+        {
+            TriggerOnKeyUp = true
+        };
+
+        Assert.False(keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.LeftControl)));
+        Assert.False(keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyT)));
+        // Auto repeat
+        Assert.False(keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyT)));
+        Assert.False(keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyT)));
+
+        Assert.True(keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyT)));
+        Assert.False(keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.LeftControl)));
+    }
+
+    /// <summary>
+    /// Test that, without TriggerOnKeyUp, a repeated key down is swallowed but doesn't trigger again
+    /// </summary>
+    [Fact]
+    public void TestKeyHandler_KeyCombinationHandler_Repeat_IsSwallowedButDoesNotTrigger()
+    {
+        var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.KeyT);
+
+        Assert.False(keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.LeftControl)));
+        var keyDown = KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyT);
+        Assert.True(keyCombinationHandler.Handle(keyDown));
+        Assert.True(keyDown.Handled);
+
+        var repeat = KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyT);
+        Assert.False(keyCombinationHandler.Handle(repeat));
+        Assert.True(repeat.Handled);
+
+        Assert.False(keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyT)));
+        Assert.False(keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.LeftControl)));
     }
 
     /// <summary>
     /// Test that TriggerOnKeyUp works correctly with key combinations
     /// </summary>
-    //[Fact]
-    private void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_Combination()
+    [Fact]
+    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_Combination()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyA)
         {
@@ -416,8 +462,8 @@ public class KeyboardHookTests
     /// <summary>
     /// Test that TriggerOnKeyUp does not trigger if an extra key was pressed
     /// </summary>
-    //[Fact]
-    private void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_WithExtraKey()
+    [Fact]
+    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_WithExtraKey()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.KeyA)
         {
@@ -452,7 +498,7 @@ public class KeyboardHookTests
     /// Test that TriggerOnKeyUp does not trigger if not all combination keys were pressed
     /// </summary>
     [Fact]
-    private void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_PartialPress()
+    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_PartialPress()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyA)
         {

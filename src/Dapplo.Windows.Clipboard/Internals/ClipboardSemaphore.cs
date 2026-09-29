@@ -52,37 +52,44 @@ internal sealed class ClipboardSemaphore : IDisposable
             };
         }
 
-        // Create the clipboard lock itself
-        bool isOpened = false;
-        do
+        // From here on the semaphore is held: every path must either hand it over to a token, or release it.
+        try
         {
-            if (OpenClipboard(hWnd))
+            // Create the clipboard lock itself
+            bool isOpened = false;
+            do
             {
-                isOpened = true;
-                break;
-            }
-            retries--;
-            // No reason to sleep, if there are no more retries
-            if (retries >= 0)
+                if (OpenClipboard(hWnd))
+                {
+                    isOpened = true;
+                    break;
+                }
+                retries--;
+                // No reason to sleep, if there are no more retries
+                if (retries >= 0)
+                {
+                    Thread.Sleep(retryInterval.Value);
+                }
+
+            } while (retries >= 0);
+
+            if (!isOpened)
             {
-                Thread.Sleep(retryInterval.Value);
+                _semaphoreSlim.Release();
+                return new ClipboardAccessToken
+                {
+                    CanAccess = false,
+                    IsOpenTimeout = true
+                };
             }
-
-        } while (retries >= 0);
-
-        if (!isOpened)
+        }
+        catch
         {
-            return new ClipboardAccessToken
-            {
-                CanAccess = false,
-                IsOpenTimeout = true
-            };
+            _semaphoreSlim.Release();
+            throw;
         }
         // Return a disposable which cleans up the current state.
-        return new ClipboardAccessToken(() => {
-            CloseClipboard();
-            _semaphoreSlim.Release();
-        });
+        return CreateOpenToken();
     }
 
     /// <summary>
@@ -118,40 +125,66 @@ internal sealed class ClipboardSemaphore : IDisposable
             };
         }
 
-        bool isOpened = false;
-        do
+        // From here on the semaphore is held: every path must either hand it over to a token, or release it.
+        try
         {
-            if (cancellationToken.IsCancellationRequested)
+            bool isOpened = false;
+            do
             {
-                break;
-            }
-            if (OpenClipboard(hWnd))
-            {
-                isOpened = true;
-                break;
-            }
-            retries--;
-            // Break if there are no more retries
-            if (retries < 0)
-            {
-                break;
-            }
-            await Task.Delay(retryInterval.Value, cancellationToken).ConfigureAwait(false);
-        } while (true);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                if (OpenClipboard(hWnd))
+                {
+                    isOpened = true;
+                    break;
+                }
+                retries--;
+                // Break if there are no more retries
+                if (retries < 0)
+                {
+                    break;
+                }
+                await Task.Delay(retryInterval.Value, cancellationToken).ConfigureAwait(false);
+            } while (true);
 
-        if (!isOpened)
-        {
-            // Timeout
-            return new ClipboardAccessToken
+            if (!isOpened)
             {
-                CanAccess = false,
-                IsOpenTimeout = true
-            };
+                _semaphoreSlim.Release();
+                // Timeout
+                return new ClipboardAccessToken
+                {
+                    CanAccess = false,
+                    IsOpenTimeout = true
+                };
+            }
+        }
+        catch
+        {
+            // e.g. OperationCanceledException from Task.Delay
+            _semaphoreSlim.Release();
+            throw;
         }
 
+        return CreateOpenToken();
+    }
+
+    /// <summary>
+    /// Create the token for an opened clipboard, disposing it closes the clipboard and releases the semaphore (once).
+    /// </summary>
+    /// <returns>ClipboardAccessToken</returns>
+    private ClipboardAccessToken CreateOpenToken()
+    {
         return new ClipboardAccessToken(() => {
-            CloseClipboard();
-            _semaphoreSlim.Release();
+            try
+            {
+                CloseClipboard();
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
         });
     }
 

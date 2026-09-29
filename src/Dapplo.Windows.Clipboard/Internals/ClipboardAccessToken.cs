@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
+using System.Threading;
 
 namespace Dapplo.Windows.Clipboard.Internals;
 
@@ -9,7 +10,7 @@ namespace Dapplo.Windows.Clipboard.Internals;
 /// </summary>
 internal class ClipboardAccessToken : IClipboardAccessToken
 {
-    private readonly Action _disposeAction;
+    private Action _disposeAction;
 
     public ClipboardAccessToken(Action disposeAction = null)
     {
@@ -20,7 +21,8 @@ internal class ClipboardAccessToken : IClipboardAccessToken
     public void Dispose()
     {
         CanAccess = false;
-        _disposeAction?.Invoke();
+        // Take the action out atomically, so a second (or concurrent) Dispose never closes the clipboard or releases the lock again
+        Interlocked.Exchange(ref _disposeAction, null)?.Invoke();
     }
 
     /// <inheritdoc />

@@ -31,11 +31,11 @@ public static class PowerManagementApi
     /// </param>
     /// <returns><c>true</c> if the function succeeds, otherwise <c>false</c>.</returns>
     [DllImport(PowrprofDll, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static extern bool SetSuspendState(
-        [MarshalAs(UnmanagedType.Bool)] bool hibernate,
-        [MarshalAs(UnmanagedType.Bool)] bool forceCritical,
-        [MarshalAs(UnmanagedType.Bool)] bool disableWakeEvent);
+        [MarshalAs(UnmanagedType.U1)] bool hibernate,
+        [MarshalAs(UnmanagedType.U1)] bool forceCritical,
+        [MarshalAs(UnmanagedType.U1)] bool disableWakeEvent);
 
     /// <summary>
     /// Logs off the interactive user, shuts down the system, or shuts down and restarts the system.

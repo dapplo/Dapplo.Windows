@@ -284,6 +284,18 @@ public static class DwmApi
     public static extern HResult DwmSetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttributeToSet, IntPtr pvAttributeValue, int cbAttribute);
 
     /// <summary>
+    ///     Sets the value of a DWORD sized (uint, enum, BOOL or COLORREF) non-client rendering attribute for a window.
+    ///     See <a href="https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmsetwindowattribute">DwmSetWindowAttribute function</a>
+    /// </summary>
+    /// <param name="hWnd">IntPtr with the handle to the window that will receive the attributes.</param>
+    /// <param name="dwAttributeToSet">A single DWMWINDOWATTRIBUTE flag to apply to the window.</param>
+    /// <param name="pvAttributeValue">uint with the value of the attribute specified in the dwAttributeToSet parameter.</param>
+    /// <param name="cbAttribute">The size, in bytes, of the value, this should be sizeof(uint).</param>
+    /// <returns>HResult</returns>
+    [DllImport(DwmApiDll, SetLastError = true)]
+    public static extern HResult DwmSetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttributeToSet, ref uint pvAttributeValue, int cbAttribute);
+
+    /// <summary>
     /// Removes a Desktop Window Manager (DWM) thumbnail relationship created by the DwmRegisterThumbnail function.
     /// </summary>
     /// <param name="hThumbnailId">The handle to the thumbnail relationship to be removed. Null or non-existent handles will result in a return value of E_INVALIDARG.</param>
@@ -348,7 +360,7 @@ public static class DwmApi
         {
             return DwmWindowCornerPreference.Default;
         }
-        var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.WindowCornerPreference, out uint cornerPreference, Marshal.SizeOf(typeof(DwmWindowCornerPreference)));
+        var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.WindowCornerPreference, out uint cornerPreference, sizeof(uint));
         return result.Succeeded() ? (DwmWindowCornerPreference)cornerPreference : DwmWindowCornerPreference.Default;
     }
 
@@ -365,12 +377,9 @@ public static class DwmApi
             return false;
         }
 
-        IntPtr refToWindowCornerPreference;
-        unsafe
-        {
-            refToWindowCornerPreference = new IntPtr(Unsafe.AsPointer(ref windowCornerPreference));
-        }
-        var result = DwmSetWindowAttribute(hWnd, DwmWindowAttributes.WindowCornerPreference, refToWindowCornerPreference, Marshal.SizeOf(typeof(DwmWindowCornerPreference)));
+        // DWM_WINDOW_CORNER_PREFERENCE is a 4-byte enum, Marshal.SizeOf cannot be used on an enum type (it throws)
+        var cornerPreference = (uint)windowCornerPreference;
+        var result = DwmSetWindowAttribute(hWnd, DwmWindowAttributes.WindowCornerPreference, ref cornerPreference, sizeof(uint));
         return result.Succeeded();
     }
 

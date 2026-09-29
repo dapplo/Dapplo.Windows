@@ -118,6 +118,13 @@ public static class DpiApi
         var ptr = Marshal.AllocHGlobal(size);
         try
         {
+            // Initialize the buffer, AllocHGlobal returns uninitialized memory
+            Marshal.StructureToPtr(default(T), ptr, false);
+            if (action is SystemParametersInfoActions.SPI_GETNONCLIENTMETRICS or SystemParametersInfoActions.SPI_GETICONMETRICS)
+            {
+                // For NONCLIENTMETRICS and ICONMETRICS the first field (cbSize) must match uiParam, otherwise the call fails
+                Marshal.WriteInt32(ptr, size);
+            }
             if (NativeDpiMethods.SystemParametersInfoForDpi(action, (uint)size, ptr, SystemParametersInfoBehaviors.None, dpi))
             {
                 return Marshal.PtrToStructure<T>(ptr);

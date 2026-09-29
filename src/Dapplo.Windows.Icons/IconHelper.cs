@@ -247,7 +247,8 @@ public static class IconHelper
     }
 
     /// <summary>
-    /// Create a TIcon from the specified iconHandle
+    /// Create a TIcon from the specified iconHandle.
+    /// The returned TIcon is always an independent copy, the caller keeps ownership of the iconHandle and may destroy it afterwards.
     /// </summary>
     /// <typeparam name="TIcon">Bitmap, Icon or BitmapSource</typeparam>
     /// <param name="iconHandle">IntPtr</param>
@@ -260,7 +261,11 @@ public static class IconHelper
         }
         if (typeof(TIcon) == typeof(Icon))
         {
-            return Icon.FromHandle(iconHandle) as TIcon;
+            // Icon.FromHandle does not own the handle, clone it so the returned Icon has its own copy (CopyImage)
+            using (var icon = Icon.FromHandle(iconHandle))
+            {
+                return icon.Clone() as TIcon;
+            }
         }
         if (typeof(TIcon) == typeof(Bitmap))
         {

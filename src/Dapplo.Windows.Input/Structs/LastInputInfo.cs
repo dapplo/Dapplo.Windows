@@ -24,7 +24,10 @@ public struct LastInputInfo
     /// <summary>
     /// The timespan for how long ago the last input was
     /// </summary>
-    public TimeSpan LastInputTimeSpan => TimeSpan.FromMilliseconds(Environment.TickCount - _dwTime);
+    /// <remarks>
+    /// The tick difference is calculated with modular (unchecked) uint arithmetic, so this stays correct when the tick count wraps (every 49.7 days).
+    /// </remarks>
+    public TimeSpan LastInputTimeSpan => TimeSpan.FromMilliseconds(unchecked((uint)Environment.TickCount - _dwTime));
 
     /// <summary>
     /// Returns the DateTimeOffset for the tick count of the last input

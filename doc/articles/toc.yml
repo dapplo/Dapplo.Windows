@@ -12,3 +12,5 @@
   href: system-state.md
 - name: Common Scenarios
   href: common-scenarios.md
+- name: Migrating to 3.0
+  href: migration-3.0.md

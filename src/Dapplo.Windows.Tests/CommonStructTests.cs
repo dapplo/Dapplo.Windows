@@ -287,4 +287,33 @@ public class CommonStructTests
 
         Assert.Equal(intersectRectangle, intersectNativeRect);
     }
+
+    /// <summary>
+    /// Test that NativePoint.Offset keeps the coordinate when an offset is not specified
+    /// </summary>
+    [Fact]
+    public void Test_NativePoint_Offset_Nullable()
+    {
+        var point = new NativePoint(100, 100);
+        Assert.Equal(new NativePoint(100, 105), point.Offset(offsetY: 5));
+        Assert.Equal(new NativePoint(105, 100), point.Offset(offsetX: 5));
+        Assert.Equal(new NativePoint(105, 110), point.Offset(5, 10));
+        Assert.Equal(point, point.Offset());
+    }
+
+    /// <summary>
+    /// Test that NativePointFloat.Offset and NativeRectFloat.Offset keep the coordinate when an offset is not specified
+    /// </summary>
+    [Fact]
+    public void Test_NativePointFloat_Offset_Nullable()
+    {
+        var point = new NativePointFloat(100.5f, 100.5f);
+        Assert.Equal(new NativePointFloat(100.5f, 105.5f), point.Offset(offsetY: 5f));
+        Assert.Equal(new NativePointFloat(105.5f, 100.5f), point.Offset(offsetX: 5f));
+        Assert.Equal(point, point.Offset());
+
+        var rect = new NativeRectFloat(100.5f, 100.5f, 10f, 20f);
+        Assert.Equal(new NativeRectFloat(100.5f, 105.5f, 10f, 20f), rect.Offset(offsetY: 5f));
+        Assert.Equal(new NativeRectFloat(105.5f, 100.5f, 10f, 20f), rect.Offset(offsetX: 5f));
+    }
 }

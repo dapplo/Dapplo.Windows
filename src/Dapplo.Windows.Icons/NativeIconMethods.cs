@@ -63,7 +63,7 @@ public static class NativeIconMethods
     /// <param name="iconOrCursorHandle">A IntPtr handle to the icon or cursor.</param>
     /// <param name="iconInfoEx">A pointer to an ICONINFOEX structure. The function fills in the structure's members.</param>
     /// <returns>bool true if the function succeeds, the return value is in the IconInfo structure.</returns>
-    [DllImport(User32Api.User32, SetLastError = true, CharSet = CharSet.Auto)]
+    [DllImport(User32Api.User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "GetIconInfoExW")]
     public static extern bool GetIconInfoEx(IntPtr iconOrCursorHandle, ref IconInfoEx iconInfoEx);
 
     /// <summary>
@@ -74,7 +74,7 @@ public static class NativeIconMethods
     /// <param name="iconOrCursorHandle">A handle to the icon or cursor.</param>
     /// <param name="iconInfoEx">A pointer to an ICONINFOEX structure. The function fills in the structure's members.</param>
     /// <returns>bool true if the function succeeds, the return value is in the IconInfo structure.</returns>
-    [DllImport(User32Api.User32, SetLastError = true)]
+    [DllImport(User32Api.User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "GetIconInfoExW")]
     public static extern bool GetIconInfoEx(SafeIconHandle iconOrCursorHandle, ref IconInfoEx iconInfoEx);
 
     /// <summary>

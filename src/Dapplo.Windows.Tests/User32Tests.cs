@@ -108,7 +108,8 @@ public class User32Tests
     ///     Test GetTextFromWindow
     /// </summary>
     [WpfFact]
-    private void Test_GetTextFromWindow()
+    [Trait("Category", "Interactive")]
+    public void Test_GetTextFromWindow()
     {
         const string title = "1234567890";
         var window = new Window
@@ -121,5 +122,25 @@ public class User32Tests
         var text = User32Api.GetTextFromWindow(handle);
         window.Close();
         Assert.Equal(title, text);
+    }
+
+    /// <summary>
+    ///     Test GetTextFromWindow with a text which is too large for the stack
+    /// </summary>
+    [WpfFact]
+    [Trait("Category", "Interactive")]
+    public void Test_GetTextFromWindow_LargeText()
+    {
+        var largeText = new string('x', 600_000);
+        using var textBox = new System.Windows.Forms.TextBox
+        {
+            Multiline = true,
+            MaxLength = 0
+        };
+        var handle = textBox.Handle;
+        textBox.Text = largeText;
+
+        var text = User32Api.GetTextFromWindow(handle);
+        Assert.Equal(largeText, text);
     }
 }

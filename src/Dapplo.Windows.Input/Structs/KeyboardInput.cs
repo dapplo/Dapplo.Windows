@@ -72,7 +72,7 @@ public struct KeyboardInput
     ///     Create a KeyboardInput for a key press (up / down)
     /// </summary>
     /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
-    /// <param name="timestamp">optional Timestamp</param>
+    /// <param name="timestamp">optional Timestamp, null or 0 lets the system provide the time stamp</param>
     /// <returns>KeyboardInput[]</returns>
     public static KeyboardInput[] ForKeyPress(VirtualKeyCode virtualKeyCode, uint? timestamp = null)
     {
@@ -87,15 +87,16 @@ public struct KeyboardInput
     ///     Create a KeyboardInput for a key down
     /// </summary>
     /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
-    /// <param name="timestamp">optional Timestamp</param>
+    /// <param name="timestamp">optional Timestamp, null or 0 lets the system provide the time stamp</param>
     /// <returns>KeyboardInput</returns>
     public static KeyboardInput ForKeyDown(VirtualKeyCode virtualKeyCode, uint? timestamp = null)
     {
-        var messageTime = timestamp ?? (uint)Environment.TickCount;
         return new KeyboardInput
         {
             VirtualKeyCode = virtualKeyCode,
-            Timestamp = messageTime
+            ScanCode = MapToScanCode(virtualKeyCode),
+            KeyEventFlags = IsExtendedKey(virtualKeyCode) ? KeyEventFlags.ExtendedKey : 0,
+            Timestamp = timestamp ?? 0
         };
     }
 
@@ -103,16 +104,72 @@ public struct KeyboardInput
     ///     Create a KeyboardInput for a key up
     /// </summary>
     /// <param name="virtualKeyCode">Value from VirtualKeyCodes</param>
-    /// <param name="timestamp">optional Timestamp</param>
+    /// <param name="timestamp">optional Timestamp, null or 0 lets the system provide the time stamp</param>
     /// <returns>KeyboardInput</returns>
     public static KeyboardInput ForKeyUp(VirtualKeyCode virtualKeyCode, uint? timestamp = null)
     {
-        var messageTime = timestamp ?? (uint)Environment.TickCount;
+        var keyEventFlags = KeyEventFlags.KeyUp;
+        if (IsExtendedKey(virtualKeyCode))
+        {
+            keyEventFlags |= KeyEventFlags.ExtendedKey;
+        }
         return new KeyboardInput
         {
             VirtualKeyCode = virtualKeyCode,
-            KeyEventFlags = KeyEventFlags.KeyUp,
-            Timestamp = messageTime
+            ScanCode = MapToScanCode(virtualKeyCode),
+            KeyEventFlags = keyEventFlags,
+            Timestamp = timestamp ?? 0
         };
     }
+
+    /// <summary>
+    ///     Check if the specified VirtualKeyCode is an extended key (E0 prefixed scan code), these need KEYEVENTF_EXTENDEDKEY
+    ///     when they are injected, otherwise Windows uses the non-extended (numpad) equivalent.
+    ///     Examples are the arrow keys, Insert, Delete, Home, End, PageUp, PageDown, RightControl, RightMenu (AltGr), Divide, NumLock, the Windows keys and the media keys.
+    /// </summary>
+    /// <param name="virtualKeyCode">VirtualKeyCode</param>
+    /// <returns>bool true if the key is an extended key</returns>
+    public static bool IsExtendedKey(VirtualKeyCode virtualKeyCode)
+    {
+        switch (virtualKeyCode)
+        {
+            case VirtualKeyCode.Cancel:
+            case VirtualKeyCode.Prior:
+            case VirtualKeyCode.Next:
+            case VirtualKeyCode.End:
+            case VirtualKeyCode.Home:
+            case VirtualKeyCode.Left:
+            case VirtualKeyCode.Up:
+            case VirtualKeyCode.Right:
+            case VirtualKeyCode.Down:
+            case VirtualKeyCode.Snapshot:
+            case VirtualKeyCode.Insert:
+            case VirtualKeyCode.Delete:
+            case VirtualKeyCode.LeftWin:
+            case VirtualKeyCode.RightWin:
+            case VirtualKeyCode.Apps:
+            case VirtualKeyCode.Sleep:
+            case VirtualKeyCode.Divide:
+            case VirtualKeyCode.NumLock:
+            case VirtualKeyCode.RightControl:
+            case VirtualKeyCode.RightMenu:
+                return true;
+        }
+        // Browser, volume, media and launch keys
+        return virtualKeyCode >= VirtualKeyCode.BrowserBack && virtualKeyCode <= VirtualKeyCode.LaunchApp2;
+    }
+
+    /// <summary>
+    ///     Map the VirtualKeyCode to the scan code of the current keyboard layout, so hooks and raw input see a correct scan code
+    /// </summary>
+    /// <param name="virtualKeyCode">VirtualKeyCode</param>
+    /// <returns>ScanCodes</returns>
+    private static ScanCodes MapToScanCode(VirtualKeyCode virtualKeyCode)
+    {
+        var scanCode = MapVirtualKey((uint)virtualKeyCode, (uint)MapVkType.VkToVsc);
+        return (ScanCodes)(short)(scanCode & 0xFF);
+    }
+
+    [DllImport("user32.dll")]
+    private static extern uint MapVirtualKey(uint uCode, uint uMapType);
 }

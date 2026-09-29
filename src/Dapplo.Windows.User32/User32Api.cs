@@ -233,39 +233,101 @@ public static class User32Api
     }
 
     /// <summary>
-    ///     Get the text of a control, this is not the caption
+    ///     The maximum number of characters which <see cref="GetTextFromWindow"/> retrieves, longer texts are truncated.
+    /// </summary>
+    public const int MaxWindowTextLength = 1024 * 1024;
+
+    /// <summary>
+    ///     Buffers up to this number of characters (including the terminating 0) are allocated on the stack, larger ones on the heap.
+    /// </summary>
+    private const int StackAllocTextThreshold = 512;
+
+    /// <summary>
+    ///     Timeout, in milliseconds, for messages which are sent to (possibly foreign) windows to retrieve information.
+    /// </summary>
+    private const uint InformationMessageTimeout = 500;
+
+    /// <summary>
+    ///     Get the text of a control, this is not the caption.
+    ///     The messages are sent with SendMessageTimeout and SMTO_ABORTIFHUNG, so a hung window cannot block the caller.
+    ///     Texts longer than <see cref="MaxWindowTextLength"/> characters are truncated.
     /// </summary>
     /// <param name="hWnd">IntPtr</param>
-    /// <returns>string with the text</returns>
+    /// <returns>string with the text, or null if there is no text or the window didn't respond in time</returns>
     public static string GetTextFromWindow(IntPtr hWnd)
     {
         // Get the size of the string required to hold the window's text.
-        var size = SendMessage(hWnd, WindowsMessages.WM_GETTEXTLENGTH, 0, 0).ToInt32();
-
-        // If the return is 0, there is no text.
-        if (size <= 0)
+        if (!TrySendMessage(hWnd, WindowsMessages.WM_GETTEXTLENGTH, IntPtr.Zero, out var lengthResult, timeout: InformationMessageTimeout))
         {
             return null;
         }
 
+        var length = lengthResult.ToInt64();
+        // If the return is 0, there is no text.
+        if (length <= 0)
+        {
+            return null;
+        }
+
+        var bufferSize = (int)Math.Min(length, MaxWindowTextLength) + 1;
         unsafe
         {
-            var text = stackalloc char[size + 1];
-            SendMessage(hWnd, WindowsMessages.WM_GETTEXT, size + 1, text);
-            return new string(text, 0, size);
+            if (bufferSize <= StackAllocTextThreshold)
+            {
+                var stackBuffer = stackalloc char[bufferSize];
+                return ReadWindowText(hWnd, stackBuffer, bufferSize);
+            }
+
+            var heapBuffer = new char[bufferSize];
+            fixed (char* text = heapBuffer)
+            {
+                return ReadWindowText(hWnd, text, bufferSize);
+            }
         }
     }
 
     /// <summary>
-    ///     Get the titlebar info ex for the specified window
+    ///     Send WM_GETTEXT, with a timeout, to the specified window and create a string from the result
     /// </summary>
     /// <param name="hWnd">IntPtr with the window handle</param>
-    /// <returns>TitleBarInfoEx</returns>
+    /// <param name="buffer">char pointer to the buffer to fill</param>
+    /// <param name="bufferSize">int with the size of the buffer, in characters, including the terminating 0</param>
+    /// <returns>string or null if there is no text or the window didn't respond in time</returns>
+    private static unsafe string ReadWindowText(IntPtr hWnd, char* buffer, int bufferSize)
+    {
+        if (!TrySendMessage(hWnd, WindowsMessages.WM_GETTEXT, new IntPtr(bufferSize), out var copiedResult, new IntPtr(buffer), InformationMessageTimeout))
+        {
+            return null;
+        }
+
+        // The text might have changed since WM_GETTEXTLENGTH, so use the number of characters which were really copied
+        var copied = (int)Math.Min(Math.Max(copiedResult.ToInt64(), 0), bufferSize - 1);
+        return copied == 0 ? null : new string(buffer, 0, copied);
+    }
+
+    /// <summary>
+    ///     Get the titlebar info ex for the specified window.
+    ///     The message is sent with SendMessageTimeout and SMTO_ABORTIFHUNG, so a hung window cannot block the caller.
+    /// </summary>
+    /// <param name="hWnd">IntPtr with the window handle</param>
+    /// <returns>TitleBarInfoEx, this is empty (only the size is set) if the window didn't respond in time</returns>
     public static TitleBarInfoEx GetTitleBarInfoEx(IntPtr hWnd)
     {
         var result = TitleBarInfoEx.Create();
-        SendMessage(hWnd, WindowsMessages.WM_GETTITLEBARINFOEX, IntPtr.Zero, ref result);
+        if (!SendMessageTimeout(hWnd, WindowsMessages.WM_GETTITLEBARINFOEX, IntPtr.Zero, ref result, SendMessageTimeoutFlags.AbortIfHung | SendMessageTimeoutFlags.ErrorOnExit, InformationMessageTimeout, out _))
+        {
+            return TitleBarInfoEx.Create();
+        }
         return result;
+    }
+
+    /// <summary>
+    ///     Get the number of lines to scroll when the vertical mouse wheel is moved, see SPI_GETWHEELSCROLLLINES.
+    /// </summary>
+    /// <returns>uint with the number of lines, 0 means no scrolling, uint.MaxValue (WHEEL_PAGESCROLL) means scroll a page. If the value cannot be retrieved, the Windows default of 3 is returned.</returns>
+    public static uint GetWheelScrollLines()
+    {
+        return SystemParametersInfo(SystemParametersInfoActions.SPI_GETWHEELSCROLLLINES, 0, out uint wheelScrollLines, SystemParametersInfoBehaviors.None) ? wheelScrollLines : 3;
     }
 
     /// <summary>
@@ -717,26 +779,18 @@ public static class User32Api
     public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, int lParam);
 
     /// <summary>
-    ///     SendMessage for getting TitleBarInfoEx
+    ///     SendMessageTimeout for getting TitleBarInfoEx
     /// </summary>
-    /// <param name="hWnd"></param>
-    /// <param name="windowsMessage"></param>
-    /// <param name="wParam"></param>
+    /// <param name="hWnd">IntPtr</param>
+    /// <param name="msg">WindowsMessages</param>
+    /// <param name="wParam">IntPtr</param>
     /// <param name="lParam">TitleBarInfoEx</param>
-    /// <returns>LResut which is an IntPtr</returns>
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    internal static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, ref TitleBarInfoEx lParam);
-
-    /// <summary>
-    ///     Used for WM_GETTEXT
-    /// </summary>
-    /// <param name="hWnd">IntPtr for the Window handle</param>
-    /// <param name="windowsMessage"></param>
-    /// <param name="wParam">int with the capacity of the string builder</param>
-    /// <param name="lParam">char *</param>
-    /// <returns></returns>
-    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern unsafe IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, char* lParam);
+    /// <param name="fuFlags">SendMessageTimeoutFlags</param>
+    /// <param name="uTimeout">uint with the timeout in milliseconds</param>
+    /// <param name="lpdwResult">IntPtr with the result of the message processing</param>
+    /// <returns>bool false if timeout true if the sendmessage returned</returns>
+    [DllImport(User32, SetLastError = true)]
+    private static extern bool SendMessageTimeout(IntPtr hWnd, WindowsMessages msg, IntPtr wParam, ref TitleBarInfoEx lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out IntPtr lpdwResult);
 
     /// <summary>
     ///     Used for WM_SETTEXT or another message where a string needs to be send
@@ -1219,6 +1273,18 @@ public static class User32Api
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, ref AnimationInfo animationInfo, SystemParametersInfoBehaviors fWinIni);
+
+    /// <summary>
+    ///     SystemParametersInfo for reading a UINT parameter, e.g. SPI_GETWHEELSCROLLLINES
+    /// </summary>
+    /// <param name="uiAction">SystemParametersInfoActions</param>
+    /// <param name="uiParam">uint, must be 0 for most actions</param>
+    /// <param name="pvParam">out uint with the value</param>
+    /// <param name="fWinIni">SystemParametersInfoBehaviors</param>
+    /// <returns>bool</returns>
+    [DllImport(User32, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, out uint pvParam, SystemParametersInfoBehaviors fWinIni);
 
 
     /// <summary>

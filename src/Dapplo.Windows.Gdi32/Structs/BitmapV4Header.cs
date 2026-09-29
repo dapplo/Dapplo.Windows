@@ -287,7 +287,7 @@ public struct BitmapV4Header
     public uint GammaGreen
     {
         get => _bV5GammaGreen;
-        set => _bV5GammaRed = value;
+        set => _bV5GammaGreen = value;
     }
 
     /// <summary>

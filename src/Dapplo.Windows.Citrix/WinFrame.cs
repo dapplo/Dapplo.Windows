@@ -27,10 +27,9 @@ public static class WinFrame
         {
             try
             {
-                QuerySessionConnectState();
-                return true;
+                return QuerySessionConnectState().HasValue;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException or BadImageFormatException)
             {
                 Log.Warn().WriteLine("Couldn't load WFAPI.DLL, this only means that the process is not running on Citrix and could be okay. Error: {0}", ex.Message);
             }
@@ -68,7 +67,8 @@ public static class WinFrame
         }
         try
         {
-            return (ConnectStates)state.ToInt32();
+            // ppBuffer points to an INT with the connect state
+            return (ConnectStates)Marshal.ReadInt32(state);
         }
         finally
         {

@@ -57,6 +57,6 @@ public static class NativePointExtensions
     [Pure]
     public static NativePoint Offset(this NativePoint point, int? offsetX = null, int? offsetY = null)
     {
-        return new NativePoint(point.X + offsetX ?? 0, point.Y + offsetY ?? 0);
+        return new NativePoint(point.X + (offsetX ?? 0), point.Y + (offsetY ?? 0));
     }
 }

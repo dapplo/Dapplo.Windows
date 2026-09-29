@@ -11,9 +11,9 @@ namespace Dapplo.Windows.Kernel32.Enums;
 public enum ProcessAccessRights : uint
 {
     /// <summary>
-    ///     Combined value for access all
+    ///     All possible access rights for a process object (PROCESS_ALL_ACCESS, Windows Vista and later value).
     /// </summary>
-    All = 0x001F0FFF,
+    All = 0x001FFFFF,
 
     /// <summary>
     ///     Enables usage of the process handle in the TerminateProcess function to terminate the process.
@@ -50,6 +50,16 @@ public enum ProcessAccessRights : uint
     DuplicateHandle = 0x00000040,
 
     /// <summary>
+    ///     Required to create a process (PROCESS_CREATE_PROCESS).
+    /// </summary>
+    CreateProcess = 0x00000080,
+
+    /// <summary>
+    ///     Required to set memory limits using SetProcessWorkingSetSize (PROCESS_SET_QUOTA).
+    /// </summary>
+    SetQuota = 0x00000100,
+
+    /// <summary>
     ///     Enables usage of the process handle in the SetPriorityClass function to set the priority class of the process.
     /// </summary>
     SetInformation = 0x00000200,
@@ -61,10 +71,15 @@ public enum ProcessAccessRights : uint
     QueryInformation = 0x00000400,
 
     /// <summary>
+    ///     Required to suspend or resume a process (PROCESS_SUSPEND_RESUME).
+    /// </summary>
+    SuspendResume = 0x00000800,
+
+    /// <summary>
     ///     Required to retrieve certain information about a process (see GetExitCodeProcess, GetPriorityClass, IsProcessInJob, QueryFullProcessImageName). A handle that has the PROCESS_QUERY_INFORMATION access right is automatically granted PROCESS_QUERY_LIMITED_INFORMATION.
     ///     Windows Server 2003 and Windows XP:  This access right is not supported.
     /// </summary>
-    QueryLimitedInformation = 0x00000400,
+    QueryLimitedInformation = 0x00001000,
 
     /// <summary>
     ///     The right to use the object for synchronization.

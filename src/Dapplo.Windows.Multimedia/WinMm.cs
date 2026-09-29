@@ -13,13 +13,18 @@ namespace Dapplo.Windows.Multimedia;
 /// </summary>
 public static class WinMm
 {
+    private static readonly object PlayMemoryLock = new object();
+    // Unmanaged copy of the wave data passed to Play(byte[]), this needs to stay alive while winmm plays it asynchronously
+    private static IntPtr _playingMemory = IntPtr.Zero;
+
     /// <summary>
     /// Play a system sound
     /// </summary>
     /// <param name="systemSound">Value from the SystemSounds enum</param>
     public static void PlaySystemSound(SystemSounds systemSound)
     {
-        PlaySound(systemSound.ToString(), UIntPtr.Zero, SoundSettings.AliasId | SoundSettings.Async);
+        // The enum names are the system-event alias names from the registry, so SND_ALIAS (not SND_ALIAS_ID) is needed
+        PlaySound(systemSound.ToString(), UIntPtr.Zero, SoundSettings.Alias | SoundSettings.Async);
     }
 
     /// <summary>
@@ -32,7 +37,8 @@ public static class WinMm
     }
 
     /// <summary>
-    /// Play a wav from memorySetLastError
+    /// Play a wav from memory.
+    /// Note: the caller owns the memory, when <see cref="SoundSettings.Async"/> is used it must stay valid until the sound has finished or was stopped with <see cref="StopPlaying"/>.
     /// </summary>
     /// <param name="memoryPtr">Pointer to the wav file to play</param>
     /// <param name="settings">SoundSettings</param>
@@ -42,34 +48,63 @@ public static class WinMm
     }
 
     /// <summary>
-    /// Play wave data
-    /// Note: The byte[] should be pinned into memory, and cannot be removed while playing!!
+    /// Play wave data asynchronously.
+    /// The wave data is copied into unmanaged memory which is kept alive until the next call to <see cref="Play(byte[])"/> or <see cref="StopPlaying"/>,
+    /// so the passed byte[] can be reused or collected directly after this call.
+    /// Any sound which is currently playing is stopped first.
     /// See <a href="https://blogs.msdn.microsoft.com/larryosterman/2009/02/19/playsoundxxx-snd_memory-snd_async-is-almost-always-a-bad-idea/">PlaySound(xxx, SND_MEMORY | SND_ASYNC) is almost always a bad idea.</a>
     /// </summary>
-    /// <param name="soundBytes">Wave data to play to play</param>
-    public static void Play(byte[] soundBytes)
+    /// <param name="soundBytes">Wave data to play</param>
+    /// <returns>bool true if the sound started playing</returns>
+    public static bool Play(byte[] soundBytes)
     {
-        PlaySound(soundBytes, UIntPtr.Zero, SoundSettings.Memory | SoundSettings.Async);
+        if (soundBytes is null)
+        {
+            throw new ArgumentNullException(nameof(soundBytes));
+        }
+
+        lock (PlayMemoryLock)
+        {
+            // Stop the current sound (synchronously) so the previous buffer is no longer used, then free it
+            StopAndFreeMemory();
+
+            var memory = Marshal.AllocHGlobal(soundBytes.Length);
+            Marshal.Copy(soundBytes, 0, memory, soundBytes.Length);
+            if (!PlaySound(memory, UIntPtr.Zero, SoundSettings.Memory | SoundSettings.Async))
+            {
+                Marshal.FreeHGlobal(memory);
+                return false;
+            }
+            _playingMemory = memory;
+            return true;
+        }
     }
 
     /// <summary>
-    /// Stop playing
+    /// Stop playing, this also frees the memory of a sound started with <see cref="Play(byte[])"/>
     /// </summary>
     public static void StopPlaying()
     {
-        PlaySound((string)null, UIntPtr.Zero, SoundSettings.None);
+        lock (PlayMemoryLock)
+        {
+            StopAndFreeMemory();
+        }
     }
 
     /// <summary>
-    ///     The PlaySound function plays a sound specified by the given file name, resource, or system event. (A system event may be associated with a sound in the registry or in the WIN.INI file.)
+    /// Stop the currently playing sound, and free the memory used by <see cref="Play(byte[])"/>. Must be called while holding PlayMemoryLock.
     /// </summary>
-    /// <param name="soundBytes">byte array with the wave information</param>
-    /// <param name="hmod">Handle to the executable file that contains the resource to be loaded. This parameter must be NULL unless SND_RESOURCE is specified in fdwSound.</param>
-    /// <param name="fdwSound">Flags for playing the sound.</param>
-    /// <returns>Returns TRUE if successful or FALSE otherwise.</returns>
-    [DllImport("winmm", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool PlaySound(byte[] soundBytes, UIntPtr hmod, SoundSettings fdwSound);
+    private static void StopAndFreeMemory()
+    {
+        // PlaySound with NULL stops the currently playing (async) sound before it returns
+        PlaySound((string)null, UIntPtr.Zero, SoundSettings.None);
+        if (_playingMemory == IntPtr.Zero)
+        {
+            return;
+        }
+        Marshal.FreeHGlobal(_playingMemory);
+        _playingMemory = IntPtr.Zero;
+    }
 
     /// <summary>
     ///  The PlaySound function plays a sound specified by the given file name, resource, or system event. (A system event may be associated with a sound in the registry or in the WIN.INI file.)

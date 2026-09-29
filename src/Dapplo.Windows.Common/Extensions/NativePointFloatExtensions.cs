@@ -45,7 +45,7 @@ public static class NativePointFloatExtensions
     [Pure]
     public static NativePointFloat Offset(this NativePointFloat point, float? offsetX = null, float? offsetY = null)
     {
-        return new NativePointFloat(point.X + offsetX ?? 0, point.Y + offsetY ?? 0);
+        return new NativePointFloat(point.X + (offsetX ?? 0), point.Y + (offsetY ?? 0));
     }
 
     /// <summary>

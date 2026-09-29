@@ -45,7 +45,10 @@ public readonly struct Msg
     /// <summary>
     /// Time of the message
     /// </summary>
-    public DateTimeOffset Time => DateTimeOffset.Now.Subtract(TimeSpan.FromMilliseconds(Environment.TickCount - _time));
+    /// <remarks>
+    /// The tick difference is calculated with modular (unchecked) uint arithmetic, so this stays correct when the tick count wraps (every 49.7 days).
+    /// </remarks>
+    public DateTimeOffset Time => DateTimeOffset.Now.Subtract(TimeSpan.FromMilliseconds(unchecked((uint)Environment.TickCount - _time)));
 
     /// <summary>
     /// The cursor position, in screen coordinates, when the message was posted.

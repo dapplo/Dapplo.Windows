@@ -28,10 +28,10 @@ public static class NativeCursorMethods
     [DllImport(User32Api.User32, SetLastError = true)]
     internal static extern bool DestroyCursor(IntPtr hCursor);
 
-    [DllImport(User32Api.User32, SetLastError = true)]
+    [DllImport(User32Api.User32, SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern IntPtr LoadImage(IntPtr hInst, IntPtr name, ImageType type, int cx, int cy, LoadImageFlags fuLoad);
 
-    [DllImport(User32Api.User32, SetLastError = true)]
+    [DllImport(User32Api.User32, SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern IntPtr LoadImage(IntPtr hInst, string name, ImageType type, int cx, int cy, LoadImageFlags fuLoad);
 
     [DllImport(User32Api.User32, SetLastError = true)]

@@ -57,8 +57,8 @@ public static class InteropWindowExtensions
         {
             throw new ArgumentException("Can't have both Children & ZOrderedChildren", nameof(retrieveSettings));
         }
-        var forceUpdate = (retrieveSettings | InteropWindowRetrieveSettings.ForceUpdate) != 0;
-        var autoCorrect = (retrieveSettings | InteropWindowRetrieveSettings.AutoCorrectValues) != 0;
+        var forceUpdate = (retrieveSettings & InteropWindowRetrieveSettings.ForceUpdate) != 0;
+        var autoCorrect = (retrieveSettings & InteropWindowRetrieveSettings.AutoCorrectValues) != 0;
 
         if ((retrieveSettings & InteropWindowRetrieveSettings.Info) != 0)
         {
@@ -84,7 +84,7 @@ public static class InteropWindowExtensions
         {
             interopWindow.IsVisible(forceUpdate);
         }
-        if ((retrieveSettings | InteropWindowRetrieveSettings.Maximized) != 0)
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Maximized) != 0)
         {
             interopWindow.IsMaximized(forceUpdate);
         }
@@ -367,7 +367,7 @@ public static class InteropWindowExtensions
                 ScrollBarWindow = interopWindow,
                 ScrollBarType = scrollBarType,
                 InitialScrollInfo = initialScrollInfo,
-                WheelDelta = (int) (120 * (initialScrollInfo.PageSize / WindowScroller.ScrollWheelLinesFromRegistry))
+                WheelDelta = WindowScroller.CalculateWheelDelta(initialScrollInfo.PageSize, WindowScroller.ScrollWheelLines)
             };
             interopWindow.CanScroll = true;
             return windowScroller;
@@ -380,7 +380,7 @@ public static class InteropWindowExtensions
                 ScrollBarWindow = interopWindow,
                 ScrollBarType = ScrollBarTypes.Control,
                 InitialScrollInfo = initialScrollInfo,
-                WheelDelta = (int) (120 * (initialScrollInfo.PageSize / WindowScroller.ScrollWheelLinesFromRegistry))
+                WheelDelta = WindowScroller.CalculateWheelDelta(initialScrollInfo.PageSize, WindowScroller.ScrollWheelLines)
             };
             interopWindow.CanScroll = true;
             return windowScroller;

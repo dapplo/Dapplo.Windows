@@ -287,7 +287,7 @@ public static class Kernel32Api
     /// <param name="lpFileName">string with the library</param>
     /// <returns>IntPtr for the module, IntPtr.Zero if this failed, use last error to see what went wrong</returns>
     [DllImport(Kernel32Dll, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "LoadLibraryW")]
-    public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)] string lpFileName);
+    public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
 
     /// <summary>
     /// Opens an existing local process object.

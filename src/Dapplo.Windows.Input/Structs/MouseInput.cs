@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.User32;
+using Dapplo.Windows.User32.Enums;
 
 namespace Dapplo.Windows.Input.Structs;
 
@@ -71,18 +72,38 @@ public struct MouseInput
     private readonly UIntPtr dwExtraInfo;
 
     /// <summary>
-    ///     The coordinates need to be mapped from 0-65535 where 0 is left and 65535 is right
+    ///     The coordinates need to be mapped to 0-65535 where 0 is the left/top and 65535 is the right/bottom of the virtual desktop
+    ///     (MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK)
     /// </summary>
-    /// <param name="location">NativePoint</param>
-    /// <returns>NativePoint</returns>
+    /// <param name="location">NativePoint in screen coordinates</param>
+    /// <returns>NativePoint with normalized coordinates</returns>
     private static NativePoint RemapLocation(NativePoint location)
     {
-        var bounds = DisplayInfo.ScreenBounds;
-        if (bounds.Width * bounds.Height == 0)
+        var virtualScreenX = User32Api.GetSystemMetrics(SystemMetric.SM_XVIRTUALSCREEN);
+        var virtualScreenY = User32Api.GetSystemMetrics(SystemMetric.SM_YVIRTUALSCREEN);
+        var virtualScreenWidth = User32Api.GetSystemMetrics(SystemMetric.SM_CXVIRTUALSCREEN);
+        var virtualScreenHeight = User32Api.GetSystemMetrics(SystemMetric.SM_CYVIRTUALSCREEN);
+        return new NativePoint(
+            NormalizeCoordinate(location.X, virtualScreenX, virtualScreenWidth),
+            NormalizeCoordinate(location.Y, virtualScreenY, virtualScreenHeight));
+    }
+
+    /// <summary>
+    ///     Map a screen coordinate to the normalized absolute range 0-65535 which SendInput uses,
+    ///     where the origin maps to 0 and origin + size - 1 maps to 65535.
+    /// </summary>
+    /// <param name="coordinate">int with the screen coordinate (x or y)</param>
+    /// <param name="origin">int with the origin of the (virtual) screen, e.g. SM_XVIRTUALSCREEN</param>
+    /// <param name="size">int with the size of the (virtual) screen, e.g. SM_CXVIRTUALSCREEN</param>
+    /// <returns>int between 0 and 65535</returns>
+    public static int NormalizeCoordinate(int coordinate, int origin, int size)
+    {
+        if (size <= 1)
         {
-            return location;
+            return 0;
         }
-        return new NativePoint(location.X * (65535 / bounds.Width), location.Y * (65535 / bounds.Height));
+        var normalized = Math.Round(((double)coordinate - origin) * 65535.0 / (size - 1));
+        return (int)Math.Max(0, Math.Min(65535, normalized));
     }
 
     /// <summary>
@@ -90,7 +111,7 @@ public struct MouseInput
     /// </summary>
     /// <param name="wheelDelta">How much does the wheel move</param>
     /// <param name="location">Location of the event</param>
-    /// <param name="timestamp">The time stamp for the event</param>
+    /// <param name="timestamp">The time stamp for the event, null or 0 lets the system provide the time stamp</param>
     /// <returns>MouseInput</returns>
     public static MouseInput MoveMouseWheel(int wheelDelta, NativePoint? location = null, uint? timestamp = null)
     {
@@ -99,7 +120,7 @@ public struct MouseInput
             location = RemapLocation(location.Value);
         }
         var mouseEventFlags = location.HasValue ? MouseMoveMouseEventFlags : MouseEventFlags.None;
-        var messageTime = timestamp ?? (uint)Environment.TickCount;
+        var messageTime = timestamp ?? 0;
         return new MouseInput
         {
             MouseData = wheelDelta,
@@ -114,17 +135,16 @@ public struct MouseInput
     ///     Create a MouseInput struct for a mouse move
     /// </summary>
     /// <param name="location">Where is the click located</param>
-    /// <param name="timestamp">The time stamp for the event</param>
+    /// <param name="timestamp">The time stamp for the event, null or 0 lets the system provide the time stamp</param>
     /// <returns>MouseInput</returns>
     public static MouseInput MouseMove(NativePoint location, uint? timestamp = null)
     {
         location = RemapLocation(location);
-        var bounds = DisplayInfo.ScreenBounds;
-        var messageTime = timestamp ?? (uint)Environment.TickCount;
+        var messageTime = timestamp ?? 0;
         return new MouseInput
         {
-            dx = location.X * (65535 / bounds.Width),
-            dy = location.Y * (65535 / bounds.Height),
+            dx = location.X,
+            dy = location.Y,
             Timestamp = messageTime,
             MouseEventFlags = MouseMoveMouseEventFlags
         };
@@ -135,7 +155,7 @@ public struct MouseInput
     /// </summary>
     /// <param name="mouseButtons">MouseButtons to specify which mouse buttons</param>
     /// <param name="location">Where is the click located</param>
-    /// <param name="timestamp">The time stamp for the event</param>
+    /// <param name="timestamp">The time stamp for the event, null or 0 lets the system provide the time stamp</param>
     /// <returns>MouseInput</returns>
     public static MouseInput MouseDown(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
     {
@@ -168,7 +188,7 @@ public struct MouseInput
             mouseEventFlags |= MouseEventFlags.XDown;
             mouseData |= 2;
         }
-        var messageTime = timestamp ?? (uint)Environment.TickCount;
+        var messageTime = timestamp ?? 0;
         return new MouseInput
         {
             dx = location?.X ?? 0,
@@ -184,7 +204,7 @@ public struct MouseInput
     /// </summary>
     /// <param name="mouseButtons">MouseButtons to specify which mouse buttons</param>
     /// <param name="location">Where is the click located</param>
-    /// <param name="timestamp">The time stamp for the event</param>
+    /// <param name="timestamp">The time stamp for the event, null or 0 lets the system provide the time stamp</param>
     /// <returns>MouseInput</returns>
     public static MouseInput MouseUp(MouseButtons mouseButtons, NativePoint? location = null, uint? timestamp = null)
     {
@@ -217,7 +237,7 @@ public struct MouseInput
             mouseEventFlags |= MouseEventFlags.XUp;
             mouseData |= 2;
         }
-        var messageTime = timestamp ?? (uint)Environment.TickCount;
+        var messageTime = timestamp ?? 0;
         return new MouseInput
         {
             dx = location?.X ?? 0,

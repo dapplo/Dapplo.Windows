@@ -164,7 +164,8 @@ public class KeyboardHookEventArgs : EventArgs
     {
         get
         {
-            var runningTimeSpan = TimeSpan.FromMilliseconds(Environment.TickCount - TimeStamp);
+            // Modular (unchecked) uint arithmetic, so this stays correct when the tick count wraps (every 49.7 days)
+            var runningTimeSpan = TimeSpan.FromMilliseconds(unchecked((uint)Environment.TickCount - TimeStamp));
             return DateTimeOffset.Now.Subtract(runningTimeSpan);
         }
     }

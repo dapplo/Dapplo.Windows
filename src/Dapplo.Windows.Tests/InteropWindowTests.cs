@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using System;
 using System.Linq;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Xunit;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Tests;
 
@@ -13,6 +15,36 @@ public class InteropWindowTests
     public InteropWindowTests(ITestOutputHelper testOutputHelper)
     {
         LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+    }
+
+    /// <summary>
+    ///    Fill without ForceUpdate must use the cached values, and only retrieve what was requested
+    /// </summary>
+    [Fact]
+    public void Test_Fill_UsesCachedValues()
+    {
+        var interopWindow = InteropWindowFactory.CreateFor(IntPtr.Zero);
+        interopWindow.Caption = "cached";
+
+        interopWindow.Fill(InteropWindowRetrieveSettings.Caption);
+
+        Assert.Equal("cached", interopWindow.Caption);
+        // Maximized was not requested, so it should not have been retrieved
+        Assert.Null(interopWindow.IsMaximized);
+    }
+
+    /// <summary>
+    ///    Fill with ForceUpdate must refresh the cached values
+    /// </summary>
+    [Fact]
+    public void Test_Fill_ForceUpdate()
+    {
+        var interopWindow = InteropWindowFactory.CreateFor(IntPtr.Zero);
+        interopWindow.Caption = "cached";
+
+        interopWindow.Fill(InteropWindowRetrieveSettings.Caption | InteropWindowRetrieveSettings.ForceUpdate);
+
+        Assert.NotEqual("cached", interopWindow.Caption);
     }
 
     /// <summary>
