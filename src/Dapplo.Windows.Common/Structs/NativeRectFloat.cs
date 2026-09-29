@@ -184,23 +184,26 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     }
 
     /// <summary>
-    ///     Cast NativeRectFloat to Rect
+    ///     Cast NativeRectFloat to Rect.
+    ///     A System.Windows.Rect cannot have a negative width or height, a not normalized NativeRectFloat is normalized.
     /// </summary>
     /// <param name="rectangle">NativeRectFloat</param>
     /// <returns>Rect</returns>
     public static implicit operator Rect(NativeRectFloat rectangle)
     {
-        return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
+        // The Rect(Point, Point) constructor normalizes, Rect(x, y, width, height) would throw an ArgumentException for a negative width or height
+        return new Rect(new System.Windows.Point(rectangle.Left, rectangle.Top), new System.Windows.Point(rectangle.Right, rectangle.Bottom));
     }
 
     /// <summary>
-    ///     Cast NativeRectFloat to Int32Rect
+    ///     Explicit (lossy) cast NativeRectFloat to Int32Rect, this results in the smallest integer rectangle which contains the NativeRectFloat (see <see cref="GetContainingIntegerBounds"/>).
     /// </summary>
     /// <param name="rectangle">NativeRectFloat</param>
     /// <returns>Int32Rect</returns>
-    public static implicit operator Int32Rect(NativeRectFloat rectangle)
+    public static explicit operator Int32Rect(NativeRectFloat rectangle)
     {
-        return new Int32Rect((int)rectangle.Left, (int)rectangle.Top, (int)rectangle.Width, (int)rectangle.Height);
+        rectangle.GetContainingIntegerBounds(out var left, out var top, out var width, out var height);
+        return new Int32Rect(left, top, width, height);
     }
 #endif
 
@@ -226,13 +229,32 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     }
 
     /// <summary>
-    ///     Cast NativeRectFloat to NativeRect
+    ///     Calculate the smallest integer rectangle which contains this NativeRectFloat:
+    ///     left and top are floored, right and bottom are rounded up. The result is normalized (no negative width or height).
+    ///     This makes sure that Right does not drift, as it would when truncating left and width independently.
+    /// </summary>
+    /// <param name="left">int</param>
+    /// <param name="top">int</param>
+    /// <param name="width">int</param>
+    /// <param name="height">int</param>
+    public void GetContainingIntegerBounds(out int left, out int top, out int width, out int height)
+    {
+        left = (int)Math.Floor(Math.Min(Left, Right));
+        top = (int)Math.Floor(Math.Min(Top, Bottom));
+        width = (int)Math.Ceiling(Math.Max(Left, Right)) - left;
+        height = (int)Math.Ceiling(Math.Max(Top, Bottom)) - top;
+    }
+
+    /// <summary>
+    ///     Explicit (lossy) cast NativeRectFloat to NativeRect, this results in the smallest integer rectangle which contains the NativeRectFloat (see <see cref="GetContainingIntegerBounds"/>).
+    ///     Use Round() to round the location and size instead.
     /// </summary>
     /// <param name="rectangle">NativeRectFloat</param>
     /// <returns>NativeRect</returns>
-    public static implicit operator NativeRect(NativeRectFloat rectangle)
+    public static explicit operator NativeRect(NativeRectFloat rectangle)
     {
-        return new NativeRect((int)rectangle.Left, (int)rectangle.Top, (int)rectangle.Width, (int)rectangle.Height);
+        rectangle.GetContainingIntegerBounds(out var left, out var top, out var width, out var height);
+        return new NativeRect(left, top, width, height);
     }
 
     /// <summary>
@@ -246,13 +268,14 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     }
 
     /// <summary>
-    ///     Cast NativeRectFloat to Rectangle
+    ///     Explicit (lossy) cast NativeRectFloat to Rectangle, this results in the smallest integer rectangle which contains the NativeRectFloat (see <see cref="GetContainingIntegerBounds"/>).
     /// </summary>
     /// <param name="rectangle">NativeRectFloat</param>
     /// <returns>Rectangle</returns>
-    public static implicit operator Rectangle(NativeRectFloat rectangle)
+    public static explicit operator Rectangle(NativeRectFloat rectangle)
     {
-        return new Rectangle((int) rectangle.X, (int) rectangle.Y, (int) rectangle.Width, (int) rectangle.Height);
+        rectangle.GetContainingIntegerBounds(out var left, out var top, out var width, out var height);
+        return new Rectangle(left, top, width, height);
     }
 
     /// <summary>

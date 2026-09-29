@@ -8,7 +8,7 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Common.TypeConverters;
 
 /// <summary>
-/// This implements a TypeConverter for the NativeRect structur
+/// This implements a TypeConverter for the NativeRect structure, the format is "Left,Top,Width,Height" using the invariant culture
 /// </summary>
 public class NativeRectTypeConverter : TypeConverter
 {
@@ -47,7 +47,8 @@ public class NativeRectTypeConverter : TypeConverter
     {
         if (destinationType == typeof(string) && value is NativeRect nativeRect)
         {
-            return $"{nativeRect.Left},{nativeRect.Top},{nativeRect.Width},{nativeRect.Height}";
+            // Always use the invariant culture, ConvertFrom parses with it (e.g. sv-SE would write U+2212 as negative sign)
+            return string.Join(",", nativeRect.Left.ToString(CultureInfo.InvariantCulture), nativeRect.Top.ToString(CultureInfo.InvariantCulture), nativeRect.Width.ToString(CultureInfo.InvariantCulture), nativeRect.Height.ToString(CultureInfo.InvariantCulture));
         }
         return base.ConvertTo(context, culture, value, destinationType);
     }

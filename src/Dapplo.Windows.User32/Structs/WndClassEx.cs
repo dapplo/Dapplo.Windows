@@ -14,7 +14,7 @@ namespace Dapplo.Windows.User32.Structs;
 /// handles, and resource handles required to register a window class using the Windows API. Before registering a window
 /// class, ensure that the cbSize field is set to the size of this structure. This structure is typically used with the
 /// RegisterClassEx function when creating custom window classes in native Windows applications.</remarks>
-[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 public struct WndClassEx
 {
     private int _cbSize;

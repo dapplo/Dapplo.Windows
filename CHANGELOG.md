@@ -15,6 +15,23 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - **Breaking:** removed `NativeRectExtensions.Intersect2`, which returned wrong results; use `Intersect` (C-05).
 - **Breaking:** corrected `ProcessAccessRights.QueryLimitedInformation` (0x1000) and `All` (0x1FFFFF), and added `CreateProcess`, `SetQuota` and `SuspendResume` (D-12).
 - **Breaking:** `WinMm.Play(byte[])` copies the wave data to unmanaged memory that stays alive until the next `Play(byte[])` or `StopPlaying()`, and returns `bool` (E-04).
+- **Breaking:** `HResult` is a signed `int` enum. `Failed()`, `Succeeded()` and `ThrowOnFailure()` now detect failures; before, every HRESULT counted as success, so failure branches that never ran now run (C-01).
+- **Breaking:** `IconInfo` / `IconInfoEx` expose the bitmaps as non-owning `IntPtr` properties (`ColorBitmap`, `BitmaskBitmap`); take ownership once with `TakeBitmaps()` or free them with `DeleteBitmaps()`. Every property read used to create a new owning SafeHandle, so the same HBITMAPs were deleted several times (C-02).
+- **Breaking:** `NativeSizeTypeConverter` writes and reads `Width,Height`; it used to swap them (C-06).
+- **Breaking:** `IsDockedToLeftOf` / `IsDockedToRightOf` treat flush rectangles (`Right == Left`, exclusive Right) as docked instead of requiring a 1-pixel gap (C-13).
+- **Breaking:** `HasOverlap` returns false for rectangles that only touch and true when one contains the other, the same as `IntersectsWith` (C-14).
+- **Breaking:** `WindowsVersion` uses `RtlGetVersion`, so it reports the real OS version without an application manifest. `IsWindowsVista` and `IsWindows10` now mean exactly that version; use the `…OrLater` properties (C-17).
+- **Breaking:** `NativeSize` / `NativeSizeFloat.CompareTo` order by ascending area; it was reversed (C-23).
+- **Breaking:** lossy float-to-int conversions of the `Native*` structs are explicit. Points floor, sizes round up, and rectangles become the containing integer rectangle (C-24).
+- **Breaking:** `MonitorFrom` values match winuser.h (`DefaultToNull = 0`, `DefaultToPrimary = 1`, `DefaultToNearest = 2`) and the enum is no longer `[Flags]`; "nearest" lookups used to return NULL (A-01).
+- **Breaking:** `SysColorIndexes.Color3Dface` is 15 (A-09).
+- **Breaking:** `ScrollBarInfo.ThumbTop` / `ThumbBottom` were swapped; `ThumbSize` (really the arrow-button size) is renamed to `LineButtonSize` (A-10).
+- **Breaking:** WPARAM, LPARAM and LRESULT are pointer-sized in every `User32Api.SendMessage` overload; the `int` overload is removed (A-20).
+- **Breaking:** `DpiAwarenessContext` is a pointer-sized struct instead of an `int` enum, so the DPI-context APIs work on x64. Compare contexts with `NativeDpiMethods.AreDpiAwarenessContextsEqual` (D-07).
+- **Breaking:** `IDispatch` has a correct vtable on every target and `GetTypeInfo` returns `ComTypes.ITypeInfo`; the unusable `IUnknown` interface is removed (D-11).
+- **Breaking:** `NativeDpiMethods.GetWindowDpiHostingBehavior` takes the window handle it requires (D-13).
+- **Breaking:** `DialogDpiChangeBehaviors.DisableControlRelayout` is 4 (D-14).
+- **Breaking:** `NativeDpiMethods.EnableNonClientDpiScaling` returns `bool` instead of `HResult` (D-15).
 - With `KeyCombinationHandler.TriggerOnKeyUp = true`, key events are never marked as handled, so `IsPassThrough` has no effect in that mode (B-05).
 - Tests that send input, replace the clipboard or write to the registry are tagged `Category=Interactive` and are excluded from default runs (F-06).
 
@@ -23,6 +40,10 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - `User32Api.GetWheelScrollLines()`, `User32Api.MaxWindowTextLength`, `WindowScroller.MaxMouseWheelSteps`, `WindowScroller.WheelDeltaPerNotch`.
 - `MouseInput.NormalizeCoordinate()` and `KeyboardInput.IsExtendedKey()`.
 - `DwmApi.DwmSetWindowAttribute` overload taking `ref uint`.
+- `NativePointFloatTypeConverter`, `NativeRectFloat.GetContainingIntegerBounds`, `IconInfoEx.IsMonochrome`, `Gdi32Api.GetObject(IntPtr, …)`.
+- `NativeDpiMethods.AreDpiAwarenessContextsEqual`, `GetWindowDpiAwarenessContext`, `SetDialogDpiChangeBehavior`, `GetDialogDpiChangeBehavior`, `DpiAwarenessContext.UnawareGdiScaled`.
+- `DpiCalculator.ScaleWithDpi` / `UnscaleWithDpi` overloads for `NativePointFloat`.
+- `WindowScroller.CreateScrollWParam`.
 
 ### Fixed
 - Reading a window's text (`GetTextFromWindow`, `GetText()`, `Fill()`) no longer crashes the process with a StackOverflowException when a control holds a very large text; texts over 1M characters are truncated (A-03).
@@ -49,3 +70,13 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - Citrix detection reads the connect state correctly on x64 (E-06).
 - `WinMm.PlaySystemSound` plays the requested system sound (E-09).
 - `PowerManagementApi.SetSuspendState` reports failure correctly (E-18).
+- `ApplicationRestartManager.ListenForEndSession` answers WM_QUERYENDSESSION with TRUE/FALSE; it answered S_OK (0), which blocks shutdown (E-01, part of it: the reply reaches Windows only after the message pipeline fix in pass 3).
+- Type converters write with the invariant culture, so negative values round-trip under cultures such as sv-SE; float converters accept exponent notation (C-16).
+- Converting a non-normalised rectangle to a WPF `Rect` no longer throws (C-24).
+- User32 imports that handle text always call the Unicode (W) entry points; `SendMessage`, `Get/SetWindowLong(Ptr)` and `GetClassLongPtr` used to resolve to the ANSI versions (A-07).
+- `SetWindowStyle` / `SetExtendedWindowStyle` no longer throw an OverflowException in 32-bit processes or Debug builds for styles such as `WS_POPUP` (A-08).
+- `WindowScroller` scrolls scroll-bar controls (`ScrollBarTypes.Control`) and no longer overflows for positions above 32767 on 32-bit (A-20).
+- Creating a `DpiAwareForm` or `DpiHandler`, or calling `AttachDpiHandler`, no longer leaves the UI thread in Per Monitor v2 awareness (D-08).
+- `NativeDpiMethods.EnableDpiAware` falls back to Per Monitor v1 and `SetProcessDpiAwareness`, and returns whether the process is actually DPI aware (D-09).
+- `DpiHandler.TryEnableNonClientDpiScaling` reports failures and no longer throws on Windows 10 before 1607 (D-15).
+- `DpiHandler.ScaleWithCurrentDpi(NativePointFloat)` / `UnscaleWithCurrentDpi(NativePointFloat)` no longer round to integers, and unscaling no longer scales.

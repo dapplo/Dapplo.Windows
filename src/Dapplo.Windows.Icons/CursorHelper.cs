@@ -84,6 +84,8 @@ public static class CursorHelper
 
         if (!NativeIconMethods.GetIconInfoEx(cursorInfo.CursorHandle, ref iconInfo)) return false;
 
+        // GetIconInfoEx created two bitmaps which we own, take the ownership exactly once so each is deleted exactly once
+        iconInfo.TakeBitmaps(out var bitmaskBitmap, out var colorBitmap);
         try
         {
             // A. CALCULATE TARGET SIZE (High-DPI)
@@ -129,13 +131,13 @@ public static class CursorHelper
             if (!isFreshHandle)
             {
                 var bmpInfo = new GdiBitmap();
-                var hMeasure = iconInfo.ColorBitmapHandle.IsInvalid ? iconInfo.BitmaskBitmapHandle : iconInfo.ColorBitmapHandle;
+                var hMeasure = colorBitmap.IsInvalid ? bitmaskBitmap : colorBitmap;
                 if (Gdi32Api.GetObject(hMeasure, Marshal.SizeOf(typeof(GdiBitmap)), ref bmpInfo) > 0)
                 {
                     nativeWidth = bmpInfo.Width;
                     nativeHeight = bmpInfo.Height;
                     // If hbmColor is NULL, hbmMask is double-height (AND + XOR) -> Actual cursor height is half.
-                    if (iconInfo.ColorBitmapHandle.IsInvalid)
+                    if (colorBitmap.IsInvalid)
                     {
                         nativeHeight /= 2;
                     }
@@ -150,7 +152,7 @@ public static class CursorHelper
                 // (If nativeW is 32, but target is 48, we scale the hotspot)
                 var maskInfo = new GdiBitmap();
                 int handleWidth = 32;
-                if (Gdi32Api.GetObject(iconInfo.BitmaskBitmapHandle, Marshal.SizeOf(typeof(GdiBitmap)), ref maskInfo) > 0)
+                if (Gdi32Api.GetObject(bitmaskBitmap, Marshal.SizeOf(typeof(GdiBitmap)), ref maskInfo) > 0)
                 {
                     handleWidth = maskInfo.Width;
                 }
@@ -164,7 +166,7 @@ public static class CursorHelper
                 result.Size = new Size(nativeWidth, nativeHeight);
             }
 
-            bool isMonochrome = iconInfo.ColorBitmapHandle.IsInvalid;
+            bool isMonochrome = colorBitmap.IsInvalid;
             
             if (isMonochrome)
             {
@@ -180,7 +182,7 @@ public static class CursorHelper
                 // If the extracted bitmap doesn't match the target size, discard it and fallback
                 if (isCustomCursor) {
                     // Directly dump the raw memory to preserve perfectly scaled Premultiplied Alpha pixels
-                    result.ColorLayer = ExtractRawColorBitmap(iconInfo.ColorBitmapHandle, nativeWidth, nativeHeight, out hasAlpha);
+                    result.ColorLayer = ExtractRawColorBitmap(colorBitmap, nativeWidth, nativeHeight, out hasAlpha);
                     result.HotSpot = iconInfo.Hotspot;
                     result.Size = new Size(nativeWidth, nativeHeight);
                 }
@@ -212,7 +214,8 @@ public static class CursorHelper
         finally
         {
             // Always cleanup the GDI objects from GetIconInfoEx
-            iconInfo.Dispose();
+            colorBitmap.Dispose();
+            bitmaskBitmap.Dispose();
         }
     }
 

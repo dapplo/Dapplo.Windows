@@ -141,6 +141,23 @@ public sealed class DpiCalculator
     }
 
     /// <summary>
+    ///     Scale the supplied NativePointFloat according to the supplied dpi
+    /// </summary>
+    /// <param name="point">NativePointFloat to scale</param>
+    /// <param name="dpi">current dpi, normal is 96.</param>
+    /// <param name="scaleModifier">A function which can modify the scale factor</param>
+    /// <returns>NativePointFloat scaled</returns>
+    public static NativePointFloat ScaleWithDpi(NativePointFloat point, int dpi, Func<float, float> scaleModifier = null)
+    {
+        var dpiScaleFactor = DpiScaleFactor(dpi);
+        if (scaleModifier != null)
+        {
+            dpiScaleFactor = scaleModifier(dpiScaleFactor);
+        }
+        return new NativePointFloat(dpiScaleFactor * point.X, dpiScaleFactor * point.Y);
+    }
+
+    /// <summary>
     /// Calculate a DPI unscale factor
     /// </summary>
     /// <param name="oldDpi">int with the old dpi</param>
@@ -241,5 +258,22 @@ public sealed class DpiCalculator
             dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
         }
         return new NativeSizeFloat(dpiUnscaleFactor * size.Width, dpiUnscaleFactor * size.Height);
+    }
+
+    /// <summary>
+    ///     Unscale the supplied NativePointFloat according to the supplied dpi
+    /// </summary>
+    /// <param name="point">NativePointFloat to unscale</param>
+    /// <param name="dpi">current dpi, normal is 96.</param>
+    /// <param name="scaleModifier">A function which can modify the scale factor</param>
+    /// <returns>NativePointFloat unscaled</returns>
+    public static NativePointFloat UnscaleWithDpi(NativePointFloat point, int dpi, Func<float, float> scaleModifier = null)
+    {
+        var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
+        if (scaleModifier != null)
+        {
+            dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
+        }
+        return new NativePointFloat(dpiUnscaleFactor * point.X, dpiUnscaleFactor * point.Y);
     }
 }

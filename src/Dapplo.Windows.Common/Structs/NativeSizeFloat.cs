@@ -141,13 +141,14 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
 #endif
 
     /// <summary>
-    ///     Implicit cast from NativeSize to System.Drawing.Size
+    ///     Explicit (lossy) cast from NativeSizeFloat to System.Drawing.Size.
+    ///     The width and height are rounded up to the smallest integer size which contains the size. Use Round() to round instead.
     /// </summary>
     /// <param name="size">NativeSizeFloat</param>
     /// <returns>System.Drawing.Size</returns>
-    public static implicit operator System.Drawing.Size(NativeSizeFloat size)
+    public static explicit operator System.Drawing.Size(NativeSizeFloat size)
     {
-        return new System.Drawing.Size((int)size.Width, (int)size.Height);
+        return new System.Drawing.Size((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
     }
 
     /// <summary>
@@ -292,7 +293,8 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
 
     /// <inheritdoc />
     [Pure]
-    public int CompareTo(NativeSizeFloat other) => unchecked(other.Width * other.Height).CompareTo(unchecked (Width * Height));
+    /// <remarks>Sizes are ordered by area (width * height, calculated as double), smallest first.</remarks>
+    public int CompareTo(NativeSizeFloat other) => ((double)_width * _height).CompareTo((double)other._width * other._height);
 
     /// <inheritdoc />
     [Pure]

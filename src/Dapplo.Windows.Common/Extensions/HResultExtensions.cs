@@ -20,7 +20,8 @@ public static class HResultExtensions
     [Pure]
     public static bool Failed(this HResult hResult)
     {
-        return hResult < 0;
+        // The severity bit is the sign bit of the signed 32-bit HRESULT
+        return (int)hResult < 0;
     }
 
     /// <summary>
@@ -31,7 +32,7 @@ public static class HResultExtensions
     [Pure]
     public static bool Succeeded(this HResult hResult)
     {
-        return hResult >= HResult.S_OK;
+        return (int)hResult >= 0;
     }
 
     /// <summary>

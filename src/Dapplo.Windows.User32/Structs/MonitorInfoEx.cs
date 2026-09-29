@@ -13,7 +13,7 @@ namespace Dapplo.Windows.User32.Structs;
 ///     The MONITORINFOEX structure is a superset of the MONITORINFO structure.
 ///     The MONITORINFOEX structure adds a string member to contain a name for the display monitor.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 [SuppressMessage("Sonar Code Smell", "S1450:Private fields only used as local variables in methods should become local variables", Justification = "Interop!")]
 [SuppressMessage("Sonar Code Smell", "S3459:Unassigned members should be removed", Justification = "Interop!")]
 [SuppressMessage("ReSharper", "ConvertToAutoProperty")]

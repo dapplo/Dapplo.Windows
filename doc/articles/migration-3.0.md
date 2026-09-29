@@ -4,7 +4,41 @@ Dapplo.Windows 3.0 fixes many interop bugs. Where an API encoded a wrong concept
 compatibility. This page lists every breaking change with the code you need to update. The full list of changes is in
 the [changelog](../../CHANGELOG.md).
 
+## HRESULT
+
+`HResult` is now `enum HResult : int`. `Failed()` and `Succeeded()` work, and `ThrowOnFailure()` throws. Failures
+that were silently treated as success in 2.x now take the failure branch, so review code that calls COM, DWM or DPI
+functions. Casts to `uint` need `unchecked((uint)hr)`.
+
 ## Window information and scrolling
+
+### `MonitorFrom`
+
+The member names are unchanged but the values now match Win32, and the enum is no longer `[Flags]`. Recompiling is
+enough, unless you stored the numbers or combined members with `|`.
+
+### `SendMessage`
+
+WPARAM, LPARAM and LRESULT are pointer-sized everywhere.
+
+```csharp
+// 2.x
+User32Api.SendMessage(hWnd, msg, 5, 0);
+int r = User32Api.SendMessage(hWnd, WindowsMessages.WM_VSCROLL, ScrollBarCommands.SB_LINEDOWN, 0);
+// 3.0
+User32Api.SendMessage(hWnd, msg, new IntPtr(5), IntPtr.Zero);
+IntPtr r = User32Api.SendMessage(hWnd, WindowsMessages.WM_VSCROLL, ScrollBarCommands.SB_LINEDOWN, IntPtr.Zero);
+```
+
+### `ScrollBarInfo`
+
+`ThumbTop` and `ThumbBottom` were swapped. `ThumbSize` is renamed to `LineButtonSize`, because it is the size of the
+arrow buttons. The thumb size is `ThumbBottom - ThumbTop`.
+
+### `SysColorIndexes.Color3Dface`
+
+Now 15 (`COLOR_3DFACE`). No code change is needed.
+
 
 ### `Fill()` caches again
 
@@ -36,6 +70,85 @@ var overlap = rect1.Intersect2(rect2);
 // 3.0
 var overlap = rect1.Intersect(rect2);
 ```
+
+### Docking and overlap
+
+Right and Bottom are exclusive, as in a Win32 `RECT`. Flush rectangles (`a.Right == b.Left`) are now docked; if you
+built docked rectangles with a 1-pixel gap, make them flush. `HasOverlap` is now the same as `IntersectsWith`.
+
+### Conversions
+
+Lossy conversions are explicit:
+
+```csharp
+// 2.x
+NativeRect r = rectFloat;
+NativePoint p = pointFloat;
+// 3.0: the containing integer rectangle, or round explicitly
+var r = (NativeRect)rectFloat;
+var p = pointFloat.Round();
+```
+
+Points floor, sizes round up and rectangles become the smallest containing integer rectangle, so values can differ
+slightly from 2.x (10.5/30.5 now becomes 10/31 where it was 10/30).
+
+### Sorting and type converters
+
+`NativeSize.CompareTo` now sorts ascending by area. `NativeSizeTypeConverter` writes `Width,Height`; strings saved by
+2.x were `Height,Width`, so swap them once or re-save them.
+
+## Windows version
+
+`WindowsVersion` reads the real version with `RtlGetVersion`. `IsWindowsVista` and `IsWindows10` now mean exactly
+that version:
+
+```csharp
+// 2.x meaning "Windows 10 or later"
+if (WindowsVersion.IsWindows10) { }
+// 3.0
+if (WindowsVersion.IsWindows10OrLater) { }
+```
+
+## Icons and cursors
+
+`IconInfo` and `IconInfoEx` no longer create a SafeHandle on every property read.
+
+```csharp
+// 2.x
+using var color = iconInfo.ColorBitmapHandle;
+iconInfoEx.Dispose();
+// 3.0: raw, non-owning handles
+IntPtr color = iconInfo.ColorBitmap;
+// take ownership once ...
+iconInfoEx.TakeBitmaps(out var mask, out var colorBitmap);
+using (mask) using (colorBitmap) { /* ... */ }
+// ... or just free them
+iconInfoEx.DeleteBitmaps();
+```
+
+## DPI
+
+`DpiAwarenessContext` is a pointer-sized struct. Compare contexts with the Win32 function, because the handles Windows
+returns are not the pseudo values:
+
+```csharp
+// 2.x
+if (NativeDpiMethods.GetThreadDpiAwarenessContext() == DpiAwarenessContext.PerMonitorAwareV2) { }
+// 3.0
+if (NativeDpiMethods.AreDpiAwarenessContextsEqual(NativeDpiMethods.GetThreadDpiAwarenessContext(), DpiAwarenessContext.PerMonitorAwareV2)) { }
+```
+
+The members are static properties, so they can't be used in `case` labels or as default parameter values.
+
+- `GetWindowDpiHostingBehavior()` → `GetWindowDpiHostingBehavior(hWnd)`.
+- `EnableNonClientDpiScaling(hWnd).Succeeded()` → `EnableNonClientDpiScaling(hWnd)` (returns `bool`).
+- `DialogDpiChangeBehaviors.DisableControlRelayout` is now 4.
+
+## COM
+
+`IUnknown` is removed; use `Marshal.QueryInterface`, `Marshal.AddRef` and `Marshal.Release`. `IDispatch.GetTypeInfo`
+now returns `System.Runtime.InteropServices.ComTypes.ITypeInfo` on every target, and `Invoke` reports the argument
+error as `out uint`.
 
 ## Kernel32
 

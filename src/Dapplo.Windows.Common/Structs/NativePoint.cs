@@ -77,21 +77,23 @@ public readonly struct NativePoint : IEquatable<NativePoint>
     }
 
     /// <summary>
-    ///     Implicit cast from System.Drawing.PointF to NativePoint
+    ///     Explicit (lossy) cast from System.Drawing.PointF to NativePoint.
+    ///     The coordinates are floored, so the result is the pixel which contains the point. Use Round() on a NativePointFloat to round instead.
     /// </summary>
     /// <param name="point">System.Drawing.PointF</param>
-    public static implicit operator NativePoint(System.Drawing.PointF point)
+    public static explicit operator NativePoint(System.Drawing.PointF point)
     {
-        return new NativePoint((int) point.X, (int) point.Y);
+        return new NativePoint((int)Math.Floor(point.X), (int)Math.Floor(point.Y));
     }
 
     /// <summary>
-    /// Implicit cast from NativePointFloat to NativePoint
+    ///     Explicit (lossy) cast from NativePointFloat to NativePoint.
+    ///     The coordinates are floored, so the result is the pixel which contains the point. Use Round() to round instead.
     /// </summary>
     /// <param name="nativePointFloat">NativePointFloat</param>
-    public static implicit operator NativePoint(NativePointFloat nativePointFloat)
+    public static explicit operator NativePoint(NativePointFloat nativePointFloat)
     {
-        return new NativePoint((int)nativePointFloat.X, (int)nativePointFloat.Y);
+        return new NativePoint((int)Math.Floor(nativePointFloat.X), (int)Math.Floor(nativePointFloat.Y));
     }
 
     /// <summary>

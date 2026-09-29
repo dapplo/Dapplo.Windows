@@ -367,7 +367,8 @@ public static class User32Api
     /// <returns>IntPtr with 0 if error, or the previous value</returns>
     public static IntPtr SetExtendedWindowStyle(IntPtr hWnd, ExtendedWindowStyleFlags extendedWindowStyleFlags)
     {
-        return User32Api.SetWindowLongWrapper(hWnd, WindowLongIndex.GWL_EXSTYLE, new IntPtr((uint)extendedWindowStyleFlags));
+        // The flags are a 32-bit value, the int constructor prevents an OverflowException on 32-bit for values with the high bit set
+        return User32Api.SetWindowLongWrapper(hWnd, WindowLongIndex.GWL_EXSTYLE, new IntPtr(unchecked((int)extendedWindowStyleFlags)));
     }
 
     /// <summary>
@@ -378,7 +379,8 @@ public static class User32Api
     /// <returns>IntPtr with 0 if error, or the previous value</returns>
     public static IntPtr SetWindowStyle(IntPtr hWnd, WindowStyleFlags windowStyleFlags)
     {
-        return User32Api.SetWindowLongWrapper(hWnd, WindowLongIndex.GWL_STYLE, new IntPtr((uint)windowStyleFlags));
+        // The flags are a 32-bit value, the int constructor prevents an OverflowException on 32-bit for WS_POPUP (0x80000000)
+        return User32Api.SetWindowLongWrapper(hWnd, WindowLongIndex.GWL_STYLE, new IntPtr(unchecked((int)windowStyleFlags)));
     }
 
     /// <summary>
@@ -716,10 +718,10 @@ public static class User32Api
     [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern unsafe int GetClassName(IntPtr hWnd, char* className, int nMaxCount);
 
-    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "GetClassLongW", ExactSpelling = true)]
     internal static extern IntPtr GetClassLong(IntPtr hWnd, ClassLongIndex index);
 
-    [DllImport(User32, SetLastError = true, EntryPoint = "GetClassLongPtr")]
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "GetClassLongPtrW", ExactSpelling = true)]
     internal static extern IntPtr GetClassLongPtr(IntPtr hWnd, ClassLongIndex index);
 
     /// <summary>
@@ -742,8 +744,10 @@ public static class User32Api
     /// <param name="sysCommand">SysCommands</param>
     /// <param name="lParam">IntPtr</param>
     /// <returns>IntPtr</returns>
-    [DllImport(User32, SetLastError = true)]
-    public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, SysCommands sysCommand, IntPtr lParam);
+    public static IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, SysCommands sysCommand, IntPtr lParam)
+    {
+        return SendMessage(hWnd, windowsMessage, new IntPtr((int)sysCommand), lParam);
+    }
 
     /// <summary>
     ///     Used for the WM_VSCROLL and WM_HSCROLL windows messages
@@ -751,10 +755,12 @@ public static class User32Api
     /// <param name="hWnd">IntPtr</param>
     /// <param name="windowsMessage">WindowsMessages</param>
     /// <param name="scrollBarCommand">ScrollBarCommands</param>
-    /// <param name="lParam"></param>
-    /// <returns>0</returns>
-    [DllImport(User32, SetLastError = true)]
-    public static extern int SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, ScrollBarCommands scrollBarCommand, int lParam);
+    /// <param name="lParam">IntPtr, IntPtr.Zero for a standard scroll bar or the handle of the scroll bar control</param>
+    /// <returns>IntPtr, 0 if the message was processed</returns>
+    public static IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, ScrollBarCommands scrollBarCommand, IntPtr lParam)
+    {
+        return SendMessage(hWnd, windowsMessage, new IntPtr(unchecked((int)scrollBarCommand)), lParam);
+    }
 
     /// <summary>
     ///  Used for calls where the arguments are IntPtr
@@ -764,19 +770,8 @@ public static class User32Api
     /// <param name="wParam">IntPtr</param>
     /// <param name="lParam">IntPtr</param>
     /// <returns>IntPtr</returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "SendMessageW", ExactSpelling = true)]
     public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, IntPtr lParam);
-
-    /// <summary>
-    ///     Used for calls where the arguments are int
-    /// </summary>
-    /// <param name="hWnd">IntPtr for the Window handle</param>
-    /// <param name="windowsMessage">WindowsMessages</param>
-    /// <param name="wParam">int</param>
-    /// <param name="lParam">int</param>
-    /// <returns></returns>
-    [DllImport(User32, SetLastError = true)]
-    public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, int wParam, int lParam);
 
     /// <summary>
     ///     SendMessageTimeout for getting TitleBarInfoEx
@@ -789,7 +784,7 @@ public static class User32Api
     /// <param name="uTimeout">uint with the timeout in milliseconds</param>
     /// <param name="lpdwResult">IntPtr with the result of the message processing</param>
     /// <returns>bool false if timeout true if the sendmessage returned</returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "SendMessageTimeoutW", ExactSpelling = true)]
     private static extern bool SendMessageTimeout(IntPtr hWnd, WindowsMessages msg, IntPtr wParam, ref TitleBarInfoEx lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out IntPtr lpdwResult);
 
     /// <summary>
@@ -800,13 +795,19 @@ public static class User32Api
     /// <param name="wParam">IntPtr</param>
     /// <param name="lParam">string</param>
     /// <returns>IntPtr, The return value specifies the result of the message processing; it depends on the message sent.</returns>
-    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "SendMessageW", ExactSpelling = true)]
     public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
-    [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLong")]
+    /// <summary>
+    ///     GetWindowLongW, only exported by the 32-bit user32, use <see cref="GetWindowLongWrapper"/>
+    /// </summary>
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "GetWindowLongW", ExactSpelling = true)]
     internal static extern IntPtr GetWindowLong(IntPtr hWnd, WindowLongIndex index);
 
-    [DllImport(User32, SetLastError = true, EntryPoint = "GetWindowLongPtr")]
+    /// <summary>
+    ///     GetWindowLongPtrW, only exported by the 64-bit user32, use <see cref="GetWindowLongWrapper"/>
+    /// </summary>
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "GetWindowLongPtrW", ExactSpelling = true)]
     internal static extern IntPtr GetWindowLongPtr(IntPtr hWnd, WindowLongIndex nIndex);
 
     /// <summary>
@@ -816,7 +817,7 @@ public static class User32Api
     /// <param name="index">WindowLongIndex</param>
     /// <param name="replacementValue">int</param>
     /// <returns>int with 0 if failed, other value was the previous value</returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "SetWindowLongW", ExactSpelling = true)]
     internal static extern int SetWindowLong(IntPtr hWnd, WindowLongIndex index, int replacementValue);
 
     /// <summary>
@@ -826,7 +827,7 @@ public static class User32Api
     /// <param name="index">WindowLongIndex</param>
     /// <param name="replacementValue">IntPtr</param>
     /// <returns>IntPtr with 0 if failed, other value was the previous value</returns>
-    [DllImport(User32, SetLastError = true, EntryPoint = "SetWindowLongPtr")]
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "SetWindowLongPtrW", ExactSpelling = true)]
     internal static extern IntPtr SetWindowLongPtr(IntPtr hWnd, WindowLongIndex index, IntPtr replacementValue);
 
     /// <summary>
@@ -1228,7 +1229,7 @@ public static class User32Api
     /// <param name="pvParam">string</param>
     /// <param name="fWinIni">SystemParametersInfoBehaviors</param>
     /// <returns>bool</returns>
-    [DllImport(User32, CharSet = CharSet.Auto, SetLastError = true)]
+    [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "SystemParametersInfoW", ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, string pvParam, SystemParametersInfoBehaviors fWinIni);
 
@@ -1249,7 +1250,7 @@ public static class User32Api
     /// <param name="pvParam">string</param>
     /// <param name="fWinIni">SystemParametersInfoBehaviors</param>
     /// <returns>bool</returns>
-    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "SystemParametersInfoW", ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, StringBuilder pvParam, SystemParametersInfoBehaviors fWinIni);
 
@@ -1270,7 +1271,7 @@ public static class User32Api
     /// <param name="animationInfo">AnimationInfo</param>
     /// <param name="fWinIni">SystemParametersInfoBehaviors</param>
     /// <returns>bool</returns>
-    [DllImport("user32.dll", SetLastError = true)]
+    [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "SystemParametersInfoW", ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, ref AnimationInfo animationInfo, SystemParametersInfoBehaviors fWinIni);
 
@@ -1282,7 +1283,7 @@ public static class User32Api
     /// <param name="pvParam">out uint with the value</param>
     /// <param name="fWinIni">SystemParametersInfoBehaviors</param>
     /// <returns>bool</returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "SystemParametersInfoW", ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, out uint pvParam, SystemParametersInfoBehaviors fWinIni);
 
@@ -1291,7 +1292,7 @@ public static class User32Api
     /// Locks the workstation's display. Locking a workstation protects it from unauthorized use.
     /// </summary>
     /// <returns>Because the function executes asynchronously, true indicates that the operation has been initiated. If false, call GetLastError</returns>
-    [DllImport("user32.dll", SetLastError = true)]
+    [DllImport(User32, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool LockWorkStation();
 
@@ -1322,6 +1323,6 @@ public static class User32Api
     /// <param name="lprc">A reference to a NativeRect structure that specifies the logical coordinates of the rectangle to be filled.</param>
     /// <param name="hbr">A handle to the brush used to fill the rectangle.</param>
     /// <returns>If the function succeeds, the return value is nonzero. If the function fails, the return value is zero.</returns>
-    [DllImport(User32Api.User32, SetLastError = true, CharSet = CharSet.Auto)]
+    [DllImport(User32Api.User32, SetLastError = true)]
     public static extern int FillRect(IntPtr hDC, [In] ref NativeRect lprc, IntPtr hbr);
 }

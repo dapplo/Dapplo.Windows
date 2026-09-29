@@ -179,10 +179,10 @@ public class CommonStructTests
     }
 
     /// <summary>
-    /// Test implicit conversion for NativeRectFloat
+    /// Test implicit and explicit conversion for NativeRectFloat
     /// </summary>
     [Fact]
-    private void Test_NativeRectFloat_ImplicitConversion()
+    public void Test_NativeRectFloat_ImplicitConversion()
     {
         var nativeRectFloat = new NativeRectFloat(10.5f, 20.5f, 30.5f, 40.5f);
 
@@ -191,8 +191,9 @@ public class CommonStructTests
         NativeRectFloat nativeRectFloatConverted1 = nativeRect;
         Assert.Equal(nativeRectFloatExpected1, nativeRectFloatConverted1);
 
-        var nativeRectExpected = new NativeRect(10, 20, 30, 40);
-        NativeRect nativeRectConverted = nativeRectFloat;
+        // The explicit conversion results in the smallest integer rectangle containing the float rectangle: 10.5..41 x 20.5..61
+        var nativeRectExpected = new NativeRect(10, 20, 31, 41);
+        var nativeRectConverted = (NativeRect)nativeRectFloat;
         Assert.Equal(nativeRectExpected, nativeRectConverted);
 
 #if !NETSTANDARD2_0
@@ -210,8 +211,8 @@ public class CommonStructTests
         NativeRectFloat nativeRectFloatConverted3 = int32Rect;
         Assert.Equal(nativeRectFloatExpected3, nativeRectFloatConverted3);
 
-        var int32RectExpected = new Int32Rect(10, 20, 30, 40);
-        Int32Rect int32RectConverted = nativeRectFloat;
+        var int32RectExpected = new Int32Rect(10, 20, 31, 41);
+        var int32RectConverted = (Int32Rect)nativeRectFloat;
         Assert.Equal(int32RectExpected, int32RectConverted);
 #endif
 
@@ -220,8 +221,8 @@ public class CommonStructTests
         NativeRectFloat nativeRectFloatConverted4 = rectangle;
         Assert.Equal(nativeRectFloatExpected4, nativeRectFloatConverted4);
 
-        var rectangleExpected = new Rectangle(10, 20, 30, 40);
-        Rectangle rectangleConverted = nativeRectFloat;
+        var rectangleExpected = new Rectangle(10, 20, 31, 41);
+        var rectangleConverted = (Rectangle)nativeRectFloat;
         Assert.Equal(rectangleExpected, rectangleConverted);
 
         var rectangleF = new RectangleF(10.5f, 20.5f, 30.5f, 40.5f);

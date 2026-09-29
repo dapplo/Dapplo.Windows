@@ -151,15 +151,61 @@ public class RectTests
         const int left = 200;
         const int top = 200;
 
-        // left
+        // left, Right is exclusive so flush rectangles have rect2.Right == rect1.Left
         var rect1 = new NativeRect(new NativePoint(left, top), new NativeSize(width, height));
-        var rect2 = new NativeRect(new NativePoint(left - width - 1, top), new NativeSize(width, height));
+        var rect2 = new NativeRect(new NativePoint(left - width, top), new NativeSize(width, height));
+        Assert.Equal(rect1.Left, rect2.Right);
         Assert.True(rect2.IsDockedToLeftOf(rect1));
         Assert.False(rect2.IsDockedToRightOf(rect1));
         // Right
-        rect2 = new NativeRect(new NativePoint(left + width + 1, top), new NativeSize(width, height));
+        rect2 = new NativeRect(new NativePoint(left + width, top), new NativeSize(width, height));
         Assert.True(rect2.IsDockedToRightOf(rect1));
         Assert.False(rect2.IsDockedToLeftOf(rect1));
+
+        // A one pixel gap is not docked
+        rect2 = new NativeRect(new NativePoint(left - width - 1, top), new NativeSize(width, height));
+        Assert.False(rect2.IsDockedToLeftOf(rect1));
+        rect2 = new NativeRect(new NativePoint(left + width + 1, top), new NativeSize(width, height));
+        Assert.False(rect2.IsDockedToRightOf(rect1));
+
+        // A taller rectangle which extends above and below is docked
+        rect2 = new NativeRect(new NativePoint(left - width, top - 50), new NativeSize(width, height + 100));
+        Assert.True(rect2.IsDockedToLeftOf(rect1));
+
+        // A rectangle which only touches at the corner (Bottom is exclusive) is not docked
+        rect2 = new NativeRect(new NativePoint(left - width, top - height), new NativeSize(width, height));
+        Assert.False(rect2.IsDockedToLeftOf(rect1));
+    }
+
+    [Fact]
+    public void IsDocked_Float()
+    {
+        var rect1 = new NativeRectFloat(200f, 200f, 100f, 100f);
+        var rect2 = new NativeRectFloat(100f, 200f, 100f, 100f);
+        Assert.True(rect2.IsDockedToLeftOf(rect1));
+        Assert.True(rect1.IsDockedToRightOf(rect2));
+        rect2 = new NativeRectFloat(99f, 200f, 100f, 100f);
+        Assert.False(rect2.IsDockedToLeftOf(rect1));
+    }
+
+    [Fact]
+    public void HasOverlap()
+    {
+        var rect1 = new NativeRect(100, 100, 100, 100);
+        // Adjacent rectangles touch, but do not overlap
+        Assert.False(rect1.HasOverlap(new NativeRect(200, 100, 100, 100)));
+        Assert.False(rect1.HasOverlap(new NativeRect(100, 200, 100, 100)));
+        // Partial overlap
+        Assert.True(rect1.HasOverlap(new NativeRect(150, 150, 100, 100)));
+        // Contained and containing
+        Assert.True(rect1.HasOverlap(new NativeRect(120, 120, 10, 10)));
+        Assert.True(new NativeRect(120, 120, 10, 10).HasOverlap(rect1));
+        // Disjoint
+        Assert.False(rect1.HasOverlap(new NativeRect(300, 300, 10, 10)));
+
+        var rectFloat = new NativeRectFloat(100f, 100f, 100f, 100f);
+        Assert.False(rectFloat.HasOverlap(new NativeRectFloat(200f, 100f, 100f, 100f)));
+        Assert.True(rectFloat.HasOverlap(new NativeRectFloat(120f, 120f, 10f, 10f)));
     }
 
     [Fact]

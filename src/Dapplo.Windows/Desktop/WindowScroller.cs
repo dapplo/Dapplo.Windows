@@ -168,17 +168,54 @@ public class WindowScroller
         {
             User32Api.SetScrollInfo(ScrollBarWindow.Handle, ScrollBarType, ref scrollInfo, true);
         }
+        var wParam = CreateScrollWParam(ScrollBarCommands.SB_THUMBPOSITION, scrollInfo.Position);
         switch (ScrollBarType)
         {
             case ScrollBarTypes.Horizontal:
-                User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_HSCROLL, 4 + 0x10000 * scrollInfo.Position, 0);
+                User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_HSCROLL, wParam, IntPtr.Zero);
                 break;
             case ScrollBarTypes.Vertical:
             case ScrollBarTypes.Control:
-                User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_VSCROLL, (int) ((uint) ScrollBarCommands.SB_THUMBPOSITION + (scrollInfo.Position << 16)), 0);
+                User32Api.SendMessage(ScrollMessageTarget, WindowsMessages.WM_VSCROLL, wParam, ScrollMessageLParam);
                 break;
         }
         return true;
+    }
+
+    /// <summary>
+    ///     The lParam for WM_HSCROLL / WM_VSCROLL: the handle of the scroll bar control for ScrollBarTypes.Control, otherwise IntPtr.Zero (standard scroll bar)
+    /// </summary>
+    private IntPtr ScrollMessageLParam => ScrollBarType == ScrollBarTypes.Control && ScrollBarWindow is not null ? ScrollBarWindow.Handle : IntPtr.Zero;
+
+    /// <summary>
+    ///     The window which receives WM_VSCROLL, this is the ScrollingWindow.
+    ///     A scroll bar control notifies its parent, so if the ScrollingWindow is the scroll bar control itself the message goes to the parent of the control.
+    /// </summary>
+    private IntPtr ScrollMessageTarget
+    {
+        get
+        {
+            var scrollingWindowHandle = ScrollingWindow.Handle;
+            if (ScrollBarType != ScrollBarTypes.Control || ScrollBarWindow is null || ScrollBarWindow.Handle != scrollingWindowHandle)
+            {
+                return scrollingWindowHandle;
+            }
+            var parentHandle = User32Api.GetParent(scrollingWindowHandle);
+            return parentHandle != IntPtr.Zero ? parentHandle : scrollingWindowHandle;
+        }
+    }
+
+    /// <summary>
+    ///     Create the wParam for a WM_HSCROLL / WM_VSCROLL message, the low-order word is the scroll bar command and the high-order word the (16-bit) position
+    /// </summary>
+    /// <param name="scrollBarCommand">ScrollBarCommands</param>
+    /// <param name="position">int with the position, only used for SB_THUMBPOSITION and SB_THUMBTRACK</param>
+    /// <returns>IntPtr with the wParam</returns>
+    public static IntPtr CreateScrollWParam(ScrollBarCommands scrollBarCommand, int position)
+    {
+        // Build the 32-bit value with uint arithmetic, and use the int constructor so this never overflows on 32-bit
+        var wParam = unchecked(((uint)position << 16) | ((uint)scrollBarCommand & 0xFFFF));
+        return new IntPtr(unchecked((int)wParam));
     }
 
 
@@ -370,10 +407,11 @@ public class WindowScroller
         switch (ScrollBarType)
         {
             case ScrollBarTypes.Horizontal:
-                User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_HSCROLL, scrollBarCommand, 0);
+                User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_HSCROLL, scrollBarCommand, IntPtr.Zero);
                 return true;
             case ScrollBarTypes.Vertical:
-                User32Api.SendMessage(ScrollingWindow.Handle, WindowsMessages.WM_VSCROLL, scrollBarCommand, 0);
+            case ScrollBarTypes.Control:
+                User32Api.SendMessage(ScrollMessageTarget, WindowsMessages.WM_VSCROLL, scrollBarCommand, ScrollMessageLParam);
                 return true;
             default:
                 return false;

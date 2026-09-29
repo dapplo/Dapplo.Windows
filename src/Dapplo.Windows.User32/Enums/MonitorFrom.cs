@@ -1,29 +1,27 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-using System;
-
 namespace Dapplo.Windows.User32.Enums;
 
 /// <summary>
-///     Flags for the MonitorFromRect / MonitorFromWindow "flags" field
+///     Values for the MonitorFromPoint / MonitorFromRect / MonitorFromWindow "dwFlags" parameter (MONITOR_DEFAULTTO*).
+///     These are plain values, not combinable flags.
 ///     see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145063(v=vs.85).aspx">MonitorFromRect function</a>
 ///     or see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145064(v=vs.85).aspx">MonitorFromWindow function</a>
 /// </summary>
-[Flags]
 public enum MonitorFrom : uint
 {
     /// <summary>
-    ///     Returns a handle to the display monitor that is nearest to the rectangle.
+    ///     MONITOR_DEFAULTTONULL: Returns NULL if the window, rectangle or point does not intersect any display monitor.
     /// </summary>
-    DefaultToNearest = 0,
+    DefaultToNull = 0,
 
     /// <summary>
-    ///     Returns NULL. (why??)
+    ///     MONITOR_DEFAULTTOPRIMARY: Returns a handle to the primary display monitor if there is no intersection.
     /// </summary>
-    DefaultToNull = 1,
+    DefaultToPrimary = 1,
 
     /// <summary>
-    ///     Returns a handle to the primary display monitor.
+    ///     MONITOR_DEFAULTTONEAREST: Returns a handle to the display monitor that is nearest to the window, rectangle or point.
     /// </summary>
-    DefaultToPrimary = 2
+    DefaultToNearest = 2
 }

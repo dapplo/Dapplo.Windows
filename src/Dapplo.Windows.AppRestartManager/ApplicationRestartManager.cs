@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dapplo.Windows.AppRestartManager.Enums;
-using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.Messages.Structs;
@@ -171,7 +170,7 @@ public static class ApplicationRestartManager
     ///     This allows applications to be notified when the system is about to shut down or restart.
     /// </summary>
     /// <param name="onQuerySession">This function will be called when a WM_QUERYENDSESSION message is received. Return true to indicate that the session end can proceed, or false to block it. If null, the message will be passed to the observable stream for handling by subscribers.</param>
-    /// <param name="onEndSession">This function will be called when a WM_ENDSESSION message is received. Return true to indicate that the session end can proceed, or false to block it. If null, the message will be passed to the observable stream for handling by subscribers.</param>
+    /// <param name="onEndSession">This function will be called when a WM_ENDSESSION message is received. The session is ending at that point and cannot be blocked anymore, the return value is ignored (the message is answered with 0). If null, the message will be passed to the observable stream for handling by subscribers.</param>
     /// <returns>
     ///     An observable stream that emits EndSessionMessage values when a session end event occurs.
     ///     Subscribe to this observable to handle shutdown requests gracefully.
@@ -193,15 +192,17 @@ public static class ApplicationRestartManager
                             if (onQuerySession != null)
                             {
                                 var canEndSession = onQuerySession(endSessionReason);
-                                windowsMessage.Result = canEndSession ? (nuint)HResult.S_OK : (nuint)HResult.S_FALSE;
+                                // WM_QUERYENDSESSION is not an HRESULT message: TRUE (1) allows the session to end, FALSE (0) blocks it
+                                windowsMessage.Result = canEndSession ? (nuint)1 : 0;
                                 windowsMessage.Handled = true;
                             }
                             break;
                         case WindowsMessages.WM_ENDSESSION:
                             if (onEndSession != null)
                             {
-                                var canEndSession = onEndSession(endSessionReason);
-                                windowsMessage.Result = canEndSession ? (nuint)HResult.S_OK : (nuint)HResult.S_FALSE;
+                                onEndSession(endSessionReason);
+                                // An application that processes WM_ENDSESSION must return zero
+                                windowsMessage.Result = 0;
                                 windowsMessage.Handled = true;
                             }
                             break;

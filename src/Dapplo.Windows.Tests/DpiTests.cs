@@ -1,9 +1,12 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using System;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
+using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Dpi.Enums;
 using Xunit;
 
 namespace Dapplo.Windows.Tests;
@@ -143,5 +146,66 @@ public class DpiTests
         
         // At 144 DPI (150%), borders should be larger than at 96 DPI (100%)
         Assert.True(border144 >= border96, "Border at 144 DPI should be >= border at 96 DPI");
+    }
+
+    /// <summary>
+    ///     The DPI_AWARENESS_CONTEXT pseudo handles must be pointer sized with the documented values
+    /// </summary>
+    [Fact]
+    public void Test_DpiAwarenessContext_PseudoHandles()
+    {
+        Assert.Equal(new IntPtr(-1), DpiAwarenessContext.Unaware.Value);
+        Assert.Equal(new IntPtr(-2), DpiAwarenessContext.SystemAware.Value);
+        Assert.Equal(new IntPtr(-3), DpiAwarenessContext.PerMonitorAware.Value);
+        Assert.Equal(new IntPtr(-4), DpiAwarenessContext.PerMonitorAwareV2.Value);
+        Assert.Equal(new IntPtr(-5), DpiAwarenessContext.UnawareGdiScaled.Value);
+        Assert.Equal(-4L, DpiAwarenessContext.PerMonitorAwareV2.Value.ToInt64());
+        Assert.True(DpiAwarenessContext.Null.IsNull);
+        Assert.True(default(DpiAwarenessContext).IsNull);
+        Assert.False(DpiAwarenessContext.PerMonitorAwareV2.IsNull);
+    }
+
+    /// <summary>
+    ///     Test that the pseudo handles are accepted by Windows, and map to the right DPI awareness
+    /// </summary>
+    [Fact]
+    public void Test_DpiAwarenessContext_Valid()
+    {
+        if (!WindowsVersion.IsWindows10BuildOrLater(15063))
+        {
+            Assert.Skip("Per Monitor v2 is only available on Windows 10 1703 or later");
+        }
+
+        Assert.True(NativeDpiMethods.IsValidDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2));
+        Assert.True(NativeDpiMethods.IsValidDpiAwarenessContext(DpiAwarenessContext.Unaware));
+        Assert.False(NativeDpiMethods.IsValidDpiAwarenessContext(DpiAwarenessContext.Null));
+        Assert.Equal(DpiAwareness.Unaware, NativeDpiMethods.GetAwarenessFromDpiAwarenessContext(DpiAwarenessContext.Unaware));
+        Assert.Equal(DpiAwareness.SystemAware, NativeDpiMethods.GetAwarenessFromDpiAwarenessContext(DpiAwarenessContext.SystemAware));
+        Assert.Equal(DpiAwareness.PerMonitorAware, NativeDpiMethods.GetAwarenessFromDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2));
+        Assert.True(NativeDpiMethods.AreDpiAwarenessContextsEqual(DpiAwarenessContext.PerMonitorAwareV2, DpiAwarenessContext.PerMonitorAwareV2));
+        Assert.False(NativeDpiMethods.AreDpiAwarenessContextsEqual(DpiAwarenessContext.PerMonitorAwareV2, DpiAwarenessContext.Unaware));
+    }
+
+    /// <summary>
+    ///     Test that the scoped thread DPI awareness context is applied, and restored when disposed
+    /// </summary>
+    [Fact]
+    public void Test_ScopedThreadDpiAwarenessContext_Restores()
+    {
+        if (!WindowsVersion.IsWindows10BuildOrLater(14393))
+        {
+            Assert.Skip("SetThreadDpiAwarenessContext is only available on Windows 10 1607 or later");
+        }
+
+        var before = NativeDpiMethods.GetThreadDpiAwarenessContext();
+        Assert.False(before.IsNull);
+        var target = NativeDpiMethods.AreDpiAwarenessContextsEqual(before, DpiAwarenessContext.Unaware) ? DpiAwarenessContext.SystemAware : DpiAwarenessContext.Unaware;
+
+        using (NativeDpiMethods.ScopedThreadDpiAwarenessContext(target))
+        {
+            Assert.True(NativeDpiMethods.AreDpiAwarenessContextsEqual(NativeDpiMethods.GetThreadDpiAwarenessContext(), target));
+        }
+
+        Assert.True(NativeDpiMethods.AreDpiAwarenessContextsEqual(NativeDpiMethods.GetThreadDpiAwarenessContext(), before));
     }
 }

@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
+using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Gdi32.Enums;
 using Dapplo.Windows.Gdi32.Structs;
@@ -36,7 +37,7 @@ public static class GdiPlusApi
     // Constant "FieldInfo" for getting the nativeImageAttributes from the ImageAttributes
     private static readonly FieldInfo FieldInfoNativeImageAttributes = typeof(ImageAttributes).GetField("nativeImageAttributes", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
 
-    private static bool _isBlurEnabled = Environment.OSVersion.Version.Major >= 6;
+    private static bool _isBlurEnabled = WindowsVersion.IsWindowsVistaOrLater;
 
     /// <summary>
     ///     Use the GDI+ blur effect on the bitmap
@@ -308,10 +309,12 @@ public static class GdiPlusApi
         {
             return false;
         }
-        if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor < 2)
+        // Windows Vista and 7 can blur with every radius, from Windows 8 on only a radius of 20 or more works.
+        // WindowsVersion is used as Environment.OSVersion reports 6.2 on Windows 8.1 and later for a not manifested .NET Framework application.
+        if (!WindowsVersion.IsWindows8OrLater)
         {
             return true;
         }
-        return Environment.OSVersion.Version.Major > 6 && radius >= 20;
+        return radius >= 20;
     }
 }

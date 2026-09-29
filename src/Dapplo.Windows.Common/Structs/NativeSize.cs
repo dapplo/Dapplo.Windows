@@ -39,19 +39,20 @@ public readonly struct NativeSize : IEquatable<NativeSize>, IComparable<NativeSi
 
 #if !NETSTANDARD2_0
     /// <summary>
-    ///     Constructor from System.Windows.Size
+    ///     Constructor from System.Windows.Size, the width and height are rounded up to the smallest integer size which contains the size.
+    ///     System.Windows.Size.Empty (which has negative infinite dimensions) results in an empty NativeSize.
     /// </summary>
     /// <param name="size">System.Windows.Size</param>
     public NativeSize(System.Windows.Size size)
-        : this((int) size.Width, (int) size.Height)
+        : this(size.IsEmpty ? 0 : (int)Math.Ceiling(size.Width), size.IsEmpty ? 0 : (int)Math.Ceiling(size.Height))
     {
     }
 
     /// <summary>
-    ///     Implicit cast from System.Windows.Size to NativeSize
+    ///     Explicit (lossy) cast from System.Windows.Size to NativeSize, see the constructor for the rounding.
     /// </summary>
     /// <param name="size">System.Windows.Size</param>
-    public static implicit operator NativeSize(System.Windows.Size size) => new NativeSize((int)size.Width, (int)size.Height);
+    public static explicit operator NativeSize(System.Windows.Size size) => new NativeSize(size);
 
     /// <summary>
     ///     Implicit cast from NativeSize to Size
@@ -149,6 +150,14 @@ public readonly struct NativeSize : IEquatable<NativeSize>, IComparable<NativeSi
     public static bool operator ==(NativeSize size1, System.Windows.Size size2) => size1.Equals(size2);
 
     /// <summary>
+    ///     Equals with a System.Windows.Size, this is only true if the System.Windows.Size has exactly the same (integer) values.
+    /// </summary>
+    /// <param name="other">System.Windows.Size</param>
+    /// <returns>bool</returns>
+    [Pure]
+    public bool Equals(System.Windows.Size other) => !other.IsEmpty && _width == other.Width && _height == other.Height;
+
+    /// <summary>
     /// Not Equals operator overloading
     /// </summary>
     /// <param name="size1">NativeSize</param>
@@ -182,7 +191,8 @@ public readonly struct NativeSize : IEquatable<NativeSize>, IComparable<NativeSi
 
     /// <inheritdoc />
     [Pure]
-    public int CompareTo(NativeSize other) => unchecked (other.Width * other.Height).CompareTo(unchecked(Width * Height));
+    /// <remarks>Sizes are ordered by area (width * height, calculated as long so it cannot overflow), smallest first.</remarks>
+    public int CompareTo(NativeSize other) => ((long)_width * _height).CompareTo((long)other._width * other._height);
 
     /// <inheritdoc />
     [Pure]

@@ -2,51 +2,56 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using Dapplo.Windows.Common.Structs;
 
 namespace Dapplo.Windows.Common.TypeConverters;
 
 /// <summary>
-/// This implements a TypeConverter for the NativeSize structure, the format is "Width,Height" using the invariant culture
+/// This implements a TypeConverter for the NativePointFloat structure, the format is "X,Y" using the invariant culture
 /// </summary>
-public class NativeSizeTypeConverter : TypeConverter
+public class NativePointFloatTypeConverter : TypeConverter
 {
     /// <inheritdoc />
+    [Pure]
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
     {
         return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
     }
 
     /// <inheritdoc />
+    [Pure]
     public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
     {
         return destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
     }
 
     /// <inheritdoc />
+    [Pure]
     public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
     {
-        if (value is string sizeStringValue)
+        if (value is string pointStringValue)
         {
-            string[] wh = sizeStringValue.Split(',');
-            if (wh.Length == 2 &&
-                int.TryParse(wh[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var w) &&
-                int.TryParse(wh[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var h))
+            string[] xy = pointStringValue.Split(',');
+            if (xy.Length == 2 &&
+                float.TryParse(xy[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var x) &&
+                float.TryParse(xy[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var y))
             {
-                return new NativeSize(w, h);
+                return new NativePointFloat(x, y);
             }
         }
         return base.ConvertFrom(context, culture, value);
     }
 
     /// <inheritdoc />
+    [Pure]
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
     {
-        if (destinationType == typeof(string) && value is NativeSize nativeSize)
+        if (destinationType == typeof(string) && value is NativePointFloat nativePointFloat)
         {
-            // Always use the invariant culture, ConvertFrom parses with it (e.g. sv-SE would write U+2212 as negative sign)
-            return string.Concat(nativeSize.Width.ToString(CultureInfo.InvariantCulture), ",", nativeSize.Height.ToString(CultureInfo.InvariantCulture));
+            // "R" makes sure the value round-trips on .NET Framework too
+            return string.Concat(nativePointFloat.X.ToString("R", CultureInfo.InvariantCulture), ",", nativePointFloat.Y.ToString("R", CultureInfo.InvariantCulture));
         }
         return base.ConvertTo(context, culture, value, destinationType);
     }

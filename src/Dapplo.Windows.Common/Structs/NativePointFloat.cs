@@ -19,7 +19,7 @@ namespace Dapplo.Windows.Common.Structs;
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 [Serializable]
-[TypeConverter(typeof(NativePointTypeConverter))]
+[TypeConverter(typeof(NativePointFloatTypeConverter))]
 [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
 public readonly struct NativePointFloat : IEquatable<NativePointFloat>
 {
@@ -68,12 +68,13 @@ public readonly struct NativePointFloat : IEquatable<NativePointFloat>
 #endif
 
     /// <summary>
-    ///     Implicit cast from NativePoint to System.Drawing.Point
+    ///     Explicit (lossy) cast from NativePointFloat to System.Drawing.Point.
+    ///     The coordinates are floored, so the result is the pixel which contains the point. Use Round() to round instead.
     /// </summary>
     /// <param name="point">NativePointFloat</param>
-    public static implicit operator System.Drawing.Point(NativePointFloat point)
+    public static explicit operator System.Drawing.Point(NativePointFloat point)
     {
-        return new System.Drawing.Point((int) point.X, (int) point.Y);
+        return new System.Drawing.Point((int)Math.Floor(point.X), (int)Math.Floor(point.Y));
     }
 
     /// <summary>

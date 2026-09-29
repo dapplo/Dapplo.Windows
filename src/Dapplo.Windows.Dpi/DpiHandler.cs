@@ -29,14 +29,14 @@ public sealed class DpiHandler : IDisposable
     // Via this the dpi values are published in details
     private readonly ISubject<DpiChangeInfo> _onDpiChanged = new Subject<DpiChangeInfo>();
 
-    private readonly IDisposable _scopedThreadDpiAwarenessContext;
     /// <summary>
-    ///     Create a DpiHandler
+    ///     Create a DpiHandler.
+    ///     This does not change the DPI awareness context of the thread, the DPI awareness of a window is decided when it's created.
+    ///     Use the process DPI awareness (manifest or NativeDpiMethods.EnableDpiAware), or wrap the window creation with NativeDpiMethods.ScopedThreadDpiAwarenessContext (DpiAwareForm does this for you).
     /// </summary>
     public DpiHandler(bool needsListenerWorkaround = false)
     {
         _needsListenerWorkaround = needsListenerWorkaround;
-        _scopedThreadDpiAwarenessContext = NativeDpiMethods.DefaultScopedThreadDpiAwarenessContext();
     }
 
     /// <summary>
@@ -111,7 +111,6 @@ public sealed class DpiHandler : IDisposable
                 }
 
                 currentDpi = NativeDpiMethods.GetDpi(windowMessageInfo.Handle);
-                _scopedThreadDpiAwarenessContext.Dispose();
                 break;
             // Handle the DPI change message, this is where it's supplied
             case WindowsMessages.WM_DPICHANGED:
@@ -389,7 +388,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>NativePointFloat unscaled</returns>
     public NativePointFloat UnscaleWithCurrentDpi(NativePointFloat point, Func<float, float> scaleModifier = null)
     {
-        return DpiCalculator.ScaleWithDpi(point, Dpi, scaleModifier);
+        return DpiCalculator.UnscaleWithDpi(point, Dpi, scaleModifier);
     }
 
     /// <summary>
@@ -399,14 +398,13 @@ public sealed class DpiHandler : IDisposable
     /// <returns>true if it worked</returns>
     public static bool TryEnableNonClientDpiScaling(IntPtr hWnd)
     {
-        // EnableNonClientDpiScaling is only available on Windows 10 and later
-        if (!WindowsVersion.IsWindows10OrLater)
+        // EnableNonClientDpiScaling is only available on Windows 10 1607 (build 14393) and later
+        if (!WindowsVersion.IsWindows10BuildOrLater(14393))
         {
             return false;
         }
 
-        var result = NativeDpiMethods.EnableNonClientDpiScaling(hWnd);
-        if (result.Succeeded())
+        if (NativeDpiMethods.EnableNonClientDpiScaling(hWnd))
         {
             return true;
         }

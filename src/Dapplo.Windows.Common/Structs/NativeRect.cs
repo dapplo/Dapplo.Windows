@@ -149,13 +149,15 @@ public readonly struct NativeRect : IEquatable<NativeRect>
 
 #if !NETSTANDARD2_0
         /// <summary>
-        ///     Cast NativeRect to Rect
+        ///     Cast NativeRect to Rect.
+        ///     A System.Windows.Rect cannot have a negative width or height, a not normalized NativeRect is normalized.
         /// </summary>
         /// <param name="rectangle">NativeRect</param>
         /// <returns>Rect</returns>
         public static implicit operator Rect(NativeRect rectangle)
         {
-            return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
+            // The Rect(Point, Point) constructor normalizes, Rect(x, y, width, height) would throw an ArgumentException for a negative width or height
+            return new Rect(new System.Windows.Point(rectangle.Left, rectangle.Top), new System.Windows.Point(rectangle.Right, rectangle.Bottom));
         }
     
         /// <summary>
