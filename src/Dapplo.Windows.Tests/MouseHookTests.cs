@@ -13,6 +13,8 @@ namespace Dapplo.Windows.Tests;
 /// <summary>
 ///     Test mouse hooking
 /// </summary>
+/// <remarks>Interactive: these tests change the real desktop (input, clipboard or registry). They are excluded by default, run them with --filter Category=Interactive.</remarks>
+[Trait("Category", "Interactive")]
 public class MouseHookTests
 {
     public MouseHookTests(ITestOutputHelper testOutputHelper)

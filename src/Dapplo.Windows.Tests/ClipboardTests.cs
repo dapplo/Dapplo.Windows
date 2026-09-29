@@ -19,7 +19,9 @@ namespace Dapplo.Windows.Tests;
 /// <summary>
 /// All clipboard related tests
 /// </summary>
-public class ClipboardTests  : IDisposable
+/// <remarks>Interactive: these tests change the real desktop (input, clipboard or registry). They are excluded by default, run them with --filter Category=Interactive.</remarks>
+[Trait("Category", "Interactive")]
+public class ClipboardTests : IDisposable
 {
     private static readonly LogSource Log = new LogSource();
     private readonly IDisposable subscription;

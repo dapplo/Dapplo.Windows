@@ -211,10 +211,6 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 
-# Cake tools
-tools/*
-!tools/packages.config
-
 # DocFX
 _site/
 /**/DROP/
@@ -228,3 +224,5 @@ coverage.xml
 coverage.json
 coverage.cobertura.xml
 xunit.xml
+# Local build/test runner requests and results (tools/build-runner)
+.build-runner/
