@@ -7,7 +7,7 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
-## [Unreleased]
+## [3.0.3]
 
 ### Fixed
 - Enlarged colour cursors with an alpha channel ("Make mouse pointer bigger") are rendered by `DrawIconEx` at the requested size instead of scaling up the 32x32 pixels, which looked blurry.
