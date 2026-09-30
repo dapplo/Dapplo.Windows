@@ -9,7 +9,7 @@ namespace Dapplo.Windows.Dpi;
 public class DpiChangeInfo
 {
     /// <summary>
-    /// The DPI from before the change
+    /// The DPI from before the change, this is 0 when the DPI was determined for the first time
     /// </summary>
     public int PreviousDpi { get; }
 

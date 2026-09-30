@@ -8,6 +8,7 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Input.Structs;
 using Dapplo.Windows.Messages;
 using System.Runtime.InteropServices;
@@ -47,35 +48,22 @@ public class RawInputTests
         Assert.True(foundOneDevice);
     }
 
-    //[WpfFact]
-    public async Task Test_RawInput_DeviceChanges_KeyboardRemoved()
+    /// <summary>
+    ///     An injected key press must arrive as raw input
+    /// </summary>
+    [WpfFact]
+    [Trait("Category", "Interactive")]
+    public async Task Test_RawInput_InjectedKey()
     {
-        var device = await RawInputDeviceMonitor.Listen(RawInputDevices.Keyboard).Where(args => !args.Added).FirstAsync();
-        Assert.False(device.Added);
-        Assert.Equal(RawInputDeviceTypes.Keyboard, device.DeviceInformation.DeviceInfo.Type);
-    }
-
-    //[WpfFact]
-    public async Task Test_RawInput_Left()
-    {
-        var rawInputObservable = RawInputMonitor.Listen(RawInputDevices.Keyboard);
-
-        using (rawInputObservable.Subscribe(ri =>
-               {
-                   if (ri.RawInput.Device.Keyboard.Flags == RawKeyboardFlags.Break)
-                   {
-                       Log.Debug().WriteLine("Key down {0}", ri.RawInput.Device.Keyboard.VirtualKey);
-                   }
-                   if (ri.RawInput.Device.Keyboard.Flags == RawKeyboardFlags.Break)
-                   {
-                       Log.Debug().WriteLine("Key up {0}", ri.RawInput.Device.Keyboard.VirtualKey);
-                   }
-               }))
+        var received = new TaskCompletionSource<RawInputEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using (RawInputMonitor.Listen(RawInputDevices.Keyboard)
+                   .Where(args => args.RawInput.Device.Keyboard.VirtualKey == VirtualKeyCode.Shift)
+                   .Subscribe(args => received.TrySetResult(args)))
         {
-            var device = await rawInputObservable.FirstAsync(args => args.RawInput.Device.Keyboard.VirtualKey == VirtualKeyCode.Left);
-            Assert.Equal(RawInputDeviceTypes.Keyboard, device.RawInput.Header.Type);
+            KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Shift);
+            var rawInputEventArgs = await TestWait.ForAsync(received.Task, "The injected key press didn't arrive as raw input");
+            Assert.Equal(RawInputDeviceTypes.Keyboard, rawInputEventArgs.RawInput.Header.Type);
         }
-
     }
 
     /// <summary>

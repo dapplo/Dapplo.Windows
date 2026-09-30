@@ -63,7 +63,13 @@ public unsafe struct MonitorInfoEx
         {
             fixed (char* deviceName = _deviceName)
             {
-                return new string(deviceName);
+                // The name is not necessarily 0 terminated when all 32 characters are used
+                var length = 0;
+                while (length < 32 && deviceName[length] != '\0')
+                {
+                    length++;
+                }
+                return new string(deviceName, 0, length);
             }
 
         }

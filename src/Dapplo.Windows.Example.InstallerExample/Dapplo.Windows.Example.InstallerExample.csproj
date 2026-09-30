@@ -7,14 +7,9 @@
 		<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
 	</PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
-		<ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
-		<ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
 		<ProjectReference Include="..\Dapplo.Windows.InstallerManager\Dapplo.Windows.InstallerManager.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Dapplo.Log.Loggers" Version="3.0.22" />
-		<PackageReference Include="System.Reactive" Version="6.1.0" />
 		<PackageReference Include="System.Resources.Extensions" Version="10.0.3" />
 	</ItemGroup>
 </Project>

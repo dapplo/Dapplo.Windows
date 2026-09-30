@@ -125,7 +125,8 @@ public sealed class FileOpenDialogBuilder
 
             var options = FileOpenOptions.FileMustExist;
             if (_allowMultiSelect) options |= FileOpenOptions.AllowMultiSelect;
-            dialog.SetOptions(options);
+            dialog.GetOptions(out var currentOptions);
+            dialog.SetOptions(ComDialogHelper.CombineOptions(currentOptions, options));
 
             ComDialogHelper.ApplyFilters(dialog.SetFileTypes, dialog.SetFileTypeIndex, _filters);
             if (_defaultExtension != null) dialog.SetDefaultExtension(_defaultExtension);
@@ -143,9 +144,7 @@ public sealed class FileOpenDialogBuilder
             }
 
             dialog.GetResult(out var item);
-            var path = ComDialogHelper.GetFileSysPath(item);
-            Marshal.ReleaseComObject(item);
-            return FileDialogResult.FromPath(path);
+            return FileDialogResult.FromPath(ComDialogHelper.GetFileSysPathAndRelease(item));
         }
         finally
         {

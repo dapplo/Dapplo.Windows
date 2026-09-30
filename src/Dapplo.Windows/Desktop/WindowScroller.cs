@@ -522,16 +522,13 @@ public class WindowScroller
             return hasScrollInfo;
         }
 
-        if (Log.IsVerboseEnabled())
+        if (hasScrollInfo)
         {
-            if (hasScrollInfo)
-            {
-                Log.Verbose().WriteLine("Retrieved ScrollInfo: {0}", scrollInfo);
-            }
-            else
-            {
-                Log.Verbose().WriteLine("Couldn't get scrollinfo.");
-            }
+            Log.Verbose().WriteLine("Retrieved ScrollInfo: {0}", scrollInfo);
+        }
+        else
+        {
+            Log.Verbose().WriteLine("Couldn't get scrollinfo.");
         }
 
         return hasScrollInfo;

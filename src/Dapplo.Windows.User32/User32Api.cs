@@ -12,6 +12,7 @@ using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.User32.Enums;
+using Dapplo.Windows.User32.SafeHandles;
 using Dapplo.Windows.User32.Structs;
 
 namespace Dapplo.Windows.User32;
@@ -78,8 +79,8 @@ public static class User32Api
         {
             MonitorHandle = monitorHandle,
             Index = index,
-            ScreenWidth = Math.Abs(monitorInfoEx.Monitor.Right - monitorInfoEx.Monitor.Left),
-            ScreenHeight = Math.Abs(monitorInfoEx.Monitor.Bottom - monitorInfoEx.Monitor.Top),
+            ScreenWidth = monitorInfoEx.Monitor.Width,
+            ScreenHeight = monitorInfoEx.Monitor.Height,
             Bounds = monitorInfoEx.Monitor,
             WorkingArea = monitorInfoEx.WorkArea,
             IsPrimary = (monitorInfoEx.Flags & MonitorInfoFlags.Primary) == MonitorInfoFlags.Primary,
@@ -191,29 +192,68 @@ public static class User32Api
     }
 
     /// <summary>
-    ///     Retrieve the windows caption, also called Text
-    ///     Note: Do not call this from the same thread as the message pump
+    ///     Retrieve the windows caption (title), with GetWindowText, the length of the caption is not limited.
+    ///     Note: for a window of the current process GetWindowText sends WM_GETTEXT. For a window of the calling thread this is a direct call,
+    ///     but for a window which belongs to another thread of the current process this can deadlock when that thread is waiting for the caller.
+    ///     Use <see cref="GetInternalText"/> for such windows.
     /// </summary>
     /// <param name="hWnd">IntPtr for the window</param>
-    /// <returns>string</returns>
+    /// <returns>string with the caption, empty if there is none</returns>
     public static string GetText(IntPtr hWnd)
     {
-        unsafe
+        var length = GetWindowTextLength(hWnd);
+        if (length <= 0)
         {
-            const int capacity = 260;
-            var caption = stackalloc char[capacity];
-            var nrCharacters = GetWindowText(hWnd, caption, capacity);
-            if (nrCharacters == 0)
-            {
-                return string.Empty;
-            }
-            return new string(caption, 0, nrCharacters);
+            return string.Empty;
         }
-
+        // Room for the terminating 0 and one extra character, so a completely filled buffer signals that the caption grew in the meantime
+        return ReadCaption(hWnd, (int)Math.Min(length + 2L, MaxWindowTextLength), false);
     }
 
     /// <summary>
-    ///     The maximum number of characters which <see cref="GetTextFromWindow"/> retrieves, longer texts are truncated.
+    ///     Retrieve the caption (title) which Windows stored for the window, with InternalGetWindowText.
+    ///     This never sends a message to the window, so it cannot hang or deadlock, even for windows of other threads of the current process.
+    ///     A text which the window procedure only supplies via WM_GETTEXT is not returned.
+    /// </summary>
+    /// <param name="hWnd">IntPtr for the window</param>
+    /// <returns>string with the caption, empty if there is none</returns>
+    public static string GetInternalText(IntPtr hWnd)
+    {
+        return ReadCaption(hWnd, 256, true);
+    }
+
+    /// <summary>
+    ///     Read the caption into a buffer of the specified capacity, the buffer is enlarged when the caption doesn't fit
+    /// </summary>
+    /// <param name="hWnd">IntPtr for the window</param>
+    /// <param name="capacity">int with the initial capacity, including the terminating 0</param>
+    /// <param name="useInternalGetWindowText">true to use InternalGetWindowText, false for GetWindowText</param>
+    /// <returns>string</returns>
+    private static unsafe string ReadCaption(IntPtr hWnd, int capacity, bool useInternalGetWindowText)
+    {
+        while (true)
+        {
+            var buffer = new char[capacity];
+            int copied;
+            fixed (char* caption = buffer)
+            {
+                copied = useInternalGetWindowText ? InternalGetWindowText(hWnd, caption, capacity) : GetWindowText(hWnd, caption, capacity);
+            }
+            if (copied <= 0)
+            {
+                return string.Empty;
+            }
+            // A completely filled buffer means the caption might be truncated, retry with a bigger buffer
+            if (copied < capacity - 1 || capacity >= MaxWindowTextLength)
+            {
+                return new string(buffer, 0, Math.Min(copied, capacity - 1));
+            }
+            capacity = (int)Math.Min(capacity * 2L, MaxWindowTextLength);
+        }
+    }
+
+    /// <summary>
+    ///     The maximum number of characters which <see cref="GetTextFromWindow"/>, <see cref="GetText"/> and <see cref="GetInternalText"/> retrieve, longer texts are truncated.
     /// </summary>
     public const int MaxWindowTextLength = 1024 * 1024;
 
@@ -237,7 +277,7 @@ public static class User32Api
     public static string GetTextFromWindow(IntPtr hWnd)
     {
         // Get the size of the string required to hold the window's text.
-        if (!TrySendMessage(hWnd, WindowsMessages.WM_GETTEXTLENGTH, IntPtr.Zero, out var lengthResult, timeout: InformationMessageTimeout))
+        if (!TrySendMessage(hWnd, WindowsMessages.WM_GETTEXTLENGTH, IntPtr.Zero, IntPtr.Zero, out var lengthResult, InformationMessageTimeout))
         {
             return null;
         }
@@ -275,7 +315,7 @@ public static class User32Api
     /// <returns>string or null if there is no text or the window didn't respond in time</returns>
     private static unsafe string ReadWindowText(IntPtr hWnd, char* buffer, int bufferSize)
     {
-        if (!TrySendMessage(hWnd, WindowsMessages.WM_GETTEXT, new IntPtr(bufferSize), out var copiedResult, new IntPtr(buffer), InformationMessageTimeout))
+        if (!TrySendMessage(hWnd, WindowsMessages.WM_GETTEXT, new IntPtr(bufferSize), new IntPtr(buffer), out var copiedResult, InformationMessageTimeout))
         {
             return null;
         }
@@ -329,9 +369,15 @@ public static class User32Api
     /// <param name="hWnd">IntPtr</param>
     /// <param name="index">WindowLongIndex</param>
     /// <param name="replacementValue">IntPtr</param>
-    /// <returns>IntPtr with 0 if error, or the previous value</returns>
+    /// <returns>
+    ///     IntPtr with the previous value.
+    ///     As 0 is also a valid previous value, a failure is only signalled by 0 together with a non-zero <see cref="Marshal.GetLastWin32Error"/>,
+    ///     the last error is cleared before the call so it's reliable.
+    /// </returns>
     public static IntPtr SetWindowLongWrapper(IntPtr hWnd, WindowLongIndex index, IntPtr replacementValue)
     {
+        // SetWindowLong(Ptr) doesn't reset the last error on success, clear it so a 0 result can be told apart from a failure
+        ClearLastError(0);
         if (IntPtr.Size == 8)
         {
             return SetWindowLongPtr(hWnd, index, replacementValue);
@@ -344,7 +390,7 @@ public static class User32Api
     /// </summary>
     /// <param name="hWnd">IntPtr</param>
     /// <param name="extendedWindowStyleFlags">ExtendedWindowStyleFlags</param>
-    /// <returns>IntPtr with 0 if error, or the previous value</returns>
+    /// <returns>IntPtr with the previous value, see <see cref="SetWindowLongWrapper"/> on how to detect a failure</returns>
     public static IntPtr SetExtendedWindowStyle(IntPtr hWnd, ExtendedWindowStyleFlags extendedWindowStyleFlags)
     {
         // The flags are a 32-bit value, the int constructor prevents an OverflowException on 32-bit for values with the high bit set
@@ -356,7 +402,7 @@ public static class User32Api
     /// </summary>
     /// <param name="hWnd">IntPtr</param>
     /// <param name="windowStyleFlags">WindowStyleFlags</param>
-    /// <returns>IntPtr with 0 if error, or the previous value</returns>
+    /// <returns>IntPtr with the previous value, see <see cref="SetWindowLongWrapper"/> on how to detect a failure</returns>
     public static IntPtr SetWindowStyle(IntPtr hWnd, WindowStyleFlags windowStyleFlags)
     {
         // The flags are a 32-bit value, the int constructor prevents an OverflowException on 32-bit for WS_POPUP (0x80000000)
@@ -373,7 +419,7 @@ public static class User32Api
     /// <param name="result">out IntPtr</param>
     /// <param name="timeout">uint with optional number of milliseconds, default is 300</param>
     /// <returns>bool true if the SendMessage worked</returns>
-    public static bool TrySendMessage(IntPtr hWnd, WindowsMessages message, IntPtr wParam, out IntPtr result, IntPtr lParam = default, uint timeout = 300)
+    public static bool TrySendMessage(IntPtr hWnd, WindowsMessages message, IntPtr wParam, IntPtr lParam, out IntPtr result, uint timeout = 300)
     {
         var isSuccess = SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung |SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
         if (!isSuccess)
@@ -393,7 +439,7 @@ public static class User32Api
     /// <param name="result">out IntPtr</param>
     /// <param name="timeout">uint with optional number of milliseconds, default is 300</param>
     /// <returns>bool true if the SendMessage worked</returns>
-    public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, out IntPtr result, IntPtr lParam = default, uint timeout = 300)
+    public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, IntPtr lParam, out IntPtr result, uint timeout = 300)
     {
         var isSuccess = SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung | SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
         if (!isSuccess)
@@ -413,7 +459,7 @@ public static class User32Api
     /// <param name="result">out UIntPtr</param>
     /// <param name="timeout">uint with optional number of milliseconds, default is 300</param>
     /// <returns>bool true if the SendMessage worked</returns>
-    public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, out UIntPtr result, IntPtr lParam = default, uint timeout = 300)
+    public static bool TrySendMessage(IntPtr hWnd, uint message, IntPtr wParam, IntPtr lParam, out UIntPtr result, uint timeout = 300)
     {
         var isSuccess = User32Api.SendMessageTimeout(hWnd, message, wParam, lParam, SendMessageTimeoutFlags.AbortIfHung | SendMessageTimeoutFlags.ErrorOnExit, timeout, out result);
         if (!isSuccess)
@@ -427,6 +473,13 @@ public static class User32Api
     /// The DLL Name for the User32 library
     /// </summary>
     public const string User32 = "user32";
+
+    /// <summary>
+    ///     kernel32 SetLastError, used to clear the last error before calling functions which don't reset it on success
+    /// </summary>
+    /// <param name="dwErrCode">uint with the error code</param>
+    [DllImport("kernel32", EntryPoint = "SetLastError", ExactSpelling = true)]
+    private static extern void ClearLastError(uint dwErrCode);
 
     /// <summary>
     ///     Delegate description for the windows enumeration
@@ -448,7 +501,7 @@ public static class User32Api
     /// The visibility state of a window is indicated by the WS_VISIBLE style bit. When WS_VISIBLE is set, the window is displayed and subsequent drawing into it is displayed as long as the window has the WS_VISIBLE style.
     /// Any drawing to a window with the WS_VISIBLE style will not be displayed if the window is obscured by other windows or is clipped by its parent window.
     /// </returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool IsWindowVisible(IntPtr hWnd);
 
@@ -487,12 +540,13 @@ public static class User32Api
     /// <summary>
     /// See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-attachthreadinput">AttachThreadInput function</a>
     /// </summary>
-    /// <param name="idAttach">int</param>
-    /// <param name="idAttachTo">int</param>
-    /// <param name="fAttach">int</param>
-    /// <returns>IntPtr</returns>
+    /// <param name="idAttach">int with the identifier of the thread to be attached to another thread</param>
+    /// <param name="idAttachTo">int with the identifier of the thread to which idAttach will be attached</param>
+    /// <param name="fAttach">true to attach, false to detach</param>
+    /// <returns>bool true if the function succeeds</returns>
     [DllImport(User32, SetLastError = true)]
-    public static extern IntPtr AttachThreadInput(int idAttach, int idAttachTo, int fAttach);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool AttachThreadInput(int idAttach, int idAttachTo, [MarshalAs(UnmanagedType.Bool)] bool fAttach);
 
     /// <summary>
     ///     Retrieves a handle to the specified window's parent or owner.
@@ -502,10 +556,22 @@ public static class User32Api
     /// <returns>
     ///     IntPtr handle to the parent window or IntPtr.Zero if none
     ///     If the window is a child window, the return value is a handle to the parent window. If the window is a top-level
-    ///     window with the WS_POPUP style, the return value is a handle to the owner window.
+    ///     window with the WS_POPUP style, the return value is a handle to the <b>owner</b> window.
+    ///     Use <see cref="GetAncestor"/> with <see cref="GetAncestorFlags.GA_PARENT"/> for the real parent, and <see cref="GetWindow"/> with <see cref="GetWindowCommands.GW_OWNER"/> for the owner.
     /// </returns>
     [DllImport(User32, SetLastError = true)]
     public static extern IntPtr GetParent(IntPtr hWnd);
+
+    /// <summary>
+    ///     Retrieves the handle to the ancestor of the specified window, see
+    ///     <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getancestor">GetAncestor function</a>.
+    ///     Unlike <see cref="GetParent"/>, GA_PARENT never returns the owner. For a top-level window GA_PARENT returns the desktop window.
+    /// </summary>
+    /// <param name="hWnd">IntPtr with the window handle, if this is the desktop window the function returns IntPtr.Zero</param>
+    /// <param name="getAncestorFlags">GetAncestorFlags</param>
+    /// <returns>IntPtr with the handle of the ancestor</returns>
+    [DllImport(User32)]
+    public static extern IntPtr GetAncestor(IntPtr hWnd, GetAncestorFlags getAncestorFlags);
 
     /// <summary>
     ///     See
@@ -577,6 +643,17 @@ public static class User32Api
     internal static extern unsafe int GetWindowText(IntPtr hWnd, char* lpString, int capacity);
 
     /// <summary>
+    ///     Get the caption of the window as stored by Windows, without sending WM_GETTEXT, see
+    ///     <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-internalgetwindowtext">InternalGetWindowText function</a>
+    /// </summary>
+    /// <param name="hWnd">IntPtr with the window handle</param>
+    /// <param name="lpString">char * to place the caption into</param>
+    /// <param name="capacity">size of the buffer, including the terminating 0</param>
+    /// <returns>int with the number of copied characters, not including the terminating 0</returns>
+    [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true, ExactSpelling = true)]
+    internal static extern unsafe int InternalGetWindowText(IntPtr hWnd, char* lpString, int capacity);
+
+    /// <summary>
     /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633521.aspx">GetWindowTextLength  function</a>
     /// Retrieves the length, in characters, of the specified window's title bar text (if the window has a title bar). If the specified window is a control, the function retrieves the length of the text within the control. However, GetWindowTextLength cannot retrieve the length of the text of an edit control in another application.
     /// </summary>
@@ -598,7 +675,7 @@ public static class User32Api
     /// If the nIndex parameter is out of range, the return value is zero.
     /// Because zero is also a valid RGB value, you cannot use GetSysColor to determine whether a system color is supported by the current platform.Instead, use the GetSysColorBrush function, which returns NULL if the color is not supported.
     /// </returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32)]
     public static extern uint GetSysColor(SysColorIndexes nIndex);
 
     /// <summary>
@@ -614,14 +691,14 @@ public static class User32Api
     /// Retrieves the hWnd for the window which is currently the foreground window
     /// </summary>
     /// <returns>IntPtr</returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32)]
     public static extern IntPtr GetForegroundWindow();
 
     /// <summary>
     ///     Get the hWnd of the Desktop window
     /// </summary>
     /// <returns>IntPtr</returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32)]
     public static extern IntPtr GetDesktopWindow();
 
     /// <summary>
@@ -675,7 +752,7 @@ public static class User32Api
     /// </summary>
     /// <param name="hWnd">IntPtr for the hWnd</param>
     /// <returns>true if minimized</returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool IsIconic(IntPtr hWnd);
 
@@ -684,7 +761,7 @@ public static class User32Api
     /// </summary>
     /// <param name="hWnd">IntPtr for the hWnd</param>
     /// <returns>true if maximized</returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool IsZoomed(IntPtr hWnd);
 
@@ -1133,16 +1210,55 @@ public static class User32Api
     private static extern bool GetCursorPos(out NativePoint cursorLocation);
 
     /// <summary>
+    /// The MapWindowPoints function converts (maps) a point from a coordinate space relative to one window to a coordinate space relative to another window.
+    /// </summary>
+    /// <param name="hWndFrom">IntPtr window handle for the from window, IntPtr.Zero for screen coordinates</param>
+    /// <param name="hWndTo">IntPtr window handle for the to window, IntPtr.Zero for screen coordinates</param>
+    /// <param name="point">NativePoint to convert, in device units</param>
+    /// <returns>See <see cref="MapWindowPoints(IntPtr, IntPtr, NativePoint[])"/></returns>
+    public static int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, ref NativePoint point)
+    {
+        return MapWindowPointsInternal(hWndFrom, hWndTo, ref point, 1);
+    }
+
+    /// <summary>
+    /// The MapWindowPoints function converts (maps) a rectangle from a coordinate space relative to one window to a coordinate space relative to another window.
+    /// If exactly one of the windows is mirrored, the left and right coordinates are swapped so the result is a normalized rectangle.
+    /// </summary>
+    /// <param name="hWndFrom">IntPtr window handle for the from window, IntPtr.Zero for screen coordinates</param>
+    /// <param name="hWndTo">IntPtr window handle for the to window, IntPtr.Zero for screen coordinates</param>
+    /// <param name="rect">NativeRect to convert, in device units</param>
+    /// <returns>See <see cref="MapWindowPoints(IntPtr, IntPtr, NativePoint[])"/></returns>
+    public static int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, ref NativeRect rect)
+    {
+        return MapWindowPointsInternal(hWndFrom, hWndTo, ref rect, 2);
+    }
+
+    /// <summary>
     /// The MapWindowPoints function converts (maps) a set of points from a coordinate space relative to one window to a coordinate space relative to another window.
     /// </summary>
-    /// <param name="hWndFrom">IntPtr window handle for the from window</param>
-    /// <param name="hWndTo">IntPtr window handle for the to window</param>
-    /// <param name="lpPoints">A pointer to an array of POINT structures that contain the set of points to be converted. The points are in device units. This parameter can also point to a RECT structure, in which case the cPoints parameter should be set to 2.</param>
-    /// <param name="cPoints">The number of POINT structures in the array pointed to by the lpPoints parameter.</param>
+    /// <param name="hWndFrom">IntPtr window handle for the from window, IntPtr.Zero for screen coordinates</param>
+    /// <param name="hWndTo">IntPtr window handle for the to window, IntPtr.Zero for screen coordinates</param>
+    /// <param name="points">NativePoint array with the points to convert, in device units, these are converted in place</param>
     /// <returns>If the function succeeds, the low-order word of the return value is the number of pixels added to the horizontal coordinate of each source point in order to compute the horizontal coordinate of each destination point. (In addition to that, if precisely one of hWndFrom and hWndTo is mirrored, then each resulting horizontal coordinate is multiplied by -1.) The high-order word is the number of pixels added to the vertical coordinate of each source point in order to compute the vertical coordinate of each destination point.
     /// If the function fails, the return value is zero. Call SetLastError prior to calling this method to differentiate an error return value from a legitimate "0" return value.</returns>
-    [DllImport(User32, SetLastError = true)]
-    public static extern int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, [In, Out] ref NativePoint lpPoints, [MarshalAs(UnmanagedType.U4)] int cPoints);
+    public static int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, NativePoint[] points)
+    {
+        if (points == null)
+        {
+            throw new ArgumentNullException(nameof(points));
+        }
+        return points.Length == 0 ? 0 : MapWindowPointsInternal(hWndFrom, hWndTo, points, points.Length);
+    }
+
+    [DllImport(User32, SetLastError = true, EntryPoint = "MapWindowPoints", ExactSpelling = true)]
+    private static extern int MapWindowPointsInternal(IntPtr hWndFrom, IntPtr hWndTo, ref NativePoint lpPoints, int cPoints);
+
+    [DllImport(User32, SetLastError = true, EntryPoint = "MapWindowPoints", ExactSpelling = true)]
+    private static extern int MapWindowPointsInternal(IntPtr hWndFrom, IntPtr hWndTo, ref NativeRect lpRect, int cPoints);
+
+    [DllImport(User32, SetLastError = true, EntryPoint = "MapWindowPoints", ExactSpelling = true)]
+    private static extern int MapWindowPointsInternal(IntPtr hWndFrom, IntPtr hWndTo, [In, Out] NativePoint[] lpPoints, int cPoints);
 
     /// <summary>
     ///     See
@@ -1150,7 +1266,7 @@ public static class User32Api
     /// </summary>
     /// <param name="index">SystemMetric</param>
     /// <returns>int</returns>
-    [DllImport(User32, SetLastError = true)]
+    [DllImport(User32)]
     public static extern int GetSystemMetrics(SystemMetric index);
 
     /// <summary>
@@ -1179,7 +1295,14 @@ public static class User32Api
     public static extern bool ReleaseCapture();
 
     [DllImport(User32, SetLastError = true)]
-    internal static extern IntPtr OpenInputDesktop(uint dwFlags, [MarshalAs(UnmanagedType.Bool)] bool fInherit, DesktopAccessRight dwDesiredAccess);
+    internal static extern SafeDesktopHandle OpenInputDesktop(uint dwFlags, [MarshalAs(UnmanagedType.Bool)] bool fInherit, DesktopAccessRight dwDesiredAccess);
+
+    [DllImport(User32, SetLastError = true)]
+    internal static extern IntPtr GetThreadDesktop(int dwThreadId);
+
+    [DllImport(User32, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool SetThreadDesktop(SafeDesktopHandle hDesktop);
 
     [DllImport(User32, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -1286,7 +1409,7 @@ public static class User32Api
     /// </summary>
     /// <param name="cursorInfo">CursorInfo structure to fill</param>
     /// <returns>bool</returns>
-    [DllImport(User32Api.User32, SetLastError = true)]
+    [DllImport(User32, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool GetCursorInfo(ref CursorInfo cursorInfo);
 
@@ -1295,7 +1418,7 @@ public static class User32Api
     /// </summary>
     /// <param name="hCursor">A handle to the cursor to be destroyed. The handle must have been created by the application.</param>
     /// <returns>true if the cursor was successfully destroyed; otherwise, false.</returns>
-    [DllImport(User32Api.User32, SetLastError = true)]
+    [DllImport(User32, SetLastError = true)]
     internal static extern bool DestroyCursor(IntPtr hCursor);
 
     /// <summary>
@@ -1304,7 +1427,8 @@ public static class User32Api
     /// <param name="hDC">A handle to the device context in which the rectangle is to be filled.</param>
     /// <param name="lprc">A reference to a NativeRect structure that specifies the logical coordinates of the rectangle to be filled.</param>
     /// <param name="hbr">A handle to the brush used to fill the rectangle.</param>
-    /// <returns>If the function succeeds, the return value is nonzero. If the function fails, the return value is zero.</returns>
-    [DllImport(User32Api.User32, SetLastError = true)]
-    public static extern int FillRect(IntPtr hDC, [In] ref NativeRect lprc, IntPtr hbr);
+    /// <returns>true if the function succeeds</returns>
+    [DllImport(User32, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool FillRect(IntPtr hDC, [In] ref NativeRect lprc, IntPtr hbr);
 }

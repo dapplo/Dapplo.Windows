@@ -34,6 +34,51 @@ using Dapplo.Windows.Wpf;
 var wpfRect = nativeRect.ToRect();
 ```
 
+## Renames and moved types (sweep)
+
+| 2.x | 3.0 |
+|---|---|
+| `window.GetParent()` for an owned dialog | `window.GetOwner()` (`GetParent()` is only the real parent now) |
+| `window.GetChildren()` meaning all descendants | `window.GetDescendants()` |
+| `new SafeCurrentInputDesktopHandle()` | `ThreadDesktopScope.SwitchToInputDesktop()` / `SafeDesktopHandle.OpenInputDesktop()` |
+| `TrySendMessage(h, msg, wp, out r, lp, t)` | `TrySendMessage(h, msg, wp, lp, out r, t)` |
+| `AttachThreadInput(a, b, 1)` | `AttachThreadInput(a, b, true)` |
+| `MapWindowPoints(a, b, ref pt, 1)` | `MapWindowPoints(a, b, ref pt)` |
+| `InteropWindow w = hWnd;` / `IntPtr h = w;` | `InteropWindowFactory.CreateFor(hWnd)` / `w.Handle` |
+| `InteropWindowQuery.IgnoreClasses.Add(x)` | `InteropWindowQuery.AddIgnoreClass(x)` |
+| `DesktopAccessRight.GENERIC_ALL` (0x1FF) | `DesktopAccessRight.DESKTOP_ALL_SPECIFIC` |
+| `IconHelper.GetAppLogo<Bitmap>(window)` | `window.GetAppLogo<Bitmap>()` (package Dapplo.Windows) |
+| `long hr = Win32.GetHResult(e)` | `HResult hr = Win32.GetHResult(e)` |
+| `ColorSpace.LCS_GM_IMAGES` | `ColorSpaceIntent.LCS_GM_IMAGES` |
+| `BitfieldColorMask.Create(255, 255, 255)` | `BitfieldColorMask.Rgb888` |
+| `int s = Kernel32Api.GlobalSize(h)` | `ulong s = Kernel32Api.GlobalSize(h).ToUInt64()` |
+| `PackageInfo.IsRunningOnUwp` | `PackageInfo.HasPackageIdentity` |
+| `Ole32Api.ClassIdFromProgId(p) == Guid.Empty` | `!Ole32Api.ClassIdFromProgId(p).HasValue` |
+| `Dapplo.Windows.Kernel32.RestartManager`, `Kernel32.Enums.Rm*`, `Kernel32.Structs.Rm*` | `Dapplo.Windows.InstallerManager.InstallerRestartManager`, `InstallerManager.Enums`, `InstallerManager.Structs` |
+| `RmProcessInfo.strAppName` / `Process.dwProcessId` / `bRestartable` | `AppName` / `Process.ProcessId` / `IsRestartable` |
+| `session.Shutdown()` (forced) | `session.Shutdown(RmShutdownType.RmForceShutdown)`; the default is now graceful |
+| `ExtractIconEx(f, i, out l, out s, 1)` | `var l = new IntPtr[1]; var s = new IntPtr[1]; ExtractIconEx(f, i, l, s, 1)`; count: `CountIcons(f)` |
+| `Shell32Api.TaskbarPosition` | `Shell32Api.TryGetTaskbarPosition(out var data)` |
+| `Advapi32Api.CurrentSessionId` | `Advapi32Api.CurrentLogonSid` (the session id is `Process.GetCurrentProcess().SessionId`) |
+| `IntPtr timer = SystemStateApi.CreateWaitableTimer(...)` | `SafeWaitHandle timer = ...` |
+| `WinFrame.IsAvailabe`, `ClientLatency.Avarage` / `Derivation`, `UserInfo.Domainname` / `Username` | `IsAvailable`, `Average` / `Deviation`, `DomainName` / `UserName` |
+| `AppBarStates.AllwaysOnTop`, `AppBarMessages.SetAutohideAppBar` | `AlwaysOnTop`, `SetAutoHideAppBar` |
+| `DwmWindowAttributes.NcrenderingPolicy`, `TransitionsForcedisabled` | `NcRenderingPolicy`, `TransitionsForceDisabled` |
+| `VirtualKeyCode.Snapshot`, `Hangul`, `Kanji` | `PrintScreen`, `Kana`, `Hanja` |
+| `MouseButtonStates.Button4Up` / `Button6Up` / `Button1Down` | `ButtonX1Up` / `ButtonX2Up` / `LeftButtonDown` |
+| `LowerIntegretyInjected`, `HidUsagesGeneric.Consumer` | `LowerIntegrityInjected`, `HidUsagePages.Consumer` |
+| `WM_KEYFIRST`, `WM_MOUSEFIRST` | `WM_KEYDOWN`, `WM_MOUSEMOVE` |
+| `ApplicationRestartManager.MaxCommandLineLength` | `RestartMaxCmdLine` |
+
+Behaviour changes to check:
+
+- **Owner vs parent:** `IsTopLevel` / `IsPopup` now accept owned windows, and `GetInfo(autoCorrect)` no longer crops owned dialogs.
+- **DPI:** `DpiAwareForm` lets WinForms scale on WM_DPICHANGED. Remove manual font or control scaling you did in `FormDpiHandler.OnDpiChanged`, or cancel `Form.DpiChanged`. DPI scaling now rounds (`ScaleWithDpi(3, 144)` is 5).
+- **Cursor drawing:** `DrawCursorOnGraphics` / `DrawCursorOnBitmap` take the top-left of the cursor image; subtract `cursor.HotSpot` to draw at the mouse position.
+- **Empty rectangles:** rectangles and sizes with a negative width or height count as empty.
+- **Keyboard handlers:** use one handler instance per subscription, or the `Where(() => new KeyCombinationHandler(...))` factory overload.
+- **Strong names:** the net10 assemblies are now strong-named too.
+
 ## HRESULT
 
 `HResult` is now `enum HResult : int`. `Failed()` and `Succeeded()` work, and `ThrowOnFailure()` throws. Failures

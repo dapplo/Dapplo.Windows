@@ -17,7 +17,7 @@ public class SoftwareInstallationTests
     }
 
     [Fact]
-    private void Test_InstalledSoftware()
+    public void Test_InstalledSoftware()
     {
         var software = InstallationInformation.InstalledSoftware().OrderBy(details => details.DisplayName).ToList();
         Assert.True(software.Count > 0);

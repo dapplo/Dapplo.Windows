@@ -182,14 +182,23 @@ public static class NativeRectExtensions
     }
 
     /// <summary>
-    /// Creates a new NativeRect which is the union of rect1 and rect2
+    /// Creates a new NativeRect which is the union of rect1 and rect2.
+    /// Like the Win32 UnionRect, empty rectangles (see <see cref="NativeRect.IsEmpty"/>) are ignored, so accumulating from NativeRect.Empty works.
     /// </summary>
     /// <param name="rect1">NativeRect</param>
     /// <param name="rect2">NativeRect</param>
-    /// <returns>NativeRect which is the union of rect1 and rect2</returns>
+    /// <returns>NativeRect which is the union of rect1 and rect2, or NativeRect.Empty if both are empty</returns>
     [Pure]
     public static NativeRect Union(this NativeRect rect1, NativeRect rect2)
     {
+        if (rect1.IsEmpty)
+        {
+            return rect2.IsEmpty ? NativeRect.Empty : rect2;
+        }
+        if (rect2.IsEmpty)
+        {
+            return rect1;
+        }
         var minX1 = Math.Min(rect1.Left, rect1.Right);
         var minX2 = Math.Min(rect2.Left, rect2.Right);
         var minX = Math.Min(minX1, minX2);

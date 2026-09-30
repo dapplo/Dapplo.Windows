@@ -7,7 +7,9 @@ using Dapplo.Windows.Clipboard.Internals;
 namespace Dapplo.Windows.Clipboard;
 
 /// <summary>
-/// These are extensions to work with the clipboard
+/// These are extensions to work with the clipboard.
+/// The streams returned by GetAsStream and TryGetAsStream contain a copy of the clipboard content (the complete clipboard memory allocation, which can be larger than the actual data).
+/// This costs memory for the size of the content, but the stream can't outlive the clipboard lock and stays valid after the access token is disposed.
 /// </summary>
 public static class ClipboardStreamExtensions
 {
@@ -137,7 +139,7 @@ public static class ClipboardStreamExtensions
     /// </summary>
     /// <param name="clipboardAccessToken">IClipboardLock</param>
     /// <param name="format">StandardClipboardFormats with the format to retrieve the content for</param>
-    /// <param name="stream">Stream output parameter, this reads directly from the clipboard memory: read and dispose it before disposing the access token</param>
+    /// <param name="stream">Stream output parameter, a read-only MemoryStream with a copy of the clipboard content, it stays valid after the access token is disposed</param>
     /// <returns>true if the format can be read as a stream, false otherwise</returns>
     public static bool TryGetAsStream(this IClipboardAccessToken clipboardAccessToken, StandardClipboardFormats format, out Stream stream)
     {
@@ -150,7 +152,7 @@ public static class ClipboardStreamExtensions
     /// </summary>
     /// <param name="clipboardAccessToken">IClipboardLock</param>
     /// <param name="format">string with the format to retrieve the content for</param>
-    /// <param name="stream">Stream output parameter, this reads directly from the clipboard memory: read and dispose it before disposing the access token</param>
+    /// <param name="stream">Stream output parameter, a read-only MemoryStream with a copy of the clipboard content, it stays valid after the access token is disposed</param>
     /// <returns>true if the format can be read as a stream, false otherwise</returns>
     public static bool TryGetAsStream(this IClipboardAccessToken clipboardAccessToken, string format, out Stream stream)
     {
@@ -163,7 +165,7 @@ public static class ClipboardStreamExtensions
     /// </summary>
     /// <param name="clipboardAccessToken">IClipboardLock</param>
     /// <param name="formatId">uint with the format to retrieve the content for</param>
-    /// <param name="stream">Stream output parameter, this reads directly from the clipboard memory: read and dispose it before disposing the access token</param>
+    /// <param name="stream">Stream output parameter, a read-only MemoryStream with a copy of the clipboard content, it stays valid after the access token is disposed</param>
     /// <returns>true if the format can be read as a stream, false otherwise</returns>
     public static bool TryGetAsStream(this IClipboardAccessToken clipboardAccessToken, uint formatId, out Stream stream)
     {
@@ -174,15 +176,11 @@ public static class ClipboardStreamExtensions
             return false;
         }
         
-        // return the memory stream, the global unlock is done when the UnmanagedMemoryStreamWrapper is disposed
-        unsafe
+        using (readInfo)
         {
-            var result = new UnmanagedMemoryStreamWrapper((byte*)readInfo.MemoryPtr, readInfo.Size, readInfo.Size, FileAccess.Read);
-            // Make sure the readinfo is disposed when needed
-            result.SetDisposable(readInfo);
-            stream = result;
-            return true;
+            stream = CreateReadOnlyStream(ClipboardByteExtensions.ReadBytes(readInfo));
         }
+        return true;
     }
 
     /// <summary>
@@ -191,7 +189,7 @@ public static class ClipboardStreamExtensions
     /// </summary>
     /// <param name="clipboardAccessToken">IClipboardLock</param>
     /// <param name="format">StandardClipboardFormats with the format to retrieve the content for</param>
-    /// <returns>Stream which reads directly from the clipboard memory, read and dispose it before disposing the access token</returns>
+    /// <returns>Stream, a read-only MemoryStream with a copy of the clipboard content, it stays valid after the access token is disposed</returns>
     public static Stream GetAsStream(this IClipboardAccessToken clipboardAccessToken, StandardClipboardFormats format)
     {
         return clipboardAccessToken.GetAsStream((uint)format);
@@ -203,7 +201,7 @@ public static class ClipboardStreamExtensions
     /// </summary>
     /// <param name="clipboardAccessToken">IClipboardLock</param>
     /// <param name="format">string with the format to retrieve the content for</param>
-    /// <returns>Stream which reads directly from the clipboard memory, read and dispose it before disposing the access token</returns>
+    /// <returns>Stream, a read-only MemoryStream with a copy of the clipboard content, it stays valid after the access token is disposed</returns>
     public static Stream GetAsStream(this IClipboardAccessToken clipboardAccessToken, string format)
     {
         return clipboardAccessToken.GetAsStream(ClipboardFormatExtensions.MapFormatToId(format));
@@ -215,17 +213,20 @@ public static class ClipboardStreamExtensions
     /// </summary>
     /// <param name="clipboardAccessToken">IClipboardLock</param>
     /// <param name="formatId">uint with the format to retrieve the content for</param>
-    /// <returns>Stream which reads directly from the clipboard memory, read and dispose it before disposing the access token</returns>
+    /// <returns>Stream, a read-only MemoryStream with a copy of the clipboard content, it stays valid after the access token is disposed</returns>
     public static Stream GetAsStream(this IClipboardAccessToken clipboardAccessToken, uint formatId)
     {
-        var readInfo = clipboardAccessToken.ReadInfo(formatId);
-        // return the memory stream, the global unlock is done when the UnmanagedMemoryStreamWrapper is disposed
-        unsafe
-        {
-            var result = new UnmanagedMemoryStreamWrapper((byte*)readInfo.MemoryPtr, readInfo.Size, readInfo.Size, FileAccess.Read);
-            // Make sure the readinfo is disposed when needed
-            result.SetDisposable(readInfo);
-            return result;
-        }
+        using var readInfo = clipboardAccessToken.ReadInfo(formatId);
+        return CreateReadOnlyStream(ClipboardByteExtensions.ReadBytes(readInfo));
+    }
+
+    /// <summary>
+    /// Wrap the copied clipboard content in a read-only MemoryStream
+    /// </summary>
+    /// <param name="bytes">byte array</param>
+    /// <returns>MemoryStream</returns>
+    private static MemoryStream CreateReadOnlyStream(byte[] bytes)
+    {
+        return new MemoryStream(bytes, 0, bytes.Length, writable: false, publiclyVisible: true);
     }
 }

@@ -47,7 +47,7 @@ public enum AppBarMessages
     /// <summary>
     /// ABM_SETAUTOHIDEBAR - Registers or unregisters an autohide appbar for an edge of the screen.
     /// </summary>
-    SetAutohideAppBar = 8,
+    SetAutoHideAppBar = 8,
     /// <summary>
     /// ABM_WINDOWPOSCHANGED - Notifies the system when an appbar's position has changed.
     /// </summary>

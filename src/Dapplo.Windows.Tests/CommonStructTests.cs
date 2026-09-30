@@ -23,7 +23,7 @@ public class CommonStructTests
     ///     Test NativeRect Properties
     /// </summary>
     [Fact]
-    private void Test_NativeRect_Properties()
+    public void Test_NativeRect_Properties()
     {
         const int left = 100;
         const int top = 200;
@@ -56,7 +56,7 @@ public class CommonStructTests
     ///     Test NativePoint TypeConverter
     /// </summary>
     [Fact]
-    private void Test_NativePoint_TypeConverter()
+    public void Test_NativePoint_TypeConverter()
     {
         var nativePoint = new NativePoint(123, 456);
 
@@ -76,7 +76,7 @@ public class CommonStructTests
     ///     Test NativeSize operators
     /// </summary>
     [Fact]
-    private void Test_NativeSize_Operators()
+    public void Test_NativeSize_Operators()
     {
         var nativeSize1 = new NativeSize(123, 456);
         var nativeSize2 = new NativeSize(123, 456);
@@ -100,7 +100,7 @@ public class CommonStructTests
     ///     Test NativeSize operators
     /// </summary>
     [Fact]
-    private void Test_NativeSizeFloat_Operators()
+    public void Test_NativeSizeFloat_Operators()
     {
         var nativeSize1 = new NativeSizeFloat(123, 456);
         var nativeSize2 = new NativeSizeFloat(123, 456);
@@ -124,7 +124,7 @@ public class CommonStructTests
     ///     Test NativeRect TypeConverter
     /// </summary>
     [Fact]
-    private void Test_NativeRect_TypeConverter()
+    public void Test_NativeRect_TypeConverter()
     {
         var nativeRect = new NativeRect(123, 456, 457, 876);
 
@@ -144,7 +144,7 @@ public class CommonStructTests
     ///     Test NativeRectFloat TypeConverter
     /// </summary>
     [Fact]
-    private void Test_NativeRectFloat_TypeConverter()
+    public void Test_NativeRectFloat_TypeConverter()
     {
         var nativeRect = new NativeRectFloat(123.1f, 456.2f, 457.3f, 876.4f);
 
@@ -164,7 +164,7 @@ public class CommonStructTests
     ///     Test NativeRect Transform
     /// </summary>
     [Fact]
-    private void Test_NativeRect_Transform()
+    public void Test_NativeRect_Transform()
     {
         const int offsetX = 20;
         const int offsetY = 30;
@@ -239,7 +239,7 @@ public class CommonStructTests
     [InlineData(100, 200, -20, -40, 20, 10)]
     [InlineData(100, 100, 40, 40, -10, 10)]
     [InlineData(100, 100, 40, 40, 10, -10)]
-    private void Test_NativeRect_Inflate(int x, int y, int width, int height, int inflateX, int inflateY)
+    public void Test_NativeRect_Inflate(int x, int y, int width, int height, int inflateX, int inflateY)
     {
         var nativeRect = new NativeRect(x, y, width, height);
         var nativeSize = new NativeSize(inflateX, inflateY);
@@ -258,7 +258,7 @@ public class CommonStructTests
     [Theory]
     [InlineData(10, 10, 40, 40, 20, 20, 10,10)]
     [InlineData(150, 150, 100, 100, 100, 100, 100, 100)]
-    private void Test_NativeRect_Union(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
+    public void Test_NativeRect_Union(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
     {
         var nativeRect1 = new NativeRect(x1, y1, width1, height1);
         var nativeRect2 = new NativeRect(x2, y2, width2, height2);
@@ -274,7 +274,7 @@ public class CommonStructTests
     [Theory]
     [InlineData(10, 10, 40, 40, 20, 20, 10, 10)]
     [InlineData(150, 150, 100, 100, 100, 100, 100, 100)]
-    private void Test_NativeRect_Intersect(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
+    public void Test_NativeRect_Intersect(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
     {
         var nativeRect1 = new NativeRect(x1, y1, width1, height1);
         var nativeRect2 = new NativeRect(x2, y2, width2, height2);

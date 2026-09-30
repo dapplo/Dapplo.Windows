@@ -210,12 +210,60 @@ public struct BitmapInfoHeader
             _biWidth = width,
             _biHeight = height,
             _biBitCount = bpp,
-            _biSizeImage = (uint) (width * Math.Abs(height) * (bpp >> 3)),
+            _biSizeImage = CalculateImageSize(width, height, bpp),
             _biXPelsPerMeter = 0,
             _biYPelsPerMeter = 0,
             _biClrUsed = 0,
             _biClrImportant = 0,
         };
+    }
+
+    /// <summary>
+    ///     Calculate the stride, the number of bytes of a row including the DWORD padding, of a DIB
+    /// </summary>
+    /// <param name="width">int with the width of the bitmap</param>
+    /// <param name="bpp">int with the bits per pixel of the bitmap</param>
+    /// <returns>int with the stride in bytes</returns>
+    public static int CalculateStride(int width, ushort bpp)
+    {
+        return checked((int)(((Math.Abs((long)width) * bpp + 31) / 32) * 4));
+    }
+
+    /// <summary>
+    ///     Calculate the size, in bytes, of the pixels of an uncompressed DIB, taking the DWORD row padding and top-down (negative) heights into account
+    /// </summary>
+    /// <param name="width">int with the width of the bitmap</param>
+    /// <param name="height">int with the height of the bitmap, negative for a top-down DIB</param>
+    /// <param name="bpp">int with the bits per pixel of the bitmap</param>
+    /// <returns>uint with the size of the image in bytes</returns>
+    public static uint CalculateImageSize(int width, int height, ushort bpp)
+    {
+        return checked((uint)(CalculateStride(width, bpp) * Math.Abs((long)height)));
+    }
+
+    /// <summary>
+    ///     Calculate the offset from the start of the bitmap info header to the pixels
+    /// </summary>
+    /// <param name="headerSize">uint with the size of the header</param>
+    /// <param name="compression">BitmapCompressionMethods</param>
+    /// <param name="bpp">ushort with the bits per pixel</param>
+    /// <param name="colorsUsed">uint with the number of used colors</param>
+    /// <returns>uint</returns>
+    internal static uint CalculateOffsetToPixels(uint headerSize, BitmapCompressionMethods compression, ushort bpp, uint colorsUsed)
+    {
+        var offset = headerSize;
+        // Only a 40 byte BITMAPINFOHEADER is followed by the 3 DWORD color masks, the V4 and V5 headers contain them
+        if (compression == BitmapCompressionMethods.BI_BITFIELDS && headerSize == (uint)Marshal.SizeOf(typeof(BitmapInfoHeader)))
+        {
+            offset += 3 * 4;
+        }
+        // The color table, when biClrUsed is 0 and the bpp is 8 or less the table has the maximum number of entries
+        var colorTableEntries = colorsUsed;
+        if (colorTableEntries == 0 && bpp is > 0 and <= 8)
+        {
+            colorTableEntries = 1u << bpp;
+        }
+        return offset + colorTableEntries * 4;
     }
 
     /// <summary>
@@ -243,18 +291,9 @@ public struct BitmapInfoHeader
     }
 
     /// <summary>
-    ///     Calculate the offset to the pixels
+    ///     Calculate the offset, from the start of this header, to the pixels.
+    ///     This includes the BI_BITFIELDS color masks which follow a 40 byte header and the color table.
+    ///     Add the size of the BitmapFileHeader for the offset in a .bmp file.
     /// </summary>
-    public uint OffsetToPixels
-    {
-        get
-        {
-            if (_biCompression == BitmapCompressionMethods.BI_BITFIELDS)
-            {
-                // Add 3x4 bytes for the bitfield color mask
-                return _biSize + 3 * 4;
-            }
-            return _biSize;
-        }
-    }
+    public uint OffsetToPixels => BitmapInfoHeader.CalculateOffsetToPixels(_biSize, _biCompression, _biBitCount, _biClrUsed);
 }

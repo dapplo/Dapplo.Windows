@@ -1,7 +1,7 @@
 // Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Dapplo.Windows.Kernel32.Enums;
+namespace Dapplo.Windows.InstallerManager.Enums;
 
 /// <summary>
 ///     Configures the shut down of applications.
@@ -9,6 +9,12 @@ namespace Dapplo.Windows.Kernel32.Enums;
 /// </summary>
 public enum RmShutdownType : uint
 {
+    /// <summary>
+    ///     Graceful shutdown (no flags): the Restart Manager asks the applications and services to shut down,
+    ///     and RmShutdown fails with ERROR_FAIL_SHUTDOWN when one of them refuses. Nothing is killed, so no unsaved data is lost.
+    /// </summary>
+    Graceful = 0x0,
+
     /// <summary>
     ///     Force unresponsive applications and services to shut down after the timeout period.
     ///     An application that does not respond to a shutdown request by the Restart Manager is forced to shut down after 30 seconds.

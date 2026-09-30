@@ -181,14 +181,23 @@ public static class NativeRectFloatExtensions
     }
 
     /// <summary>
-    /// Creates a new NativeRectFloat which is the union of rect1 and rect2
+    /// Creates a new NativeRectFloat which is the union of rect1 and rect2.
+    /// Like the Win32 UnionRect, empty rectangles (see <see cref="NativeRectFloat.IsEmpty"/>) are ignored, so accumulating from NativeRectFloat.Empty works.
     /// </summary>
     /// <param name="rect1">NativeRectFloat</param>
     /// <param name="rect2">NativeRectFloat</param>
-    /// <returns>NativeRectFloat which is the union of rect1 and rect2</returns>
+    /// <returns>NativeRectFloat which is the union of rect1 and rect2, or NativeRectFloat.Empty if both are empty</returns>
     [Pure]
     public static NativeRectFloat Union(this NativeRectFloat rect1, NativeRectFloat rect2)
     {
+        if (rect1.IsEmpty)
+        {
+            return rect2.IsEmpty ? NativeRectFloat.Empty : rect2;
+        }
+        if (rect2.IsEmpty)
+        {
+            return rect1;
+        }
         var minX1 = Math.Min(rect1.Left, rect1.Right);
         var minX2 = Math.Min(rect2.Left, rect2.Right);
         var minX = Math.Min(minX1, minX2);

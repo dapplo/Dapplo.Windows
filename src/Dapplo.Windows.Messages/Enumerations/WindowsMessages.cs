@@ -302,7 +302,6 @@ public enum WindowsMessages : uint
     /// </summary>
     WM_INPUT = 0x00FF,
 
-    WM_KEYFIRST = 0x0100,
     WM_KEYDOWN = 0x0100,
     WM_KEYUP = 0x0101,
     WM_CHAR = 0x0102,
@@ -312,12 +311,10 @@ public enum WindowsMessages : uint
     WM_SYSCHAR = 0x0106,
     WM_SYSDEADCHAR = 0x0107,
     WM_UNICHAR = 0x0109,
-    WM_KEYLAST = 0x0109,
 
     WM_IME_STARTCOMPOSITION = 0x010D,
     WM_IME_ENDCOMPOSITION = 0x010E,
     WM_IME_COMPOSITION = 0x010F,
-    WM_IME_KEYLAST = 0x010F,
 
     WM_INITDIALOG = 0x0110,
     WM_COMMAND = 0x0111,
@@ -444,11 +441,6 @@ public enum WindowsMessages : uint
 
     MN_FIRST = 0x01e0,
     WM_GETHMENU = 0x01E1,
-
-    /// <summary>
-    /// Defines the start of the mouse related messages
-    /// </summary>
-    WM_MOUSEFIRST = 0x0200,
 
     /// <summary>
     /// Posted to a window when the cursor moves.

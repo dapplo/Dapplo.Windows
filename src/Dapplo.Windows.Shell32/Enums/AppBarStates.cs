@@ -5,7 +5,7 @@ using System;
 namespace Dapplo.Windows.Shell32.Enums;
 
 /// <summary>
-/// A value that specifies an edge of the screen.
+/// The autohide and always-on-top states of an appbar (ABS_*), used with ABM_GETSTATE and ABM_SETSTATE.
 /// </summary>
 [Flags]
 public enum AppBarStates
@@ -21,5 +21,5 @@ public enum AppBarStates
     /// <summary>
     /// ABS_ALWAYSONTOP - Make sure the AppBar is always on top 
     /// </summary>
-    AllwaysOnTop = 2
+    AlwaysOnTop = 2
 }

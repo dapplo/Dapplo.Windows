@@ -31,31 +31,37 @@ public class IconTests
     ///     Test getting an Icon for a top level window
     /// </summary>
     [WpfFact]
-    public void TestIcon_GetIcon()
+    [Trait("Category", "Interactive")]
+    public async System.Threading.Tasks.Task TestIcon_GetIcon()
     {
         // Start a process to test against
         using var process = Process.Start("charmap.exe");
         // Make sure it's started
         Assert.NotNull(process);
-        // Wait until the process started it's message pump (listening for input)
-        if (!process.WaitForInputIdle(4000))
+        try
         {
-            Assert.Fail("Test-Process didn't get ready.");
-            return;
+            // Wait until the process started it's message pump (listening for input)
+            Assert.True(process.WaitForInputIdle(4000), "Test-Process didn't get ready.");
+
+            // Find the window of the started process, not just any window
+            IInteropWindow window = null;
+            await TestWait.UntilAsync(() =>
+            {
+                window = InteropWindowQuery.GetTopLevelWindows().FirstOrDefault(interopWindow => interopWindow.GetProcessId() == process.Id);
+                return window != null;
+            }, "The window of charmap wasn't found");
+
+            using var icon = window.GetIcon<Bitmap>();
+            Assert.NotNull(icon);
+            // Convert to a WPF BitmapSource with the Dapplo.Windows.Wpf extension
+            var bitmapSource = icon.ToBitmapSource();
+            Assert.Equal(icon.Width, bitmapSource.PixelWidth);
+            Assert.Equal(icon.Height, bitmapSource.PixelHeight);
         }
-
-        _ = User32Api.SetWindowText(process.MainWindowHandle, "TestIcon_GetIcon");
-
-        var window = InteropWindowQuery.GetTopLevelWindows().First();
-        using var icon = window.GetIcon<Bitmap>();
-        Assert.NotNull(icon);
-        // Convert to a WPF BitmapSource with the Dapplo.Windows.Wpf extension
-        var bitmapSource = icon.ToBitmapSource();
-        Assert.Equal(icon.Width, bitmapSource.PixelWidth);
-        Assert.Equal(icon.Height, bitmapSource.PixelHeight);
-
-        // Kill the process
-        process.Kill();
+        finally
+        {
+            process.Kill();
+        }
     }
 
     /// <summary>
@@ -114,25 +120,6 @@ public class IconTests
         Assert.True(spacingHeight >= standardHeight, "Icon spacing height should be >= standard icon height");
     }
 
-    //[Fact]
-    private void TestIcon_V6Loaded()
-    {
-        try
-        {
-            var idiApplication = new IntPtr(32512);
-            IconHelper.LoadIconWithSystemMetrics<Bitmap>(IntPtr.Zero, idiApplication, Icons.Enums.IconMetricSize.SmallIcon);
-        } catch {
-            // Just to make sure it's loaded
-        }
-        var comctl32 = Process.GetCurrentProcess()
-            .Modules
-            .OfType<ProcessModule>()
-            .FirstOrDefault(m => m.ModuleName.Equals("comctl32.dll", StringComparison.OrdinalIgnoreCase));
-
-        Assert.NotNull(comctl32);
-        Assert.True(comctl32.FileVersionInfo.FileMajorPart >= 6, "comctl32.dll version should be 6 or higher");
-    }
-
     /// <summary>
     ///     Test getting system icon size using the helper method
     /// </summary>
@@ -153,49 +140,42 @@ public class IconTests
     }
 
     /// <summary>
-    ///     Test LoadIconMetric with system stock icons
+    ///     Test LoadIconMetric with system stock icons, this needs comctl32 v6 which the app.manifest of the test executable selects
     /// </summary>
-    [WpfFact]
-    private void TestIcon_LoadIconMetric()
+    [Fact]
+    public void TestIcon_LoadIconMetric()
     {
         var idiApplication = new IntPtr(32512);
 
-        try
-        {
-            // Load small icon using LoadIconMetric
-            var smallIcon = IconHelper.LoadIconWithSystemMetrics<Bitmap>(IntPtr.Zero, idiApplication, Icons.Enums.IconMetricSize.SmallIcon);
-            Assert.NotNull(smallIcon);
+        // Load small icon using LoadIconMetric
+        using var smallIcon = IconHelper.LoadIconWithSystemMetrics<Bitmap>(IntPtr.Zero, idiApplication, Icons.Enums.IconMetricSize.SmallIcon);
+        Assert.NotNull(smallIcon);
 
-            var expectedSmallSize = IconHelper.GetSystemIconSize(Icons.Enums.IconMetricSize.SmallIcon);
-            Assert.Equal(expectedSmallSize.Width, smallIcon.Width);
-            Assert.Equal(expectedSmallSize.Height, smallIcon.Height);
+        var expectedSmallSize = IconHelper.GetSystemIconSize(Icons.Enums.IconMetricSize.SmallIcon);
+        Assert.Equal(expectedSmallSize.Width, smallIcon.Width);
+        Assert.Equal(expectedSmallSize.Height, smallIcon.Height);
 
-            // Load standard icon using LoadIconMetric
-            var standardIcon = IconHelper.LoadIconWithSystemMetrics<Bitmap>(IntPtr.Zero, idiApplication, Icons.Enums.IconMetricSize.StandardIcon);
-            Assert.NotNull(standardIcon);
+        // Load standard icon using LoadIconMetric
+        using var standardIcon = IconHelper.LoadIconWithSystemMetrics<Bitmap>(IntPtr.Zero, idiApplication, Icons.Enums.IconMetricSize.StandardIcon);
+        Assert.NotNull(standardIcon);
 
-            var expectedStandardSize = IconHelper.GetSystemIconSize(Icons.Enums.IconMetricSize.StandardIcon);
-            Assert.Equal(expectedStandardSize.Width, standardIcon.Width);
-            Assert.Equal(expectedStandardSize.Height, standardIcon.Height);
-        }
-        catch (EntryPointNotFoundException)
-        {
-            // Skip test on systems without LoadIconMetric API
-        }
+        var expectedStandardSize = IconHelper.GetSystemIconSize(Icons.Enums.IconMetricSize.StandardIcon);
+        Assert.Equal(expectedStandardSize.Width, standardIcon.Width);
+        Assert.Equal(expectedStandardSize.Height, standardIcon.Height);
     }
 
     /// <summary>
     ///     Test LoadIconWithScaleDown with system stock icons
     /// </summary>
-    //[WpfFact]
-    private void TestIcon_LoadIconWithScaleDown()
+    [Fact]
+    public void TestIcon_LoadIconWithScaleDown()
     {
         // IDI_QUESTION is 32514
         var idiQuestion = new IntPtr(32514);
 
         // Load icon at a specific size
         const int targetSize = 24;
-        var icon = IconHelper.LoadIconWithScaleDown<Bitmap>(IntPtr.Zero, idiQuestion, targetSize, targetSize);
+        using var icon = IconHelper.LoadIconWithScaleDown<Bitmap>(IntPtr.Zero, idiQuestion, targetSize, targetSize);
         Assert.NotNull(icon);
 
         // The icon should be scaled to the requested size

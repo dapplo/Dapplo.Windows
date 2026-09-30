@@ -147,13 +147,12 @@ public static class NativeStructWpfExtensions
     [Pure]
     public static NativeRect Transform(this NativeRect rect, Matrix matrix)
     {
-        Point[] points = { rect.TopLeft.ToPoint(), rect.BottomRight.ToPoint() };
-        matrix.Transform(points);
-        return (NativeRect)new NativeRectFloat(points[0].ToNativePointFloat(), points[1].ToNativePointFloat());
+        return (NativeRect)new NativeRectFloat(rect.X, rect.Y, rect.Width, rect.Height).Transform(matrix);
     }
 
     /// <summary>
-    ///     Transform the specified NativeRectFloat
+    ///     Transform the specified NativeRectFloat, the result is the axis-aligned bounding box of all four transformed corners,
+    ///     so rotation and mirroring are handled.
     /// </summary>
     /// <param name="rect">NativeRectFloat</param>
     /// <param name="matrix">Matrix</param>
@@ -161,8 +160,20 @@ public static class NativeStructWpfExtensions
     [Pure]
     public static NativeRectFloat Transform(this NativeRectFloat rect, Matrix matrix)
     {
-        Point[] points = { rect.TopLeft.ToPoint(), rect.BottomRight.ToPoint() };
+        Point[] points =
+        {
+            new Point(rect.Left, rect.Top), new Point(rect.Right, rect.Top),
+            new Point(rect.Right, rect.Bottom), new Point(rect.Left, rect.Bottom)
+        };
         matrix.Transform(points);
-        return new NativeRectFloat(points[0].ToNativePointFloat(), points[1].ToNativePointFloat());
+        double minX = points[0].X, maxX = points[0].X, minY = points[0].Y, maxY = points[0].Y;
+        for (int i = 1; i < points.Length; i++)
+        {
+            minX = Math.Min(minX, points[i].X);
+            maxX = Math.Max(maxX, points[i].X);
+            minY = Math.Min(minY, points[i].Y);
+            maxY = Math.Max(maxY, points[i].Y);
+        }
+        return new NativeRectFloat((float)minX, (float)minY, (float)(maxX - minX), (float)(maxY - minY));
     }
 }

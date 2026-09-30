@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dapplo.Windows.Kernel32.Enums;
+namespace Dapplo.Windows.InstallerManager.Enums;
 
 /// <summary>
 ///     Describes the current status of an application that is acted upon by the Restart Manager.

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dapplo.Windows.Messages.Native;
 using Dapplo.Windows.User32.Enums;
 using System.Runtime.InteropServices;
 
@@ -19,7 +18,7 @@ public struct WndClassEx
 {
     private int _cbSize;
     private WindowsClassStyles _windowsClassStyle;
-    private WndProc _lpfnWndProc;
+    private nint _lpfnWndProc;
     private int _cbClsExtra;
     private int _cbWndExtra;
     private nint _hInstance;
@@ -44,12 +43,12 @@ public struct WndClassEx
     public nint HInstance { get => _hInstance; set => _hInstance = value; }
 
     /// <summary>
-    /// Gets or sets the application-defined callback function that processes messages sent to a window.
+    /// Gets or sets the pointer to the window procedure which processes the messages sent to the windows of the class,
+    /// e.g. created with Marshal.GetFunctionPointerForDelegate from a Dapplo.Windows.Messages.Native.WndProc delegate.
     /// </summary>
-    /// <remarks>This property typically specifies the window procedure used by the operating system to handle
-    /// messages for a window. Assigning a custom delegate allows interception and processing of window messages. Ensure
-    /// that the delegate remains valid for the lifetime of the window to avoid unexpected behavior.</remarks>
-    public WndProc LpfnWndProc { get => _lpfnWndProc; set => _lpfnWndProc = value; }
+    /// <remarks>The structure only holds the pointer: the delegate it was created from must be kept referenced
+    /// as long as the window class is registered, otherwise the garbage collector collects it while Windows still calls it.</remarks>
+    public nint LpfnWndProc { get => _lpfnWndProc; set => _lpfnWndProc = value; }
 
     /// <summary>
     /// Gets or sets the name of the window class associated with this instance.

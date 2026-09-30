@@ -31,35 +31,6 @@ public class ClipboardTests
     }
 
     /// <summary>
-    ///     Test monitoring the clipboard
-    /// </summary>
-    //[WpfFact]
-    public async Task TestClipboardMonitor_WaitForCopy()
-    {
-        var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var subscription = ClipboardNative.OnUpdate.Skip(1).Subscribe(clipboardUpdateInformation =>
-        {
-            Log.Debug().WriteLine("Formats {0}", string.Join(",", clipboardUpdateInformation.Formats));
-            Log.Debug().WriteLine("Owner {0}", clipboardUpdateInformation.OwnerHandle);
-            Log.Debug().WriteLine("Sequence {0}", clipboardUpdateInformation.Id);
-
-            if (clipboardUpdateInformation.Formats.Contains("PNG"))
-            {
-                using var clipboard = ClipboardNative.Access();
-                using var stream = clipboard.GetAsStream("PNG");
-                using var fileStream = File.Create(@"c:\projects\test.png");
-                stream.CopyTo(fileStream);
-            }
-
-            tcs.TrySetResult(true);
-        });
-
-        await tcs.Task;
-
-        subscription.Dispose();
-    }
-
-    /// <summary>
     ///     Test delayed rendering of the clipboard, without any other subscription keeping the SharedMessageWindow busy
     /// </summary>
     [WpfFact]
@@ -266,18 +237,6 @@ public class ClipboardTests
         }
     }
 
-
-    /// <summary>
-    ///     Test if the clipboard contains files
-    /// </summary>
-    /// <returns></returns>
-    //[WpfFact]
-    public void TestClipboard_FileNames()
-    {
-        using var clipboardAccessToken = ClipboardNative.Access();
-        var fileNames = clipboardAccessToken.GetFileNames();
-        Assert.True(fileNames.Any());
-    }
 
     /// <summary>
     ///     Test setting file names on the clipboard and reading them back

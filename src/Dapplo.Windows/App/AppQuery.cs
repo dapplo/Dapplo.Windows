@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Dapplo.Windows.Com;
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Extensions;
@@ -125,33 +124,23 @@ public static class AppQuery
 
         foreach (var screen in DisplayInfo.AllDisplayInfos)
         {
-            if (!screen.Bounds.Contains(windowBounds))
+            if (!windowBounds.Equals(screen.Bounds))
             {
                 continue;
             }
 
-            if (windowBounds.Equals(screen.Bounds))
+            // Fullscreen, it's "visible" when AppVisibilityOnMonitor says yes
+            // Although it might be the other App, this is not "very" important
+            var rect = screen.Bounds;
+            var monitor = User32Api.MonitorFromRect(ref rect, MonitorFrom.DefaultToNearest);
+            if (monitor == IntPtr.Zero)
             {
-                // Fullscreen, it's "visible" when AppVisibilityOnMonitor says yes
-                // Although it might be the other App, this is not "very" important
-                var rect = screen.Bounds;
-                var monitor = User32Api.MonitorFromRect(ref rect, MonitorFrom.DefaultToNearest);
-                if (monitor != IntPtr.Zero)
-                {
-                    var monitorAppVisibility = AppVisibility.ComObject.GetAppVisibilityOnMonitor(monitor);
-                    if (monitorAppVisibility == MonitorAppVisibility.MAV_APP_VISIBLE)
-                    {
-                        return true;
-                    }
-                }
+                return false;
             }
-            else
-            {
-                // Is only partly on the screen, when this happens the app is allways visible!
-                return true;
-            }
+            return AppVisibility.ComObject.GetAppVisibilityOnMonitor(monitor) == MonitorAppVisibility.MAV_APP_VISIBLE;
         }
-        return false;
+        // Not covering a complete screen (only partly on a screen, or spanning multiple screens): such an app window is always visible
+        return true;
     }
 
     /// <summary>
@@ -160,8 +149,8 @@ public static class AppQuery
     /// <returns>IInteropWindow</returns>
     public static IInteropWindow GetAppLauncher()
     {
-        // Works only if Windows 8 (or higher)
-        if (IsLauncherVisible)
+        // Works only if Windows 8 (or higher), and only returns the launcher when it's visible
+        if (!IsLauncherVisible)
         {
             return null;
         }
@@ -204,7 +193,8 @@ public static class AppQuery
 
     /// <summary>
     ///     This checks if the window is a Windows 10 App
-    ///     For Windows 10 apps are hosted inside "ApplicationFrameWindow"
+    ///     For Windows 10 apps are hosted inside "ApplicationFrameWindow", this checks for a direct child with the class "Windows.UI.Core.CoreWindow"
+    ///     without changing the Children of the interopWindow.
     /// </summary>
     public static bool IsWin10App(this IInteropWindow interopWindow)
     {
@@ -212,7 +202,29 @@ public static class AppQuery
         {
             return false;
         }
-        return AppWindowClass.Equals(interopWindow.GetClassname()) || interopWindow.GetChildren().Any(window => string.Equals(window.GetClassname(), AppWindowClass));
+        return AppWindowClass.Equals(interopWindow.GetClassname()) || HasCoreWindowChild(interopWindow);
+    }
+
+    /// <summary>
+    ///     Get the "Windows.UI.Core.CoreWindow" child of an "ApplicationFrameWindow", this belongs to the process of the app.
+    ///     This uses FindWindowEx, as EnumChildWindows (GetChildren) doesn't return the CoreWindow, and doesn't change the Children of the interopWindow.
+    /// </summary>
+    /// <param name="interopWindow">IInteropWindow</param>
+    /// <returns>IInteropWindow for the CoreWindow, or null if there is none</returns>
+    public static IInteropWindow GetCoreWindow(this IInteropWindow interopWindow)
+    {
+        var coreWindow = User32Api.FindWindowEx(interopWindow.Handle, IntPtr.Zero, AppWindowClass, null);
+        return coreWindow == IntPtr.Zero ? null : InteropWindowFactory.CreateFor(coreWindow);
+    }
+
+    /// <summary>
+    ///     Check if the window has a direct child with the class "Windows.UI.Core.CoreWindow", without enumerating (and caching) all the children
+    /// </summary>
+    /// <param name="interopWindow">IInteropWindow</param>
+    /// <returns>bool</returns>
+    private static bool HasCoreWindowChild(IInteropWindow interopWindow)
+    {
+        return User32Api.FindWindowEx(interopWindow.Handle, IntPtr.Zero, AppWindowClass, null) != IntPtr.Zero;
     }
 
     /// <summary>
@@ -225,7 +237,7 @@ public static class AppQuery
         {
             return false;
         }
-        return AppFrameWindowClass.Equals(interopWindow.GetClassname()) && !interopWindow.GetChildren().Any(window => string.Equals(window.GetClassname(), AppWindowClass));
+        return AppFrameWindowClass.Equals(interopWindow.GetClassname()) && !HasCoreWindowChild(interopWindow);
     }
 
     /// <summary>

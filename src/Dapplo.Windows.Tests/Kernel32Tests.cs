@@ -18,13 +18,13 @@ public class Kernel32Tests
     }
 
     [Fact]
-    private void Test_IsRunningAsUwp()
+    public void Test_IsRunningAsUwp()
     {
-        Assert.False(PackageInfo.IsRunningOnUwp);
+        Assert.False(PackageInfo.HasPackageIdentity);
     }
 
     [Fact]
-    private void Test_GetOsVersionInfoEx()
+    public void Test_GetOsVersionInfoEx()
     {
         var osVersionInfoEx= OsVersionInfoEx.Create();
         Assert.True(Kernel32Api.GetVersionEx(ref osVersionInfoEx));

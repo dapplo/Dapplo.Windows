@@ -3,9 +3,5 @@
     <Description>Dapplo.Windows.InstallerManager provides APIs for installers to manage application restarts using Windows Restart Manager.</Description>
     <PackageTags>windows native restart-manager installer</PackageTags>
     <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
-  </ItemGroup>
 </Project>

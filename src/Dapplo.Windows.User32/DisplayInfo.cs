@@ -57,7 +57,7 @@ public class DisplayInfo
     /// <summary>
     /// Index of the Display, as specified in the "control panel".
     /// </summary>
-    public int? Index { get; set; }
+    public int Index { get; set; }
 
     /// <summary>
     ///     Screen bounds

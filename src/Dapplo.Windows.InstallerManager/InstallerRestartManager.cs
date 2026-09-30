@@ -1,4 +1,4 @@
-// Copyright (c) Dapplo and contributors. All rights reserved.
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using Dapplo.Windows.Kernel32.Enums;
-using Dapplo.Windows.Kernel32.Structs;
+using System.Threading;
+using Dapplo.Windows.InstallerManager.Enums;
+using Dapplo.Windows.InstallerManager.Structs;
 
-using Dapplo.Windows.Kernel32;
 namespace Dapplo.Windows.InstallerManager;
 
 /// <summary>
@@ -27,7 +27,7 @@ namespace Dapplo.Windows.InstallerManager;
 ///         
 ///         foreach (var process in processes)
 ///         {
-///             Console.WriteLine($"Process {process.strAppName} (PID: {process.Process.dwProcessId}) is using the file");
+///             Console.WriteLine($"Process {process.AppName} (PID: {process.Process.ProcessId}) is using the file");
 ///         }
 ///     }
 ///     </code>
@@ -35,7 +35,8 @@ namespace Dapplo.Windows.InstallerManager;
 public sealed class InstallerRestartManager : IDisposable
 {
     private const int ErrorMoreData = 234;
-    
+    private const int MaxGetListAttempts = 5;
+
     private int _sessionHandle = RestartManagerApi.RmInvalidSession;
     private readonly string _sessionKey;
     private bool _disposed;
@@ -181,35 +182,7 @@ public sealed class InstallerRestartManager : IDisposable
     /// <returns>A list of RmProcessInfo structures describing the affected applications.</returns>
     /// <exception cref="ObjectDisposedException">Thrown when the session has been disposed.</exception>
     /// <exception cref="Win32Exception">Thrown when the list could not be retrieved.</exception>
-    public IReadOnlyList<RmProcessInfo> GetProcessesUsingResources()
-    {
-        ThrowIfDisposed();
-
-        uint pnProcInfo = 0;
-        var result = RestartManagerApi.RmGetList(_sessionHandle, out var pnProcInfoNeeded, ref pnProcInfo, null, out _);
-
-        if (result != 0 && result != ErrorMoreData)
-        {
-            throw new Win32Exception(result, "Failed to get list size from Restart Manager");
-        }
-
-        if (pnProcInfoNeeded == 0)
-        {
-            return Array.Empty<RmProcessInfo>();
-        }
-
-        var processInfo = new RmProcessInfo[pnProcInfoNeeded];
-        pnProcInfo = pnProcInfoNeeded;
-
-        result = RestartManagerApi.RmGetList(_sessionHandle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, out _);
-
-        if (result != 0)
-        {
-            throw new Win32Exception(result, "Failed to get process list from Restart Manager");
-        }
-
-        return processInfo.Take((int)pnProcInfo).ToList();
-    }
+    public IReadOnlyList<RmProcessInfo> GetProcessesUsingResources() => GetProcessesUsingResources(out _);
 
     /// <summary>
     ///     Gets a list of all applications and services using the registered resources, along with the reboot reason.
@@ -225,37 +198,44 @@ public sealed class InstallerRestartManager : IDisposable
         uint pnProcInfo = 0;
         var result = RestartManagerApi.RmGetList(_sessionHandle, out var pnProcInfoNeeded, ref pnProcInfo, null, out rebootReason);
 
-        if (result != 0 && result != ErrorMoreData)
+        // The list can grow between the size query and the actual call (a process starts using a resource),
+        // in that case RmGetList returns ERROR_MORE_DATA again and the call is retried with the new size.
+        for (var attempt = 0; result == ErrorMoreData && attempt < MaxGetListAttempts; attempt++)
         {
-            throw new Win32Exception(result, "Failed to get list size from Restart Manager");
+            if (pnProcInfoNeeded == 0)
+            {
+                break;
+            }
+            var processInfo = new RmProcessInfo[pnProcInfoNeeded];
+            pnProcInfo = pnProcInfoNeeded;
+            result = RestartManagerApi.RmGetList(_sessionHandle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, out rebootReason);
+            if (result == 0)
+            {
+                return processInfo.Take((int)pnProcInfo).ToList();
+            }
         }
-
-        if (pnProcInfoNeeded == 0)
-        {
-            return Array.Empty<RmProcessInfo>();
-        }
-
-        var processInfo = new RmProcessInfo[pnProcInfoNeeded];
-        pnProcInfo = pnProcInfoNeeded;
-
-        result = RestartManagerApi.RmGetList(_sessionHandle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, out rebootReason);
 
         if (result != 0)
         {
             throw new Win32Exception(result, "Failed to get process list from Restart Manager");
         }
 
-        return processInfo.Take((int)pnProcInfo).ToList();
+        // Success with an empty buffer means nothing is using the registered resources
+        return Array.Empty<RmProcessInfo>();
     }
 
     /// <summary>
     ///     Shuts down the applications and services using the registered resources.
     /// </summary>
-    /// <param name="shutdownType">Flags controlling the shutdown behavior.</param>
+    /// <param name="shutdownType">
+    ///     Flags controlling the shutdown behavior. The default, <see cref="RmShutdownType.Graceful"/>, asks the applications to close
+    ///     and fails (ERROR_FAIL_SHUTDOWN) when one of them refuses, so no unsaved data is lost.
+    ///     Pass <see cref="RmShutdownType.RmForceShutdown"/> to explicitly opt in to killing unresponsive applications.
+    /// </param>
     /// <param name="statusCallback">Optional callback to receive progress updates (0-100).</param>
     /// <exception cref="ObjectDisposedException">Thrown when the session has been disposed.</exception>
-    /// <exception cref="Win32Exception">Thrown when the shutdown failed.</exception>
-    public void Shutdown(RmShutdownType shutdownType = RmShutdownType.RmForceShutdown, Action<uint> statusCallback = null)
+    /// <exception cref="Win32Exception">Thrown when the shutdown failed, e.g. because an application refused to close.</exception>
+    public void Shutdown(RmShutdownType shutdownType = RmShutdownType.Graceful, Action<uint> statusCallback = null)
     {
         ThrowIfDisposed();
 
@@ -266,6 +246,7 @@ public sealed class InstallerRestartManager : IDisposable
         }
 
         var result = RestartManagerApi.RmShutdown(_sessionHandle, shutdownType, callback);
+        GC.KeepAlive(callback);
 
         if (result != 0)
         {
@@ -290,6 +271,7 @@ public sealed class InstallerRestartManager : IDisposable
         }
 
         var result = RestartManagerApi.RmRestart(_sessionHandle, 0, callback);
+        GC.KeepAlive(callback);
 
         if (result != 0)
         {
@@ -299,6 +281,8 @@ public sealed class InstallerRestartManager : IDisposable
 
     /// <summary>
     ///     Checks if a reboot would be required to complete the operation.
+    ///     This queries the Restart Manager every time (the state can change), when you also need the process list
+    ///     use <see cref="GetProcessesUsingResources(out RmRebootReason)"/> instead to avoid a second query.
     /// </summary>
     /// <returns>True if a reboot is required, false otherwise.</returns>
     /// <exception cref="ObjectDisposedException">Thrown when the session has been disposed.</exception>
@@ -311,6 +295,8 @@ public sealed class InstallerRestartManager : IDisposable
 
     /// <summary>
     ///     Gets the reason why a reboot would be required.
+    ///     This queries the Restart Manager every time (the state can change), when you also need the process list
+    ///     use <see cref="GetProcessesUsingResources(out RmRebootReason)"/> instead to avoid a second query.
     /// </summary>
     /// <returns>Flags indicating the reboot reason.</returns>
     /// <exception cref="ObjectDisposedException">Thrown when the session has been disposed.</exception>
@@ -338,13 +324,25 @@ public sealed class InstallerRestartManager : IDisposable
         {
             return;
         }
-
-        if (_sessionHandle != RestartManagerApi.RmInvalidSession)
-        {
-            RestartManagerApi.RmEndSession(_sessionHandle);
-            _sessionHandle = RestartManagerApi.RmInvalidSession;
-        }
-
         _disposed = true;
+        EndSession();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Ends the Restart Manager session if the instance was not disposed, a leaked session would otherwise stay open until the process exits.
+    /// </summary>
+    ~InstallerRestartManager()
+    {
+        EndSession();
+    }
+
+    private void EndSession()
+    {
+        var sessionHandle = Interlocked.Exchange(ref _sessionHandle, RestartManagerApi.RmInvalidSession);
+        if (sessionHandle != RestartManagerApi.RmInvalidSession)
+        {
+            RestartManagerApi.RmEndSession(sessionHandle);
+        }
     }
 }

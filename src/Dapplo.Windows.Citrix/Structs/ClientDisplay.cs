@@ -21,7 +21,8 @@ public struct ClientDisplay
     public NativeSize ClientSize => new NativeSize((int)_horizontalResolution, (int)_verticalResolution);
 
     /// <summary>
-    ///     Returns the number of colors the client can display
+    ///     Returns the color depth of the client display, in bits per pixel.
+    ///     The native WF color-depth codes (1, 2, 4, 8, 16, 24) are mapped to 4, 8, 16, 24, 15 and 32 bpp.
     /// </summary>
     public uint ColorDepth
     {
@@ -31,7 +32,8 @@ public struct ClientDisplay
                 2 => 8,
                 4 => 16,
                 8 => 24,
-                16 => 32,
+                16 => 15,
+                24 => 32,
                 _ => _colorDepth
             };
     }

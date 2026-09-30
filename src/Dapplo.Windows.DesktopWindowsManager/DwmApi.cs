@@ -66,8 +66,9 @@ public static class DwmApi
         {
             // According to: http://technet.microsoft.com/en-us/subscriptions/aa969538%28v=vs.85%29.aspx
             // And: http://msdn.microsoft.com/en-us/library/windows/desktop/aa969510%28v=vs.85%29.aspx
-            // DMW is always enabled on Windows 8! So return true and save a check! ;-)
-            if (WindowsVersion.IsWindows8X)
+            // DWM is always enabled on Windows 8 and later, DwmIsCompositionEnabled could even report FALSE there
+            // when the host has no Windows 8+ compatibility manifest. So return true and save a check.
+            if (WindowsVersion.IsWindows8OrLater)
             {
                 return true;
             }
@@ -76,8 +77,7 @@ public static class DwmApi
                 return false;
             }
 
-            DwmIsCompositionEnabled(out var dwmEnabled);
-            return dwmEnabled;
+            return DwmIsCompositionEnabled(out var dwmEnabled).Succeeded() && dwmEnabled;
         }
     }
 
@@ -97,7 +97,7 @@ public static class DwmApi
     /// <param name="hWnd">The handle to the window on which the blur behind data is applied.</param>
     /// <param name="blurBehind">DwmBlurBehind</param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmEnableBlurBehindWindow(IntPtr hWnd, ref DwmBlurBehind blurBehind);
 
     /// <summary>
@@ -114,7 +114,7 @@ public static class DwmApi
     ///     disable composition.
     /// </param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmEnableComposition(uint uCompositionAction);
 
     /// <summary>
@@ -130,7 +130,7 @@ public static class DwmApi
     /// </param>
     /// <param name="size"></param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmGetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttribute, out NativeRect lpRect, int size);
 
     /// <summary>
@@ -144,7 +144,7 @@ public static class DwmApi
     /// </param>
     /// <param name="size"></param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmGetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttribute, out bool pvAttribute, int size);
 
     /// <summary>
@@ -158,7 +158,7 @@ public static class DwmApi
     /// </param>
     /// <param name="size"></param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmGetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttribute, out uint pvAttribute, int size);
 
     /// <summary>
@@ -182,26 +182,8 @@ public static class DwmApi
     /// </summary>
     /// <param name="pfEnabled">out bool to get the current state</param>
     /// <returns>If this function succeeds, it returns S_OK. Otherwise, it returns an HRESULT error code.</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     private static extern HResult DwmIsCompositionEnabled([MarshalAs(UnmanagedType.Bool)] out bool pfEnabled);
-
-    /// <summary>
-    ///     Activate Aero Peek
-    /// </summary>
-    /// <param name="active">uint</param>
-    /// <param name="hWnd">IntPtr</param>
-    /// <param name="onTopHandle">IntPtr</param>
-    /// <param name="unknown">uint</param>
-    /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, EntryPoint = "#113", SetLastError = true)]
-    internal static extern HResult DwmpActivateLivePreview(uint active, IntPtr hWnd, IntPtr onTopHandle, uint unknown);
-
-    /// <summary>
-    ///     Activate Windows + Tab effect
-    /// </summary>
-    /// <returns>bool if it worked</returns>
-    [DllImport(DwmApiDll, EntryPoint = "#105", SetLastError = true)]
-    public static extern bool DwmpStartOrStopFlip3D();
 
     /// <summary>
     /// Retrieves the source size of the Desktop Window Manager (DWM) thumbnail.
@@ -209,7 +191,7 @@ public static class DwmApi
     /// <param name="hThumbnail">A handle to the thumbnail to retrieve the source window size from.</param>
     /// <param name="size">a NativeSize structure that, when this function returns successfully, receives the size of the source thumbnail.</param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmQueryThumbnailSourceSize(IntPtr hThumbnail, out NativeSize size);
 
     /// <summary>
@@ -219,7 +201,7 @@ public static class DwmApi
     /// <param name="hWndSource">The handle to the window to use as the thumbnail source. Setting the source window handle to anything other than a top-level window type will result in a return value of E_INVALIDARG.</param>
     /// <param name="phThumbnailId">A pointer to a handle that, when this function returns successfully, represents the registration of the DWM thumbnail.</param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmRegisterThumbnail(IntPtr hWndDestination, IntPtr hWndSource, out IntPtr phThumbnailId);
 
     /// <summary>
@@ -240,7 +222,7 @@ public static class DwmApi
     /// </param>
     /// <param name="setIconicLivePreviewFlags">The display options for the live preview.</param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     internal static extern HResult DwmSetIconicLivePreviewBitmap(IntPtr hWnd, IntPtr hBitmap, ref NativePoint ptClient, DwmSetIconicLivePreviewFlags setIconicLivePreviewFlags);
 
     /// <summary>
@@ -262,7 +244,7 @@ public static class DwmApi
     /// </param>
     /// <param name="cbAttribute">The size, in bytes, of the value type pointed to by the pvAttribute parameter.</param>
     /// <returns></returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmSetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttributeToSet, IntPtr pvAttributeValue, int cbAttribute);
 
     /// <summary>
@@ -274,7 +256,7 @@ public static class DwmApi
     /// <param name="pvAttributeValue">uint with the value of the attribute specified in the dwAttributeToSet parameter.</param>
     /// <param name="cbAttribute">The size, in bytes, of the value, this should be sizeof(uint).</param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmSetWindowAttribute(IntPtr hWnd, DwmWindowAttributes dwAttributeToSet, ref uint pvAttributeValue, int cbAttribute);
 
     /// <summary>
@@ -282,7 +264,7 @@ public static class DwmApi
     /// </summary>
     /// <param name="hThumbnailId">The handle to the thumbnail relationship to be removed. Null or non-existent handles will result in a return value of E_INVALIDARG.</param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmUnregisterThumbnail(IntPtr hThumbnailId);
 
     /// <summary>
@@ -291,7 +273,7 @@ public static class DwmApi
     /// <param name="hThumbnailId">IntPtr The handle to the DWM thumbnail to be updated. Null or invalid thumbnails, as well as thumbnails owned by other processes will result in a return value of E_INVALIDARG.</param>
     /// <param name="props">A pointer to a DwmThumbnailProperties structure that contains the new thumbnail properties.</param>
     /// <returns>HResult</returns>
-    [DllImport(DwmApiDll, SetLastError = true)]
+    [DllImport(DwmApiDll)]
     public static extern HResult DwmUpdateThumbnailProperties(IntPtr hThumbnailId, ref DwmThumbnailProperties props);
 
     /// <summary>
@@ -327,8 +309,9 @@ public static class DwmApi
         {
             return false;
         }
-        DwmGetWindowAttribute(hWnd, DwmWindowAttributes.Cloaked, out bool isCloaked, Marshal.SizeOf(typeof(bool)));
-        return isCloaked;
+        // DWMWA_CLOAKED returns a DWORD with the DWM_CLOAKED_* reason flags, 0 means not cloaked
+        var result = DwmGetWindowAttribute(hWnd, DwmWindowAttributes.Cloaked, out uint cloakedReasons, sizeof(uint));
+        return result.Succeeded() && cloakedReasons != 0;
     }
 
     /// <summary>
@@ -364,34 +347,4 @@ public static class DwmApi
         var result = DwmSetWindowAttribute(hWnd, DwmWindowAttributes.WindowCornerPreference, ref cornerPreference, sizeof(uint));
         return result.Succeeded();
     }
-
-    /// <summary>
-    /// Retrieves the shared surface of the specified hWnd, maybe https://github.com/notr1ch/DWMCapture can help on the usage.
-    /// http://undoc.airesoft.co.uk/user32.dll/DwmGetDxSharedSurface.php?
-    /// </summary>
-    /// <param name="hWnd">IntPtr</param>
-    /// <param name="adapterLuid"></param>
-    /// <param name="one"></param>
-    /// <param name="two"></param>
-    /// <param name="pD3DFormat"></param>
-    /// <param name="pSharedHandle"></param>
-    /// <param name="unknown"></param>
-    /// <returns></returns>
-    [PreserveSig]
-    [DllImport(DwmApiDll, EntryPoint = "#100", SetLastError = true)]
-    public static extern int GetSharedSurface(IntPtr hWnd, long adapterLuid, uint one, uint two, [In] [Out] ref uint pD3DFormat, [Out] out IntPtr pSharedHandle, ulong unknown);
-
-    /// <summary>
-    /// maybe https://github.com/notr1ch/DWMCapture can help on the usage.
-    /// </summary>
-    /// <param name="hWnd">IntPtr</param>
-    /// <param name="one"></param>
-    /// <param name="two"></param>
-    /// <param name="three"></param>
-    /// <param name="hMonitor"></param>
-    /// <param name="unknown"></param>
-    /// <returns></returns>
-    [PreserveSig]
-    [DllImport(DwmApiDll, EntryPoint = "#101", SetLastError = true)]
-    public static extern int UpdateWindowShared(IntPtr hWnd, int one, int two, int three, IntPtr hMonitor, IntPtr unknown);
 }

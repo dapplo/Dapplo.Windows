@@ -30,7 +30,7 @@ internal sealed class ClipboardNativeInfo : IDisposable
     /// <summary>
     /// Returns the size of the clipboard area, this is the size of the allocation which can be larger than the actual data.
     /// </summary>
-    internal int Size => Kernel32Api.GlobalSize(GlobalHandle);
+    internal long Size => (long)Kernel32Api.GlobalSize(GlobalHandle).ToUInt64();
 
     /// <summary>
     /// Place the written memory on the clipboard, after this the memory is owned by the system.

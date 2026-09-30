@@ -21,5 +21,5 @@ public enum ExtendedMouseFlags : uint
     /// <summary>
     ///     Test the event-injected (from a process running at lower integrity level) flag.
     /// </summary>
-    LowerIntegretyInjected = 0x02
+    LowerIntegrityInjected = 0x02
 }

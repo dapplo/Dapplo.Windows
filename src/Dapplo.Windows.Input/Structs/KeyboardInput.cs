@@ -152,7 +152,7 @@ public struct KeyboardInput
             case VirtualKeyCode.Up:
             case VirtualKeyCode.Right:
             case VirtualKeyCode.Down:
-            case VirtualKeyCode.Snapshot:
+            case VirtualKeyCode.PrintScreen:
             case VirtualKeyCode.Insert:
             case VirtualKeyCode.Delete:
             case VirtualKeyCode.LeftWin:

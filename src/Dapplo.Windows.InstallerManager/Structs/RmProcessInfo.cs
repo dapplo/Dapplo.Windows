@@ -3,9 +3,9 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Kernel32.Enums;
+using Dapplo.Windows.InstallerManager.Enums;
 
-namespace Dapplo.Windows.Kernel32.Structs;
+namespace Dapplo.Windows.InstallerManager.Structs;
 
 /// <summary>
 ///     Describes an application that is to be registered with the Restart Manager.
@@ -31,14 +31,14 @@ public struct RmProcessInfo
     ///     If the process is not a service, this parameter returns the user-friendly name for the application.
     /// </summary>
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CchRmMaxAppName)]
-    public string strAppName;
+    public string AppName;
 
     /// <summary>
     ///     If the process is a service, this is the short name for the service.
     ///     This member is not used if the process is not a service.
     /// </summary>
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CchRmMaxSvcName)]
-    public string strServiceShortName;
+    public string ServiceShortName;
 
     /// <summary>
     ///     Contains an RM_APP_TYPE enumeration value that specifies the type of application as RmUnknownApp, RmMainWindow, RmOtherWindow, RmService, RmExplorer or RmCritical.
@@ -55,7 +55,7 @@ public struct RmProcessInfo
     ///     If the terminal session of the process cannot be determined, the value of this member is set to RM_INVALID_SESSION (-1).
     ///     This member is not used if the process is a service or a system critical process.
     /// </summary>
-    public uint TSSessionId;
+    public uint TerminalServicesSessionId;
 
     /// <summary>
     ///     TRUE if the application can be restarted by the Restart Manager; otherwise, FALSE.
@@ -63,5 +63,5 @@ public struct RmProcessInfo
     ///     This member is always FALSE if the process is a critical system process.
     /// </summary>
     [MarshalAs(UnmanagedType.Bool)]
-    public bool bRestartable;
+    public bool IsRestartable;
 }

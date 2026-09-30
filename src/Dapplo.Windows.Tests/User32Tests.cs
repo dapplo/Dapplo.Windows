@@ -39,33 +39,8 @@ public class User32Tests
     ///     Test GetWindow
     /// </summary>
     /// <returns></returns>
-    //[Fact]
-    private void TestDetectChanges()
-    {
-        bool foundWindow;
-        var initialWindows = InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()).ToList();
-
-        while (true)
-        {
-            Thread.Sleep(1000);
-            var newWindow = InteropWindowQuery.GetTopWindows().FirstOrDefault(window => window.IsVisible() && !initialWindows.Contains(window));
-            if (newWindow != null)
-            {
-                foundWindow = true;
-                Log.Debug().WriteLine("{0}", newWindow.Dump());
-                break;
-            }
-        }
-
-        Assert.True(foundWindow);
-    }
-
-    /// <summary>
-    ///     Test GetWindow
-    /// </summary>
-    /// <returns></returns>
     [Fact]
-    private void TestGetTopLevelWindows()
+    public void TestGetTopLevelWindows()
     {
         var foundWindow = false;
         foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()))
@@ -84,7 +59,7 @@ public class User32Tests
     /// </summary>
     /// <returns></returns>
     [Fact]
-    private void TestWindowPlacement_TypeConverter()
+    public void TestWindowPlacement_TypeConverter()
     {
         var windowPlacement = WindowPlacement.Create();
         windowPlacement.MinPosition = new NativePoint(10, 10);

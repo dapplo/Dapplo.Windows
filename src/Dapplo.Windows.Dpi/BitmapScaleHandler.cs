@@ -70,7 +70,10 @@ namespace Dapplo.Windows.Dpi
 
     /// <summary>
     ///     This provides bitmaps scaled according to the current DPI.
-    ///     If the DPI changes, it will reapply the bitmaps and dispose the old ones (if needed).
+    ///     If the DPI changes, it will reapply the bitmaps and dispose the old ones.
+    ///     The BitmapScaleHandler owns every value which the provider and the scaler return: they are cached per DPI, and disposed when the DPI changes or the handler is disposed.
+    ///     When the scaler returns a new instance, the one from the provider is disposed directly. So the provider must return a new instance for every call (not a shared one).
+    ///     Dispose the handler on the UI thread (e.g. when the form closes), it assigns the default value to all targets.
     /// </summary>
     public sealed class BitmapScaleHandler<TKey, TValue> : IDisposable where TValue : IDisposable
     {
@@ -171,13 +174,18 @@ namespace Dapplo.Windows.Dpi
         }
 
         /// <summary>
-        ///     Dispose implementation
+        ///     Stop processing DPI changes, assign the default value to all targets, and dispose all cached bitmaps.
+        ///     Call this on the UI thread.
         /// </summary>
         public void Dispose()
         {
+            if (_areWeDisposing)
+            {
+                return;
+            }
             _dpiChangeSubscription?.Dispose();
-            ReleaseUnmanagedResources();
-            GC.SuppressFinalize(this);
+            _dpiChangeSubscription = null;
+            ReleaseResources();
         }
 
         /// <summary>
@@ -223,13 +231,6 @@ namespace Dapplo.Windows.Dpi
             }
         }
 
-        /// <inheritdoc />
-        ~BitmapScaleHandler()
-        {
-            _dpiChangeSubscription?.Dispose();
-            ReleaseUnmanagedResources();
-        }
-
         /// <summary>
         ///     Get bitmaps for displaying
         /// </summary>
@@ -255,14 +256,18 @@ namespace Dapplo.Windows.Dpi
                     return default;
                 }
 
+                result = image;
                 if (BitmapScaler != null)
                 {
-                    result = BitmapScaler.Invoke(image, _dpi);
+                    var scaled = BitmapScaler.Invoke(image, _dpi);
+                    if (scaled != null && !ReferenceEquals(image, scaled))
+                    {
+                        // The original is replaced by the scaled one, and no longer needed
+                        image.Dispose();
+                        result = scaled;
+                    }
                 }
-                if (result == null || Equals(image, result))
-                {
-                    return image;
-                }
+                // Cache what is returned, so it is reused and disposed when the DPI changes
                 try
                 {
                     _imagesLock.EnterWriteLock();
@@ -288,8 +293,9 @@ namespace Dapplo.Windows.Dpi
         /// <param name="bitmapScaler">A function to provide a newly scaled bitmap</param>
         internal void Initialize(DpiHandler dpiHandler, Func<TKey, int, TValue> bitmapProvider, Func<TValue, int, TValue> bitmapScaler = null)
         {
-            BitmapProvider = bitmapProvider;
+            BitmapProvider = bitmapProvider ?? throw new ArgumentNullException(nameof(bitmapProvider));
             BitmapScaler = bitmapScaler;
+            _dpi = dpiHandler?.Dpi ?? DpiCalculator.DefaultScreenDpi;
             if (dpiHandler != null)
             {
                 _dpiChangeSubscription = dpiHandler.OnDpiChanged.Subscribe(ProcessDpiChange);
@@ -299,7 +305,7 @@ namespace Dapplo.Windows.Dpi
         /// <summary>
         ///     Cleanup the images, they are no longer needed
         /// </summary>
-        private void ReleaseUnmanagedResources()
+        private void ReleaseResources()
         {
             _areWeDisposing = true;
 

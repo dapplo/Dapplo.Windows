@@ -42,10 +42,11 @@ public class DpiTests
     {
         var size96 = DpiCalculator.UnscaleWithDpi(16, 96);
         Assert.Equal(16, size96);
+        // 12.8 and 10.67 are rounded, not truncated
         var size120 = DpiCalculator.UnscaleWithDpi(16, 120);
-        Assert.Equal(12, size120);
+        Assert.Equal(13, size120);
         var size144 = DpiCalculator.UnscaleWithDpi(16, 144);
-        Assert.Equal(10, size144);
+        Assert.Equal(11, size144);
         var size192 = DpiCalculator.UnscaleWithDpi(16, 192);
         Assert.Equal(8, size192);
     }

@@ -12,11 +12,7 @@
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Shell32\Dapplo.Windows.Shell32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
-	<ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj" />
-	<ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+    <ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System.Drawing" />

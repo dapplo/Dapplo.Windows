@@ -7,6 +7,10 @@
     <TestTfmsInParallel>false</TestTfmsInParallel>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
+    <!-- Per-monitor DPI awareness and comctl32 v6 for both target frameworks, the app.config DpiAwareness setting only applies to WinForms on .NET Framework -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- WFO0003: the test runner generates Main, so Application.SetHighDpiMode can't be used, the manifest is the only way to set the DPI awareness before any window exists -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
@@ -34,7 +38,6 @@
     <ProjectReference Include="..\Dapplo.Windows.Wpf\Dapplo.Windows.Wpf.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="System.Reactive" Version="6.1.0" />
     <PackageReference Include="Dapplo.Log.Loggers" Version="3.0.22" />
     <PackageReference Include="Dapplo.Log.XUnit" Version="3.0.22" />

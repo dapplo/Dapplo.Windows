@@ -25,19 +25,16 @@ public static class GdiPlusApi
     private static readonly LogSource Log = new LogSource();
     private static readonly Guid BlurEffectGuid = new("{633C80A4-1843-482B-9EF2-BE2834C5FDD4}");
 
-    // Constant "FieldInfo" for getting the nativeImage from the Bitmap
-    private static readonly FieldInfo FieldInfoNativeImage = typeof(Bitmap).GetField("nativeImage", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
+    // System.Drawing has no public API to get the native GDI+ handles, the names of the internal members differ per framework:
+    // .NET Framework: fields nativeImage (in Image), nativeGraphics, nativeMatrix and nativeImageAttributes, all IntPtr
+    // System.Drawing.Common 9+ (dotnet/winforms): the internal IPointer<T> interface for Image and Graphics,
+    // the field _nativeImage, the properties NativeGraphics and NativeMatrix and the field _nativeImageAttributes, these are pointers.
+    private static readonly Func<object, IntPtr> NativeImageAccessor = CreateNativeHandleAccessor(typeof(Bitmap), "nativeImage", "_nativeImage", "NativeImage");
+    private static readonly Func<object, IntPtr> NativeGraphicsAccessor = CreateNativeHandleAccessor(typeof(Graphics), "nativeGraphics", "NativeGraphics", "_nativeGraphics");
+    private static readonly Func<object, IntPtr> NativeMatrixAccessor = CreateNativeHandleAccessor(typeof(Matrix), "nativeMatrix", "NativeMatrix", "_nativeMatrix");
+    private static readonly Func<object, IntPtr> NativeImageAttributesAccessor = CreateNativeHandleAccessor(typeof(ImageAttributes), "nativeImageAttributes", "_nativeImageAttributes", "NativeImageAttributes");
 
-    // Constant "FieldInfo" for getting the NativeGraphics from the Graphics
-    private static readonly FieldInfo FieldInfoNativeGraphics = typeof(Graphics).GetField("nativeGraphics", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
-
-    // Constant "FieldInfo" for getting the nativeMatrix from the Matrix
-    private static readonly FieldInfo FieldInfoNativeMatrix = typeof(Matrix).GetField("nativeMatrix", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
-
-    // Constant "FieldInfo" for getting the nativeImageAttributes from the ImageAttributes
-    private static readonly FieldInfo FieldInfoNativeImageAttributes = typeof(ImageAttributes).GetField("nativeImageAttributes", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
-
-    private static bool _isBlurEnabled = WindowsVersion.IsWindowsVistaOrLater;
+    private static bool _isBlurEnabled = WindowsVersion.IsWindowsVistaOrLater && AreNativeHandlesAvailable();
 
     /// <summary>
     ///     Use the GDI+ blur effect on the bitmap
@@ -154,7 +151,7 @@ public static class GdiPlusApi
             // Allocate space in unmanaged memory
             hBlurParams = Marshal.AllocHGlobal(Marshal.SizeOf(blurParams));
             // Copy the structure to the unmanaged memory
-            Marshal.StructureToPtr(blurParams, hBlurParams, true);
+            Marshal.StructureToPtr(blurParams, hBlurParams, false);
 
             // Create the GDI+ BlurEffect, using the Guid
             var status = GdipCreateEffect(BlurEffectGuid, out hEffect);
@@ -241,60 +238,137 @@ public static class GdiPlusApi
     private static extern GdiPlusStatus GdipSetEffectParameters(IntPtr effect, IntPtr parameters, uint size);
 
     /// <summary>
-    ///     Get the NativeGraphics field from the graphics
+    ///     Checks if the native GDI+ handles of the System.Drawing objects, which are needed for the blur, can be retrieved in the current framework.
+    /// </summary>
+    /// <returns>true if the native handles for Bitmap, Graphics, Matrix and ImageAttributes are available</returns>
+    public static bool AreNativeHandlesAvailable()
+    {
+        return NativeImageAccessor != null && NativeGraphicsAccessor != null && NativeMatrixAccessor != null && NativeImageAttributesAccessor != null;
+    }
+
+    /// <summary>
+    ///     Create an accessor for the native GDI+ handle of the specified System.Drawing type.
+    ///     First the internal IPointer&lt;T&gt; interface (System.Drawing.Common 9+) is tried, than fields and properties with the specified names in the type hierarchy.
+    /// </summary>
+    /// <param name="type">Type</param>
+    /// <param name="memberNames">string array with the possible names of the member which holds the handle</param>
+    /// <returns>Func which returns the handle, or null if not found</returns>
+    private static Func<object, IntPtr> CreateNativeHandleAccessor(Type type, params string[] memberNames)
+    {
+        try
+        {
+            // System.Drawing.Common 9+ implements the internal Windows.Win32.Foundation.IPointer<T> interface, explicitly
+            foreach (var interfaceType in type.GetInterfaces())
+            {
+                if (!interfaceType.IsGenericType || interfaceType.Name != "IPointer`1")
+                {
+                    continue;
+                }
+                var pointerProperty = interfaceType.GetProperty("Pointer");
+                if (pointerProperty == null)
+                {
+                    continue;
+                }
+                return instance => ToIntPtr(pointerProperty.GetValue(instance));
+            }
+
+            const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly;
+            foreach (var memberName in memberNames)
+            {
+                for (var currentType = type; currentType != null && currentType != typeof(object); currentType = currentType.BaseType)
+                {
+                    var field = currentType.GetField(memberName, bindingFlags);
+                    if (field != null && IsHandleType(field.FieldType))
+                    {
+                        return instance => ToIntPtr(field.GetValue(instance));
+                    }
+                    var property = currentType.GetProperty(memberName, bindingFlags);
+                    if (property != null && property.GetIndexParameters().Length == 0 && property.GetGetMethod(true) != null && IsHandleType(property.PropertyType))
+                    {
+                        return instance => ToIntPtr(property.GetValue(instance));
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warn().WriteLine(ex, "Couldn't find the native GDI+ handle of {0}", type.FullName);
+            return null;
+        }
+        Log.Warn().WriteLine("Couldn't find the native GDI+ handle of {0}, the GDI+ blur effect is not available.", type.FullName);
+        return null;
+    }
+
+    /// <summary>
+    ///     Check if the type can hold a native handle
+    /// </summary>
+    /// <param name="type">Type</param>
+    /// <returns>bool</returns>
+    private static bool IsHandleType(Type type) => type == typeof(IntPtr) || type == typeof(UIntPtr) || type.IsPointer;
+
+    /// <summary>
+    ///     Convert the value of a handle field or property, which is an IntPtr or a boxed pointer, to an IntPtr
+    /// </summary>
+    /// <param name="value">object</param>
+    /// <returns>IntPtr</returns>
+    private static unsafe IntPtr ToIntPtr(object value)
+    {
+        return value switch
+        {
+            null => IntPtr.Zero,
+            IntPtr intPtr => intPtr,
+            UIntPtr uIntPtr => new IntPtr(uIntPtr.ToPointer()),
+            Pointer pointer => new IntPtr(Pointer.Unbox(pointer)),
+            _ => throw new NotSupportedException($"Can't convert {value.GetType()} to an IntPtr")
+        };
+    }
+
+    /// <summary>
+    ///     Get the native GDI+ handle of the object
+    /// </summary>
+    /// <param name="accessor">Func which retrieves the handle</param>
+    /// <param name="instance">object or null</param>
+    /// <returns>IntPtr</returns>
+    private static IntPtr GetNativeHandle(Func<object, IntPtr> accessor, object instance)
+    {
+        if (instance == null)
+        {
+            return IntPtr.Zero;
+        }
+        if (accessor == null)
+        {
+            throw new NotSupportedException($"The native GDI+ handle of {instance.GetType().FullName} is not available");
+        }
+        return accessor(instance);
+    }
+
+    /// <summary>
+    ///     Get the native GpGraphics handle from the graphics
     /// </summary>
     /// <param name="graphics"></param>
     /// <returns>IntPtr</returns>
-    private static IntPtr GetNativeGraphics(Graphics graphics)
-    {
-        if (graphics == null)
-        {
-            return IntPtr.Zero;
-        }
-        return (IntPtr) FieldInfoNativeGraphics.GetValue(graphics);
-    }
+    private static IntPtr GetNativeGraphics(Graphics graphics) => GetNativeHandle(NativeGraphicsAccessor, graphics);
 
     /// <summary>
-    ///     Get the nativeImage field from the bitmap
+    ///     Get the native GpImage handle from the bitmap
     /// </summary>
     /// <param name="bitmap">Bitmap</param>
     /// <returns>IntPtr</returns>
-    private static IntPtr GetNativeImage(Bitmap bitmap)
-    {
-        if (bitmap == null)
-        {
-            return IntPtr.Zero;
-        }
-        return (IntPtr) FieldInfoNativeImage.GetValue(bitmap);
-    }
+    private static IntPtr GetNativeImage(Bitmap bitmap) => GetNativeHandle(NativeImageAccessor, bitmap);
 
     /// <summary>
-    ///     Get the nativeImageAttributes field from the ImageAttributes
+    ///     Get the native GpImageAttributes handle from the ImageAttributes
     /// </summary>
     /// <param name="imageAttributes">ImageAttributes</param>
     /// <returns>IntPtr</returns>
-    private static IntPtr GetNativeImageAttributes(ImageAttributes imageAttributes)
-    {
-        if (imageAttributes == null)
-        {
-            return IntPtr.Zero;
-        }
-        return (IntPtr) FieldInfoNativeImageAttributes.GetValue(imageAttributes);
-    }
+    private static IntPtr GetNativeImageAttributes(ImageAttributes imageAttributes) => GetNativeHandle(NativeImageAttributesAccessor, imageAttributes);
 
     /// <summary>
-    ///     Get the nativeMatrix field from the matrix
+    ///     Get the native GpMatrix handle from the matrix
     /// </summary>
     /// <param name="matrix">Matrix</param>
     /// <returns>IntPtr</returns>
-    private static IntPtr GetNativeMatrix(Matrix matrix)
-    {
-        if (matrix == null)
-        {
-            return IntPtr.Zero;
-        }
-        return (IntPtr) FieldInfoNativeMatrix.GetValue(matrix);
-    }
+    private static IntPtr GetNativeMatrix(Matrix matrix) => GetNativeHandle(NativeMatrixAccessor, matrix);
 
     /// <summary>
     ///     Returns if a GDIPlus blur can be made for the supplied radius.

@@ -113,7 +113,7 @@ public readonly struct NativePointFloat : IEquatable<NativePointFloat>
     {
         unchecked
         {
-            return (_x.GetHashCode() * 397) ^ _y.GetHashCode();
+            return (FloatHelper.GetHashCode(_x) * 397) ^ FloatHelper.GetHashCode(_y);
         }
     }
 
@@ -125,7 +125,7 @@ public readonly struct NativePointFloat : IEquatable<NativePointFloat>
     [Pure]
     public bool Equals(NativePointFloat other)
     {
-        return Math.Abs(X - other.X) < float.Epsilon && Math.Abs(Y - other.Y) < float.Epsilon;
+        return _x.Equals(other._x) && _y.Equals(other._y);
     }
 
     /// <summary>

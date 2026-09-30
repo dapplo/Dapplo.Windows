@@ -1,6 +1,7 @@
 // Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Icons.Structs;
@@ -64,6 +65,7 @@ public struct GrpIconDirEntry
     /// Creates a new GRPICONDIRENTRY for an icon resource
     /// </summary>
     /// <param name="width">Width in pixels (1-256)</param>
+    /// <exception cref="ArgumentOutOfRangeException">when width or height is not in the range 1-256</exception>
     /// <param name="height">Height in pixels (1-256)</param>
     /// <param name="bitCount">Bits per pixel (typically 32 for modern icons)</param>
     /// <param name="imageSize">Size of the image data in bytes</param>
@@ -73,8 +75,8 @@ public struct GrpIconDirEntry
     {
         return new GrpIconDirEntry
         {
-            Width = width == 256 ? (byte)0 : (byte)width,
-            Height = height == 256 ? (byte)0 : (byte)height,
+            Width = IconDirEntry.ToDirectorySize(width, nameof(width)),
+            Height = IconDirEntry.ToDirectorySize(height, nameof(height)),
             ColorCount = 0, // 0 for PNG and modern formats
             Reserved = 0,
             Planes = 0, // 0 or 1 for icons
@@ -88,6 +90,7 @@ public struct GrpIconDirEntry
     /// Creates a new GRPICONDIRENTRY for a cursor resource
     /// </summary>
     /// <param name="width">Width in pixels (1-256)</param>
+    /// <exception cref="ArgumentOutOfRangeException">when width or height is not in the range 1-256</exception>
     /// <param name="height">Height in pixels (1-256)</param>
     /// <param name="hotspotX">Horizontal coordinate of the hotspot</param>
     /// <param name="hotspotY">Vertical coordinate of the hotspot</param>
@@ -103,8 +106,8 @@ public struct GrpIconDirEntry
     {
         return new GrpIconDirEntry
         {
-            Width = width == 256 ? (byte)0 : (byte)width,
-            Height = height == 256 ? (byte)0 : (byte)height,
+            Width = IconDirEntry.ToDirectorySize(width, nameof(width)),
+            Height = IconDirEntry.ToDirectorySize(height, nameof(height)),
             ColorCount = 0,
             Reserved = 0,
             Planes = hotspotX, // For cursors, Planes is hotspot X

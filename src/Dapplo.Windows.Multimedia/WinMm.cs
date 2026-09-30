@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
 using Dapplo.Windows.Multimedia.Enums;
 
 namespace Dapplo.Windows.Multimedia;
@@ -28,12 +27,21 @@ public static class WinMm
     }
 
     /// <summary>
-    /// Play a resource
+    /// Play a native (Win32) WAVE resource asynchronously.
     /// </summary>
-    /// <param name="resource">Resource to play</param>
-    public static void Play(string resource)
+    /// <param name="resource">Name of the WAVE resource to play</param>
+    /// <param name="moduleHandle">
+    /// Handle (HMODULE) of the executable or DLL which contains the resource,
+    /// <see cref="IntPtr.Zero"/> (default) uses the executable of the current process.
+    /// </param>
+    /// <returns>bool true if the sound started playing</returns>
+    public static bool Play(string resource, IntPtr moduleHandle = default)
     {
-        PlaySound(resource, UIntPtr.Zero, SoundSettings.Resource | SoundSettings.Async);
+        if (moduleHandle == IntPtr.Zero)
+        {
+            moduleHandle = GetModuleHandle(null);
+        }
+        return PlaySound(resource, new UIntPtr((ulong)moduleHandle.ToInt64()), SoundSettings.Resource | SoundSettings.Async);
     }
 
     /// <summary>
@@ -113,7 +121,7 @@ public static class WinMm
     /// <param name="hmod">Handle to the executable file that contains the resource to be loaded. This parameter must be NULL unless SND_RESOURCE is specified in fdwSound.</param>
     /// <param name="fdwSound">Flags for playing the sound.</param>
     /// <returns>Returns TRUE if successful or FALSE otherwise.</returns>
-    [DllImport("winmm", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport("winmm", CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool PlaySound(string pszSound, UIntPtr hmod, SoundSettings fdwSound);
 
@@ -124,22 +132,13 @@ public static class WinMm
     /// <param name="hmod">Handle to the executable file that contains the resource to be loaded. This parameter must be NULL unless SND_RESOURCE is specified in fdwSound.</param>
     /// <param name="fdwSound">Flags for playing the sound.</param>
     /// <returns>Returns TRUE if successful or FALSE otherwise.</returns>
-    [DllImport("winmm", SetLastError = true)]
+    [DllImport("winmm")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool PlaySound(IntPtr memoryPtr, UIntPtr hmod, SoundSettings fdwSound);
 
     /// <summary>
-    /// 
+    /// Retrieves a module handle for the specified module, NULL returns the handle of the file used to create the calling process (the .exe).
     /// </summary>
-    /// <param name="command">Pointer to a null-terminated string that specifies an MCI command string. For a list, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd743572(v=vs.85).aspx">Multimedia Command Strings</a></param>
-    /// <param name="buffer">Pointer to a buffer that receives return information. If no return information is needed, this parameter can be NULL.</param>
-    /// <param name="bufferSize">Size, in characters, of the return buffer specified by the lpszReturnString parameter.</param>
-    /// <param name="hWndCallback">Handle to a callback window if the "notify" flag was specified in the command string.</param>
-    /// <returns>
-    /// Returns zero if successful or an error otherwise. The low-order word of the returned DWORD value contains the error return value. If the error is device-specific, the high-order word of the return value is the driver identifier; otherwise, the high-order word is zero.
-    /// For a list of possible error values, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd757153(v=vs.85).aspx">MCIERR Return Values</a>.
-    /// To retrieve a text description of return values, pass the return value to the <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd757158(v=vs.85).aspx">mciGetErrorString</a> function.
-    /// </returns>
-    [DllImport("winmm")]
-    private static extern int mciSendString(string command, StringBuilder buffer, int bufferSize, IntPtr hWndCallback);
+    [DllImport("kernel32", EntryPoint = "GetModuleHandleW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    private static extern IntPtr GetModuleHandle(string moduleName);
 }

@@ -3,6 +3,7 @@
     <Description>Dapplo.Windows.Gdi32 bringt Gdi32 and GdiPlus functionality.</Description>
     <PackageTags>windows native gdi</PackageTags>
     <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />

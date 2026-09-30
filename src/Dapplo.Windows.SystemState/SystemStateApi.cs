@@ -3,6 +3,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 using Dapplo.Windows.SystemState.Enums;
 
 namespace Dapplo.Windows.SystemState;
@@ -45,11 +46,11 @@ public static class SystemStateApi
     /// </param>
     /// <param name="lpTimerName">The name of the timer object. If <c>null</c>, creates an unnamed timer.</param>
     /// <returns>
-    /// If the function succeeds, the return value is a handle to the timer object.
-    /// If the function fails, the return value is <see cref="IntPtr.Zero"/>. Call GetLastError for extended error information.
+    /// If the function succeeds, the return value is a handle to the timer object, which is closed when the SafeWaitHandle is disposed.
+    /// If the function fails, the returned handle is invalid (<see cref="SafeHandle.IsInvalid"/>). Call GetLastError for extended error information.
     /// </returns>
     [DllImport(Kernel32Dll, SetLastError = true, CharSet = CharSet.Unicode)]
-    public static extern IntPtr CreateWaitableTimer(IntPtr lpTimerAttributes, [MarshalAs(UnmanagedType.Bool)] bool bManualReset, string lpTimerName);
+    public static extern SafeWaitHandle CreateWaitableTimer(IntPtr lpTimerAttributes, [MarshalAs(UnmanagedType.Bool)] bool bManualReset, string lpTimerName);
 
     /// <summary>
     /// Opens an existing named waitable timer object.
@@ -61,11 +62,11 @@ public static class SystemStateApi
     /// </param>
     /// <param name="lpTimerName">The name of the timer object to open.</param>
     /// <returns>
-    /// If the function succeeds, the return value is a handle to the timer object.
-    /// If the function fails, the return value is <see cref="IntPtr.Zero"/>.
+    /// If the function succeeds, the return value is a handle to the timer object, which is closed when the SafeWaitHandle is disposed.
+    /// If the function fails, the returned handle is invalid (<see cref="SafeHandle.IsInvalid"/>).
     /// </returns>
     [DllImport(Kernel32Dll, SetLastError = true, CharSet = CharSet.Unicode)]
-    public static extern IntPtr OpenWaitableTimer(uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, string lpTimerName);
+    public static extern SafeWaitHandle OpenWaitableTimer(uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, string lpTimerName);
 
     /// <summary>
     /// Activates the specified waitable timer. When the due time arrives, the timer is signaled
@@ -90,12 +91,13 @@ public static class SystemStateApi
     /// </param>
     /// <param name="fResume">
     /// If <c>true</c> and the system supports it, restores a system in suspended sleep or hibernation when the timer fires.
-    /// Requires the SE_SYSTEMTIME_NAME privilege.
+    /// No privilege is needed, but the wake only happens when the "Allow wake timers" power setting is enabled.
+    /// If the system does not support a restore, the call succeeds but GetLastError returns ERROR_NOT_SUPPORTED.
     /// </param>
     /// <returns><c>true</c> if the function succeeds; otherwise <c>false</c>.</returns>
     [DllImport(Kernel32Dll, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool SetWaitableTimer(IntPtr hTimer, ref long pDueTime, int lPeriod, IntPtr pfnCompletionRoutine, IntPtr lpArgToCompletionRoutine, [MarshalAs(UnmanagedType.Bool)] bool fResume);
+    public static extern bool SetWaitableTimer(SafeWaitHandle hTimer, ref long pDueTime, int lPeriod, IntPtr pfnCompletionRoutine, IntPtr lpArgToCompletionRoutine, [MarshalAs(UnmanagedType.Bool)] bool fResume);
 
     /// <summary>
     /// Sets a cancel on a waitable timer, so it is no longer activated.
@@ -105,7 +107,7 @@ public static class SystemStateApi
     /// <returns><c>true</c> if the function succeeds; otherwise <c>false</c>.</returns>
     [DllImport(Kernel32Dll, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool CancelWaitableTimer(IntPtr hTimer);
+    public static extern bool CancelWaitableTimer(SafeWaitHandle hTimer);
 
     /// <summary>
     /// Closes an open object handle.

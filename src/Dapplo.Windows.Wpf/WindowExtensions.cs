@@ -27,14 +27,14 @@ public static class WindowExtensions
     }
 
     /// <summary>
-    ///     Retrieve the handle of a Window
+    ///     Retrieve the handle of a Window, the native window is created when this didn't happen yet (the window wasn't shown yet)
     /// </summary>
     /// <param name="window">Window</param>
     /// <returns>IntPtr</returns>
     public static IntPtr GetHandle(this Window window)
     {
         var windowInteropHelper = new WindowInteropHelper(window);
-        return windowInteropHelper.Handle;
+        return windowInteropHelper.EnsureHandle();
     }
 
     /// <summary>

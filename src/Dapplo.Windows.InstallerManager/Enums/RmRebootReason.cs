@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dapplo.Windows.Kernel32.Enums;
+namespace Dapplo.Windows.InstallerManager.Enums;
 
 /// <summary>
 ///     Describes the reasons a restart of the system is needed.

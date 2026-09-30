@@ -20,12 +20,12 @@ public struct UserInfo
     /// <summary>
     ///     Return the username
     /// </summary>
-    public string Username => _userName;
+    public string UserName => _userName;
 
     /// <summary>
     ///     Return the domain name
     /// </summary>
-    public string Domainname => _domainName;
+    public string DomainName => _domainName;
 
     /// <summary>
     ///     Return the connection name

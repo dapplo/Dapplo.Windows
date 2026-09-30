@@ -3,10 +3,9 @@
 
 using System;
 using System.Drawing;
-using System.Windows;
-using System.Windows.Interop;
+using System.Drawing.Imaging;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Dapplo.Windows.Gdi32.SafeHandles;
 
 namespace Dapplo.Windows.Wpf;
 
@@ -16,7 +15,7 @@ namespace Dapplo.Windows.Wpf;
 public static class BitmapSourceExtensions
 {
     /// <summary>
-    ///     Convert a Bitmap to a BitmapSource
+    ///     Convert a Bitmap to a (frozen) BitmapSource with 96 DPI, the alpha channel is preserved.
     /// </summary>
     /// <param name="bitmap">Bitmap</param>
     /// <returns>BitmapSource</returns>
@@ -27,8 +26,24 @@ public static class BitmapSourceExtensions
             throw new ArgumentNullException(nameof(bitmap));
         }
 
-        using var hBitmap = new SafeHBitmapHandle(bitmap.GetHbitmap());
-        return Imaging.CreateBitmapSourceFromHBitmap(hBitmap.DangerousGetHandle(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        // Bitmap.GetHbitmap composites the alpha channel onto a background color, so the pixels are copied instead.
+        // LockBits converts every source format (also indexed ones) to the requested 32 bpp format.
+        var hasAlpha = System.Drawing.Image.IsAlphaPixelFormat(bitmap.PixelFormat);
+        var lockFormat = hasAlpha ? System.Drawing.Imaging.PixelFormat.Format32bppArgb : System.Drawing.Imaging.PixelFormat.Format32bppRgb;
+        var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, lockFormat);
+        try
+        {
+            // Format32bppArgb is BGRA in memory, which is Bgra32 for WPF, Format32bppRgb is Bgr32
+            var bitmapSource = BitmapSource.Create(bitmapData.Width, bitmapData.Height, 96, 96,
+                hasAlpha ? PixelFormats.Bgra32 : PixelFormats.Bgr32, null,
+                bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+            bitmapSource.Freeze();
+            return bitmapSource;
+        }
+        finally
+        {
+            bitmap.UnlockBits(bitmapData);
+        }
     }
 
     /// <summary>

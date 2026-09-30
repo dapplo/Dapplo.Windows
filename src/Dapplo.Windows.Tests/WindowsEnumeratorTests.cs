@@ -21,61 +21,77 @@ public class WindowsEnumeratorTests
     }
 
     [StaFact]
-    private void EnumerateWindows()
+    public void EnumerateWindows()
     {
         var windows = WindowsEnumerator.EnumerateWindows().ToList();
         Assert.True(windows.Count > 0);
     }
 
     [StaFact]
-    private void EnumerateWindowHandles()
+    public void EnumerateWindowHandles()
     {
         var windows = WindowsEnumerator.EnumerateWindowHandles().ToList();
         Assert.True(windows.Count > 0);
     }
 
     [StaFact]
-    private void EnumerateWindows_Take10()
+    public void EnumerateWindows_Take10()
     {
         var windows = WindowsEnumerator.EnumerateWindows().Take(10).ToList();
         Assert.True(windows.Count == 10);
     }
 
     [StaFact]
-    private async Task EnumerateWindowsAsync()
+    public async Task EnumerateWindowsAsync()
     {
         var windows = await WindowsEnumerator.EnumerateWindowsAsync().ToList().ToTask().ConfigureAwait(false);
         Assert.True(windows.Count > 0);
     }
 
     [StaFact]
-    private async Task EnumerateWindowHandlesAsync()
+    public async Task EnumerateWindowHandlesAsync()
     {
         var windows = await WindowsEnumerator.EnumerateWindowHandlesAsync().ToList().ToTask().ConfigureAwait(false);
         Assert.True(windows.Count > 0);
     }
 
     [StaFact]
-    private async Task EnumerateWindowsAsync_Find()
+    public async Task EnumerateWindowsAsync_Find()
     {
         var textValue = Guid.NewGuid().ToString();
-        var form = new Form
+        using var form = new Form
         {
             Text = textValue,
             TopLevel = true
         };
         form.Show();
-        // Important, otherwise Windows doesn't have time to display the window!
-        Application.DoEvents();
+        try
+        {
+            // Important, otherwise Windows doesn't have time to display the window!
+            Application.DoEvents();
 
-        await Task.Delay(400);
-        var window = await WindowsEnumerator.EnumerateWindowsAsync().Where(info => info.GetCaption().Contains(textValue)).FirstOrDefaultAsync();
+            IInteropWindow window = null;
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            while (window == null && stopwatch.Elapsed < TestWait.DefaultTimeout)
+            {
+                window = await WindowsEnumerator.EnumerateWindowsAsync().Where(info => info.GetCaption().Contains(textValue)).FirstOrDefaultAsync();
+                if (window == null)
+                {
+                    Application.DoEvents();
+                    await Task.Delay(50, TestContext.Current.CancellationToken);
+                }
+            }
 
-        Assert.NotNull(window);
+            Assert.NotNull(window);
+        }
+        finally
+        {
+            form.Close();
+        }
     }
 
     [StaFact]
-    private async Task EnumerateWindowsAsync_Take10()
+    public async Task EnumerateWindowsAsync_Take10()
     {
         var windows = await WindowsEnumerator.EnumerateWindowsAsync().Take(10).ToList().ToTask().ConfigureAwait(false);
         Assert.True(windows.Count == 10);

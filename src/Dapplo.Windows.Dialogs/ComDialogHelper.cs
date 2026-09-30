@@ -67,8 +67,14 @@ internal static class ComDialogHelper
         try
         {
             var shellItem = ShellItemFromPath(path);
-            setFolder(shellItem);
-            Marshal.ReleaseComObject(shellItem);
+            try
+            {
+                setFolder(shellItem);
+            }
+            finally
+            {
+                Marshal.ReleaseComObject(shellItem);
+            }
         }
         catch (COMException)
         {
@@ -92,8 +98,14 @@ internal static class ComDialogHelper
             try
             {
                 var shellItem = ShellItemFromPath(path);
-                addPlace(shellItem, atTop ? FileDialogAddPlaceFlags.Top : FileDialogAddPlaceFlags.Bottom);
-                Marshal.ReleaseComObject(shellItem);
+                try
+                {
+                    addPlace(shellItem, atTop ? FileDialogAddPlaceFlags.Top : FileDialogAddPlaceFlags.Bottom);
+                }
+                finally
+                {
+                    Marshal.ReleaseComObject(shellItem);
+                }
             }
             catch (COMException)
             {
@@ -101,6 +113,15 @@ internal static class ComDialogHelper
             }
         }
     }
+
+    /// <summary>
+    /// Combines the dialog's current options (from <c>GetOptions</c>) with <paramref name="wanted"/>, keeping the dialog's defaults
+    /// (e.g. PathMustExist, FileMustExist, NoReadOnlyReturn). Always adds <see cref="FileOpenOptions.ForceFileSystem"/>,
+    /// so only file-system items can be picked, and <see cref="FileOpenOptions.NoChangeDir"/>,
+    /// so the dialog never changes the process's current directory.
+    /// </summary>
+    internal static FileOpenOptions CombineOptions(FileOpenOptions current, FileOpenOptions wanted) =>
+        current | wanted | FileOpenOptions.ForceFileSystem | FileOpenOptions.NoChangeDir;
 
     /// <summary>Returns the file-system path string for the given <see cref="IShellItem"/>.</summary>
     internal static string GetFileSysPath(IShellItem item)
@@ -110,21 +131,42 @@ internal static class ComDialogHelper
     }
 
     /// <summary>
+    /// Returns the file-system path string for the given <see cref="IShellItem"/> and releases the item,
+    /// also when <c>GetDisplayName</c> throws.
+    /// </summary>
+    internal static string GetFileSysPathAndRelease(IShellItem item)
+    {
+        try
+        {
+            return GetFileSysPath(item);
+        }
+        finally
+        {
+            Marshal.ReleaseComObject(item);
+        }
+    }
+
+    /// <summary>
     /// Collects file-system paths from all items in an <see cref="IShellItemArray"/>,
     /// releasing each item and the array itself before returning.
     /// </summary>
     internal static IReadOnlyList<string> CollectPaths(IShellItemArray items)
     {
-        items.GetCount(out var count);
-        var result = new List<string>((int)count);
-        for (uint i = 0; i < count; i++)
+        try
         {
-            items.GetItemAt(i, out var item);
-            result.Add(GetFileSysPath(item));
-            Marshal.ReleaseComObject(item);
+            items.GetCount(out var count);
+            var result = new List<string>((int)count);
+            for (uint i = 0; i < count; i++)
+            {
+                items.GetItemAt(i, out var item);
+                result.Add(GetFileSysPathAndRelease(item));
+            }
+            return result;
         }
-        Marshal.ReleaseComObject(items);
-        return result;
+        finally
+        {
+            Marshal.ReleaseComObject(items);
+        }
     }
 
     /// <summary>Creates an <see cref="IShellItem"/> from a file-system path.</summary>

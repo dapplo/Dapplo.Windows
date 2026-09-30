@@ -25,7 +25,7 @@ public class WindowsSessionListenerTests
     /// <summary>
     /// Test that WindowsSessionListener can be created and started
     /// </summary>
-    //[WpfFact]
+    [Fact]
     public void TestWindowsSessionListener_CanCreate()
     {
         using var listener = new WindowsSessionListener();
@@ -35,7 +35,7 @@ public class WindowsSessionListenerTests
     /// <summary>
     /// Test that WindowsSessionListener can be started and stopped
     /// </summary>
-    //[WpfFact]
+    [Fact]
     public void TestWindowsSessionListener_CanStartAndStop()
     {
         using var listener = new WindowsSessionListener();
@@ -46,7 +46,7 @@ public class WindowsSessionListenerTests
     /// <summary>
     /// Test that WindowsSessionListener can be paused and resumed
     /// </summary>
-    //[WpfFact]
+    [Fact]
     public void TestWindowsSessionListener_CanPauseAndResume()
     {
         using var listener = new WindowsSessionListener();
@@ -59,7 +59,7 @@ public class WindowsSessionListenerTests
     /// <summary>
     /// Test that WindowsSessionListener events can be subscribed
     /// </summary>
-    //[WpfFact]
+    [Fact]
     public void TestWindowsSessionListener_CanSubscribeToEvents()
     {
         using var listener = new WindowsSessionListener();
@@ -92,7 +92,7 @@ public class WindowsSessionListenerTests
     /// <summary>
     /// Test that WindowsSessionListener can be disposed multiple times safely
     /// </summary>
-    //[WpfFact]
+    [Fact]
     public void TestWindowsSessionListener_CanDisposeMultipleTimes()
     {
         var listener = new WindowsSessionListener();
@@ -104,7 +104,7 @@ public class WindowsSessionListenerTests
     /// <summary>
     /// Test that WindowsSessionListener throws when used after disposal
     /// </summary>
-    //[WpfFact]
+    [Fact]
     public void TestWindowsSessionListener_ThrowsAfterDisposal()
     {
         var listener = new WindowsSessionListener();
@@ -115,7 +115,7 @@ public class WindowsSessionListenerTests
     /// <summary>
     /// Test that WtsSessionChangeEvents enum has expected values
     /// </summary>
-    //[WpfFact]
+    [Fact]
     public void TestWtsSessionChangeEvents_HasExpectedValues()
     {
         Assert.Equal(0x5, (int)WtsSessionChangeEvents.WTS_SESSION_LOGON);
@@ -127,7 +127,7 @@ public class WindowsSessionListenerTests
     /// <summary>
     /// Test SessionChangeEventArgs properties
     /// </summary>
-    //[WpfFact]
+    [Fact]
     public void TestSessionChangeEventArgs_HasCorrectProperties()
     {
         var args = new SessionChangeEventArgs(WtsSessionChangeEvents.WTS_SESSION_LOCK, 123);

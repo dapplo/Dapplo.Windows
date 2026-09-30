@@ -266,18 +266,18 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     [Pure]
     public bool Equals(NativeRectFloat rectangle)
     {
-        return Math.Abs(rectangle._x - _x) < float.Epsilon
-               && Math.Abs(rectangle._y - _y) < float.Epsilon
-               && Math.Abs(rectangle._width - _width) < float.Epsilon
-               && Math.Abs(rectangle._height - _height) < float.Epsilon;
+        return rectangle._x.Equals(_x)
+               && rectangle._y.Equals(_y)
+               && rectangle._width.Equals(_width)
+               && rectangle._height.Equals(_height);
     }
 
     /// <summary>
-    ///     Checks if this NativeRectFloat is empty
+    ///     Checks if this NativeRectFloat is empty, this is the case when the width or height is zero, negative or NaN
     /// </summary>
     /// <returns>true when empty</returns>
     [Pure]
-    public bool IsEmpty => Math.Abs(_width * _height) < float.Epsilon;
+    public bool IsEmpty => !(_width > 0) || !(_height > 0);
 
     /// <inheritdoc />
     [Pure]
@@ -300,11 +300,10 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     {
         unchecked
         {
-            var hashCode = _x.GetHashCode();
-            hashCode = (hashCode * 397) ^ _x.GetHashCode();
-            hashCode = (hashCode * 397) ^ _y.GetHashCode();
-            hashCode = (hashCode * 397) ^ _width.GetHashCode();
-            hashCode = (hashCode * 397) ^ _height.GetHashCode();
+            var hashCode = FloatHelper.GetHashCode(_x);
+            hashCode = (hashCode * 397) ^ FloatHelper.GetHashCode(_y);
+            hashCode = (hashCode * 397) ^ FloatHelper.GetHashCode(_width);
+            hashCode = (hashCode * 397) ^ FloatHelper.GetHashCode(_height);
             return hashCode;
         }
     }

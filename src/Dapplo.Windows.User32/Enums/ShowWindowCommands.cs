@@ -28,7 +28,7 @@ public enum ShowWindowCommands : uint
     /// <summary>
     ///     Maximizes the specified window.
     /// </summary>
-    Maximize = 3, // is this the right value?
+    Maximize = 3,
 
     /// <summary>
     ///     Activates the window and displays it as a maximized window.

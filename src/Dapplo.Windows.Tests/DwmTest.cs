@@ -18,8 +18,8 @@ public class DwmTest
     ///     Test is Dwm is Enabled
     /// </summary>
     /// <returns></returns>
-    //[Fact]
-    private void TestDwmEnabled()
+    [Fact]
+    public void TestDwmEnabled()
     {
         Assert.True(DwmApi.IsDwmEnabled);
     }

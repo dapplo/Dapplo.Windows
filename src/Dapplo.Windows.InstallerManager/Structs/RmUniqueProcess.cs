@@ -4,7 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace Dapplo.Windows.Kernel32.Structs;
+namespace Dapplo.Windows.InstallerManager.Structs;
 
 /// <summary>
 ///     Uniquely identifies a process by its PID and the time the process began.
@@ -18,7 +18,7 @@ public struct RmUniqueProcess
     /// <summary>
     ///     The process identifier (PID).
     /// </summary>
-    public int dwProcessId;
+    public int ProcessId;
 
     /// <summary>
     ///     The creation time of the process. The time is provided as a FILETIME structure.

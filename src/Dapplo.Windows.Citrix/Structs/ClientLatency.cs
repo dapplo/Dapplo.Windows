@@ -10,21 +10,21 @@ namespace Dapplo.Windows.Citrix.Structs;
 [StructLayout(LayoutKind.Sequential)]
 public struct ClientLatency
 {
-    private readonly uint _avarage;
+    private readonly uint _average;
     private readonly uint _last;
-    private readonly uint _derivation;
+    private readonly uint _deviation;
 
     /// <summary>
-    ///     Return the client's avarage latency
+    ///     Return the client's average latency
     /// </summary>
-    public uint Avarage => _avarage;
+    public uint Average => _average;
     /// <summary>
     ///     Return the client's last latency
     /// </summary>
     public uint Last => _last;
 
     /// <summary>
-    ///     Return the client's latency derivation
+    ///     Return the client's latency deviation
     /// </summary>
-    public uint Derivation => _derivation;
+    public uint Deviation => _deviation;
 }

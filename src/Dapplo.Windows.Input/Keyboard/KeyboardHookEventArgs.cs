@@ -194,7 +194,7 @@ public class KeyboardHookEventArgs : EventArgs
     /// <summary>
     /// Test if this event is injected by another process with a lower integrity level
     /// </summary>
-    public bool IsInjectedByLowerIntegrityLevelProcess => (Flags & ExtendedKeyFlags.Injected) != 0 && (Flags & ExtendedKeyFlags.LowerIntegretyInjected) != 0;
+    public bool IsInjectedByLowerIntegrityLevelProcess => (Flags & ExtendedKeyFlags.Injected) != 0 && (Flags & ExtendedKeyFlags.LowerIntegrityInjected) != 0;
 
     /// <inheritdoc />
     public override string ToString()

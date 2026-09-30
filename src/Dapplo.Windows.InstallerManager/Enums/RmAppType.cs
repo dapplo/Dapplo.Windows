@@ -1,7 +1,7 @@
 // Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Dapplo.Windows.Kernel32.Enums;
+namespace Dapplo.Windows.InstallerManager.Enums;
 
 /// <summary>
 ///     Specifies the type of application that is described by the RmProcessInfo structure.

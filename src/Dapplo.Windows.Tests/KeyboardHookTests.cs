@@ -34,17 +34,22 @@ public class KeyboardHookTests
             IsPassThrough = false
         };
         using (KeyboardHook.KeyboardEvents.Where(keyHandler).Subscribe(keyboardHookEventArgs => pressCount++))
+        using (var counter = new InjectedKeyCounter())
         {
-            await Task.Delay(20);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
-            await Task.Delay(20);
+            await counter.WaitForAsync(4);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
-            await Task.Delay(20);
+            await counter.WaitForAsync(8);
         }
-        Assert.True(pressCount == 2);
-        KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
-        await Task.Delay(20);
-        Assert.True(pressCount == 2);
+        Assert.Equal(2, pressCount);
+
+        // After the subscription is disposed, the handler must not be called anymore
+        using (var counter = new InjectedKeyCounter())
+        {
+            KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
+            await counter.WaitForAsync(4);
+        }
+        Assert.Equal(2, pressCount);
     }
 
     [StaFact]
@@ -52,8 +57,6 @@ public class KeyboardHookTests
     {
         int pressCount = 0;
         const int pressHandlingTime = 500;
-        // Wait 2x press plus overhead
-        const int waitForPressHandling = (int)((pressHandlingTime * 2) * 1.1);
 
         var sequenceHandler = new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA) { IgnoreInjected = false };
 
@@ -72,8 +75,8 @@ public class KeyboardHookTests
             Log.Info().WriteLine("Pressing key combination", null);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
             Log.Info().WriteLine("Pressed key combination", null);
-            await Task.Delay(waitForPressHandling);
-            Assert.Equal(2, pressCount);
+            // Both presses are handled one after the other, this takes 2x the handling time
+            await TestWait.UntilAsync(() => Volatile.Read(ref pressCount) == 2, "The slow subscriber didn't handle both key combinations", TimeSpan.FromSeconds(10));
         }
     }
 
@@ -85,21 +88,20 @@ public class KeyboardHookTests
             new KeyCombinationHandler(VirtualKeyCode.Print) { IgnoreInjected = false },
             new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA) { IgnoreInjected = false });
 
-
         using (KeyboardHook.KeyboardEvents.Where(sequenceHandler).Subscribe(keyboardHookEventArgs => pressCount++))
+        using (var counter = new InjectedKeyCounter())
         {
-            await Task.Delay(20);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
-            await Task.Delay(20);
-            Assert.True(pressCount == 0);
+            await counter.WaitForAsync(2);
+            Assert.Equal(0, pressCount);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyB);
-            await Task.Delay(20);
-            Assert.True(pressCount == 0);
+            await counter.WaitForAsync(6);
+            Assert.Equal(0, pressCount);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
-            await Task.Delay(20);
+            await counter.WaitForAsync(8);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
-            await Task.Delay(20);
-            Assert.True(pressCount == 1);
+            await counter.WaitForAsync(12);
+            Assert.Equal(1, pressCount);
         }
     }
 
@@ -119,59 +121,68 @@ public class KeyboardHookTests
         };
 
         using (KeyboardHook.KeyboardEvents.Where(sequenceHandler).Subscribe(keyboardHookEventArgs => pressCount++))
+        using (var counter = new InjectedKeyCounter())
         {
-            await Task.Delay(20);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
-            await Task.Delay(20);
+            await counter.WaitForAsync(2);
             Assert.Equal(0, pressCount);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyB);
-            await Task.Delay(20);
+            await counter.WaitForAsync(6);
             Assert.Equal(1, pressCount);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
-            await Task.Delay(20);
+            await counter.WaitForAsync(8);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
-            await Task.Delay(20);
+            await counter.WaitForAsync(12);
             Assert.Equal(2, pressCount);
 
-            // Test with timeout, waiting to long
+            // Test with timeout, waiting too long between the keys of the sequence (this delay is part of the test)
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Print);
-            await Task.Delay(400);
+            await counter.WaitForAsync(14);
+            await Task.Delay(400, TestContext.Current.CancellationToken);
             KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Shift, VirtualKeyCode.KeyA);
-            await Task.Delay(20);
+            await counter.WaitForAsync(18);
             Assert.Equal(2, pressCount);
         }
     }
 
-    //[StaFact]
-    private async Task TestHandlingKeyAsync()
+    /// <summary>
+    /// A handler keeps state, using the same instance in two subscriptions at the same time must fail instead of silently not working
+    /// </summary>
+    [Fact]
+    public void TestKeyHandler_SameInstanceTwice_Fails()
     {
-        await KeyboardHook.KeyboardEvents.Where(args => args.IsWindows && args.IsShift && args.IsControl && args.IsAlt)
-            .Select(args =>
-            {
-                args.Handled = true;
-                return args;
-            })
-            .FirstAsync();
+        var keyHandler = new KeyCombinationHandler(VirtualKeyCode.Back, VirtualKeyCode.RightShift) { IgnoreInjected = false };
+        Exception error = null;
+        using (KeyboardHook.KeyboardEvents.Where(keyHandler).Subscribe(_ => { }))
+        using (KeyboardHook.KeyboardEvents.Where(keyHandler).Subscribe(_ => { }, exception => error = exception))
+        {
+            Assert.IsType<InvalidOperationException>(error);
+        }
+        // After disposing, the handler can be used again
+        error = null;
+        using (KeyboardHook.KeyboardEvents.Where(keyHandler).Subscribe(_ => { }, exception => error = exception))
+        {
+            Assert.Null(error);
+        }
     }
 
-    //[StaFact]
-    private async Task TestMappingAsync()
+    /// <summary>
+    /// The factory overload creates a handler for every subscription
+    /// </summary>
+    [StaFact]
+    public async Task TestKeyHandler_Factory_PerSubscription()
     {
-        await KeyboardHook.KeyboardEvents.FirstAsync(info => info.IsLeftShift && info.IsKeyDown);
-    }
-
-    //[StaFact]
-    private async Task TestSuppressVolumeAsync()
-    {
-        await KeyboardHook.KeyboardEvents.Where(args =>
-            {
-                if (args.Key != VirtualKeyCode.VolumeUp)
-                {
-                    return true;
-                }
-                args.Handled = true;
-                return false;
-            })
-            .FirstAsync();
+        int pressCount1 = 0;
+        int pressCount2 = 0;
+        var observable = KeyboardHook.KeyboardEvents.Where(() => new KeyCombinationHandler(VirtualKeyCode.Back, VirtualKeyCode.RightShift) { IgnoreInjected = false });
+        using (observable.Subscribe(_ => pressCount1++))
+        using (observable.Subscribe(_ => pressCount2++))
+        using (var counter = new InjectedKeyCounter())
+        {
+            KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Back, VirtualKeyCode.RightShift);
+            await counter.WaitForAsync(4);
+        }
+        Assert.Equal(1, pressCount1);
+        Assert.Equal(1, pressCount2);
     }
 }

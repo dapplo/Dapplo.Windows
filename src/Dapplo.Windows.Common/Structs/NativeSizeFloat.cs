@@ -184,11 +184,11 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
     }
 
     /// <summary>
-    ///     Checks if the width * height are 0
+    ///     Checks if the size is empty, this is the case when the width or height is zero, negative or NaN
     /// </summary>
     /// <returns>true if the size is empty</returns>
     [Pure]
-    public bool IsEmpty => Math.Abs(_width * _height) < float.Epsilon;
+    public bool IsEmpty => !(_width > 0) || !(_height > 0);
 
     /// <inheritdoc />
     [Pure]
@@ -209,8 +209,7 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
     [Pure]
     public bool Equals(NativeSizeFloat other)
     {
-        return Math.Abs(_width - other._width) < float.Epsilon &&
-               Math.Abs(_height - other._height) < float.Epsilon;
+        return _width.Equals(other._width) && _height.Equals(other._height);
     }
 
     /// <inheritdoc />
@@ -224,7 +223,7 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
     {
         unchecked
         {
-            return (_width.GetHashCode() * 397) ^ _height.GetHashCode();
+            return (FloatHelper.GetHashCode(_width) * 397) ^ FloatHelper.GetHashCode(_height);
         }
     }
 

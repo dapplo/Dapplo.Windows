@@ -117,11 +117,11 @@ public readonly struct NativeSize : IEquatable<NativeSize>, IComparable<NativeSi
     public static bool operator !=(System.Drawing.Size size1, NativeSize size2) => !(size1 == size2);
 
     /// <summary>
-    ///     Checks if the width * height are 0
+    ///     Checks if the size is empty, this is the case when the width or height is zero or negative
     /// </summary>
     /// <returns>true if the size is empty</returns>
     [Pure]
-    public bool IsEmpty => _width * _height == 0;
+    public bool IsEmpty => _width <= 0 || _height <= 0;
 
     /// <inheritdoc />
     /// <remarks>Sizes are ordered by area (width * height, calculated as long so it cannot overflow), smallest first.</remarks>

@@ -226,3 +226,18 @@ coverage.cobertura.xml
 xunit.xml
 # Local build/test runner requests and results (tools/build-runner)
 .build-runner/
+
+# Test results and coverage (dotnet test, coverlet lcov output from the CI build)
+TestResults/
+*.trx
+coverage.info
+*.lcov
+
+# Packages, also when created outside of bin
+*.snupkg
+
+# BenchmarkDotNet
+BenchmarkDotNet.Artifacts/
+
+# JetBrains Rider
+.idea/

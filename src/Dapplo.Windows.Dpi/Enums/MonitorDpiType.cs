@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-using System;
 
 namespace Dapplo.Windows.Dpi.Enums;
 
@@ -11,7 +10,6 @@ namespace Dapplo.Windows.Dpi.Enums;
 ///         enumeration
 ///     </a>
 /// </summary>
-[Flags]
 public enum MonitorDpiType
 {
     /// <summary>

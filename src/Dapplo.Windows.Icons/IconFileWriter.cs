@@ -20,6 +20,7 @@ public static class IconFileWriter
 {
     /// <summary>
     /// Writes icon images to a stream using the ICO file format with proper structures.
+    /// Images larger than 256 pixels in either dimension are scaled down to fit into 256x256, see <see cref="CalculateIconImageSize"/>.
     /// </summary>
     /// <param name="stream">Stream to write to</param>
     /// <param name="images">Collection of images to include in the icon</param>
@@ -48,10 +49,12 @@ public static class IconFileWriter
         {
             foreach (var image in imageList)
             {
-                var imageStream = new MemoryStream();
-                image.Save(imageStream, ImageFormat.Png);
-                imageStream.Seek(0, SeekOrigin.Begin);
-                encodedImages.Add((image.Size, imageStream));
+                if (image == null)
+                {
+                    throw new ArgumentException("The images must not contain null", nameof(images));
+                }
+                var imageStream = EncodeImage(image, out var size, out _);
+                encodedImages.Add((size, imageStream));
             }
 
             // Write ICONDIR header
@@ -111,6 +114,7 @@ public static class IconFileWriter
 
     /// <summary>
     /// Writes cursor images to a stream using the CUR file format.
+    /// Images larger than 256 pixels in either dimension are scaled down to fit into 256x256, the hotspot is scaled with them.
     /// </summary>
     /// <param name="stream">Stream to write to</param>
     /// <param name="images">Collection of images with hotspot information</param>
@@ -139,10 +143,20 @@ public static class IconFileWriter
         {
             foreach (var (image, hotspot) in imageList)
             {
-                var imageStream = new MemoryStream();
-                image.Save(imageStream, ImageFormat.Png);
-                imageStream.Seek(0, SeekOrigin.Begin);
-                encodedImages.Add((image.Size, hotspot, imageStream));
+                if (image == null)
+                {
+                    throw new ArgumentException("The images must not contain null", nameof(images));
+                }
+                if (hotspot.X < 0 || hotspot.Y < 0 || hotspot.X >= image.Width || hotspot.Y >= image.Height)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(images), hotspot, $"The hotspot must be inside the {image.Width}x{image.Height} image.");
+                }
+                var imageStream = EncodeImage(image, out var size, out var scale);
+                // Scale the hotspot together with the image
+                var scaledHotspot = new Point(
+                    Math.Min(size.Width - 1, (int)(hotspot.X * scale)),
+                    Math.Min(size.Height - 1, (int)(hotspot.Y * scale)));
+                encodedImages.Add((size, scaledHotspot, imageStream));
             }
 
             // Write ICONDIR header (Type = 2 for cursor)
@@ -159,8 +173,8 @@ public static class IconFileWriter
                 var entry = IconDirEntry.CreateForCursor(
                     size.Width,
                     size.Height,
-                    (ushort)hotspot.X,
-                    (ushort)hotspot.Y,
+                    checked((ushort)hotspot.X),
+                    checked((ushort)hotspot.Y),
                     (uint)data.Length,
                     offset
                 );
@@ -199,6 +213,74 @@ public static class IconFileWriter
 
         using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
         WriteCursorFile(fileStream, images);
+    }
+
+    /// <summary>
+    /// Encode the image as PNG, an image which is larger than 256 pixels in either dimension is scaled down (keeping the aspect ratio) to fit into 256x256,
+    /// as this is the maximum the ICO and CUR formats support.
+    /// </summary>
+    /// <param name="image">Image to encode</param>
+    /// <param name="size">Size of the encoded image</param>
+    /// <param name="scale">double with the scale factor which was applied (1 if not scaled)</param>
+    /// <returns>MemoryStream with the PNG data, positioned at the start</returns>
+    private static MemoryStream EncodeImage(Image image, out Size size, out double scale)
+    {
+        if (image.Width < 1 || image.Height < 1)
+        {
+            throw new ArgumentException($"Image size {image.Width}x{image.Height} is not valid for an icon or cursor.", nameof(image));
+        }
+        size = CalculateIconImageSize(image.Size, out scale);
+        var imageStream = new MemoryStream();
+        try
+        {
+            if (size == image.Size)
+            {
+                image.Save(imageStream, ImageFormat.Png);
+            }
+            else
+            {
+                using var scaledImage = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppArgb);
+                using (var graphics = Graphics.FromImage(scaledImage))
+                {
+                    graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                    graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                    graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                    using var imageAttributes = new ImageAttributes();
+                    imageAttributes.SetWrapMode(System.Drawing.Drawing2D.WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, new Rectangle(0, 0, size.Width, size.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, imageAttributes);
+                }
+                scaledImage.Save(imageStream, ImageFormat.Png);
+            }
+            imageStream.Seek(0, SeekOrigin.Begin);
+            return imageStream;
+        }
+        catch
+        {
+            imageStream.Dispose();
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Calculate the size an image will have in an icon or cursor file: images larger than 256 pixels in either dimension are scaled down,
+    /// keeping the aspect ratio, to fit into 256x256.
+    /// </summary>
+    /// <param name="imageSize">Size of the original image</param>
+    /// <param name="scale">double with the scale factor (1 if not scaled)</param>
+    /// <returns>Size of the image in the icon or cursor file</returns>
+    public static Size CalculateIconImageSize(Size imageSize, out double scale)
+    {
+        const int maxSize = IconDirEntry.MaxImageSize;
+        if (imageSize.Width <= maxSize && imageSize.Height <= maxSize)
+        {
+            scale = 1;
+            return imageSize;
+        }
+        scale = Math.Min((double)maxSize / imageSize.Width, (double)maxSize / imageSize.Height);
+        var width = Math.Max(1, Math.Min(maxSize, (int)Math.Round(imageSize.Width * scale)));
+        var height = Math.Max(1, Math.Min(maxSize, (int)Math.Round(imageSize.Height * scale)));
+        return new Size(width, height);
     }
 
     /// <summary>

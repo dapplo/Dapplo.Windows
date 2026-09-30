@@ -8,26 +8,16 @@ using System.Runtime.InteropServices;
 namespace Dapplo.Windows.Gdi32.Structs;
 
 /// <summary>
-/// Specify the color mask when the BITMAPINFOHEADER structure biCompression uses BI_BITFIELDS
+/// The three DWORD color masks (red, green, blue, in this order) which follow a 40 byte BITMAPINFOHEADER when biCompression is BI_BITFIELDS
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("Sonar Code Smell", "S2292:Trivial properties should be auto-implemented", Justification = "Interop!")]
 [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
 public readonly struct BitfieldColorMask : IEquatable<BitfieldColorMask>
 {
-    private readonly uint _blue;
-    private readonly uint _green;
     private readonly uint _red;
-
-    /// <summary>
-    /// Blue component of the mask
-    /// </summary>
-    public uint Blue => _blue;
-
-    /// <summary>
-    /// Green component of the mask
-    /// </summary>
-    public uint Green => _green;
+    private readonly uint _green;
+    private readonly uint _blue;
 
     /// <summary>
     /// Red component of the mask
@@ -35,28 +25,42 @@ public readonly struct BitfieldColorMask : IEquatable<BitfieldColorMask>
     public uint Red => _red;
 
     /// <summary>
+    /// Green component of the mask
+    /// </summary>
+    public uint Green => _green;
+
+    /// <summary>
+    /// Blue component of the mask
+    /// </summary>
+    public uint Blue => _blue;
+
+    /// <summary>
     /// Constructor of the BitfieldColorMask
     /// </summary>
-    /// <param name="r">byte</param>
-    /// <param name="g">byte</param>
-    /// <param name="b">byte</param>
-    public BitfieldColorMask(byte r = 255, byte g = 255, byte b = 255)
+    /// <param name="red">uint with the mask for the red component, e.g. 0x00FF0000</param>
+    /// <param name="green">uint with the mask for the green component, e.g. 0x0000FF00</param>
+    /// <param name="blue">uint with the mask for the blue component, e.g. 0x000000FF</param>
+    public BitfieldColorMask(uint red, uint green, uint blue)
     {
-        _red = (uint)r << 8;
-        _green = (uint)g << 16;
-        _blue = (uint)b << 24;
+        _red = red;
+        _green = green;
+        _blue = blue;
     }
 
     /// <summary>
-    /// Create with BitfieldColorMask defaults
+    /// The masks for 32 bits per pixel with 8 bits per component, as used by 32bpp BI_RGB (0x00RRGGBB)
     /// </summary>
-    /// <param name="r">byte value for Red component of the mask</param>
-    /// <param name="g">byte value for Green component of the mask</param>
-    /// <param name="b">byte value for Blue component of the mask</param>
-    public static BitfieldColorMask Create(byte r = 255, byte g = 255, byte b = 255)
-    {
-        return new BitfieldColorMask(r,g,b);
-    }
+    public static BitfieldColorMask Rgb888 { get; } = new BitfieldColorMask(0x00FF0000, 0x0000FF00, 0x000000FF);
+
+    /// <summary>
+    /// The masks for 16 bits per pixel with 5 bits for red and blue and 6 for green
+    /// </summary>
+    public static BitfieldColorMask Rgb565 { get; } = new BitfieldColorMask(0xF800, 0x07E0, 0x001F);
+
+    /// <summary>
+    /// The masks for 16 bits per pixel with 5 bits per component, as used by 16bpp BI_RGB
+    /// </summary>
+    public static BitfieldColorMask Rgb555 { get; } = new BitfieldColorMask(0x7C00, 0x03E0, 0x001F);
 
     /// <inheritdoc />
     public bool Equals(BitfieldColorMask other)

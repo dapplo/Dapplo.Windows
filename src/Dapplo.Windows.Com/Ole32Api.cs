@@ -17,14 +17,14 @@ public static class Ole32Api
     /// This converts a ProgID (program ID) into a Guid with the clsId
     /// </summary>
     /// <param name="programId">string with the program ID</param>
-    /// <returns>Guid with the clsId</returns>
-    public static Guid ClassIdFromProgId(string programId)
+    /// <returns>Guid with the clsId, or null when the ProgID is not registered (or the conversion failed)</returns>
+    public static Guid? ClassIdFromProgId(string programId)
     {
         if (CLSIDFromProgID(programId, out Guid clsId).Succeeded())
         {
             return clsId;
         }
-        return clsId;
+        return null;
     }
 
     /// <summary>

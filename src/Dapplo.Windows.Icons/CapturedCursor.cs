@@ -33,16 +33,13 @@ public class CapturedCursor: IDisposable
     /// Gets or sets the coordinates of the hotspot, which is the point of interest for operations such as rendering or
     /// interaction.
     /// </summary>
-    /// <remarks>The hotspot is typically used to define a specific point within a graphical element that may
-    /// be used for user interactions or visual effects. Ensure that the coordinates are within the bounds of the
-    /// associated graphical element to avoid unexpected behavior.</remarks>
+    /// <remarks>The hotspot is relative to the top-left of the layers (in the same scale as <see cref="Size"/>),
+    /// subtract it from the mouse position to get the position to draw the cursor at.</remarks>
     public NativePoint HotSpot { get; set; }
 
     /// <summary>
-    /// Gets or sets the size of the native element.
+    /// Gets or sets the size of the cursor, for a captured cursor this is the size of the ColorLayer and MaskLayer.
     /// </summary>
-    /// <remarks>The size is represented as a NativeSize structure, which encapsulates the dimensions of the
-    /// element. Ensure that the size is set appropriately to avoid layout issues.</remarks>
     public NativeSize Size { get; set; }
 
     /// <summary>

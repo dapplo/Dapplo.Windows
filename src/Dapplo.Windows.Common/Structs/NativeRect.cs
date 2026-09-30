@@ -215,10 +215,10 @@ public readonly struct NativeRect : IEquatable<NativeRect>
     }
 
     /// <summary>
-    ///     Checks if this NativeRect is empty
+    ///     Checks if this NativeRect is empty, like the Win32 IsRectEmpty this is the case when the width or height is zero or negative
     /// </summary>
     /// <returns>true when empty</returns>
-    public bool IsEmpty => unchecked (Width * Height) == 0;
+    public bool IsEmpty => _right <= _left || _bottom <= _top;
 
     /// <inheritdoc />
     [Pure]

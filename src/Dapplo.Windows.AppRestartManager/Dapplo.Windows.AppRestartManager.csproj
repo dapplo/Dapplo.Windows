@@ -3,7 +3,6 @@
     <Description>Dapplo.Windows.AppRestartManager provides APIs for applications to register for automatic restart with Windows Restart Manager.</Description>
     <PackageTags>windows native restart-manager application</PackageTags>
     <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />

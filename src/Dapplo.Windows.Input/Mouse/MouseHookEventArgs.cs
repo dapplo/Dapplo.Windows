@@ -58,7 +58,7 @@ public class MouseHookEventArgs : EventArgs
     /// <summary>
     ///     Test if this event was injected by a process running at a lower integrity level
     /// </summary>
-    public bool IsInjectedByLowerIntegrityLevelProcess => (Flags & ExtendedMouseFlags.Injected) != 0 && (Flags & ExtendedMouseFlags.LowerIntegretyInjected) != 0;
+    public bool IsInjectedByLowerIntegrityLevelProcess => (Flags & ExtendedMouseFlags.Injected) != 0 && (Flags & ExtendedMouseFlags.LowerIntegrityInjected) != 0;
 
     /// <summary>
     ///     The time stamp of the event, equivalent to what GetMessageTime would return for this message.

@@ -43,7 +43,7 @@ public static class WinEventHook
     {
         return Observable.Create<WinEventInfo>(observer =>
             {
-                void WinEventHookDelegate(IntPtr eventHook, WinEvents winEvent, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime)
+                void WinEventHookDelegate(IntPtr eventHook, WinEvents winEvent, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, int eventThread, uint eventTime)
                 {
                     // Exceptions must never propagate into the native callback
                     try
@@ -181,7 +181,7 @@ public static class WinEventHook
     /// <param name="hWnd">IntPtr</param>
     /// <param name="idObject">ObjectIdentifiers</param>
     /// <param name="idChild">int</param>
-    /// <param name="eventThread">uint with EventThread</param>
+    /// <param name="eventThread">int with the thread ID (a DWORD, natively)</param>
     /// <param name="eventTime">uint with EventTime</param>
-    private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvents eventType, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, uint eventThread, uint eventTime);
+    private delegate void WinEventDelegate(IntPtr hWinEventHook, WinEvents eventType, IntPtr hWnd, ObjectIdentifiers idObject, int idChild, int eventThread, uint eventTime);
 }

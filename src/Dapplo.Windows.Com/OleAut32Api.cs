@@ -34,10 +34,15 @@ public static class OleAut32Api
     /// </summary>
     /// <typeparam name="T">Type for the instance</typeparam>
     /// <param name="progId">string</param>
-    /// <returns>IDisposableCom of T</returns>
+    /// <returns>IDisposableCom of T, or null when the progId is unknown or there is no active instance</returns>
     public static IDisposableCom<T> GetActiveObject<T>(string progId)
     {
-        var clsId = Ole32Api.ClassIdFromProgId(progId);
+        var classId = Ole32Api.ClassIdFromProgId(progId);
+        if (!classId.HasValue)
+        {
+            return null;
+        }
+        var clsId = classId.Value;
         return GetActiveObject<T>(ref clsId);
     }
 

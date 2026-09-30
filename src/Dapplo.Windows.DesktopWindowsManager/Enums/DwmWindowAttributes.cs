@@ -20,13 +20,13 @@ public enum DwmWindowAttributes
     ///     Use with DwmSetWindowAttribute. Sets the non-client rendering policy. The pvAttribute parameter points to a value
     ///     from the DWMNCRENDERINGPOLICY enumeration.
     /// </summary>
-    NcrenderingPolicy,
+    NcRenderingPolicy,
 
     /// <summary>
     ///     Use with DwmSetWindowAttribute. Enables or forcibly disables DWM transitions. The pvAttribute parameter points to a
     ///     value of TRUE to disable transitions or FALSE to enable transitions.
     /// </summary>
-    TransitionsForcedisabled,
+    TransitionsForceDisabled,
 
     /// <summary>
     ///     Use with DwmSetWindowAttribute. Enables content rendered in the non-client area to be visible on the frame drawn by
@@ -99,7 +99,7 @@ public enum DwmWindowAttributes
     ExcludedFromPeek,
 
     /// <summary>
-    ///     Use with DwmGetWindowAttribute. Cloaks the window such that it is not visible to the user. The window is still
+    ///     Use with DwmSetWindowAttribute. Cloaks the window such that it is not visible to the user. The window is still
     ///     composed by DWM.
     ///     Using with DirectComposition:  Use the DWMWA_CLOAK flag to cloak the layered child window when animating a
     ///     representation of the window's content via a DirectComposition visual which has been associated with the layered
@@ -143,7 +143,7 @@ public enum DwmWindowAttributes
     /// For compatibility reasons, all windows default to light mode regardless of the system setting.
     /// The pvAttribute parameter points to a value of type BOOL.
     /// TRUE to honor dark mode for the window, FALSE to always use light mode.
-    ///  This value is supported starting with Windows 11 Build 22000.
+    /// This value is documented as supported starting with Windows 11 Build 22000, but it also works on Windows 10 20H1 (build 19041) and later.
     /// </summary>
     UseImmersiveDarkMode = 20,
 
@@ -178,6 +178,13 @@ public enum DwmWindowAttributes
     /// This value is supported starting with Windows 11 Build 22000.
     /// </summary>
     VisibleFrameBorderThickness,
+
+    /// <summary>
+    /// Use with DwmGetWindowAttribute or DwmSetWindowAttribute. Retrieves or specifies the system-drawn backdrop material of a window,
+    /// including behind the non-client area. The pvAttribute parameter points to a value of type DWM_SYSTEMBACKDROP_TYPE, see <see cref="DwmSystemBackdropType"/>.
+    /// This value is supported starting with Windows 11 Build 22621.
+    /// </summary>
+    SystemBackdropType,
 
     /// <summary>
     ///     The maximum recognized DWMWINDOWATTRIBUTE value, used for validation purposes.

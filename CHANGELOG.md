@@ -18,6 +18,32 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - **Breaking:** icon helpers support `Icon` and `Bitmap` only and throw `NotSupportedException` for other types instead of returning null; use `ToBitmapSource()` from Dapplo.Windows.Wpf.
 - **Breaking:** `DwmApi.ColorizationColor` (WPF `Color`) is removed; use `ColorizationSystemDrawingColor.ToMediaColor()`.
 - **Breaking:** `BitmapScaleHandler.AddTarget(Button / ToolStripItem)` moved to Dapplo.Windows.Forms extension methods; the core has `AddTargetAction`.
+- **Breaking:** `Parent` / `HasParent` / `GetParent()` mean the real parent (child windows only, `GetAncestor(GA_PARENT)`), never the owner; new `Owner` / `HasOwner` / `GetOwner()` and `InteropWindowRetrieveSettings.Owner`. `GetInfo(autoCorrect)` no longer crops owned dialogs to their owner (A-06).
+- **Breaking:** `GetChildren()` returns direct children only; new `GetDescendants()` returns all descendants (A-14).
+- **Breaking:** `SafeCurrentInputDesktopHandle` is replaced by `SafeDesktopHandle.OpenInputDesktop()` and `ThreadDesktopScope.SwitchToInputDesktop()` (A-18).
+- **Breaking:** `TrySendMessage(hWnd, msg, wParam, lParam, out result, timeout)`; `AttachThreadInput` takes and returns `bool`; `MapWindowPoints` has `ref NativePoint`, `ref NativeRect` and `NativePoint[]` overloads; `FillRect` returns `bool`; `DisplayInfo.Index` is `int` (A-22, A-36, A-41, A-48).
+- **Breaking:** `DesktopAccessRight.GENERIC_ALL` is the real 0x10000000 (the old value is `DESKTOP_ALL_SPECIFIC`); `ObjectStates.STATE_SYSTEM_VALID` is 0x7FFFFFFF (A-30, A-38).
+- **Breaking:** `InteropWindow` conversions to and from `IntPtr` are explicit and `Equals` is symmetric; `InteropWindowQuery.IgnoreClasses` is read-only (use `AddIgnoreClass` / `RemoveIgnoreClass`); `WinEventInfo` is a readonly struct with 32-bit fields; `WndClassEx.LpfnWndProc` is a function pointer; the sync window enumerators return `IReadOnlyList` (A-39, A-42, A-43, A-46, A-47).
+- **Breaking:** the `IInteropWindow` icon extensions (`GetIcon`, `GetIconFromWindow`, `GetAppLogo`) moved from Dapplo.Windows.Icons to the Dapplo.Windows package (same namespace); `IconHelper.GetAppLogo<T>` takes the executable path (F-28).
+- **Breaking:** `Win32.GetHResult` returns `HResult` and maps success to `S_OK`; `ColorSpace` profile values are corrected and the rendering intent is the new `ColorSpaceIntent` enum; `BitfieldColorMask` has the correct layout (`Rgb888`, `Rgb565`, `Rgb555` presets) (C-29, C-30, C-31).
+- **Breaking:** `IsEmpty` of the rectangle and size structs is true for zero or negative width or height, like Win32 `IsRectEmpty` (C-35).
+- **Breaking:** `Bgra32.AlphaBlend` uses Porter-Duff "over" for non-opaque targets; new `AlphaBlendPremultiplied`, `ToPremultiplied`, `ToStraight` (C-12).
+- **Breaking:** `DpiAwareForm` no longer swallows WM_DPICHANGED: WinForms' own Per Monitor v2 scaling and `Form.DpiChanged` run; without it only the window bounds follow the suggested rectangle (D-21). The WPF `AttachDpiHandler` no longer double-scales (D-22).
+- **Breaking:** DPI scaling rounds instead of truncating; `DpiHandler.Dpi` is 96 until known, see `IsDpiKnown` (D-32).
+- **Breaking:** `Kernel32Api.GlobalSize` returns `UIntPtr`; `PackageInfo.IsRunningOnUwp` is renamed to `HasPackageIdentity`; `Ole32Api.ClassIdFromProgId` returns `Guid?`; `IOleCommandTarget` takes `IntPtr pguidCmdGroup`; `ComWrapper` no longer force-releases the RCW (D-28, D-30, D-36, D-37, D-38).
+- **Breaking:** `MonitorDpiType` and `WindowsProductTypes` are no longer `[Flags]` (D-39).
+- **Breaking:** clipboard `GetAsStream` / `TryGetAsStream` return a copy of the data that stays valid after the token is disposed (D-34).
+- **Breaking:** the Restart Manager types moved from Kernel32 to Dapplo.Windows.InstallerManager (`RestartManagerApi`, `Enums`, `Structs`), with readable field names (`AppName`, `ProcessId`, `IsRestartable`, …); the duplicate Kernel32 `RestartManager` is removed (F-38).
+- **Breaking:** `InstallerRestartManager.Shutdown()` defaults to the new `RmShutdownType.Graceful`; forcing is opt-in (E-16).
+- **Breaking:** `Shell32Api.ExtractIconEx` takes `IntPtr[]` arrays (new `CountIcons`); `AppBarData.lParam` is pointer-sized; `Shell32Api.TaskbarPosition` is replaced by `TryGetTaskbarPosition` (new `GetTaskbarState`) (E-19, E-26).
+- **Breaking:** Citrix `EventMask` is a 32-bit enum, `SessionTime` exposes UTC `DateTime?` (E-15, E-23); `Advapi32Api.CurrentSessionId` is renamed to `CurrentLogonSid` (E-27); `WaitableTimer` APIs use `SafeWaitHandle` (E-28).
+- **Breaking:** fixed typos in public names: `WinFrame.IsAvailabe` → `IsAvailable`, `ClientLatency.Avarage` → `Average`, `Derivation` → `Deviation`, `UserInfo.Domainname` / `Username` → `DomainName` / `UserName`, `AppBarStates.AllwaysOnTop` → `AlwaysOnTop`, `AppBarMessages.SetAutohideAppBar` → `SetAutoHideAppBar`, `DwmWindowAttributes.NcrenderingPolicy` → `NcRenderingPolicy`, `TransitionsForcedisabled` → `TransitionsForceDisabled` (E-33, F-35).
+- **Breaking:** Input and Messages enums lost their duplicate-value aliases and misspellings: `VirtualKeyCode.Snapshot` → `PrintScreen`, `Hangul` → `Kana`, `Kanji` → `Hanja`; `MouseButtonStates.Button*` aliases removed, `Buttonx1Up` → `ButtonX1Up`; `LowerIntegretyInjected` → `LowerIntegrityInjected`; `WM_KEYFIRST` / `WM_KEYLAST` / `WM_MOUSEFIRST` removed (B-32).
+- **Breaking:** `KeyboardHookExtensions.Where(handler)` rejects a handler already used by another active subscription; use the new `Where(() => handler)` factory overload for observables subscribed more than once (B-33).
+- **Breaking:** all assemblies are strong-named for every target framework and configuration (F-26).
+- **Breaking:** removed `ApplicationRestartManager.MaxCommandLineLength` (use `RestartMaxCmdLine`), `PowerBroadcastEvent` values that can't arrive, and undocumented DWM ordinals (`DwmpStartOrStopFlip3D`, `GetSharedSurface`, `UpdateWindowShared`) (E-31, E-35, E-36).
+- Debug builds no longer enable checked arithmetic, so Debug and Release behave the same (F-25, F-37).
+- Every package contains a README; builds are deterministic and use `ContinuousIntegrationBuild` on CI; unnecessary dependencies (Dapplo.Log in Advapi32, Microsoft.SourceLink.GitHub) are gone and no empty `.dll.config` is shipped (F-27, F-29, F-30).
 - `DpiHandler.HandleWindowMessages`, `HandleContextMenuMessages` and `MessageHandler` are public, so other UI frameworks can feed messages to a `DpiHandler`.
 - `User32Api.GetCursorLocation()` falls back to `GetCursorPos` instead of WinForms `Cursor.Position`.
 - Packages are published to NuGet only from version tags (`v*`), each with a GitHub Release built from this changelog; other builds are prereleases. The API reference is generated again with docfx as a dotnet tool, and the wiki mirror removes deleted pages (F-02, F-07, F-16, F-19).
@@ -76,6 +102,23 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - `WindowsSessionListener.IsRegistered` and `RegistrationFailed`; `DevBroadcastDeviceInterface.TryGetDevBroadcastPort` / `TryGetDevBroadcastHandle`; `PowerManagementApi.EnableShutdownPrivilege()`.
 
 ### Fixed
+- Window information: `GetCaption` works for the calling thread's own windows without deadlocks (A-11); `GetTopWindows` / `GetZOrderedChildren` no longer yield handle 0 (A-13); `GetInfo` no longer overwrites `Children` as a side effect (A-15); `GetText` no longer truncates at 259 characters (A-21); `GetAppLauncher`, `AppVisible` and `IsLauncherVisible` give correct answers (A-23..A-25); `MonitorInfoEx.DeviceName` stays in its buffer (A-26); `GetVisibleLocation` returns the working-area origin (A-32); `InstalledSoftware()` reads both registry views and HKCU (A-33); `GetInfo` doesn't cache failures (A-34); `ToForegroundAsync` really waits for the restore (A-22); WPF `GetHandle()` works before the window is shown (A-45).
+- `PrintWindow` crops to the visible bounds instead of shifting the capture and uses `PW_RENDERFULLCONTENT` on Windows 8.1+, so DirectComposition, Chromium and UWP content is no longer black (A-16, A-27).
+- `ToBitmapSource` keeps the alpha channel (A-28, C-25).
+- Cursor capture: `TryGetCurrentCursor` returns a `Size` / `HotSpot` that match the captured layers at every DPI and pointer size; drawing respects the Graphics transform, handles non-square and premultiplied cursors, and no longer leaks handles on errors (C-10, C-11, C-12, C-34).
+- `SafeWindowDcHandle.FromWindowClientArea` returns a client-area DC (C-15); GDI SafeHandles no longer touch finalized objects (C-26).
+- DIB header factories compute correct image sizes, pixel offsets and file sizes (C-19); the ICO/CUR writer scales images above 256 pixels instead of truncating them (C-20); `ExtractVistaIcon` returns a Bitmap that outlives the stream (C-21); the app logo lookup finds scaled logos (C-33); `GetIcon` no longer leaks `Process` objects (C-36).
+- The GDI+ blur works again on .NET 10 (C-22).
+- `NativeRect.Union(NativeRect.Empty)` no longer includes (0,0) (C-27); `Transform(Matrix)` uses all four corners, so rotation and mirroring work (C-28); float struct equality is consistent with `GetHashCode` and reflexive for NaN (C-32).
+- `DpiHandler` keeps working after a WinForms handle recreate (D-20); `BitmapScaleHandler` no longer leaks bitmaps or touches UI from its finalizer (D-23).
+- `GetProcessPath` returns correct paths for more processes and long paths (D-25); `PreventDllHijacking` handles non-ANSI paths and reports failures (D-29); `PackageInfo.CurrentPackageFullName` is correct (D-30); Restart Manager callbacks no longer unbalance the stack on x86 (D-31).
+- The EmbeddedBrowser registers the real executable name and keeps page scripts running after a script error (E-30).
+- File open, save and folder dialogs keep the default options and no longer change the current directory (E-08).
+- `DwmApi.IsDwmEnabled` is true on every Windows 8+; `IsWindowCloaked` reads a DWORD; added `DwmWindowAttributes.SystemBackdropType` (E-20, E-21).
+- Citrix `ClientDisplay.ColorDepth` maps high values correctly (E-22).
+- `InstallerRestartManager` retries when the process list grows, ends leaked sessions and keeps callbacks alive (E-29).
+- `WinMm.Play(string)` plays WAVE resources from the given module (E-34); `SetLastError` usage matches the native APIs (A-40, E-32).
+- The InstallerExample finds the FormsExample for any build configuration; the WpfExample only swallows PrintScreen while active (F-34).
 - `dotnet pack` of a single project no longer fails on the missing icon; package release notes point to this changelog (F-09).
 - Benchmarks target the runtimes the project builds for (F-04); FormsExample embeds its app.manifest, so the DPI demos run Per Monitor v2 (F-18).
 - Reading a window's text (`GetTextFromWindow`, `GetText()`, `Fill()`) no longer crashes the process with a StackOverflowException when a control holds a very large text; texts over 1M characters are truncated (A-03).

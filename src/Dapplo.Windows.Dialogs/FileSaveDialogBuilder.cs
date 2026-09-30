@@ -115,8 +115,9 @@ public sealed class FileSaveDialogBuilder
         try
         {
             if (_title != null) dialog.SetTitle(_title);
-            // OverwritePrompt is the default for save dialogs; set it explicitly.
-            dialog.SetOptions(FileOpenOptions.OverwritePrompt);
+            // OverwritePrompt is one of the save dialog defaults; the defaults are kept and it is added explicitly.
+            dialog.GetOptions(out var currentOptions);
+            dialog.SetOptions(ComDialogHelper.CombineOptions(currentOptions, FileOpenOptions.OverwritePrompt));
             ComDialogHelper.ApplyFilters(dialog.SetFileTypes, dialog.SetFileTypeIndex, _filters);
             if (_suggestedFileName != null) dialog.SetFileName(_suggestedFileName);
             if (_defaultExtension != null) dialog.SetDefaultExtension(_defaultExtension);
@@ -128,9 +129,7 @@ public sealed class FileSaveDialogBuilder
             if (hr != 0) Marshal.ThrowExceptionForHR(hr);
 
             dialog.GetResult(out var item);
-            var path = ComDialogHelper.GetFileSysPath(item);
-            Marshal.ReleaseComObject(item);
-            return FileDialogResult.FromPath(path);
+            return FileDialogResult.FromPath(ComDialogHelper.GetFileSysPathAndRelease(item));
         }
         finally
         {

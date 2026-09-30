@@ -56,12 +56,6 @@ public static class ApplicationRestartManager
     ///     This corresponds to the Windows RESTART_MAX_CMD_LINE constant.
     /// </summary>
     public const int RestartMaxCmdLine = 1024;
-    
-    /// <summary>
-    ///     Maximum length for the command line arguments (in characters).
-    ///     Alias for RestartMaxCmdLine for backward compatibility.
-    /// </summary>
-    public const int MaxCommandLineLength = RestartMaxCmdLine;
 
     /// <summary>
     ///     Registers the current application for automatic restart.
@@ -83,9 +77,9 @@ public static class ApplicationRestartManager
     /// <exception cref="Win32Exception">Thrown when registration fails.</exception>
     public static void RegisterForRestart(string commandLineArgs = null, ApplicationRestartFlags flags = ApplicationRestartFlags.None)
     {
-        if (!string.IsNullOrEmpty(commandLineArgs) && commandLineArgs.Length > MaxCommandLineLength)
+        if (!string.IsNullOrEmpty(commandLineArgs) && commandLineArgs.Length > RestartMaxCmdLine)
         {
-            throw new ArgumentException($"Command line arguments cannot exceed {MaxCommandLineLength} characters", nameof(commandLineArgs));
+            throw new ArgumentException($"Command line arguments cannot exceed {RestartMaxCmdLine} characters", nameof(commandLineArgs));
         }
 
         var result = RegisterApplicationRestart(commandLineArgs, flags);

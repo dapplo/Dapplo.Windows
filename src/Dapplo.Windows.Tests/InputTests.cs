@@ -29,80 +29,61 @@ public class InputTests
     }
 
     /// <summary>
-    ///     Test LastInputTimeSpan
+    ///     Test LastInputTimeSpan, an injected (harmless) shift press is input
     /// </summary>
     [Fact]
-    private async Task TestInput_LastInputTimeSpan()
+    public async Task TestInput_LastInputTimeSpan()
     {
-        var initialLastInputTimeSpan = NativeInput.LastInputTimeSpan;
-        await Task.Delay(100, TestContext.Current.CancellationToken);
-        var laterLastInputTimeSpan = NativeInput.LastInputTimeSpan;
-        Assert.True(laterLastInputTimeSpan > initialLastInputTimeSpan);
+        Assert.Equal(4u, KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Shift, VirtualKeyCode.Shift));
+        await TestWait.UntilAsync(() => NativeInput.LastInputTimeSpan < TimeSpan.FromSeconds(1), "The injected input didn't update the last input time");
     }
 
     /// <summary>
-    ///     Test LastInputDateTime
+    ///     Test LastInputDateTime, an injected (harmless) shift press is input
     /// </summary>
     [Fact]
-    private async Task TestInput_LastInputDateTime()
+    public async Task TestInput_LastInputDateTime()
     {
-        var initialLastInput = NativeInput.LastInputDateTime;
-        await Task.Delay(50, TestContext.Current.CancellationToken);
-        var laterLastInput = NativeInput.LastInputDateTime;
-        var deviation = laterLastInput.Subtract(initialLastInput);
-        Assert.True(deviation < TimeSpan.FromMilliseconds(100));
+        var beforeInput = DateTimeOffset.Now;
+        Assert.Equal(2u, KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Shift));
+        // The tick count has a resolution of 10-16 ms, allow some deviation
+        var tolerance = TimeSpan.FromMilliseconds(100);
+        await TestWait.UntilAsync(() => NativeInput.LastInputDateTime >= beforeInput - tolerance, "The injected input didn't update the last input time");
+        Assert.True(NativeInput.LastInputDateTime <= DateTimeOffset.Now + tolerance);
     }
 
     /// <summary>
-    ///     Test typing in a notepad
+    ///     Test generating keyboard input, only harmless modifier keys are pressed
     /// </summary>
     [Fact]
-    private async Task TestInput()
+    public void TestInput()
     {
-        // Start a process to test against
-        using (var process = Process.Start("charmap.exe"))
+        var sentInputs = KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Shift, VirtualKeyCode.Control);
+        // 2 x down & up
+        Assert.Equal(4u, sentInputs);
+    }
+
+    /// <summary>
+    ///     Test moving the mouse, the cursor is restored afterwards
+    /// </summary>
+    [Fact]
+    public async Task TestMouseInput()
+    {
+        var originalLocation = User32Api.GetCursorLocation();
+        try
         {
-            // Make sure it's started
-            Assert.NotNull(process);
-            // Wait until the process started it's message pump (listening for input)
-            if (!process.WaitForInputIdle(2000))
+            var target = new NativePoint(10, 10);
+            Assert.Equal(1u, MouseInputGenerator.MoveMouse(target));
+            // The absolute coordinates are normalized to 0-65535, allow a rounding difference
+            await TestWait.UntilAsync(() =>
             {
-                Assert.Fail("Test-Process didn't get ready.");
-                return;
-            }
-
-            User32Api.SetWindowText(process.MainWindowHandle, "TestInput");
-
-            // Find the belonging window
-            var testWindow = await WindowsEnumerator.EnumerateWindowsAsync()
-                .Where(interopWindow =>
-                {
-                    User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var processId);
-                    return processId == process.Id;
-                })
-                .FirstOrDefaultAsync();
-            Assert.NotNull(testWindow);
-
-            // Send input
-            var sentInputs = KeyboardInputGenerator.KeyPresses(VirtualKeyCode.KeyR, VirtualKeyCode.KeyO, VirtualKeyCode.KeyB, VirtualKeyCode.KeyI, VirtualKeyCode.KeyN);
-            // Test if we indead sent 10 inputs (5 x down & up)
-            Assert.Equal((uint) 10, sentInputs);
-
-            // Kill the process
-            process.Kill();
+                var location = User32Api.GetCursorLocation();
+                return Math.Abs(location.X - target.X) <= 1 && Math.Abs(location.Y - target.Y) <= 1;
+            }, "The mouse didn't move to the target location");
         }
-    }
-
-    /// <summary>
-    ///     Test typing in a notepad
-    /// </summary>
-    /// <returns></returns>
-    [Fact]
-    private void TestMouseInput()
-    {
-        MouseInputGenerator.MoveMouse(new NativePoint(10, 10));
-        Thread.Sleep(100);
-        MouseInputGenerator.MoveMouse(new NativePoint(100, 100));
-        Thread.Sleep(100);
+        finally
+        {
+            MouseInputGenerator.MoveMouse(originalLocation);
+        }
     }
 }

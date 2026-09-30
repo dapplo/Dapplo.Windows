@@ -24,7 +24,7 @@ public static class PowerBroadcastListener
     {
         _powerBroadcastEvents = SharedMessageWindow.Messages
             .Where(m => m.Msg == WindowsMessages.WM_POWERBROADCAST)
-            // Only the event type is passed on: lParam (e.g. the POWERBROADCAST_SETTING of PBT_POWERSETTINGCHANGE) is only valid during the message
+            // Only the event type is passed on, lParam is only valid during the message
             .Select(m => unchecked((PowerBroadcastEvent)(uint)m.WParam))
             .Publish()
             .RefCount();

@@ -56,11 +56,13 @@ public class WinEventHookTests
                 Assert.NotNull(process);
 
                 // Wait until the process started it's message pump (listening for input)
-                if (!process.WaitForInputIdle(2000))
+                Assert.True(process.WaitForInputIdle(5000), "Process wasn't ready for input.");
+                // The MainWindowHandle can still be 0 directly after the start
+                await TestWait.UntilAsync(() =>
                 {
-                    Assert.Fail("Process wasn't ready for input.");
-                    return;
-                }
+                    process.Refresh();
+                    return process.MainWindowHandle != IntPtr.Zero;
+                }, "The main window of charmap wasn't created");
                 User32Api.SetWindowText(process.MainWindowHandle, "TestWinEventHook - Test");
 
                 // Find the belonging window

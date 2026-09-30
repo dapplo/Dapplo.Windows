@@ -55,6 +55,12 @@ public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
     public IInteropWindow ParentWindow { get; set; }
 
     /// <inheritdoc />
+    public bool HasOwner => Owner.HasValue && Owner != IntPtr.Zero;
+
+    /// <inheritdoc />
+    public IntPtr? Owner { get; set; }
+
+    /// <inheritdoc />
     public string Caption { get; set; }
 
     /// <inheritdoc />
@@ -128,32 +134,34 @@ public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
             dump.AppendLine($"{indentation}{nameof(Parent)}={Parent}");
         }
 
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Owner) != 0)
+        {
+            dump.AppendLine($"{indentation}{nameof(Owner)}={Owner}");
+        }
+
+        if ((retrieveSettings & InteropWindowRetrieveSettings.ProcessId) != 0)
+        {
+            dump.AppendLine($"{indentation}{nameof(ProcessId)}={ProcessId}");
+            dump.AppendLine($"{indentation}{nameof(ThreadId)}={ThreadId}");
+        }
+
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Placement) != 0)
+        {
+            dump.AppendLine($"{indentation}{nameof(Placement)}={Placement}");
+        }
+
         if ((retrieveSettings & InteropWindowRetrieveSettings.ScrollInfo) != 0)
         {
             dump.AppendLine($"{indentation}{nameof(CanScroll)}={CanScroll}");
         }
 
-        if ((retrieveSettings & InteropWindowRetrieveSettings.Children) != 0 && !HasParent)
+        // Fill already retrieved the (Z-ordered) children, when requested. Each child dumps its own children, so the complete tree is dumped.
+        if ((retrieveSettings & (InteropWindowRetrieveSettings.Children | InteropWindowRetrieveSettings.ZOrderedChildren)) != 0 && Children != null)
         {
-            foreach (var child in this.GetChildren())
+            foreach (var child in Children)
             {
                 child.Dump(retrieveSettings, dump, indentation + "\t");
             }
-        }
-
-        if ((retrieveSettings & InteropWindowRetrieveSettings.ZOrderedChildren) == 0)
-        {
-            return dump;
-        }
-
-        if (HasParent)
-        {
-            return dump;
-        }
-
-        foreach (var child in this.GetZOrderedChildren())
-        {
-            child.Dump(retrieveSettings, dump, indentation + "\t");
         }
 
         return dump;
@@ -176,19 +184,8 @@ public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
     /// <inheritdoc />
     public override bool Equals(object obj)
     {
-        if (obj is null)
-        {
-            return false;
-        }
-        if (ReferenceEquals(this, obj))
-        {
-            return true;
-        }
-        if (obj.GetType() != GetType())
-        {
-            return false;
-        }
-        return Equals((IInteropWindow) obj);
+        // Symmetric with Equals(IInteropWindow): every IInteropWindow with the same handle is equal
+        return obj is IInteropWindow other && Equals(other);
     }
 
     /// <inheritdoc />
@@ -209,21 +206,21 @@ public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
     }
 
     /// <summary>
-    /// Create (cast) a InteropWindow from an IntPtr
+    /// Create (cast) a new InteropWindow for an IntPtr, this is the same as <see cref="InteropWindowFactory.CreateFor(IntPtr)"/>
     /// </summary>
     /// <param name="handle">IntPtr</param>
-    public static implicit operator InteropWindow(IntPtr handle)
+    public static explicit operator InteropWindow(IntPtr handle)
     {
         return InteropWindowFactory.CreateFor(handle);
     }
 
     /// <summary>
-    /// Cast the InteropWindow to it's handle
+    /// Cast the InteropWindow to it's handle, null results in IntPtr.Zero
     /// </summary>
     /// <param name="interopWindow">InteropWindow</param>
-    public static implicit operator IntPtr(InteropWindow interopWindow)
+    public static explicit operator IntPtr(InteropWindow interopWindow)
     {
-        return interopWindow.Handle;
+        return interopWindow?.Handle ?? IntPtr.Zero;
     }
 
     /// <summary>

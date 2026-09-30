@@ -306,6 +306,7 @@ public struct BitmapV4Header
     /// <param name="width">int with the width of the bitmap</param>
     /// <param name="height">int with the height of the bitmap</param>
     /// <param name="bpp">int with the bits per pixel of the bitmap</param>
+    /// <remarks>The compression is BI_RGB, which means GDI ignores the color masks which are set, set Compression to BI_BITFIELDS to use them.</remarks>
     public static BitmapV4Header Create(int width, int height, ushort bpp)
     {
         return new BitmapV4Header
@@ -318,7 +319,7 @@ public struct BitmapV4Header
             _biWidth = width,
             _biHeight = height,
             _biBitCount = bpp,
-            _biSizeImage = (uint) (width * height * (bpp >> 3)),
+            _biSizeImage = BitmapInfoHeader.CalculateImageSize(width, height, bpp),
             _biXPelsPerMeter = 0,
             _biYPelsPerMeter = 0,
             _biClrUsed = 0,
@@ -367,18 +368,9 @@ public struct BitmapV4Header
     }
 
     /// <summary>
-    ///     Calculate the offset to the pixels
+    ///     Calculate the offset, from the start of this header, to the pixels.
+    ///     This includes the BI_BITFIELDS color masks which follow a 40 byte header and the color table.
+    ///     Add the size of the BitmapFileHeader for the offset in a .bmp file.
     /// </summary>
-    public uint OffsetToPixels
-    {
-        get
-        {
-            if (_biCompression == BitmapCompressionMethods.BI_BITFIELDS)
-            {
-                // Add 3x4 bytes for the bitfield color mask
-                return _biSize + 3 * 4;
-            }
-            return _biSize;
-        }
-    }
+    public uint OffsetToPixels => BitmapInfoHeader.CalculateOffsetToPixels(_biSize, _biCompression, _biBitCount, _biClrUsed);
 }

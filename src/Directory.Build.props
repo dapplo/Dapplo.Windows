@@ -11,35 +11,52 @@
     <LangVersion>latest</LangVersion>
     <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <Deterministic>true</Deterministic>
+    <!--
+      Debug and Release use the same arithmetic: unchecked (the C# default).
+      Code which must detect an overflow uses checked(...) explicitly, interop conversions use unchecked(...) to document the intent.
+    -->
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <!--
+      Nullable reference types stay "oblivious" for now: <Nullable>annotations</Nullable> without annotating the code
+      would tell consumers that every reference type is non-null, which is wrong for the many methods returning null.
+      Enable it per project once the project has been annotated.
+    -->
+    <!-- Projects named Dapplo.* which are not tests or examples are the libraries which are packed, signed and documented -->
+    <IsDapploLibrary>false</IsDapploLibrary>
+    <IsDapploLibrary Condition="$(MSBuildProjectName.StartsWith('Dapplo')) And !$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">true</IsDapploLibrary>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(MSBuildProjectName.Contains('Dapplo')) And $(TargetFramework.StartsWith('net4')) And '$(Configuration)' == 'Release' And !$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">
+  <!-- Deterministic paths for CI builds (GitHub Actions sets CI and GITHUB_ACTIONS, Azure DevOps sets TF_BUILD) -->
+  <PropertyGroup Condition="'$(CI)' == 'true' Or '$(GITHUB_ACTIONS)' == 'true' Or '$(TF_BUILD)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- The libraries are strong-named for every target framework and configuration, so the assembly identity never differs between builds -->
+  <PropertyGroup Condition="'$(IsDapploLibrary)' == 'true'">
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Dapplo.Windows.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
-  </PropertyGroup>
-  
-  <!-- Global definition for non test or example projects -->
-  <PropertyGroup Condition="!$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Source Link is part of the .NET SDK, embed the generated sources (e.g. AssemblyInfo) which are not in git -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
-  <!-- Global definition for non test or example projects to enable packaging in release mode -->
-  <PropertyGroup Condition="'$(Configuration)' != 'Debug' And !$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">
+  <!-- Libraries create their package in release mode -->
+  <PropertyGroup Condition="'$(Configuration)' != 'Debug' And '$(IsDapploLibrary)' == 'true'">
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-  
+
   <!-- Global definition for test or example projects -->
   <PropertyGroup Condition="$(MSBuildProjectName.Contains('Tests')) Or $(MSBuildProjectName.Contains('Example'))">
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <IsPackable>false</IsPackable>
-  </PropertyGroup>  
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugSymbols>True</DebugSymbols>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <DebugType>embedded</DebugType>
     <Optimize>false</Optimize>
   </PropertyGroup>
@@ -49,14 +66,13 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
-	
-  <!-- Global definition for non test or example projects to enable InternalsVisibleTo, git versioning and pdbgit -->
-  <ItemGroup Condition="!$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example')) And $(MSBuildProjectName.StartsWith('Dapplo'))">
+
+  <!-- Git based versioning and the package icon for the libraries -->
+  <ItemGroup Condition="'$(IsDapploLibrary)' == 'true'">
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.9.50">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103" PrivateAssets="All"/>
     <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="\" Visible="false"/>
   </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@ namespace Dapplo.Windows.Citrix.Enums;
 ///     the events (possible values for EventMask), and indicates the flags triggered by the event.
 /// </summary>
 [Flags]
-public enum EventMask : ulong
+public enum EventMask : uint
 {
     /// <summary>
     ///     WF_EVENT_NONE: No event (this event is used only as a return value in pEventFlags)

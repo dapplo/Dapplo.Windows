@@ -15,13 +15,13 @@ public class Shell32Tests
     }
 
     /// <summary>
-    ///     Test AppBarr
+    ///     Test AppBar, this needs a desktop with a taskbar
     /// </summary>
-    /// <returns></returns>
     [Fact]
-    private void TestAppBar()
+    [Trait("Category", "Interactive")]
+    public void TestAppBar()
     {
-        var appBarData = Shell32Api.TaskbarPosition;
+        Assert.True(Shell32Api.TryGetTaskbarPosition(out var appBarData));
         Assert.False(appBarData.Bounds.IsEmpty);
     }
 }

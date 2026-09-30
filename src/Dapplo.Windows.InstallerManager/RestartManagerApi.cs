@@ -4,10 +4,10 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Dapplo.Windows.Kernel32.Enums;
-using Dapplo.Windows.Kernel32.Structs;
+using Dapplo.Windows.InstallerManager.Enums;
+using Dapplo.Windows.InstallerManager.Structs;
 
-namespace Dapplo.Windows.Kernel32;
+namespace Dapplo.Windows.InstallerManager;
 
 /// <summary>
 ///     Restart Manager API functionality
@@ -173,6 +173,8 @@ public static class RestartManagerApi
     ///     Callback function used by RmShutdown and RmRestart to report status updates.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nc-restartmanager-rm_write_status_callback">RM_WRITE_STATUS_CALLBACK callback function</a>
     /// </summary>
+    /// <remarks>The native typedef has no WINAPI, so this is a cdecl callback (this matters for x86 processes).</remarks>
     /// <param name="nPercentComplete">An integer value between 0 and 100 that indicates the percentage of the total number of applications that have either been shut down or restarted.</param>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void RmStatusCallback(uint nPercentComplete);
 }

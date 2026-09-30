@@ -8,6 +8,8 @@ namespace Dapplo.Windows.SystemState.Enums;
 /// <summary>
 /// Power broadcast events (wParam values for WM_POWERBROADCAST).
 /// See <a href="https://learn.microsoft.com/en-us/windows/win32/power/wm-powerbroadcast">WM_POWERBROADCAST message</a>
+/// Only the events which are still sent since Windows Vista are listed. PBT_POWERSETTINGCHANGE is not listed,
+/// it is only sent after RegisterPowerSettingNotification and its POWERBROADCAST_SETTING lParam is not passed on.
 /// </summary>
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
@@ -27,21 +29,11 @@ public enum PowerBroadcastEvent : uint
     PBT_APMRESUMESUSPEND = 0x0007,
 
     /// <summary>
-    /// Battery power is low.
-    /// </summary>
-    PBT_APMBATTERYLOW = 0x0009,
-
-    /// <summary>
     /// A change in the power status of the computer is detected, such as a switch from battery power to AC.
     /// The system also broadcasts this event when remaining battery power slips below the threshold
     /// specified by the user or if the battery power changes by a specified percentage.
     /// </summary>
     PBT_APMPOWERSTATUSCHANGE = 0x000A,
-
-    /// <summary>
-    /// The system has resumed operation after a critical suspension caused by a failing battery.
-    /// </summary>
-    PBT_APMRESUMEDCRITICAL = 0x0006,
 
     /// <summary>
     /// The system has resumed operation automatically to handle an event.
@@ -50,10 +42,4 @@ public enum PowerBroadcastEvent : uint
     /// See <a href="https://learn.microsoft.com/en-us/windows/win32/power/system-wake-up-events">System Wake-Up Events</a>
     /// </summary>
     PBT_APMRESUMEAUTOMATIC = 0x0012,
-
-    /// <summary>
-    /// A power setting change event has been received.
-    /// The lParam parameter points to a POWERBROADCAST_SETTING structure.
-    /// </summary>
-    PBT_POWERSETTINGCHANGE = 0x8013,
 }

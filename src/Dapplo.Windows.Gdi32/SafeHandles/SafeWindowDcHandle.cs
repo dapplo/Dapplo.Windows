@@ -37,10 +37,10 @@ public class SafeWindowDcHandle : SafeHandleZeroOrMinusOneIsInvalid
     }
 
     /// <summary>
-    /// Creates a DC as SafeWindowDcHandle for the whole of the specified hWnd
+    /// Creates a DC as SafeWindowDcHandle for the whole of the specified hWnd, including the non-client area (GetWindowDC)
     /// </summary>
     /// <param name="hWnd">IntPtr</param>
-    /// <returns>SafeWindowDcHandle</returns>
+    /// <returns>SafeWindowDcHandle, or null when hWnd is IntPtr.Zero (use <see cref="FromDesktop"/> for the screen)</returns>
     public static SafeWindowDcHandle FromWindow(IntPtr hWnd)
     {
         if (hWnd == IntPtr.Zero)
@@ -52,14 +52,14 @@ public class SafeWindowDcHandle : SafeHandleZeroOrMinusOneIsInvalid
     }
 
     /// <summary>
-    /// Creates a DC as SafeWindowDcHandle for the client area of the specified hWnd
+    /// Creates a DC as SafeWindowDcHandle for the client area of the specified hWnd (GetDC), when hWnd is IntPtr.Zero this is the DC for the entire screen
     /// </summary>
     /// <param name="hWnd">IntPtr</param>
     /// <returns>SafeWindowDcHandle</returns>
     public static SafeWindowDcHandle FromWindowClientArea(IntPtr hWnd)
     {
-        var hDcDesktop = User32Api.GetWindowDC(hWnd);
-        return new SafeWindowDcHandle(hWnd, hDcDesktop);
+        var hDc = User32Api.GetDC(hWnd);
+        return new SafeWindowDcHandle(hWnd, hDc);
     }
 
     /// <summary>

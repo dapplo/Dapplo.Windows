@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Dapplo.Windows.Com;
 
@@ -24,7 +25,7 @@ namespace Dapplo.Windows.EmbeddedBrowser
         /// </summary>
         protected class ExtendedWebBrowserSite : WebBrowserSite, IOleCommandTarget
         {
-            private const int OleCmdDidShowScriptError = 40;
+            private const int OleCmdIdShowScriptError = 40;
 
             private const int Ok = 0;
             private const int OleCmmdErrENotsupported = -2147221248;
@@ -40,22 +41,30 @@ namespace Dapplo.Windows.EmbeddedBrowser
             }
 
             /// <inheritdoc />
-            public int QueryStatus(Guid pguidCmdGroup, int cCmds, IntPtr prgCmds, IntPtr pCmdText)
+            public int QueryStatus(IntPtr pguidCmdGroup, int cCmds, IntPtr prgCmds, IntPtr pCmdText)
             {
                 return OleCmmdErrENotsupported;
             }
 
+            /// <summary>
+            /// Suppresses the script error dialog, and lets the scripts on the page continue running
+            /// </summary>
             /// <inheritdoc />
-            public int Exec(Guid pguidCmdGroup, int nCmdId, int nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+            public int Exec(IntPtr pguidCmdGroup, int nCmdId, int nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
             {
-                if (pguidCmdGroup != CGID_DocHostCommandHandler)
+                // NULL is the standard group, which isn't handled here
+                if (pguidCmdGroup == IntPtr.Zero || Marshal.PtrToStructure<Guid>(pguidCmdGroup) != CGID_DocHostCommandHandler)
                 {
                     return OleCmmdErrENotsupported;
                 }
 
-                if (nCmdId == OleCmdDidShowScriptError)
+                if (nCmdId == OleCmdIdShowScriptError)
                 {
-                    // do not need to alter pvaOut as the docs says, enough to return Ok here
+                    // Setting pvaOut to VARIANT_TRUE continues running the scripts on the page, otherwise they are stopped (see KB261003)
+                    if (pvaOut != IntPtr.Zero)
+                    {
+                        Marshal.GetNativeVariantForObject(true, pvaOut);
+                    }
                     return Ok;
                 }
 
