@@ -80,6 +80,13 @@ public static class ClipboardDataSourceExtensions
     /// <summary>
     /// Try to get a UTF-16 string, like CF_UNICODETEXT. The string ends at the first NUL character.
     /// </summary>
+    /// <remarks>
+    /// Windows synthesizes CF_UNICODETEXT from CF_TEXT and CF_OEMTEXT on the clipboard, but other sources (e.g. a <see cref="DataObjectReader"/>
+    /// for a drop) may only have CF_TEXT. For CF_UNICODETEXT such sources fall back like Windows: CF_TEXT decoded with the ANSI code page of
+    /// CF_LOCALE when present, else the system ANSI code page; then CF_OEMTEXT with the OEM code page. The text ends at the first NUL.
+    /// The open clipboard, a <see cref="ClipboardSnapshot"/> and the OLE clipboard (<see cref="ClipboardNative.GetOleDataObject"/>) don't
+    /// use the fallback: the clipboard synthesizes CF_UNICODETEXT itself, and a snapshot has exactly the formats which were requested.
+    /// </remarks>
     /// <param name="source">IClipboardDataSource</param>
     /// <param name="text">string</param>
     /// <param name="format">string with the format name, default CF_UNICODETEXT</param>
@@ -87,16 +94,48 @@ public static class ClipboardDataSourceExtensions
     public static bool TryGetAsUnicodeString(this IClipboardDataSource source, out string text, string format = null)
     {
         text = null;
-        if (!source.TryGetAsBytes(format ?? StandardClipboardFormats.UnicodeText.AsString(), out var bytes))
+        var unicodeTextFormat = StandardClipboardFormats.UnicodeText.AsString();
+        format ??= unicodeTextFormat;
+        if (source.TryGetAsBytes(format, out var bytes))
         {
-            return false;
+            text = DecodeNullTerminated(Encoding.Unicode.GetString(bytes));
+            return true;
         }
-        text = DecodeNullTerminated(Encoding.Unicode.GetString(bytes));
-        return true;
+        return string.Equals(format, unicodeTextFormat, StringComparison.OrdinalIgnoreCase)
+               && !HasSynthesizedFormats(source)
+               && TryGetAnsiTextAsUnicode(source, out text);
     }
 
     /// <summary>
-    /// Get a UTF-16 string, like CF_UNICODETEXT
+    /// True for the sources which represent the clipboard: Windows synthesizes the text formats there, and a snapshot must only
+    /// return what was read from the clipboard
+    /// </summary>
+    private static bool HasSynthesizedFormats(IClipboardDataSource source) =>
+        source is ClipboardSnapshot or ClipboardTokenDataSource or DataObjectReader { IsFromClipboard: true };
+
+    /// <summary>
+    /// CF_TEXT with the code page of CF_LOCALE (or CP_ACP), else CF_OEMTEXT with CP_OEMCP, like Windows synthesizes CF_UNICODETEXT
+    /// </summary>
+    private static bool TryGetAnsiTextAsUnicode(IClipboardDataSource source, out string text)
+    {
+        text = null;
+        if (source.TryGetAsBytes(StandardClipboardFormats.Text.AsString(), out var ansi) && ansi != null)
+        {
+            source.TryGetAsBytes(StandardClipboardFormats.Locale.AsString(), out var locale);
+            text = AnsiText.Decode(ansi, AnsiText.CodePageOfLocale(locale));
+            return text != null;
+        }
+        if (source.TryGetAsBytes(StandardClipboardFormats.OemText.AsString(), out var oem) && oem != null)
+        {
+            text = AnsiText.Decode(oem, AnsiText.OemCodePage);
+            return text != null;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Get a UTF-16 string, like CF_UNICODETEXT. For CF_UNICODETEXT, sources other than the clipboard fall back to CF_TEXT / CF_OEMTEXT,
+    /// see <see cref="TryGetAsUnicodeString"/>.
     /// </summary>
     /// <param name="source">IClipboardDataSource</param>
     /// <param name="format">string with the format name, default CF_UNICODETEXT</param>
@@ -119,6 +158,22 @@ public static class ClipboardDataSourceExtensions
         }
         text = DecodeNullTerminated(Encoding.UTF8.GetString(bytes));
         return true;
+    }
+
+    /// <summary>
+    /// Check if the source has virtual files (FileGroupDescriptorW or the ANSI FileGroupDescriptor), e.g. Outlook attachments.
+    /// The descriptor isn't read. Read the files with <see cref="DataObjectReader.GetVirtualFiles"/>, for a snapshot of the clipboard with
+    /// <see cref="ClipboardSnapshot.TryUseVirtualFiles{T}"/>; <see cref="ClipboardNative.HasVirtualFiles"/> checks the clipboard itself.
+    /// </summary>
+    /// <param name="source">IClipboardDataSource</param>
+    /// <returns>bool</returns>
+    public static bool HasVirtualFiles(this IClipboardDataSource source)
+    {
+        if (source == null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+        return source.HasFormat(DataObjectReader.FileGroupDescriptorWFormat) || source.HasFormat(DataObjectReader.FileGroupDescriptorFormat);
     }
 
     /// <summary>

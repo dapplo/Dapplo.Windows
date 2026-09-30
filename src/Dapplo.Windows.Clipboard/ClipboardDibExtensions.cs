@@ -65,19 +65,36 @@ public static class ClipboardDibExtensions
     }
 
     /// <summary>
-    /// Read a bitmap from CF_DIBV5, or CF_DIB when there is no CF_DIBV5. Windows synthesizes both from CF_BITMAP, so this also reads
-    /// bitmaps which were placed as a GDI handle.
+    /// Read a bitmap from CF_DIBV5, or CF_DIB when there is no CF_DIBV5 (or it can't be decoded). Windows synthesizes both from CF_BITMAP,
+    /// so this also reads bitmaps which were placed as a GDI handle. Bitmaps with more than <see cref="DibImage.DefaultMaxPixelCount"/>
+    /// pixels aren't decoded, see <see cref="TryGetAsDib(IClipboardDataSource, long, out DibImage)"/>.
     /// </summary>
     /// <param name="source">IClipboardDataSource, e.g. a snapshot or clipboard.AsDataSource()</param>
     /// <param name="image">DibImage with top-down BGRA32 pixels</param>
     /// <returns>true when a bitmap could be read</returns>
-    public static bool TryGetAsDib(this IClipboardDataSource source, out DibImage image)
+    public static bool TryGetAsDib(this IClipboardDataSource source, out DibImage image) => source.TryGetAsDib(DibImage.DefaultMaxPixelCount, out image);
+
+    /// <summary>
+    /// Read a bitmap from CF_DIBV5, or CF_DIB when there is no CF_DIBV5 (or it can't be decoded), with a maximum size:
+    /// bitmaps with more than <paramref name="maxPixelCount"/> pixels (width * |height|) aren't decoded, this is checked from the header
+    /// before the pixels are allocated. See <see cref="DibImage.TryDecode(byte[], long, out DibImage)"/>.
+    /// </summary>
+    /// <param name="source">IClipboardDataSource, e.g. a snapshot or clipboard.AsDataSource()</param>
+    /// <param name="maxPixelCount">long with the maximum number of pixels, e.g. <see cref="DibImage.DefaultMaxPixelCount"/></param>
+    /// <param name="image">DibImage with top-down BGRA32 pixels</param>
+    /// <returns>true when a bitmap could be read</returns>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="maxPixelCount"/> isn't positive</exception>
+    public static bool TryGetAsDib(this IClipboardDataSource source, long maxPixelCount, out DibImage image)
     {
+        if (maxPixelCount <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxPixelCount), maxPixelCount, "The maximum pixel count must be positive.");
+        }
         image = null;
-        if (source.TryGetAsBytes(StandardClipboardFormats.DeviceIndependentBitmapV5.AsString(), out var dibV5) && DibImage.TryDecode(dibV5, out image))
+        if (source.TryGetAsBytes(StandardClipboardFormats.DeviceIndependentBitmapV5.AsString(), out var dibV5) && DibImage.TryDecode(dibV5, maxPixelCount, out image))
         {
             return true;
         }
-        return source.TryGetAsBytes(StandardClipboardFormats.DeviceIndependentBitmap.AsString(), out var dib) && DibImage.TryDecode(dib, out image);
+        return source.TryGetAsBytes(StandardClipboardFormats.DeviceIndependentBitmap.AsString(), out var dib) && DibImage.TryDecode(dib, maxPixelCount, out image);
     }
 }

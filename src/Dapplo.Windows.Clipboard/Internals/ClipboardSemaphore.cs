@@ -228,7 +228,7 @@ internal sealed class ClipboardSemaphore : IDisposable
                 if (retries < 0)
                 {
                     var blocker = ClipboardBlocker.Detect();
-                    throw ClipboardAccessToken.CreateOpenTimeoutException(blocker.Window, blocker.ProcessId, blocker.Describe());
+                    throw ClipboardAccessToken.CreateOpenTimeoutException(blocker);
                 }
                 await Task.Delay(options.RetryInterval, cancellationToken);
             }

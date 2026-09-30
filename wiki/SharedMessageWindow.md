@@ -92,7 +92,9 @@ IntPtr handle = SharedMessageWindow.Handle;
 
 `Shutdown(timeout)` destroys the window on its own thread and waits for its loop; it runs automatically on
 `AppDomain.ProcessExit` (with `ProcessExitShutdownTimeout`, default 1.5 seconds), after which the window is not
-created again. After an explicit call the next use creates a new window, without the old registrations.
+created again. On .NET Framework the same happens on `AppDomain.DomainUnload` of a non-default AppDomain (e.g. test
+hosts), so the window thread has ended before the CLR aborts the threads of that AppDomain. After an explicit call the
+next use creates a new window, without the old registrations.
 
 <!-- sample: MessagesSamples.Shutdown -->
 ```csharp

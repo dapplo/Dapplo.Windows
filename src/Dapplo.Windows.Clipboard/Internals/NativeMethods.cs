@@ -166,6 +166,42 @@ internal static class NativeMethods
     internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
     /// <summary>
+    /// See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-internalgetwindowtext">InternalGetWindowText</a>,
+    /// unlike GetWindowText this never sends WM_GETTEXT, so it can't hang on a window of a blocked thread.
+    /// </summary>
+    [DllImport("user32", CharSet = CharSet.Unicode)]
+    private static extern unsafe int InternalGetWindowText(IntPtr hWnd, char* text, int maxCount);
+
+    /// <summary>
+    /// The title of a window, without sending it a message
+    /// </summary>
+    /// <param name="hWnd">IntPtr with the window</param>
+    /// <returns>string, empty when the window has no title or doesn't exist</returns>
+    internal static string GetWindowTitle(IntPtr hWnd)
+    {
+        const int maxLength = 512;
+        unsafe
+        {
+            var buffer = stackalloc char[maxLength];
+            var length = InternalGetWindowText(hWnd, buffer, maxLength);
+            return length > 0 ? new string(buffer, 0, Math.Min(length, maxLength - 1)) : string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// See <a href="https://learn.microsoft.com/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar">MultiByteToWideChar</a>
+    /// </summary>
+    [DllImport("kernel32", SetLastError = true)]
+    internal static extern unsafe int MultiByteToWideChar(uint codePage, uint flags, byte* multiByte, int multiByteLength, char* wideChar, int wideCharLength);
+
+    /// <summary>
+    /// See <a href="https://learn.microsoft.com/windows/win32/api/winnls/nf-winnls-getlocaleinfow">GetLocaleInfoW</a>, used with
+    /// LOCALE_RETURN_NUMBER: the value is a DWORD, the size is 2 characters
+    /// </summary>
+    [DllImport("kernel32", SetLastError = true, EntryPoint = "GetLocaleInfoW")]
+    internal static extern int GetLocaleInfoNumber(uint locale, uint localeType, out uint value, int valueSizeInChars);
+
+    /// <summary>
     /// Retrieves the sequence number of the clipboard
     /// </summary>
     /// <returns>sequence number or 0 if this cannot be retrieved</returns>

@@ -85,6 +85,79 @@ public class ClipboardSnapshotTests
     }
 
     [WpfFact]
+    public async Task UseAsync_Blocked_ExceptionHasBlockingProcessName()
+    {
+        var window = CreateWindow();
+        try
+        {
+            var blocked = ClipboardThreadingTests.BlockClipboard(TimeSpan.FromMilliseconds(500), window.Handle);
+            var exception = await Assert.ThrowsAsync<ClipboardAccessDeniedException>(() =>
+                ClipboardNative.UseAsync(_ => { }, new ClipboardAccessOptions { Retries = 1, RetryInterval = TimeSpan.FromMilliseconds(20) }));
+
+            Assert.True(exception.IsOpenTimeout);
+            Assert.Equal(ClipboardBlockerTests.CurrentExecutableFileName, exception.BlockingProcessName);
+            Assert.Contains(exception.BlockingProcessName, exception.Message);
+            await blocked;
+        }
+        finally
+        {
+            window.DestroyHandle();
+        }
+    }
+
+    [WpfFact]
+    public async Task Access_Blocked_TokenAndItsExceptionHaveBlockingProcessName()
+    {
+        var window = CreateWindow();
+        try
+        {
+            var blocked = ClipboardThreadingTests.BlockClipboard(TimeSpan.FromMilliseconds(500), window.Handle);
+            using (var clipboard = ClipboardNative.Access(retries: 1, retryInterval: TimeSpan.FromMilliseconds(20)))
+            {
+                Assert.True(clipboard.IsOpenTimeout);
+                var processName = clipboard.GetBlockingProcessName();
+                Assert.Equal(ClipboardBlockerTests.CurrentExecutableFileName, processName);
+                var exception = Assert.Throws<ClipboardAccessDeniedException>(() => clipboard.ThrowWhenNoAccess());
+                Assert.Equal(processName, exception.BlockingProcessName);
+                Assert.Contains(processName, exception.Message);
+            }
+            await blocked;
+        }
+        finally
+        {
+            window.DestroyHandle();
+        }
+    }
+
+    [WpfFact]
+    public async Task AccessAsync_Blocked_TokenHasBlockingProcessName()
+    {
+        var window = CreateWindow();
+        try
+        {
+            var blocked = ClipboardThreadingTests.BlockClipboard(TimeSpan.FromMilliseconds(500), window.Handle);
+            using (var clipboard = await ClipboardNative.AccessAsync(retries: 1, retryInterval: TimeSpan.FromMilliseconds(20)))
+            {
+                Assert.True(clipboard.IsOpenTimeout);
+                Assert.Equal(ClipboardBlockerTests.CurrentExecutableFileName, clipboard.GetBlockingProcessName());
+            }
+            await blocked;
+        }
+        finally
+        {
+            window.DestroyHandle();
+        }
+    }
+
+    [WpfFact]
+    public void Access_Opened_HasNoBlockingProcessName()
+    {
+        using var clipboard = ClipboardNative.Access();
+        Assert.True(clipboard.CanAccess);
+        Assert.Null(clipboard.GetBlockingProcessName());
+    }
+
+    [WpfFact]
     public async Task LockTimeout_Exception_IsLockTimeout()
     {
         using (ClipboardNative.Access())
@@ -265,6 +338,85 @@ public class ClipboardSnapshotTests
         var source = clipboard.AsDataSource();
         var exception = await Task.Run(() => Record.Exception(() => source.HasFormat("CF_UNICODETEXT")));
         Assert.IsType<InvalidOperationException>(exception);
+    }
+
+    // ── 3.2: text fallback, available formats, virtual files ─────────────────
+
+    [WpfFact]
+    public async Task Clipboard_OnlyCfText_SnapshotHasNoFallback_ClipboardSynthesizes()
+    {
+        var restore = await ClipboardRestore.SaveAsync();
+        try
+        {
+            var ansi = Encoding.ASCII.GetBytes("Only ANSI\0");
+            await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents().AddBytes(ansi, "CF_TEXT")));
+
+            // Windows synthesizes CF_UNICODETEXT on the clipboard
+            Assert.Equal("Only ANSI", await ClipboardNative.UseAsync(clipboard => clipboard.AsDataSource().GetAsUnicodeString()));
+
+            // A snapshot has exactly the requested formats, no fallback
+            var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "CF_TEXT" });
+            Assert.True(snapshot.HasFormat("CF_TEXT"));
+            Assert.Null(snapshot.GetAsUnicodeString());
+            Assert.False(snapshot.TryGetAsUnicodeString(out _));
+        }
+        finally
+        {
+            await restore.RestoreAsync();
+        }
+    }
+
+    [WpfFact]
+    public async Task AvailableFormats_InTheGivenOrder_WithoutOpeningTheClipboard()
+    {
+        var restore = await ClipboardRestore.SaveAsync();
+        try
+        {
+            await WriteTestContent(new byte[] { 1, 2, 3 });
+
+            var preferred = new[] { "Dapplo.Windows.Tests.NotOnTheClipboard", LargeFormat, null, "CF_UNICODETEXT", JsonFormat, LargeFormat, "" };
+            // Another thread keeps the clipboard open: AvailableFormats doesn't open it, so it still works
+            var blocked = ClipboardThreadingTests.BlockClipboard(TimeSpan.FromMilliseconds(300));
+            try
+            {
+                Assert.Equal(new[] { LargeFormat, "CF_UNICODETEXT" }, ClipboardNative.AvailableFormats(preferred, 2));
+            }
+            finally
+            {
+                await blocked;
+            }
+
+            Assert.Equal(new[] { LargeFormat, "CF_UNICODETEXT", JsonFormat }, ClipboardNative.AvailableFormats(preferred));
+            Assert.Empty(ClipboardNative.AvailableFormats(preferred, 0));
+            // Synthesized formats count
+            Assert.Equal(new[] { "CF_TEXT" }, ClipboardNative.AvailableFormats(new[] { "CF_TEXT" }, 1));
+        }
+        finally
+        {
+            await restore.RestoreAsync();
+        }
+    }
+
+    [WpfFact]
+    public async Task HasVirtualFiles_Clipboard()
+    {
+        var restore = await ClipboardRestore.SaveAsync();
+        try
+        {
+            // A descriptor placed with the Win32 API is enough for the check, the content isn't read
+            await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents()
+                .AddBytes(new byte[4], DataObjectReader.FileGroupDescriptorWFormat)));
+            Assert.True(ClipboardNative.HasVirtualFiles());
+            var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { DataObjectReader.FileGroupDescriptorWFormat, DataObjectReader.FileGroupDescriptorFormat });
+            Assert.True(snapshot.HasVirtualFiles());
+
+            await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents().AddUnicodeString("No files")));
+            Assert.False(ClipboardNative.HasVirtualFiles());
+        }
+        finally
+        {
+            await restore.RestoreAsync();
+        }
     }
 
     [Fact]

@@ -13,43 +13,74 @@ internal static class DibCodec
     private const uint BiRgb = 0;
     private const uint BiBitfields = 3;
     private const uint BiAlphaBitfields = 6;
+    private const int CoreHeaderSize = 12;
     private const int InfoHeaderSize = 40;
     private const int V5HeaderSize = 124;
     // LCS_sRGB = 'sRGB'
     private const uint LcsSrgb = 0x73524742;
     // LCS_GM_IMAGES
     private const uint LcsGmImages = 4;
-    // Protect against absurd sizes in broken headers
-    private const long MaxPixels = 1L << 28;
+    // The largest byte array the runtime allows (Array.MaxLength), the decoded pixels must fit in one
+    private const long MaxArrayLength = 0x7FFFFFC7;
 
-    public static bool TryDecode(byte[] data, out DibImage image)
+    public static bool TryDecode(byte[] data, long maxPixelCount, out DibImage image)
     {
+        if (maxPixelCount <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxPixelCount), maxPixelCount, "The maximum pixel count must be positive.");
+        }
         image = null;
-        if (data == null || data.Length < InfoHeaderSize)
+        if (data == null || data.Length < CoreHeaderSize)
         {
             return false;
         }
         var headerSize = ReadUInt32(data, 0);
-        if (headerSize != 40 && headerSize != 52 && headerSize != 56 && headerSize != 108 && headerSize != 124)
+        int width;
+        int rawHeight;
+        int bitCount;
+        uint compression;
+        uint colorsUsed;
+        int paletteEntrySize;
+        if (headerSize == CoreHeaderSize)
         {
-            return false;
+            // BITMAPCOREHEADER: unsigned 16-bit width and height (always bottom-up), 1, 4, 8 or 24 bpp, RGBTRIPLE palette
+            width = ReadUInt16(data, 4);
+            rawHeight = ReadUInt16(data, 6);
+            bitCount = ReadUInt16(data, 10);
+            compression = BiRgb;
+            colorsUsed = 0;
+            paletteEntrySize = 3;
+            if (bitCount != 1 && bitCount != 4 && bitCount != 8 && bitCount != 24)
+            {
+                return false;
+            }
         }
-        if (data.Length < headerSize)
+        else
         {
-            return false;
+            if (headerSize != 40 && headerSize != 52 && headerSize != 56 && headerSize != 108 && headerSize != 124)
+            {
+                return false;
+            }
+            if (data.Length < headerSize)
+            {
+                return false;
+            }
+            width = ReadInt32(data, 4);
+            rawHeight = ReadInt32(data, 8);
+            bitCount = ReadUInt16(data, 14);
+            compression = ReadUInt32(data, 16);
+            colorsUsed = ReadUInt32(data, 32);
+            paletteEntrySize = 4;
         }
-        var width = ReadInt32(data, 4);
-        var rawHeight = ReadInt32(data, 8);
-        var bitCount = ReadUInt16(data, 14);
-        var compression = ReadUInt32(data, 16);
-        var colorsUsed = ReadUInt32(data, 32);
         if (width <= 0 || rawHeight == 0 || rawHeight == int.MinValue)
         {
             return false;
         }
         var isTopDown = rawHeight < 0;
         var height = Math.Abs(rawHeight);
-        if ((long)width * height > MaxPixels)
+        // Checked from the header, before anything is allocated. Both are below 2^31, so the product can't overflow a long.
+        var pixelCount = (long)width * height;
+        if (pixelCount > maxPixelCount || pixelCount > MaxArrayLength / 4)
         {
             return false;
         }
@@ -136,26 +167,30 @@ internal static class DibCodec
         {
             var maxColors = 1 << bitCount;
             var colors = colorsUsed == 0 || colorsUsed > maxColors ? maxColors : (int)colorsUsed;
-            if (data.Length < offset + colors * 4)
+            if (data.Length < offset + colors * paletteEntrySize)
             {
                 return false;
             }
             palette = new uint[maxColors];
             for (var i = 0; i < colors; i++)
             {
-                // RGBQUAD: blue, green, red, reserved
-                palette[i] = ReadUInt32(data, offset + i * 4) | 0xFF000000;
+                var entry = offset + i * paletteEntrySize;
+                // RGBQUAD: blue, green, red, reserved; RGBTRIPLE: blue, green, red
+                palette[i] = data[entry] | ((uint)data[entry + 1] << 8) | ((uint)data[entry + 2] << 16) | 0xFF000000;
             }
-            offset += colors * 4;
+            offset += colors * paletteEntrySize;
         }
 
-        var sourceStride = (int)((((long)width * bitCount) + 31) / 32 * 4);
-        if (data.Length < offset + (long)sourceStride * height)
+        // Rows are padded to 4 bytes. Compared by division, so the check can't overflow whatever the header says.
+        var sourceStride = ((long)width * bitCount + 31) / 32 * 4;
+        long available = data.Length - offset;
+        if (available < 0 || sourceStride > available / height)
         {
             return false;
         }
+        var stride = (int)sourceStride;
 
-        var pixels = new byte[width * 4 * height];
+        var pixels = new byte[pixelCount * 4];
         var redChannel = new Channel(redMask);
         var greenChannel = new Channel(greenMask);
         var blueChannel = new Channel(blueMask);
@@ -165,7 +200,7 @@ internal static class DibCodec
 
         for (var y = 0; y < height; y++)
         {
-            var sourceRow = offset + (isTopDown ? y : height - 1 - y) * sourceStride;
+            var sourceRow = offset + (isTopDown ? y : height - 1 - y) * stride;
             var targetRow = y * width * 4;
             for (var x = 0; x < width; x++)
             {

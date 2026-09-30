@@ -148,10 +148,15 @@ When you change a code sample, change it in `src/Dapplo.Windows.Example.DocSampl
 ## Releasing
 
 Every merge to `master` is a release. The build computes the version with Nerdbank.GitVersioning
-(`src/version.json`: `3.0` plus the number of commits since the version last changed, e.g. 3.0.1, 3.0.2, …), packs everything and then waits for approval
-of the `NuGet` environment. After approval it pushes the packages to nuget.org, creates the tag and the GitHub release
-(notes from the `## [<version>]` or `## [Unreleased]` section of [CHANGELOG.md](CHANGELOG.md)) and publishes the
-documentation and the wiki. For a new minor or major version, change `version` in `src/version.json`.
+(`src/version.json`: major.minor plus the number of commits since the version last changed, e.g. 3.2.1, 3.2.4, …), packs
+everything and then waits for approval of the `NuGet` environment. After approval it pushes the packages to nuget.org, creates
+the tag and the GitHub release and publishes the documentation and the wiki. For a new minor or major version, change
+`version` in `src/version.json`.
+
+The release notes come from [CHANGELOG.md](CHANGELOG.md). Because the patch number is only known when the release is built,
+write the changes of a new minor version under `## [3.2.0]` (the first release of 3.2 uses it), and later fixes under
+`## [Unreleased]`. A section with the exact version (`## [3.2.4]`) always wins. Without a matching section GitHub generates
+the notes from the merged pull requests.
 
 ## Contributing
 
