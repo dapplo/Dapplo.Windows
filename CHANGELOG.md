@@ -125,6 +125,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - `WindowsSessionListener.IsRegistered` and `RegistrationFailed`; `DevBroadcastDeviceInterface.TryGetDevBroadcastPort` / `TryGetDevBroadcastHandle`; `PowerManagementApi.EnableShutdownPrivilege()`.
 
 ### Fixed
+- `KeyHelper.VirtualKeyCodeFromString` still parses the removed alias names `Snapshot`, `Hangul`, `Hangeul` and `Kanji`, so hotkeys stored by 2.x keep working.
 - Delayed-rendered clipboard formats survive process exit: the shared window is destroyed on exit, so Windows sends WM_RENDERALLFORMATS.
 - The children of the desktop window no longer get the desktop as parent, so `IsVisibleApplicationWindow()` is correct for them.
 - Window information: `GetCaption` works for the calling thread's own windows without deadlocks (A-11); `GetTopWindows` no longer yields handle 0 (A-13); `GetInfo` no longer overwrites `Children` as a side effect (A-15); `GetText` no longer truncates at 259 characters (A-21); `GetAppLauncher`, `AppVisible` and `IsLauncherVisible` give correct answers (A-23..A-25); `MonitorInfoEx.DeviceName` stays in its buffer (A-26); `GetVisibleLocation` returns the working-area origin (A-32); `InstalledSoftware()` reads both registry views and HKCU (A-33); `GetInfo` doesn't cache failures (A-34); `ToForegroundAsync` really waits for the restore (A-22); WPF `GetHandle()` works before the window is shown (A-45).

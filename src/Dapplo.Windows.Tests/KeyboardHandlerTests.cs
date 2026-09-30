@@ -54,6 +54,16 @@ public class KeyboardHandlerTests
     }
 
     [Fact]
+    public void TestKeyHelper_ParsesNamesStoredBy2x()
+    {
+        Assert.Equal(VirtualKeyCode.PrintScreen, KeyHelper.VirtualKeyCodeFromString("Snapshot"));
+        Assert.Equal(VirtualKeyCode.PrintScreen, KeyHelper.VirtualKeyCodeFromString("PrintScreen"));
+        Assert.Equal(VirtualKeyCode.Kana, KeyHelper.VirtualKeyCodeFromString("Hangul"));
+        Assert.Equal(VirtualKeyCode.Hanja, KeyHelper.VirtualKeyCodeFromString("Kanji"));
+        Assert.Equal(VirtualKeyCode.Win, KeyHelper.VirtualKeyCodeFromString("win"));
+    }
+
+    [Fact]
     public void TestKeyHandler_KeySequenceHandler_Wrong_Right_ModifierReleasedLast()
     {
         var sequenceHandler = new KeySequenceHandler(

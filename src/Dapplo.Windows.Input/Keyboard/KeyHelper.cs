@@ -185,13 +185,17 @@ public static class KeyHelper
 
         keyDescription = keyDescription.ToLowerInvariant();
             
-        // Border cases
+        // Border cases, and the names of enum aliases removed in 3.0, so key descriptions stored by older versions still parse
         return keyDescription switch
         {
             "alt" => VirtualKeyCode.Menu,
             "ctrl" => VirtualKeyCode.Control,
             "win" => VirtualKeyCode.Win,
             "shift" => VirtualKeyCode.Shift,
+            "snapshot" => VirtualKeyCode.PrintScreen,
+            "hangul" => VirtualKeyCode.Kana,
+            "hangeul" => VirtualKeyCode.Kana,
+            "kanji" => VirtualKeyCode.Hanja,
             _ => VirtualKeyCode.None
         };
     }

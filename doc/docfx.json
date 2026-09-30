@@ -30,6 +30,7 @@
           "api/**.md",
           "api/**.yml",
           "articles/**.md",
+          "ai/**.md",
           "articles/**/toc.yml",
           "toc.yml",
           "*.md"

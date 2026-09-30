@@ -4,6 +4,9 @@ Dapplo.Windows 3.0 fixes many interop bugs. Where an API encoded a wrong concept
 compatibility. This page lists every breaking change with the code you need to update. The full list of changes is in
 the [changelog](../../CHANGELOG.md).
 
+Upgrading an application with an AI assistant? Give it [the upgrade prompt](../ai/upgrade-to-3.0.md): it covers the
+renames and, more importantly, the changes that still compile but behave differently.
+
 ## Target frameworks and packages
 
 3.0 targets `net480` and `net10.0-windows`. The core packages no longer pull in WinForms or WPF; add
@@ -69,13 +72,11 @@ var wpfRect = nativeRect.ToRect();
 | `LowerIntegretyInjected`, `HidUsagesGeneric.Consumer` | `LowerIntegrityInjected`, `HidUsagePages.Consumer` |
 | `WM_KEYFIRST`, `WM_MOUSEFIRST` | `WM_KEYDOWN`, `WM_MOUSEMOVE` |
 | `ApplicationRestartManager.MaxCommandLineLength` | `RestartMaxCmdLine` |
-
 | `new KeyCombinationHandler(...) { TriggerOnKeyUp = true }` | `{ TriggerMode = TriggerMode.FirstKeyUp }`, or `TriggerMode.AllKeysUp` when the hotkey sends input |
 | `window.GetZOrderedChildren(force)` | `window.GetChildren(force)` |
 | `InteropWindowRetrieveSettings.ZOrderedChildren` / `CacheAllChildZorder` | `Children` / `CacheAllWithChildren` |
 | `new IntPtr(-1)` / `new IntPtr(-2)` for `SetWindowPos` | `WindowHandles.HWND_TOPMOST` / `WindowHandles.HWND_NOTOPMOST` |
 | `token.SetAsUnicodeString(x)` without `ClearContents()` | `ClipboardNative.ReplaceContents(new ClipboardContents().AddUnicodeString(x))` |
-
 | `Dapplo.Windows.Messages.Enumerations` | `Dapplo.Windows.Messages.Enums` |
 | `Dapplo.Windows.Messages.Structs.WindowMessage` | `Dapplo.Windows.Messages.WindowMessage` |
 | `WindowMessageInfo` (`Handle`, `Message`, `WordParam`, `LongParam`) | `WindowMessage` (`Hwnd`, `Msg`, `WParam`, `LParam`) |
@@ -92,7 +93,6 @@ var wpfRect = nativeRect.ToRect();
 | `SystemStateApi.CloseHandle(h)` | `Kernel32Api.CloseHandle(h)` (the timers use `SafeWaitHandle`) |
 
 Behaviour changes to check:
-
 - **Dialogs** must be shown from an STA thread (the UI thread or a `[STAThread]` Main), not from `Task.Run`.
 - **`GetTopWindows()`** returns a list taken at call time; call it again for the current state.
 
@@ -102,6 +102,22 @@ Behaviour changes to check:
 - **Empty rectangles:** rectangles and sizes with a negative width or height count as empty.
 - **Keyboard handlers:** use one handler instance per subscription, or the `Where(() => new KeyCombinationHandler(...))` factory overload.
 - **Strong names:** the net10 assemblies are now strong-named too.
+
+## Saved settings
+
+Check everything your application stored with 2.x:
+
+- **`NativeSize` strings:** 2.x wrote `Height,Width` and read the values back the other way round. 3.0 reads and writes
+  `Width,Height`, so a size saved by 2.x comes back swapped. Swap stored values once when you upgrade (for example with
+  a settings version number), or reset them.
+- **Culture:** the type converters now always write with the invariant culture. Values written by 2.x under a culture
+  with a different minus sign (sv-SE, nb-NO) could not be read back before and may need a reset.
+- **Key names:** `KeyHelper.VirtualKeyCodeFromString` still accepts the removed alias names `Snapshot`, `Hangul`,
+  `Hangeul` and `Kanji`. `VirtualKeyCode.ToString()` now always gives the remaining name (`PrintScreen`, `Kana`,
+  `Hanja`), so re-saved settings use the new names. `"win"` now means either Windows key.
+- **Enum numbers:** if you stored `MonitorFrom`, `SysColorIndexes.Color3Dface`, `ProcessAccessRights`,
+  `DialogDpiChangeBehaviors`, `ObjectStates.STATE_SYSTEM_VALID` or `DesktopAccessRight.GENERIC_ALL` as numbers, the
+  values changed.
 
 ## HRESULT
 
