@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Struct KeyboardInput | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Struct KeyboardInput | Dapplo.Windows ">
+      
+      <meta name="description" content="This struct contains information about a simulated keyboard event. See KEYBDINPUT structure">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Input_Structs_KeyboardInput.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Input.Structs.KeyboardInput%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Input.Structs.KeyboardInput">
+
+
+
+  <h1 id="Dapplo_Windows_Input_Structs_KeyboardInput" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput" class="text-break">
+Struct KeyboardInput  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Input.html">Input</a>.<a class="xref" href="Dapplo.Windows.Input.Structs.html">Structs</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Input.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>This struct contains information about a simulated keyboard event.
+See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646271.aspx">KEYBDINPUT structure</a></p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public struct KeyboardInput</code></pre>
+  </div>
+
+
+
+
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetype.equals">ValueType.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetype.gethashcode">ValueType.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetype.tostring">ValueType.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_ExtraInfo_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ExtraInfo*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_ExtraInfo" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ExtraInfo">
+  ExtraInfo
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>An additional value associated with the keystroke. Use the GetMessageExtraInfo function to obtain this information.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public nuint ExtraInfo { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uintptr">nuint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_KeyEventFlags_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.KeyEventFlags*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_KeyEventFlags" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.KeyEventFlags">
+  KeyEventFlags
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L46"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Specifies various aspects of a keystroke. This member can be certain combinations of the following values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public KeyEventFlags KeyEventFlags { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Enums.KeyEventFlags.html">KeyEventFlags</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_ScanCode_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ScanCode*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_ScanCode" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ScanCode">
+  ScanCode
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A hardware scan code for the key. If KeyEventFlags specifies Unicode, ScanCode specifies a Unicode character which
+is to be sent to the foreground application.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ScanCodes ScanCode { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Enums.ScanCodes.html">ScanCodes</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_Timestamp_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.Timestamp*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_Timestamp" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.Timestamp">
+  Timestamp
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The time stamp for the event, in milliseconds. If this parameter is zero, the system will provide its own time
+stamp.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public uint Timestamp { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_VirtualKeyCode_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.VirtualKeyCode*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_VirtualKeyCode" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.VirtualKeyCode">
+  VirtualKeyCode
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A virtual-key code. The code must be a value in the range 1 to 254.
+If the dwFlags member specifies KEYEVENTF_UNICODE, wVk must be 0.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public VirtualKeyCode VirtualKeyCode { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Enums.VirtualKeyCode.html">VirtualKeyCode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_ForKeyDown_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForKeyDown*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_ForKeyDown_Dapplo_Windows_Input_Enums_VirtualKeyCode_System_Nullable_System_UInt32__" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForKeyDown(Dapplo.Windows.Input.Enums.VirtualKeyCode,System.Nullable{System.UInt32})">
+  ForKeyDown(VirtualKeyCode, uint?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a KeyboardInput for a key down</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static KeyboardInput ForKeyDown(VirtualKeyCode virtualKeyCode, uint? timestamp = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>virtualKeyCode</code> <a class="xref" href="Dapplo.Windows.Input.Enums.VirtualKeyCode.html">VirtualKeyCode</a></dt>
+    <dd><p>Value from VirtualKeyCodes</p>
+</dd>
+    <dt><code>timestamp</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a>?</dt>
+    <dd><p>optional Timestamp, null or 0 lets the system provide the time stamp</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Structs.KeyboardInput.html">KeyboardInput</a></dt>
+    <dd><p>KeyboardInput</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_ForKeyPress_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForKeyPress*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_ForKeyPress_Dapplo_Windows_Input_Enums_VirtualKeyCode_System_Nullable_System_UInt32__" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForKeyPress(Dapplo.Windows.Input.Enums.VirtualKeyCode,System.Nullable{System.UInt32})">
+  ForKeyPress(VirtualKeyCode, uint?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L77"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a KeyboardInput for a key press (up / down)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static KeyboardInput[] ForKeyPress(VirtualKeyCode virtualKeyCode, uint? timestamp = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>virtualKeyCode</code> <a class="xref" href="Dapplo.Windows.Input.Enums.VirtualKeyCode.html">VirtualKeyCode</a></dt>
+    <dd><p>Value from VirtualKeyCodes</p>
+</dd>
+    <dt><code>timestamp</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a>?</dt>
+    <dd><p>optional Timestamp, null or 0 lets the system provide the time stamp</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Structs.KeyboardInput.html">KeyboardInput</a>[]</dt>
+    <dd><p>KeyboardInput[]</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_ForKeyUp_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForKeyUp*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_ForKeyUp_Dapplo_Windows_Input_Enums_VirtualKeyCode_System_Nullable_System_UInt32__" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForKeyUp(Dapplo.Windows.Input.Enums.VirtualKeyCode,System.Nullable{System.UInt32})">
+  ForKeyUp(VirtualKeyCode, uint?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L114"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a KeyboardInput for a key up</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static KeyboardInput ForKeyUp(VirtualKeyCode virtualKeyCode, uint? timestamp = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>virtualKeyCode</code> <a class="xref" href="Dapplo.Windows.Input.Enums.VirtualKeyCode.html">VirtualKeyCode</a></dt>
+    <dd><p>Value from VirtualKeyCodes</p>
+</dd>
+    <dt><code>timestamp</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a>?</dt>
+    <dd><p>optional Timestamp, null or 0 lets the system provide the time stamp</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Structs.KeyboardInput.html">KeyboardInput</a></dt>
+    <dd><p>KeyboardInput</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_ForText_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForText*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_ForText_System_String_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForText(System.String)">
+  ForText(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L181"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create the KeyboardInputs which type the text, as used by <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardInputGenerator.html#Dapplo_Windows_Input_Keyboard_KeyboardInputGenerator_TypeText_System_String_">TypeText(string)</a>.
+Every UTF-16 code unit becomes a Unicode key down and key up (<a class="xref" href="Dapplo.Windows.Input.Structs.KeyboardInput.html#Dapplo_Windows_Input_Structs_KeyboardInput_ForUnicodeKeyDown_System_Char_System_Nullable_System_UInt32__">ForUnicodeKeyDown(char, uint?)</a>, <a class="xref" href="Dapplo.Windows.Input.Structs.KeyboardInput.html#Dapplo_Windows_Input_Structs_KeyboardInput_ForUnicodeKeyUp_System_Char_System_Nullable_System_UInt32__">ForUnicodeKeyUp(char, uint?)</a>),
+a surrogate pair becomes two of these, the high surrogate first.
+Line breaks (&quot;\r\n&quot;, &quot;\n&quot; or &quot;\r&quot;) become a press of <a class="xref" href="Dapplo.Windows.Input.Enums.VirtualKeyCode.html#Dapplo_Windows_Input_Enums_VirtualKeyCode_Return">Return</a>, &quot;\t&quot; a press of <a class="xref" href="Dapplo.Windows.Input.Enums.VirtualKeyCode.html#Dapplo_Windows_Input_Enums_VirtualKeyCode_Tab">Tab</a>,
+as most applications ignore these characters when they arrive as WM_CHAR without the key.
+All other control characters (<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char.iscontrol#system-char-iscontrol(system-char)">IsControl(char)</a>, e.g. \0, \b, escape, form feed) are skipped:
+applications treat them as editing commands (backspace, cancel, Ctrl+C in a console) and not as text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static KeyboardInput[] ForText(string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the text</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Structs.KeyboardInput.html">KeyboardInput</a>[]</dt>
+    <dd><p>KeyboardInput array, two for every typed character</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_ForUnicodeKeyDown_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForUnicodeKeyDown*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_ForUnicodeKeyDown_System_Char_System_Nullable_System_UInt32__" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForUnicodeKeyDown(System.Char,System.Nullable{System.UInt32})">
+  ForUnicodeKeyDown(char, uint?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L142"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a KeyboardInput for the key down of a Unicode character (KEYEVENTF_UNICODE), the application receives it as a VK_PACKET key which
+TranslateMessage turns into WM_CHAR with the character, independent of the keyboard layout.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static KeyboardInput ForUnicodeKeyDown(char character, uint? timestamp = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>character</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a></dt>
+    <dd><p>char, one UTF-16 code unit. A character outside the Basic Multilingual Plane needs two, the high and the low surrogate, in that order</p>
+</dd>
+    <dt><code>timestamp</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a>?</dt>
+    <dd><p>optional Timestamp, null or 0 lets the system provide the time stamp</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Structs.KeyboardInput.html">KeyboardInput</a></dt>
+    <dd><p>KeyboardInput</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_ForUnicodeKeyUp_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForUnicodeKeyUp*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_ForUnicodeKeyUp_System_Char_System_Nullable_System_UInt32__" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.ForUnicodeKeyUp(System.Char,System.Nullable{System.UInt32})">
+  ForUnicodeKeyUp(char, uint?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L159"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a KeyboardInput for the key up of a Unicode character (KEYEVENTF_UNICODE | KEYEVENTF_KEYUP), see <a class="xref" href="Dapplo.Windows.Input.Structs.KeyboardInput.html#Dapplo_Windows_Input_Structs_KeyboardInput_ForUnicodeKeyDown_System_Char_System_Nullable_System_UInt32__">ForUnicodeKeyDown(char, uint?)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static KeyboardInput ForUnicodeKeyUp(char character, uint? timestamp = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>character</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a></dt>
+    <dd><p>char, one UTF-16 code unit</p>
+</dd>
+    <dt><code>timestamp</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a>?</dt>
+    <dd><p>optional Timestamp, null or 0 lets the system provide the time stamp</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Structs.KeyboardInput.html">KeyboardInput</a></dt>
+    <dd><p>KeyboardInput</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Structs_KeyboardInput_IsExtendedKey_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.IsExtendedKey*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Structs_KeyboardInput_IsExtendedKey_Dapplo_Windows_Input_Enums_VirtualKeyCode_" data-uid="Dapplo.Windows.Input.Structs.KeyboardInput.IsExtendedKey(Dapplo.Windows.Input.Enums.VirtualKeyCode)">
+  IsExtendedKey(VirtualKeyCode)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L224"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check if the specified VirtualKeyCode is an extended key (E0 prefixed scan code), these need KEYEVENTF_EXTENDEDKEY
+when they are injected, otherwise Windows uses the non-extended (numpad) equivalent.
+Examples are the arrow keys, Insert, Delete, Home, End, PageUp, PageDown, RightControl, RightMenu (AltGr), Divide, NumLock, the Windows keys and the media keys.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsExtendedKey(VirtualKeyCode virtualKeyCode)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>virtualKeyCode</code> <a class="xref" href="Dapplo.Windows.Input.Enums.VirtualKeyCode.html">VirtualKeyCode</a></dt>
+    <dd><p>VirtualKeyCode</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the key is an extended key</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Structs/KeyboardInput.cs/#L14" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

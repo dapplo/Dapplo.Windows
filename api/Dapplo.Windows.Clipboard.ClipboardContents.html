@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class ClipboardContents | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ClipboardContents | Dapplo.Windows ">
+      
+      <meta name="description" content="Describes the complete content for the clipboard: one or more formats of the same data, and optionally the clipboard history / cloud clipboard options. Build it before opening the clipboard, then place it in one short operation with  or , which always clear the clipboard first.">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Clipboard_ClipboardContents.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Clipboard.ClipboardContents%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Clipboard.ClipboardContents">
+
+
+
+  <h1 id="Dapplo_Windows_Clipboard_ClipboardContents" data-uid="Dapplo.Windows.Clipboard.ClipboardContents" class="text-break">
+Class ClipboardContents  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L20"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Clipboard.html">Clipboard</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Clipboard.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Describes the complete content for the clipboard: one or more formats of the same data, and optionally the clipboard history / cloud clipboard options.
+Build it before opening the clipboard, then place it in one short operation with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_ReplaceContents_Dapplo_Windows_Clipboard_ClipboardContents_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__">ReplaceContents(ClipboardContents, nint, int, TimeSpan?, TimeSpan?)</a>
+or <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContentsExtensions.html#Dapplo_Windows_Clipboard_ClipboardContentsExtensions_ReplaceContents_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_ClipboardContents_">ReplaceContents(IClipboardAccessToken, ClipboardContents)</a>, which always clear the clipboard first.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class ClipboardContents</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ClipboardContents</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDibExtensions.html#Dapplo_Windows_Clipboard_ClipboardDibExtensions_AddDib_Dapplo_Windows_Clipboard_ClipboardContents_System_ReadOnlySpan_System_Byte__System_Int32_System_Int32_System_Int32_System_Boolean_Dapplo_Windows_Clipboard_DibFormats_">ClipboardDibExtensions.AddDib(ClipboardContents, ReadOnlySpan&lt;byte&gt;, int, int, int, bool, DibFormats)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardHtmlExtensions.html#Dapplo_Windows_Clipboard_ClipboardHtmlExtensions_AddHtml_Dapplo_Windows_Clipboard_ClipboardContents_System_String_System_Uri_">ClipboardHtmlExtensions.AddHtml(ClipboardContents, string, Uri)</a>
+  </div>
+  </dd></dl>
+
+
+
+  <h2 id="Dapplo_Windows_Clipboard_ClipboardContents_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>The formats are placed in the order they were added: add the richest format first, applications which enumerate the formats prefer the first they understand.
+Byte arrays and file names are captured when they are added, streams are read when the content is placed: keep them open until then.</p>
+</div>
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_FormatIds_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.FormatIds*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_FormatIds" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.FormatIds">
+  FormatIds
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L30"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The IDs of the formats, in the order they are placed on the clipboard. The clipboard history / cloud clipboard option formats are not included.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;uint&gt; FormatIds { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddBytes_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddBytes*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddBytes_System_Byte___Dapplo_Windows_Clipboard_StandardClipboardFormats_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddBytes(System.Byte[],Dapplo.Windows.Clipboard.StandardClipboardFormats)">
+  AddBytes(byte[], StandardClipboardFormats)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add bytes in the specified format</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddBytes(byte[] bytes, StandardClipboardFormats format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>bytes</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd><p>byte array with the content</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="Dapplo.Windows.Clipboard.StandardClipboardFormats.html">StandardClipboardFormats</a></dt>
+    <dd><p>StandardClipboardFormats with the clipboard format</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddBytes_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddBytes*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddBytes_System_Byte___System_String_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddBytes(System.Byte[],System.String)">
+  AddBytes(byte[], string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L86"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add bytes in the specified format</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddBytes(byte[] bytes, string format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>bytes</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd><p>byte array with the content</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the clipboard format, e.g. &quot;PNG&quot; or your own format (it is registered on first use)</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddBytes_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddBytes*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddBytes_System_Byte___System_UInt32_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddBytes(System.Byte[],System.UInt32)">
+  AddBytes(byte[], uint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L71"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add bytes in the specified format</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddBytes(byte[] bytes, uint formatId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>bytes</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd><p>byte array with the content, it is not copied: don't change it until the content was placed</p>
+</dd>
+    <dt><code>formatId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with the clipboard format</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>When the format was already added</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddDelayedRendered_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddDelayedRendered*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddDelayedRendered_Dapplo_Windows_Clipboard_StandardClipboardFormats_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddDelayedRendered(Dapplo.Windows.Clipboard.StandardClipboardFormats)">
+  AddDelayedRendered(StandardClipboardFormats)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L168"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Announce a format which is rendered on request (delayed rendering), see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html#Dapplo_Windows_Clipboard_ClipboardContents_AddDelayedRendered_System_UInt32_">AddDelayedRendered(uint)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddDelayedRendered(StandardClipboardFormats format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="Dapplo.Windows.Clipboard.StandardClipboardFormats.html">StandardClipboardFormats</a></dt>
+    <dd><p>StandardClipboardFormats with the clipboard format</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddDelayedRendered_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddDelayedRendered*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddDelayedRendered_System_String_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddDelayedRendered(System.String)">
+  AddDelayedRendered(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L161"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Announce a format which is rendered on request (delayed rendering), see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html#Dapplo_Windows_Clipboard_ClipboardContents_AddDelayedRendered_System_UInt32_">AddDelayedRendered(uint)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddDelayedRendered(string format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the clipboard format</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddDelayedRendered_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddDelayedRendered*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddDelayedRendered_System_UInt32_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddDelayedRendered(System.UInt32)">
+  AddDelayedRendered(uint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L154"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Announce a format which is rendered on request (delayed rendering).
+A renderer must be registered with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_System_UInt32_System_Action_Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest__">RegisterDelayedRenderer(uint, Action&lt;ClipboardRenderFormatRequest&gt;)</a> before the content is placed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddDelayedRendered(uint formatId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>formatId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with the clipboard format</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>When the format was already added</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddFileNames_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddFileNames*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddFileNames_System_Collections_Generic_IEnumerable_System_String__" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddFileNames(System.Collections.Generic.IEnumerable{System.String})">
+  AddFileNames(IEnumerable&lt;string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L137"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add a list of files (CF_HDROP), e.g. for Explorer</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddFileNames(IEnumerable&lt;string&gt; fileNames)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>fileNames</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>IEnumerable of string with the fully-qualified file names, the list is copied</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>When CF_HDROP was already added</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddStream_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddStream*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddStream_Dapplo_Windows_Clipboard_StandardClipboardFormats_System_IO_Stream_System_Nullable_System_Int64__" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddStream(Dapplo.Windows.Clipboard.StandardClipboardFormats,System.IO.Stream,System.Nullable{System.Int64})">
+  AddStream(StandardClipboardFormats, Stream, long?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L129"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add the content of a stream in the specified format, the stream is read when the content is placed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddStream(StandardClipboardFormats format, Stream stream, long? size = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="Dapplo.Windows.Clipboard.StandardClipboardFormats.html">StandardClipboardFormats</a></dt>
+    <dd><p>StandardClipboardFormats with the clipboard format</p>
+</dd>
+    <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>Stream with the content, keep it open until the content was placed</p>
+</dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</dt>
+    <dd><p>optional long with the number of bytes to place</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddStream_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddStream*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddStream_System_String_System_IO_Stream_System_Nullable_System_Int64__" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddStream(System.String,System.IO.Stream,System.Nullable{System.Int64})">
+  AddStream(string, Stream, long?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add the content of a stream in the specified format, the stream is read when the content is placed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddStream(string format, Stream stream, long? size = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the clipboard format, e.g. &quot;PNG&quot;</p>
+</dd>
+    <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>Stream with the content, keep it open until the content was placed</p>
+</dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</dt>
+    <dd><p>optional long with the number of bytes to place</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddStream_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddStream*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddStream_System_UInt32_System_IO_Stream_System_Nullable_System_Int64__" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddStream(System.UInt32,System.IO.Stream,System.Nullable{System.Int64})">
+  AddStream(uint, Stream, long?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L104"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add the content of a stream in the specified format, the stream is read when the content is placed (from its position at that moment).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddStream(uint formatId, Stream stream, long? size = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>formatId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with the clipboard format</p>
+</dd>
+    <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>Stream with the content, keep it open until the content was placed</p>
+</dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</dt>
+    <dd><p>optional long with the number of bytes to place, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html#Dapplo_Windows_Clipboard_ClipboardStreamExtensions_SetAsStream_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_UInt32_System_IO_Stream_System_Nullable_System_Int64__">SetAsStream(IClipboardAccessToken, uint, Stream, long?)</a></p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>When the format was already added</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddUnicodeString_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddUnicodeString*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddUnicodeString_System_String_Dapplo_Windows_Clipboard_StandardClipboardFormats_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddUnicodeString(System.String,Dapplo.Windows.Clipboard.StandardClipboardFormats)">
+  AddUnicodeString(string, StandardClipboardFormats)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add a string in the specified format</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddUnicodeString(string text, StandardClipboardFormats format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string to place on the clipboard</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="Dapplo.Windows.Clipboard.StandardClipboardFormats.html">StandardClipboardFormats</a></dt>
+    <dd><p>StandardClipboardFormats with the clipboard format</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddUnicodeString_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddUnicodeString*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddUnicodeString_System_String_System_String_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddUnicodeString(System.String,System.String)">
+  AddUnicodeString(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L54"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add a string in the specified format</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddUnicodeString(string text, string format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string to place on the clipboard</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the clipboard format</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_AddUnicodeString_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddUnicodeString*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_AddUnicodeString_System_String_System_UInt32_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.AddUnicodeString(System.String,System.UInt32)">
+  AddUnicodeString(string, uint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add a string, by default as CF_UNICODETEXT (Windows generates CF_TEXT and CF_OEMTEXT from it)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents AddUnicodeString(string text, uint formatId = 13)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string to place on the clipboard</p>
+</dd>
+    <dt><code>formatId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with the clipboard format, default CF_UNICODETEXT</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>When the format was already added</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_ExcludeFromMonitorProcessing_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.ExcludeFromMonitorProcessing*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_ExcludeFromMonitorProcessing" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.ExcludeFromMonitorProcessing">
+  ExcludeFromMonitorProcessing()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L190"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Exclude the content from the clipboard history, the cloud clipboard and clipboard monitors, use this for passwords and other secrets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents ExcludeFromMonitorProcessing()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardContents_WithCloudClipboardOptions_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.WithCloudClipboardOptions*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardContents_WithCloudClipboardOptions_System_Nullable_System_Boolean__System_Nullable_System_Boolean__System_Boolean_" data-uid="Dapplo.Windows.Clipboard.ClipboardContents.WithCloudClipboardOptions(System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Boolean)">
+  WithCloudClipboardOptions(bool?, bool?, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L178"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Set the clipboard history and cloud clipboard options, they are placed after all formats.
+See <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.html#Dapplo_Windows_Clipboard_ClipboardCloudExtensions_SetCloudClipboardOptions_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Nullable_System_Boolean__System_Nullable_System_Boolean__System_Boolean_">SetCloudClipboardOptions(IClipboardAccessToken, bool?, bool?, bool)</a> for the meaning of the values, options which are null are not placed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents WithCloudClipboardOptions(bool? canIncludeInHistory = null, bool? canUploadToCloud = null, bool excludeFromMonitoring = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>canIncludeInHistory</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>?</dt>
+    <dd><p>null: not placed, true / false: allow / prevent the clipboard history (Win+V)</p>
+</dd>
+    <dt><code>canUploadToCloud</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>?</dt>
+    <dd><p>null: not placed, true / false: allow / prevent syncing to other devices</p>
+</dd>
+    <dt><code>excludeFromMonitoring</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true: exclude the content from history, cloud and clipboard monitors (e.g. for passwords)</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>this, for chaining</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardContents.cs/#L20" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

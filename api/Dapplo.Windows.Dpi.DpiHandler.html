@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DpiHandler | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DpiHandler | Dapplo.Windows ">
+      
+      <meta name="description" content="This handles DPI changes see Writing DPI-Aware Desktop and Win32 Applications">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Dpi_DpiHandler.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Dpi.DpiHandler%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Dpi.DpiHandler">
+
+
+
+  <h1 id="Dapplo_Windows_Dpi_DpiHandler" data-uid="Dapplo.Windows.Dpi.DpiHandler" class="text-break">
+Class DpiHandler  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L22"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Dpi.html">Dpi</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Dpi.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>This handles DPI changes see
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn469266.aspx">Writing DPI-Aware Desktop and Win32 Applications</a></p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class DpiHandler : IDisposable</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DpiHandler</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler__ctor_" data-uid="Dapplo.Windows.Dpi.DpiHandler.#ctor*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler__ctor_System_Boolean_" data-uid="Dapplo.Windows.Dpi.DpiHandler.#ctor(System.Boolean)">
+  DpiHandler(bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L42"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a DpiHandler.
+This does not change the DPI awareness context of the thread, the DPI awareness of a window is decided when it's created.
+Use the process DPI awareness (manifest or NativeDpiMethods.EnableDpiAware), or wrap the window creation with NativeDpiMethods.ScopedThreadDpiAwarenessContext (DpiAwareForm does this for you).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DpiHandler(bool needsListenerWorkaround = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>needsListenerWorkaround</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_ApplySuggestedWindowRect_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ApplySuggestedWindowRect*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_ApplySuggestedWindowRect" data-uid="Dapplo.Windows.Dpi.DpiHandler.ApplySuggestedWindowRect">
+  ApplySuggestedWindowRect
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Specifies if the DpiHandler moves and resizes the window to the rectangle which Windows suggests with WM_DPICHANGED (default true).
+When true, the WM_DPICHANGED message is reported as handled.
+Set this to false when the UI framework applies the suggested rectangle itself, e.g. WinForms or WPF with Per-Monitor (v2) DPI support enabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ApplySuggestedWindowRect { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_Dpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.Dpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_Dpi" data-uid="Dapplo.Windows.Dpi.DpiHandler.Dpi">
+  Dpi
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L51"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieve the current DPI for the UI element which is related to this DpiHandler.
+As long as the DPI is not known yet (see <a class="xref" href="Dapplo.Windows.Dpi.DpiHandler.html#Dapplo_Windows_Dpi_DpiHandler_IsDpiKnown">IsDpiKnown</a>), this returns <a class="xref" href="Dapplo.Windows.Dpi.DpiCalculator.html#Dapplo_Windows_Dpi_DpiCalculator_DefaultScreenDpi">DefaultScreenDpi</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Dpi { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_IsDpiKnown_" data-uid="Dapplo.Windows.Dpi.DpiHandler.IsDpiKnown*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_IsDpiKnown" data-uid="Dapplo.Windows.Dpi.DpiHandler.IsDpiKnown">
+  IsDpiKnown
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True when the DPI of the UI element was determined (e.g. after WM_CREATE), before that <a class="xref" href="Dapplo.Windows.Dpi.DpiHandler.html#Dapplo_Windows_Dpi_DpiHandler_Dpi">Dpi</a> returns the default of 96.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsDpiKnown { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_MessageHandler_" data-uid="Dapplo.Windows.Dpi.DpiHandler.MessageHandler*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_MessageHandler" data-uid="Dapplo.Windows.Dpi.DpiHandler.MessageHandler">
+  MessageHandler
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The subscription which feeds the window messages to this DpiHandler, e.g. set by the AttachDpiHandler extensions in Dapplo.Windows.Forms or Dapplo.Windows.Wpf.
+It is disposed together with this DpiHandler.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IDisposable MessageHandler { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_OnDpiChanged_" data-uid="Dapplo.Windows.Dpi.DpiHandler.OnDpiChanged*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_OnDpiChanged" data-uid="Dapplo.Windows.Dpi.DpiHandler.OnDpiChanged">
+  OnDpiChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This publishes whenever the DPI changes, with some details.
+The first notification is published when the DPI is determined for the first time, the <a class="xref" href="Dapplo.Windows.Dpi.DpiChangeInfo.html#Dapplo_Windows_Dpi_DpiChangeInfo_PreviousDpi">PreviousDpi</a> is 0 in that case.
+The sequence completes when this DpiHandler is disposed, a recreate of the window handle does not complete it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IObservable&lt;DpiChangeInfo&gt; OnDpiChanged { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">IObservable</a>&lt;<a class="xref" href="Dapplo.Windows.Dpi.DpiChangeInfo.html">DpiChangeInfo</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_ApplySuggestedRect_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ApplySuggestedRect*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_ApplySuggestedRect_System_IntPtr_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ApplySuggestedRect(System.IntPtr,Dapplo.Windows.Common.Structs.NativeRect)">
+  ApplySuggestedRect(nint, NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L215"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Move and resize the window to the rectangle which Windows suggested in the WM_DPICHANGED message</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ApplySuggestedRect(nint hWnd, NativeRect suggestedRect)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle</p>
+</dd>
+    <dt><code>suggestedRect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect, copied from the lParam of the WM_DPICHANGED</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_ApplySuggestedRect_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ApplySuggestedRect*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_ApplySuggestedRect_System_IntPtr_System_IntPtr_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ApplySuggestedRect(System.IntPtr,System.IntPtr)">
+  ApplySuggestedRect(nint, nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L200"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Move and resize the window to the rectangle which Windows suggested in the WM_DPICHANGED message</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ApplySuggestedRect(nint hWnd, nint suggestedRectPtr)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle</p>
+</dd>
+    <dt><code>suggestedRectPtr</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, the lParam of the WM_DPICHANGED, which points to a RECT</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_Dispose_" data-uid="Dapplo.Windows.Dpi.DpiHandler.Dispose*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_Dispose" data-uid="Dapplo.Windows.Dpi.DpiHandler.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L464"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Stops the message processing (disposes the <a class="xref" href="Dapplo.Windows.Dpi.DpiHandler.html#Dapplo_Windows_Dpi_DpiHandler_MessageHandler">MessageHandler</a>) and completes <a class="xref" href="Dapplo.Windows.Dpi.DpiHandler.html#Dapplo_Windows_Dpi_DpiHandler_OnDpiChanged">OnDpiChanged</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_HandleContextMenuMessages_" data-uid="Dapplo.Windows.Dpi.DpiHandler.HandleContextMenuMessages*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_HandleContextMenuMessages_Dapplo_Windows_Messages_WindowMessage_" data-uid="Dapplo.Windows.Dpi.DpiHandler.HandleContextMenuMessages(Dapplo.Windows.Messages.WindowMessage)">
+  HandleContextMenuMessages(WindowMessage)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L275"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Message handler of the DPI Aware ContextMenuStrip, this is simplified compared to the normal
+The handles the WM_DPICHANGED message and adjusts window size, graphics and text based on the DPI of the monitor.
+The window message provides the new window size (lparam) and new DPI (wparam)
+See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn312083(v=vs.85).aspx">WM_DPICHANGED message</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public nint HandleContextMenuMessages(WindowMessage windowMessage)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>windowMessage</code> <a class="xref" href="Dapplo.Windows.Messages.WindowMessage.html">WindowMessage</a></dt>
+    <dd><p>WindowMessage</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_HandleWindowMessages_" data-uid="Dapplo.Windows.Dpi.DpiHandler.HandleWindowMessages*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_HandleWindowMessages_Dapplo_Windows_Messages_WindowMessage_" data-uid="Dapplo.Windows.Dpi.DpiHandler.HandleWindowMessages(Dapplo.Windows.Messages.WindowMessage)">
+  HandleWindowMessages(WindowMessage)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L110"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Message handler of the Per_Monitor_DPI_Aware window.
+The handles the WM_DPICHANGED message and adjusts window size, graphics and text based on the DPI of the monitor.
+The window message provides the new window size (lparam) and new DPI (wparam)
+See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn312083(v=vs.85).aspx">WM_DPICHANGED message</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HandleWindowMessages(WindowMessage windowMessage)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>windowMessage</code> <a class="xref" href="Dapplo.Windows.Messages.WindowMessage.html">WindowMessage</a></dt>
+    <dd><p>WindowMessage</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the message was handled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_RefreshDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.RefreshDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_RefreshDpi_System_IntPtr_" data-uid="Dapplo.Windows.Dpi.DpiHandler.RefreshDpi(System.IntPtr)">
+  RefreshDpi(nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L232"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Read the DPI of the specified window, and publish it when it changed.
+Use this when the DpiHandler is attached to a window which already exists, and will not see a WM_CREATE.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RefreshDpi(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_Dapplo_Windows_Common_Structs_NativePoint_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi(Dapplo.Windows.Common.Structs.NativePoint,System.Func{System.Single,System.Single})">
+  ScaleWithCurrentDpi(NativePoint, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L352"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scale the supplied NativePoint to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativePoint ScaleWithCurrentDpi(NativePoint point, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>point</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint to scale</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint scaled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_Dapplo_Windows_Common_Structs_NativePointFloat_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi(Dapplo.Windows.Common.Structs.NativePointFloat,System.Func{System.Single,System.Single})">
+  ScaleWithCurrentDpi(NativePointFloat, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L363"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scale the supplied NativePointFloat to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativePointFloat ScaleWithCurrentDpi(NativePointFloat point, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>point</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePointFloat.html">NativePointFloat</a></dt>
+    <dd><p>NativePointFloat to scale</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativePointFloat.html">NativePointFloat</a></dt>
+    <dd><p>NativePointFloat scaled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_Dapplo_Windows_Common_Structs_NativeSize_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi(Dapplo.Windows.Common.Structs.NativeSize,System.Func{System.Single,System.Single})">
+  ScaleWithCurrentDpi(NativeSize, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L330"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scale the supplied NativeSize to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeSize ScaleWithCurrentDpi(NativeSize size, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>size</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeSize.html">NativeSize</a></dt>
+    <dd><p>NativeSize to scale</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeSize.html">NativeSize</a></dt>
+    <dd><p>NativeSize scaled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_Dapplo_Windows_Common_Structs_NativeSizeFloat_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi(Dapplo.Windows.Common.Structs.NativeSizeFloat,System.Func{System.Single,System.Single})">
+  ScaleWithCurrentDpi(NativeSizeFloat, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L341"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scale the supplied NativeSizeFloat to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeSizeFloat ScaleWithCurrentDpi(NativeSizeFloat size, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>size</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeSizeFloat.html">NativeSizeFloat</a></dt>
+    <dd><p>NativeSizeFloat to scale</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeSizeFloat.html">NativeSizeFloat</a></dt>
+    <dd><p>NativeSizeFloat scaled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_System_Double_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi(System.Double,System.Func{System.Single,System.Single})">
+  ScaleWithCurrentDpi(double, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L308"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scale the supplied number to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double ScaleWithCurrentDpi(double someNumber, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>someNumber</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>double with e.g. a width like 16 for 16x16 images</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>double with scaled number</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_ScaleWithCurrentDpi_System_Int32_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.ScaleWithCurrentDpi(System.Int32,System.Func{System.Single,System.Single})">
+  ScaleWithCurrentDpi(int, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L319"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scale the supplied number to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int ScaleWithCurrentDpi(int someNumber, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>someNumber</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with e.g. a width like 16 for 16x16 images</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with scaled number</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_TryEnableNonClientDpiScaling_" data-uid="Dapplo.Windows.Dpi.DpiHandler.TryEnableNonClientDpiScaling*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_TryEnableNonClientDpiScaling_System_IntPtr_" data-uid="Dapplo.Windows.Dpi.DpiHandler.TryEnableNonClientDpiScaling(System.IntPtr)">
+  TryEnableNonClientDpiScaling(nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L439"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>public wrapper for EnableNonClientDpiScaling, this also checks if the function is available.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryEnableNonClientDpiScaling(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if it worked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_Dapplo_Windows_Common_Structs_NativePoint_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi(Dapplo.Windows.Common.Structs.NativePoint,System.Func{System.Single,System.Single})">
+  UnscaleWithCurrentDpi(NativePoint, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L418"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unscale the supplied NativePoint to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativePoint UnscaleWithCurrentDpi(NativePoint point, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>point</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint to unscale</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint unscaled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_Dapplo_Windows_Common_Structs_NativePointFloat_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi(Dapplo.Windows.Common.Structs.NativePointFloat,System.Func{System.Single,System.Single})">
+  UnscaleWithCurrentDpi(NativePointFloat, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L429"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unscale the supplied NativePointFloat to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativePointFloat UnscaleWithCurrentDpi(NativePointFloat point, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>point</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePointFloat.html">NativePointFloat</a></dt>
+    <dd><p>NativePointFloat to unscale</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativePointFloat.html">NativePointFloat</a></dt>
+    <dd><p>NativePointFloat unscaled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_Dapplo_Windows_Common_Structs_NativeSize_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi(Dapplo.Windows.Common.Structs.NativeSize,System.Func{System.Single,System.Single})">
+  UnscaleWithCurrentDpi(NativeSize, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L396"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unscale the supplied NativeSize to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeSize UnscaleWithCurrentDpi(NativeSize size, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>size</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeSize.html">NativeSize</a></dt>
+    <dd><p>NativeSize to unscale</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeSize.html">NativeSize</a></dt>
+    <dd><p>NativeSize unscaled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_Dapplo_Windows_Common_Structs_NativeSizeFloat_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi(Dapplo.Windows.Common.Structs.NativeSizeFloat,System.Func{System.Single,System.Single})">
+  UnscaleWithCurrentDpi(NativeSizeFloat, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L407"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unscale the supplied NativeSizeFloat to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeSizeFloat UnscaleWithCurrentDpi(NativeSizeFloat size, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>size</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeSizeFloat.html">NativeSizeFloat</a></dt>
+    <dd><p>NativeSizeFloat to unscale</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeSizeFloat.html">NativeSizeFloat</a></dt>
+    <dd><p>NativeSizeFloat unscaled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_System_Double_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi(System.Double,System.Func{System.Single,System.Single})">
+  UnscaleWithCurrentDpi(double, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L374"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unscale the supplied number to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double UnscaleWithCurrentDpi(double someNumber, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>someNumber</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>double with e.g. a width like 16 for 16x16 images</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>double with unscaled number</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_DpiHandler_UnscaleWithCurrentDpi_System_Int32_System_Func_System_Single_System_Single__" data-uid="Dapplo.Windows.Dpi.DpiHandler.UnscaleWithCurrentDpi(System.Int32,System.Func{System.Single,System.Single})">
+  UnscaleWithCurrentDpi(int, Func&lt;float, float&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L385"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unscale the supplied number to the current dpi</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int UnscaleWithCurrentDpi(int someNumber, Func&lt;float, float&gt; scaleModifier = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>someNumber</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with e.g. a width like 16 for 16x16 images</p>
+</dd>
+    <dt><code>scaleModifier</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd><p>A function which can modify the scale factor</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with unscaled number</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/DpiHandler.cs/#L22" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

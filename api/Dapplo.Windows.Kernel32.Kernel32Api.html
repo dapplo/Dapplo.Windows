@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class Kernel32Api | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class Kernel32Api | Dapplo.Windows ">
+      
+      <meta name="description" content="Kernel 32 functionality">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Kernel32_Kernel32Api.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Kernel32.Kernel32Api%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Kernel32.Kernel32Api">
+
+
+
+  <h1 id="Dapplo_Windows_Kernel32_Kernel32Api" data-uid="Dapplo.Windows.Kernel32.Kernel32Api" class="text-break">
+Class Kernel32Api  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Kernel32Api.cs/#L16"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Kernel32.html">Kernel32</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Kernel32.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Kernel 32 functionality</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class Kernel32Api</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">Kernel32Api</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_SystemStartup_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.SystemStartup*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_SystemStartup" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.SystemStartup">
+  SystemStartup
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Kernel32Api.cs/#L458"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns a DateTimeOffset which specifies when the system started</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DateTimeOffset SystemStartup { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetimeoffset">DateTimeOffset</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_AllocConsole_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.AllocConsole*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_AllocConsole" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.AllocConsole">
+  AllocConsole()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Allocates a new console for the calling process.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool AllocConsole()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_AttachConsole_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.AttachConsole*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_AttachConsole_System_UInt32_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.AttachConsole(System.UInt32)">
+  AttachConsole(uint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Attaches the calling process to the console of the specified process.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms681944(v=vs.85).aspx">AllocConsole function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool AttachConsole(uint dwProcessId = 4294967295)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dwProcessId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>The identifier of the process whose console is to be used. Or -1 to use the console of the parent of the current process.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool if it worked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_CloseHandle_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.CloseHandle*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_CloseHandle_System_IntPtr_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.CloseHandle(System.IntPtr)">
+  CloseHandle(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Closes an open object handle.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx">CloseHandle function</a>
+The CloseHandle function closes handles to the following win32 objects:</p>
+<ul>
+<li>Access token</li>
+<li>Communications device</li>
+<li>Console input</li>
+<li>Console screen buffer</li>
+<li>Event</li>
+<li>File</li>
+<li>File mapping</li>
+<li>I/O completion port</li>
+<li>Job</li>
+<li>Mailslot</li>
+<li>Memory resource notification</li>
+<li>Mutex</li>
+<li>Named pipe</li>
+<li>Pipe</li>
+<li>Process</li>
+<li>Semaphore</li>
+<li>Thread</li>
+<li>Transaction</li>
+<li>Waitable timer</li>
+</ul>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool CloseHandle(nint hObject)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hObject</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A valid handle to an open object.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if it worked, use GetLastError if not</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_DevicePathToDosPath_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.DevicePathToDosPath*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_DevicePathToDosPath_System_String_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.DevicePathToDosPath(System.String)">
+  DevicePathToDosPath(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Kernel32Api.cs/#L169"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Convert a device path, like GetProcessImageFileName returns (&quot;\Device\HarddiskVolume3\Windows\notepad.exe&quot;), to a path with a drive letter (&quot;C:\Windows\notepad.exe&quot;)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string DevicePathToDosPath(string devicePath)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>devicePath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the device path</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the drive letter path, or null if no drive matches</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_FreeLibrary_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.FreeLibrary*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_FreeLibrary_System_IntPtr_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.FreeLibrary(System.IntPtr)">
+  FreeLibrary(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><pre><code>Frees the loaded dynamic-link library (DLL) module and, if necessary, decrements its reference count.
+When the reference count reaches zero, the module is unloaded from the address space of the calling process and the
+handle is no longer valid.
+</code></pre>
+<p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms683152(v=vs.85).aspx">FreeLibrary function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool FreeLibrary(nint module)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>module</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if it worked, false if an error occured</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GetCurrentProcessId_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetCurrentProcessId*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GetCurrentProcessId" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetCurrentProcessId">
+  GetCurrentProcessId()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the process identifier of the calling process.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int GetCurrentProcessId()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GetCurrentThreadId_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetCurrentThreadId*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GetCurrentThreadId" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetCurrentThreadId">
+  GetCurrentThreadId()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the thread identifier of the calling thread.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int GetCurrentThreadId()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GetModuleHandle_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetModuleHandle*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GetModuleHandle_System_String_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetModuleHandle(System.String)">
+  GetModuleHandle(string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves a module handle for the specified module. The module must have been loaded by the calling process.
+To avoid the race conditions described in the Remarks section, use the GetModuleHandleEx function.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms683199(v=vs.85).aspx">GetModuleHandle function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GetModuleHandle(string lpModuleName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>lpModuleName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The name of the loaded module (either a .dll or .exe file). If the file name extension is omitted, the default library extension .dll is appended. The file name string can include a trailing point character (.) to indicate that the module name has no extension. The string does not have to specify a path. When specifying a path, be sure to use backslashes (), not forward slashes (/). The name is compared (case independently) to the names of modules currently mapped into the address space of the calling process.
+If this parameter is NULL, GetModuleHandle returns a handle to the file used to create the calling process (.exe file).
+The GetModuleHandle function does not retrieve handles for modules that were loaded using the LOAD_LIBRARY_AS_DATAFILE flag. For more information, see LoadLibraryEx.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>If the function succeeds, the return value is a handle to the specified module.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GetPackageFullName_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetPackageFullName*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GetPackageFullName_System_IntPtr_System_Int32__System_Text_StringBuilder_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetPackageFullName(System.IntPtr,System.Int32@,System.Text.StringBuilder)">
+  GetPackageFullName(nint, ref int, StringBuilder)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>GetPackageFullName</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int GetPackageFullName(nint hProcess, ref int packageFullNameLength, StringBuilder fullName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hProcess</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>packageFullNameLength</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>fullName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.stringbuilder">StringBuilder</a></dt>
+    <dd><p>StringBuilder to place the fullname in</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GetProcessPath_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetProcessPath*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GetProcessPath_System_Diagnostics_Process_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetProcessPath(System.Diagnostics.Process)">
+  GetProcessPath(Process)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Kernel32Api.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Method to get the process path for a process</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string GetProcessPath(this Process process)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>process</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.diagnostics.process">Process</a></dt>
+    <dd><p>Process</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GetProcessPath_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetProcessPath*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GetProcessPath_System_Int32_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetProcessPath(System.Int32)">
+  GetProcessPath(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Kernel32Api.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Method to get the path of the executable of a process, this also works for processes of other users and with a different bitness.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string GetProcessPath(int processId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>processId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the process ID</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the path, or null if it can't be retrieved</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GetProductInfo_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetProductInfo*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GetProductInfo_System_Int32_System_Int32_System_Int32_System_Int32_Dapplo_Windows_Kernel32_Enums_WindowsProducts__" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetProductInfo(System.Int32,System.Int32,System.Int32,System.Int32,Dapplo.Windows.Kernel32.Enums.WindowsProducts@)">
+  GetProductInfo(int, int, int, int, out WindowsProducts)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724358.aspx">GetProductInfo function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetProductInfo(int osMajorVersion, int osMinorVersion, int spMajorVersion, int spMinorVersion, out WindowsProducts edition)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>osMajorVersion</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The major version number of the operating system. The minimum value is 6.
+The combination of the dwOSMajorVersion, dwOSMinorVersion, dwSpMajorVersion, and dwSpMinorVersion parameters
+describes the maximum target operating system version for the application. For example, Windows Vista and Windows
+Server 2008 are version 6.0.0.0 and Windows 7 and Windows Server 2008 R2 are version 6.1.0.0.</p>
+</dd>
+    <dt><code>osMinorVersion</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The minor version number of the operating system. The minimum value is 0.</p>
+</dd>
+    <dt><code>spMajorVersion</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The major version number of the operating system service pack. The minimum value is 0.</p>
+</dd>
+    <dt><code>spMinorVersion</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The minor version number of the operating system service pack. The minimum value is 0.</p>
+</dd>
+    <dt><code>edition</code> <a class="xref" href="Dapplo.Windows.Kernel32.Enums.WindowsProducts.html">WindowsProducts</a></dt>
+    <dd><p>WindowsProducts</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GetTickCount64_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetTickCount64*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GetTickCount64" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetTickCount64">
+  GetTickCount64()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the number of milliseconds that have elapsed since the system was started.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern ulong GetTickCount64()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint64">ulong</a></dt>
+    <dd><p>ulong with the ticks</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GetVersionEx_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetVersionEx*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GetVersionEx_Dapplo_Windows_Kernel32_Structs_OsVersionInfoEx__" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GetVersionEx(Dapplo.Windows.Kernel32.Structs.OsVersionInfoEx@)">
+  GetVersionEx(ref OsVersionInfoEx)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724451(v=vs.85).aspx">GetVersionEx function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetVersionEx(ref OsVersionInfoEx osVersionInfo)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>osVersionInfo</code> <a class="xref" href="Dapplo.Windows.Kernel32.Structs.OsVersionInfoEx.html">OsVersionInfoEx</a></dt>
+    <dd><p>OsVersionInfoEx</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If the function fails, the return value is false. To get extended error information, call GetLastError.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GlobalAlloc_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GlobalAlloc*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GlobalAlloc_Dapplo_Windows_Kernel32_Enums_GlobalMemorySettings_System_UIntPtr_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GlobalAlloc(Dapplo.Windows.Kernel32.Enums.GlobalMemorySettings,System.UIntPtr)">
+  GlobalAlloc(GlobalMemorySettings, nuint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Allocates the specified number of bytes from the heap.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa366574(v=vs.85).aspx">GlobalAlloc function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GlobalAlloc(GlobalMemorySettings globalMemorySettings, nuint bytes)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>globalMemorySettings</code> <a class="xref" href="Dapplo.Windows.Kernel32.Enums.GlobalMemorySettings.html">GlobalMemorySettings</a></dt>
+    <dd><p>The memory allocation attributes. If zero is specified, the default is GMEM_FIXED. This parameter can be one or more of the following values, except for the incompatible combinations that are specifically noted.</p>
+</dd>
+    <dt><code>bytes</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uintptr">nuint</a></dt>
+    <dd><p>The number of bytes to allocate. If this parameter is zero and the uFlags parameter specifies GMEM_MOVEABLE, the function returns a handle to a memory object that is marked as discarded.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>If the function succeeds, the return value is a handle to the newly allocated memory object.
+If the function fails, the return value is NULL. To get extended error information, call GetLastError.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GlobalLock_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GlobalLock*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GlobalLock_System_IntPtr_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GlobalLock(System.IntPtr)">
+  GlobalLock(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Locks a global memory object and returns a pointer to the first byte of the object's memory block.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GlobalLock(nint hMem)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hMem</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with a hGlobal, handle for a global memory blockk</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr to the first byte of the global memory block</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GlobalSize_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GlobalSize*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GlobalSize_System_IntPtr_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GlobalSize(System.IntPtr)">
+  GlobalSize(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the current size of the specified global memory object, in bytes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nuint GlobalSize(nint hMem)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hMem</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with a hGlobal, handle for a global memory block</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uintptr">nuint</a></dt>
+    <dd><p>UIntPtr (SIZE_T) with the size in bytes, 0 if the handle is invalid or the object was discarded</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_GlobalUnlock_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GlobalUnlock*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_GlobalUnlock_System_IntPtr_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.GlobalUnlock(System.IntPtr)">
+  GlobalUnlock(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Decrements the lock count associated with a memory object that was allocated with GMEM_MOVEABLE. This function has no effect on memory objects allocated with GMEM_FIXED.
+If the memory object is still locked after decrementing the lock count, the return value is a nonzero value. If the memory object is unlocked after decrementing the lock count, the function returns zero and GetLastError returns NO_ERROR.
+If the function fails, the return value is zero and GetLastError returns a value other than NO_ERROR.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GlobalUnlock(nint hMem)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hMem</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with a hGlobal, handle for a global memory block</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool if the unlock worked.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_LoadLibrary_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.LoadLibrary*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_LoadLibrary_System_String_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.LoadLibrary(System.String)">
+  LoadLibrary(string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Loads the specified module into the address space of the calling process. The specified module may cause other
+modules to be loaded.
+See <a href="https://msdn.microsoft.com/en-us/library/ms684175(VS.85).aspx">LoadLibrary function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint LoadLibrary(string lpFileName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>lpFileName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the library</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr for the module, IntPtr.Zero if this failed, use last error to see what went wrong</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_LocalFree_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.LocalFree*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_LocalFree_System_IntPtr_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.LocalFree(System.IntPtr)">
+  LocalFree(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>This function frees the specified local memory object and invalidates its handle.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint LocalFree(nint hMem)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hMem</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_OpenProcess_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.OpenProcess*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_OpenProcess_Dapplo_Windows_Kernel32_Enums_ProcessAccessRights_System_Boolean_System_Int32_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.OpenProcess(Dapplo.Windows.Kernel32.Enums.ProcessAccessRights,System.Boolean,System.Int32)">
+  OpenProcess(ProcessAccessRights, bool, int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Opens an existing local process object.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms684320(v=vs.85).aspx">OpenProcess function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint OpenProcess(ProcessAccessRights dwDesiredAccess, bool bInheritHandle, int dwProcessId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dwDesiredAccess</code> <a class="xref" href="Dapplo.Windows.Kernel32.Enums.ProcessAccessRights.html">ProcessAccessRights</a></dt>
+    <dd><p>ProcessAccessRights</p>
+</dd>
+    <dt><code>bInheritHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If this value is TRUE, processes created by this process will inherit the handle. Otherwise, the processes do not inherit this handle.</p>
+</dd>
+    <dt><code>dwProcessId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The identifier of the local process to be opened.
+If the specified process is the System Process (0x00000000), the function fails and the last error code is ERROR_INVALID_PARAMETER. If the specified process is the Idle process or one of the CSRSS processes, this function fails and the last error code is ERROR_ACCESS_DENIED because their access restrictions prevent user-level code from opening them.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>If the function succeeds, the return value is an open handle to the specified process.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_OpenThread_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.OpenThread*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_OpenThread_Dapplo_Windows_Kernel32_Enums_ThreadAccess_System_Boolean_System_UInt32_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.OpenThread(Dapplo.Windows.Kernel32.Enums.ThreadAccess,System.Boolean,System.UInt32)">
+  OpenThread(ThreadAccess, bool, uint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>OpenThread</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dwDesiredAccess</code> <a class="xref" href="Dapplo.Windows.Kernel32.Enums.ThreadAccess.html">ThreadAccess</a></dt>
+    <dd><p>ThreadAccess</p>
+</dd>
+    <dt><code>bInheritHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+    <dt><code>dwThreadId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with hThread</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_PreventDllHijacking_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.PreventDllHijacking*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_PreventDllHijacking_System_String_System_Boolean_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.PreventDllHijacking(System.String,System.Boolean)">
+  PreventDllHijacking(string, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Kernel32Api.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A helper method to prevent Dll Hijacking, this drastically reduces the DLL search paths for the rest of the process lifetime!
+This will not help against a version.dll attack (DLLs which are loaded before this can be called).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void PreventDllHijacking(string allowDllDirectory = &quot;&quot;, bool searchApplicationDirectory = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>allowDllDirectory</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>An optional single directory where additional DLL searches are made</p>
+</dd>
+    <dt><code>searchApplicationDirectory</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool, true to also search the directory of the application</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Kernel32_Kernel32Api_PreventDllHijacking_System_String_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>After this call DLLs which are loaded by name (LoadLibrary, and on .NET Framework DllImport of native DLLs) are only searched in System32,
+the optionally specified directory and, when <code class="paramref">searchApplicationDirectory</code> is true, the application directory.
+The current directory and the PATH are no longer searched. So when you ship native DLLs next to your application, pass searchApplicationDirectory: true.</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.win32exception">Win32Exception</a></dt>
+    <dd><p>When the search path couldn't be changed</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_QueryDosDevice_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.QueryDosDevice*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_QueryDosDevice_System_String_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.QueryDosDevice(System.String)">
+  QueryDosDevice(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Kernel32Api.cs/#L143"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieve the (current) target of an MS-DOS device name, e.g. &quot;C:&quot; gives &quot;\Device\HarddiskVolume3&quot;</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string QueryDosDevice(string deviceName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>deviceName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the MS-DOS device name, without trailing backslash e.g. &quot;C:&quot;</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string or null if it failed</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_QueryDosDevice_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.QueryDosDevice*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_QueryDosDevice_System_String_System_Char__System_Int32_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.QueryDosDevice(System.String,System.Char*,System.Int32)">
+  QueryDosDevice(string, char*, int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365461(v=vs.85).aspx">QueryDosDevice function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int QueryDosDevice(string lpDeviceName, char* lpTargetPath, int uuchMax)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>lpDeviceName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>An MS-DOS device name string specifying the target of the query. The device name cannot have a trailing backslash; for example, use &quot;C:&quot;, not &quot;C:&quot;.
+This parameter can be NULL. In that case, the QueryDosDevice function will store a list of all existing MS-DOS device names into the buffer pointed to by lpTargetPath.</p>
+</dd>
+    <dt><code>lpTargetPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a>*</dt>
+    <dd><p>A pointer to a buffer that will receive the result of the query. The function fills this buffer with one or more null-terminated strings. The final null-terminated string is followed by an additional NULL.
+If lpDeviceName is non-NULL, the function retrieves information about the particular MS-DOS device specified by lpDeviceName. The first null-terminated string stored into the buffer is the current mapping for the device. The other null-terminated strings represent undeleted prior mappings for the device.
+If lpDeviceName is NULL, the function retrieves a list of all existing MS-DOS device names. Each null-terminated string stored into the buffer is the name of an existing MS-DOS device, for example, \Device\HarddiskVolume1 or \Device\Floppy0.</p>
+</dd>
+    <dt><code>uuchMax</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The maximum number of TCHARs that can be stored into the buffer pointed to by lpTargetPath.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>If the function succeeds, the return value is the number of TCHARs stored into the buffer pointed to by lpTargetPath.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_QueryFullProcessImageName_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.QueryFullProcessImageName*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_QueryFullProcessImageName_System_IntPtr_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.QueryFullProcessImageName(System.IntPtr)">
+  QueryFullProcessImageName(nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Kernel32Api.cs/#L110"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieve the full path of the executable of the process, in the Win32 format</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string QueryFullProcessImageName(nint hProcess)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hProcess</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with a process handle which has at least PROCESS_QUERY_LIMITED_INFORMATION</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string or null if it failed</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_QueryFullProcessImageName_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.QueryFullProcessImageName*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_QueryFullProcessImageName_System_IntPtr_System_UInt32_System_Char__System_Int32__" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.QueryFullProcessImageName(System.IntPtr,System.UInt32,System.Char*,System.Int32@)">
+  QueryFullProcessImageName(nint, uint, char*, ref int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the full name of the executable image for the specified process.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool QueryFullProcessImageName(nint hProcess, uint dwFlags, char* lpExeName, ref int lpdwSize)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hProcess</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the process. This handle must be created with the PROCESS_QUERY_INFORMATION or PROCESS_QUERY_LIMITED_INFORMATION access right. For more information, see Process Security and Access Rights.</p>
+</dd>
+    <dt><code>dwFlags</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>This parameter can be one of the following values:
+0 - The name should use the Win32 path format.
+PROCESS_NAME_NATIVE 0x00000001 - The name should use the native system path format.</p>
+</dd>
+    <dt><code>lpExeName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a>*</dt>
+    <dd><p>The path to the executable image. If the function succeeds, this string is null-terminated.</p>
+</dd>
+    <dt><code>lpdwSize</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>On input, specifies the size of the lpExeName buffer, in characters. On success, receives the number of characters written to the buffer, not including the null-terminating character.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If the function succeeds, the return value is nonzero.
+If the function fails, the return value is zero. To get extended error information, call GetLastError.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_ResumeThread_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.ResumeThread*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_ResumeThread_System_IntPtr_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.ResumeThread(System.IntPtr)">
+  ResumeThread(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>ResumeThread</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int ResumeThread(nint hThread)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hThread</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_SetDefaultDllDirectories_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.SetDefaultDllDirectories*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_SetDefaultDllDirectories_Dapplo_Windows_Kernel32_Enums_DefaultDllDirectories_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.SetDefaultDllDirectories(Dapplo.Windows.Kernel32.Enums.DefaultDllDirectories)">
+  SetDefaultDllDirectories(DefaultDllDirectories)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Specifies a default set of directories to search when the calling process loads a DLL. This search path is used when LoadLibraryEx is called with no LOAD_LIBRARY_SEARCH flags.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/hh310515(v=vs.85).aspx">SetDefaultDllDirectories function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SetDefaultDllDirectories(DefaultDllDirectories directoryFlags)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>directoryFlags</code> <a class="xref" href="Dapplo.Windows.Kernel32.Enums.DefaultDllDirectories.html">DefaultDllDirectories</a></dt>
+    <dd><p>DefaultDllDirectories with the directories to search. This parameter can be any combination of the following values.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If the function succeeds, the return value is nonzero.
+If the function fails, the return value is zero. To get extended error information, call GetLastError.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Kernel32_Kernel32Api_SetDefaultDllDirectories_Dapplo_Windows_Kernel32_Enums_DefaultDllDirectories__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The DLL search path is the set of directories that are searched for a DLL when a full path is not specified in a LoadLibrary or LoadLibraryEx function call, or when a full path to the DLL is specified but the system must search for dependent DLLs. For more information about the standard DLL search path, see Dynamic-Link Library Search Order.
+The standard DLL search path contains directories that can be vulnerable to a DLL pre-loading attack. An application can use the SetDefaultDllDirectories function to specify a default DLL search path for the process that eliminates the most vulnerable directories and limits the other directories that are searched. The process DLL search path applies only to the calling process and persists for the life of the process.
+If the DirectoryFlags parameter specifies more than one flag, the directories are searched in the following order:
+The directory that contains the DLL (LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR). This directory is searched only for dependencies of the DLL being loaded.
+The application directory (LOAD_LIBRARY_SEARCH_APPLICATION_DIR).
+Paths explicitly added to the application search path with the AddDllDirectory function (LOAD_LIBRARY_SEARCH_USER_DIRS) or the SetDllDirectory function. If more than one path has been added, the order in which the paths are searched is unspecified.
+The System directory (LOAD_LIBRARY_SEARCH_SYSTEM32).
+If SetDefaultDllDirectories does not specify LOAD_LIBRARY_SEARCH_USER_DIRS, directories specified with the AddDllDirectory function are used only for LoadLibraryEx function calls that specify LOAD_LIBRARY_SEARCH_USER_DIRS.
+It is not possible to revert to the standard DLL search path or remove any directory specified with SetDefaultDllDirectories from the search path. However, the process DLL search path can be overridden by calling LoadLibraryEx with one or more LOAD_LIBRARY_SEARCH flags, and directories added with AddDllDirectory can be removed by calling RemoveDllDirectory.
+Windows 7, Windows Server 2008 R2, Windows Vista and Windows Server 2008:  To call this function in an application, use the GetProcAddress function to retrieve its address from Kernel32.dll. KB2533623 must be installed on the target platform.</p>
+</div>
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_SetDllDirectory_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.SetDllDirectory*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_SetDllDirectory_System_String_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.SetDllDirectory(System.String)">
+  SetDllDirectory(string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a directory to the search path used to locate DLLs for the application.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SetDllDirectory(string lpPathName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>lpPathName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The directory to be added to the search path. If this parameter is an empty string (&quot;&quot;), the call removes the current directory from the default DLL search order. If this parameter is NULL, the function restores the default search order.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If the function succeeds, the return value is nonzero.
+If the function fails, the return value is zero. To get extended error information, call GetLastError.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_SetLastError_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.SetLastError*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_SetLastError_System_UInt32_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.SetLastError(System.UInt32)">
+  SetLastError(uint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Change the last error</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern void SetLastError(uint dwErrCode)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dwErrCode</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with the last error code to change to</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Kernel32_Kernel32Api_SuspendThread_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.SuspendThread*"></a>
+
+  <h3 id="Dapplo_Windows_Kernel32_Kernel32Api_SuspendThread_System_IntPtr_" data-uid="Dapplo.Windows.Kernel32.Kernel32Api.SuspendThread(System.IntPtr)">
+  SuspendThread(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-suspendthread">Suspend thread</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern uint SuspendThread(nint hThread)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hThread</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Kernel32Api.cs/#L16" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

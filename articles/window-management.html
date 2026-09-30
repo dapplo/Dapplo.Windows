@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Window management | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Window management | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/window-management.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="window-management">Window management</h1>
+
+<p>The <strong>Dapplo.Windows</strong> package wraps a window handle (HWND) in an <code>IInteropWindow</code>, which reads information about the
+window on demand and caches it. Static classes find windows (<code>InteropWindowQuery</code>, <code>WindowsEnumerator</code>) and report
+window events (<code>WinEventHook</code>).</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows
+</code></pre>
+<p>Namespaces used on this page: <code>Dapplo.Windows.Desktop</code>, <code>Dapplo.Windows.Enums</code>, <code>Dapplo.Windows.User32</code>,
+<code>Dapplo.Windows.User32.Enums</code>, <code>Dapplo.Windows.User32.Structs</code>, <code>Dapplo.Windows.Common.Structs</code>, <code>Dapplo.Windows.App</code>,
+<code>Dapplo.Windows.Icons</code>, <code>Dapplo.Windows.Software</code>, <code>Dapplo.Windows.Messages</code>, <code>Dapplo.Windows.Messages.Enums</code>,
+<code>System.Reactive.Linq</code>.</p>
+<h2 id="window-information">Window information</h2>
+<p><code>InteropWindowFactory.CreateFor(handle)</code> wraps a handle, nothing is read at that moment. The <code>Get...</code> extension methods
+read a value the first time and store it in the window object; later calls return the stored value unless you pass
+<code>forceUpdate: true</code>.</p>
+<!-- sample: WindowSamples.WindowInformation -->
+<pre><code class="lang-csharp">// Wrap a window handle, nothing is read yet
+IInteropWindow window = InteropWindowFactory.CreateFor(User32Api.GetForegroundWindow());
+// Or: IInteropWindow window = InteropWindowQuery.GetForegroundWindow();
+
+// The Get... methods read the value once and cache it in the window object, pass forceUpdate: true to read it again
+Console.WriteLine($&quot;Title: {window.GetCaption()}&quot;);
+Console.WriteLine($&quot;Class: {window.GetClassname()}&quot;);
+Console.WriteLine($&quot;Bounds: {window.GetInfo().Bounds}&quot;);
+Console.WriteLine($&quot;Client bounds: {window.GetInfo().ClientBounds}&quot;);
+Console.WriteLine($&quot;Process: {window.GetProcessId()}&quot;);
+Console.WriteLine($&quot;Visible: {window.IsVisible()}, minimized: {window.IsMinimized()}, maximized: {window.IsMaximized()}&quot;);
+</code></pre>
+<p><code>GetInfo()</code> returns a <code>WindowInfo</code> with <code>Bounds</code>, <code>ClientBounds</code>, <code>Style</code>, <code>ExtendedStyle</code> and more. For top-level
+windows the bounds are corrected with the DWM &quot;extended frame bounds&quot;, so they don't include the invisible resize
+border that Windows 10 and 11 add around windows.</p>
+<h3 id="reading-several-values-at-once">Reading several values at once</h3>
+<p><code>Fill()</code> reads the values you select with <code>InteropWindowRetrieveSettings</code>. It respects the cache, so add <code>ForceUpdate</code>
+when you need fresh values. The cached values are also available as properties (<code>Caption</code>, <code>Info</code>, <code>IsVisible</code>, ...),
+which are <code>null</code> when they were not read yet.</p>
+<!-- sample: WindowSamples.FillSelective -->
+<pre><code class="lang-csharp">// Read several values at once, the default is everything except the children (CacheAllAutoCorrect)
+window.Fill();
+
+// Only what you need
+window.Fill(InteropWindowRetrieveSettings.Caption | InteropWindowRetrieveSettings.Info);
+
+// ForceUpdate reads the values again, even when they were cached
+window.Fill(InteropWindowRetrieveSettings.Info | InteropWindowRetrieveSettings.ForceUpdate);
+
+// The cached values are properties, null when they were not retrieved
+string caption = window.Caption;
+NativeRect? bounds = window.Info?.Bounds;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Reads</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CacheAll</code></td>
+<td>caption, class name, info, maximized, minimized, parent, owner, placement, process id, text, visible, scroll info</td>
+</tr>
+<tr>
+<td><code>CacheAllAutoCorrect</code> (default of <code>Fill</code>)</td>
+<td>the same, with the bounds corrected (DWM frame, clipped to the parent)</td>
+</tr>
+<tr>
+<td><code>CacheAllWithChildren</code></td>
+<td><code>CacheAll</code> plus the direct children, in Z-order</td>
+</tr>
+<tr>
+<td><code>ForceUpdate</code></td>
+<td>combine with the above to read again</td>
+</tr>
+</tbody>
+</table>
+<h2 id="finding-windows">Finding windows</h2>
+<p><code>InteropWindowQuery.GetVisibleApplicationWindows()</code> returns the windows a user sees as application windows, from top to
+bottom (Z-order): top-level windows (no parent, owned windows are included) which are visible, not minimized, have a
+title and a size, and are not a tool window, a background store app or one of a few known system windows (the desktop
+<code>Progman</code>, <code>Button</code>, <code>Dwm</code>). The same test is available as <code>window.IsVisibleApplicationWindow()</code>;
+<code>window.IsVisiblePopup()</code> is the similar test for visible <code>WS_POPUP</code> windows, which also accepts tool windows and
+windows without a title. Change the list of ignored classes with <code>InteropWindowQuery.AddIgnoreClass</code> /
+<code>RemoveIgnoreClass</code>, or pass <code>false</code> to include them.</p>
+<p><code>InteropWindowQuery.GetTopWindows()</code> returns <em>all</em> top-level windows in Z-order (index 0 is the top-most window),
+without any filter. <code>GetTopWindows(parent)</code> returns the direct children of a window, also in Z-order.</p>
+<p>Both are a snapshot: the list is taken at once, with <code>EnumWindows</code> / <code>EnumChildWindows</code>, when you call the method.
+Windows builds the list before it reports the first window, so the result can't loop, skip or repeat windows when
+windows are activated, created or destroyed in the meantime (a <code>GetWindow(GW_HWNDNEXT)</code> walk can). The windows in the
+snapshot can of course still change or disappear afterwards; <code>GetVisibleApplicationWindows()</code> takes the snapshot when it is called
+and applies its filter while you enumerate the result.</p>
+<!-- sample: WindowSamples.ApplicationWindows -->
+<pre><code class="lang-csharp">// The application windows the user sees (visible, with a title, not minimized), from top to bottom
+foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows())
+{
+    Console.WriteLine($&quot;{window.GetCaption()} ({window.GetClassname()})&quot;);
+}
+</code></pre>
+<p>Filter with LINQ, or let <code>WindowsEnumerator</code> filter while it enumerates:</p>
+<!-- sample: WindowSamples.FilterWindows -->
+<pre><code class="lang-csharp">// All visible Notepad windows
+var notepads = InteropWindowQuery.GetVisibleApplicationWindows()
+    .Where(window =&gt; window.GetClassname() == &quot;Notepad&quot;)
+    .ToList();
+
+// All top-level windows of a process
+var ownWindows = InteropWindowQuery.GetWindowsForProcess(Process.GetCurrentProcess().Id);
+
+// Enumerate with a predicate and stop early: the first window with &quot;Dapplo&quot; in the title
+var firstMatch = WindowsEnumerator.EnumerateWindows(
+        wherePredicate: window =&gt; window.GetCaption().Contains(&quot;Dapplo&quot;),
+        takeWhileFunc: (window, count) =&gt; count &lt; 1)
+    .FirstOrDefault();
+</code></pre>
+<!-- sample: WindowSamples.FindByTitle -->
+<pre><code class="lang-csharp">IInteropWindow FindWindowByTitle(string title) =&gt;
+    InteropWindowQuery.GetVisibleApplicationWindows()
+        .FirstOrDefault(window =&gt; window.GetCaption().IndexOf(title, StringComparison.OrdinalIgnoreCase) &gt;= 0);
+
+var calculator = FindWindowByTitle(&quot;Calculator&quot;);
+</code></pre>
+<h3 id="children-parent-and-owner">Children, parent and owner</h3>
+<p>A <em>child</em> window lives inside its <em>parent</em> (a button in a dialog). A top-level window can have an <em>owner</em> (a dialog
+belongs to the main window of the application), but it has no parent. Dapplo.Windows keeps both apart: <code>GetParent()</code>
+never returns the owner, use <code>GetOwner()</code> for that.</p>
+<!-- sample: WindowSamples.ChildWindows -->
+<pre><code class="lang-csharp">// The direct children, from top to bottom (Z-order)
+foreach (var child in window.GetChildren())
+{
+    Console.WriteLine($&quot;Child {child.GetClassname()}&quot;);
+}
+
+// Children, grandchildren, ...
+var descendants = window.GetDescendants();
+</code></pre>
+<!-- sample: WindowSamples.ParentAndOwner -->
+<pre><code class="lang-csharp">// The parent is the window a child window lives in, top-level windows have none (IntPtr.Zero)
+IInteropWindow parent = window.GetParentWindow();
+
+// The owner is the window a dialog or tool window belongs to, e.g. the main window of the application
+IInteropWindow owner = window.GetOwnerWindow();
+
+// All other top-level windows of the same process
+var linked = window.GetLinkedWindows();
+</code></pre>
+<p><code>GetChildren()</code> returns the direct children in Z-order (a snapshot, see above) and stores them in <code>Children</code>; pass
+<code>forceUpdate: true</code> to read them again. <code>GetDescendants()</code> returns all levels, depth-first (a child is followed by its
+own descendants), and doesn't store them.</p>
+<h2 id="changing-windows">Changing windows</h2>
+<!-- sample: WindowSamples.ShowHide -->
+<pre><code class="lang-csharp">window.Minimize();
+window.Maximize();
+window.Restore();
+
+// Anything else ShowWindow supports
+User32Api.ShowWindow(window.Handle, ShowWindowCommands.Hide);
+User32Api.ShowWindow(window.Handle, ShowWindowCommands.ShowNoActivation);
+</code></pre>
+<!-- sample: WindowSamples.MoveResize -->
+<pre><code class="lang-csharp">// Move, keeping the size
+window.MoveTo(new NativePoint(100, 100));
+
+// Move and resize
+User32Api.SetWindowPos(window.Handle, IntPtr.Zero, 100, 100, 800, 600, WindowPos.SWP_NOZORDER | WindowPos.SWP_NOACTIVATE);
+
+// Placement: the normal (restored) bounds and the show state, e.g. to save and restore a layout
+WindowPlacement placement = window.GetPlacement();
+window.SetPlacement(placement);
+</code></pre>
+<p>After a monitor was removed, windows can end up where nobody sees them. <code>GetVisibleLocation</code> finds a place on one of the
+current displays:</p>
+<!-- sample: WindowSamples.KeepVisible -->
+<pre><code class="lang-csharp">// Move a window, e.g. after a monitor was disconnected, to a place where it can be seen
+if (!window.GetVisibleLocation(out var visibleLocation) || visibleLocation != window.GetInfo().Bounds.Location)
+{
+    window.MoveTo(visibleLocation);
+}
+</code></pre>
+<h3 id="bringing-a-window-to-the-front">Bringing a window to the front</h3>
+<p><code>ToForegroundAsync()</code> restores a minimized window, waits (up to 2 seconds) until it's restored and makes it the
+foreground window. Windows has rules about which process may change the foreground window; when it refuses, the
+taskbar button flashes instead.</p>
+<!-- sample: WindowSamples.ToForeground -->
+<pre><code class="lang-csharp">// Restores a minimized window and makes it the foreground window. Windows may still refuse,
+// e.g. when the user is working in another application: then the taskbar button flashes.
+await window.ToForegroundAsync();
+</code></pre>
+<h3 id="z-order-and-always-on-top">Z-order and always on top</h3>
+<p><code>SetWindowPos</code> changes the Z-order. <code>WindowHandles</code> has the special handles for its <code>hWndInsertAfter</code> argument:
+<code>HWND_TOP</code>, <code>HWND_BOTTOM</code>, <code>HWND_TOPMOST</code> and <code>HWND_NOTOPMOST</code> (and <code>HWND_MESSAGE</code> and <code>HWND_BROADCAST</code> for other APIs).</p>
+<!-- sample: WindowSamples.AlwaysOnTop -->
+<pre><code class="lang-csharp">bool isTopmost = (window.GetInfo(forceUpdate: true).ExtendedStyle &amp; ExtendedWindowStyleFlags.WS_EX_TOPMOST) != 0;
+User32Api.SetWindowPos(window.Handle, isTopmost ? WindowHandles.HWND_NOTOPMOST : WindowHandles.HWND_TOPMOST, 0, 0, 0, 0,
+    WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE | WindowPos.SWP_NOACTIVATE);
+</code></pre>
+<!-- sample: WindowSamples.ZOrder -->
+<pre><code class="lang-csharp">const WindowPos zOrderOnly = WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE | WindowPos.SWP_NOACTIVATE;
+
+// Send a window behind all other windows, or bring it to the top without activating it
+User32Api.SetWindowPos(window.Handle, WindowHandles.HWND_BOTTOM, 0, 0, 0, 0, zOrderOnly);
+User32Api.SetWindowPos(window.Handle, WindowHandles.HWND_TOP, 0, 0, 0, 0, zOrderOnly);
+
+// Place a window directly below another one
+User32Api.SetWindowPos(window.Handle, other.Handle, 0, 0, 0, 0, zOrderOnly);
+
+// A snapshot of the Z-order, index 0 is the top-most window
+var zOrder = InteropWindowQuery.GetTopWindows().Select(w =&gt; w.Handle).ToList();
+bool isAboveOther = zOrder.IndexOf(window.Handle) &lt; zOrder.IndexOf(other.Handle);
+</code></pre>
+<h3 id="posting-messages">Posting messages</h3>
+<p><code>window.PostMessage(...)</code> (or <code>User32Api.PostMessage</code> for a handle) puts a message in the message queue of the window's
+thread and returns immediately, <code>SendMessage</code> waits until the message was processed. It returns <code>false</code> when the
+message couldn't be posted, <code>Marshal.GetLastWin32Error()</code> tells why (e.g. the window is gone, or UIPI blocks messages
+from a process with a lower integrity level). Only post messages with values in <code>wParam</code> / <code>lParam</code>, not with pointers
+to your memory. <code>User32Api.PostThreadMessage</code> posts to a thread (its message loop) instead of a window.</p>
+<!-- sample: WindowSamples.PostMessages -->
+<pre><code class="lang-csharp">// Ask a window to close, without waiting: an application which asks &quot;Save changes?&quot; doesn't block the caller
+if (!window.PostMessage(WindowsMessages.WM_CLOSE))
+{
+    Console.WriteLine($&quot;Posting failed, error {Marshal.GetLastWin32Error()}&quot;);
+}
+
+// Post a registered message to all top-level windows, e.g. to the other instances of your application
+uint showMessage = RegisteredWindowMessages.Register(&quot;MyApp.ShowMainWindow&quot;);
+User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
+</code></pre>
+<h2 id="window-state">Window state</h2>
+<p>Window handles are reused by Windows after a window is destroyed. Check <code>Exists()</code> before you use a handle you kept
+for a while.</p>
+<!-- sample: WindowSamples.WindowState -->
+<pre><code class="lang-csharp">// Handles are recycled, check that the window still exists before working with it
+if (!window.Exists())
+{
+    return;
+}
+bool isApplicationWindow = window.IsVisibleApplicationWindow();
+bool isOwnWindow = window.IsOwnedByCurrentProcess();
+// A Windows Store (UWP) app window
+bool isApp = window.IsApp();
+</code></pre>
+<h2 id="screenshots-icons-and-scrolling">Screenshots, icons and scrolling</h2>
+<p><code>PrintWindow()</code> asks the window to render itself into a <code>Bitmap</code>, so it also works for windows which are covered by
+other windows. It uses <code>PW_RENDERFULLCONTENT</code> on Windows 8.1 and later, which captures DirectComposition content
+(browsers, UWP apps) as well. Minimized windows can't be captured. For WPF use <code>PrintWindowAsBitmapSource()</code> from
+Dapplo.Windows.Wpf.</p>
+<!-- sample: WindowSamples.Screenshot -->
+<pre><code class="lang-csharp">// Renders the window, also when it's covered by other windows (not when it's minimized).
+// The result is cropped to the visible frame, without the invisible resize borders.
+using Bitmap bitmap = window.PrintWindow();
+bitmap?.Save(&quot;window.png&quot;, ImageFormat.Png);
+</code></pre>
+<!-- sample: WindowSamples.WindowIcon -->
+<pre><code class="lang-csharp">// The icon of a window, as Bitmap or Icon
+using var smallIcon = window.GetIcon&lt;Bitmap&gt;();
+using var largeIcon = window.GetIcon&lt;Icon&gt;(useLargeIcons: true);
+</code></pre>
+<p><code>GetWindowScroller()</code> returns a <code>WindowScroller</code> for a window with a scroll bar, for example to capture a long page in
+parts. It returns <code>null</code> when the window can't be scrolled.</p>
+<!-- sample: WindowSamples.Scroll -->
+<pre><code class="lang-csharp">// null when the window has no scroll bar
+WindowScroller scroller = window.GetWindowScroller();
+if (scroller == null)
+{
+    return;
+}
+scroller.Start();                 // scroll to the top
+while (!scroller.IsAtEnd)
+{
+    // e.g. capture the visible part here
+    if (!scroller.Next())         // one page down
+    {
+        break;
+    }
+}
+scroller.Reset();                 // back to the original position
+</code></pre>
+<h2 id="window-events">Window events</h2>
+<p><code>WinEventHook</code> turns <a href="https://learn.microsoft.com/en-us/windows/win32/winauto/winevents">WinEvents</a> into observables.
+The hook is installed when you subscribe and removed when the last subscription is disposed. The events are delivered
+on the thread of the <a href="window-messages.html">SharedMessageWindow</a>: keep <code>OnNext</code> short and use <code>ObserveOn</code> for slow work.</p>
+<p>The events are also raised for objects inside windows (menus, the caret, list items ...). Check
+<code>ObjectIdentifier == ObjectIdentifiers.Window</code> (and <code>IsSelf</code>) when you only want windows.</p>
+<!-- sample: WindowSamples.MonitorCreateDestroy -->
+<pre><code class="lang-csharp">// Created and destroyed top-level and child windows, events arrive on the SharedMessageWindow thread
+IDisposable subscription = WinEventHook.WindowCreateDestroyObservable()
+    .Subscribe(info =&gt;
+    {
+        if (info.WinEvent == WinEvents.EVENT_OBJECT_CREATE)
+        {
+            Console.WriteLine($&quot;Created {info.Handle}&quot;);
+        }
+        else
+        {
+            // The window is gone, only the handle is left
+            Console.WriteLine($&quot;Destroyed {info.Handle}&quot;);
+        }
+    });
+
+// Removes the hook
+subscription.Dispose();
+</code></pre>
+<!-- sample: WindowSamples.MonitorTitle -->
+<pre><code class="lang-csharp">var subscription = WinEventHook.WindowTitleChangeObservable()
+    .Select(info =&gt; InteropWindowFactory.CreateFor(info.Handle))
+    .Where(window =&gt; window.IsVisibleApplicationWindow())
+    .Subscribe(window =&gt; Console.WriteLine($&quot;New title: {window.GetCaption(forceUpdate: true)}&quot;));
+</code></pre>
+<!-- sample: WindowSamples.MonitorForeground -->
+<pre><code class="lang-csharp">// The user switched to another window
+var subscription = WinEventHook.Create(WinEvents.EVENT_SYSTEM_FOREGROUND)
+    .Subscribe(info =&gt; Console.WriteLine($&quot;Active: {InteropWindowFactory.CreateFor(info.Handle).GetCaption()}&quot;));
+</code></pre>
+<!-- sample: WindowSamples.MonitorLocation -->
+<pre><code class="lang-csharp">// Moved or resized windows, this also fires for the caret and the cursor: filter on the window itself
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_LOCATIONCHANGE)
+    .Where(info =&gt; info.ObjectIdentifier == ObjectIdentifiers.Window &amp;&amp; info.IsSelf)
+    // Many events arrive while dragging, only take the last one
+    .Throttle(TimeSpan.FromMilliseconds(100))
+    .Subscribe(info =&gt; Console.WriteLine($&quot;Moved: {InteropWindowFactory.CreateFor(info.Handle).GetInfo(forceUpdate: true).Bounds}&quot;));
+</code></pre>
+<p>Limit a hook to one process (or thread) when you can, Windows then only calls you for that process:</p>
+<!-- sample: WindowSamples.MonitorProcess -->
+<pre><code class="lang-csharp">// Only the events of one process: less work for Windows and for you
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE, WinEvents.EVENT_OBJECT_DESTROY, process: process.Id)
+    .Where(info =&gt; info.ObjectIdentifier == ObjectIdentifiers.Window)
+    .Subscribe(info =&gt; Console.WriteLine($&quot;{process.ProcessName}: {info.WinEvent}&quot;));
+</code></pre>
+<h2 id="displays">Displays</h2>
+<p><code>DisplayInfo.AllDisplayInfos</code> lists the monitors; it's updated when displays, resolutions or the work area change.</p>
+<!-- sample: WindowSamples.Displays -->
+<pre><code class="lang-csharp">foreach (var display in DisplayInfo.AllDisplayInfos)
+{
+    Console.WriteLine($&quot;{display.DeviceName}: {display.Bounds}, work area {display.WorkingArea}, primary: {display.IsPrimary}&quot;);
+}
+// The bounds of all displays together
+NativeRect desktop = DisplayInfo.ScreenBounds;
+</code></pre>
+<h2 id="installed-software">Installed software</h2>
+<!-- sample: WindowSamples.InstalledSoftware -->
+<pre><code class="lang-csharp">// Reads the uninstall information of the registry (64 and 32 bit, machine and user)
+foreach (var software in InstallationInformation.InstalledSoftware().Where(s =&gt; s.Publisher == &quot;Microsoft Corporation&quot;))
+{
+    Console.WriteLine($&quot;{software.DisplayName} {software.DisplayVersion}&quot;);
+}
+</code></pre>
+<h2 id="tips">Tips</h2>
+<ul>
+<li>An <code>IInteropWindow</code> is a snapshot. Values which change (title, bounds, state) need <code>forceUpdate: true</code> when you read
+them again later.</li>
+<li><code>GetTopWindows()</code>, <code>GetVisibleApplicationWindows()</code>, <code>GetChildren()</code> and <code>WindowsEnumerator</code> return a snapshot of the windows
+at the moment of the call; call them again for the current state.</li>
+<li>Reading the text of a window which belongs to a hung application times out after 500 ms instead of blocking.</li>
+<li>Keep WinEvent subscriptions narrow (event range, process) and throttle location events, they are frequent.</li>
+</ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="window-messages.html">Window messages and the SharedMessageWindow</a></li>
+<li><a href="forms-and-wpf.html">Windows Forms and WPF</a></li>
+<li><a href="common-scenarios.html">Common scenarios</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/window-management.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

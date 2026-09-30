@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class RestartManagerApi | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class RestartManagerApi | Dapplo.Windows ">
+      
+      <meta name="description" content="Restart Manager API functionality See Restart Manager">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_InstallerManager_RestartManagerApi.md&amp;value=---%0Auid%3A%20Dapplo.Windows.InstallerManager.RestartManagerApi%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi">
+
+
+
+  <h1 id="Dapplo_Windows_InstallerManager_RestartManagerApi" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi" class="text-break">
+Class RestartManagerApi  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.InstallerManager/RestartManagerApi.cs/#L16"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.InstallerManager.html">InstallerManager</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.InstallerManager.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Restart Manager API functionality
+See <a href="https://docs.microsoft.com/en-us/windows/win32/rstmgr/restart-manager-portal">Restart Manager</a></p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class RestartManagerApi</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">RestartManagerApi</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmInvalidSession" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmInvalidSession">
+  RmInvalidSession
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.InstallerManager/RestartManagerApi.cs/#L28"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Invalid session value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const int RmInvalidSession = -1</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmInvalidTsSession" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmInvalidTsSession">
+  RmInvalidTsSession
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.InstallerManager/RestartManagerApi.cs/#L33"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Invalid Terminal Services session ID.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const uint RmInvalidTsSession = 4294967295</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmSessionKeyLen" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmSessionKeyLen">
+  RmSessionKeyLen
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.InstallerManager/RestartManagerApi.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Maximum length of a session key string (in characters).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const int RmSessionKeyLen = 32</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmEndSession_" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmEndSession*"></a>
+
+  <h3 id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmEndSession_System_Int32_" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmEndSession(System.Int32)">
+  RmEndSession(int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Ends the Restart Manager session.
+This function should be called by the primary installer that has previously started the session by calling the RmStartSession function.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmendsession">RmEndSession function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int RmEndSession(int dwSessionHandle)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dwSessionHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>A handle to an existing Restart Manager session.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Returns ERROR_SUCCESS (0) on success, or an error code on failure.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmGetList_" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmGetList*"></a>
+
+  <h3 id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmGetList_System_Int32_System_UInt32__System_UInt32__Dapplo_Windows_InstallerManager_Structs_RmProcessInfo___Dapplo_Windows_InstallerManager_Enums_RmRebootReason__" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmGetList(System.Int32,System.UInt32@,System.UInt32@,Dapplo.Windows.InstallerManager.Structs.RmProcessInfo[],Dapplo.Windows.InstallerManager.Enums.RmRebootReason@)">
+  RmGetList(int, out uint, ref uint, RmProcessInfo[], out RmRebootReason)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a list of all applications and services that are currently using resources that have been registered with the Restart Manager session.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmgetlist">RmGetList function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int RmGetList(int dwSessionHandle, out uint pnProcInfoNeeded, ref uint pnProcInfo, RmProcessInfo[] rgAffectedApps, out RmRebootReason lpdwRebootReasons)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dwSessionHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>A handle to an existing Restart Manager session.</p>
+</dd>
+    <dt><code>pnProcInfoNeeded</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>A pointer to an array size necessary to receive RM_PROCESS_INFO results.
+If the buffer size is insufficient, this parameter receives the size required.</p>
+</dd>
+    <dt><code>pnProcInfo</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>A pointer to the total number of RM_PROCESS_INFO structures that are returned to the caller.</p>
+</dd>
+    <dt><code>rgAffectedApps</code> <a class="xref" href="Dapplo.Windows.InstallerManager.Structs.RmProcessInfo.html">RmProcessInfo</a>[]</dt>
+    <dd><p>An array of RM_PROCESS_INFO structures that list the applications and services using resources that have been registered with the session.
+This parameter can be NULL if lpdwRebootReasons is not NULL.</p>
+</dd>
+    <dt><code>lpdwRebootReasons</code> <a class="xref" href="Dapplo.Windows.InstallerManager.Enums.RmRebootReason.html">RmRebootReason</a></dt>
+    <dd><p>Pointer to location that receives a value of the RM_REBOOT_REASON enumeration that describes the reason a system restart is needed.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Returns ERROR_SUCCESS (0) on success.
+Returns ERROR_MORE_DATA if the rgAffectedApps buffer is too small.
+Returns an error code on other failures.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmRegisterResources_" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmRegisterResources*"></a>
+
+  <h3 id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmRegisterResources_System_Int32_System_UInt32_System_String___System_UInt32_Dapplo_Windows_InstallerManager_Structs_RmUniqueProcess___System_UInt32_System_String___" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmRegisterResources(System.Int32,System.UInt32,System.String[],System.UInt32,Dapplo.Windows.InstallerManager.Structs.RmUniqueProcess[],System.UInt32,System.String[])">
+  RmRegisterResources(int, uint, string[], uint, RmUniqueProcess[], uint, string[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Registers resources to a Restart Manager session.
+The Restart Manager uses the list of resources registered with the session to determine which applications and services must be shut down and restarted.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmregisterresources">RmRegisterResources function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int RmRegisterResources(int dwSessionHandle, uint nFiles, string[] rgsFilenames, uint nApplications, RmUniqueProcess[] rgApplications, uint nServices, string[] rgsServiceNames)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dwSessionHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>A handle to an existing Restart Manager session.</p>
+</dd>
+    <dt><code>nFiles</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>The number of files being registered.</p>
+</dd>
+    <dt><code>rgsFilenames</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd><p>An array of null-terminated strings of full filename paths.
+This parameter can be NULL if nFiles is 0.</p>
+</dd>
+    <dt><code>nApplications</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>The number of processes being registered.</p>
+</dd>
+    <dt><code>rgApplications</code> <a class="xref" href="Dapplo.Windows.InstallerManager.Structs.RmUniqueProcess.html">RmUniqueProcess</a>[]</dt>
+    <dd><p>An array of RM_UNIQUE_PROCESS structures.
+This parameter can be NULL if nApplications is 0.</p>
+</dd>
+    <dt><code>nServices</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>The number of services to be registered.</p>
+</dd>
+    <dt><code>rgsServiceNames</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd><p>An array of null-terminated strings of service short names.
+This parameter can be NULL if nServices is 0.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Returns ERROR_SUCCESS (0) on success, or an error code on failure.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmRestart_" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmRestart*"></a>
+
+  <h3 id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmRestart_System_Int32_System_Int32_Dapplo_Windows_InstallerManager_RestartManagerApi_RmStatusCallback_" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmRestart(System.Int32,System.Int32,Dapplo.Windows.InstallerManager.RestartManagerApi.RmStatusCallback)">
+  RmRestart(int, int, RmStatusCallback)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Restarts applications and services that have been shut down by the RmShutdown function and that have been registered to be restarted using the RegisterApplicationRestart function.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmrestart">RmRestart function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int RmRestart(int dwSessionHandle, int dwRestartFlags, RestartManagerApi.RmStatusCallback fnStatus)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dwSessionHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>A handle to an existing Restart Manager session.</p>
+</dd>
+    <dt><code>dwRestartFlags</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Reserved. This parameter should be 0.</p>
+</dd>
+    <dt><code>fnStatus</code> <a class="xref" href="Dapplo.Windows.InstallerManager.RestartManagerApi.html">RestartManagerApi</a>.<a class="xref" href="Dapplo.Windows.InstallerManager.RestartManagerApi.RmStatusCallback.html">RmStatusCallback</a></dt>
+    <dd><p>A pointer to a status message callback function that is used to communicate status while the RmRestart function is executing.
+This parameter can be NULL if you do not want to receive status updates.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Returns ERROR_SUCCESS (0) on success, or an error code on failure.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmShutdown_" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmShutdown*"></a>
+
+  <h3 id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmShutdown_System_Int32_Dapplo_Windows_InstallerManager_Enums_RmShutdownType_Dapplo_Windows_InstallerManager_RestartManagerApi_RmStatusCallback_" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmShutdown(System.Int32,Dapplo.Windows.InstallerManager.Enums.RmShutdownType,Dapplo.Windows.InstallerManager.RestartManagerApi.RmStatusCallback)">
+  RmShutdown(int, RmShutdownType, RmStatusCallback)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initiates the shutdown of applications.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmshutdown">RmShutdown function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int RmShutdown(int dwSessionHandle, RmShutdownType lActionFlags, RestartManagerApi.RmStatusCallback fnStatus)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dwSessionHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>A handle to an existing Restart Manager session.</p>
+</dd>
+    <dt><code>lActionFlags</code> <a class="xref" href="Dapplo.Windows.InstallerManager.Enums.RmShutdownType.html">RmShutdownType</a></dt>
+    <dd><p>One or more RM_SHUTDOWN_TYPE values that configure the shut down of components.</p>
+</dd>
+    <dt><code>fnStatus</code> <a class="xref" href="Dapplo.Windows.InstallerManager.RestartManagerApi.html">RestartManagerApi</a>.<a class="xref" href="Dapplo.Windows.InstallerManager.RestartManagerApi.RmStatusCallback.html">RmStatusCallback</a></dt>
+    <dd><p>A pointer to a status message callback function that is used to communicate status while the RmShutdown function is executing.
+This parameter can be NULL if you do not want to receive status updates.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Returns ERROR_SUCCESS (0) on success, or an error code on failure.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmStartSession_" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmStartSession*"></a>
+
+  <h3 id="Dapplo_Windows_InstallerManager_RestartManagerApi_RmStartSession_System_Int32__System_Int32_System_Text_StringBuilder_" data-uid="Dapplo.Windows.InstallerManager.RestartManagerApi.RmStartSession(System.Int32@,System.Int32,System.Text.StringBuilder)">
+  RmStartSession(out int, int, StringBuilder)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Starts a new Restart Manager session.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmstartsession">RmStartSession function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int RmStartSession(out int pSessionHandle, int dwSessionFlags, StringBuilder strSessionKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>pSessionHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>A pointer to the handle of a Restart Manager session.
+The session handle can be passed in subsequent calls to the Restart Manager API.</p>
+</dd>
+    <dt><code>dwSessionFlags</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Reserved. This parameter should be 0.</p>
+</dd>
+    <dt><code>strSessionKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.stringbuilder">StringBuilder</a></dt>
+    <dd><p>A null-terminated string that contains the session key to the new session.
+The string must be allocated before calling this function and should be at least CCH_RM_SESSION_KEY characters in length.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Returns ERROR_SUCCESS (0) on success, or an error code on failure.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.InstallerManager/RestartManagerApi.cs/#L16" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

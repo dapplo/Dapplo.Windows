@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>DPI awareness | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="DPI awareness | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/dpi-awareness.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="dpi-awareness">DPI awareness</h1>
+
+<p>Windows runs monitors at different scale factors (100 %, 125 %, 150 %, ...), and a window can move between them.
+<strong>Dapplo.Windows.Dpi</strong> helps an application to follow the DPI of its windows: DPI calculations, a <code>DpiHandler</code> which
+reports DPI changes, bitmap scaling and the DPI awareness APIs of Windows. The Windows Forms and WPF parts are in
+<strong>Dapplo.Windows.Forms</strong> and <strong>Dapplo.Windows.Wpf</strong>.</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows.Dpi
+dotnet add package Dapplo.Windows.Forms   # DpiAwareForm, AttachDpiHandler for forms and context menus
+dotnet add package Dapplo.Windows.Wpf     # AttachDpiHandler for WPF windows
+</code></pre>
+<p>Namespaces used on this page: <code>Dapplo.Windows.Dpi</code>, <code>Dapplo.Windows.Dpi.Enums</code>, <code>Dapplo.Windows.Forms.Dpi</code>,
+<code>Dapplo.Windows.Wpf.Dpi</code>, <code>Dapplo.Windows.Common.Structs</code>, <code>Dapplo.Windows.User32</code>.</p>
+<h2 id="first-make-the-process-dpi-aware">First: make the process DPI aware</h2>
+<p>A process which is not DPI aware is scaled by Windows as a bitmap and looks blurry; nothing on this page changes that.
+Declare the awareness in the application manifest (<code>&lt;ApplicationManifest&gt;app.manifest&lt;/ApplicationManifest&gt;</code> in the
+project file):</p>
+<pre><code class="lang-xml">&lt;application xmlns=&quot;urn:schemas-microsoft-com:asm.v3&quot;&gt;
+  &lt;windowsSettings&gt;
+    &lt;dpiAware xmlns=&quot;http://schemas.microsoft.com/SMI/2005/WindowsSettings&quot;&gt;true/pm&lt;/dpiAware&gt;
+    &lt;dpiAwareness xmlns=&quot;http://schemas.microsoft.com/SMI/2016/WindowsSettings&quot;&gt;PerMonitorV2, PerMonitor&lt;/dpiAwareness&gt;
+  &lt;/windowsSettings&gt;
+&lt;/application&gt;
+</code></pre>
+<ul>
+<li>.NET (Core) Windows Forms: also call <code>Application.SetHighDpiMode(HighDpiMode.PerMonitorV2)</code> or set
+<code>&lt;ApplicationHighDpiMode&gt;PerMonitorV2&lt;/ApplicationHighDpiMode&gt;</code> in the project, so WinForms scales on DPI changes.</li>
+<li>.NET Framework 4.8 Windows Forms: add <code>&lt;add key=&quot;DpiAwareness&quot; value=&quot;PerMonitorV2&quot; /&gt;</code> to the
+<code>System.Windows.Forms.ApplicationConfigurationSection</code> in app.config, otherwise WinForms doesn't scale on DPI changes.</li>
+<li>WPF scales by itself when the process is Per Monitor aware.</li>
+</ul>
+<p>If you can't use a manifest, call <code>NativeDpiMethods.EnableDpiAware()</code> before the first window is created:</p>
+<!-- sample: DpiSamples.EnableDpiAware -->
+<pre><code class="lang-csharp">// Prefer the manifest. If that's not possible, call this before any window is created:
+// it tries Per Monitor V2, then Per Monitor, and returns if the process is DPI aware afterwards.
+if (!NativeDpiMethods.EnableDpiAware())
+{
+    Console.WriteLine(&quot;The process is not DPI aware, Windows scales it as a bitmap&quot;);
+}
+</code></pre>
+<h2 id="windows-forms">Windows Forms</h2>
+<h3 id="dpiawareform">DpiAwareForm</h3>
+<p>Derive from <code>DpiAwareForm</code> (Dapplo.Windows.Forms). What it does:</p>
+<ul>
+<li>It creates its window handle with the Per Monitor V2 awareness context (Per Monitor as fallback), even when the
+thread or process uses another awareness. The awareness of the thread is restored right after.</li>
+<li>On Per Monitor (v1) it enables the scaling of the non-client area (title bar, menus).</li>
+<li>WM_DPICHANGED is always passed to WinForms. When WinForms handles the DPI change (it raises <code>Form.DpiChanged</code>), it
+scales fonts and controls and applies the window bounds Windows suggests. That is the case on .NET 10 with a Per
+Monitor V2 high DPI mode, and on .NET Framework 4.8 with the app.config setting above.</li>
+<li>When WinForms doesn't handle it, only the window bounds are set to the rectangle Windows suggests. <strong>The content is
+not scaled</strong>; do that yourself in <code>FormDpiHandler.OnDpiChanged</code>.</li>
+<li>A cancelled <code>Form.DpiChanged</code> (<code>e.Cancel = true</code>) is respected, the bounds are not changed.</li>
+<li><code>FormDpiHandler</code> reports the DPI: the first time when the handle is created, then for every change. It survives
+handle re-creation and is disposed with the form.</li>
+</ul>
+<!-- sample: DpiSamples.DpiAwareForm -->
+<pre><code class="lang-csharp">public class MainForm : DpiAwareForm
+{
+    private readonly IDisposable _dpiSubscription;
+
+    public MainForm()
+    {
+        // FormDpiHandler is created by DpiAwareForm, OnDpiChanged fires with the first DPI when the handle is created,
+        // and for every change. WinForms scales the fonts and controls itself (Per Monitor V2), this is for everything else.
+        _dpiSubscription = FormDpiHandler.OnDpiChanged.Subscribe(info =&gt;
+            Console.WriteLine($&quot;DPI {info.PreviousDpi} -&gt; {info.NewDpi}, scale factor {DpiCalculator.DpiScaleFactor(info.NewDpi)}&quot;));
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _dpiSubscription.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+}
+</code></pre>
+<h3 id="a-form-that-stays-dpi-unaware">A form that stays DPI unaware</h3>
+<p>For a form which can't handle high DPI, derive from <code>DpiUnawareForm</code>. Windows then scales it as a bitmap: blurry, but
+the right size.</p>
+<!-- sample: DpiSamples.DpiUnawareForm -->
+<pre><code class="lang-csharp">// Windows scales this form as a bitmap (blurry, but always the right size), even when the process is DPI aware
+public class LegacyForm : DpiUnawareForm
+{
+}
+</code></pre>
+<h3 id="attachdpihandler">AttachDpiHandler</h3>
+<p>When you can't change the base class, attach a <code>DpiHandler</code> to a form. It moves and resizes the form to the rectangle
+Windows suggests on a DPI change and reports the DPI. It does not enable the non-client scaling of Per Monitor v1, for
+that you need <code>DpiAwareForm</code> (or call <code>DpiHandler.TryEnableNonClientDpiScaling(hWnd)</code> in WM_NCCREATE yourself).</p>
+<!-- sample: DpiSamples.AttachDpiHandler -->
+<pre><code class="lang-csharp">public class SettingsForm : Form
+{
+    private readonly DpiHandler _dpiHandler;
+
+    public SettingsForm()
+    {
+        // Moves / resizes the form to the rectangle Windows suggests on a DPI change,
+        // and publishes the DPI. It's disposed together with the form.
+        _dpiHandler = this.AttachDpiHandler();
+        _dpiHandler.OnDpiChanged.Subscribe(info =&gt; Console.WriteLine($&quot;Now at {info.NewDpi} DPI&quot;));
+    }
+}
+</code></pre>
+<p>A <code>ContextMenuStrip</code> is a window of its own and can open on another monitor than its form:</p>
+<!-- sample: DpiSamples.ContextMenu -->
+<pre><code class="lang-csharp">// A ContextMenuStrip is its own window, it can show up on another monitor than the form
+DpiHandler menuDpiHandler = contextMenuStrip.AttachDpiHandler();
+menuDpiHandler.OnDpiChanged.Subscribe(info =&gt; contextMenuStrip.ImageScalingSize = DpiCalculator.ScaleWithDpi(new Size(16, 16), info.NewDpi));
+</code></pre>
+<h3 id="images">Images</h3>
+<p><code>BitmapScaleHandler</code> provides a bitmap for the current DPI and applies it again on every DPI change. It owns the
+bitmaps: they are cached per DPI and disposed when the DPI changes or the handler is disposed, so the provider must
+return a new instance for every call. Dispose the handler on the UI thread.</p>
+<!-- sample: DpiSamples.BitmapScaling -->
+<pre><code class="lang-csharp">public class ToolbarForm : DpiAwareForm
+{
+    private readonly ToolStripButton _saveButton = new ToolStripButton();
+    private readonly BitmapScaleHandler&lt;string, Bitmap&gt; _scaleHandler;
+
+    public ToolbarForm()
+    {
+        // Load the image from the form's resources, scale it for the current DPI, and apply it again on every DPI change.
+        // The handler owns and disposes the bitmaps.
+        _scaleHandler = BitmapScaleHandler.WithComponentResourceManager&lt;Bitmap&gt;(FormDpiHandler, GetType(), BitmapScaleHandler.SimpleBitmapScaler)
+            .AddTarget(_saveButton, &quot;saveButton.Image&quot;, bitmap =&gt; bitmap);
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        // Dispose on the UI thread
+        _scaleHandler.Dispose();
+        base.OnClosing(e);
+    }
+}
+</code></pre>
+<p><code>BitmapScaleHandler.SimpleBitmapScaler</code> scales with nearest neighbor: sharp pixels for icons, but blocky at
+uneven factors. For better results provide images for several sizes and pick the right one:</p>
+<!-- sample: DpiSamples.CustomBitmapProvider -->
+<pre><code class="lang-csharp">// Pick the best source image for the DPI yourself, return a new Bitmap for every call: the handler disposes them
+var scaleHandler = BitmapScaleHandler.Create&lt;string, Bitmap&gt;(dpiHandler,
+    (name, dpi) =&gt; new Bitmap(dpi &gt; 120 ? $&quot;Images\\{name}@2x.png&quot; : $&quot;Images\\{name}.png&quot;));
+
+scaleHandler.AddTargetAction(pictureBox, &quot;logo&quot;, bitmap =&gt; pictureBox.Image = bitmap, execute: true);
+</code></pre>
+<h2 id="wpf">WPF</h2>
+<p>WPF already renders in device independent units. With a Per Monitor manifest WPF follows the monitor DPI itself, and
+<code>AttachDpiHandler()</code> only reports the DPI. Only when the monitor DPI differs from the DPI WPF renders with (the process
+isn't Per Monitor aware, or WPF's per-monitor support is disabled), it applies a <code>LayoutTransform</code> to the content and
+moves the window to the rectangle Windows suggests. The handler is disposed with the window.</p>
+<!-- sample: DpiSamples.Wpf -->
+<pre><code class="lang-csharp">// With a Per Monitor (V2) manifest WPF scales the window itself, the handler only reports the DPI.
+// Without it, a LayoutTransform is applied to the content when the monitor DPI differs from the DPI WPF renders with.
+DpiHandler dpiHandler = window.AttachDpiHandler();
+dpiHandler.OnDpiChanged.Subscribe(info =&gt; Console.WriteLine($&quot;{window.Title} is now at {info.NewDpi} DPI&quot;));
+</code></pre>
+<h2 id="calculations">Calculations</h2>
+<p>96 DPI is 100 %. <code>DpiCalculator</code> scales and unscales numbers and the native structs; results are rounded, not
+truncated.</p>
+<!-- sample: DpiSamples.Calculations -->
+<pre><code class="lang-csharp">// 96 DPI is 100%, 144 DPI is 150%
+int scaled = DpiCalculator.ScaleWithDpi(16, 144);      // 24
+int unscaled = DpiCalculator.UnscaleWithDpi(24, 144);  // 16
+float factor = DpiCalculator.DpiScaleFactor(120);     // 1.25
+
+// Structs are scaled too, values are rounded
+NativeSize iconSize = DpiCalculator.ScaleWithDpi(new NativeSize(32, 32), 120); // 40x40
+
+// From one DPI to another: 144 -&gt; 96 is 0.667
+float factor144To96 = DpiCalculator.DpiScaleFactor(144, 96);
+</code></pre>
+<p>A <code>DpiHandler</code> knows the DPI of its window. <code>Dpi</code> is 96 until the DPI is known (<code>IsDpiKnown</code>).</p>
+<!-- sample: DpiSamples.HandlerScaling -->
+<pre><code class="lang-csharp">// A DpiHandler knows the DPI of its window: Dpi is 96 until the first DPI is known (IsDpiKnown)
+int margin = dpiHandler.ScaleWithCurrentDpi(8);
+NativeSize buttonSize = dpiHandler.ScaleWithCurrentDpi(new NativeSize(75, 23));
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>DPI</th>
+<th>Scale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>96</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>120</td>
+<td>125 %</td>
+</tr>
+<tr>
+<td>144</td>
+<td>150 %</td>
+</tr>
+<tr>
+<td>168</td>
+<td>175 %</td>
+</tr>
+<tr>
+<td>192</td>
+<td>200 %</td>
+</tr>
+</tbody>
+</table>
+<h2 id="dpi-of-windows-and-monitors">DPI of windows and monitors</h2>
+<!-- sample: DpiSamples.GetDpi -->
+<pre><code class="lang-csharp">// The DPI of a window, and of the monitor at a location
+int windowDpi = NativeDpiMethods.GetDpi(hWnd);
+int cursorDpi = NativeDpiMethods.GetDpi(User32Api.GetCursorLocation());
+
+// The DPI of every display
+foreach (var display in DisplayInfo.AllDisplayInfos)
+{
+    Console.WriteLine($&quot;{display.DeviceName} {display.Bounds}: {NativeDpiMethods.GetDpi(display.Bounds.Location)} DPI&quot;);
+}
+</code></pre>
+<h2 id="awareness-contexts">Awareness contexts</h2>
+<p><code>DpiAwarenessContext</code> values are handles, and the handles Windows returns are not the same values as the constants.
+Compare them with <code>NativeDpiMethods.AreDpiAwarenessContextsEqual</code>. <code>ScopedThreadDpiAwarenessContext</code> creates windows
+with another awareness and restores the thread's awareness afterwards.</p>
+<!-- sample: DpiSamples.AwarenessContext -->
+<pre><code class="lang-csharp">// Awareness contexts are handles: compare them with AreDpiAwarenessContextsEqual, not with ==
+var threadContext = NativeDpiMethods.GetThreadDpiAwarenessContext();
+bool isPerMonitorV2 = NativeDpiMethods.AreDpiAwarenessContextsEqual(threadContext, DpiAwarenessContext.PerMonitorAwareV2);
+
+// Create a window with another awareness, the previous context of the thread is restored when the scope is disposed
+using (NativeDpiMethods.ScopedThreadDpiAwarenessContext(DpiAwarenessContext.SystemAware))
+{
+    var toolWindow = new Form();
+    toolWindow.CreateControl();
+}
+</code></pre>
+<p><code>NativeDpiMethods</code> also wraps <code>GetDpiForWindow</code>, <code>GetDpiForMonitor</code>, <code>GetSystemMetricsForDpi</code>,
+<code>AdjustWindowRectExForDpi</code>, <code>SetDialogDpiChangeBehavior</code> and more; <code>DpiApi</code> has convenience methods for system metrics
+and <code>SystemParametersInfo</code> for a DPI.</p>
+<h2 id="testing">Testing</h2>
+<p>Test with at least two monitors at different scale factors, and move the windows between them. Change the scale factor
+while the application runs, and start it on the secondary monitor. The example project
+<a href="https://github.com/dapplo/Dapplo.Windows/tree/master/src/Dapplo.Windows.Example.FormsExample">Dapplo.Windows.Example.FormsExample</a>
+has forms for each approach.</p>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="forms-and-wpf.html">Windows Forms and WPF</a></li>
+<li><a href="https://learn.microsoft.com/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows">High DPI desktop application development on Windows</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/dpi-awareness.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

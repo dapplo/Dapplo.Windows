@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Interface IInteropWindow | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Interface IInteropWindow | Dapplo.Windows ">
+      
+      <meta name="description" content="This is the interface of all classes which represent a native window">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Desktop_IInteropWindow.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Desktop.IInteropWindow%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Desktop.IInteropWindow">
+
+
+
+  <h1 id="Dapplo_Windows_Desktop_IInteropWindow" data-uid="Dapplo.Windows.Desktop.IInteropWindow" class="text-break">
+Interface IInteropWindow  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Desktop.html">Desktop</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>This is the interface of all classes which represent a native window</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface IInteropWindow</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="Dapplo.Windows.App.AppQuery.html#Dapplo_Windows_App_AppQuery_GetCoreWindow_Dapplo_Windows_Desktop_IInteropWindow_">AppQuery.GetCoreWindow(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.App.AppQuery.html#Dapplo_Windows_App_AppQuery_IsApp_Dapplo_Windows_Desktop_IInteropWindow_">AppQuery.IsApp(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.App.AppQuery.html#Dapplo_Windows_App_AppQuery_IsAppLauncher_Dapplo_Windows_Desktop_IInteropWindow_">AppQuery.IsAppLauncher(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.App.AppQuery.html#Dapplo_Windows_App_AppQuery_IsBackgroundWin10App_Dapplo_Windows_Desktop_IInteropWindow_">AppQuery.IsBackgroundWin10App(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.App.AppQuery.html#Dapplo_Windows_App_AppQuery_IsGutter_Dapplo_Windows_Desktop_IInteropWindow_">AppQuery.IsGutter(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.App.AppQuery.html#Dapplo_Windows_App_AppQuery_IsWin10App_Dapplo_Windows_Desktop_IInteropWindow_">AppQuery.IsWin10App(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.App.AppQuery.html#Dapplo_Windows_App_AppQuery_IsWin8App_Dapplo_Windows_Desktop_IInteropWindow_">AppQuery.IsWin8App(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_Exists_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.Exists(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_Fill_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_Enums_InteropWindowRetrieveSettings_">InteropWindowExtensions.Fill(IInteropWindow, InteropWindowRetrieveSettings)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetCaption_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.GetCaption(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetChildren_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.GetChildren(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetClassname_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.GetClassname(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetDescendants_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.GetDescendants(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetInfo_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_System_Boolean_">InteropWindowExtensions.GetInfo(IInteropWindow, bool, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetLinkedWindows_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.GetLinkedWindows(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetOwner_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.GetOwner(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetOwnerWindow_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.GetOwnerWindow(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetParent_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.GetParent(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetParentWindow_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.GetParentWindow(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetPlacement_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.GetPlacement(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetProcessId_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.GetProcessId(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetRegion_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.GetRegion(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetText_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.GetText(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetVisibleLocation_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_Common_Structs_NativePoint__">InteropWindowExtensions.GetVisibleLocation(IInteropWindow, out NativePoint)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetWindowScroller_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_User32_Enums_ScrollBarTypes_System_Boolean_">InteropWindowExtensions.GetWindowScroller(IInteropWindow, ScrollBarTypes, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_IsDockedToLeftOf_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_Desktop_IInteropWindow_System_Func_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_Common_Structs_NativeRect__">InteropWindowExtensions.IsDockedToLeftOf(IInteropWindow, IInteropWindow, Func&lt;IInteropWindow, NativeRect&gt;)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_IsDockedToRightOf_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_Desktop_IInteropWindow_System_Func_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_Common_Structs_NativeRect__">InteropWindowExtensions.IsDockedToRightOf(IInteropWindow, IInteropWindow, Func&lt;IInteropWindow, NativeRect&gt;)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_IsMaximized_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.IsMaximized(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_IsMinimized_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.IsMinimized(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_IsOwnedByCurrentProcess_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.IsOwnedByCurrentProcess(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_IsOwnedByCurrentThread_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.IsOwnedByCurrentThread(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_IsVisible_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowExtensions.IsVisible(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_Maximize_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.Maximize(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_Minimize_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.Minimize(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_MoveTo_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_Common_Structs_NativePoint_">InteropWindowExtensions.MoveTo(IInteropWindow, NativePoint)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_PostMessage_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_Messages_Enums_WindowsMessages_System_IntPtr_System_IntPtr_">InteropWindowExtensions.PostMessage(IInteropWindow, WindowsMessages, nint, nint)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_PostMessage_Dapplo_Windows_Desktop_IInteropWindow_System_UInt32_System_IntPtr_System_IntPtr_">InteropWindowExtensions.PostMessage(IInteropWindow, uint, nint, nint)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_PrintWindow_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.PrintWindow(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_Restore_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.Restore(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_SetExtendedStyle_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_User32_Enums_ExtendedWindowStyleFlags_">InteropWindowExtensions.SetExtendedStyle(IInteropWindow, ExtendedWindowStyleFlags)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_SetPlacement_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_User32_Structs_WindowPlacement_">InteropWindowExtensions.SetPlacement(IInteropWindow, WindowPlacement)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_SetStyle_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_User32_Enums_WindowStyleFlags_">InteropWindowExtensions.SetStyle(IInteropWindow, WindowStyleFlags)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_ToForegroundAsync_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowExtensions.ToForegroundAsync(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_CanIgnoreClass_Dapplo_Windows_Desktop_IInteropWindow_">InteropWindowQuery.CanIgnoreClass(IInteropWindow)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_IsVisibleApplicationWindow_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowQuery.IsVisibleApplicationWindow(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_IsVisiblePopup_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowQuery.IsVisiblePopup(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Icons.InteropWindowIconExtensions.html#Dapplo_Windows_Icons_InteropWindowIconExtensions_GetAppLogo__1_Dapplo_Windows_Desktop_IInteropWindow_System_Int32_">InteropWindowIconExtensions.GetAppLogo&lt;TBitmap&gt;(IInteropWindow, int)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Icons.InteropWindowIconExtensions.html#Dapplo_Windows_Icons_InteropWindowIconExtensions_GetIconFromWindow__1_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowIconExtensions.GetIconFromWindow&lt;TIcon&gt;(IInteropWindow, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Icons.InteropWindowIconExtensions.html#Dapplo_Windows_Icons_InteropWindowIconExtensions_GetIcon__1_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_">InteropWindowIconExtensions.GetIcon&lt;TIcon&gt;(IInteropWindow, bool)</a>
+  </div>
+  </dd></dl>
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_CanScroll_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.CanScroll*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_CanScroll" data-uid="Dapplo.Windows.Desktop.IInteropWindow.CanScroll">
+  CanScroll
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Specifies if a WindowScroller can work with this window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool? CanScroll { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_Caption_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Caption*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_Caption" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Caption">
+  Caption
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return the title of the window, if any</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">string Caption { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_Children_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Children*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_Children" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Children">
+  Children
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The direct children of this window in Z-order from top to bottom, filled by GetChildren (null when they were not retrieved)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IEnumerable&lt;IInteropWindow&gt; Children { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_Classname_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Classname*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_Classname" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Classname">
+  Classname
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>string with the name of the internal class for the window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">string Classname { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_Handle_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Handle*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_Handle" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Handle">
+  Handle
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Handle (ID) of the window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">nint Handle { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_HasChildren_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.HasChildren*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_HasChildren" data-uid="Dapplo.Windows.Desktop.IInteropWindow.HasChildren">
+  HasChildren
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if there are any children</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool HasChildren { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_HasClassname_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.HasClassname*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_HasClassname" data-uid="Dapplo.Windows.Desktop.IInteropWindow.HasClassname">
+  HasClassname
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Does the window have a classname?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool HasClassname { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_HasOwner_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.HasOwner*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_HasOwner" data-uid="Dapplo.Windows.Desktop.IInteropWindow.HasOwner">
+  HasOwner
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Does this window have an owner, e.g. a dialog which is owned by the main window of an application.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool HasOwner { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_HasParent_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.HasParent*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_HasParent" data-uid="Dapplo.Windows.Desktop.IInteropWindow.HasParent">
+  HasParent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L54"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Does this window have a (real) parent, this is true for child windows. The owner of a window is not its parent, see <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html#Dapplo_Windows_Desktop_IInteropWindow_HasOwner">HasOwner</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool HasParent { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_Info_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Info*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_Info" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Info">
+  Info
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L64"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>WindowInfo for the Window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">WindowInfo? Info { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.User32.Structs.WindowInfo.html">WindowInfo</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_IsMaximized_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.IsMaximized*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_IsMaximized" data-uid="Dapplo.Windows.Desktop.IInteropWindow.IsMaximized">
+  IsMaximized
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if the window is maximized</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool? IsMaximized { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_IsMinimized_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.IsMinimized*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_IsMinimized" data-uid="Dapplo.Windows.Desktop.IInteropWindow.IsMinimized">
+  IsMinimized
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if the window is minimized</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool? IsMinimized { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_IsVisible_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.IsVisible*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_IsVisible" data-uid="Dapplo.Windows.Desktop.IInteropWindow.IsVisible">
+  IsVisible
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L79"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if the window is visible</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool? IsVisible { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_Owner_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Owner*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_Owner" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Owner">
+  Owner
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L97"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The handle of the owner of this window (GetWindow with GW_OWNER), IntPtr.Zero if the window has no owner.
+Only top-level windows can be owned, e.g. dialogs, message boxes and tool windows.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">nint? Owner { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_Parent_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Parent*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_Parent" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Parent">
+  Parent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L85"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The handle of the (real) parent of this window, IntPtr.Zero for a top-level window.
+This is retrieved with GetAncestor(GA_PARENT) and is never the owner, unlike the result of the Win32 GetParent function.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">nint? Parent { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_ParentWindow_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.ParentWindow*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_ParentWindow" data-uid="Dapplo.Windows.Desktop.IInteropWindow.ParentWindow">
+  ParentWindow
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The actually IInteropWindow for the parent.
+This is filled when this window was retrieved via parent.GetChildren</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IInteropWindow ParentWindow { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_Placement_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Placement*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_Placement" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Placement">
+  Placement
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L102"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>WindowPlacement for the Window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">WindowPlacement? Placement { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.User32.Structs.WindowPlacement.html">WindowPlacement</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_ProcessId_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.ProcessId*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_ProcessId" data-uid="Dapplo.Windows.Desktop.IInteropWindow.ProcessId">
+  ProcessId
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the process ID this window belongs to, read with GetProcessId()</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int? ProcessId { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_Text_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Text*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_Text" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Text">
+  Text
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L117"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return the text (not title) of the window, if any</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">string Text { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_ThreadId_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.ThreadId*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_ThreadId" data-uid="Dapplo.Windows.Desktop.IInteropWindow.ThreadId">
+  ThreadId
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L107"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the thread ID this window belongs to, read with GetProcessId()</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int? ThreadId { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Desktop_IInteropWindow_Dump_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Dump*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_IInteropWindow_Dump_Dapplo_Windows_Enums_InteropWindowRetrieveSettings_System_Text_StringBuilder_System_String_" data-uid="Dapplo.Windows.Desktop.IInteropWindow.Dump(Dapplo.Windows.Enums.InteropWindowRetrieveSettings,System.Text.StringBuilder,System.String)">
+  Dump(InteropWindowRetrieveSettings, StringBuilder, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L126"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Dump the information in the InteropWindow for debugging</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">StringBuilder Dump(InteropWindowRetrieveSettings retrieveSettings = InteropWindowRetrieveSettings.CacheAll, StringBuilder dump = null, string indentation = &quot;&quot;)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>retrieveSettings</code> <a class="xref" href="Dapplo.Windows.Enums.InteropWindowRetrieveSettings.html">InteropWindowRetrieveSettings</a></dt>
+    <dd><p>InteropWindowRetrieveSettings to specify what to dump</p>
+</dd>
+    <dt><code>dump</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.stringbuilder">StringBuilder</a></dt>
+    <dd><p>StringBuilder to dump to</p>
+</dd>
+    <dt><code>indentation</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.stringbuilder">StringBuilder</a></dt>
+    <dd><p>StringBuilder</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/IInteropWindow.cs/#L14" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

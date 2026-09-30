@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class ClipboardDataSourceExtensions | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ClipboardDataSourceExtensions | Dapplo.Windows ">
+      
+      <meta name="description" content="Read helpers for every : the open clipboard, a , drag and drop data, …">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions">
+
+
+
+  <h1 id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions" class="text-break">
+Class ClipboardDataSourceExtensions  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L15"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Clipboard.html">Clipboard</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Clipboard.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Read helpers for every <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a>: the open clipboard, a <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html">ClipboardSnapshot</a>, drag and drop data, …</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class ClipboardDataSourceExtensions</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ClipboardDataSourceExtensions</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_AsDataSource_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.AsDataSource*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_AsDataSource_Dapplo_Windows_Clipboard_IClipboardAccessToken_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.AsDataSource(Dapplo.Windows.Clipboard.IClipboardAccessToken)">
+  AsDataSource(IClipboardAccessToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Use the open clipboard as <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a>, so code written for a <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html">ClipboardSnapshot</a> also reads the clipboard directly.
+The data source is only usable while the token is open, and only on the thread which opened the clipboard.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IClipboardDataSource AsDataSource(this IClipboardAccessToken clipboardAccessToken)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>clipboardAccessToken</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd><p>IClipboardAccessToken</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></dt>
+    <dd><p>IClipboardDataSource</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_GetAsBytes_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.GetAsBytes*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_GetAsBytes_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.GetAsBytes(Dapplo.Windows.Clipboard.IClipboardDataSource,System.String)">
+  GetAsBytes(IClipboardDataSource, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the data of a format as bytes</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static byte[] GetAsBytes(this IClipboardDataSource source, string format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></dt>
+    <dd><p>IClipboardDataSource</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the format name</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd><p>byte array with a copy of the data, or null when the format isn't available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_GetAsUnicodeString_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.GetAsUnicodeString*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_GetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.GetAsUnicodeString(Dapplo.Windows.Clipboard.IClipboardDataSource,System.String)">
+  GetAsUnicodeString(IClipboardDataSource, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L143"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get a UTF-16 string, like CF_UNICODETEXT. For CF_UNICODETEXT, sources other than the clipboard fall back to CF_TEXT / CF_OEMTEXT,
+see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String__System_String_">TryGetAsUnicodeString(IClipboardDataSource, out string, string)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string GetAsUnicodeString(this IClipboardDataSource source, string format = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></dt>
+    <dd><p>IClipboardDataSource</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the format name, default CF_UNICODETEXT</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string, or null when the format isn't available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_GetFileNames_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.GetFileNames*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_GetFileNames_Dapplo_Windows_Clipboard_IClipboardDataSource_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.GetFileNames(Dapplo.Windows.Clipboard.IClipboardDataSource)">
+  GetFileNames(IClipboardDataSource)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L184"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the file names of CF_HDROP (e.g. files copied in Explorer)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;string&gt; GetFileNames(this IClipboardDataSource source)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></dt>
+    <dd><p>IClipboardDataSource</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>list with the file names, empty when the format isn't available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_HasFormat_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.HasFormat*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_HasFormat_Dapplo_Windows_Clipboard_IClipboardDataSource_Dapplo_Windows_Clipboard_StandardClipboardFormats_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.HasFormat(Dapplo.Windows.Clipboard.IClipboardDataSource,Dapplo.Windows.Clipboard.StandardClipboardFormats)">
+  HasFormat(IClipboardDataSource, StandardClipboardFormats)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check if the standard format is available</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool HasFormat(this IClipboardDataSource source, StandardClipboardFormats format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></dt>
+    <dd><p>IClipboardDataSource</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="Dapplo.Windows.Clipboard.StandardClipboardFormats.html">StandardClipboardFormats</a></dt>
+    <dd><p>StandardClipboardFormats</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_HasVirtualFiles_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.HasVirtualFiles*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_HasVirtualFiles_Dapplo_Windows_Clipboard_IClipboardDataSource_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.HasVirtualFiles(Dapplo.Windows.Clipboard.IClipboardDataSource)">
+  HasVirtualFiles(IClipboardDataSource)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L170"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check if the source has virtual files (FileGroupDescriptorW or the ANSI FileGroupDescriptor), e.g. Outlook attachments.
+The descriptor isn't read. Read the files with <a class="xref" href="Dapplo.Windows.Clipboard.DataObjectReader.html#Dapplo_Windows_Clipboard_DataObjectReader_GetVirtualFiles">GetVirtualFiles()</a>, for a snapshot of the clipboard with
+<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html#Dapplo_Windows_Clipboard_ClipboardSnapshot_TryUseVirtualFiles__1_System_Func_System_Collections_Generic_IReadOnlyList_Dapplo_Windows_Clipboard_VirtualFile____0____0__System_Int64_">TryUseVirtualFiles&lt;T&gt;(Func&lt;IReadOnlyList&lt;VirtualFile&gt;, T&gt;, out T, long)</a>; <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_HasVirtualFiles">HasVirtualFiles()</a> checks the clipboard itself.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool HasVirtualFiles(this IClipboardDataSource source)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></dt>
+    <dd><p>IClipboardDataSource</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsBytes_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.TryGetAsBytes*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsBytes_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String_System_Byte____" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.TryGetAsBytes(Dapplo.Windows.Clipboard.IClipboardDataSource,System.String,System.Byte[]@)">
+  TryGetAsBytes(IClipboardDataSource, string, out byte[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Try to get the data of a format as bytes</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryGetAsBytes(this IClipboardDataSource source, string format, out byte[] bytes)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></dt>
+    <dd><p>IClipboardDataSource</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the format name</p>
+</dd>
+    <dt><code>bytes</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd><p>byte array with a copy of the data</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true when the format is available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsUnicodeString_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.TryGetAsUnicodeString*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String__System_String_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.TryGetAsUnicodeString(Dapplo.Windows.Clipboard.IClipboardDataSource,System.String@,System.String)">
+  TryGetAsUnicodeString(IClipboardDataSource, out string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Try to get a UTF-16 string, like CF_UNICODETEXT. The string ends at the first NUL character.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryGetAsUnicodeString(this IClipboardDataSource source, out string text, string format = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></dt>
+    <dd><p>IClipboardDataSource</p>
+</dd>
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the format name, default CF_UNICODETEXT</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true when the format is available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String__System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Windows synthesizes CF_UNICODETEXT from CF_TEXT and CF_OEMTEXT on the clipboard, but other sources (e.g. a <a class="xref" href="Dapplo.Windows.Clipboard.DataObjectReader.html">DataObjectReader</a>
+for a drop) may only have CF_TEXT. For CF_UNICODETEXT such sources fall back like Windows: CF_TEXT decoded with the ANSI code page of
+CF_LOCALE when present, else the system ANSI code page; then CF_OEMTEXT with the OEM code page. The text ends at the first NUL.
+The open clipboard, a <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html">ClipboardSnapshot</a> and the OLE clipboard (<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_GetOleDataObject_System_Int32_System_Nullable_System_TimeSpan__">GetOleDataObject(int, TimeSpan?)</a>) don't
+use the fallback: the clipboard synthesizes CF_UNICODETEXT itself, and a snapshot has exactly the formats which were requested.</p>
+</div>
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsUtf8String_" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.TryGetAsUtf8String*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsUtf8String_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String_System_String__" data-uid="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.TryGetAsUtf8String(Dapplo.Windows.Clipboard.IClipboardDataSource,System.String,System.String@)">
+  TryGetAsUtf8String(IClipboardDataSource, string, out string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L152"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Try to get a UTF-8 string, e.g. for formats like &quot;text/plain;charset=utf-8&quot; or your own formats. The string ends at the first NUL character.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryGetAsUtf8String(this IClipboardDataSource source, string format, out string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></dt>
+    <dd><p>IClipboardDataSource</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the format name</p>
+</dd>
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true when the format is available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardDataSourceExtensions.cs/#L15" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class KeyboardHookEventArgs | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class KeyboardHookEventArgs | Dapplo.Windows ">
+      
+      <meta name="description" content="Information on keyboard changes">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs">
+
+
+
+  <h1 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs" class="text-break">
+Class KeyboardHookEventArgs  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L12"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Input.html">Input</a>.<a class="xref" href="Dapplo.Windows.Input.Keyboard.html">Keyboard</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Input.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Information on keyboard changes</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class KeyboardHookEventArgs : EventArgs</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a></div>
+      <div><span class="xref">KeyboardHookEventArgs</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs.empty">EventArgs.Empty</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_EventTime_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.EventTime*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_EventTime" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.EventTime">
+  EventTime
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L203"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns the DateTimeOffset for this event</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DateTimeOffset EventTime { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetimeoffset">DateTimeOffset</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_Flags_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.Flags*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_Flags" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.Flags">
+  Flags
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L216"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Details on the keyboard event</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ExtendedKeyFlags Flags { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Enums.ExtendedKeyFlags.html">ExtendedKeyFlags</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_Handled_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.Handled*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_Handled" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.Handled">
+  Handled
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Set this to true to swallow the key event, other applications will not see it.
+Only honoured when set synchronously in a subscriber of <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHook.html#Dapplo_Windows_Input_Keyboard_KeyboardHook_KeyboardEvents">KeyboardEvents</a>, on the hook thread.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Handled { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsAlt_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsAlt*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsAlt" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsAlt">
+  IsAlt
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L79"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if Alt key is pressed</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsAlt { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsCapsLockActive_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsCapsLockActive*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsCapsLockActive" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsCapsLockActive">
+  IsCapsLockActive
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L84"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the caps-lock currently active?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsCapsLockActive { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsControl_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsControl*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsControl" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsControl">
+  IsControl
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L89"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if control is pressed</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsControl { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsExtended_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsExtended*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsExtended" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsExtended">
+  IsExtended
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L188"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if this is an extended key (the scan code has an E0 prefix), e.g. NumpadEnter, RightControl or the arrow keys which are not on the numpad.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsExtended { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsFromKeyboardHook_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsFromKeyboardHook*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsFromKeyboardHook" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsFromKeyboardHook">
+  IsFromKeyboardHook
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L193"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if this event was created by the <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHook.html">KeyboardHook</a>, false for synthetic events (e.g. created with <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html#Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_KeyDown_Dapplo_Windows_Input_Enums_VirtualKeyCode_">KeyDown(VirtualKeyCode)</a> or <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html#Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_KeyUp_Dapplo_Windows_Input_Enums_VirtualKeyCode_">KeyUp(VirtualKeyCode)</a>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsFromKeyboardHook { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsInjectedByLowerIntegrityLevelProcess_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsInjectedByLowerIntegrityLevelProcess*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsInjectedByLowerIntegrityLevelProcess" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsInjectedByLowerIntegrityLevelProcess">
+  IsInjectedByLowerIntegrityLevelProcess
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L226"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if this event is injected by another process with a lower integrity level</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsInjectedByLowerIntegrityLevelProcess { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsInjectedByProcess_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsInjectedByProcess*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsInjectedByProcess" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsInjectedByProcess">
+  IsInjectedByProcess
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L221"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if this event is injected by another process</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsInjectedByProcess { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsKeyDown_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsKeyDown*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsKeyDown" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsKeyDown">
+  IsKeyDown
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is this a key down, else it's up</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsKeyDown { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsLeftAlt_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsLeftAlt*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsLeftAlt" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsLeftAlt">
+  IsLeftAlt
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the alt on the left side pressed?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsLeftAlt { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsLeftControl_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsLeftControl*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsLeftControl" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsLeftControl">
+  IsLeftControl
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L104"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the control on the left side pressed?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsLeftControl { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsLeftShift_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsLeftShift*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsLeftShift" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsLeftShift">
+  IsLeftShift
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L109"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the shift on the left side pressed?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsLeftShift { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsLeftWindows_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsLeftWindows*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsLeftWindows" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsLeftWindows">
+  IsLeftWindows
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L114"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the windows key on the left side pressed?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsLeftWindows { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsModifier_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsModifier*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsModifier" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsModifier">
+  IsModifier
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Specifies if this event is for a modifier key: Shift, Control, Alt (Menu) or Windows, left, right or generic.
+The lock/toggle keys (CapsLock, NumLock, ScrollLock) are not modifiers, see <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html#Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsToggleKey">IsToggleKey</a>.
+This is computed from <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html#Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_Key">Key</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsModifier { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsNumLockActive_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsNumLockActive*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsNumLockActive" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsNumLockActive">
+  IsNumLockActive
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L119"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the num-lock currently active?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsNumLockActive { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsPacket_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsPacket*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsPacket" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsPacket">
+  IsPacket
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L178"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if this is a VK_PACKET event: not a key, but a Unicode character (one UTF-16 code unit, see <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html#Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_PacketCharacter">PacketCharacter</a>) which was sent with KEYEVENTF_UNICODE,
+e.g. by <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardInputGenerator.html#Dapplo_Windows_Input_Keyboard_KeyboardInputGenerator_TypeText_System_String_">TypeText(string)</a>, an IME, an on-screen keyboard or a remote desktop client.
+A character outside the Basic Multilingual Plane arrives as two packets (a high and a low surrogate).
+The <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyCombinationHandler.html">KeyCombinationHandler</a> and the <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeySequenceHandler.html">KeySequenceHandler</a> ignore these events.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsPacket { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsRightAlt_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsRightAlt*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsRightAlt" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsRightAlt">
+  IsRightAlt
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L124"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the alt on the right side pressed?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsRightAlt { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsRightControl_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsRightControl*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsRightControl" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsRightControl">
+  IsRightControl
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L129"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the control on the right side pressed?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsRightControl { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsRightShift_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsRightShift*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsRightShift" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsRightShift">
+  IsRightShift
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L134"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the shift on the right side pressed?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsRightShift { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsRightWindows_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsRightWindows*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsRightWindows" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsRightWindows">
+  IsRightWindows
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L139"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the windows key on the right side pressed?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsRightWindows { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsScrollLockActive_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsScrollLockActive*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsScrollLockActive" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsScrollLockActive">
+  IsScrollLockActive
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L144"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the scroll-lock currently active?</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsScrollLockActive { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsShift_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsShift*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsShift" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsShift">
+  IsShift
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L149"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if shift is pressed</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsShift { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsSystemKey_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsSystemKey*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsSystemKey" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsSystemKey">
+  IsSystemKey
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L155"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is this a system key: the event came as WM_SYSKEYDOWN or WM_SYSKEYUP, which happens for F10 and for keys pressed while Alt is down.
+This does not change the Alt state, use <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html#Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsAlt">IsAlt</a> or <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html#Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_Flags">Flags</a> (<a class="xref" href="Dapplo.Windows.Input.Enums.ExtendedKeyFlags.html#Dapplo_Windows_Input_Enums_ExtendedKeyFlags_AltDown">AltDown</a>) for that.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsSystemKey { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsToggleKey_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsToggleKey*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsToggleKey" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsToggleKey">
+  IsToggleKey
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if the key is a lock/toggle key (CapsLock, NumLock, ScrollLock).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsToggleKey { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsWindows_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsWindows*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsWindows" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.IsWindows">
+  IsWindows
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L160"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if a windows key is pressed</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsWindows { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_Key_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.Key*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_Key" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.Key">
+  Key
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L165"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The key code itself</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public VirtualKeyCode Key { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Enums.VirtualKeyCode.html">VirtualKeyCode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_PacketCharacter_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.PacketCharacter*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_PacketCharacter" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.PacketCharacter">
+  PacketCharacter
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L183"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The UTF-16 code unit of a VK_PACKET event (<a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html#Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsPacket">IsPacket</a>), Windows passes it in the scan code. '\0' for all other events.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public char PacketCharacter { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_ScanCode_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.ScanCode*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_ScanCode" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.ScanCode">
+  ScanCode
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L170"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The hardware scan code of the key, together with <a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html#Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_IsExtended">IsExtended</a> this distinguishes e.g. Enter from NumpadEnter or the arrow keys from the numpad arrows.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ScanCodes ScanCode { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Enums.ScanCodes.html">ScanCodes</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_TimeStamp_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.TimeStamp*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_TimeStamp" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.TimeStamp">
+  TimeStamp
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L198"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Timestamp of the event, a DateTime can be calculated by using EventTime instead</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public uint TimeStamp { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_KeyDown_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.KeyDown*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_KeyDown_Dapplo_Windows_Input_Enums_VirtualKeyCode_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.KeyDown(Dapplo.Windows.Input.Enums.VirtualKeyCode)">
+  KeyDown(VirtualKeyCode)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Generate KeyboardHookEventArgs for a key down</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static KeyboardHookEventArgs KeyDown(VirtualKeyCode virtualKeyCode)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>virtualKeyCode</code> <a class="xref" href="Dapplo.Windows.Input.Enums.VirtualKeyCode.html">VirtualKeyCode</a></dt>
+    <dd><p>VirtualKeyCode</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html">KeyboardHookEventArgs</a></dt>
+    <dd><p>KeyboardHookEventArgs</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_KeyUp_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.KeyUp*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_KeyUp_Dapplo_Windows_Input_Enums_VirtualKeyCode_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.KeyUp(Dapplo.Windows.Input.Enums.VirtualKeyCode)">
+  KeyUp(VirtualKeyCode)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L33"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Generate KeyboardHookEventArgs for a key up</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static KeyboardHookEventArgs KeyUp(VirtualKeyCode virtualKeyCode)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>virtualKeyCode</code> <a class="xref" href="Dapplo.Windows.Input.Enums.VirtualKeyCode.html">VirtualKeyCode</a></dt>
+    <dd><p>VirtualKeyCode</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html">KeyboardHookEventArgs</a></dt>
+    <dd><p>KeyboardHookEventArgs</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_Packet_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.Packet*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_Packet_System_Char_System_Boolean_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.Packet(System.Char,System.Boolean)">
+  Packet(char, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L48"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Generate KeyboardHookEventArgs for a VK_PACKET event, as a low-level hook reports a Unicode character which was sent with KEYEVENTF_UNICODE</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static KeyboardHookEventArgs Packet(char character, bool isKeyDown)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>character</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a></dt>
+    <dd><p>char, the UTF-16 code unit of the packet</p>
+</dd>
+    <dt><code>isKeyDown</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true for the key-down, false for the key-up</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.html">KeyboardHookEventArgs</a></dt>
+    <dd><p>KeyboardHookEventArgs</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_ToString_" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.ToString*"></a>
+
+  <h3 id="Dapplo_Windows_Input_Keyboard_KeyboardHookEventArgs_ToString" data-uid="Dapplo.Windows.Input.Keyboard.KeyboardHookEventArgs.ToString">
+  ToString()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L229"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns a string that represents the current object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A string that represents the current object.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Keyboard/KeyboardHookEventArgs.cs/#L12" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
