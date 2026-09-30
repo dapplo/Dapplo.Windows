@@ -7,6 +7,14 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.3.0]
+
+### Added
+- CF_HTML: `ClipboardHtml.Create` / `TryParse`, `AddHtml` / `SetAsHtml` and `TryGetAsHtml` (any `IClipboardDataSource`) with correct UTF-8 byte offsets, `SourceURL`, `Fragment` and `FullHtml`. Offsets which don't match the `StartFragment` / `EndFragment` comments (producers which count characters) fall back to the comments; version 1.0 without context (`StartHTML:-1`) is supported.
+- CF_DIB / CF_DIBV5 without System.Drawing: `DibImage` (top-down BGRA32, straight alpha, `HasAlpha`), `DibImage.TryDecode` / `CreateDibV5` / `CreateDib`, `AddDib` / `SetAsDib` (`DibFormats`) and `TryGetAsDib`. Reads BITMAPINFOHEADER / V4 / V5, BI_RGB 1-32 bpp and BI_BITFIELDS 16/32 bpp, bottom-up and top-down, and masks repeated after a V5 header (Greenshot's byte-reversed ones included).
+- `TryGetEnhancedMetafileBits`: CF_ENHMETAFILE as EMF bytes.
+- `SetDelayedRenderedContent(format, Func<Stream>)`: delayed rendering for the current content without a registration, dropped on `WM_DESTROYCLIPBOARD`, rendered at exit with `WM_RENDERALLFORMATS`.
+
 ## [3.2.0]
 
 ### Added

@@ -1,0 +1,190 @@
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using Dapplo.Windows.Clipboard;
+using Xunit;
+
+namespace Dapplo.Windows.Tests;
+
+/// <summary>
+/// CF_HTML and DIB parsing and writing, without the clipboard
+/// </summary>
+public class ClipboardFormatParsingTests
+{
+    private static byte[] Sample(string name) => File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "Samples", "Clipboard", name));
+
+    // ── CF_HTML ──────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Html_Create_OffsetsAreUtf8ByteOffsets()
+    {
+        const string fragment = "<p>Grüße, 日本語 and emoji 😀</p>";
+        var bytes = ClipboardHtml.Create(fragment, new Uri("https://example.com/ä"));
+        var text = Encoding.UTF8.GetString(bytes);
+
+        int Offset(string key)
+        {
+            var start = text.IndexOf(key + ":", StringComparison.Ordinal) + key.Length + 1;
+            return int.Parse(text.Substring(start, 10));
+        }
+
+        Assert.Equal(fragment, Encoding.UTF8.GetString(bytes, Offset("StartFragment"), Offset("EndFragment") - Offset("StartFragment")));
+        Assert.StartsWith("<html>", Encoding.UTF8.GetString(bytes, Offset("StartHTML"), 6));
+        Assert.Equal(bytes.Length, Offset("EndHTML"));
+        Assert.Contains("SourceURL:https://example.com/%C3%A4\r\n", text);
+    }
+
+    [Fact]
+    public void Html_RoundTrip_NonAscii()
+    {
+        const string fragment = "<b>Grüße</b> – ✓ 日本語";
+        Assert.True(ClipboardHtml.TryParse(ClipboardHtml.Create(fragment, new Uri("https://example.com/")), out var html));
+        Assert.Equal(fragment, html.Fragment);
+        Assert.Contains(fragment, html.FullHtml);
+        Assert.Equal(new Uri("https://example.com/"), html.SourceUrl);
+        Assert.Equal("0.9", html.Version);
+    }
+
+    [Theory]
+    [InlineData("html-chrome-style.bin", "<h1>Überschrift</h1><p>Hello <b>wörld</b> – ✓</p>", "https://example.com/page?a=1&b=2", "0.9")]
+    [InlineData("html-firefox-style.bin", "<p>Hello <i>wörld</i></p>", "https://example.org/", "0.9")]
+    [InlineData("html-word-style.bin", "\r\n\r\n<p class=MsoNormal>Grüße aus <b>Word</b></p>\r\n\r\n", "file:///C:/Users/test/Documents/Brief.docx", "1.0")]
+    [InlineData("html-greenshot.bin", "\r\n<img border='0' src='file:///C:/Users/test/AppData/Local/Temp/capture.png' width='20' height='10'>\r\n", null, "0.9")]
+    [InlineData("html-character-offsets.bin", "<p>Ärger über Öl</p>", null, "0.9")]
+    [InlineData("html-v1-no-context.bin", "<span>Only a fragment</span>", null, "1.0")]
+    public void Html_ParseSamples(string file, string expectedFragment, string expectedSourceUrl, string expectedVersion)
+    {
+        Assert.True(ClipboardHtml.TryParse(Sample(file), out var html));
+        Assert.Equal(expectedFragment, html.Fragment);
+        Assert.Equal(expectedSourceUrl, html.SourceUrl?.OriginalString);
+        Assert.Equal(expectedVersion, html.Version);
+        Assert.Contains(expectedFragment, html.FullHtml);
+    }
+
+    [Fact]
+    public void Html_FullHtml_IsTheContext()
+    {
+        Assert.True(ClipboardHtml.TryParse(Sample("html-word-style.bin"), out var html));
+        Assert.StartsWith("<html xmlns:v=", html.FullHtml);
+        Assert.EndsWith("</html>", html.FullHtml);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("Just some text")]
+    [InlineData("<html><body>No header</body></html>")]
+    public void Html_NotCfHtml_ReturnsFalse(string text)
+    {
+        Assert.False(ClipboardHtml.TryParse(Encoding.UTF8.GetBytes(text), out _));
+    }
+
+    // ── DIB ──────────────────────────────────────────────────────────────────
+
+    // The reference image of the samples: B, G, R, A, top-down
+    private static readonly byte[][] Reference =
+    {
+        new byte[] { 0, 0, 255, 255 }, new byte[] { 0, 255, 0, 128 }, new byte[] { 255, 0, 0, 0 },
+        new byte[] { 255, 255, 255, 255 }, new byte[] { 0, 0, 0, 255 }, new byte[] { 128, 128, 128, 64 }
+    };
+
+    private static void AssertReference(DibImage image, bool withAlpha)
+    {
+        Assert.Equal(3, image.Width);
+        Assert.Equal(2, image.Height);
+        Assert.Equal(12, image.Stride);
+        Assert.Equal(withAlpha, image.HasAlpha);
+        for (var i = 0; i < 6; i++)
+        {
+            var expected = Reference[i];
+            var actual = image.Pixels.Skip(i * 4).Take(4).ToArray();
+            Assert.Equal(expected.Take(3).ToArray(), actual.Take(3).ToArray());
+            Assert.Equal(withAlpha ? expected[3] : (byte)255, actual[3]);
+        }
+    }
+
+    [Theory]
+    [InlineData("dib-24bpp-bottomup.bin", false)]
+    [InlineData("dib-32bpp-bitfields.bin", false)]
+    [InlineData("dib-32bpp-rgb-topdown-alpha.bin", true)]
+    [InlineData("dib-32bpp-rgb-zero-alpha.bin", false)]
+    [InlineData("dibv5-bitfields-alpha.bin", true)]
+    [InlineData("dibv4-bitfields-alpha.bin", true)]
+    [InlineData("dibv5-greenshot.bin", true)]
+    [InlineData("dib-8bpp-palette.bin", false)]
+    public void Dib_DecodeSamples(string file, bool withAlpha)
+    {
+        Assert.True(DibImage.TryDecode(Sample(file), out var image));
+        AssertReference(image, withAlpha);
+    }
+
+    private static byte[] ReferencePixels(int stride)
+    {
+        var pixels = new byte[stride * 2];
+        for (var i = 0; i < 6; i++)
+        {
+            Array.Copy(Reference[i], 0, pixels, (i / 3) * stride + (i % 3) * 4, 4);
+        }
+        return pixels;
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Dib_RoundTrip_WithAlphaAndStride(bool v5)
+    {
+        // A stride larger than width * 4, like many imaging libraries use
+        var pixels = ReferencePixels(16);
+        var dib = v5 ? DibImage.CreateDibV5(pixels, 3, 2, 16, false) : DibImage.CreateDib(pixels, 3, 2, 16, false);
+        Assert.Equal(v5 ? 124 : 40, BitConverter.ToInt32(dib, 0));
+        Assert.Equal(2, BitConverter.ToInt32(dib, 8));
+        Assert.Equal(v5 ? 3 : 0, BitConverter.ToInt32(dib, 16));
+        Assert.True(DibImage.TryDecode(dib, out var image));
+        AssertReference(image, true);
+    }
+
+    [Fact]
+    public void Dib_Premultiplied_IsWrittenStraight()
+    {
+        // 50% transparent red, premultiplied: R = 128
+        var pixels = new byte[] { 0, 0, 128, 128, 0, 0, 0, 0 };
+        Assert.True(DibImage.TryDecode(DibImage.CreateDibV5(pixels, 2, 1, 8, true), out var image));
+        Assert.Equal(new byte[] { 0, 0, 255, 128, 0, 0, 0, 0 }, image.Pixels);
+    }
+
+    [Fact]
+    public void Dib_V5Header_IsSrgbWithAlphaMask()
+    {
+        var dib = DibImage.CreateDibV5(new byte[4], 1, 1, 4, false);
+        Assert.Equal(0xFF000000u, BitConverter.ToUInt32(dib, 52));
+        Assert.Equal(0x73524742u, BitConverter.ToUInt32(dib, 56));
+        Assert.Equal(124 + 4, dib.Length);
+    }
+
+    [Theory]
+    [InlineData(new byte[0])]
+    [InlineData(new byte[] { 12, 0, 0, 0 })]
+    public void Dib_Invalid_ReturnsFalse(byte[] data)
+    {
+        Assert.False(DibImage.TryDecode(data, out _));
+    }
+
+    [Fact]
+    public void Dib_Truncated_ReturnsFalse()
+    {
+        var sample = Sample("dibv5-bitfields-alpha.bin");
+        Assert.False(DibImage.TryDecode(sample.Take(sample.Length - 1).ToArray(), out _));
+    }
+
+    [Fact]
+    public void Dib_Compressed_ReturnsFalse()
+    {
+        var sample = Sample("dib-24bpp-bottomup.bin");
+        // BI_PNG
+        BitConverter.GetBytes(5).CopyTo(sample, 16);
+        Assert.False(DibImage.TryDecode(sample, out _));
+    }
+}

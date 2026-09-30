@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using Dapplo.Windows.Messages;
@@ -19,6 +20,8 @@ namespace Dapplo.Windows.Clipboard.Internals;
 internal static class DelayedRenderers
 {
     private static readonly ConcurrentDictionary<uint, Action<ClipboardRenderFormatRequest>> Renderers = new();
+    // Renderers for the current clipboard content only (SetDelayedRenderedContent with a Func), dropped when the content is replaced
+    private static readonly ConcurrentDictionary<uint, Func<Stream>> ContentRenderers = new();
     // The formats which were placed on the clipboard with delayed rendering, and are not rendered yet
     private static readonly ConcurrentDictionary<uint, bool> PendingFormats = new();
     private static readonly object Lock = new();
@@ -49,7 +52,39 @@ internal static class DelayedRenderers
     /// <summary>
     /// Check if a renderer is registered for the format
     /// </summary>
-    public static bool IsRegistered(uint formatId) => Renderers.ContainsKey(formatId);
+    public static bool IsRegistered(uint formatId) => Renderers.ContainsKey(formatId) || ContentRenderers.ContainsKey(formatId);
+
+    /// <summary>
+    /// Register a renderer for the format of the current clipboard content, it's dropped when the content is replaced (WM_DESTROYCLIPBOARD)
+    /// </summary>
+    public static void RegisterForContent(uint formatId, Func<Stream> renderer)
+    {
+        EnsureListening();
+        ContentRenderers[formatId] = renderer;
+    }
+
+    /// <summary>
+    /// Remove the renderer for the current content again, only if it's still this one
+    /// </summary>
+    public static void UnregisterForContent(uint formatId, Func<Stream> renderer) =>
+        ((ICollection<KeyValuePair<uint, Func<Stream>>>)ContentRenderers).Remove(new KeyValuePair<uint, Func<Stream>>(formatId, renderer));
+
+    /// <summary>
+    /// Find the renderer for a format, the one for the current content wins
+    /// </summary>
+    private static bool TryGetRenderer(uint formatId, out Action<ClipboardRenderFormatRequest> renderer)
+    {
+        if (ContentRenderers.TryGetValue(formatId, out var streamRenderer))
+        {
+            renderer = request =>
+            {
+                using var stream = streamRenderer() ?? throw new InvalidOperationException($"The delayed renderer for clipboard format {formatId} returned no stream.");
+                request.AccessToken.SetAsStream(formatId, stream);
+            };
+            return true;
+        }
+        return Renderers.TryGetValue(formatId, out renderer);
+    }
 
     /// <summary>
     /// Mark the format as placed on the clipboard with delayed rendering
@@ -78,7 +113,7 @@ internal static class DelayedRenderers
             {
                 case WindowsMessages.WM_RENDERFORMAT:
                     var formatId = unchecked((uint)(long)message.WParam);
-                    if (Renderers.TryGetValue(formatId, out var renderer))
+                    if (TryGetRenderer(formatId, out var renderer))
                     {
                         // The clipboard must NOT be opened for WM_RENDERFORMAT
                         Render(message.Hwnd, formatId, renderer, false);
@@ -96,11 +131,13 @@ internal static class DelayedRenderers
                 case WindowsMessages.WM_DESTROYCLIPBOARD:
                     // We are no longer the owner (the clipboard was emptied), nothing will be requested anymore
                     PendingFormats.Clear();
+                    ContentRenderers.Clear();
                     break;
                 case WindowsMessages.WM_NCDESTROY:
                     // The window is gone (SharedMessageWindow.Shutdown or process exit), WM_RENDERALLFORMATS was processed before:
                     // formats which were not rendered are removed from the clipboard by Windows. A new window never owns the old content.
                     PendingFormats.Clear();
+                    ContentRenderers.Clear();
                     break;
             }
         }
@@ -116,7 +153,7 @@ internal static class DelayedRenderers
     /// <returns>true if something was rendered</returns>
     private static bool RenderAllFormats(nint hwnd)
     {
-        var formatIds = PendingFormats.Keys.Where(Renderers.ContainsKey).ToList();
+        var formatIds = PendingFormats.Keys.Where(IsRegistered).ToList();
         if (formatIds.Count == 0)
         {
             return false;
@@ -132,11 +169,12 @@ internal static class DelayedRenderers
         if (NativeMethods.GetClipboardOwner() != hwnd)
         {
             PendingFormats.Clear();
+            ContentRenderers.Clear();
             return true;
         }
         foreach (var formatId in formatIds)
         {
-            if (Renderers.TryGetValue(formatId, out var renderer))
+            if (TryGetRenderer(formatId, out var renderer))
             {
                 Render(hwnd, formatId, renderer, true);
             }

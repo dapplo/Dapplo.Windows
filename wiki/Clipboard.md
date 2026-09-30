@@ -160,6 +160,27 @@ bool changed = snapshot.SequenceNumber != ClipboardNative.SequenceNumber;
 When the clipboard stays busy, `ClipboardAccessDeniedException.BlockingWindow` / `BlockingProcessId` (also on the token)
 tell which application keeps it open.
 
+## HTML, bitmaps and metafiles
+
+Without System.Drawing: `AddHtml` / `SetAsHtml` and `TryGetAsHtml` handle CF_HTML with its byte-offset header;
+`AddDib` / `SetAsDib` and `TryGetAsDib` read and write CF_DIB / CF_DIBV5 as raw BGRA32 pixels (`DibImage`);
+`TryGetEnhancedMetafileBits` reads CF_ENHMETAFILE as EMF bytes.
+
+<!-- sample: ClipboardSamples.Html -->
+```csharp
+// Write: the header with the UTF-8 byte offsets is created for you
+await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents()
+    .AddHtml("<p>Hello <b>World</b></p>", new Uri("https://example.com/"))
+    .AddUnicodeString("Hello World")));
+
+// Read: what a browser or Word copied
+var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { ClipboardHtml.FormatName });
+if (snapshot.TryGetAsHtml(out ClipboardHtml html))
+{
+    Console.WriteLine($"Copied from {html.SourceUrl}: {html.Fragment}");
+}
+```
+
 ## Delayed rendering
 
 The renderer runs when an application pastes the format, and at process exit for every format nobody requested yet:
@@ -185,6 +206,9 @@ ClipboardNative.ReplaceContents(new ClipboardContents().AddDelayedRendered("MyAp
 // Disposing it earlier means these formats can't be rendered anymore.
 registration.Dispose();
 ```
+
+For content-specific data, `SetDelayedRenderedContent(format, () => stream)` needs no registration: the renderer is
+dropped when the content is replaced. Clipboard history and clipboard managers usually request formats right away.
 
 ## Clipboard history and cloud clipboard
 

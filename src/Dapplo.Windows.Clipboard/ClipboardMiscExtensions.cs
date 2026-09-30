@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.IO;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Clipboard.Internals;
@@ -46,6 +47,51 @@ public static class ClipboardMiscExtensions
     public static void SetDelayedRenderedContent(this IClipboardAccessToken clipboardAccessToken, string format)
     {
         SetDelayedRenderedContent(clipboardAccessToken, ClipboardFormatExtensions.MapFormatToId(format));
+    }
+
+    /// <summary>
+    /// Place a format with delayed rendering, rendered by <paramref name="renderer"/> when an application requests it.
+    /// The renderer belongs to the current clipboard content: it's dropped when the content is replaced (WM_DESTROYCLIPBOARD),
+    /// so there is nothing to unregister. Call ClearContents with this token first; the token must use the SharedMessageWindow (the default owner).
+    /// </summary>
+    /// <remarks>
+    /// <list type="bullet">
+    /// <item>The renderer runs on the SharedMessageWindow thread (WM_RENDERFORMAT) while the requesting application waits in GetClipboardData,
+    /// Windows only waits a limited time for the data. Render quickly, don't await or open the clipboard.</item>
+    /// <item>Clipboard history (Win+V), cloud clipboard and clipboard managers usually request the formats right after the copy,
+    /// so the renderer often runs immediately. Delayed rendering saves work only when nobody listens.</item>
+    /// <item>When the process exits (or SharedMessageWindow.Shutdown is called) every format which wasn't requested yet is rendered (WM_RENDERALLFORMATS),
+    /// so the content survives the process.</item>
+    /// </list>
+    /// </remarks>
+    /// <param name="clipboardAccessToken">The IClipboardAccessToken</param>
+    /// <param name="format">string with the clipboard format</param>
+    /// <param name="renderer">Func which creates a stream with the data, it's disposed after the data is placed</param>
+    /// <exception cref="InvalidOperationException">When the token doesn't use the SharedMessageWindow, or the clipboard isn't owned by it</exception>
+    public static void SetDelayedRenderedContent(this IClipboardAccessToken clipboardAccessToken, string format, Func<Stream> renderer)
+    {
+        if (renderer == null)
+        {
+            throw new ArgumentNullException(nameof(renderer));
+        }
+        clipboardAccessToken.ThrowWhenNoAccess();
+        var ownerHandle = (clipboardAccessToken as ClipboardAccessToken)?.OwnerHandle ?? IntPtr.Zero;
+        if (ownerHandle == IntPtr.Zero || ownerHandle != SharedMessageWindow.Handle)
+        {
+            throw new InvalidOperationException("Managed delayed rendering needs the SharedMessageWindow as clipboard owner, open the clipboard without a window handle.");
+        }
+        var formatId = ClipboardFormatExtensions.MapFormatToId(format);
+        // Register before announcing: an application might request the format right away
+        DelayedRenderers.RegisterForContent(formatId, renderer);
+        try
+        {
+            SetDelayedRenderedContent(clipboardAccessToken, formatId);
+        }
+        catch
+        {
+            DelayedRenderers.UnregisterForContent(formatId, renderer);
+            throw;
+        }
     }
 
     /// <summary>

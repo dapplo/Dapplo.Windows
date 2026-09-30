@@ -196,6 +196,65 @@ public static class ClipboardSamples
         #endregion
     }
 
+    public static async Task Html()
+    {
+        #region Html
+        // Write: the header with the UTF-8 byte offsets is created for you
+        await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents()
+            .AddHtml("<p>Hello <b>World</b></p>", new Uri("https://example.com/"))
+            .AddUnicodeString("Hello World")));
+
+        // Read: what a browser or Word copied
+        var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { ClipboardHtml.FormatName });
+        if (snapshot.TryGetAsHtml(out ClipboardHtml html))
+        {
+            Console.WriteLine($"Copied from {html.SourceUrl}: {html.Fragment}");
+        }
+        #endregion
+    }
+
+    public static async Task Dib()
+    {
+        #region Dib
+        // Read a bitmap as top-down BGRA32 pixels (CF_DIBV5, or CF_DIB), and hand them to any imaging library
+        var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "CF_DIBV5", "CF_DIB" });
+        if (snapshot.TryGetAsDib(out DibImage image))
+        {
+            Console.WriteLine($"{image.Width}x{image.Height}, alpha: {image.HasAlpha}, {image.Pixels.Length} bytes");
+        }
+
+        // Write BGRA32 pixels as CF_DIBV5 (with alpha) and CF_DIB (for older applications)
+        byte[] pixels = new byte[16 * 16 * 4];
+        await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents()
+            .AddDib(pixels, 16, 16, 16 * 4, premultipliedAlpha: false)));
+        #endregion
+    }
+
+    public static async Task EnhancedMetafile()
+    {
+        #region EnhancedMetafile
+        // Vector graphics from Office or Visio, as the bytes of an .emf file
+        byte[] emf = await ClipboardNative.UseAsync(clipboard => clipboard.TryGetEnhancedMetafileBits(out var bits) ? bits : null);
+        if (emf != null)
+        {
+            File.WriteAllBytes(@"C:\Temp\copied.emf", emf);
+        }
+        #endregion
+    }
+
+    public static async Task DelayedRenderingFunc()
+    {
+        #region DelayedRenderingFunc
+        await ClipboardNative.UseAsync(clipboard =>
+        {
+            clipboard.ClearContents();
+            clipboard.SetAsUnicodeString("A large export");
+            // Rendered only when an application pastes the format; the renderer is dropped when the content is replaced
+            clipboard.SetDelayedRenderedContent("MyApp.Export", () => new MemoryStream(CreateLargeData()));
+        });
+        #endregion
+    }
+
     public static async Task ReadTextAsync()
     {
         #region ReadTextAsync

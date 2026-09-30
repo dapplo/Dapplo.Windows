@@ -1,0 +1,83 @@
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using System;
+
+namespace Dapplo.Windows.Clipboard;
+
+/// <summary>
+/// Read and write bitmaps as CF_DIB / CF_DIBV5 without System.Drawing: the pixels are raw BGRA32 bytes,
+/// so any imaging library can be used to produce or consume them.
+/// </summary>
+public static class ClipboardDibExtensions
+{
+    /// <summary>
+    /// Place a bitmap as CF_DIBV5 and / or CF_DIB on the clipboard, see <see cref="DibImage.CreateDibV5"/> and <see cref="DibImage.CreateDib"/>.
+    /// Call ClearContents first. Tip: also place a "PNG" format, it's the best choice for applications which support it.
+    /// </summary>
+    /// <param name="clipboardAccessToken">IClipboardAccessToken</param>
+    /// <param name="bgra32">the pixels, top-down rows of B, G, R, A bytes</param>
+    /// <param name="width">int with the width</param>
+    /// <param name="height">int with the height</param>
+    /// <param name="stride">int with the bytes per row of <paramref name="bgra32"/>, at least width * 4</param>
+    /// <param name="premultipliedAlpha">true when the pixels have premultiplied alpha, they are written with straight alpha</param>
+    /// <param name="formats">DibFormats, default both; CF_DIBV5 is placed first</param>
+    public static void SetAsDib(this IClipboardAccessToken clipboardAccessToken, ReadOnlySpan<byte> bgra32, int width, int height, int stride,
+        bool premultipliedAlpha, DibFormats formats = DibFormats.DibV5 | DibFormats.Dib)
+    {
+        clipboardAccessToken.ThrowWhenNoAccess();
+        if ((formats & DibFormats.DibV5) != 0)
+        {
+            clipboardAccessToken.SetAsBytes(DibImage.CreateDibV5(bgra32, width, height, stride, premultipliedAlpha), StandardClipboardFormats.DeviceIndependentBitmapV5);
+        }
+        if ((formats & DibFormats.Dib) != 0)
+        {
+            clipboardAccessToken.SetAsBytes(DibImage.CreateDib(bgra32, width, height, stride, premultipliedAlpha), StandardClipboardFormats.DeviceIndependentBitmap);
+        }
+    }
+
+    /// <summary>
+    /// Add a bitmap as CF_DIBV5 and / or CF_DIB to the contents
+    /// </summary>
+    /// <param name="contents">ClipboardContents</param>
+    /// <param name="bgra32">the pixels, top-down rows of B, G, R, A bytes</param>
+    /// <param name="width">int with the width</param>
+    /// <param name="height">int with the height</param>
+    /// <param name="stride">int with the bytes per row of <paramref name="bgra32"/>, at least width * 4</param>
+    /// <param name="premultipliedAlpha">true when the pixels have premultiplied alpha</param>
+    /// <param name="formats">DibFormats, default both</param>
+    /// <returns>ClipboardContents for fluent usage</returns>
+    public static ClipboardContents AddDib(this ClipboardContents contents, ReadOnlySpan<byte> bgra32, int width, int height, int stride,
+        bool premultipliedAlpha, DibFormats formats = DibFormats.DibV5 | DibFormats.Dib)
+    {
+        if (contents == null)
+        {
+            throw new ArgumentNullException(nameof(contents));
+        }
+        if ((formats & DibFormats.DibV5) != 0)
+        {
+            contents.AddBytes(DibImage.CreateDibV5(bgra32, width, height, stride, premultipliedAlpha), StandardClipboardFormats.DeviceIndependentBitmapV5);
+        }
+        if ((formats & DibFormats.Dib) != 0)
+        {
+            contents.AddBytes(DibImage.CreateDib(bgra32, width, height, stride, premultipliedAlpha), StandardClipboardFormats.DeviceIndependentBitmap);
+        }
+        return contents;
+    }
+
+    /// <summary>
+    /// Read a bitmap from CF_DIBV5, or CF_DIB when there is no CF_DIBV5. Windows synthesizes both from CF_BITMAP, so this also reads
+    /// bitmaps which were placed as a GDI handle.
+    /// </summary>
+    /// <param name="source">IClipboardDataSource, e.g. a snapshot or clipboard.AsDataSource()</param>
+    /// <param name="image">DibImage with top-down BGRA32 pixels</param>
+    /// <returns>true when a bitmap could be read</returns>
+    public static bool TryGetAsDib(this IClipboardDataSource source, out DibImage image)
+    {
+        image = null;
+        if (source.TryGetAsBytes(StandardClipboardFormats.DeviceIndependentBitmapV5.AsString(), out var dibV5) && DibImage.TryDecode(dibV5, out image))
+        {
+            return true;
+        }
+        return source.TryGetAsBytes(StandardClipboardFormats.DeviceIndependentBitmap.AsString(), out var dib) && DibImage.TryDecode(dib, out image);
+    }
+}

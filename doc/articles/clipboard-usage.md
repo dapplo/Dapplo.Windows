@@ -397,6 +397,66 @@ using var clipboard = ClipboardNative.Access();
 clipboard.ClearContents();
 ```
 
+## HTML, bitmaps and metafiles
+
+These helpers work on raw bytes, without System.Drawing, WinForms or WPF. The readers take any `IClipboardDataSource`
+(a snapshot, `clipboard.AsDataSource()`, …).
+
+**CF_HTML** (`"HTML Format"`): `AddHtml` / `SetAsHtml` write a fragment with a correct header (UTF-8 byte offsets, optional
+`SourceURL`). `TryGetAsHtml` returns the `Fragment`, the `FullHtml` context and the `SourceUrl`; it uses the header offsets
+when they are consistent and falls back to the `<!--StartFragment-->` / `<!--EndFragment-->` comments when a producer
+counted characters instead of bytes. `ClipboardHtml.Create` / `TryParse` do the same without the clipboard.
+
+<!-- sample: ClipboardSamples.Html -->
+```csharp
+// Write: the header with the UTF-8 byte offsets is created for you
+await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents()
+    .AddHtml("<p>Hello <b>World</b></p>", new Uri("https://example.com/"))
+    .AddUnicodeString("Hello World")));
+
+// Read: what a browser or Word copied
+var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { ClipboardHtml.FormatName });
+if (snapshot.TryGetAsHtml(out ClipboardHtml html))
+{
+    Console.WriteLine($"Copied from {html.SourceUrl}: {html.Fragment}");
+}
+```
+
+**CF_DIB / CF_DIBV5**: `TryGetAsDib` returns a `DibImage` with top-down BGRA32 pixels and straight alpha. It reads
+BITMAPINFOHEADER, V4 and V5 headers, BI_RGB (1, 4, 8 bpp with palette, 16, 24, 32 bpp) and BI_BITFIELDS (16, 32 bpp),
+bottom-up and top-down, and masks which some writers repeat after a V5 header (Greenshot even byte-reversed).
+32 bpp BI_RGB has an alpha channel only when some pixel has a non-zero fourth byte. Windows synthesizes CF_DIB and
+CF_DIBV5 from CF_BITMAP, so this reads GDI bitmaps too. `AddDib` / `SetAsDib` write CF_DIBV5 (32 bpp BI_BITFIELDS, sRGB,
+straight alpha; premultiplied input is converted) and CF_DIB (32 bpp BI_RGB, many applications ignore its alpha).
+Also place a `"PNG"` format when you can.
+
+<!-- sample: ClipboardSamples.Dib -->
+```csharp
+// Read a bitmap as top-down BGRA32 pixels (CF_DIBV5, or CF_DIB), and hand them to any imaging library
+var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "CF_DIBV5", "CF_DIB" });
+if (snapshot.TryGetAsDib(out DibImage image))
+{
+    Console.WriteLine($"{image.Width}x{image.Height}, alpha: {image.HasAlpha}, {image.Pixels.Length} bytes");
+}
+
+// Write BGRA32 pixels as CF_DIBV5 (with alpha) and CF_DIB (for older applications)
+byte[] pixels = new byte[16 * 16 * 4];
+await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents()
+    .AddDib(pixels, 16, 16, 16 * 4, premultipliedAlpha: false)));
+```
+
+**CF_ENHMETAFILE**: `TryGetEnhancedMetafileBits` returns the bytes of an EMF file (`GetEnhMetaFileBits`).
+
+<!-- sample: ClipboardSamples.EnhancedMetafile -->
+```csharp
+// Vector graphics from Office or Visio, as the bytes of an .emf file
+byte[] emf = await ClipboardNative.UseAsync(clipboard => clipboard.TryGetEnhancedMetafileBits(out var bits) ? bits : null);
+if (emf != null)
+{
+    File.WriteAllBytes(@"C:\Temp\copied.emf", emf);
+}
+```
+
 ## Delayed rendering
 
 With delayed rendering you announce a format and create the data only when an application pastes it. Register a
@@ -442,6 +502,29 @@ registration.Dispose();
   `InvalidOperationException` when no renderer is registered or when the token's window doesn't own the clipboard
   (call `ClearContents()` first).
 - Exceptions in a renderer are written to `System.Diagnostics.Trace`.
+
+### Delayed rendering for the current content
+
+`SetDelayedRenderedContent(format, () => stream)` announces a format and renders it with the function when an application
+pastes it. The renderer belongs to the current content: it's dropped when the content is replaced (`WM_DESTROYCLIPBOARD`),
+and pending formats are still rendered at process exit (`WM_RENDERALLFORMATS`). Call `ClearContents` first, with the
+default owner (the SharedMessageWindow).
+
+- The renderer runs on the SharedMessageWindow thread while the requesting application waits in `GetClipboardData`;
+  Windows only waits a limited time for the data. Render quickly; don't await or open the clipboard.
+- Clipboard history (Win+V), cloud clipboard and clipboard managers usually request the formats right after the copy,
+  so the renderer often runs immediately. Delayed rendering only saves work when nobody listens.
+
+<!-- sample: ClipboardSamples.DelayedRenderingFunc -->
+```csharp
+await ClipboardNative.UseAsync(clipboard =>
+{
+    clipboard.ClearContents();
+    clipboard.SetAsUnicodeString("A large export");
+    // Rendered only when an application pastes the format; the renderer is dropped when the content is replaced
+    clipboard.SetDelayedRenderedContent("MyApp.Export", () => new MemoryStream(CreateLargeData()));
+});
+```
 
 ## Clipboard history and cloud clipboard
 
