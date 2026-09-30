@@ -72,11 +72,21 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
     private IDataObject DataObject => _dataObject ?? throw new ObjectDisposedException(nameof(DataObjectReader));
 
     /// <summary>
+    /// True when the data object is the one of the clipboard (OleGetClipboard), which has the formats Windows synthesizes
+    /// </summary>
+    internal bool IsFromClipboard { get; set; }
+
+    /// <summary>
+    /// The default of <see cref="MaxDataSize"/>: 512 MiB
+    /// </summary>
+    public const long DefaultMaxDataSize = 512L * 1024 * 1024;
+
+    /// <summary>
     /// The maximum size of the data of one format (or one virtual file) in bytes, default 512 MiB. Larger data isn't read:
     /// <see cref="TryGetStream(string, int, out Stream)"/> returns false and <see cref="VirtualFile.OpenContent"/> null.
     /// This protects against data sources which claim or stream huge amounts of data.
     /// </summary>
-    public long MaxDataSize { get; set; } = 512L * 1024 * 1024;
+    public long MaxDataSize { get; set; } = DefaultMaxDataSize;
 
     /// <inheritdoc />
     public IReadOnlyCollection<string> Formats

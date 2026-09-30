@@ -5,8 +5,8 @@ using System;
 namespace Dapplo.Windows.Clipboard;
 
 /// <summary>
-/// The clipboard couldn't be accessed: another application keeps it open (<see cref="IsOpenTimeout"/>, see <see cref="BlockingWindow"/>
-/// and <see cref="BlockingProcessId"/>), or another thread of this application uses it (<see cref="IsLockTimeout"/>).
+/// The clipboard couldn't be accessed: another application keeps it open (<see cref="IsOpenTimeout"/>, see <see cref="BlockingWindow"/>,
+/// <see cref="BlockingProcessId"/> and <see cref="BlockingProcessName"/>), or another thread of this application uses it (<see cref="IsLockTimeout"/>).
 /// </summary>
 public class ClipboardAccessDeniedException : Exception
 {
@@ -20,6 +20,13 @@ public class ClipboardAccessDeniedException : Exception
     /// The process ID of <see cref="BlockingWindow"/>, 0 when unknown
     /// </summary>
     public int BlockingProcessId { get; internal set; }
+
+    /// <summary>
+    /// The application which kept the clipboard open, to show to the user: the file name of its executable (e.g. "notepad.exe"),
+    /// else the process name, else the title of <see cref="BlockingWindow"/>; null when unknown.
+    /// It was determined when opening failed, together with the message.
+    /// </summary>
+    public string BlockingProcessName { get; internal set; }
 
     /// <summary>
     /// True when the clipboard couldn't be opened because another application (or window) kept it open

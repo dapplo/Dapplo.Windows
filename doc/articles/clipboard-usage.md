@@ -187,6 +187,9 @@ snapshot never changes, and can be used on any thread.
   requested but isn't in the snapshot.
 - `SequenceNumber` tells whether the clipboard changed since; `ToContents()` writes the snapshot back, e.g. to restore
   the clipboard after using it temporarily. With an open token use `clipboard.ReadSnapshot(formats)`.
+- `ClipboardNative.AvailableFormats(preferred, max)` returns the first `max` formats of `preferred` which are available,
+  in that order, without opening the clipboard (formats Windows synthesizes count). Use it to request only what you need,
+  see the second sample.
 
 <!-- sample: ClipboardSamples.Snapshot -->
 ```csharp
@@ -206,6 +209,16 @@ string text = snapshot.GetAsUnicodeString();
 
 // Has the clipboard changed since?
 bool changed = snapshot.SequenceNumber != ClipboardNative.SequenceNumber;
+```
+
+<!-- sample: ClipboardSamples.SelectFormats -->
+```csharp
+// The best two image formats which are available, checked without opening the clipboard.
+// Reading a format makes the application which copied render it, so only request what you need;
+// the second format is a fallback when the first can't be decoded.
+string[] imageFormats = { "PNG", "CF_DIBV5", "JFIF", "CF_DIB", "GIF" };
+IReadOnlyList<string> formats = ClipboardNative.AvailableFormats(imageFormats, 2);
+ClipboardSnapshot snapshot = await ClipboardNative.ReadSnapshotAsync(formats);
 ```
 
 ### One reader for every source: IClipboardDataSource
@@ -235,11 +248,11 @@ string fromSnapshot = Describe(await ClipboardNative.ReadSnapshotAsync());
 
 | Content | Method |
 |---|---|
-| Text | `GetAsUnicodeString()` (CF_UNICODETEXT), or `GetAsUnicodeString(format)` for other text formats |
+| Text | `GetAsUnicodeString()` (CF_UNICODETEXT), or `GetAsUnicodeString(format)` for other text formats. Sources other than the clipboard (e.g. a drop) fall back to CF_TEXT / CF_OEMTEXT |
 | Files | `GetFileNames()` (CF_HDROP) |
 | Any format as bytes | `GetAsBytes(format)` |
 | Any format as stream | `GetAsStream(format)` / `TryGetAsStream(format, out stream)`; the stream is a copy and stays valid after the token is disposed |
-| Which formats | `AvailableFormats()`, `AvailableFormatIds()`, or `ClipboardNative.HasFormat(format)` without opening the clipboard |
+| Which formats | `AvailableFormats()`, `AvailableFormatIds()`, or without opening the clipboard `ClipboardNative.HasFormat(format)` and `ClipboardNative.AvailableFormats(preferred, max)` |
 
 <!-- sample: ClipboardSamples.ReadFiles -->
 ```csharp
@@ -424,7 +437,8 @@ if (snapshot.TryGetAsHtml(out ClipboardHtml html))
 
 **CF_DIB / CF_DIBV5**: `TryGetAsDib` returns a `DibImage` with top-down BGRA32 pixels and straight alpha. It reads
 BITMAPINFOHEADER, V4 and V5 headers, BI_RGB (1, 4, 8 bpp with palette, 16, 24, 32 bpp) and BI_BITFIELDS (16, 32 bpp),
-bottom-up and top-down, and masks which some writers repeat after a V5 header (Greenshot even byte-reversed).
+bottom-up and top-down, masks which some writers repeat after a V5 header (Greenshot even byte-reversed), and the old
+BITMAPCOREHEADER.
 32 bpp BI_RGB has an alpha channel only when some pixel has a non-zero fourth byte. Windows synthesizes CF_DIB and
 CF_DIBV5 from CF_BITMAP, so this reads GDI bitmaps too. `AddDib` / `SetAsDib` write CF_DIBV5 (32 bpp BI_BITFIELDS, sRGB,
 straight alpha; premultiplied input is converted) and CF_DIB (32 bpp BI_RGB, many applications ignore its alpha).
@@ -443,6 +457,22 @@ if (snapshot.TryGetAsDib(out DibImage image))
 byte[] pixels = new byte[16 * 16 * 4];
 await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents()
     .AddDib(pixels, 16, 16, 16 * 4, premultipliedAlpha: false)));
+```
+
+Crafted or broken headers can claim huge bitmaps. The decoder checks the size from the header before it allocates
+anything, overflow-safe: bitmaps with more than `DibImage.DefaultMaxPixelCount` pixels (64 megapixels, 256 MiB of
+BGRA32 pixels) return `false`. `TryDecode(dib, maxPixelCount, out image)` and `TryGetAsDib(maxPixelCount, out image)`
+take another maximum (width * |height|).
+
+<!-- sample: ClipboardSamples.DibMaxSize -->
+```csharp
+// Bitmaps larger than DibImage.DefaultMaxPixelCount (64 megapixels) aren't decoded, the size is checked from the header
+// before anything is allocated. Pass your own maximum (width * height), e.g. for very large scans:
+var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "CF_DIBV5", "CF_DIB" });
+if (snapshot.TryGetAsDib(16384L * 16384, out DibImage image))
+{
+    Console.WriteLine($"{image.Width}x{image.Height}");
+}
 ```
 
 **CF_ENHMETAFILE**: `TryGetEnhancedMetafileBits` returns the bytes of an EMF file (`GetEnhMetaFileBits`).
@@ -468,6 +498,11 @@ attachments or images dragged from some browsers. `DataObjectReader` reads them:
 - `GetVirtualFiles()` returns name (can contain a relative path), size, attributes and times; `OpenContent()` copies the
   content (HGLOBAL or IStream) into a stream. `TryGetStream(format, index, out stream)` reads any format with an index.
 - It is an `IClipboardDataSource`, so `GetAsUnicodeString`, `GetFileNames`, `TryGetAsHtml`, `TryGetAsDib`, … work on it.
+  Windows synthesizes CF_UNICODETEXT only on the clipboard: when a drop only has CF_TEXT, `GetAsUnicodeString()`
+  decodes it with the code page of CF_LOCALE (else the ANSI code page), or CF_OEMTEXT with the OEM code page, up to the
+  first NUL. The open clipboard, snapshots and `GetOleDataObject()` keep returning only what the clipboard has.
+- `HasVirtualFiles()` checks any `IClipboardDataSource`, `ClipboardNative.HasVirtualFiles()` the clipboard without
+  opening it (`FileGroupDescriptorW` or `FileGroupDescriptor`).
 - The data comes from another application, treat it as untrusted: file names can contain `..\` or absolute paths, so
   create files with `VirtualFile.SafeFileName`, never `Name`. Data larger than `MaxDataSize` (default 512 MiB) isn't
   read, and a failing or misbehaving source makes the `Try...` methods return `false` instead of throwing.
@@ -502,6 +537,53 @@ using (DataObjectReader reader = ClipboardNative.GetOleDataObject())
 
 // A data object from a drop event (System.Runtime.InteropServices.ComTypes.IDataObject): the reader doesn't release it
 // var reader = new DataObjectReader((System.Runtime.InteropServices.ComTypes.IDataObject)e.Data);
+```
+
+**Virtual files from a snapshot.** A `ClipboardSnapshot` has the descriptor but not the content of virtual files.
+`snapshot.TryUseVirtualFiles(use, out result, maxDataSize)` takes the OLE data object of the clipboard, lets `use` read
+the files and releases it again. It returns `false` without calling `use` when the snapshot has no descriptor, the
+thread isn't STA, the clipboard changed since the snapshot (`SequenceNumber`), or the data object can't be taken.
+The files can only be read inside `use` (`OpenContent()` throws an `ObjectDisposedException` afterwards), so return
+what you copied. `maxDataSize` (default `DataObjectReader.DefaultMaxDataSize`, 512 MiB) limits every file.
+
+<!-- sample: ClipboardSamples.VirtualFilesFromSnapshot -->
+```csharp
+// On the UI thread (STA with OLE initialized): the await continues there.
+// Copy what you need in one short session, including the descriptor of virtual files (e.g. Outlook attachments)
+var formats = ClipboardNative.AvailableFormats(new[] { "PNG", DataObjectReader.FileGroupDescriptorWFormat, DataObjectReader.FileGroupDescriptorFormat });
+ClipboardSnapshot snapshot = await ClipboardNative.ReadSnapshotAsync(formats);
+
+// Reads the virtual files through OLE, only when the clipboard didn't change since the snapshot
+if (snapshot.TryUseVirtualFiles(files =>
+    {
+        // The files can only be read in here: copy the content now
+        var saved = new List<string>();
+        foreach (VirtualFile file in files.Where(f => !f.IsDirectory))
+        {
+            using Stream content = file.OpenContent();
+            if (content == null)
+            {
+                continue;
+            }
+            string path = Path.Combine(@"C:\Temp", file.SafeFileName);
+            using var target = File.Create(path);
+            content.CopyTo(target);
+            saved.Add(path);
+        }
+        return saved;
+    }, out List<string> savedFiles, maxDataSize: 256L * 1024 * 1024))
+{
+    Console.WriteLine($"Saved {savedFiles.Count} file(s)");
+}
+```
+
+<!-- sample: ClipboardSamples.DropText -->
+```csharp
+// A drop only has the formats of its source, Windows doesn't synthesize CF_UNICODETEXT there.
+// With only CF_TEXT, GetAsUnicodeString decodes it with the code page of CF_LOCALE (else the ANSI code page),
+// with only CF_OEMTEXT with the OEM code page.
+using var reader = new DataObjectReader(dataObject);
+string text = reader.GetAsUnicodeString();
 ```
 
 ## Delayed rendering
@@ -646,19 +728,31 @@ kept it open: `BlockingWindow` and `BlockingProcessId` (zero when unknown, e.g. 
 window). `ClipboardNative.OpenClipboardWindow` returns that window at any time. `IsLockTimeout` means another thread of
 your own process holds the in-process lock.
 
+To show the user who blocks the clipboard, use `ex.BlockingProcessName` or `token.GetBlockingProcessName()`: the file
+name of the executable (e.g. `notepad.exe`, also for elevated processes), else the process name, else the window title;
+`null` when unknown. It's determined once, when opening failed, together with the exception message. For your own
+`IClipboardAccessToken` implementations the extension method determines it from `BlockingProcessId` / `BlockingWindow`.
+
 <!-- sample: ClipboardSamples.WhoBlocks -->
 ```csharp
 try
 {
     await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents().AddUnicodeString("Hello")));
 }
-catch (ClipboardAccessDeniedException ex) when (ex.IsOpenTimeout && ex.BlockingProcessId != 0)
+catch (ClipboardAccessDeniedException ex) when (ex.IsOpenTimeout)
 {
-    // Tell the user which application keeps the clipboard open
-    using var process = Process.GetProcessById(ex.BlockingProcessId);
-    Console.WriteLine($"The clipboard is in use by {process.ProcessName}");
+    // Tell the user which application keeps the clipboard open, e.g. "notepad.exe"
+    Console.WriteLine($"The clipboard is in use by {ex.BlockingProcessName ?? "an unknown application"}");
+}
+
+// The same for a token which couldn't open the clipboard
+using var token = ClipboardNative.Access();
+if (token.IsOpenTimeout)
+{
+    Console.WriteLine($"The clipboard is in use by {token.GetBlockingProcessName() ?? "an unknown application"}");
 }
 ```
+
 
 ## Formats
 

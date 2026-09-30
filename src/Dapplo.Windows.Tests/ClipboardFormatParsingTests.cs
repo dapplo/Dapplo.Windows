@@ -238,4 +238,209 @@ public class ClipboardFormatParsingTests
         BitConverter.GetBytes(5).CopyTo(sample, 16);
         Assert.False(DibImage.TryDecode(sample, out _));
     }
+
+    // ── DIB size limit (3.2) ─────────────────────────────────────────────────
+
+    /// <summary>
+    /// A BITMAPINFOHEADER followed by <paramref name="dataBytes"/> zero bytes (palette and pixels)
+    /// </summary>
+    private static byte[] CreateInfoHeader(int width, int height, ushort bitCount, long dataBytes = 0)
+    {
+        var dib = new byte[40 + dataBytes];
+        BitConverter.GetBytes(40).CopyTo(dib, 0);
+        BitConverter.GetBytes(width).CopyTo(dib, 4);
+        BitConverter.GetBytes(height).CopyTo(dib, 8);
+        BitConverter.GetBytes((ushort)1).CopyTo(dib, 12);
+        BitConverter.GetBytes(bitCount).CopyTo(dib, 14);
+        return dib;
+    }
+
+    /// <summary>
+    /// A BITMAPCOREHEADER (12 bytes, 16-bit width and height) followed by <paramref name="dataBytes"/> zero bytes
+    /// </summary>
+    private static byte[] CreateCoreHeader(ushort width, ushort height, ushort bitCount, int dataBytes = 0)
+    {
+        var dib = new byte[12 + dataBytes];
+        BitConverter.GetBytes(12).CopyTo(dib, 0);
+        BitConverter.GetBytes(width).CopyTo(dib, 4);
+        BitConverter.GetBytes(height).CopyTo(dib, 6);
+        BitConverter.GetBytes((ushort)1).CopyTo(dib, 8);
+        BitConverter.GetBytes(bitCount).CopyTo(dib, 10);
+        return dib;
+    }
+
+    private sealed class BytesSource : IClipboardDataSource
+    {
+        private readonly string _format;
+        private readonly byte[] _bytes;
+
+        public BytesSource(string format, byte[] bytes)
+        {
+            _format = format;
+            _bytes = bytes;
+        }
+
+        public System.Collections.Generic.IReadOnlyCollection<string> Formats => new[] { _format };
+
+        public bool HasFormat(string format) => format == _format;
+
+        public bool TryGetStream(string format, out Stream stream)
+        {
+            stream = format == _format ? new MemoryStream(_bytes, false) : null;
+            return stream != null;
+        }
+    }
+
+    [Fact]
+    public void Dib_DefaultMaxPixelCount_Is64Megapixels()
+    {
+        Assert.Equal(64L * 1024 * 1024, DibImage.DefaultMaxPixelCount);
+        Assert.Equal(8192L * 8192, DibImage.DefaultMaxPixelCount);
+    }
+
+    [Theory]
+    [InlineData("dib-24bpp-bottomup.bin")]
+    [InlineData("dib-32bpp-rgb-topdown-alpha.bin")]
+    public void Dib_MaxPixelCount_IsWidthTimesAbsoluteHeight(string file)
+    {
+        // 3 x 2 pixels, the top-down sample has a negative height
+        var sample = Sample(file);
+        Assert.True(DibImage.TryDecode(sample, 6, out var image));
+        Assert.Equal(6, image.Width * image.Height);
+        Assert.False(DibImage.TryDecode(sample, 5, out image));
+        Assert.Null(image);
+
+        var source = new BytesSource(StandardClipboardFormats.DeviceIndependentBitmap.AsString(), sample);
+        Assert.True(source.TryGetAsDib(6, out _));
+        Assert.False(source.TryGetAsDib(5, out _));
+        Assert.True(source.TryGetAsDib(out _));
+    }
+
+    [Theory]
+    [InlineData(0L)]
+    [InlineData(-1L)]
+    public void Dib_MaxPixelCount_MustBePositive(long maxPixelCount)
+    {
+        var sample = Sample("dib-24bpp-bottomup.bin");
+        Assert.Throws<ArgumentOutOfRangeException>(() => DibImage.TryDecode(sample, maxPixelCount, out _));
+        var source = new BytesSource(StandardClipboardFormats.DeviceIndependentBitmap.AsString(), sample);
+        Assert.Throws<ArgumentOutOfRangeException>(() => source.TryGetAsDib(maxPixelCount, out _));
+    }
+
+    /// <summary>
+    /// Headers which claim huge bitmaps, without the data: rejected from the header, no exception (no OverflowException,
+    /// no OutOfMemoryException), even without a pixel limit
+    /// </summary>
+    [Theory]
+    [InlineData(int.MaxValue, int.MaxValue, 32)]
+    [InlineData(int.MaxValue, -int.MaxValue, 32)]
+    [InlineData(int.MaxValue, 1, 32)]          // stride * height and width * 4 overflow an int
+    [InlineData(65536, 65536, 32)]             // width * height overflows an int
+    [InlineData(32768, 32768, 32)]             // width * height * 4 = 4 GiB overflows an int
+    [InlineData(46341, 46341, 32)]             // width * height just above int.MaxValue
+    [InlineData(0x20000000, 1, 32)]            // the pixels don't fit in one byte array
+    [InlineData(100_000, 100_000, 1)]          // small data per pixel, huge image
+    [InlineData(8193, 8192, 32)]               // just above 64 megapixels
+    public void Dib_HugeDimensions_AreRejectedFromTheHeader(int width, int height, int bitCount)
+    {
+        var dib = CreateInfoHeader(width, height, (ushort)bitCount, 64);
+#if NET
+        var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+#endif
+        Assert.False(DibImage.TryDecode(dib, out var image));
+        Assert.Null(image);
+        Assert.False(DibImage.TryDecode(dib, long.MaxValue, out image));
+        Assert.Null(image);
+#if NET
+        // Nothing was allocated for the pixels
+        Assert.True(GC.GetAllocatedBytesForCurrentThread() - allocatedBefore < 64 * 1024);
+#endif
+    }
+
+    [Fact]
+    public void Dib_AboveTheDefaultLimit_WithCompleteData_IsRejected()
+    {
+        // 8193 x 8192 at 1 bpp: 8 MiB of data, which would be 256 MiB of pixels
+        const int width = 8193;
+        const int stride = (width + 31) / 32 * 4;
+        var tooLarge = CreateInfoHeader(width, 8192, 1, 8 + (long)stride * 8192);
+        Assert.False(DibImage.TryDecode(tooLarge, out _));
+        Assert.False(DibImage.TryDecode(tooLarge, 8193L * 8192 - 1, out _));
+
+        // The same bitmap with fewer rows is decoded
+        var small = CreateInfoHeader(width, 2, 1, 8 + stride * 2);
+        Assert.True(DibImage.TryDecode(small, out var image));
+        Assert.Equal(width, image.Width);
+        Assert.Equal(2, image.Height);
+    }
+
+    [Fact]
+    public void Dib_CoreHeader_24bpp_Decodes()
+    {
+        // 3 x 2, bottom-up, rows padded to 12 bytes
+        var dib = CreateCoreHeader(3, 2, 24, 2 * 12);
+        for (var i = 0; i < 6; i++)
+        {
+            var row = 1 - i / 3;
+            Array.Copy(Reference[i], 0, dib, 12 + row * 12 + (i % 3) * 3, 3);
+        }
+        Assert.True(DibImage.TryDecode(dib, out var image));
+        AssertReference(image, false);
+    }
+
+    [Fact]
+    public void Dib_CoreHeader_8bpp_HasRgbTriplePalette()
+    {
+        // 256 RGBTRIPLE palette entries (3 bytes), then one row of 2 pixels padded to 4 bytes
+        var dib = CreateCoreHeader(2, 1, 8, 256 * 3 + 4);
+        new byte[] { 10, 20, 30 }.CopyTo(dib, 12 + 1 * 3);
+        new byte[] { 40, 50, 60 }.CopyTo(dib, 12 + 2 * 3);
+        dib[12 + 256 * 3] = 1;
+        dib[12 + 256 * 3 + 1] = 2;
+        Assert.True(DibImage.TryDecode(dib, out var image));
+        Assert.Equal(new byte[] { 10, 20, 30, 255, 40, 50, 60, 255 }, image.Pixels);
+        Assert.False(image.HasAlpha);
+    }
+
+    [Fact]
+    public void Dib_CoreHeader_SizesAreUnsigned16Bit()
+    {
+        // 65535 x 2 at 1 bpp: a signed 16-bit width would be -1
+        const int stride = (65535 + 31) / 32 * 4;
+        var dib = CreateCoreHeader(0xFFFF, 2, 1, 2 * 3 + 2 * stride);
+        Assert.True(DibImage.TryDecode(dib, 65535L * 2, out var image));
+        Assert.Equal(65535, image.Width);
+        Assert.Equal(2, image.Height);
+        Assert.False(DibImage.TryDecode(dib, 65535L * 2 - 1, out _));
+    }
+
+    [Theory]
+    [InlineData(0xFFFF, 0xFFFF, 1)]
+    [InlineData(0xFFFF, 0xFFFF, 24)]
+    [InlineData(0x2001, 0x2000, 24)]  // just above 64 megapixels
+    public void Dib_CoreHeader_HugeDimensions_AreRejected(int width, int height, int bitCount)
+    {
+        var dib = CreateCoreHeader((ushort)width, (ushort)height, (ushort)bitCount, 64);
+        Assert.False(DibImage.TryDecode(dib, out _));
+        Assert.False(DibImage.TryDecode(dib, long.MaxValue, out _));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(16)]
+    [InlineData(32)]
+    public void Dib_CoreHeader_UnsupportedBitCount_ReturnsFalse(int bitCount)
+    {
+        var dib = CreateCoreHeader(1, 1, (ushort)bitCount, 64);
+        Assert.False(DibImage.TryDecode(dib, out _));
+    }
+
+    [Fact]
+    public void Dib_CoreHeader_Truncated_ReturnsFalse()
+    {
+        // The palette is missing
+        Assert.False(DibImage.TryDecode(CreateCoreHeader(1, 1, 8, 10), out _));
+        // Only the header
+        Assert.False(DibImage.TryDecode(CreateCoreHeader(1, 1, 24), out _));
+    }
 }

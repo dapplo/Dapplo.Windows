@@ -64,25 +64,53 @@ internal sealed class ClipboardAccessToken : IClipboardAccessToken
     public int BlockingProcessId { get; private set; }
 
     /// <summary>
-    /// Create a token for a failed open, with the window which blocks the clipboard
+    /// When <see cref="IsOpenTimeout"/>: the name of the blocking application, determined once when opening failed,
+    /// see <see cref="ClipboardAccessTokenExtensions.GetBlockingProcessName"/>
     /// </summary>
-    internal static ClipboardAccessToken OpenTimeout(ClipboardBlocker blocker) => new()
+    internal string BlockingProcessName { get; private set; }
+
+    /// <summary>
+    /// The description of the blocker for the exception message, determined together with <see cref="BlockingProcessName"/>
+    /// </summary>
+    private string _blockerDescription;
+
+    /// <summary>
+    /// Create a token for a failed open, with the window which blocks the clipboard.
+    /// The blocker is described right away (the process may be gone later), and only once.
+    /// </summary>
+    internal static ClipboardAccessToken OpenTimeout(ClipboardBlocker blocker)
     {
-        CanAccess = false,
-        IsOpenTimeout = true,
-        BlockingWindow = blocker.Window,
-        BlockingProcessId = blocker.ProcessId
-    };
+        var description = blocker.Describe(out var processName);
+        return new ClipboardAccessToken
+        {
+            CanAccess = false,
+            IsOpenTimeout = true,
+            BlockingWindow = blocker.Window,
+            BlockingProcessId = blocker.ProcessId,
+            BlockingProcessName = processName,
+            _blockerDescription = description
+        };
+    }
+
+    /// <summary>
+    /// Create the exception for a failed open, the blocker is described once for the message and <see cref="ClipboardAccessDeniedException.BlockingProcessName"/>
+    /// </summary>
+    internal static ClipboardAccessDeniedException CreateOpenTimeoutException(ClipboardBlocker blocker)
+    {
+        var description = blocker.Describe(out var processName);
+        return CreateOpenTimeoutException(blocker.Window, blocker.ProcessId, processName, description);
+    }
 
     /// <summary>
     /// Create the exception for a failed open
     /// </summary>
-    internal static ClipboardAccessDeniedException CreateOpenTimeoutException(IntPtr blockingWindow, int blockingProcessId, string description) =>
+    internal static ClipboardAccessDeniedException CreateOpenTimeoutException(IntPtr blockingWindow, int blockingProcessId, string blockingProcessName, string description) =>
         new("The clipboard couldn't be opened for usage, it's probably locked by another process." + description)
         {
             IsOpenTimeout = true,
             BlockingWindow = blockingWindow,
-            BlockingProcessId = blockingProcessId
+            BlockingProcessId = blockingProcessId,
+            BlockingProcessName = blockingProcessName
         };
 
     /// <summary>
@@ -113,8 +141,8 @@ internal sealed class ClipboardAccessToken : IClipboardAccessToken
         }
         if (IsOpenTimeout)
         {
-            var description = BlockingWindow == IntPtr.Zero ? "" : $" It was in use by window 0x{BlockingWindow.ToInt64():X} of process {BlockingProcessId}.";
-            throw CreateOpenTimeoutException(BlockingWindow, BlockingProcessId, description);
+            // The blocker was described when opening failed, don't query the process again
+            throw CreateOpenTimeoutException(BlockingWindow, BlockingProcessId, BlockingProcessName, _blockerDescription ?? "");
         }
         if (_canAccess)
         {

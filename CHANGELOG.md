@@ -7,6 +7,22 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.2.0]
+
+What Greenshot still had to do itself around the clipboard moves into Dapplo.Windows.Clipboard, so every application gets it right.
+
+### Added
+- The name of the application which keeps the clipboard open: `ClipboardAccessDeniedException.BlockingProcessName` and, for a token from `Access()` / `AccessAsync()` which couldn't open the clipboard, `token.GetBlockingProcessName()` (new `ClipboardAccessTokenExtensions`). It's the file name of the executable (e.g. `notepad.exe`, via QueryFullProcessImageName, so also for elevated processes), else the process name, else the window title; `null` when unknown. It's determined once when opening fails, together with the exception message. For your own `IClipboardAccessToken` implementations the extension determines it from `BlockingProcessId` / `BlockingWindow`, the interface is unchanged.
+- A size limit for DIB decoding: `DibImage.TryDecode(dib, maxPixelCount, out image)` and `TryGetAsDib(maxPixelCount, out image)`. The pixel count (width * |height|) is checked from the header before anything is allocated, overflow-safe for every header value; the default is `DibImage.DefaultMaxPixelCount`, 64 megapixels (256 MiB of BGRA32 pixels).
+- `DibImage.TryDecode` also reads DIBs with a BITMAPCOREHEADER (16-bit width and height, RGBTRIPLE palette, 1, 4, 8 and 24 bpp).
+- Text from sources without synthesized formats: for CF_UNICODETEXT, `GetAsUnicodeString()` / `TryGetAsUnicodeString()` fall back to CF_TEXT, decoded with the code page of CF_LOCALE (else the ANSI code page), and then to CF_OEMTEXT with the OEM code page, up to the first NUL, e.g. for a `DataObjectReader` of a drop which only has CF_TEXT. The open clipboard, `ClipboardSnapshot` and `ClipboardNative.GetOleDataObject()` behave as before.
+- Virtual files from the clipboard in one call: `ClipboardSnapshot.TryUseVirtualFiles(use, out result, maxDataSize)` takes the OLE data object only when the snapshot has a file group descriptor, the thread is STA and the clipboard didn't change since the snapshot, lets `use` read the files and releases the data object again (the files can't be read after `use` returned). `HasVirtualFiles()` for every `IClipboardDataSource`, `ClipboardNative.HasVirtualFiles()` without opening the clipboard, and `DataObjectReader.DefaultMaxDataSize`.
+- `ClipboardNative.AvailableFormats(preferred, max)`: the first `max` formats of `preferred` which are available, in that order, without opening the clipboard, so a snapshot only reads (and makes the source render) what is needed.
+
+### Changed
+- **Behaviour change:** `DibImage.TryDecode(dib, out image)` and `TryGetAsDib(out image)` return `false` for bitmaps with more than 64 megapixels; the internal limit was 256 megapixels. Pass a larger `maxPixelCount` to decode them.
+- The message of `ClipboardAccessDeniedException` names the executable of the blocking application (e.g. `notepad.exe` instead of `notepad`), also when it's thrown by `ThrowWhenNoAccess()` of a token, which only named the window and process ID before.
+
 ## [3.1.0]
 
 The clipboard package becomes a complete, async-friendly replacement for WinForms/OLE clipboard code, without System.Drawing, WinForms or WPF in its API.

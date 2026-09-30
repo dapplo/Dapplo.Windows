@@ -45,9 +45,17 @@ public sealed class DibImage
     public bool HasAlpha { get; }
 
     /// <summary>
+    /// The default maximum number of pixels (width * |height|) which <see cref="TryDecode(byte[], out DibImage)"/> and
+    /// <see cref="ClipboardDibExtensions.TryGetAsDib(IClipboardDataSource, out DibImage)"/> decode: 64 megapixels (e.g. 8192 x 8192),
+    /// which are 256 MiB of BGRA32 pixels. Larger bitmaps return false; pass a larger maximum when you really need them.
+    /// </summary>
+    public const long DefaultMaxPixelCount = 64L * 1024 * 1024;
+
+    /// <summary>
     /// Decode a device independent bitmap: BITMAPINFOHEADER, BITMAPV4HEADER or BITMAPV5HEADER followed by the optional masks or
-    /// palette and the pixels. Supported: BI_RGB with 1, 4, 8 (palette), 16, 24 and 32 bpp; BI_BITFIELDS / BI_ALPHABITFIELDS with 16
-    /// and 32 bpp; bottom-up and top-down. Compressed bitmaps (RLE, JPEG, PNG) return false.
+    /// palette and the pixels, or a BITMAPCOREHEADER with an RGBTRIPLE palette. Supported: BI_RGB with 1, 4, 8 (palette), 16, 24 and 32 bpp;
+    /// BI_BITFIELDS / BI_ALPHABITFIELDS with 16 and 32 bpp; bottom-up and top-down. Compressed bitmaps (RLE, JPEG, PNG) return false.
+    /// Bitmaps with more than <see cref="DefaultMaxPixelCount"/> pixels return false, see <see cref="TryDecode(byte[], long, out DibImage)"/>.
     /// </summary>
     /// <remarks>
     /// 32 bpp BI_RGB officially has no alpha channel; it's used when at least one pixel has a non-zero value there, otherwise the image is opaque.
@@ -57,7 +65,20 @@ public sealed class DibImage
     /// <param name="dib">byte array with the CF_DIB or CF_DIBV5 data</param>
     /// <param name="image">DibImage</param>
     /// <returns>true when the bitmap could be decoded</returns>
-    public static bool TryDecode(byte[] dib, out DibImage image) => DibCodec.TryDecode(dib, out image);
+    public static bool TryDecode(byte[] dib, out DibImage image) => DibCodec.TryDecode(dib, DefaultMaxPixelCount, out image);
+
+    /// <summary>
+    /// Decode a device independent bitmap like <see cref="TryDecode(byte[], out DibImage)"/>, with a maximum size.
+    /// The size is checked from the header before anything is allocated, so a crafted header can't make the decoder allocate huge amounts
+    /// of memory: bitmaps with more than <paramref name="maxPixelCount"/> pixels (width * |height|), or with more pixels than fit in one
+    /// byte array, return false.
+    /// </summary>
+    /// <param name="dib">byte array with the CF_DIB or CF_DIBV5 data</param>
+    /// <param name="maxPixelCount">long with the maximum number of pixels, e.g. <see cref="DefaultMaxPixelCount"/></param>
+    /// <param name="image">DibImage</param>
+    /// <returns>true when the bitmap could be decoded</returns>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="maxPixelCount"/> isn't positive</exception>
+    public static bool TryDecode(byte[] dib, long maxPixelCount, out DibImage image) => DibCodec.TryDecode(dib, maxPixelCount, out image);
 
     /// <summary>
     /// Create CF_DIBV5 data: BITMAPV5HEADER, 32 bpp BI_BITFIELDS (BGRA masks), sRGB, straight alpha, bottom-up rows.

@@ -161,6 +161,18 @@ public static class ClipboardSamples
         #endregion
     }
 
+    public static async Task SelectFormats()
+    {
+        #region SelectFormats
+        // The best two image formats which are available, checked without opening the clipboard.
+        // Reading a format makes the application which copied render it, so only request what you need;
+        // the second format is a fallback when the first can't be decoded.
+        string[] imageFormats = { "PNG", "CF_DIBV5", "JFIF", "CF_DIB", "GIF" };
+        IReadOnlyList<string> formats = ClipboardNative.AvailableFormats(imageFormats, 2);
+        ClipboardSnapshot snapshot = await ClipboardNative.ReadSnapshotAsync(formats);
+        #endregion
+    }
+
     public static async Task DataSource()
     {
         #region DataSource
@@ -187,11 +199,17 @@ public static class ClipboardSamples
         {
             await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents().AddUnicodeString("Hello")));
         }
-        catch (ClipboardAccessDeniedException ex) when (ex.IsOpenTimeout && ex.BlockingProcessId != 0)
+        catch (ClipboardAccessDeniedException ex) when (ex.IsOpenTimeout)
         {
-            // Tell the user which application keeps the clipboard open
-            using var process = Process.GetProcessById(ex.BlockingProcessId);
-            Console.WriteLine($"The clipboard is in use by {process.ProcessName}");
+            // Tell the user which application keeps the clipboard open, e.g. "notepad.exe"
+            Console.WriteLine($"The clipboard is in use by {ex.BlockingProcessName ?? "an unknown application"}");
+        }
+
+        // The same for a token which couldn't open the clipboard
+        using var token = ClipboardNative.Access();
+        if (token.IsOpenTimeout)
+        {
+            Console.WriteLine($"The clipboard is in use by {token.GetBlockingProcessName() ?? "an unknown application"}");
         }
         #endregion
     }
@@ -227,6 +245,19 @@ public static class ClipboardSamples
         byte[] pixels = new byte[16 * 16 * 4];
         await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents()
             .AddDib(pixels, 16, 16, 16 * 4, premultipliedAlpha: false)));
+        #endregion
+    }
+
+    public static async Task DibMaxSize()
+    {
+        #region DibMaxSize
+        // Bitmaps larger than DibImage.DefaultMaxPixelCount (64 megapixels) aren't decoded, the size is checked from the header
+        // before anything is allocated. Pass your own maximum (width * height), e.g. for very large scans:
+        var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "CF_DIBV5", "CF_DIB" });
+        if (snapshot.TryGetAsDib(16384L * 16384, out DibImage image))
+        {
+            Console.WriteLine($"{image.Width}x{image.Height}");
+        }
         #endregion
     }
 
@@ -283,6 +314,50 @@ public static class ClipboardSamples
 
         // A data object from a drop event (System.Runtime.InteropServices.ComTypes.IDataObject): the reader doesn't release it
         // var reader = new DataObjectReader((System.Runtime.InteropServices.ComTypes.IDataObject)e.Data);
+        #endregion
+    }
+
+    public static async Task VirtualFilesFromSnapshot()
+    {
+        #region VirtualFilesFromSnapshot
+        // On the UI thread (STA with OLE initialized): the await continues there.
+        // Copy what you need in one short session, including the descriptor of virtual files (e.g. Outlook attachments)
+        var formats = ClipboardNative.AvailableFormats(new[] { "PNG", DataObjectReader.FileGroupDescriptorWFormat, DataObjectReader.FileGroupDescriptorFormat });
+        ClipboardSnapshot snapshot = await ClipboardNative.ReadSnapshotAsync(formats);
+
+        // Reads the virtual files through OLE, only when the clipboard didn't change since the snapshot
+        if (snapshot.TryUseVirtualFiles(files =>
+            {
+                // The files can only be read in here: copy the content now
+                var saved = new List<string>();
+                foreach (VirtualFile file in files.Where(f => !f.IsDirectory))
+                {
+                    using Stream content = file.OpenContent();
+                    if (content == null)
+                    {
+                        continue;
+                    }
+                    string path = Path.Combine(@"C:\Temp", file.SafeFileName);
+                    using var target = File.Create(path);
+                    content.CopyTo(target);
+                    saved.Add(path);
+                }
+                return saved;
+            }, out List<string> savedFiles, maxDataSize: 256L * 1024 * 1024))
+        {
+            Console.WriteLine($"Saved {savedFiles.Count} file(s)");
+        }
+        #endregion
+    }
+
+    public static void DropText(System.Runtime.InteropServices.ComTypes.IDataObject dataObject)
+    {
+        #region DropText
+        // A drop only has the formats of its source, Windows doesn't synthesize CF_UNICODETEXT there.
+        // With only CF_TEXT, GetAsUnicodeString decodes it with the code page of CF_LOCALE (else the ANSI code page),
+        // with only CF_OEMTEXT with the OEM code page.
+        using var reader = new DataObjectReader(dataObject);
+        string text = reader.GetAsUnicodeString();
         #endregion
     }
 

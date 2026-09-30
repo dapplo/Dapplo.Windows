@@ -220,6 +220,141 @@ public class DataObjectReaderTests
         Assert.Equal("only.txt", Assert.Single(reader.GetVirtualFiles()).Name);
     }
 
+    // ── Text without synthesized formats (3.2) ──────────────────────────────
+
+    private static byte[] Terminated(byte[] text) => text.Concat(new byte[] { 0, (byte)'x', (byte)'y', 0 }).ToArray();
+
+    [Theory]
+    [InlineData(0x0419u, new byte[] { 0xCF, 0xF0, 0xE8, 0xE2, 0xE5, 0xF2 }, "Привет")] // Russian: code page 1251
+    [InlineData(0x0407u, new byte[] { 0x47, 0x72, 0xFC, 0xDF, 0x65 }, "Grüße")]       // German: code page 1252
+    [InlineData(0x0408u, new byte[] { 0xC1, 0xE8 }, "Αθ")]                             // Greek: code page 1253
+    public void DataObject_OnlyCfText_UsesTheCodePageOfCfLocale(uint lcid, byte[] ansi, string expected)
+    {
+        var dataObject = new TestDataObject();
+        dataObject.Add("CF_TEXT", -1, TYMED.TYMED_HGLOBAL, Terminated(ansi));
+        dataObject.Add("CF_LOCALE", -1, TYMED.TYMED_HGLOBAL, BitConverter.GetBytes(lcid));
+        using var reader = new DataObjectReader(dataObject);
+
+        Assert.False(reader.HasFormat("CF_UNICODETEXT"));
+        Assert.Equal(expected, reader.GetAsUnicodeString());
+        Assert.True(reader.TryGetAsUnicodeString(out var text));
+        Assert.Equal(expected, text);
+        Assert.Equal(expected, reader.GetAsUnicodeString(StandardClipboardFormats.UnicodeText.AsString()));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData(0x12345678u)] // not a locale: the ANSI code page is used
+    public void DataObject_OnlyCfText_WithoutUsableLocale_UsesTheAnsiCodePage(uint? lcid)
+    {
+        var dataObject = new TestDataObject();
+        dataObject.Add("CF_TEXT", -1, TYMED.TYMED_HGLOBAL, Terminated(Encoding.ASCII.GetBytes("Plain ANSI text")));
+        if (lcid.HasValue)
+        {
+            dataObject.Add("CF_LOCALE", -1, TYMED.TYMED_HGLOBAL, BitConverter.GetBytes(lcid.Value));
+        }
+        using var reader = new DataObjectReader(dataObject);
+        Assert.Equal("Plain ANSI text", reader.GetAsUnicodeString());
+    }
+
+    [Fact]
+    public void DataObject_OnlyCfOemText_IsDecoded()
+    {
+        var dataObject = new TestDataObject();
+        dataObject.Add("CF_OEMTEXT", -1, TYMED.TYMED_HGLOBAL, Terminated(Encoding.ASCII.GetBytes("OEM text")));
+        using var reader = new DataObjectReader(dataObject);
+        Assert.Equal("OEM text", reader.GetAsUnicodeString());
+    }
+
+    [Fact]
+    public void DataObject_TextFallback_Order()
+    {
+        // CF_UNICODETEXT first, then CF_TEXT, then CF_OEMTEXT
+        var dataObject = new TestDataObject();
+        dataObject.Add("CF_OEMTEXT", -1, TYMED.TYMED_HGLOBAL, Terminated(Encoding.ASCII.GetBytes("oem")));
+        dataObject.Add("CF_TEXT", -1, TYMED.TYMED_HGLOBAL, Terminated(Encoding.ASCII.GetBytes("ansi")));
+        using (var reader = new DataObjectReader(dataObject))
+        {
+            Assert.Equal("ansi", reader.GetAsUnicodeString());
+        }
+        dataObject.Add("CF_UNICODETEXT", -1, TYMED.TYMED_HGLOBAL, Encoding.Unicode.GetBytes("unicode\0"));
+        using (var reader = new DataObjectReader(dataObject))
+        {
+            Assert.Equal("unicode", reader.GetAsUnicodeString());
+        }
+    }
+
+    [Fact]
+    public void DataObject_TextFallback_EmptyAndMissing()
+    {
+        var dataObject = new TestDataObject();
+        dataObject.Add("CF_TEXT", -1, TYMED.TYMED_HGLOBAL, new byte[] { 0, 65, 0 });
+        using (var reader = new DataObjectReader(dataObject))
+        {
+            Assert.Equal("", reader.GetAsUnicodeString());
+            // Only for CF_UNICODETEXT, not for other formats
+            Assert.Null(reader.GetAsUnicodeString("Dapplo.Windows.Tests.OtherText"));
+        }
+        using (var reader = new DataObjectReader(new TestDataObject()))
+        {
+            Assert.Null(reader.GetAsUnicodeString());
+            Assert.False(reader.TryGetAsUnicodeString(out var text));
+            Assert.Null(text);
+        }
+    }
+
+    [Fact]
+    public void OtherDataSource_OnlyCfText_FallsBackToo()
+    {
+        var source = new DictionarySource
+        {
+            ["CF_TEXT"] = Terminated(new byte[] { 0x47, 0x72, 0xFC, 0xDF, 0x65 }),
+            ["CF_LOCALE"] = BitConverter.GetBytes(0x0407u)
+        };
+        Assert.Equal("Grüße", source.GetAsUnicodeString());
+    }
+
+    // ── Virtual files (3.2) ──────────────────────────────────────────────────
+
+    [Fact]
+    public void HasVirtualFiles_BothDescriptorFormats()
+    {
+        using (var reader = new DataObjectReader(CreateVirtualFiles()))
+        {
+            Assert.True(reader.HasVirtualFiles());
+        }
+        var ansi = new TestDataObject();
+        ansi.Add(DataObjectReader.FileGroupDescriptorFormat, -1, TYMED.TYMED_HGLOBAL, new byte[4]);
+        using (var reader = new DataObjectReader(ansi))
+        {
+            Assert.True(reader.HasVirtualFiles());
+        }
+        var text = new TestDataObject();
+        text.Add("CF_UNICODETEXT", -1, TYMED.TYMED_HGLOBAL, Encoding.Unicode.GetBytes("text\0"));
+        using (var reader = new DataObjectReader(text))
+        {
+            Assert.False(reader.HasVirtualFiles());
+        }
+        Assert.True(new DictionarySource { [DataObjectReader.FileGroupDescriptorWFormat] = new byte[4] }.HasVirtualFiles());
+        Assert.Throws<ArgumentNullException>(() => ((IClipboardDataSource)null).HasVirtualFiles());
+    }
+
+    /// <summary>
+    /// An IClipboardDataSource of another library, e.g. an adapter for a WPF data object
+    /// </summary>
+    private sealed class DictionarySource : Dictionary<string, byte[]>, IClipboardDataSource
+    {
+        public IReadOnlyCollection<string> Formats => Keys.ToList();
+
+        public bool HasFormat(string format) => format != null && ContainsKey(format);
+
+        public bool TryGetStream(string format, out Stream stream)
+        {
+            stream = format != null && TryGetValue(format, out var bytes) ? new MemoryStream(bytes, false) : null;
+            return stream != null;
+        }
+    }
+
     [Fact]
     public async Task GetOleDataObject_OnMtaThread_Throws()
     {
@@ -269,6 +404,95 @@ public class OleClipboardTests
         finally
         {
             OleUninitialize();
+        }
+    }
+
+    /// <summary>
+    /// OleSetClipboard, retrying while clipboard monitors (e.g. the clipboard history) have the clipboard open
+    /// </summary>
+    private static void SetOleClipboard(IDataObject dataObject)
+    {
+        var hResult = 0;
+        for (var attempt = 0; attempt < 20; attempt++)
+        {
+            hResult = OleSetClipboard(dataObject);
+            if (hResult != unchecked((int)0x800401D0))
+            {
+                break;
+            }
+            Thread.Sleep(50);
+        }
+        Assert.Equal(0, hResult);
+    }
+
+    private static readonly string[] DescriptorFormats = { DataObjectReader.FileGroupDescriptorWFormat, DataObjectReader.FileGroupDescriptorFormat };
+
+    [WpfFact]
+    public async Task Snapshot_TryUseVirtualFiles_ReadsThemThroughOle()
+    {
+        var restore = await ClipboardRestore.SaveAsync();
+        var oleInitialize = OleInitialize(IntPtr.Zero);
+        Assert.True(oleInitialize is 0 or 1, $"OleInitialize returned 0x{oleInitialize:X}");
+        try
+        {
+            SetOleClipboard(DataObjectReaderTests.CreateVirtualFiles());
+            try
+            {
+                Assert.True(ClipboardNative.HasVirtualFiles());
+                var snapshot = await ClipboardNative.ReadSnapshotAsync(DescriptorFormats);
+                Assert.True(snapshot.HasVirtualFiles());
+
+                IReadOnlyList<VirtualFile> captured = null;
+                Assert.True(snapshot.TryUseVirtualFiles(files =>
+                {
+                    captured = files;
+                    using var first = files[0].OpenContent();
+                    using var copy = new MemoryStream();
+                    first.CopyTo(copy);
+                    return (Names: files.Select(f => f.Name).ToList(), First: copy.ToArray());
+                }, out var result));
+                Assert.Equal(new[] { "Report ä.txt", @"Folder\Image.bin", "Folder" }, result.Names);
+                Assert.Equal(DataObjectReaderTests.FirstContent, result.First);
+
+                // The data object was released when use returned: the files can't be read any more
+                Assert.Throws<ObjectDisposedException>(() => captured[1].OpenContent());
+
+                // maxDataSize: the second file (200,000 bytes) isn't read, the descriptor and the first file are
+                Assert.True(snapshot.TryUseVirtualFiles(files => files[1].OpenContent() == null && files[0].OpenContent() != null, out var limited, 100_000));
+                Assert.True(limited);
+
+                // Exceptions of use are passed on
+                Assert.Throws<FormatException>(() => snapshot.TryUseVirtualFiles<bool>(_ => throw new FormatException(), out _));
+                Assert.Throws<ArgumentNullException>(() => snapshot.TryUseVirtualFiles<bool>(null, out _));
+                Assert.Throws<ArgumentOutOfRangeException>(() => snapshot.TryUseVirtualFiles(_ => true, out _, 0));
+
+                // Not on an STA thread
+                var calledOnMta = false;
+                var onMta = await Task.Run(() => snapshot.TryUseVirtualFiles(_ => calledOnMta = true, out _));
+                Assert.False(onMta);
+                Assert.False(calledOnMta);
+
+                // A snapshot without the descriptor
+                var textOnly = await ClipboardNative.ReadSnapshotAsync(new[] { "CF_UNICODETEXT" });
+                Assert.False(textOnly.TryUseVirtualFiles(_ => true, out var none));
+                Assert.False(none);
+
+                // The clipboard changed since the snapshot
+                SetOleClipboard(DataObjectReaderTests.CreateVirtualFiles());
+                Assert.NotEqual(snapshot.SequenceNumber, ClipboardNative.SequenceNumber);
+                var calledAfterChange = false;
+                Assert.False(snapshot.TryUseVirtualFiles(_ => calledAfterChange = true, out _));
+                Assert.False(calledAfterChange);
+            }
+            finally
+            {
+                OleSetClipboard(null);
+            }
+        }
+        finally
+        {
+            OleUninitialize();
+            await restore.RestoreAsync();
         }
     }
 

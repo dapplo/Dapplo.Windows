@@ -289,7 +289,8 @@ namespace Dapplo.Windows.Clipboard
         /// Decode or send the data afterwards, while the clipboard is available for other applications again.
         /// </summary>
         /// <param name="formats">The formats to read, null reads every format which is stored in memory (handle formats like CF_BITMAP, CF_ENHMETAFILE and CF_PALETTE are skipped).
-        /// Pass the formats you need: reading all formats makes the copying application render every delayed rendered format.</param>
+        /// Pass the formats you need: reading all formats makes the copying application render every delayed rendered format.
+        /// <see cref="AvailableFormats(IEnumerable{string}, int)"/> selects the available ones without opening the clipboard.</param>
         /// <param name="options">optional ClipboardAccessOptions</param>
         /// <param name="cancellationToken">CancellationToken, cancels the waiting for the clipboard</param>
         /// <returns>Task with the ClipboardSnapshot</returns>
@@ -354,7 +355,7 @@ namespace Dapplo.Windows.Clipboard
                 if (retries-- <= 0)
                 {
                     var blocker = ClipboardBlocker.Detect();
-                    throw ClipboardAccessToken.CreateOpenTimeoutException(blocker.Window, blocker.ProcessId, blocker.Describe());
+                    throw ClipboardAccessToken.CreateOpenTimeoutException(blocker);
                 }
                 Thread.Sleep(retryInterval.Value);
             }
@@ -367,7 +368,7 @@ namespace Dapplo.Windows.Clipboard
             {
                 Marshal.ThrowExceptionForHR(hResult);
             }
-            return new DataObjectReader(dataObject, true);
+            return new DataObjectReader(dataObject, true) { IsFromClipboard = true };
         }
 
         [DllImport("ole32")]
@@ -404,5 +405,59 @@ namespace Dapplo.Windows.Clipboard
         /// <param name="format">string</param>
         /// <returns>bool</returns>
         public static bool HasFormat(string format) => NativeMethods.IsClipboardFormatAvailable(ClipboardFormatExtensions.MapFormatToId(format));
+
+        /// <summary>
+        /// Test if the clipboard has virtual files (FileGroupDescriptorW or the ANSI FileGroupDescriptor), e.g. Outlook attachments,
+        /// without opening the clipboard. Reading them needs OLE, see <see cref="ClipboardSnapshot.TryUseVirtualFiles{T}"/>.
+        /// </summary>
+        /// <returns>bool</returns>
+        public static bool HasVirtualFiles() => HasFormat(DataObjectReader.FileGroupDescriptorWFormat) || HasFormat(DataObjectReader.FileGroupDescriptorFormat);
+
+        /// <summary>
+        /// The formats of <paramref name="preferred"/> which are available on the clipboard right now, in the order of <paramref name="preferred"/>,
+        /// at most <paramref name="max"/>. The clipboard isn't opened (IsClipboardFormatAvailable), so this never blocks or fails because another
+        /// application has it open. Formats which Windows synthesizes (e.g. CF_DIB from CF_BITMAP, CF_UNICODETEXT from CF_TEXT) count as available.
+        /// </summary>
+        /// <remarks>
+        /// Reading a format makes the application which copied render it, which can be slow (e.g. large images in several formats). Use this to
+        /// pass only the formats you need to <see cref="ReadSnapshotAsync(IEnumerable{string}, ClipboardAccessOptions, CancellationToken)"/>, e.g.
+        /// the best two image formats: the second one is a fallback when the first can't be decoded.
+        /// The clipboard can change between this call and the read: the snapshot then simply has fewer formats.
+        /// </remarks>
+        /// <param name="preferred">the format names in the order of preference, null or empty names are ignored, duplicates are returned once</param>
+        /// <param name="max">int with the maximum number of formats to return, default all</param>
+        /// <returns>list with the available format names, as passed in <paramref name="preferred"/></returns>
+        /// <exception cref="ArgumentNullException">When <paramref name="preferred"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">When <paramref name="max"/> is negative</exception>
+        public static IReadOnlyList<string> AvailableFormats(IEnumerable<string> preferred, int max = int.MaxValue)
+        {
+            if (preferred == null)
+            {
+                throw new ArgumentNullException(nameof(preferred));
+            }
+            if (max < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(max), max, "The maximum must not be negative.");
+            }
+            var result = new List<string>();
+            var seen = new HashSet<uint>();
+            foreach (var format in preferred)
+            {
+                if (result.Count >= max)
+                {
+                    break;
+                }
+                if (string.IsNullOrEmpty(format))
+                {
+                    continue;
+                }
+                var formatId = ClipboardFormatExtensions.MapFormatToId(format);
+                if (formatId != 0 && seen.Add(formatId) && NativeMethods.IsClipboardFormatAvailable(formatId))
+                {
+                    result.Add(format);
+                }
+            }
+            return result;
+        }
     }
 }
