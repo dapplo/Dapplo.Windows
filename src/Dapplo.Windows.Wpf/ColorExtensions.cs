@@ -6,7 +6,7 @@ using System.Diagnostics.Contracts;
 namespace Dapplo.Windows.Wpf;
 
 /// <summary>
-///     Conversions between System.Drawing.Color and System.Windows.Media.Color, e.g. for <c>DwmApi.ColorizationDrawingColor.ToMediaColor()</c>
+///     Conversions between System.Drawing.Color and System.Windows.Media.Color, e.g. for <c>DwmApi.ColorizationColor.ToMediaColor()</c>
 /// </summary>
 public static class ColorExtensions
 {

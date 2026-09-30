@@ -30,7 +30,9 @@
     <ProjectReference Include="..\Dapplo.Windows.Icons\Dapplo.Windows.Icons.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Input\Dapplo.Windows.Input.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.InstallerManager\Dapplo.Windows.InstallerManager.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Multimedia\Dapplo.Windows.Multimedia.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Shell32\Dapplo.Windows.Shell32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />

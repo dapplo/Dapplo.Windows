@@ -4,7 +4,7 @@ using System;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Input.Mouse;
 

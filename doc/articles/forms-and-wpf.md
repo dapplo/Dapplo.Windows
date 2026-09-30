@@ -5,7 +5,7 @@ services and other UI frameworks. The integration lives in two packages:
 
 | Package | Contents |
 |---|---|
-| **Dapplo.Windows.Forms** | `DpiAwareForm`, `DpiUnawareForm`, `AttachDpiHandler()` for `Form` and `ContextMenuStrip`, `BitmapScaleHandler.AddTarget` for buttons and tool strip items, `WinProcFormsMessages()` for a `Control`, `WinProcListener`, placement and `AsInteropWindow()` for a `Form` |
+| **Dapplo.Windows.Forms** | `DpiAwareForm`, `DpiUnawareForm`, `AttachDpiHandler()` for `Form` and `ContextMenuStrip`, `BitmapScaleHandler.AddTarget` for buttons and tool strip items, `WinProcMessages()` for a `Control`, `WinProcListener`, placement and `AsInteropWindow()` for a `Form` |
 | **Dapplo.Windows.Wpf** | `AttachDpiHandler()` for a `Window`, `WinProcMessages()` for a `Window` / `HwndSource`, `WinProcHandler`, conversions between the native structs and WPF types, `ToBitmapSource()`, `PrintWindowAsBitmapSource()`, `ToMediaColor()`, placement, `GetHandle()` and `AsInteropWindow()` for a `Window` |
 
 ```powershell
@@ -78,5 +78,5 @@ using (var icon = window.GetIcon<Icon>())
 }
 
 // The accent color as WPF color
-System.Windows.Media.Color accent = DwmApi.ColorizationSystemDrawingColor.ToMediaColor();
+System.Windows.Media.Color accent = DwmApi.ColorizationColor.ToMediaColor();
 ```

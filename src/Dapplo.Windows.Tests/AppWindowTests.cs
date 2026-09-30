@@ -37,13 +37,13 @@ public class AppWindowTests
     }
 
     /// <summary>
-    ///     Make sure GetTopLevelWindows doesn't return an App Window.
+    ///     Make sure GetVisibleApplicationWindows doesn't return an App Window.
     /// </summary>
     /// <returns></returns>
     [WpfFact]
     public void TestApp_TopLevel()
     {
-        var topLevelWindows = InteropWindowQuery.GetTopLevelWindows().ToList();
+        var topLevelWindows = InteropWindowQuery.GetVisibleApplicationWindows().ToList();
         Assert.DoesNotContain(topLevelWindows, window => window.IsApp());
     }
 }

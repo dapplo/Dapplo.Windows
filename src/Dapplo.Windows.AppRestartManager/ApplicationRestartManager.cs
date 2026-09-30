@@ -3,7 +3,7 @@
 
 using Dapplo.Windows.AppRestartManager.Enums;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using System;
 using System.ComponentModel;
 using System.Linq;

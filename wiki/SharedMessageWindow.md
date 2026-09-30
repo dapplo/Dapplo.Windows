@@ -160,15 +160,15 @@ sessionListener.Dispose();
 
 ## Your own windows
 
-For the messages of your own forms or WPF windows use `WinProcFormsMessages()` (Dapplo.Windows.Forms) or
+For the messages of your own forms or WPF windows use `WinProcMessages()` (Dapplo.Windows.Forms) or
 `WinProcMessages()` (Dapplo.Windows.Wpf):
 
 <!-- sample: MessagesSamples.FormsMessages -->
 ```csharp
 // Subclasses the form's window. Runs on the UI thread, you may set Handled / Result.
 // The sequence follows handle re-creation and completes when the form is disposed.
-var subscription = form.WinProcFormsMessages()
-    .Where(m => m.Message == WindowsMessages.WM_NCHITTEST)
+var subscription = form.WinProcMessages()
+    .Where(m => m.Msg == WindowsMessages.WM_NCHITTEST)
     .Subscribe(m =>
     {
         // HTCAPTION: the whole window can be dragged like its title bar

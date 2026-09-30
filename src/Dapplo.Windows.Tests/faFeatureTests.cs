@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Kernel32;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Xunit;

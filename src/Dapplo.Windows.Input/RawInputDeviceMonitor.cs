@@ -10,8 +10,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
-using Dapplo.Windows.Messages.Structs;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Input;
 

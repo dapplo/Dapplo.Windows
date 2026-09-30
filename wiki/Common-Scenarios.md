@@ -93,21 +93,15 @@ var subscription = KeyboardHook.KeyboardEvents
 
 ## Single instance
 
-<!-- sample: CommonScenariosSamples.SingleInstancePInvoke -->
-```csharp
-[System.Runtime.InteropServices.DllImport("user32", SetLastError = true)]
-private static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-```
-
 <!-- sample: CommonScenariosSamples.SingleInstance -->
 ```csharp
 // The first instance listens, a second instance broadcasts and exits
-uint showMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMainWindow");
+uint showMessage = RegisteredWindowMessages.Register("MyApp.ShowMainWindow");
 using var mutex = new Mutex(true, "MyApp.SingleInstance", out var isFirstInstance);
 if (!isFirstInstance)
 {
     // HWND_BROADCAST: every top-level window gets it, also the SharedMessageWindow of the first instance
-    PostMessage(new IntPtr(0xFFFF), showMessage, IntPtr.Zero, IntPtr.Zero);
+    User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
     return;
 }
 var subscription = SharedMessageWindow.Messages

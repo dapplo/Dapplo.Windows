@@ -73,7 +73,7 @@ public static class FormsAndWpfSamples
         }
 
         // The accent color as WPF color
-        System.Windows.Media.Color accent = DwmApi.ColorizationSystemDrawingColor.ToMediaColor();
+        System.Windows.Media.Color accent = DwmApi.ColorizationColor.ToMediaColor();
         #endregion
     }
 }

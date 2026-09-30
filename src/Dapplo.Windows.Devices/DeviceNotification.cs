@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using Dapplo.Windows.Devices.Enums;
 using Dapplo.Windows.Devices.Structs;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.Messages.Native;
 
 namespace Dapplo.Windows.Devices

@@ -3,7 +3,7 @@
 using System;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Input.Enums;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Input.Mouse;
 

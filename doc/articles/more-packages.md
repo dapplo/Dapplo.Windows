@@ -48,7 +48,7 @@ if (DwmApi.GetExtendedFrameBounds(hWnd, out var frameBounds))
 bool isCloaked = DwmApi.IsWindowCloaked(hWnd);
 
 // The accent color of the user
-System.Drawing.Color accent = DwmApi.ColorizationSystemDrawingColor;
+System.Drawing.Color accent = DwmApi.ColorizationColor;
 ```
 
 `DwmApi` also sets the window corner preference on Windows 11 (`SetWindowCornerPreference`), and
@@ -121,11 +121,14 @@ if (Shell32Api.TryGetTaskbarPosition(out var appBarData))
 // One of the sounds of the Windows sound scheme
 WinMm.PlaySystemSound(SystemSounds.SystemAsterisk);
 
-// A WAV file, asynchronous. The data is copied, it plays until it's done or StopPlaying is called.
-WinMm.Play(System.IO.File.ReadAllBytes(@"C:\Windows\Media\chimes.wav"));
+// A WAV file, asynchronous: false (and silence) when the file doesn't exist
+bool isPlaying = WinMm.PlayFile(@"C:\Windows\Media\chimes.wav");
 
-// A WAVE resource of the executable
-WinMm.Play("NotificationSound");
+// WAV data, asynchronous. The data is copied, it plays until it's done or StopPlaying is called.
+WinMm.PlayWave(System.IO.File.ReadAllBytes(@"C:\Windows\Media\chimes.wav"));
+
+// A WAVE resource of the executable (or pass the module handle of a DLL)
+WinMm.PlayResource("NotificationSound");
 ```
 
 ## Embedded browser (Dapplo.Windows.EmbeddedBrowser)

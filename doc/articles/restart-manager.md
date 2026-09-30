@@ -133,8 +133,8 @@ if (rebootReason != RmRebootReason.RmRebootReasonNone)
 
 `Shutdown()` asks the applications to close. The default, `RmShutdownType.Graceful`, fails with a `Win32Exception`
 when an application refuses (for example because of unsaved work), so nobody loses data.
-`RmShutdownType.RmForceShutdown` kills applications which don't respond; use it only when you must.
-`RmShutdownOnlyRegistered` only closes applications which registered for restart. After the files are replaced,
+`RmShutdownType.Force` kills applications which don't respond; use it only when you must.
+`RmShutdownType.OnlyRegistered` (a flag, it can be combined with `Force`) only closes applications which registered for restart. After the files are replaced,
 `Restart()` starts the applications again which registered for restart.
 
 <!-- sample: RestartManagerSamples.UpdateFiles -->
@@ -156,7 +156,7 @@ try
 catch (Win32Exception ex)
 {
     Console.WriteLine($"An application refused to close: {ex.Message}");
-    // Only when you must: RmShutdownType.RmForceShutdown kills unresponsive applications, which can lose data
+    // Only when you must: RmShutdownType.Force kills unresponsive applications, which can lose data
     return;
 }
 

@@ -8,7 +8,7 @@ using Dapplo.Windows.Common.Structs;
 using System.Reactive.Linq;
 using System.Threading;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.User32;
 

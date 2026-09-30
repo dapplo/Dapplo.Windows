@@ -21,7 +21,7 @@ using Dapplo.Windows.Enums;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 
@@ -91,7 +91,7 @@ public static class CommonScenariosSamples
         var subscription = WinEventHook.WindowCreateDestroyObservable()
             .Where(info => info.WinEvent == WinEvents.EVENT_OBJECT_CREATE)
             .Select(info => InteropWindowFactory.CreateFor(info.Handle))
-            .Where(window => window.IsTopLevel() && window.GetClassname() == "Notepad")
+            .Where(window => window.IsVisibleApplicationWindow() && window.GetClassname() == "Notepad")
             .Subscribe(window => Console.WriteLine($"Notepad opened a window: {window.Handle}"));
         #endregion
     }
@@ -159,8 +159,8 @@ public static class CommonScenariosSamples
         #region TileWindows
         // Place the visible windows of the primary display next to each other
         var primary = DisplayInfo.AllDisplayInfos.First(display => display.IsPrimary);
-        var windows = InteropWindowQuery.GetTopLevelWindows()
-            .Where(window => window.IsVisible() && !window.IsMinimized() && !string.IsNullOrEmpty(window.GetCaption()))
+        // GetVisibleApplicationWindows skips hidden, minimized and untitled windows and tool windows
+        var windows = InteropWindowQuery.GetVisibleApplicationWindows()
             .Where(window => primary.Bounds.Contains(window.GetInfo().Bounds.Location))
             .ToList();
         if (windows.Count == 0)
@@ -182,28 +182,23 @@ public static class CommonScenariosSamples
     {
         #region MinimizeOthers
         var active = InteropWindowQuery.GetForegroundWindow();
-        foreach (var window in InteropWindowQuery.GetTopLevelWindows().Where(w => w.IsVisible() && w.Handle != active.Handle))
+        foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows().Where(w => w.Handle != active.Handle))
         {
             window.Minimize();
         }
         #endregion
     }
 
-    #region SingleInstancePInvoke
-    [System.Runtime.InteropServices.DllImport("user32", SetLastError = true)]
-    private static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-    #endregion
-
     public static void SingleInstance(Action showMainWindow)
     {
         #region SingleInstance
         // The first instance listens, a second instance broadcasts and exits
-        uint showMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMainWindow");
+        uint showMessage = RegisteredWindowMessages.Register("MyApp.ShowMainWindow");
         using var mutex = new Mutex(true, "MyApp.SingleInstance", out var isFirstInstance);
         if (!isFirstInstance)
         {
             // HWND_BROADCAST: every top-level window gets it, also the SharedMessageWindow of the first instance
-            PostMessage(new IntPtr(0xFFFF), showMessage, IntPtr.Zero, IntPtr.Zero);
+            User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
             return;
         }
         var subscription = SharedMessageWindow.Messages

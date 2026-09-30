@@ -1,21 +1,24 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System.Runtime.InteropServices;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Messages;
 
 /// <summary>
-/// Helper class to work with windows messages
+/// Registers application defined window messages (RegisterWindowMessage), which are unique on the desktop,
+/// and resolves the name of a message id.
+/// See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-registerwindowmessagew">RegisterWindowMessageW</a>.
 /// </summary>
-public static class WindowsMessage
+public static class RegisteredWindowMessages
 {
     /// <summary>
-    /// This returns the name of a windows message, which was registered with RegisterWindowMessage 
+    /// Get the name of a window message: for a message registered with <see cref="Register"/> (0xC000 through 0xFFFF) this is the registered name,
+    /// for the other messages the name of the <see cref="WindowsMessages"/> value (or the number, when it has no name).
     /// </summary>
-    /// <param name="messageId">uint with the id which was returned by RegisterWindowMessage</param>
-    /// <returns>string</returns>
-    public static string GetWindowsMessage(uint messageId)
+    /// <param name="messageId">uint with the message id, e.g. as returned by <see cref="Register"/></param>
+    /// <returns>string with the name, null when the id is in the registered range but no message with this id was registered</returns>
+    public static string GetName(uint messageId)
     {
         // Not a message which we can resolve
         if (messageId < (uint) WindowsMessages.WM_APPLICATION_STRING)
@@ -39,13 +42,14 @@ public static class WindowsMessage
     }
 
     /// <summary>
-    /// Register a windows message
+    /// Register a window message, which is unique on the desktop: every process which registers the same name gets the same id.
+    /// Use this e.g. to communicate between instances of an application with PostMessage / SendMessage.
     /// </summary>
-    /// <param name="message">Windows message</param>
-    /// <returns>uint with the message ID</returns>
-    public static uint RegisterWindowsMessage(string message)
+    /// <param name="name">string with the unique name of the message, e.g. "MyApp.ShowMainWindow"</param>
+    /// <returns>uint with the message id, in the range 0xC000 through 0xFFFF, or 0 when it failed (use Marshal.GetLastWin32Error for the reason)</returns>
+    public static uint Register(string name)
     {
-        return RegisterWindowMessageW(message);
+        return RegisterWindowMessageW(name);
     }
 
     /// <summary>

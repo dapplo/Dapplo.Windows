@@ -4,7 +4,7 @@
 using System;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Messages.Structs;
 
@@ -35,12 +35,12 @@ public readonly struct Msg
     /// <summary>
     /// Additional information about the message. The exact meaning depends on the value of the message member.
     /// </summary>
-    public UIntPtr wParam => _wParam;
+    public UIntPtr WParam => _wParam;
 
     /// <summary>
     /// Additional information about the message. The exact meaning depends on the value of the message member.
     /// </summary>
-    public UIntPtr lParam => _lParam;
+    public UIntPtr LParam => _lParam;
 
     /// <summary>
     /// Time of the message

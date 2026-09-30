@@ -110,15 +110,6 @@ public static class SystemStateApi
     public static extern bool CancelWaitableTimer(SafeWaitHandle hTimer);
 
     /// <summary>
-    /// Closes an open object handle.
-    /// </summary>
-    /// <param name="hObject">A valid handle to an open object.</param>
-    /// <returns><c>true</c> if the function succeeds; otherwise <c>false</c>.</returns>
-    [DllImport(Kernel32Dll, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool CloseHandle(IntPtr hObject);
-
-    /// <summary>
     /// Keeps the system awake and prevents the screen from turning off until the returned <see cref="SleepBlocker"/> is disposed.
     /// This uses a power request, it is not bound to the calling thread and can be disposed on any thread.
     /// </summary>

@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Windows.Clipboard.Internals;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Clipboard
 {

@@ -47,7 +47,7 @@ public class IconTests
             IInteropWindow window = null;
             await TestWait.UntilAsync(() =>
             {
-                window = InteropWindowQuery.GetTopLevelWindows().FirstOrDefault(interopWindow => interopWindow.GetProcessId() == process.Id);
+                window = InteropWindowQuery.GetVisibleApplicationWindows().FirstOrDefault(interopWindow => interopWindow.GetProcessId() == process.Id);
                 return window != null;
             }, "The window of charmap wasn't found");
 

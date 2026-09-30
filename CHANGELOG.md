@@ -10,8 +10,14 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 ## [Unreleased] - 3.0.0
 
 ### Changed
+- **Breaking:** the Windows message types are unambiguous: `WindowMessage` lives in `Dapplo.Windows.Messages` and is also what the Forms/WPF `WinProcMessages()` and `DpiHandler` use (`WindowMessageInfo` is gone); `WindowsMessage` is now `RegisteredWindowMessages` (`Register`, `GetName`); `Dapplo.Windows.Messages.Enumerations` is now `.Enums`; `Msg.wParam` / `lParam` are `WParam` / `LParam`.
+- **Breaking:** the Forms `WinProcFormsMessages()` is renamed to `WinProcMessages()`, the same name as in WPF.
+- **Breaking:** `IsTopLevel` / `GetTopLevelWindows` / `IsPopup` are renamed to `IsVisibleApplicationWindow` / `GetVisibleApplicationWindows` / `IsVisiblePopup`, after what they check (no parent, visible, has a title, not a tool window, not minimized, …); owned windows are accepted.
+- **Breaking:** consistent WinMm names: `PlayResource`, `PlayFile`, `PlayWave(byte[])`, `PlayWave(IntPtr, SoundSettings)` and `PlaySystemSound` all return `bool`; `PlayResource` no longer plays the default sound for a missing resource.
+- **Breaking:** `RmShutdownType` is a `[Flags]` enum with `Graceful`, `Force` and `OnlyRegistered`.
+- **Breaking:** `DrawIconExFlags` moved to `Dapplo.Windows.Icons.Enums`; misspellings fixed: `GdiExtensions.AreRectangleCornersVisible`, `CieXyzTriple`; `SystemStateApi.CloseHandle` is removed.
 - **Breaking:** `KeyCombinationHandler.TriggerOnKeyUp` is replaced by `TriggerMode` (`KeyDown`, `FirstKeyUp`, `AllKeysUp`).
-- **Breaking:** `InteropWindowQuery.GetTopWindows()` / `GetTopWindows(parent)` take a snapshot with `EnumWindows` / `EnumChildWindows` and return `IReadOnlyList<IInteropWindow>`, so they can no longer skip, repeat or loop over windows when the Z-order changes during the walk. `GetTopLevelWindows()` takes its snapshot when called.
+- **Breaking:** `InteropWindowQuery.GetTopWindows()` / `GetTopWindows(parent)` take a snapshot with `EnumWindows` / `EnumChildWindows` and return `IReadOnlyList<IInteropWindow>`, so they can no longer skip, repeat or loop over windows when the Z-order changes during the walk. `GetVisibleApplicationWindows()` takes its snapshot when called.
 - **Breaking:** `GetChildren()` returns the direct children in Z-order; `GetZOrderedChildren()`, `HasZOrderedChildren`, `InteropWindowRetrieveSettings.ZOrderedChildren` and `CacheAllChildZorder` are removed.
 - **Breaking:** the clipboard `Set*` methods throw `InvalidOperationException` when the content belongs to another window (you forgot `ClearContents`), instead of mixing your formats into another application's content.
 - **Breaking:** once the process is exiting and the shared window is gone, using `SharedMessageWindow` throws `ObjectDisposedException`.
@@ -23,7 +29,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - **Breaking:** `WinProcListener` (now in Dapplo.Windows.Forms) takes a `WinProcHook` delegate instead of the WPF `HwndSourceHook`.
 - **Breaking:** `InteropWindowExtensions.PrintWindow()` returns a `Bitmap`; `PrintWindowAsBitmapSource()` is in Dapplo.Windows.Wpf.
 - **Breaking:** icon helpers support `Icon` and `Bitmap` only and throw `NotSupportedException` for other types instead of returning null; use `ToBitmapSource()` from Dapplo.Windows.Wpf.
-- **Breaking:** `DwmApi.ColorizationColor` (WPF `Color`) is removed; use `ColorizationSystemDrawingColor.ToMediaColor()`.
+- **Breaking:** `DwmApi.ColorizationColor` returns a `System.Drawing.Color` (the WPF `Color` version and the duplicate `ColorizationDrawingColor` / `ColorizationSystemDrawingColor` are gone); convert with `ToMediaColor()` from Dapplo.Windows.Wpf. It returns white instead of throwing when the registry value isn't a DWORD.
 - **Breaking:** `BitmapScaleHandler.AddTarget(Button / ToolStripItem)` moved to Dapplo.Windows.Forms extension methods; the core has `AddTargetAction`.
 - **Breaking:** `Parent` / `HasParent` / `GetParent()` mean the real parent (child windows only, `GetAncestor(GA_PARENT)`), never the owner; new `Owner` / `HasOwner` / `GetOwner()` and `InteropWindowRetrieveSettings.Owner`. `GetInfo(autoCorrect)` no longer crops owned dialogs to their owner (A-06).
 - **Breaking:** `GetChildren()` returns direct children only; new `GetDescendants()` returns all descendants (A-14).
@@ -60,7 +66,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - **Breaking:** `WindowScroller.ScrollWheelLinesFromRegistry` is replaced by `WindowScroller.ScrollWheelLines`, read with `SystemParametersInfo(SPI_GETWHEELSCROLLLINES)`; the wheel delta is calculated by the new `WindowScroller.CalculateWheelDelta` (A-17).
 - **Breaking:** removed `NativeRectExtensions.Intersect2`, which returned wrong results; use `Intersect` (C-05).
 - **Breaking:** corrected `ProcessAccessRights.QueryLimitedInformation` (0x1000) and `All` (0x1FFFFF), and added `CreateProcess`, `SetQuota` and `SuspendResume` (D-12).
-- **Breaking:** `WinMm.Play(byte[])` copies the wave data to unmanaged memory that stays alive until the next `Play(byte[])` or `StopPlaying()`, and returns `bool` (E-04).
+- **Breaking:** `WinMm.PlayWave(byte[])` (was `Play(byte[])`) copies the wave data to unmanaged memory that stays alive until the next `PlayWave` or `StopPlaying()`, and returns `bool` (E-04).
 - **Breaking:** `HResult` is a signed `int` enum. `Failed()`, `Succeeded()` and `ThrowOnFailure()` now detect failures; before, every HRESULT counted as success, so failure branches that never ran now run (C-01).
 - **Breaking:** `IconInfo` / `IconInfoEx` expose the bitmaps as non-owning `IntPtr` properties (`ColorBitmap`, `BitmaskBitmap`); take ownership once with `TakeBitmaps()` or free them with `DeleteBitmaps()`. Every property read used to create a new owning SafeHandle, so the same HBITMAPs were deleted several times (C-02).
 - **Breaking:** `NativeSizeTypeConverter` writes and reads `Width,Height`; it used to swap them (C-06).
@@ -92,10 +98,11 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - **Breaking:** `SystemStateApi.PreventSleep()` / `PreventSystemSleep()` return a disposable `SleepBlocker` (a power request that works across threads); `AllowSleep()` is removed (E-13).
 - `WinEventHook`, raw input and session-notification registrations happen on the SharedMessageWindow thread, so events arrive there (A-12, B-02, B-11).
 - `RawInputMonitor` and `RawInputDeviceMonitor` are available for netstandard2.0 too (B-31).
-- With `KeyCombinationHandler.TriggerOnKeyUp = true`, key events are never marked as handled, so `IsPassThrough` has no effect in that mode (B-05).
+- In the key-up trigger modes (`TriggerMode.FirstKeyUp` / `AllKeysUp`), key events are never marked as handled, so `IsPassThrough` has no effect there (B-05).
 - Tests that send input, replace the clipboard or write to the registry are tagged `Category=Interactive` and are excluded from default runs (F-06).
 
 ### Added
+- `WinMm.PlayFile(string path)` plays a WAV file asynchronously and returns false when the file doesn't exist.
 - `KeyboardInputGenerator.TypeText(string)` types text as Unicode characters (KEYEVENTF_UNICODE), whatever the keyboard layout; line breaks become Enter, `\t` becomes Tab, other control characters are skipped. `KeyboardInput.ForText`, `ForUnicodeKeyDown` and `ForUnicodeKeyUp` build the input.
 - `KeyboardState` with `IsDown`, `IsAnyDown`, `IsDownForCurrentThread` and `IsToggled`.
 - `TriggerMode.AllKeysUp`: a `KeyCombinationHandler` can fire once all keys of the combination are released; another key pressed in between cancels it.
@@ -112,15 +119,15 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - `NativeDpiMethods.AreDpiAwarenessContextsEqual`, `GetWindowDpiAwarenessContext`, `SetDialogDpiChangeBehavior`, `GetDialogDpiChangeBehavior`, `DpiAwarenessContext.UnawareGdiScaled`.
 - `DpiCalculator.ScaleWithDpi` / `UnscaleWithDpi` overloads for `NativePointFloat`.
 - `WindowScroller.CreateScrollWParam`.
-- `WindowMessageInfo.Handled` / `Result`, `ClipboardNative.RegisterDelayedRenderer`, `HasFormat(StandardClipboardFormats)`.
+- `ClipboardNative.RegisterDelayedRenderer`, `HasFormat(StandardClipboardFormats)`.
 - `RawInputApi.TryGetRawInputData`, `TryParseRawInput`, `GetRegisteredDevices`; `KeyCombinationHandler.KeyStateVerifier`.
 - Keyboard hook args: `ScanCode`, `IsExtended`, `IsFromKeyboardHook`; mouse hook args: `MouseData`, `WheelDelta`, `XButton`, `Flags`, `IsInjectedByProcess`, `IsInjectedByLowerIntegrityLevelProcess`, `TimeStamp`.
 - `WindowsSessionListener.IsRegistered` and `RegistrationFailed`; `DevBroadcastDeviceInterface.TryGetDevBroadcastPort` / `TryGetDevBroadcastHandle`; `PowerManagementApi.EnableShutdownPrivilege()`.
 
 ### Fixed
 - Delayed-rendered clipboard formats survive process exit: the shared window is destroyed on exit, so Windows sends WM_RENDERALLFORMATS.
-- The children of the desktop window no longer get the desktop as parent, so `IsTopLevel()` is correct for them.
-- Window information: `GetCaption` works for the calling thread's own windows without deadlocks (A-11); `GetTopWindows` / `GetZOrderedChildren` no longer yield handle 0 (A-13); `GetInfo` no longer overwrites `Children` as a side effect (A-15); `GetText` no longer truncates at 259 characters (A-21); `GetAppLauncher`, `AppVisible` and `IsLauncherVisible` give correct answers (A-23..A-25); `MonitorInfoEx.DeviceName` stays in its buffer (A-26); `GetVisibleLocation` returns the working-area origin (A-32); `InstalledSoftware()` reads both registry views and HKCU (A-33); `GetInfo` doesn't cache failures (A-34); `ToForegroundAsync` really waits for the restore (A-22); WPF `GetHandle()` works before the window is shown (A-45).
+- The children of the desktop window no longer get the desktop as parent, so `IsVisibleApplicationWindow()` is correct for them.
+- Window information: `GetCaption` works for the calling thread's own windows without deadlocks (A-11); `GetTopWindows` no longer yields handle 0 (A-13); `GetInfo` no longer overwrites `Children` as a side effect (A-15); `GetText` no longer truncates at 259 characters (A-21); `GetAppLauncher`, `AppVisible` and `IsLauncherVisible` give correct answers (A-23..A-25); `MonitorInfoEx.DeviceName` stays in its buffer (A-26); `GetVisibleLocation` returns the working-area origin (A-32); `InstalledSoftware()` reads both registry views and HKCU (A-33); `GetInfo` doesn't cache failures (A-34); `ToForegroundAsync` really waits for the restore (A-22); WPF `GetHandle()` works before the window is shown (A-45).
 - `PrintWindow` crops to the visible bounds instead of shifting the capture and uses `PW_RENDERFULLCONTENT` on Windows 8.1+, so DirectComposition, Chromium and UWP content is no longer black (A-16, A-27).
 - `ToBitmapSource` keeps the alpha channel (A-28, C-25).
 - Cursor capture: `TryGetCurrentCursor` returns a `Size` / `HotSpot` that match the captured layers at every DPI and pointer size; drawing respects the Graphics transform, handles non-square and premultiplied cursors, and no longer leaks handles on errors (C-10, C-11, C-12, C-34).
@@ -135,7 +142,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - `DwmApi.IsDwmEnabled` is true on every Windows 8+; `IsWindowCloaked` reads a DWORD; added `DwmWindowAttributes.SystemBackdropType` (E-20, E-21).
 - Citrix `ClientDisplay.ColorDepth` maps high values correctly (E-22).
 - `InstallerRestartManager` retries when the process list grows, ends leaked sessions and keeps callbacks alive (E-29).
-- `WinMm.Play(string)` plays WAVE resources from the given module (E-34); `SetLastError` usage matches the native APIs (A-40, E-32).
+- `WinMm.PlayResource` plays WAVE resources from the given module (E-34); `SetLastError` usage matches the native APIs (A-40, E-32).
 - The InstallerExample finds the FormsExample for any build configuration; the WpfExample only swallows PrintScreen while active (F-34).
 - `dotnet pack` of a single project no longer fails on the missing icon; package release notes point to this changelog (F-09).
 - Benchmarks target the runtimes the project builds for (F-04); FormsExample embeds its app.manifest, so the DPI demos run Per Monitor v2 (F-18).
@@ -145,7 +152,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - A wheel-lines setting of 0 or "one page" no longer causes a DivideByZeroException, a negative or a zero wheel delta (A-17).
 - Mouse moves and clicks at a given location land on the right pixel, including on monitors left of or above the primary one (B-03).
 - `LastInputTimeSpan`, `LastInputDateTime`, `KeyboardHookEventArgs.EventTime` and `Msg.Time` are correct after 24.9 days of uptime and when the tick count wraps (B-04).
-- `KeyCombinationHandler` with `TriggerOnKeyUp = true` fires, and no longer swallows the key-up, which left a stuck key (B-05, F-01).
+- A `KeyCombinationHandler` that triggers on key-up fires, and no longer swallows the key-up, which left a stuck key (B-05, F-01).
 - Injected arrow, navigation, right Ctrl/Alt, Windows and media keys are sent as extended keys, so they are no longer seen as numpad keys or the left modifier (B-15).
 - `KeyboardInputGenerator.KeyCombinationPress` releases keys in reverse order.
 - Input generation no longer throws an OverflowException in Debug builds after 24.9 days of uptime (B-28).
@@ -174,7 +181,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - `DpiHandler.TryEnableNonClientDpiScaling` reports failures and no longer throws on Windows 10 before 1607 (D-15).
 - An exception in a SharedMessageWindow, keyboard-hook or mouse-hook subscriber no longer crashes the process; it is published on `SubscriberErrors` (B-06).
 - Disposing a `Window.WinProcMessages()` subscription no longer destroys the WPF window (B-07).
-- `WinProcListener` returns the handling hook's result to Windows; `WinProcFormsMessages` survives handle recreation and completes when the control is disposed (B-10, B-18).
+- `WinProcListener` returns the handling hook's result to Windows; the Forms `WinProcMessages()` survives handle recreation and completes when the control is disposed (B-10, B-18).
 - `WinProcHandler` no longer recreates its window during disposal (B-25); `MessageLoop.ProcessMessages` throws on a `GetMessage` error (B-26).
 - Raw-input monitors register when you subscribe and unregister when you dispose, and no longer overwrite each other's registrations (B-02, B-13); `RawInputDeviceMonitor` no longer throws for unknown devices (B-12).
 - F10 and the Alt key-up no longer report a phantom Alt (B-14); lock-key state is not flipped by auto-repeat (B-23).

@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 
-namespace Dapplo.Windows.Messages.Structs;
+namespace Dapplo.Windows.Messages;
 
 /// <summary>
 /// Represents a Windows message, including its window handle, message identifier, and associated parameters.
 /// Subscribers can mark the message as handled and supply the LRESULT which is returned to Windows.
+/// This is used for the messages of the SharedMessageWindow, and by the WinProcMessages() extensions of Dapplo.Windows.Forms and Dapplo.Windows.Wpf for your own windows.
 /// </summary>
 /// <remarks>
 /// This is a class (reference type), so every subscriber sees the same instance and <see cref="Handled"/> and <see cref="Result"/>

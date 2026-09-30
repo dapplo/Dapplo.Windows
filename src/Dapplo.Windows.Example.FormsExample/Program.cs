@@ -5,7 +5,7 @@ using Dapplo.Log.Loggers;
 using Dapplo.Windows.AppRestartManager;
 using Dapplo.Windows.AppRestartManager.Enums;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using System;
 using System.Diagnostics;
 using System.Linq;

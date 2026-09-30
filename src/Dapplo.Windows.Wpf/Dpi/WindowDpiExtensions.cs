@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using System;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
@@ -96,17 +96,17 @@ namespace Dapplo.Windows.Wpf.Dpi
             subscriptions.Add(dpiHandler.OnDpiChanged.Subscribe(_ => ScheduleUpdateScaling()));
             subscriptions.Add(window.WinProcMessages().Subscribe(message =>
             {
-                switch (message.Message)
+                switch (message.Msg)
                 {
                     case WindowsMessages.WM_NCCREATE:
                         // This is simulated after SourceInitialized, the window already exists
-                        dpiHandler.RefreshDpi(message.Handle);
+                        dpiHandler.RefreshDpi(message.Hwnd);
                         return;
                     case WindowsMessages.WM_DPICHANGED:
                         // The lParam is only valid while processing the message, copy it
-                        if (message.LongParam != IntPtr.Zero)
+                        if (message.LParam != IntPtr.Zero)
                         {
-                            suggestedRect = Marshal.PtrToStructure<NativeRect>(message.LongParam);
+                            suggestedRect = Marshal.PtrToStructure<NativeRect>(message.LParam);
                         }
                         break;
                 }

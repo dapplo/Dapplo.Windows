@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -15,7 +15,7 @@ namespace Dapplo.Windows.Wpf.Messages
     ///     A monitor for window messages
     /// </summary>
     /// <remarks>
-    ///     Setting <see cref="WindowMessageInfo.Handled"/> and <see cref="WindowMessageInfo.Result"/> synchronously in OnNext (on the UI thread)
+    ///     Setting <see cref="WindowMessage.Handled"/> and <see cref="WindowMessage.Result"/> synchronously in OnNext (on the UI thread)
     ///     returns the result to Windows, and stops the following hooks and the default window procedure from processing it.
     ///     The HwndSource is never disposed by these extensions, the sequence completes when the HwndSource is disposed.
     /// </remarks>
@@ -24,7 +24,7 @@ namespace Dapplo.Windows.Wpf.Messages
         /// <summary>
         ///     Create an observable for the specified window, if the window has no handle yet the hook is added when the source is initialized.
         /// </summary>
-        public static IObservable<WindowMessageInfo> WinProcMessages(this Window window)
+        public static IObservable<WindowMessage> WinProcMessages(this Window window)
         {
             if (window == null)
             {
@@ -36,7 +36,7 @@ namespace Dapplo.Windows.Wpf.Messages
         /// <summary>
         ///     Create an observable for the specified HwndSource
         /// </summary>
-        public static IObservable<WindowMessageInfo> WinProcMessages(this HwndSource hWndSource)
+        public static IObservable<WindowMessage> WinProcMessages(this HwndSource hWndSource)
         {
             if (hWndSource == null)
             {
@@ -51,9 +51,9 @@ namespace Dapplo.Windows.Wpf.Messages
         /// <param name="window">Window</param>
         /// <param name="suppliedHwndSource">HwndSource</param>
         /// <returns>IObservable</returns>
-        private static IObservable<WindowMessageInfo> CreateWinProcMessages(Window window, HwndSource suppliedHwndSource)
+        private static IObservable<WindowMessage> CreateWinProcMessages(Window window, HwndSource suppliedHwndSource)
         {
-            return Observable.Create<WindowMessageInfo>(observer =>
+            return Observable.Create<WindowMessage>(observer =>
             {
                 HwndSource hWndSource = null;
                 var isDisposed = false;
@@ -61,7 +61,7 @@ namespace Dapplo.Windows.Wpf.Messages
                 // This handles the message, and generates the observable OnNext
                 IntPtr WindowMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                 {
-                    var message = WindowMessageInfo.Create(hWnd, msg, wParam, lParam);
+                    var message = new WindowMessage(hWnd, (WindowsMessages)msg, wParam, lParam);
                     observer.OnNext(message);
                     if (!message.Handled)
                     {
@@ -93,7 +93,7 @@ namespace Dapplo.Windows.Wpf.Messages
                     }
                     RegisterHwndSource(source);
                     // Simulate the WM_NCCREATE
-                    observer.OnNext(WindowMessageInfo.Create(source.Handle, (int)WindowsMessages.WM_NCCREATE, IntPtr.Zero, IntPtr.Zero));
+                    observer.OnNext(new WindowMessage(source.Handle, WindowsMessages.WM_NCCREATE, IntPtr.Zero, IntPtr.Zero));
                 }
 
                 var initialSource = suppliedHwndSource ?? window?.ToHwndSource();

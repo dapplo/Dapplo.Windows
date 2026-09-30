@@ -46,7 +46,7 @@ public struct BitmapV5Header
     [FieldOffset(56)]
     private ColorSpace _bV5CSType;
     [FieldOffset(60)]
-    private CieXyzTripple _bV5Endpoints;
+    private CieXyzTriple _bV5Endpoints;
     [FieldOffset(96)]
     private uint _bV5GammaRed;
     [FieldOffset(100)]
@@ -271,7 +271,7 @@ public struct BitmapV5Header
     ///     green, and blue endpoints for the logical color space associated with the bitmap. This member is ignored unless the
     ///     bV5CSType member specifies LCS_CALIBRATED_RGB.
     /// </summary>
-    public CieXyzTripple Endpoints
+    public CieXyzTriple Endpoints
     {
         get => _bV5Endpoints;
         set => _bV5Endpoints = value;
@@ -380,7 +380,7 @@ public struct BitmapV5Header
             _bV5BlueMask = 255,
             _bV5AlphaMask = (uint) 255 << 24,
             _bV5CSType = ColorSpace.LCS_sRGB,
-            _bV5Endpoints = new CieXyzTripple
+            _bV5Endpoints = new CieXyzTriple
             {
                 Blue = CieXyz.Create(0),
                 Green = CieXyz.Create(0),

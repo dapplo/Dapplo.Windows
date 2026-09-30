@@ -4,7 +4,7 @@
 using System;
 using System.Reactive.Linq;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.SystemState.Enums;
 
 namespace Dapplo.Windows.SystemState;

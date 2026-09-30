@@ -9,7 +9,7 @@ using Dapplo.Windows.Devices;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.Wpf.Dpi;
 using Dapplo.Windows.Wpf.Messages;
@@ -35,8 +35,8 @@ public partial class MainWindow
         Deactivated += (sender, args) => _isActive = false;
 
         _subscriptions.Add(this.WinProcMessages()
-            .Where(m => m.Message == WindowsMessages.WM_DESTROY)
-            .Subscribe(m => Debug.WriteLine($"{m.Message}")));
+            .Where(m => m.Msg == WindowsMessages.WM_DESTROY)
+            .Subscribe(m => Debug.WriteLine($"{m.Msg}")));
 
         // Handled must be set synchronously on the hook thread, this swallows the Print Screen key only while this window is active
         _subscriptions.Add(KeyboardHook.KeyboardEvents.Subscribe(HandleKeyboardEvent));

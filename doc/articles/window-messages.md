@@ -8,7 +8,7 @@ changes, hotkeys, raw input. **Dapplo.Windows.Messages** provides one hidden win
 dotnet add package Dapplo.Windows.Messages
 ```
 
-Namespaces used on this page: `Dapplo.Windows.Messages`, `Dapplo.Windows.Messages.Enumerations`,
+Namespaces used on this page: `Dapplo.Windows.Messages`, `Dapplo.Windows.Messages.Enums`,
 `System.Reactive.Linq`; for the integrations `Dapplo.Windows.Forms.Messages`, `Dapplo.Windows.Wpf.Messages` and
 `Dapplo.Windows.Desktop`.
 
@@ -175,14 +175,14 @@ var errorSubscription = SharedMessageWindow.SubscriberErrors
 
 ### Your own messages
 
-`WindowsMessage.RegisterWindowsMessage` registers a message which is unique on the desktop, for example so a second
+`RegisteredWindowMessages.Register` registers a message which is unique on the desktop, for example so a second
 instance of your application can talk to the first one (see
 [Common scenarios](common-scenarios.md#single-instance)).
 
 <!-- sample: MessagesSamples.CustomMessage -->
 ```csharp
 // A message which is unique for the whole desktop, e.g. to let a second instance talk to the first
-uint showMeMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMe");
+uint showMeMessage = RegisteredWindowMessages.Register("MyApp.ShowMe");
 
 var subscription = SharedMessageWindow.Messages
     .Where(m => (uint)m.Msg == showMeMessage)
@@ -262,15 +262,15 @@ var subscription = EnvironmentMonitor.EnvironmentUpdateEvents
 The SharedMessageWindow only sees its own messages. For the messages of your forms and WPF windows use the
 integration packages. Both run on the UI thread, so `Handled` and `Result` can be set in `OnNext`.
 
-Windows Forms (**Dapplo.Windows.Forms**): `WinProcFormsMessages()` subclasses the control, follows handle re-creation
+Windows Forms (**Dapplo.Windows.Forms**): `WinProcMessages()` subclasses the control, follows handle re-creation
 and completes when the control is disposed.
 
 <!-- sample: MessagesSamples.FormsMessages -->
 ```csharp
 // Subclasses the form's window. Runs on the UI thread, you may set Handled / Result.
 // The sequence follows handle re-creation and completes when the form is disposed.
-var subscription = form.WinProcFormsMessages()
-    .Where(m => m.Message == WindowsMessages.WM_NCHITTEST)
+var subscription = form.WinProcMessages()
+    .Where(m => m.Msg == WindowsMessages.WM_NCHITTEST)
     .Subscribe(m =>
     {
         // HTCAPTION: the whole window can be dragged like its title bar
@@ -286,17 +286,17 @@ is shown works, the hook is added when the source is created. Disposing the subs
 ```csharp
 // Works before the window is shown, the hook is added when the HwndSource is created
 var subscription = window.WinProcMessages()
-    .Where(m => m.Message == WindowsMessages.WM_DPICHANGED)
+    .Where(m => m.Msg == WindowsMessages.WM_DPICHANGED)
     .Subscribe(m => Console.WriteLine("DPI changed"));
 ```
 
 ## Names of the message types
 
-- `WindowsMessages` is the enum of message identifiers (`WM_...`).
-- `WindowMessage` is a message of the SharedMessageWindow (`Hwnd`, `Msg`, `WParam`, `LParam`, `Handled`, `Result`).
-- `WindowMessageInfo` is a message of your own form or WPF window (`Handle`, `Message`, `WordParam`, `LongParam`,
-  `Handled`, `Result`).
-- `WindowsMessage` is a helper to register and name custom messages.
+- `WindowsMessages` (namespace `Dapplo.Windows.Messages.Enums`) is the enum of message identifiers (`WM_...`).
+- `WindowMessage` is one message sent to a window (`Hwnd`, `Msg`, `WParam`, `LParam`, `Handled`, `Result`), both for
+  the SharedMessageWindow and for your own forms and WPF windows (`WinProcMessages()`).
+- `Msg` (namespace `Dapplo.Windows.Messages.Structs`) is the native `MSG` structure of a message loop.
+- `RegisteredWindowMessages` registers custom messages (`Register`) and gets the name of a message id (`GetName`).
 
 ## See also
 

@@ -5,7 +5,7 @@ using System;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Xunit;
 
 namespace Dapplo.Windows.Tests;

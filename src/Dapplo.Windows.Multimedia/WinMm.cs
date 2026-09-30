@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Multimedia.Enums;
 
@@ -13,58 +14,87 @@ namespace Dapplo.Windows.Multimedia;
 public static class WinMm
 {
     private static readonly object PlayMemoryLock = new object();
-    // Unmanaged copy of the wave data passed to Play(byte[]), this needs to stay alive while winmm plays it asynchronously
+    // Unmanaged copy of the wave data passed to PlayWave(byte[]), this needs to stay alive while winmm plays it asynchronously
     private static IntPtr _playingMemory = IntPtr.Zero;
 
     /// <summary>
-    /// Play a system sound
+    /// Play a sound of the Windows sound scheme asynchronously.
     /// </summary>
     /// <param name="systemSound">Value from the SystemSounds enum</param>
-    public static void PlaySystemSound(SystemSounds systemSound)
+    /// <returns>bool true if the sound started playing</returns>
+    public static bool PlaySystemSound(SystemSounds systemSound)
     {
         // The enum names are the system-event alias names from the registry, so SND_ALIAS (not SND_ALIAS_ID) is needed
-        PlaySound(systemSound.ToString(), UIntPtr.Zero, SoundSettings.Alias | SoundSettings.Async);
+        return PlaySound(systemSound.ToString(), UIntPtr.Zero, SoundSettings.Alias | SoundSettings.Async);
     }
 
     /// <summary>
     /// Play a native (Win32) WAVE resource asynchronously.
     /// </summary>
-    /// <param name="resource">Name of the WAVE resource to play</param>
+    /// <param name="resourceName">Name of the WAVE resource to play</param>
     /// <param name="moduleHandle">
     /// Handle (HMODULE) of the executable or DLL which contains the resource,
     /// <see cref="IntPtr.Zero"/> (default) uses the executable of the current process.
     /// </param>
-    /// <returns>bool true if the sound started playing</returns>
-    public static bool Play(string resource, IntPtr moduleHandle = default)
+    /// <returns>bool true if the sound started playing, false if the resource wasn't found or can't be played</returns>
+    public static bool PlayResource(string resourceName, IntPtr moduleHandle = default)
     {
+        if (resourceName is null)
+        {
+            throw new ArgumentNullException(nameof(resourceName));
+        }
         if (moduleHandle == IntPtr.Zero)
         {
             moduleHandle = GetModuleHandle(null);
         }
-        return PlaySound(resource, new UIntPtr((ulong)moduleHandle.ToInt64()), SoundSettings.Resource | SoundSettings.Async);
+        return PlaySound(resourceName, new UIntPtr((ulong)moduleHandle.ToInt64()), SoundSettings.Resource | SoundSettings.Async | SoundSettings.NoDefault);
     }
 
     /// <summary>
-    /// Play a wav from memory.
-    /// Note: the caller owns the memory, when <see cref="SoundSettings.Async"/> is used it must stay valid until the sound has finished or was stopped with <see cref="StopPlaying"/>.
+    /// Play a WAV file asynchronously, winmm reads the file itself.
     /// </summary>
-    /// <param name="memoryPtr">Pointer to the wav file to play</param>
-    /// <param name="settings">SoundSettings</param>
-    public static void Play(IntPtr memoryPtr, SoundSettings settings)
+    /// <param name="path">Path of the WAV file, PlaySound supports at most 255 characters</param>
+    /// <returns>
+    /// bool true if the sound was started, false if the file doesn't exist or playing failed. A file which exists but isn't a valid WAV file
+    /// can't be detected up front (PlaySound opens it asynchronously), it simply doesn't play: no default sound is played instead.
+    /// </returns>
+    public static bool PlayFile(string path)
     {
-        PlaySound(memoryPtr, UIntPtr.Zero, settings);
+        if (path is null)
+        {
+            throw new ArgumentNullException(nameof(path));
+        }
+        // With SND_ASYNC PlaySound returns TRUE before the file is opened, so check that it exists first
+        if (path.Length == 0 || !File.Exists(path))
+        {
+            return false;
+        }
+        return PlaySound(path, UIntPtr.Zero, SoundSettings.Filename | SoundSettings.Async | SoundSettings.NoDefault);
     }
 
     /// <summary>
-    /// Play wave data asynchronously.
-    /// The wave data is copied into unmanaged memory which is kept alive until the next call to <see cref="Play(byte[])"/> or <see cref="StopPlaying"/>,
+    /// Play WAVE data from unmanaged memory, <see cref="SoundSettings.Memory"/> is always added to the settings.
+    /// Note: the caller owns the memory, when <see cref="SoundSettings.Async"/> is used it must stay valid until the sound has finished or was stopped with <see cref="StopPlaying"/>.
+    /// Prefer <see cref="PlayWave(byte[])"/>, which takes care of this.
+    /// </summary>
+    /// <param name="memoryPtr">Pointer to the WAVE data (a complete .wav file in memory)</param>
+    /// <param name="settings">SoundSettings, e.g. <see cref="SoundSettings.None"/> to play synchronously</param>
+    /// <returns>bool true if the sound was played (synchronous) or started playing (asynchronous)</returns>
+    public static bool PlayWave(IntPtr memoryPtr, SoundSettings settings)
+    {
+        return PlaySound(memoryPtr, UIntPtr.Zero, settings | SoundSettings.Memory);
+    }
+
+    /// <summary>
+    /// Play WAVE data (a complete .wav file) asynchronously.
+    /// The wave data is copied into unmanaged memory which is kept alive until the next call to <see cref="PlayWave(byte[])"/> or <see cref="StopPlaying"/>,
     /// so the passed byte[] can be reused or collected directly after this call.
     /// Any sound which is currently playing is stopped first.
     /// See <a href="https://blogs.msdn.microsoft.com/larryosterman/2009/02/19/playsoundxxx-snd_memory-snd_async-is-almost-always-a-bad-idea/">PlaySound(xxx, SND_MEMORY | SND_ASYNC) is almost always a bad idea.</a>
     /// </summary>
     /// <param name="soundBytes">Wave data to play</param>
     /// <returns>bool true if the sound started playing</returns>
-    public static bool Play(byte[] soundBytes)
+    public static bool PlayWave(byte[] soundBytes)
     {
         if (soundBytes is null)
         {
@@ -89,7 +119,7 @@ public static class WinMm
     }
 
     /// <summary>
-    /// Stop playing, this also frees the memory of a sound started with <see cref="Play(byte[])"/>
+    /// Stop playing, this also frees the memory of a sound started with <see cref="PlayWave(byte[])"/>
     /// </summary>
     public static void StopPlaying()
     {
@@ -100,7 +130,7 @@ public static class WinMm
     }
 
     /// <summary>
-    /// Stop the currently playing sound, and free the memory used by <see cref="Play(byte[])"/>. Must be called while holding PlayMemoryLock.
+    /// Stop the currently playing sound, and free the memory used by <see cref="PlayWave(byte[])"/>. Must be called while holding PlayMemoryLock.
     /// </summary>
     private static void StopAndFreeMemory()
     {

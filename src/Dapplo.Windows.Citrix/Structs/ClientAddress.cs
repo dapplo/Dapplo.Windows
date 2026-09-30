@@ -11,14 +11,14 @@ namespace Dapplo.Windows.Citrix.Structs;
 [StructLayout(LayoutKind.Sequential)]
 public unsafe struct ClientAddress
 {
-    private readonly int _adressFamily;
+    private readonly int _addressFamily;
 
     private fixed byte _address[20];
 
     /// <summary>
     ///     Address Family
     /// </summary>
-    public AddressFamily AddressFamily => (AddressFamily)_adressFamily;
+    public AddressFamily AddressFamily => (AddressFamily)_addressFamily;
 
     /// <summary>
     ///     IP Address used

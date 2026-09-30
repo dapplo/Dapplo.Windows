@@ -8,7 +8,7 @@ dotnet add package Dapplo.Windows.Input
 ```
 
 Namespaces used on this page: `Dapplo.Windows.Input`, `Dapplo.Windows.Input.Enums`, `Dapplo.Windows.Input.Keyboard`,
-`Dapplo.Windows.Input.Mouse`, `Dapplo.Windows.Messages.Enumerations`, `Dapplo.Windows.Common.Structs`,
+`Dapplo.Windows.Input.Mouse`, `Dapplo.Windows.Messages.Enums`, `Dapplo.Windows.Common.Structs`,
 `System.Reactive.Linq`, `System.Reactive.Concurrency`.
 
 ## Keyboard hook

@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 using Dapplo.Windows.Dpi.Enums;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.Dpi;
 
 namespace Dapplo.Windows.Forms.Dpi
@@ -72,10 +72,10 @@ namespace Dapplo.Windows.Forms.Dpi
         /// <param name="m">Message</param>
         protected override void WndProc(ref Message m)
         {
-            var messageInfo = WindowMessageInfo.Create(m.HWnd, m.Msg, m.WParam, m.LParam);
-            if (messageInfo.Message != WindowsMessages.WM_DPICHANGED)
+            var messageInfo = new WindowMessage(m.HWnd, (WindowsMessages)m.Msg, m.WParam, m.LParam);
+            if (messageInfo.Msg != WindowsMessages.WM_DPICHANGED)
             {
-                if (messageInfo.Message == WindowsMessages.WM_NCCREATE)
+                if (messageInfo.Msg == WindowsMessages.WM_NCCREATE)
                 {
                     // Enable the non client scaling before WinForms (and DefWindowProc) processes the WM_NCCREATE
                     FormDpiHandler.HandleWindowMessages(messageInfo);

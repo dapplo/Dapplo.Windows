@@ -15,7 +15,7 @@ using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Icons;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.Software;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
@@ -63,11 +63,11 @@ public static class WindowSamples
         #endregion
     }
 
-    public static void TopLevelWindows()
+    public static void ApplicationWindows()
     {
-        #region TopLevelWindows
+        #region ApplicationWindows
         // The application windows the user sees (visible, with a title, not minimized), from top to bottom
-        foreach (var window in InteropWindowQuery.GetTopLevelWindows())
+        foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows())
         {
             Console.WriteLine($"{window.GetCaption()} ({window.GetClassname()})");
         }
@@ -78,7 +78,7 @@ public static class WindowSamples
     {
         #region FilterWindows
         // All visible Notepad windows
-        var notepads = InteropWindowQuery.GetTopLevelWindows()
+        var notepads = InteropWindowQuery.GetVisibleApplicationWindows()
             .Where(window => window.GetClassname() == "Notepad")
             .ToList();
 
@@ -97,7 +97,7 @@ public static class WindowSamples
     {
         #region FindByTitle
         IInteropWindow FindWindowByTitle(string title) =>
-            InteropWindowQuery.GetTopLevelWindows()
+            InteropWindowQuery.GetVisibleApplicationWindows()
                 .FirstOrDefault(window => window.GetCaption().IndexOf(title, StringComparison.OrdinalIgnoreCase) >= 0);
 
         var calculator = FindWindowByTitle("Calculator");
@@ -217,7 +217,7 @@ public static class WindowSamples
         }
 
         // Post a registered message to all top-level windows, e.g. to the other instances of your application
-        uint showMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMainWindow");
+        uint showMessage = RegisteredWindowMessages.Register("MyApp.ShowMainWindow");
         User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
         #endregion
     }
@@ -230,7 +230,7 @@ public static class WindowSamples
         {
             return;
         }
-        bool isTopLevel = window.IsTopLevel();
+        bool isApplicationWindow = window.IsVisibleApplicationWindow();
         bool isOwnWindow = window.IsOwnedByCurrentProcess();
         // A Windows Store (UWP) app window
         bool isApp = window.IsApp();
@@ -306,7 +306,7 @@ public static class WindowSamples
         #region MonitorTitle
         var subscription = WinEventHook.WindowTitleChangeObservable()
             .Select(info => InteropWindowFactory.CreateFor(info.Handle))
-            .Where(window => window.IsTopLevel())
+            .Where(window => window.IsVisibleApplicationWindow())
             .Subscribe(window => Console.WriteLine($"New title: {window.GetCaption(forceUpdate: true)}"));
         #endregion
     }

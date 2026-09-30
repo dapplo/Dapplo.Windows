@@ -20,7 +20,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using Dapplo.Log;
 using Dapplo.Windows.Kernel32;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Desktop;
 
@@ -732,7 +732,7 @@ public static class InteropWindowExtensions
     public static IEnumerable<IInteropWindow> GetLinkedWindows(this IInteropWindow windowToLinkTo)
     {
         int processIdSelectedWindow = windowToLinkTo.GetProcessId();
-        return InteropWindowQuery.GetTopLevelWindows().Where(window => window.Handle != windowToLinkTo.Handle && window.GetProcessId() == processIdSelectedWindow);
+        return InteropWindowQuery.GetVisibleApplicationWindows().Where(window => window.Handle != windowToLinkTo.Handle && window.GetProcessId() == processIdSelectedWindow);
     }
 
     /// <summary>
@@ -763,13 +763,13 @@ public static class InteropWindowExtensions
             }
 
             // If the formLocation is not inside the visible area
-            if (!workingArea.AreRectangleCornersVisisble(windowRectangle))
+            if (!workingArea.AreRectangleCornersVisible(windowRectangle))
             {
                 // Try to place the window at the top-left of the working area (not below a taskbar) of one of the displays, the primary first
                 foreach (var display in displays.OrderByDescending(display => display.IsPrimary))
                 {
                     var newWindowRectangle = new Rectangle(display.WorkingArea.Location, windowRectangle.Size);
-                    if (!workingArea.AreRectangleCornersVisisble(newWindowRectangle))
+                    if (!workingArea.AreRectangleCornersVisible(newWindowRectangle))
                     {
                         continue;
                     }

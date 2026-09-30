@@ -14,7 +14,7 @@ the [changelog](../../CHANGELOG.md).
 | `Dapplo.Windows.Dpi.Forms.DpiAwareForm`, `DpiUnawareForm`, `FormsDpiExtensions.AttachDpiHandler(Form / ContextMenuStrip)` | Dapplo.Windows.Forms, `Dapplo.Windows.Forms.Dpi` |
 | `BitmapScaleHandler.AddTarget(Button / ToolStripItem, …)` | `Dapplo.Windows.Forms.Dpi.BitmapScaleHandlerExtensions`; core: `AddTargetAction(target, key, apply, execute)` |
 | `Dapplo.Windows.Messages.WinProcListener` (`AddHook(HwndSourceHook)`) | `Dapplo.Windows.Forms.Messages.WinProcListener` (`AddHook(WinProcHook)`, same signature) |
-| `Dapplo.Windows.Messages.WinProcFormsExtensions.WinProcFormsMessages()` | `Dapplo.Windows.Forms.Messages` |
+| `Dapplo.Windows.Messages.WinProcFormsExtensions.WinProcFormsMessages()` | `WinProcMessages()` in `Dapplo.Windows.Forms.Messages` |
 | `Dapplo.Windows.Extensions.FormsExtensions` | `Dapplo.Windows.Forms.FormsExtensions` |
 | `Dapplo.Windows.Messages.WinProcHandler`, `WinProcHandlerHook`, `WinProcWindowsExtensions.WinProcMessages(Window)` | Dapplo.Windows.Wpf, `Dapplo.Windows.Wpf.Messages` |
 | `Dapplo.Windows.Dpi.Wpf.WindowDpiExtensions` | `Dapplo.Windows.Wpf.Dpi.WindowDpiExtensions` |
@@ -22,7 +22,7 @@ the [changelog](../../CHANGELOG.md).
 | `Dapplo.Windows.Extensions.BitmapExtensions.ToBitmapSource(Bitmap / Image)` | `Dapplo.Windows.Wpf.BitmapSourceExtensions.ToBitmapSource(Bitmap / Image / Icon)` |
 | `interopWindow.PrintWindow<TBitmap>()` | `PrintWindow()` returns `Bitmap`; `PrintWindowAsBitmapSource()` in Dapplo.Windows.Wpf |
 | `GetIcon<BitmapSource>()`, `IconHelper.*<BitmapSource>` | `GetIcon<Bitmap>().ToBitmapSource()` |
-| `DwmApi.ColorizationColor` (WPF `Color`) | `DwmApi.ColorizationSystemDrawingColor.ToMediaColor()` |
+| `DwmApi.ColorizationColor` (WPF `Color`) | `DwmApi.ColorizationColor.ToMediaColor()` (now a `System.Drawing.Color`) |
 | Casts between `Native*` structs and `System.Windows.Point` / `Size` / `Rect` / `Int32Rect` | `Dapplo.Windows.Wpf.NativeStructWpfExtensions`: `ToPoint`, `ToNativePointFloat`, `ToSize`, `ToNativeSize`, `ToNativeSizeFloat`, `ToRect`, `ToNativeRectFloat`, `ToInt32Rect`, `ToNativeRect` |
 | `NativeRect(Float).Transform(Matrix)` | `Dapplo.Windows.Wpf.NativeStructWpfExtensions.Transform` |
 
@@ -56,7 +56,7 @@ var wpfRect = nativeRect.ToRect();
 | `Ole32Api.ClassIdFromProgId(p) == Guid.Empty` | `!Ole32Api.ClassIdFromProgId(p).HasValue` |
 | `Dapplo.Windows.Kernel32.RestartManager`, `Kernel32.Enums.Rm*`, `Kernel32.Structs.Rm*` | `Dapplo.Windows.InstallerManager.InstallerRestartManager`, `InstallerManager.Enums`, `InstallerManager.Structs` |
 | `RmProcessInfo.strAppName` / `Process.dwProcessId` / `bRestartable` | `AppName` / `Process.ProcessId` / `IsRestartable` |
-| `session.Shutdown()` (forced) | `session.Shutdown(RmShutdownType.RmForceShutdown)`; the default is now graceful |
+| `session.Shutdown()` (forced) | `session.Shutdown(RmShutdownType.Force)`; the default is now graceful |
 | `ExtractIconEx(f, i, out l, out s, 1)` | `var l = new IntPtr[1]; var s = new IntPtr[1]; ExtractIconEx(f, i, l, s, 1)`; count: `CountIcons(f)` |
 | `Shell32Api.TaskbarPosition` | `Shell32Api.TryGetTaskbarPosition(out var data)` |
 | `Advapi32Api.CurrentSessionId` | `Advapi32Api.CurrentLogonSid` (the session id is `Process.GetCurrentProcess().SessionId`) |
@@ -76,12 +76,27 @@ var wpfRect = nativeRect.ToRect();
 | `new IntPtr(-1)` / `new IntPtr(-2)` for `SetWindowPos` | `WindowHandles.HWND_TOPMOST` / `WindowHandles.HWND_NOTOPMOST` |
 | `token.SetAsUnicodeString(x)` without `ClearContents()` | `ClipboardNative.ReplaceContents(new ClipboardContents().AddUnicodeString(x))` |
 
+| `Dapplo.Windows.Messages.Enumerations` | `Dapplo.Windows.Messages.Enums` |
+| `Dapplo.Windows.Messages.Structs.WindowMessage` | `Dapplo.Windows.Messages.WindowMessage` |
+| `WindowMessageInfo` (`Handle`, `Message`, `WordParam`, `LongParam`) | `WindowMessage` (`Hwnd`, `Msg`, `WParam`, `LParam`) |
+| `WindowsMessage.RegisterWindowsMessage(name)` / `GetWindowsMessage(id)` | `RegisteredWindowMessages.Register(name)` / `GetName(id)` |
+| `Msg.wParam` / `Msg.lParam` | `Msg.WParam` / `Msg.LParam` |
+| `control.WinProcFormsMessages()` | `control.WinProcMessages()` |
+| `InteropWindowQuery.GetTopLevelWindows()` | `InteropWindowQuery.GetVisibleApplicationWindows()` |
+| `window.IsTopLevel()` / `window.IsPopup()` | `window.IsVisibleApplicationWindow()` / `window.IsVisiblePopup()` (for "no parent" use `GetParent() == IntPtr.Zero`) |
+| `WinMm.Play(string)` / `Play(byte[])` / `Play(IntPtr, SoundSettings)` | `WinMm.PlayResource` / `PlayWave(byte[])` / `PlayWave(IntPtr, SoundSettings)` |
+| `RmShutdownType.RmForceShutdown` / `RmShutdownOnlyRegistered` | `RmShutdownType.Force` / `OnlyRegistered` |
+| `DwmApi.ColorizationDrawingColor` / `ColorizationSystemDrawingColor` | `DwmApi.ColorizationColor` |
+| `Dapplo.Windows.Gdi32.Enums.DrawIconExFlags` | `Dapplo.Windows.Icons.Enums.DrawIconExFlags` |
+| `GdiExtensions.AreRectangleCornersVisisble`, `CieXyzTripple` | `AreRectangleCornersVisible`, `CieXyzTriple` |
+| `SystemStateApi.CloseHandle(h)` | `Kernel32Api.CloseHandle(h)` (the timers use `SafeWaitHandle`) |
+
 Behaviour changes to check:
 
 - **Dialogs** must be shown from an STA thread (the UI thread or a `[STAThread]` Main), not from `Task.Run`.
 - **`GetTopWindows()`** returns a list taken at call time; call it again for the current state.
 
-- **Owner vs parent:** `IsTopLevel` / `IsPopup` now accept owned windows, and `GetInfo(autoCorrect)` no longer crops owned dialogs.
+- **Owner vs parent:** `IsVisibleApplicationWindow` / `IsVisiblePopup` (formerly `IsTopLevel` / `IsPopup`) accept owned windows, and `GetInfo(autoCorrect)` no longer crops owned dialogs.
 - **DPI:** `DpiAwareForm` lets WinForms scale on WM_DPICHANGED. Remove manual font or control scaling you did in `FormDpiHandler.OnDpiChanged`, or cancel `Form.DpiChanged`. DPI scaling now rounds (`ScaleWithDpi(3, 144)` is 5).
 - **Cursor drawing:** `DrawCursorOnGraphics` / `DrawCursorOnBitmap` take the top-left of the cursor image; subtract `cursor.HotSpot` to draw at the mouse position.
 - **Empty rectangles:** rectangles and sizes with a negative width or height count as empty.
@@ -329,5 +344,5 @@ Vista-and-later value 0x1FFFFF.
 
 ## Multimedia
 
-`WinMm.Play(byte[])` returns `bool` and copies the data, so you no longer need to keep the array pinned. Callers must
+`WinMm.Play(byte[])` is now `WinMm.PlayWave(byte[])`, returns `bool` and copies the data, so you no longer need to keep the array pinned. Callers must
 recompile.

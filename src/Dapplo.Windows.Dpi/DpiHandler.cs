@@ -9,7 +9,7 @@ using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 
@@ -90,7 +90,7 @@ public sealed class DpiHandler : IDisposable
     /// <returns>IntPtr</returns>
     internal IntPtr HandleWindowMessages(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (HandleWindowMessages(WindowMessageInfo.Create(hWnd, msg, wParam, lParam)))
+        if (HandleWindowMessages(new WindowMessage(hWnd, (WindowsMessages)msg, wParam, lParam)))
         {
             handled = true;
         }
@@ -105,56 +105,56 @@ public sealed class DpiHandler : IDisposable
     ///     See
     ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn312083(v=vs.85).aspx">WM_DPICHANGED message</a>
     /// </summary>
-    /// <param name="windowMessageInfo">WindowMessageInfo</param>
+    /// <param name="windowMessage">WindowMessage</param>
     /// <returns>bool true if the message was handled</returns>
-    public bool HandleWindowMessages(WindowMessageInfo windowMessageInfo)
+    public bool HandleWindowMessages(WindowMessage windowMessage)
     {
         bool handled = false;
         var currentDpi = DpiCalculator.DefaultScreenDpi;
         bool isDpiMessage = false;
-        switch (windowMessageInfo.Message)
+        switch (windowMessage.Msg)
         {
             // Handle the WM_NCCREATE for Forms / controls, for WPF this is done differently
             case WindowsMessages.WM_NCCREATE:
                 if (Log.IsVerboseEnabled())
                 {
-                    Log.Verbose().WriteLine("Processing {0} event, enabling DPI scaling for window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    Log.Verbose().WriteLine("Processing {0} event, enabling DPI scaling for window {1}", windowMessage.Msg, windowMessage.Hwnd);
                 }
 
-                TryEnableNonClientDpiScaling(windowMessageInfo.Handle);
+                TryEnableNonClientDpiScaling(windowMessage.Hwnd);
                 break;
             // Handle the WM_CREATE, this is where we can get the DPI via system calls
             case WindowsMessages.WM_CREATE:
                 isDpiMessage = true;
                 if (Log.IsVerboseEnabled())
                 {
-                    Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for window {1}", windowMessage.Msg, windowMessage.Hwnd);
                 }
 
-                currentDpi = NativeDpiMethods.GetDpi(windowMessageInfo.Handle);
+                currentDpi = NativeDpiMethods.GetDpi(windowMessage.Hwnd);
                 break;
             // Handle the DPI change message, this is where it's supplied
             case WindowsMessages.WM_DPICHANGED:
                 isDpiMessage = true;
                 if (Log.IsVerboseEnabled())
                 {
-                    Log.Verbose().WriteLine("Processing {0} event, resizing / positioning window {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    Log.Verbose().WriteLine("Processing {0} event, resizing / positioning window {1}", windowMessage.Msg, windowMessage.Hwnd);
                 }
 
                 if (ApplySuggestedWindowRect)
                 {
-                    ApplySuggestedRect(windowMessageInfo.Handle, windowMessageInfo.LongParam);
+                    ApplySuggestedRect(windowMessage.Hwnd, windowMessage.LParam);
                     // specify that the message was handled
                     handled = true;
                 }
-                currentDpi = (int)windowMessageInfo.WordParam & 0xFFFF;
+                currentDpi = (int)windowMessage.WParam & 0xFFFF;
                 break;
             case WindowsMessages.WM_PAINT:
                 // This is a workaround for non DPI aware applications, these don't seem to get a WM_CREATE
                 if (_dpi == 0)
                 {
                     isDpiMessage = true;
-                    currentDpi = NativeDpiMethods.GetDpi(windowMessageInfo.Handle);
+                    currentDpi = NativeDpiMethods.GetDpi(windowMessage.Hwnd);
                 }
                 break;
             case WindowsMessages.WM_SETICON:
@@ -164,20 +164,20 @@ public sealed class DpiHandler : IDisposable
                     isDpiMessage = true;
                     // disable workaround
                     _needsListenerWorkaround = false;
-                    currentDpi = NativeDpiMethods.GetDpi(windowMessageInfo.Handle);
+                    currentDpi = NativeDpiMethods.GetDpi(windowMessage.Hwnd);
                 }
 
                 break;
             case WindowsMessages.WM_DPICHANGED_BEFOREPARENT:
                 if (Log.IsVerboseEnabled())
                 {
-                    Log.Verbose().WriteLine("Dpi changed on {0} before parent", windowMessageInfo.Handle);
+                    Log.Verbose().WriteLine("Dpi changed on {0} before parent", windowMessage.Hwnd);
                 }
                 break;
             case WindowsMessages.WM_DPICHANGED_AFTERPARENT:
                 if (Log.IsVerboseEnabled())
                 {
-                    Log.Verbose().WriteLine("Dpi changed on {0} after parent", windowMessageInfo.Handle);
+                    Log.Verbose().WriteLine("Dpi changed on {0} after parent", windowMessage.Hwnd);
                 }
                 break;
             // Note: WM_DESTROY doesn't complete anything, WinForms destroys and recreates handles (RecreateHandle) and the new handle is processed like the first.
@@ -270,23 +270,23 @@ public sealed class DpiHandler : IDisposable
     ///     See
     ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn312083(v=vs.85).aspx">WM_DPICHANGED message</a>
     /// </summary>
-    /// <param name="windowMessageInfo">WindowMessageInfo</param>
+    /// <param name="windowMessage">WindowMessage</param>
     /// <returns>IntPtr</returns>
-    public IntPtr HandleContextMenuMessages(WindowMessageInfo windowMessageInfo)
+    public IntPtr HandleContextMenuMessages(WindowMessage windowMessage)
     {
         var currentDpi = DpiCalculator.DefaultScreenDpi;
         bool isDpiMessage = false;
-        switch (windowMessageInfo.Message)
+        switch (windowMessage.Msg)
         {
             // Handle the WM_CREATE, this is where we can get the DPI via system calls
             case WindowsMessages.WM_SHOWWINDOW:
                 isDpiMessage = true;
                 if (Log.IsVerboseEnabled())
                 {
-                    Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for ContextMenuStrip {1}", windowMessageInfo.Message, windowMessageInfo.Handle);
+                    Log.Verbose().WriteLine("Processing {0} event, retrieving DPI for ContextMenuStrip {1}", windowMessage.Msg, windowMessage.Hwnd);
                 }
 
-                currentDpi = NativeDpiMethods.GetDpi(windowMessageInfo.Handle);
+                currentDpi = NativeDpiMethods.GetDpi(windowMessage.Hwnd);
                 break;
         }
 

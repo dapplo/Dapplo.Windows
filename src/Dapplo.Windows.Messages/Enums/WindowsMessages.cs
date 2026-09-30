@@ -6,7 +6,7 @@ using System.Linq;
 
 #pragma warning disable 1591
 
-namespace Dapplo.Windows.Messages.Enumerations;
+namespace Dapplo.Windows.Messages.Enums;
 
 /// <summary>
 /// Provides extension methods for evaluating Windows message values.

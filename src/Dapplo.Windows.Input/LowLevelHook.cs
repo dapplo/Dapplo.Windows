@@ -10,6 +10,8 @@ using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Dapplo.Windows.Input.Enums;
+using Dapplo.Windows.Messages.Enums;
+using Dapplo.Windows.User32;
 using static Dapplo.Windows.Input.LowLevelHookNativeMethods;
 
 namespace Dapplo.Windows.Input;
@@ -269,7 +271,7 @@ internal sealed class LowLevelHook<TEventArgs> where TEventArgs : class
             var threadId = _threadId;
             if (threadId != 0)
             {
-                PostThreadMessage(threadId, WmQuit, IntPtr.Zero, IntPtr.Zero);
+                User32Api.PostThreadMessage(unchecked((int)threadId), WindowsMessages.WM_QUIT, IntPtr.Zero, IntPtr.Zero);
             }
         }
 

@@ -22,16 +22,16 @@ Console.WriteLine($"Visible: {window.IsVisible()}, minimized: {window.IsMinimize
 
 ## Finding windows
 
-`GetTopLevelWindows()` returns the application windows a user sees: visible, not minimized, with a title, no tool
+`GetVisibleApplicationWindows()` returns the application windows a user sees: visible, not minimized, with a title, no tool
 windows. `GetTopWindows()` returns all top-level windows without a filter, `GetTopWindows(parent)` and
 `window.GetChildren()` the direct children. All of them are in Z-order (top-most first) and are a snapshot taken at
 once with `EnumWindows` / `EnumChildWindows` when you call them, so they can't loop or skip windows while the Z-order
 changes.
 
-<!-- sample: WindowSamples.TopLevelWindows -->
+<!-- sample: WindowSamples.ApplicationWindows -->
 ```csharp
 // The application windows the user sees (visible, with a title, not minimized), from top to bottom
-foreach (var window in InteropWindowQuery.GetTopLevelWindows())
+foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows())
 {
     Console.WriteLine($"{window.GetCaption()} ({window.GetClassname()})");
 }
@@ -40,7 +40,7 @@ foreach (var window in InteropWindowQuery.GetTopLevelWindows())
 <!-- sample: WindowSamples.FilterWindows -->
 ```csharp
 // All visible Notepad windows
-var notepads = InteropWindowQuery.GetTopLevelWindows()
+var notepads = InteropWindowQuery.GetVisibleApplicationWindows()
     .Where(window => window.GetClassname() == "Notepad")
     .ToList();
 
@@ -122,7 +122,7 @@ if (!window.PostMessage(WindowsMessages.WM_CLOSE))
 }
 
 // Post a registered message to all top-level windows, e.g. to the other instances of your application
-uint showMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMainWindow");
+uint showMessage = RegisteredWindowMessages.Register("MyApp.ShowMainWindow");
 User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
 ```
 

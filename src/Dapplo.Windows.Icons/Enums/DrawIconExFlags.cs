@@ -3,11 +3,11 @@
 
 using System;
 
-namespace Dapplo.Windows.Gdi32.Enums;
+namespace Dapplo.Windows.Icons.Enums;
 
 /// <summary>
-///     A raster-operation code. These codes define how the color data for the source rectangle is to be combined with the
-///     color data for the destination rectangle to achieve the final color.
+///     The drawing flags (diFlags) of DrawIconEx, which draws an icon or cursor.
+///     See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-drawiconex">DrawIconEx function</a>
 /// </summary>
 [Flags]
 public enum DrawIconExFlags : uint

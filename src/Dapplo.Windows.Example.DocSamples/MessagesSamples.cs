@@ -9,7 +9,7 @@ using System.Threading;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Forms.Messages;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.Wpf.Messages;
 
 namespace Dapplo.Windows.Example.DocSamples;
@@ -134,7 +134,7 @@ public static class MessagesSamples
     {
         #region CustomMessage
         // A message which is unique for the whole desktop, e.g. to let a second instance talk to the first
-        uint showMeMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMe");
+        uint showMeMessage = RegisteredWindowMessages.Register("MyApp.ShowMe");
 
         var subscription = SharedMessageWindow.Messages
             .Where(m => (uint)m.Msg == showMeMessage)
@@ -193,8 +193,8 @@ public static class MessagesSamples
         #region FormsMessages
         // Subclasses the form's window. Runs on the UI thread, you may set Handled / Result.
         // The sequence follows handle re-creation and completes when the form is disposed.
-        var subscription = form.WinProcFormsMessages()
-            .Where(m => m.Message == WindowsMessages.WM_NCHITTEST)
+        var subscription = form.WinProcMessages()
+            .Where(m => m.Msg == WindowsMessages.WM_NCHITTEST)
             .Subscribe(m =>
             {
                 // HTCAPTION: the whole window can be dragged like its title bar
@@ -209,7 +209,7 @@ public static class MessagesSamples
         #region WpfMessages
         // Works before the window is shown, the hook is added when the HwndSource is created
         var subscription = window.WinProcMessages()
-            .Where(m => m.Message == WindowsMessages.WM_DPICHANGED)
+            .Where(m => m.Msg == WindowsMessages.WM_DPICHANGED)
             .Subscribe(m => Console.WriteLine("DPI changed"));
         #endregion
     }

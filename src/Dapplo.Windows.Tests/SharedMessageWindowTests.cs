@@ -6,8 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
-using Dapplo.Windows.Messages.Structs;
+using Dapplo.Windows.Messages.Enums;
 using Xunit;
 
 namespace Dapplo.Windows.Tests;

@@ -19,7 +19,7 @@ public static class GdiExtensions
     /// <param name="region"></param>
     /// <param name="rectangle"></param>
     /// <returns></returns>
-    public static bool AreRectangleCornersVisisble(this Region region, NativeRect rectangle)
+    public static bool AreRectangleCornersVisible(this Region region, NativeRect rectangle)
     {
         var topLeft = new Point(rectangle.X, rectangle.Y);
         var topRight = new Point(rectangle.X + rectangle.Width, rectangle.Y);

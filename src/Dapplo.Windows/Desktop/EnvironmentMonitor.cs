@@ -5,7 +5,7 @@ using System;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.User32.Enums;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Desktop

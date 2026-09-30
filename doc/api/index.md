@@ -15,7 +15,7 @@ page tells you which package contains which namespaces and where to start. For e
 | Dapplo.Windows.Dpi | `Dapplo.Windows.Dpi`, `.Enums` | `DpiHandler`, `DpiCalculator`, `BitmapScaleHandler`, `NativeDpiMethods` |
 | Dapplo.Windows.Forms | `Dapplo.Windows.Forms`, `.Dpi`, `.Messages` | `DpiAwareForm`, `FormsDpiExtensions`, `WinProcFormsExtensions` |
 | Dapplo.Windows.Wpf | `Dapplo.Windows.Wpf`, `.Dpi`, `.Messages` | `WindowDpiExtensions`, `WinProcWindowsExtensions`, `NativeStructWpfExtensions`, `BitmapSourceExtensions` |
-| Dapplo.Windows.Messages | `Dapplo.Windows.Messages`, `.Enumerations`, `.Structs`, `.Native` | `SharedMessageWindow`, `WindowsSessionListener`, `WindowsMessages` |
+| Dapplo.Windows.Messages | `Dapplo.Windows.Messages`, `.Enums`, `.Structs`, `.Native` | `SharedMessageWindow`, `WindowMessage`, `RegisteredWindowMessages`, `WindowsSessionListener`, `WindowsMessages` |
 | Dapplo.Windows.SystemState | `Dapplo.Windows.SystemState`, `.Enums` | `SystemStateApi`, `SleepBlocker`, `PowerManagementApi`, `WaitableTimer`, `PowerBroadcastListener` |
 | Dapplo.Windows.AppRestartManager | `Dapplo.Windows.AppRestartManager`, `.Enums` | `ApplicationRestartManager`, `EndSessionMessage` |
 | Dapplo.Windows.InstallerManager | `Dapplo.Windows.InstallerManager`, `.Enums`, `.Structs` | `InstallerRestartManager`, `RestartManagerApi` |
@@ -40,4 +40,4 @@ page tells you which package contains which namespaces and where to start. For e
 | Dapplo.Windows.Common | `Dapplo.Windows.Common`, `.Enums`, `.Extensions`, `.Structs`, `.Structs.PixelFormats`, `.TypeConverters` | `NativeRect`, `NativePoint`, `NativeSize`, `HResult`, `Win32`, `WindowsVersion` |
 
 Some packages add types to a namespace of another package: the window icon extensions of Dapplo.Windows are in
-`Dapplo.Windows.Icons`, and Dapplo.Windows.Icons adds `DrawIconExFlags` to `Dapplo.Windows.Gdi32.Enums`.
+`Dapplo.Windows.Icons`.

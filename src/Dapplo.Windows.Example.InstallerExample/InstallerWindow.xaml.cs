@@ -84,7 +84,7 @@ namespace Dapplo.Windows.Example.InstallerExample
             try
             {
                 // Only shut down when all applications are registered for restart, the default (Graceful) would also ask unregistered applications
-                session.Shutdown(Dapplo.Windows.InstallerManager.Enums.RmShutdownType.RmShutdownOnlyRegistered, (progress) =>
+                session.Shutdown(Dapplo.Windows.InstallerManager.Enums.RmShutdownType.OnlyRegistered, (progress) =>
                 {
                     this.Dispatcher.BeginInvoke(() =>
                     {

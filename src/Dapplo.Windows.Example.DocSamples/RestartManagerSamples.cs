@@ -112,7 +112,7 @@ public static class RestartManagerSamples
         catch (Win32Exception ex)
         {
             Console.WriteLine($"An application refused to close: {ex.Message}");
-            // Only when you must: RmShutdownType.RmForceShutdown kills unresponsive applications, which can lose data
+            // Only when you must: RmShutdownType.Force kills unresponsive applications, which can lose data
             return;
         }
 

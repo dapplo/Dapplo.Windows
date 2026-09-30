@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Forms;
 using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Forms.Messages
 {
@@ -20,24 +21,24 @@ namespace Dapplo.Windows.Forms.Messages
         ///     The sequence completes when the control is disposed.
         /// </summary>
         /// <remarks>
-        ///     Setting <see cref="WindowMessageInfo.Handled"/> and <see cref="WindowMessageInfo.Result"/> synchronously in OnNext (on the UI thread)
+        ///     Setting <see cref="WindowMessage.Handled"/> and <see cref="WindowMessage.Result"/> synchronously in OnNext (on the UI thread)
         ///     returns the result to Windows instead of calling the original window procedure.
         /// </remarks>
-        public static IObservable<WindowMessageInfo> WinProcFormsMessages(this Control control)
+        public static IObservable<WindowMessage> WinProcMessages(this Control control)
         {
             if (control == null)
             {
                 throw new ArgumentNullException(nameof(control));
             }
 
-            return Observable.Create<WindowMessageInfo>(observer =>
+            return Observable.Create<WindowMessage>(observer =>
             {
                 var winProcListener = new WinProcListener(control);
 
                 // This handles the message, and generates the observable OnNext
                 IntPtr WindowMessageHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
                 {
-                    var message = WindowMessageInfo.Create(hWnd, msg, wParam, lParam);
+                    var message = new WindowMessage(hWnd, (WindowsMessages)msg, wParam, lParam);
                     observer.OnNext(message);
                     handled = message.Handled;
                     return message.Result;

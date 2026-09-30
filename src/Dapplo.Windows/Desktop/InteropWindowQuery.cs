@@ -113,14 +113,15 @@ public static class InteropWindowQuery
     }
 
     /// <summary>
-    ///     Get the top-level windows the user sees as application windows (see <see cref="IsTopLevel"/>), from top to bottom.
+    ///     Get the windows the user sees as application windows (see <see cref="IsVisibleApplicationWindow"/>), from top to bottom:
+    ///     visible, not minimized, with a title and a size, no tool window and no child window.
     ///     The windows are a snapshot taken by <see cref="GetTopWindows"/> when this method is called, the filter is applied lazily while enumerating the result.
     /// </summary>
-    /// <param name="ignoreKnownClasses">true to ignore windows with certain known classes</param>
-    /// <returns>IEnumerable with all the top level windows</returns>
-    public static IEnumerable<IInteropWindow> GetTopLevelWindows(bool ignoreKnownClasses = true)
+    /// <param name="ignoreKnownClasses">true (default) to ignore windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <returns>IEnumerable with the visible application windows</returns>
+    public static IEnumerable<IInteropWindow> GetVisibleApplicationWindows(bool ignoreKnownClasses = true)
     {
-        return GetTopWindows().Where(possibleTopLevel => possibleTopLevel.IsTopLevel(ignoreKnownClasses));
+        return GetTopWindows().Where(window => window.IsVisibleApplicationWindow(ignoreKnownClasses));
     }
 
     /// <summary>
@@ -168,14 +169,15 @@ public static class InteropWindowQuery
     }
 
     /// <summary>
-    /// Is the specified window a visible popup, this is a top-level window (it can be owned) with the WS_POPUP style.
+    /// Is the specified window a visible popup: a top-level window (it can be owned, it has no parent) with the WS_POPUP style,
+    /// which has a size, is rendered normally, is visible (WS_VISIBLE) and is not minimized. Unlike <see cref="IsVisibleApplicationWindow"/> tool windows and windows without a title are included.
     /// </summary>
     /// <param name="interopWindow">IInteropWindow</param>
-    /// <param name="ignoreKnowClasses">true (default) to ignore some known internal windows classes</param>
-    /// <returns>true if the IInteropWindow is a popup</returns>
-    public static bool IsPopup(this IInteropWindow interopWindow, bool ignoreKnowClasses = true)
+    /// <param name="ignoreKnownClasses">true (default) to ignore windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <returns>true if the IInteropWindow is a visible popup</returns>
+    public static bool IsVisiblePopup(this IInteropWindow interopWindow, bool ignoreKnownClasses = true)
     {
-        if (ignoreKnowClasses && interopWindow.CanIgnoreClass())
+        if (ignoreKnownClasses && interopWindow.CanIgnoreClass())
         {
             return false;
         }
@@ -219,15 +221,17 @@ public static class InteropWindowQuery
     }
 
     /// <summary>
-    ///     Check if the window is a top level window.
+    ///     Check if the window is what the user sees as an application window (e.g. what Alt+Tab shows):
+    ///     a top-level window (it can be owned, it has no parent) with a size, which is not a tool window (WS_EX_TOOLWINDOW), is rendered normally,
+    ///     is not a background Windows 10 app, is visible (WS_VISIBLE), has a title and is not minimized.
     ///     This method will retrieve all information, and fill it to the interopWindow, it needs to make the decision.
     /// </summary>
     /// <param name="interopWindow">InteropWindow</param>
-    /// <param name="ignoreKnowClasses">true (default) to ignore classes from the IgnoreClasses list</param>
-    /// <returns>bool</returns>
-    public static bool IsTopLevel(this IInteropWindow interopWindow, bool ignoreKnowClasses = true)
+    /// <param name="ignoreKnownClasses">true (default) to ignore windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <returns>true if the window is a visible application window</returns>
+    public static bool IsVisibleApplicationWindow(this IInteropWindow interopWindow, bool ignoreKnownClasses = true)
     {
-        if (ignoreKnowClasses && interopWindow.CanIgnoreClass())
+        if (ignoreKnownClasses && interopWindow.CanIgnoreClass())
         {
             return false;
         }

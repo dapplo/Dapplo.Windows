@@ -10,7 +10,7 @@ dotnet add package Dapplo.Windows
 
 Namespaces used on this page: `Dapplo.Windows.Desktop`, `Dapplo.Windows.Enums`, `Dapplo.Windows.User32`,
 `Dapplo.Windows.User32.Enums`, `Dapplo.Windows.User32.Structs`, `Dapplo.Windows.Common.Structs`, `Dapplo.Windows.App`,
-`Dapplo.Windows.Icons`, `Dapplo.Windows.Software`, `Dapplo.Windows.Messages`, `Dapplo.Windows.Messages.Enumerations`,
+`Dapplo.Windows.Icons`, `Dapplo.Windows.Software`, `Dapplo.Windows.Messages`, `Dapplo.Windows.Messages.Enums`,
 `System.Reactive.Linq`.
 
 ## Window information
@@ -69,11 +69,13 @@ NativeRect? bounds = window.Info?.Bounds;
 
 ## Finding windows
 
-`InteropWindowQuery.GetTopLevelWindows()` returns the windows a user sees as application windows, from top to bottom
-(Z-order). "Top-level" here is stricter than in Win32: the window must be visible, not minimized, have a title and a
-size, and must not be a tool window, a background store app or one of a few known system windows (the desktop
-`Progman`, `Button`, `Dwm`). The same test is available as `window.IsTopLevel()`. Change the list of ignored classes
-with `InteropWindowQuery.AddIgnoreClass` / `RemoveIgnoreClass`, or pass `false` to include them.
+`InteropWindowQuery.GetVisibleApplicationWindows()` returns the windows a user sees as application windows, from top to
+bottom (Z-order): top-level windows (no parent, owned windows are included) which are visible, not minimized, have a
+title and a size, and are not a tool window, a background store app or one of a few known system windows (the desktop
+`Progman`, `Button`, `Dwm`). The same test is available as `window.IsVisibleApplicationWindow()`;
+`window.IsVisiblePopup()` is the similar test for visible `WS_POPUP` windows, which also accepts tool windows and
+windows without a title. Change the list of ignored classes with `InteropWindowQuery.AddIgnoreClass` /
+`RemoveIgnoreClass`, or pass `false` to include them.
 
 `InteropWindowQuery.GetTopWindows()` returns *all* top-level windows in Z-order (index 0 is the top-most window),
 without any filter. `GetTopWindows(parent)` returns the direct children of a window, also in Z-order.
@@ -81,13 +83,13 @@ without any filter. `GetTopWindows(parent)` returns the direct children of a win
 Both are a snapshot: the list is taken at once, with `EnumWindows` / `EnumChildWindows`, when you call the method.
 Windows builds the list before it reports the first window, so the result can't loop, skip or repeat windows when
 windows are activated, created or destroyed in the meantime (a `GetWindow(GW_HWNDNEXT)` walk can). The windows in the
-snapshot can of course still change or disappear afterwards; `GetTopLevelWindows()` takes the snapshot when it is called
+snapshot can of course still change or disappear afterwards; `GetVisibleApplicationWindows()` takes the snapshot when it is called
 and applies its filter while you enumerate the result.
 
-<!-- sample: WindowSamples.TopLevelWindows -->
+<!-- sample: WindowSamples.ApplicationWindows -->
 ```csharp
 // The application windows the user sees (visible, with a title, not minimized), from top to bottom
-foreach (var window in InteropWindowQuery.GetTopLevelWindows())
+foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows())
 {
     Console.WriteLine($"{window.GetCaption()} ({window.GetClassname()})");
 }
@@ -98,7 +100,7 @@ Filter with LINQ, or let `WindowsEnumerator` filter while it enumerates:
 <!-- sample: WindowSamples.FilterWindows -->
 ```csharp
 // All visible Notepad windows
-var notepads = InteropWindowQuery.GetTopLevelWindows()
+var notepads = InteropWindowQuery.GetVisibleApplicationWindows()
     .Where(window => window.GetClassname() == "Notepad")
     .ToList();
 
@@ -115,7 +117,7 @@ var firstMatch = WindowsEnumerator.EnumerateWindows(
 <!-- sample: WindowSamples.FindByTitle -->
 ```csharp
 IInteropWindow FindWindowByTitle(string title) =>
-    InteropWindowQuery.GetTopLevelWindows()
+    InteropWindowQuery.GetVisibleApplicationWindows()
         .FirstOrDefault(window => window.GetCaption().IndexOf(title, StringComparison.OrdinalIgnoreCase) >= 0);
 
 var calculator = FindWindowByTitle("Calculator");
@@ -251,7 +253,7 @@ if (!window.PostMessage(WindowsMessages.WM_CLOSE))
 }
 
 // Post a registered message to all top-level windows, e.g. to the other instances of your application
-uint showMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMainWindow");
+uint showMessage = RegisteredWindowMessages.Register("MyApp.ShowMainWindow");
 User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
 ```
 
@@ -267,7 +269,7 @@ if (!window.Exists())
 {
     return;
 }
-bool isTopLevel = window.IsTopLevel();
+bool isApplicationWindow = window.IsVisibleApplicationWindow();
 bool isOwnWindow = window.IsOwnedByCurrentProcess();
 // A Windows Store (UWP) app window
 bool isApp = window.IsApp();
@@ -352,7 +354,7 @@ subscription.Dispose();
 ```csharp
 var subscription = WinEventHook.WindowTitleChangeObservable()
     .Select(info => InteropWindowFactory.CreateFor(info.Handle))
-    .Where(window => window.IsTopLevel())
+    .Where(window => window.IsVisibleApplicationWindow())
     .Subscribe(window => Console.WriteLine($"New title: {window.GetCaption(forceUpdate: true)}"));
 ```
 
@@ -412,7 +414,7 @@ foreach (var software in InstallationInformation.InstalledSoftware().Where(s => 
 
 - An `IInteropWindow` is a snapshot. Values which change (title, bounds, state) need `forceUpdate: true` when you read
   them again later.
-- `GetTopWindows()`, `GetTopLevelWindows()`, `GetChildren()` and `WindowsEnumerator` return a snapshot of the windows
+- `GetTopWindows()`, `GetVisibleApplicationWindows()`, `GetChildren()` and `WindowsEnumerator` return a snapshot of the windows
   at the moment of the call; call them again for the current state.
 - Reading the text of a window which belongs to a hung application times out after 500 ms instead of blocking.
 - Keep WinEvent subscriptions narrow (event range, process) and throttle location events, they are frequent.

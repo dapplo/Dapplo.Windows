@@ -32,7 +32,7 @@ namespace Dapplo.Windows.Forms.Dpi
             }
             // Create a DpiHandler which runs "outside" of the form (not via WinProc)
             var dpiHandler = new DpiHandler(true);
-            dpiHandler.MessageHandler = form.WinProcFormsMessages().Subscribe(message => dpiHandler.HandleWindowMessages(message), dpiHandler.Dispose);
+            dpiHandler.MessageHandler = form.WinProcMessages().Subscribe(message => dpiHandler.HandleWindowMessages(message), dpiHandler.Dispose);
             if (form.IsHandleCreated)
             {
                 // The WM_CREATE was already processed
@@ -54,7 +54,7 @@ namespace Dapplo.Windows.Forms.Dpi
             }
             // Create a DpiHandler which runs "outside" of the contextMenu (not via WinProc)
             var dpiHandler = new DpiHandler(true);
-            dpiHandler.MessageHandler = contextMenuStrip.WinProcFormsMessages().Subscribe(message => dpiHandler.HandleContextMenuMessages(message), dpiHandler.Dispose);
+            dpiHandler.MessageHandler = contextMenuStrip.WinProcMessages().Subscribe(message => dpiHandler.HandleContextMenuMessages(message), dpiHandler.Dispose);
             return dpiHandler;
         }
     }

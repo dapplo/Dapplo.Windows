@@ -66,7 +66,7 @@ if (rebootReason != RmRebootReason.RmRebootReasonNone)
 }
 ```
 
-`Shutdown()` is graceful by default: it fails when an application refuses to close. `RmShutdownType.RmForceShutdown`
+`Shutdown()` is graceful by default: it fails when an application refuses to close. `RmShutdownType.Force`
 is opt-in.
 
 <!-- sample: RestartManagerSamples.UpdateFiles -->
@@ -88,7 +88,7 @@ try
 catch (Win32Exception ex)
 {
     Console.WriteLine($"An application refused to close: {ex.Message}");
-    // Only when you must: RmShutdownType.RmForceShutdown kills unresponsive applications, which can lose data
+    // Only when you must: RmShutdownType.Force kills unresponsive applications, which can lose data
     return;
 }
 

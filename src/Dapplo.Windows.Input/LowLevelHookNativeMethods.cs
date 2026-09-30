@@ -17,7 +17,6 @@ internal static class LowLevelHookNativeMethods
     /// </summary>
     public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-    public const uint WmQuit = 0x0012;
     public const uint PmNoRemove = 0x0000;
 
     [DllImport("user32.dll", EntryPoint = "SetWindowsHookExW", SetLastError = true)]
@@ -43,10 +42,6 @@ internal static class LowLevelHookNativeMethods
 
     [DllImport("user32.dll", EntryPoint = "DispatchMessageW")]
     public static extern IntPtr DispatchMessage(ref Msg lpMsg);
-
-    [DllImport("user32.dll", EntryPoint = "PostThreadMessageW", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool PostThreadMessage(uint idThread, uint msg, IntPtr wParam, IntPtr lParam);
 
     [DllImport("kernel32.dll")]
     public static extern uint GetCurrentThreadId();

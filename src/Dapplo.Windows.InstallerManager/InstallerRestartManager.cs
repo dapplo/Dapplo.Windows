@@ -230,7 +230,7 @@ public sealed class InstallerRestartManager : IDisposable
     /// <param name="shutdownType">
     ///     Flags controlling the shutdown behavior. The default, <see cref="RmShutdownType.Graceful"/>, asks the applications to close
     ///     and fails (ERROR_FAIL_SHUTDOWN) when one of them refuses, so no unsaved data is lost.
-    ///     Pass <see cref="RmShutdownType.RmForceShutdown"/> to explicitly opt in to killing unresponsive applications.
+    ///     Pass <see cref="RmShutdownType.Force"/> to explicitly opt in to killing unresponsive applications.
     /// </param>
     /// <param name="statusCallback">Optional callback to receive progress updates (0-100).</param>
     /// <exception cref="ObjectDisposedException">Thrown when the session has been disposed.</exception>

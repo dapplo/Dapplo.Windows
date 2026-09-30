@@ -25,7 +25,7 @@ List the visible application windows:
 <!-- sample: GettingStartedSamples.FirstWindowQuery -->
 ```csharp
 // using Dapplo.Windows.Desktop;
-foreach (var window in InteropWindowQuery.GetTopLevelWindows())
+foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows())
 {
     Console.WriteLine($"{window.GetCaption()} - {window.GetClassname()} at {window.GetInfo().Bounds}");
 }

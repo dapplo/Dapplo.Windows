@@ -3,7 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Dapplo.Windows.Messages.Enumerations;
+namespace Dapplo.Windows.Messages.Enums;
 
 /// <summary>
 ///     Session change events for WM_WTSSESSION_CHANGE message

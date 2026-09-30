@@ -5,7 +5,7 @@ application needs it.
 
 Namespaces used on this page: `Dapplo.Windows.Clipboard`, `Dapplo.Windows.Desktop`, `Dapplo.Windows.Enums`,
 `Dapplo.Windows.Input.Enums`, `Dapplo.Windows.Input.Keyboard`, `Dapplo.Windows.Messages`,
-`Dapplo.Windows.Messages.Enumerations`, `Dapplo.Windows.User32`, `Dapplo.Windows.User32.Enums`,
+`Dapplo.Windows.Messages.Enums`, `Dapplo.Windows.User32`, `Dapplo.Windows.User32.Enums`,
 `Dapplo.Windows.Common.Extensions`, `System.Reactive.Linq`, `System.Reactive.Concurrency`.
 
 ## Screenshot of the active window with a hotkey
@@ -70,7 +70,7 @@ var subscription = WinEventHook.Create(WinEvents.EVENT_SYSTEM_FOREGROUND)
 var subscription = WinEventHook.WindowCreateDestroyObservable()
     .Where(info => info.WinEvent == WinEvents.EVENT_OBJECT_CREATE)
     .Select(info => InteropWindowFactory.CreateFor(info.Handle))
-    .Where(window => window.IsTopLevel() && window.GetClassname() == "Notepad")
+    .Where(window => window.IsVisibleApplicationWindow() && window.GetClassname() == "Notepad")
     .Subscribe(window => Console.WriteLine($"Notepad opened a window: {window.Handle}"));
 ```
 
@@ -150,8 +150,8 @@ clipboard and send Ctrl+V; read the old clipboard content first and put it back 
 ```csharp
 // Place the visible windows of the primary display next to each other
 var primary = DisplayInfo.AllDisplayInfos.First(display => display.IsPrimary);
-var windows = InteropWindowQuery.GetTopLevelWindows()
-    .Where(window => window.IsVisible() && !window.IsMinimized() && !string.IsNullOrEmpty(window.GetCaption()))
+// GetVisibleApplicationWindows skips hidden, minimized and untitled windows and tool windows
+var windows = InteropWindowQuery.GetVisibleApplicationWindows()
     .Where(window => primary.Bounds.Contains(window.GetInfo().Bounds.Location))
     .ToList();
 if (windows.Count == 0)
@@ -173,7 +173,7 @@ for (var i = 0; i < windows.Count; i++)
 <!-- sample: CommonScenariosSamples.MinimizeOthers -->
 ```csharp
 var active = InteropWindowQuery.GetForegroundWindow();
-foreach (var window in InteropWindowQuery.GetTopLevelWindows().Where(w => w.IsVisible() && w.Handle != active.Handle))
+foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows().Where(w => w.Handle != active.Handle))
 {
     window.Minimize();
 }
@@ -184,21 +184,15 @@ foreach (var window in InteropWindowQuery.GetTopLevelWindows().Where(w => w.IsVi
 A second instance tells the first one to show itself, with a registered message which the SharedMessageWindow of the
 first instance receives.
 
-<!-- sample: CommonScenariosSamples.SingleInstancePInvoke -->
-```csharp
-[System.Runtime.InteropServices.DllImport("user32", SetLastError = true)]
-private static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-```
-
 <!-- sample: CommonScenariosSamples.SingleInstance -->
 ```csharp
 // The first instance listens, a second instance broadcasts and exits
-uint showMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMainWindow");
+uint showMessage = RegisteredWindowMessages.Register("MyApp.ShowMainWindow");
 using var mutex = new Mutex(true, "MyApp.SingleInstance", out var isFirstInstance);
 if (!isFirstInstance)
 {
     // HWND_BROADCAST: every top-level window gets it, also the SharedMessageWindow of the first instance
-    PostMessage(new IntPtr(0xFFFF), showMessage, IntPtr.Zero, IntPtr.Zero);
+    User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
     return;
 }
 var subscription = SharedMessageWindow.Messages

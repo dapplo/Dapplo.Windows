@@ -26,30 +26,19 @@ public static class DwmApi
     private const string DwmApiDll = "dwmapi.dll";
 
     /// <summary>
-    ///     Return the AERO Color
+    ///     The colorization (accent / window frame) color of the DWM, including the alpha, as read from the ColorizationColor value
+    ///     of HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\DWM. White when it's not available.
+    ///     For WPF use <c>DwmApi.ColorizationColor.ToMediaColor()</c> from Dapplo.Windows.Wpf.
     /// </summary>
-    public static System.Drawing.Color ColorizationDrawingColor
-    {
-        get
-        {
-            var color = ColorizationSystemDrawingColor;
-            return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
-        }
-    }
-
-    /// <summary>
-    ///     Return the Aero Color
-    /// </summary>
-    public static System.Drawing.Color ColorizationSystemDrawingColor
+    public static System.Drawing.Color ColorizationColor
     {
         get
         {
             using (var key = Registry.CurrentUser.OpenSubKey(ColorizationColorKey, false))
             {
-                var dwordValue = key?.GetValue("ColorizationColor");
-                if (dwordValue != null)
+                if (key?.GetValue("ColorizationColor") is int argb)
                 {
-                    return System.Drawing.Color.FromArgb((int) dwordValue);
+                    return System.Drawing.Color.FromArgb(argb);
                 }
             }
             return System.Drawing.Color.White;

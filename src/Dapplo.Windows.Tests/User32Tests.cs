@@ -36,11 +36,11 @@ public class User32Tests
     }
 
     /// <summary>
-    ///     Test GetWindow
+    ///     Test GetTopWindows finds at least one visible window
     /// </summary>
     /// <returns></returns>
     [Fact]
-    public void TestGetTopLevelWindows()
+    public void TestGetTopWindows()
     {
         var foundWindow = false;
         foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()))

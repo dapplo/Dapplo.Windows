@@ -14,7 +14,7 @@ using Dapplo.Windows.Dpi.Enums;
 using Dapplo.Windows.Kernel32;
 using Dapplo.Windows.Kernel32.Enums;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Xunit;
 
 namespace Dapplo.Windows.Tests;
@@ -38,8 +38,8 @@ public class S3SweepTests
         public void Dispose() => IsDisposed = true;
     }
 
-    private static WindowMessageInfo CreateDpiChanged(int dpi) =>
-        WindowMessageInfo.Create(IntPtr.Zero, (int)WindowsMessages.WM_DPICHANGED, new IntPtr((dpi << 16) | dpi), IntPtr.Zero);
+    private static WindowMessage CreateDpiChanged(int dpi) =>
+        new WindowMessage(IntPtr.Zero, WindowsMessages.WM_DPICHANGED, new IntPtr((dpi << 16) | dpi), IntPtr.Zero);
 
     /// <summary>
     ///     D-32: scaling rounds (like MulDiv) instead of truncating
@@ -88,7 +88,7 @@ public class S3SweepTests
         Assert.True(dpiHandler.IsDpiKnown);
         Assert.Equal(144, dpiHandler.Dpi);
 
-        dpiHandler.HandleWindowMessages(WindowMessageInfo.Create(IntPtr.Zero, (int)WindowsMessages.WM_DESTROY, IntPtr.Zero, IntPtr.Zero));
+        dpiHandler.HandleWindowMessages(new WindowMessage(IntPtr.Zero, WindowsMessages.WM_DESTROY, IntPtr.Zero, IntPtr.Zero));
         Assert.False(completed);
 
         dpiHandler.HandleWindowMessages(CreateDpiChanged(192));

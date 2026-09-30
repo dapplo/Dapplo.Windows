@@ -12,7 +12,7 @@ namespace Dapplo.Windows.Gdi32.Structs;
 [StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
 [SuppressMessage("Sonar Code Smell", "S2292:Trivial properties should be auto-implemented", Justification = "Interop!")]
-public struct CieXyzTripple
+public struct CieXyzTriple
 {
     private CieXyz _cieXyzRed;
     private CieXyz _cieXyzGreen;
@@ -50,10 +50,10 @@ public struct CieXyzTripple
     /// <param name="red">CieXyz</param>
     /// <param name="green">CieXyz</param>
     /// <param name="blue">CieXyz</param>
-    /// <returns>CieXyzTripple</returns>
-    public static CieXyzTripple Create(CieXyz red, CieXyz green, CieXyz blue)
+    /// <returns>CieXyzTriple</returns>
+    public static CieXyzTriple Create(CieXyz red, CieXyz green, CieXyz blue)
     {
-        return new CieXyzTripple
+        return new CieXyzTriple
         {
             _cieXyzRed = red,
             _cieXyzGreen = green,

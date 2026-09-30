@@ -4,8 +4,8 @@
 using System;
 using Dapplo.Windows.AppRestartManager;
 using Dapplo.Windows.AppRestartManager.Enums;
-using Dapplo.Windows.Messages.Enumerations;
-using Dapplo.Windows.Messages.Structs;
+using Dapplo.Windows.Messages.Enums;
+using Dapplo.Windows.Messages;
 using Xunit;
 
 namespace Dapplo.Windows.Tests;
