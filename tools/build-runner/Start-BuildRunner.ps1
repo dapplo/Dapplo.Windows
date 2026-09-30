@@ -173,7 +173,7 @@ function Invoke-Request {
             '--filter', "`"$filter`"")
         if ($framework) { $testArgs += @('--framework', $framework) }
         # Same coverage options as the CI build (coverlet rewrites the assemblies before the tests run)
-        if ($coverage) { $testArgs += @('/p:CollectCoverage=true', '/p:CoverletOutputFormat=lcov', "`"/p:CoverletOutput=$ResultDir\coverage\`"") }
+        if ($coverage) { $testArgs += @('/p:CollectCoverage=true', '/p:CoverletOutputFormat=lcov', "`"/p:CoverletOutput=$($ResultDir.Replace('\', '/'))/coverage/`"") }
         $summary.test_exit_code = Invoke-Step -Name 'test' -Exe $Dotnet -Log $log -Arguments $testArgs
         $summary.trx = $trx
         $summary.tests = @(Get-ChildItem -Path $ResultDir -Filter "$id*.trx" -File -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object {
