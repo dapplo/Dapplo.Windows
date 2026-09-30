@@ -146,18 +146,18 @@ public static class CursorHelper
                 var rawColorBitmap = ExtractRawColorBitmap(colorBitmap, nativeSize.Width, nativeSize.Height, out var hasAlpha);
                 if (rawColorBitmap != null && hasAlpha)
                 {
+                    capturedCursor.MaskLayer = null;
                     if (renderSize == nativeSize)
                     {
                         capturedCursor.ColorLayer = rawColorBitmap;
                     }
                     else
                     {
-                        using (rawColorBitmap)
-                        {
-                            capturedCursor.ColorLayer = ScaleBitmap(rawColorBitmap, renderSize, PixelFormat.Format32bppArgb, InterpolationMode.HighQualityBicubic);
-                        }
+                        // Don't scale the pixels up, that is blurry: let DrawIconEx render the cursor at the render size,
+                        // for a shared (system) cursor Windows then uses the best matching image of the cursor resource.
+                        rawColorBitmap.Dispose();
+                        capturedCursor.ColorLayer = BitmapFromHIcon(hCursor, renderSize.Width, renderSize.Height, DrawIconExFlags.DI_NORMAL, PixelFormat.Format32bppArgb);
                     }
-                    capturedCursor.MaskLayer = null;
                     success = true;
                     result = capturedCursor;
                     return true;
