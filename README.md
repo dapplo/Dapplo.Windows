@@ -145,6 +145,14 @@ request, for tools which can only write files into the repository.
 When you change a code sample, change it in `src/Dapplo.Windows.Example.DocSamples` and copy it into the markdown, see
 [About the samples](doc/articles/intro.md#about-the-samples).
 
+## Releasing
+
+Every merge to `master` is a release. The build computes the version with Nerdbank.GitVersioning
+(`src/version.json`: `3.0` plus the number of commits since the version last changed, e.g. 3.0.1, 3.0.2, …), packs everything and then waits for approval
+of the `NuGet` environment. After approval it pushes the packages to nuget.org, creates the tag and the GitHub release
+(notes from the `## [<version>]` or `## [Unreleased]` section of [CHANGELOG.md](CHANGELOG.md)) and publishes the
+documentation and the wiki. For a new minor or major version, change `version` in `src/version.json`.
+
 ## Contributing
 
 Issues and pull requests are welcome. Please add an entry to [CHANGELOG.md](CHANGELOG.md) for user-visible changes.
