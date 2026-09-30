@@ -102,6 +102,41 @@ public static class ClipboardSamples
         #endregion
     }
 
+    public static async Task UseAsync()
+    {
+        #region UseAsync
+        // Waits asynchronously until the clipboard can be opened, then opens it, runs the work and closes it again:
+        // all on one thread, so the token can't end up on another thread. The work must not await.
+        string text = await ClipboardNative.UseAsync(clipboard => clipboard.GetAsUnicodeString());
+
+        // Write: prepare the content first, only place it inside the work
+        var contents = new ClipboardContents().AddUnicodeString("Hello, World!");
+        await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(contents));
+        #endregion
+    }
+
+    public static async Task UseAsyncOptions(CancellationToken cancellationToken)
+    {
+        #region UseAsyncOptions
+        try
+        {
+            var options = new ClipboardAccessOptions
+            {
+                // Try to open the clipboard 20 times, 50ms apart (asynchronously), wait up to 1 second for other threads of this process
+                Retries = 20,
+                RetryInterval = TimeSpan.FromMilliseconds(50),
+                LockTimeout = TimeSpan.FromSeconds(1)
+            };
+            // Read the raw data while the clipboard is open, decode it afterwards
+            byte[] png = await ClipboardNative.UseAsync(clipboard => ClipboardNative.HasFormat("PNG") ? clipboard.GetAsBytes("PNG") : null, options, cancellationToken);
+        }
+        catch (ClipboardAccessDeniedException ex)
+        {
+            Console.WriteLine($"The clipboard is in use: {ex.Message}");
+        }
+        #endregion
+    }
+
     public static async Task ReadTextAsync()
     {
         #region ReadTextAsync

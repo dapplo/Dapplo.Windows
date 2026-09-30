@@ -107,7 +107,7 @@ public class ClipboardTests
         var canAccessOnOtherThread = await Task.Run(() => clipboardAccessToken.CanAccess);
         Assert.False(canAccessOnOtherThread);
         var exception = await Task.Run(() => Record.Exception(() => clipboardAccessToken.ThrowWhenNoAccess()));
-        Assert.IsType<ClipboardAccessDeniedException>(exception);
+        Assert.IsType<InvalidOperationException>(exception);
         Assert.True(clipboardAccessToken.CanAccess);
     }
 

@@ -41,9 +41,30 @@ Standard formats are named like `"CF_UNICODETEXT"`; compare the IDs or use `Stan
 
 ## Reading and writing
 
-`ClipboardNative.Access()` opens the clipboard on the calling thread; use and dispose the token on that thread and
-keep it short. When the clipboard is busy `CanAccess` is `false`, and the `Get...` / `Set...` methods throw a
-`ClipboardAccessDeniedException`.
+Threading rules:
+
+- The clipboard works on **any thread**, no STA thread is needed.
+- Windows ties the opened clipboard to the thread which opened it: use and dispose the token on that thread.
+  On another thread the `Get...` / `Set...` methods and `Dispose` throw an `InvalidOperationException`.
+- **Never `await` while the clipboard is open.** From async code, prefer `UseAsync`.
+
+`ClipboardNative.UseAsync(work)` waits asynchronously until the clipboard can be opened, then opens it, runs `work` and
+closes it again on one thread. `work` must not be async; it throws a `ClipboardAccessDeniedException` when the
+clipboard stays busy. `ClipboardAccessOptions` sets the owner window, retries and timeouts.
+
+<!-- sample: ClipboardSamples.UseAsync -->
+```csharp
+// Waits asynchronously until the clipboard can be opened, then opens it, runs the work and closes it again:
+// all on one thread, so the token can't end up on another thread. The work must not await.
+string text = await ClipboardNative.UseAsync(clipboard => clipboard.GetAsUnicodeString());
+
+// Write: prepare the content first, only place it inside the work
+var contents = new ClipboardContents().AddUnicodeString("Hello, World!");
+await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(contents));
+```
+
+`ClipboardNative.Access()` opens the clipboard on the calling thread; keep it short. When the clipboard is busy
+`CanAccess` is `false`, and the `Get...` / `Set...` methods throw a `ClipboardAccessDeniedException`.
 
 <!-- sample: ClipboardSamples.ReadText -->
 ```csharp
@@ -157,4 +178,4 @@ clipboard.SetAsUnicodeString("Temporary value");
 clipboard.SetCloudClipboardOptions(canIncludeInHistory: false, canUploadToCloud: false);
 ```
 
-Files, images, streams, `AccessAsync` and error handling: see the [documentation](https://www.dapplo.net/Dapplo.Windows/articles/clipboard-usage.html).
+Files, images, streams, `AccessAsync`, `ClipboardAccessOptions` and error handling: see the [documentation](https://www.dapplo.net/Dapplo.Windows/articles/clipboard-usage.html).

@@ -86,8 +86,12 @@ The clipboard is one resource for all applications. To read or write it, open it
 your work, and dispose the returned `IClipboardAccessToken`. While you hold it, no other application can use the
 clipboard, so keep it short.
 
-- Windows ties the opened clipboard to the thread which opened it. Use and dispose the token on that thread; on another
-  thread `CanAccess` is `false`.
+- The clipboard works on any thread, no STA thread is needed.
+- Windows ties the opened clipboard to the thread which opened it. Use and dispose the token on that thread: on another
+  thread `CanAccess` is `false`, the `Get...` / `Set...` methods throw an `InvalidOperationException`, and so does
+  `Dispose` (the clipboard can only be closed on the thread which opened it; the token stays valid, dispose it on the
+  right thread).
+- Never `await` while you hold the token. From async code, prefer `UseAsync` (below).
 - `Access()` doesn't throw when the clipboard is busy. It retries opening it (5 times, 100 ms apart by default) and
   returns a token with `CanAccess == false` and `IsOpenTimeout` (another application has it) or `IsLockTimeout`
   (another thread of your process has it).
@@ -112,8 +116,53 @@ using (var clipboard = ClipboardNative.Access())
 }
 ```
 
-`AccessAsync()` waits asynchronously for the in-process lock, but opens the clipboard on the thread which continues
-after the `await`. Don't `await` anything else while you hold the token. Cancelling throws an
+### From async code: UseAsync
+
+`ClipboardNative.UseAsync(work)` waits asynchronously until the clipboard can be opened, and then opens it, runs `work`
+and closes it again synchronously, on one thread. The waiting runs on the context of the caller, so in a UI
+application `work` runs on the UI thread. It throws a `ClipboardAccessDeniedException` when the clipboard stays busy,
+and cancelling throws an `OperationCanceledException`.
+
+- `work` must not be async: the clipboard is closed when it returns. An `async` lambda doesn't compile, and work
+  which returns a `Task` throws an `InvalidOperationException`.
+- Copy the data out inside `work` and decode it afterwards; prepare what you write before calling `UseAsync`.
+- Don't call `Access`, `AccessAsync` or `UseAsync` inside `work`, the in-process lock isn't reentrant.
+
+<!-- sample: ClipboardSamples.UseAsync -->
+```csharp
+// Waits asynchronously until the clipboard can be opened, then opens it, runs the work and closes it again:
+// all on one thread, so the token can't end up on another thread. The work must not await.
+string text = await ClipboardNative.UseAsync(clipboard => clipboard.GetAsUnicodeString());
+
+// Write: prepare the content first, only place it inside the work
+var contents = new ClipboardContents().AddUnicodeString("Hello, World!");
+await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(contents));
+```
+
+`ClipboardAccessOptions` sets the owner window, the retries and the timeouts:
+
+<!-- sample: ClipboardSamples.UseAsyncOptions -->
+```csharp
+try
+{
+    var options = new ClipboardAccessOptions
+    {
+        // Try to open the clipboard 20 times, 50ms apart (asynchronously), wait up to 1 second for other threads of this process
+        Retries = 20,
+        RetryInterval = TimeSpan.FromMilliseconds(50),
+        LockTimeout = TimeSpan.FromSeconds(1)
+    };
+    // Read the raw data while the clipboard is open, decode it afterwards
+    byte[] png = await ClipboardNative.UseAsync(clipboard => ClipboardNative.HasFormat("PNG") ? clipboard.GetAsBytes("PNG") : null, options, cancellationToken);
+}
+catch (ClipboardAccessDeniedException ex)
+{
+    Console.WriteLine($"The clipboard is in use: {ex.Message}");
+}
+```
+
+`AccessAsync()` also waits asynchronously, and opens the clipboard on the thread which continues after the `await`
+(the context of the caller). Don't `await` anything else while you hold the token. Cancelling throws an
 `OperationCanceledException`.
 
 <!-- sample: ClipboardSamples.ReadTextAsync -->

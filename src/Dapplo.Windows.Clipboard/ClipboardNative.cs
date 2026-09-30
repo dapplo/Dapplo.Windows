@@ -161,6 +161,77 @@ namespace Dapplo.Windows.Clipboard
         }
 
         /// <summary>
+        /// Use the clipboard: wait asynchronously until it can be opened, then open it, run <paramref name="work"/> and close it again,
+        /// synchronously on one thread. This is the recommended way to access the clipboard from async code.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item>Works on any thread, no STA thread is needed.</item>
+        /// <item>Only the waiting is asynchronous. The awaits run on the context of the caller, so the work runs there too (e.g. the UI thread).</item>
+        /// <item><paramref name="work"/> must not be async: never await while the clipboard is open, the token is only valid until the work returns.
+        /// Read the data into memory and process it after UseAsync returns; prepare the data to write before calling UseAsync.</item>
+        /// <item>Don't call <see cref="Access"/>, <see cref="AccessAsync"/> or UseAsync inside the work, the in-process lock isn't reentrant.</item>
+        /// </list>
+        /// </remarks>
+        /// <typeparam name="T">Type of the result</typeparam>
+        /// <param name="work">Func which reads or writes the clipboard via the token and returns a result</param>
+        /// <param name="options">optional ClipboardAccessOptions (owner, retries, retry interval, lock timeout)</param>
+        /// <param name="cancellationToken">CancellationToken, cancels the waiting</param>
+        /// <returns>Task with the result of the work</returns>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard couldn't be opened, or the in-process lock timed out</exception>
+        public static Task<T> UseAsync<T>(Func<IClipboardAccessToken, T> work, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            if (work == null)
+            {
+                throw new ArgumentNullException(nameof(work));
+            }
+            options ??= new ClipboardAccessOptions();
+            options.Validate();
+            return ClipboardLockProvider.UseAsync(work, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// Use the clipboard, see <see cref="UseAsync{T}(Func{IClipboardAccessToken, T}, ClipboardAccessOptions, CancellationToken)"/>.
+        /// </summary>
+        /// <param name="work">Action which reads or writes the clipboard via the token, it must not be async</param>
+        /// <param name="options">optional ClipboardAccessOptions (owner, retries, retry interval, lock timeout)</param>
+        /// <param name="cancellationToken">CancellationToken, cancels the waiting</param>
+        /// <returns>Task</returns>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard couldn't be opened, or the in-process lock timed out</exception>
+        public static Task UseAsync(Action<IClipboardAccessToken> work, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            if (work == null)
+            {
+                throw new ArgumentNullException(nameof(work));
+            }
+            return UseAsync<bool>(token =>
+            {
+                work(token);
+                return true;
+            }, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// Not supported: the work must not be async, the clipboard is closed when it returns. This overload only exists to turn an async lambda into a compile error.
+        /// </summary>
+        [Obsolete("The work must not be async: never await while the clipboard is open. Read or write synchronously and do the asynchronous work before or after UseAsync.", true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Task UseAsync(Func<IClipboardAccessToken, Task> work, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException("The work must not be async.");
+        }
+
+        /// <summary>
+        /// Not supported: the work must not be async, the clipboard is closed when it returns. This overload only exists to turn an async lambda into a compile error.
+        /// </summary>
+        [Obsolete("The work must not be async: never await while the clipboard is open. Read or write synchronously and do the asynchronous work before or after UseAsync.", true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Task<T> UseAsync<T>(Func<IClipboardAccessToken, Task<T>> work, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException("The work must not be async.");
+        }
+
+        /// <summary>
         /// Replace the content of the clipboard with the contents: opens the clipboard, clears it, places all formats and closes it again.
         /// This is the recommended way to write to the clipboard, prepare the contents before calling this so the clipboard is only open briefly.
         /// </summary>

@@ -173,6 +173,78 @@ internal sealed class ClipboardSemaphore : IDisposable
     }
 
     /// <summary>
+    /// Wait for the clipboard asynchronously, then open it, run the work and close it again synchronously on one thread.
+    /// Every await runs on the context of the caller, so <paramref name="work"/> runs there too (e.g. the UI thread).
+    /// </summary>
+    /// <typeparam name="T">Type of the result</typeparam>
+    /// <param name="work">Func which uses the clipboard, it must not await or switch threads</param>
+    /// <param name="options">ClipboardAccessOptions</param>
+    /// <param name="cancellationToken">CancellationToken, only used while waiting</param>
+    /// <returns>Task with the result of the work</returns>
+    public async Task<T> UseAsync<T>(Func<IClipboardAccessToken, T> work, ClipboardAccessOptions options, CancellationToken cancellationToken)
+    {
+        var hWnd = options.Owner;
+        if (hWnd == IntPtr.Zero)
+        {
+            // The shared window is the owner, it's always available and it receives the delayed rendering messages
+            hWnd = SharedMessageWindow.Handle;
+        }
+
+        // Don't use ConfigureAwait(false): the work runs on the context of the caller
+        if (!await _semaphoreSlim.WaitAsync(options.LockTimeout, cancellationToken))
+        {
+            throw new ClipboardAccessDeniedException("The clipboard was already locked by another thread or task in your application, a timeout occured.");
+        }
+
+        try
+        {
+            var retries = options.Retries;
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                // Open, work and close without any await in between: all on this thread
+                if (OpenClipboard(hWnd))
+                {
+                    var ownerThreadId = Environment.CurrentManagedThreadId;
+                    var token = new ClipboardAccessToken(() =>
+                    {
+                        if (!CloseClipboard())
+                        {
+                            Trace.TraceWarning("Dapplo.Windows.Clipboard: CloseClipboard failed with error {0} on thread {1}.", Marshal.GetLastWin32Error(), ownerThreadId);
+                        }
+                    })
+                    {
+                        OwnerHandle = hWnd
+                    };
+                    try
+                    {
+                        var result = work(token);
+                        if (result is Task)
+                        {
+                            throw new InvalidOperationException("The work passed to ClipboardNative.UseAsync returned a Task: the clipboard is closed when the work returns, never await while the clipboard is open. Read or write the clipboard synchronously, and do the asynchronous work before or after UseAsync.");
+                        }
+                        return result;
+                    }
+                    finally
+                    {
+                        token.Dispose();
+                    }
+                }
+                retries--;
+                if (retries < 0)
+                {
+                    throw new ClipboardAccessDeniedException("The clipboard couldn't be opened for usage, it's probably locked by another process");
+                }
+                await Task.Delay(options.RetryInterval, cancellationToken);
+            }
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    /// <summary>
     /// Create the token for an opened clipboard, disposing it closes the clipboard and releases the semaphore (once).
     /// </summary>
     /// <param name="hWnd">IntPtr with the window handle which was used to open the clipboard</param>

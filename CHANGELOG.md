@@ -7,6 +7,16 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.1.0]
+
+### Added
+- `ClipboardNative.UseAsync(work)` and `UseAsync<T>(work)` with `ClipboardAccessOptions` (owner, retries, retry interval, lock timeout): wait asynchronously until the clipboard can be opened, then open it, run the work and close it again synchronously on one thread, so an opened clipboard can never end up on another thread. The work runs on the context of the caller; an async lambda is a compile error and work returning a `Task` throws.
+
+### Changed
+- **Behaviour change:** using a clipboard access token on another thread than the one which opened the clipboard throws an `InvalidOperationException` (was `ClipboardAccessDeniedException`), and disposing it there throws an `InvalidOperationException` instead of failing to close the clipboard silently, which left the clipboard open for every application. The token stays valid and can still be disposed on the owner thread.
+- The clipboard documentation states the threading rules: any thread, no STA; never await while the clipboard is open; prefer `UseAsync`.
+- New tests cover `AccessAsync` when it has to retry, with and without a `SynchronizationContext`: the token is usable after the await and disposing it closes the clipboard. `AccessAsync` stays supported.
+
 ## [3.0.3]
 
 ### Fixed
