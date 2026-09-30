@@ -179,6 +179,57 @@ public class ClipboardFormatParsingTests
         Assert.False(DibImage.TryDecode(sample.Take(sample.Length - 1).ToArray(), out _));
     }
 
+    /// <summary>
+    /// Crafted header fields must be rejected or ignored, never lead to reading outside the data
+    /// (see the CF_DIBV5 out-of-bounds read reported for Greenshot's DibFileFormatHandler)
+    /// </summary>
+    [Theory]
+    [InlineData(0, 0x10000000u, false)]  // biSize far beyond the data
+    [InlineData(0, 0xFFFFFFFFu, false)]  // biSize negative as int
+    [InlineData(0, 64u, false)]          // biSize which is no known header
+    [InlineData(20, 0xFFFFFFFFu, true)]  // biSizeImage is ignored, the stride is calculated
+    [InlineData(20, 1u, true)]
+    [InlineData(4, 0x7FFFFFFFu, false)]  // width
+    [InlineData(8, 0x80000000u, false)]  // height int.MinValue
+    [InlineData(8, 0x7FFFFFFFu, false)]  // height larger than the data
+    [InlineData(32, 0xFFFFFFFFu, true)]  // biClrUsed, no palette at 32 bpp
+    public void Dib_CraftedHeader_NeverReadsOutsideTheData(int offset, uint value, bool decodes)
+    {
+        var sample = Sample("dibv5-greenshot.bin");
+        BitConverter.GetBytes(value).CopyTo(sample, offset);
+        Assert.Equal(decodes, DibImage.TryDecode(sample, out var image));
+        if (decodes)
+        {
+            AssertReference(image, true);
+        }
+    }
+
+    [Fact]
+    public void Dib_Palette_ColorsUsedLargerThanPossible_IsClamped()
+    {
+        var sample = Sample("dib-8bpp-palette.bin");
+        // biClrUsed 0xFFFFFFFF: the palette would reach far beyond the data
+        BitConverter.GetBytes(0xFFFFFFFFu).CopyTo(sample, 32);
+        Assert.False(DibImage.TryDecode(sample, out _));
+    }
+
+    [Fact]
+    public void Dib_FullWidthMask_ScalesWithoutOverflow()
+    {
+        // 32 bpp BI_BITFIELDS with a 32-bit red mask: the maximum value must scale to 255
+        var dib = new byte[40 + 12 + 4];
+        BitConverter.GetBytes(40).CopyTo(dib, 0);
+        BitConverter.GetBytes(1).CopyTo(dib, 4);
+        BitConverter.GetBytes(1).CopyTo(dib, 8);
+        BitConverter.GetBytes((ushort)1).CopyTo(dib, 12);
+        BitConverter.GetBytes((ushort)32).CopyTo(dib, 14);
+        BitConverter.GetBytes(3).CopyTo(dib, 16);
+        BitConverter.GetBytes(0xFFFFFFFFu).CopyTo(dib, 40);
+        BitConverter.GetBytes(0xFFFFFFFFu).CopyTo(dib, 52);
+        Assert.True(DibImage.TryDecode(dib, out var image));
+        Assert.Equal(255, image.Pixels[2]);
+    }
+
     [Fact]
     public void Dib_Compressed_ReturnsFalse()
     {

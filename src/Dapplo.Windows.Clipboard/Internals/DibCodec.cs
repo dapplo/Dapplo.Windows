@@ -364,7 +364,8 @@ internal static class DibCodec
             {
                 return (byte)channel;
             }
-            return (byte)((channel * 255 + _maximum / 2) / _maximum);
+            // ulong: with a mask of more than 24 bits, channel * 255 doesn't fit in a uint
+            return (byte)(((ulong)channel * 255 + _maximum / 2) / _maximum);
         }
     }
 
