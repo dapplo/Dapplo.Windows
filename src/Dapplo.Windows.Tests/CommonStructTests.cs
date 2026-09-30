@@ -7,6 +7,7 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Wpf;
 using Xunit;
 
 namespace Dapplo.Windows.Tests;
@@ -90,11 +91,9 @@ public class CommonStructTests
         Assert.False(drawingSize != nativeSize1);
         Assert.True(drawingSizeNotEqual != nativeSize1);
 
-        Assert.True(nativeSize1 == windowsSize);
-        Assert.True(windowsSize == nativeSize1);
-        Assert.False(nativeSize1 != windowsSize);
-        Assert.False(windowsSize != nativeSize1);
-        Assert.True(windowsSizeNotEqual != nativeSize1);
+        Assert.Equal(windowsSize, nativeSize1.ToSize());
+        Assert.True(windowsSize.ToNativeSize() == nativeSize1);
+        Assert.True(windowsSizeNotEqual.ToNativeSize() != nativeSize1);
     }
 
     /// <summary>
@@ -116,11 +115,9 @@ public class CommonStructTests
         Assert.False(drawingSize != nativeSize1);
         Assert.True(drawingSizeNotEqual != nativeSize1);
 
-        Assert.True(nativeSize1 == windowsSize);
-        Assert.True(windowsSize == nativeSize1);
-        Assert.False(nativeSize1 != windowsSize);
-        Assert.False(windowsSize != nativeSize1);
-        Assert.True(windowsSizeNotEqual != nativeSize1);
+        Assert.Equal(windowsSize, nativeSize1.ToSize());
+        Assert.True(windowsSize.ToNativeSizeFloat() == nativeSize1);
+        Assert.True(windowsSizeNotEqual.ToNativeSizeFloat() != nativeSize1);
     }
 
     /// <summary>
@@ -196,25 +193,23 @@ public class CommonStructTests
         var nativeRectConverted = (NativeRect)nativeRectFloat;
         Assert.Equal(nativeRectExpected, nativeRectConverted);
 
-#if !NETSTANDARD2_0
         var rect = new Rect(10.0, 20.0, 30.0, 40.0);
         var nativeRectFloatExpected2 = new NativeRectFloat(10.0f, 20.0f, 30.0f, 40.0f);
-        NativeRectFloat nativeRectFloatConverted2 = rect;
+        var nativeRectFloatConverted2 = rect.ToNativeRectFloat();
         Assert.Equal(nativeRectFloatExpected2, nativeRectFloatConverted2);
 
         var rectExpected = new Rect(10.5, 20.5, 30.5, 40.5);
-        Rect rectConverted = nativeRectFloat;
+        var rectConverted = nativeRectFloat.ToRect();
         Assert.Equal(rectExpected, rectConverted);
 
         var int32Rect = new Int32Rect(10, 20, 30, 40);
         var nativeRectFloatExpected3 = new NativeRectFloat(10, 20, 30, 40);
-        NativeRectFloat nativeRectFloatConverted3 = int32Rect;
+        var nativeRectFloatConverted3 = int32Rect.ToNativeRectFloat();
         Assert.Equal(nativeRectFloatExpected3, nativeRectFloatConverted3);
 
         var int32RectExpected = new Int32Rect(10, 20, 31, 41);
-        var int32RectConverted = (Int32Rect)nativeRectFloat;
+        var int32RectConverted = nativeRectFloat.ToInt32Rect();
         Assert.Equal(int32RectExpected, int32RectConverted);
-#endif
 
         var rectangle = new Rectangle(10, 20, 30, 40);
         var nativeRectFloatExpected4 = new NativeRectFloat(10, 20, 30, 40);

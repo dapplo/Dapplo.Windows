@@ -2,12 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Common;
-#if !NETSTANDARD2_0
-using System.Windows.Media;
-#endif
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
@@ -29,19 +25,6 @@ public static class DwmApi
     private const string ColorizationColorKey = @"SOFTWARE\Microsoft\Windows\DWM";
     private const string DwmApiDll = "dwmapi.dll";
 
-#if !NETSTANDARD2_0
-    /// <summary>
-    ///     Return the AERO Color
-    /// </summary>
-    public static Color ColorizationColor
-    {
-        get
-        {
-            var color = ColorizationSystemDrawingColor;
-            return Color.FromArgb(color.A, color.R, color.G, color.B);
-        }
-    }
-
     /// <summary>
     ///     Return the AERO Color
     /// </summary>
@@ -53,7 +36,6 @@ public static class DwmApi
             return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
         }
     }
-#endif
 
     /// <summary>
     ///     Return the Aero Color

@@ -4,6 +4,36 @@ Dapplo.Windows 3.0 fixes many interop bugs. Where an API encoded a wrong concept
 compatibility. This page lists every breaking change with the code you need to update. The full list of changes is in
 the [changelog](../../CHANGELOG.md).
 
+## Target frameworks and packages
+
+3.0 targets `net480` and `net10.0-windows`. The core packages no longer pull in WinForms or WPF; add
+**Dapplo.Windows.Forms** or **Dapplo.Windows.Wpf** when you use those helpers.
+
+| 2.x | 3.0 |
+|---|---|
+| `Dapplo.Windows.Dpi.Forms.DpiAwareForm`, `DpiUnawareForm`, `FormsDpiExtensions.AttachDpiHandler(Form / ContextMenuStrip)` | Dapplo.Windows.Forms, `Dapplo.Windows.Forms.Dpi` |
+| `BitmapScaleHandler.AddTarget(Button / ToolStripItem, …)` | `Dapplo.Windows.Forms.Dpi.BitmapScaleHandlerExtensions`; core: `AddTargetAction(target, key, apply, execute)` |
+| `Dapplo.Windows.Messages.WinProcListener` (`AddHook(HwndSourceHook)`) | `Dapplo.Windows.Forms.Messages.WinProcListener` (`AddHook(WinProcHook)`, same signature) |
+| `Dapplo.Windows.Messages.WinProcFormsExtensions.WinProcFormsMessages()` | `Dapplo.Windows.Forms.Messages` |
+| `Dapplo.Windows.Extensions.FormsExtensions` | `Dapplo.Windows.Forms.FormsExtensions` |
+| `Dapplo.Windows.Messages.WinProcHandler`, `WinProcHandlerHook`, `WinProcWindowsExtensions.WinProcMessages(Window)` | Dapplo.Windows.Wpf, `Dapplo.Windows.Wpf.Messages` |
+| `Dapplo.Windows.Dpi.Wpf.WindowDpiExtensions` | `Dapplo.Windows.Wpf.Dpi.WindowDpiExtensions` |
+| `Dapplo.Windows.Extensions.WindowsExtensions` (`AsInteropWindow`, `GetHandle`, `ApplyPlacement`, `RetrievePlacement`) | `Dapplo.Windows.Wpf.WindowExtensions` |
+| `Dapplo.Windows.Extensions.BitmapExtensions.ToBitmapSource(Bitmap / Image)` | `Dapplo.Windows.Wpf.BitmapSourceExtensions.ToBitmapSource(Bitmap / Image / Icon)` |
+| `interopWindow.PrintWindow<TBitmap>()` | `PrintWindow()` returns `Bitmap`; `PrintWindowAsBitmapSource()` in Dapplo.Windows.Wpf |
+| `GetIcon<BitmapSource>()`, `IconHelper.*<BitmapSource>` | `GetIcon<Bitmap>().ToBitmapSource()` |
+| `DwmApi.ColorizationColor` (WPF `Color`) | `DwmApi.ColorizationSystemDrawingColor.ToMediaColor()` |
+| Casts between `Native*` structs and `System.Windows.Point` / `Size` / `Rect` / `Int32Rect` | `Dapplo.Windows.Wpf.NativeStructWpfExtensions`: `ToPoint`, `ToNativePointFloat`, `ToSize`, `ToNativeSize`, `ToNativeSizeFloat`, `ToRect`, `ToNativeRectFloat`, `ToInt32Rect`, `ToNativeRect` |
+| `NativeRect(Float).Transform(Matrix)` | `Dapplo.Windows.Wpf.NativeStructWpfExtensions.Transform` |
+
+```csharp
+// 2.x
+System.Windows.Rect wpfRect = nativeRect;
+// 3.0
+using Dapplo.Windows.Wpf;
+var wpfRect = nativeRect.ToRect();
+```
+
 ## HRESULT
 
 `HResult` is now `enum HResult : int`. `Failed()` and `Succeeded()` work, and `ThrowOnFailure()` throws. Failures

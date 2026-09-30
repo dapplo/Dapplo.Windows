@@ -5,12 +5,13 @@ using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows;
 using Dapplo.Windows.Devices;
-using Dapplo.Windows.Dpi.Wpf;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.User32;
+using Dapplo.Windows.Wpf.Dpi;
+using Dapplo.Windows.Wpf.Messages;
 
 namespace Dapplo.Windows.Example.WpfExample;
 

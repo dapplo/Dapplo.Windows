@@ -61,7 +61,6 @@ public static class NativeRectExtensions
         return new NativeRect(rect.Location, rect.Size.ChangeHeight(height));
     }
 
-
     /// <summary>
     ///     Test if this NativeRect contains the specified NativePoint
     /// </summary>
@@ -349,25 +348,6 @@ public static class NativeRectExtensions
     {
         return rect.Resize(new NativeSize(width ?? rect.Width, height ?? rect.Height));
     }
-
-#if !NETSTANDARD2_0
-    /// <summary>
-    /// Transform the specified NativeRect
-    /// </summary>
-    /// <param name="rect">NativeRect</param>
-    /// <param name="matrix">Matrix</param>
-    /// <returns>NativeRect</returns>
-    [Pure]
-    public static NativeRect Transform(this NativeRect rect, System.Windows.Media.Matrix matrix)
-    {
-        System.Windows.Point[] myPointArray = {rect.TopLeft, rect.BottomRight};
-        matrix.Transform(myPointArray);
-        NativePointFloat topLeft = myPointArray[0];
-        NativePointFloat bottomRight = myPointArray[1];
-        // The smallest integer rectangle containing the transformed rectangle
-        return (NativeRect)new NativeRectFloat(topLeft, bottomRight);
-    }
-#endif
 
     /// <summary>
     /// Normalize the NativeRect by making a negative width and or height absolute

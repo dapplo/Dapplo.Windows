@@ -1,10 +1,9 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-#if !NETSTANDARD2_0
 using System;
 using System.Windows.Interop;
 
-namespace Dapplo.Windows.Messages
+namespace Dapplo.Windows.Wpf.Messages
 {
     /// <summary>
     /// Wrapper of the HwndSourceHook for the WinProcHandler, to allow to specify a disposable
@@ -31,4 +30,3 @@ namespace Dapplo.Windows.Messages
         }
     }
 }
-#endif

@@ -145,7 +145,7 @@ public class RawInputTests
             var registration = FindKeyboard();
             Assert.NotNull(registration);
             Assert.Equal(RawInputDeviceFlags.InputSink, registration.Value.Flags);
-            Assert.Equal(SharedMessageWindow.Handle, registration.Value.TargetHwnd);
+            Assert.Equal<IntPtr>(SharedMessageWindow.Handle, registration.Value.TargetHwnd);
 
             var arrivedKeyboard = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             using (RawInputDeviceMonitor.Listen(RawInputDevices.Keyboard).Where(args => args.Added).Subscribe(_ => arrivedKeyboard.TrySetResult(true)))

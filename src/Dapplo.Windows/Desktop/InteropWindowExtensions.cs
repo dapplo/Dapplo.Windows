@@ -19,9 +19,6 @@ using Dapplo.Windows.User32.Structs;
 using System.Drawing.Imaging;
 using System.Linq;
 using Dapplo.Log;
-#if !NETSTANDARD2_0
-using Dapplo.Windows.Extensions;
-#endif
 using Dapplo.Windows.Kernel32;
 
 namespace Dapplo.Windows.Desktop;
@@ -710,10 +707,13 @@ public static class InteropWindowExtensions
     }
 
     /// <summary>
-    /// Return an Image representing the Window!
+    /// Return a Bitmap representing the Window!
     /// As GDI+ draws it, it will be without Aero borders!
+    /// Dapplo.Windows.Wpf has PrintWindowAsBitmapSource for a WPF BitmapSource.
     /// </summary>
-    public static TBitmap PrintWindow<TBitmap>(this IInteropWindow interopWindow) where TBitmap : class
+    /// <param name="interopWindow">IInteropWindow</param>
+    /// <returns>Bitmap, which the caller needs to dispose, or null if the window couldn't be printed</returns>
+    public static Bitmap PrintWindow(this IInteropWindow interopWindow)
     {
         var windowRect = interopWindow.GetInfo().Bounds;
         // Start the capture
@@ -758,21 +758,6 @@ public static class InteropWindowExtensions
             printWindowBitmap.Dispose();
             return default;
         }
-        if (typeof(TBitmap).IsAssignableFrom(typeof(Bitmap)))
-        {
-            return printWindowBitmap as TBitmap;
-        }
-#if !NETSTANDARD2_0
-        try
-        {
-            return printWindowBitmap.ToBitmapSource() as TBitmap;
-        }
-        finally
-        {
-            printWindowBitmap.Dispose();
-        }
-#else
-            return default;
-#endif
+        return printWindowBitmap;
     }
 }

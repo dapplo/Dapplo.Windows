@@ -1,11 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.User32 provides logic of the Windows User32 API</Description>
     <PackageTags>windows native user32</PackageTags>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TargetFrameworks>net480;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
-    <UseWindowsForms>true</UseWindowsForms>
-    <UseWPF>true</UseWPF>
+    <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
@@ -14,14 +12,5 @@
   <ItemGroup>
     <PackageReference Include="System.Reactive" Version="6.1.0" />
     <PackageReference Include="Dapplo.Log" Version="3.0.22" />
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
 </Project>

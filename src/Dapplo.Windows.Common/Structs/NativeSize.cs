@@ -37,30 +37,6 @@ public readonly struct NativeSize : IEquatable<NativeSize>, IComparable<NativeSi
     /// </summary>
     public static NativeSize Empty { get; } = new NativeSize(0, 0);
 
-#if !NETSTANDARD2_0
-    /// <summary>
-    ///     Constructor from System.Windows.Size, the width and height are rounded up to the smallest integer size which contains the size.
-    ///     System.Windows.Size.Empty (which has negative infinite dimensions) results in an empty NativeSize.
-    /// </summary>
-    /// <param name="size">System.Windows.Size</param>
-    public NativeSize(System.Windows.Size size)
-        : this(size.IsEmpty ? 0 : (int)Math.Ceiling(size.Width), size.IsEmpty ? 0 : (int)Math.Ceiling(size.Height))
-    {
-    }
-
-    /// <summary>
-    ///     Explicit (lossy) cast from System.Windows.Size to NativeSize, see the constructor for the rounding.
-    /// </summary>
-    /// <param name="size">System.Windows.Size</param>
-    public static explicit operator NativeSize(System.Windows.Size size) => new NativeSize(size);
-
-    /// <summary>
-    ///     Implicit cast from NativeSize to Size
-    /// </summary>
-    /// <param name="size">NativeSize</param>
-    public static implicit operator System.Windows.Size(NativeSize size) => new System.Windows.Size(size.Width, size.Height);
-#endif
-
     /// <summary>
     ///     Constructor from S.D.Size
     /// </summary>
@@ -140,48 +116,6 @@ public readonly struct NativeSize : IEquatable<NativeSize>, IComparable<NativeSi
     /// <returns>bool</returns>
     public static bool operator !=(System.Drawing.Size size1, NativeSize size2) => !(size1 == size2);
 
-#if !NETSTANDARD2_0
-    /// <summary>
-    /// Equals operator overloading
-    /// </summary>
-    /// <param name="size1">NativeSize</param>
-    /// <param name="size2">System.Windows.Size</param>
-    /// <returns>bool</returns>
-    public static bool operator ==(NativeSize size1, System.Windows.Size size2) => size1.Equals(size2);
-
-    /// <summary>
-    ///     Equals with a System.Windows.Size, this is only true if the System.Windows.Size has exactly the same (integer) values.
-    /// </summary>
-    /// <param name="other">System.Windows.Size</param>
-    /// <returns>bool</returns>
-    [Pure]
-    public bool Equals(System.Windows.Size other) => !other.IsEmpty && _width == other.Width && _height == other.Height;
-
-    /// <summary>
-    /// Not Equals operator overloading
-    /// </summary>
-    /// <param name="size1">NativeSize</param>
-    /// <param name="size2">System.Windows.Size</param>
-    /// <returns>bool</returns>
-    public static bool operator !=(NativeSize size1, System.Windows.Size size2) => !(size1 == size2);
-
-    /// <summary>
-    /// Equals operator overloading
-    /// </summary>
-    /// <param name="size1">System.Windows.Size</param>
-    /// <param name="size2">NativeSize</param>
-    /// <returns>bool</returns>
-    public static bool operator ==(System.Windows.Size size1, NativeSize size2) => size2.Equals(size1);
-
-    /// <summary>
-    /// Not Equals operator overloading
-    /// </summary>
-    /// <param name="size1">System.Windows.Size</param>
-    /// <param name="size2">NativeSize</param>
-    /// <returns>bool</returns>
-    public static bool operator !=(System.Windows.Size size1, NativeSize size2) => !(size1 == size2);
-#endif
-
     /// <summary>
     ///     Checks if the width * height are 0
     /// </summary>
@@ -190,8 +124,8 @@ public readonly struct NativeSize : IEquatable<NativeSize>, IComparable<NativeSi
     public bool IsEmpty => _width * _height == 0;
 
     /// <inheritdoc />
-    [Pure]
     /// <remarks>Sizes are ordered by area (width * height, calculated as long so it cannot overflow), smallest first.</remarks>
+    [Pure]
     public int CompareTo(NativeSize other) => ((long)_width * _height).CompareTo((long)other._width * other._height);
 
     /// <inheritdoc />
@@ -208,10 +142,6 @@ public readonly struct NativeSize : IEquatable<NativeSize>, IComparable<NativeSi
                 return Equals(size);
             case System.Drawing.Size size1:
                 return Equals(size1);
-#if !NETSTANDARD2_0
-            case System.Windows.Size size1:
-                return Equals(size1);
-#endif
         }
 
         return false;

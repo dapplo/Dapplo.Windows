@@ -8,7 +8,6 @@ using Dapplo.Windows.Gdi32.Structs;
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Windows;
 
 namespace Dapplo.Windows.Gdi32;
 

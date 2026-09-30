@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD2_0
 using System;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
@@ -44,11 +43,9 @@ namespace Dapplo.Windows.Desktop
                 .RefCount();
         }
 
-
         /// <summary>
         ///     The WM_SETTINGCHANGE messages of the SharedMessageWindow, produced on the thread of that window
         /// </summary>
         public static IObservable<EnvironmentChangedEventArgs> EnvironmentUpdateEvents => Singleton.Value._environmentObservable;
     }
 }
-#endif

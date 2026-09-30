@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-#if !NETSTANDARD2_0
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.User32.Structs;
 using System.Windows.Forms;
 
-namespace Dapplo.Windows.Extensions
+namespace Dapplo.Windows.Forms
 {
     /// <summary>
     /// Extensions for Forms
@@ -47,4 +46,3 @@ namespace Dapplo.Windows.Extensions
         }
     }
 }
-#endif

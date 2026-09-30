@@ -15,22 +15,18 @@ public static class Program
     public static void Main(string[] args)
     {
 
-        var jobCore50 = Job.Default
+        // The runtimes must match the TargetFrameworks of this project (net480;net10.0-windows), BenchmarkDotNet builds the benchmarks for each of them
+        var jobNet10 = Job.Default
             .WithMaxIterationCount(20)
-            .WithRuntime(CoreRuntime.Core50)
+            .WithRuntime(CoreRuntime.CreateForNewVersion("net10.0-windows", ".NET 10.0"))
             .WithPlatform(Platform.X64);
-        var jobCore31 = Job.Default
+        var jobNet48 = Job.Default
             .WithMaxIterationCount(20)
-            .WithRuntime(CoreRuntime.Core31)
-            .WithPlatform(Platform.X64);
-        var jobNet472 = Job.Default
-            .WithMaxIterationCount(20)
-            .WithRuntime(ClrRuntime.Net472)
+            .WithRuntime(ClrRuntime.Net48)
             .WithPlatform(Platform.X64);
         var config = DefaultConfig.Instance
-                .AddJob(jobCore50)
-                .AddJob(jobCore31)
-                .AddJob(jobNet472)
+                .AddJob(jobNet10)
+                .AddJob(jobNet48)
             ;
 
         BenchmarkRunner.Run<ScreenboundsBenchmark>(config);

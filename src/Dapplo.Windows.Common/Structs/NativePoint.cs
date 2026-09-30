@@ -6,16 +6,13 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
-#if !NETSTANDARD2_0
-using System.Windows;
-#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 namespace Dapplo.Windows.Common.Structs;
 
 /// <summary>
 ///     NativePoint represents the native POINT structure for calling native methods.
-///     It has conversions from and to System.Drawing.Point or System.Windows.Point
+///     It has conversions from and to System.Drawing.Point (the conversions from and to the WPF types are extension methods in Dapplo.Windows.Wpf)
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 [Serializable]
@@ -46,17 +43,6 @@ public readonly struct NativePoint : IEquatable<NativePoint>
         _x = x;
         _y = y;
     }
-
-#if !NETSTANDARD2_0
-    /// <summary>
-    ///     Implicit cast from NativePoint to Point
-    /// </summary>
-    /// <param name="point">NativePoint</param>
-    public static implicit operator Point(NativePoint point)
-    {
-        return new Point(point.X, point.Y);
-    }
-#endif
 
     /// <summary>
     ///     Implicit cast from NativePoint to System.Drawing.Point

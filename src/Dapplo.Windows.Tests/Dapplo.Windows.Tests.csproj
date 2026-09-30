@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
+    <!-- xunit.v3 test projects are executables -->
+    <OutputType>Exe</OutputType>
+    <!-- The tests use process wide resources (clipboard, hooks, the desktop), so the target frameworks must not run in parallel -->
+    <TestTfmsInParallel>false</TestTfmsInParallel>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -26,25 +30,21 @@
     <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.SystemState\Dapplo.Windows.SystemState.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Forms\Dapplo.Windows.Forms.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Wpf\Dapplo.Windows.Wpf.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="System.Reactive" Version="6.1.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.6.2" />
     <PackageReference Include="Dapplo.Log.Loggers" Version="3.0.22" />
     <PackageReference Include="Dapplo.Log.XUnit" Version="3.0.22" />
-    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
     <PackageReference Include="xunit.analyzers" Version="1.27.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-	<PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="Xunit.StaFact" Version="3.0.13" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-    <PackageReference Include="xunit.runner.console" Version="2.9.3">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -53,18 +53,5 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
 </Project>

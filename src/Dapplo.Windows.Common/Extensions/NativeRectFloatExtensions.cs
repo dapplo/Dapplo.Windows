@@ -372,24 +372,6 @@ public static class NativeRectFloatExtensions
         return new NativeRect((int)Math.Round(rect.X), (int)Math.Round(rect.Y), (int)Math.Round(rect.Width), (int)Math.Round(rect.Height));
     }
 
-#if !NETSTANDARD2_0
-    /// <summary>
-    /// Transform the specified NativeRectFloat
-    /// </summary>
-    /// <param name="rect">NativeRectFloat</param>
-    /// <param name="matrix">Matrix</param>
-    /// <returns>NativeRectFloat</returns>
-    [Pure]
-    public static NativeRectFloat Transform(this NativeRectFloat rect, System.Windows.Media.Matrix matrix)
-    {
-        System.Windows.Point[] myPointArray = { rect.TopLeft, rect.BottomRight };
-        matrix.Transform(myPointArray);
-        NativePointFloat topLeft = myPointArray[0];
-        NativePointFloat bottomRight = myPointArray[1];
-        return new NativeRectFloat(topLeft, bottomRight);
-    }
-#endif
-
     /// <summary>
     /// Normalize the NativeRectFloat by making a negative width and or height absolute
     /// </summary>

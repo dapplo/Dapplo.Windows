@@ -6,16 +6,13 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
-#if !NETSTANDARD2_0
-using System.Windows;
-#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 namespace Dapplo.Windows.Common.Structs;
 
 /// <summary>
 ///     NativePoint represents the native POINT structure for calling native methods.
-///     It has conversions from and to System.Drawing.Point or System.Windows.Point
+///     It has conversions from and to System.Drawing.Point (the conversions from and to the WPF types are extension methods in Dapplo.Windows.Wpf)
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 [Serializable]
@@ -46,26 +43,6 @@ public readonly struct NativePointFloat : IEquatable<NativePointFloat>
         _x = x;
         _y = y;
     }
-
-#if !NETSTANDARD2_0
-    /// <summary>
-    ///     Implicit cast from NativePoint to Point
-    /// </summary>
-    /// <param name="point">NativePointFloat</param>
-    public static implicit operator Point(NativePointFloat point)
-    {
-        return new Point(point.X, point.Y);
-    }
-    
-    /// <summary>
-    ///     Implicit cast from Point to NativePointFloat
-    /// </summary>
-    /// <param name="point">Point</param>
-    public static implicit operator NativePointFloat(Point point)
-    {
-        return new NativePointFloat((float) point.X, (float) point.Y);
-    }
-#endif
 
     /// <summary>
     ///     Explicit (lossy) cast from NativePointFloat to System.Drawing.Point.
@@ -125,10 +102,6 @@ public readonly struct NativePointFloat : IEquatable<NativePointFloat>
                 return Equals(drawingPoint);
             case NativePoint nativePoint:
                 return Equals(nativePoint);
-#if !NETSTANDARD2_0
-            case Point point:
-                return Equals(point);
-#endif
         }
 
         return false;

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD2_0
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Structs;
@@ -58,7 +57,6 @@ public static class CursorHelper
         }
         return 32; // Default
     }
-
 
     /// <summary>
     /// Attempts to retrieve information about the current cursor and capture its visual and positional properties.
@@ -769,4 +767,3 @@ public static class CursorHelper
     }
 
 }
-#endif

@@ -9,13 +9,6 @@ using Dapplo.Windows.App;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Kernel32;
 using Dapplo.Windows.Messages.Enumerations;
-#if !NETSTANDARD2_0
-using System.Drawing;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media.Imaging;
-using Dapplo.Windows.Gdi32.SafeHandles;
-#endif
 
 namespace Dapplo.Windows.Icons
 {
@@ -24,34 +17,17 @@ namespace Dapplo.Windows.Icons
     /// </summary>
     public static class IconExtensions
     {
-#if !NETSTANDARD2_0
-        /// <summary>
-        /// Convert an Icon to an ImageSource
-        /// </summary>
-        /// <param name="icon">Icon</param>
-        /// <returns>BitmapSource</returns>
-        public static BitmapSource ToBitmapSource(this Icon icon)
-        {
-            var bitmap = icon.ToBitmap();
-            using (var hBitmapHandle = new SafeHBitmapHandle(bitmap.GetHbitmap()))
-            {
-                return Imaging.CreateBitmapSourceFromHBitmap(
-                    hBitmapHandle.DangerousGetHandle(),
-                    IntPtr.Zero,
-                    Int32Rect.Empty,
-                    BitmapSizeOptions.FromEmptyOptions());
-            }
-        }
-#endif
         /// <summary>
         ///     Get the icon for a hWnd
         /// </summary>
-        /// <typeparam name="TIcon">The return type for the icon, can be Icon, Bitmap or BitmapSource</typeparam>
+        /// <typeparam name="TIcon">The return type for the icon, can be Icon or Bitmap (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
         /// <param name="window">IInteropWindow</param>
         /// <param name="useLargeIcons">true to try to get a big icon first</param>
         /// <returns>TIcon</returns>
+        /// <exception cref="NotSupportedException">when TIcon is not Icon or Bitmap</exception>
         public static TIcon GetIcon<TIcon>(this IInteropWindow window, bool useLargeIcons = false) where TIcon : class
         {
+            IconHelper.ThrowIfUnsupportedIconType<TIcon>();
             if (window.IsApp())
             {
                 return IconHelper.GetAppLogo<TIcon>(window);
@@ -104,7 +80,7 @@ namespace Dapplo.Windows.Icons
         /// <summary>
         ///     Get the icon for an IInteropWindow
         /// </summary>
-        /// <typeparam name="TIcon">The return type for the icon, can be Icon, Bitmap or BitmapSource</typeparam>
+        /// <typeparam name="TIcon">The return type for the icon, can be Icon or Bitmap (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
         /// <param name="window">IInteropWindow</param>
         /// <param name="useLargeIcons">true to try to get a big icon first</param>
         /// <returns>TIcon</returns>
@@ -116,7 +92,7 @@ namespace Dapplo.Windows.Icons
         /// <summary>
         ///     Get the icon for a hWnd
         /// </summary>
-        /// <typeparam name="TIcon">The return type for the icon, can be Icon, Bitmap or BitmapSource</typeparam>
+        /// <typeparam name="TIcon">The return type for the icon, can be Icon or Bitmap (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
         /// <param name="hWnd">IntPtr</param>
         /// <param name="useLargeIcons">true to try to get a big icon first</param>
         /// <returns>TIcon</returns>

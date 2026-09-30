@@ -28,8 +28,8 @@ Example `.build-runner\requests\baseline.json`:
 { "id": "baseline", "action": "verify", "configuration": "Debug" }
 ```
 
-Results land in `.build-runner\results`: `<id>.log` (full output), `<id>.trx` and `<id>.json` (exit codes, test counts,
-names of failed tests). Create the file `.build-runner\cancel` to stop a running request. Hanging tests are aborted
+Results land in `.build-runner\results`: `<id>.log` (full output), one `<id>_<framework>_<time>.trx` per target framework,
+and `<id>.json` (exit codes, test counts per framework, names of failed tests). Create the file `.build-runner\cancel` to stop a running request. Hanging tests are aborted
 after 3 minutes and named in the log. The runner restarts itself when the script changes.
 
 `.build-runner` is ignored by git.

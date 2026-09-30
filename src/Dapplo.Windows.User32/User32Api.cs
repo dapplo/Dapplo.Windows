@@ -7,9 +7,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-#if !NETSTANDARD2_0
-using System.Windows.Forms;
-#endif
 using Dapplo.Log;
 using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Structs;
@@ -26,10 +23,11 @@ public static class User32Api
 {
     private static readonly LogSource Log = new LogSource();
 
-#if !NETSTANDARD2_0
     private static bool _canCallGetPhysicalCursorPos = true;
+
     /// <summary>
     ///     Retrieves the cursor location safely, accounting for DPI settings in Vista/Windows 7.
+    ///     This uses GetPhysicalCursorPos, and falls back to GetCursorPos if that fails.
     /// </summary>
     /// <returns>
     ///     NativePoint with cursor location, relative to the origin of the monitor setup
@@ -37,45 +35,29 @@ public static class User32Api
     /// </returns>
     public static NativePoint GetCursorLocation()
     {
-        if (Environment.OSVersion.Version.Major < 6 || !_canCallGetPhysicalCursorPos)
+        if (_canCallGetPhysicalCursorPos)
         {
-            return new NativePoint(Cursor.Position.X, Cursor.Position.Y);
-        }
-        try
-        {
-            if (GetPhysicalCursorPos(out var cursorLocation))
+            try
             {
-                return cursorLocation;
+                if (GetPhysicalCursorPos(out var cursorLocation))
+                {
+                    return cursorLocation;
+                }
+                var error = Win32.GetLastErrorCode();
+                Log.Error().WriteLine("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
             }
-            var error = Win32.GetLastErrorCode();
-            Log.Error().WriteLine("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
+            catch (Exception ex)
+            {
+                Log.Error().WriteLine(ex, "Exception retrieving PhysicalCursorPos, no longer calling this. Cause :");
+                _canCallGetPhysicalCursorPos = false;
+            }
         }
-        catch (Exception ex)
+        if (GetCursorPos(out var logicalCursorLocation))
         {
-            Log.Error().WriteLine(ex, "Exception retrieving PhysicalCursorPos, no longer calling this. Cause :");
-            _canCallGetPhysicalCursorPos = false;
+            return logicalCursorLocation;
         }
-        return new NativePoint(Cursor.Position.X, Cursor.Position.Y);
+        throw new Win32Exception();
     }
-#else
-        /// <summary>
-        ///     Retrieves the cursor location safely, accounting for DPI settings in Vista/Windows 7.
-        /// </summary>
-        /// <returns>
-        ///     NativePoint with cursor location, relative to the origin of the monitor setup
-        ///     (i.e. negative coordinates are possible in multiscreen setups)
-        /// </returns>
-        public static NativePoint GetCursorLocation()
-        {
-            if (GetPhysicalCursorPos(out var cursorLocation))
-            {
-                return cursorLocation;
-            }
-            var error = Win32.GetLastErrorCode();
-            Log.Error().WriteLine("Error retrieving PhysicalCursorPos : {0}", Win32.GetMessage(error));
-            throw new Win32Exception((int)error);
-        }
-#endif
 
     /// <summary>
     /// Get the display info for the specified monitor handle
@@ -145,7 +127,6 @@ public static class User32Api
         return handles;
     }
 
-
     /// <summary>
     ///     Helper method to create a Win32 exception with the windows message in it
     /// </summary>
@@ -188,7 +169,6 @@ public static class User32Api
             return characters == 0 ? string.Empty : new string(classname, 0, characters);
         }
     }
-
 
     /// <summary>
     ///     Return the count of GDI objects.
@@ -1148,6 +1128,10 @@ public static class User32Api
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool GetPhysicalCursorPos(out NativePoint cursorLocation);
 
+    [DllImport(User32, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetCursorPos(out NativePoint cursorLocation);
+
     /// <summary>
     /// The MapWindowPoints function converts (maps) a set of points from a coordinate space relative to one window to a coordinate space relative to another window.
     /// </summary>
@@ -1287,7 +1271,6 @@ public static class User32Api
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, out uint pvParam, SystemParametersInfoBehaviors fWinIni);
 
-
     /// <summary>
     /// Locks the workstation's display. Locking a workstation protects it from unauthorized use.
     /// </summary>
@@ -1314,7 +1297,6 @@ public static class User32Api
     /// <returns>true if the cursor was successfully destroyed; otherwise, false.</returns>
     [DllImport(User32Api.User32, SetLastError = true)]
     internal static extern bool DestroyCursor(IntPtr hCursor);
-
 
     /// <summary>
     /// Fills a rectangle by using the specified brush and logical device context.

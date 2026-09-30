@@ -2,14 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dapplo.Windows.Messages.Enumerations;
-#if !NETSTANDARD2_0
 using System;
 using System.Windows;
 using System.Windows.Media;
 using Dapplo.Log;
 using Dapplo.Windows.Messages;
+using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Wpf.Messages;
 
-namespace Dapplo.Windows.Dpi.Wpf
+namespace Dapplo.Windows.Wpf.Dpi
 {
     /// <summary>
     ///     Extensions for the WPF Window class
@@ -97,4 +98,3 @@ namespace Dapplo.Windows.Dpi.Wpf
         }
     }
 }
-#endif

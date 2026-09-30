@@ -7,6 +7,7 @@ using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using System.Drawing;
 using System.Windows;
+using Dapplo.Windows.Wpf;
 using Xunit;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
@@ -73,9 +74,9 @@ public class RectTests
         Assert.Equal(nativeRect, (NativeRect)rectangle);
         Assert.Equal(rectangle, (Rectangle)nativeRect);
 
-        Int32Rect rect = nativeRect;
-        Assert.Equal(nativeRect, (NativeRect)rect);
-        Assert.Equal(rect, (Int32Rect)nativeRect);
+        Int32Rect rect = nativeRect.ToInt32Rect();
+        Assert.Equal(nativeRect, rect.ToNativeRect());
+        Assert.Equal(new Int32Rect(10, 20, 100, 200), rect);
     }
 
     [Fact]

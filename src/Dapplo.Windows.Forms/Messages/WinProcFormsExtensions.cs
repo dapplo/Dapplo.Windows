@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD2_0
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Forms;
+using Dapplo.Windows.Messages;
 
-namespace Dapplo.Windows.Messages
+namespace Dapplo.Windows.Forms.Messages
 {
     /// <summary>
     ///     A monitor for window messages
@@ -60,4 +60,3 @@ namespace Dapplo.Windows.Messages
         }
     }
 }
-#endif

@@ -4,9 +4,6 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-#if !NETSTANDARD2_0
-using System.Windows.Media.Imaging;
-#endif
 using System.Xml.Linq;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Desktop;
@@ -30,12 +27,14 @@ public static class IconHelper
     /// <summary>
     /// Helper method to get the app logo from the applications AppxManifest
     /// </summary>
-    /// <typeparam name="TBitmap">Type for the Bitmap, i.e. BitmapSource or Bitmap</typeparam>
+    /// <typeparam name="TBitmap">Type for the Bitmap, only Bitmap is supported (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="interopWindow">IInteropWindow</param>
     /// <param name="scale">int with scale, 100 is default</param>
     /// <returns>instance of TBitmap or null if nothing found</returns>
+    /// <exception cref="NotSupportedException">when TBitmap is not Icon or Bitmap</exception>
     public static TBitmap GetAppLogo<TBitmap>(IInteropWindow interopWindow, int scale = 100) where TBitmap : class
     {
+        ThrowIfUnsupportedIconType<TBitmap>();
         // get folder where actual app resides
         var exePath = GetAppProcessPath(interopWindow);
         if (exePath == null)
@@ -82,17 +81,6 @@ public static class IconHelper
         }
         using (var fileStream = File.OpenRead(finalLogoPath))
         {
-#if !NETSTANDARD2_0
-            if (typeof(BitmapSource).IsAssignableFrom(typeof(TBitmap)))
-            {
-                var img = new BitmapImage();
-                img.BeginInit();
-                img.StreamSource = fileStream;
-                img.CacheOption = BitmapCacheOption.OnLoad;
-                img.EndInit();
-                return img as TBitmap;
-            }
-#endif
             if (typeof(Bitmap) != typeof(TBitmap))
             {
                 return default;
@@ -250,11 +238,13 @@ public static class IconHelper
     /// Create a TIcon from the specified iconHandle.
     /// The returned TIcon is always an independent copy, the caller keeps ownership of the iconHandle and may destroy it afterwards.
     /// </summary>
-    /// <typeparam name="TIcon">Bitmap, Icon or BitmapSource</typeparam>
+    /// <typeparam name="TIcon">Bitmap or Icon (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="iconHandle">IntPtr</param>
     /// <returns>TIcon</returns>
+    /// <exception cref="NotSupportedException">when TIcon is not Icon or Bitmap</exception>
     public static TIcon IconHandleTo<TIcon>(IntPtr iconHandle) where TIcon : class
     {
+        ThrowIfUnsupportedIconType<TIcon>();
         if (iconHandle == IntPtr.Zero)
         {
             return default;
@@ -274,18 +264,20 @@ public static class IconHelper
                 return icon.ToBitmap() as TIcon;
             }
         }
-#if !NETSTANDARD2_0
-        if (typeof(TIcon) != typeof(BitmapSource))
+        return default;
+    }
+
+    /// <summary>
+    ///     Make sure the requested icon type is supported, this prevents that e.g. a WPF BitmapSource silently results in null.
+    /// </summary>
+    /// <typeparam name="TIcon">Icon or Bitmap</typeparam>
+    /// <exception cref="NotSupportedException">when TIcon is not Icon or Bitmap</exception>
+    internal static void ThrowIfUnsupportedIconType<TIcon>()
+    {
+        if (typeof(TIcon) != typeof(Icon) && typeof(TIcon) != typeof(Bitmap))
         {
-            return default;
+            throw new NotSupportedException($"{typeof(TIcon).FullName} is not supported, only {typeof(Icon).FullName} and {typeof(Bitmap).FullName} are. Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource.");
         }
-        using (var icon = Icon.FromHandle(iconHandle))
-        {
-            return icon.ToBitmapSource() as TIcon;
-        }
-#else
-            return default;
-#endif
     }
 
     /// <summary>
@@ -469,7 +461,7 @@ public static class IconHelper
     ///     Loads an icon at the system-preferred size using LoadIconMetric.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric">LoadIconMetric function</a>
     /// </summary>
-    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <typeparam name="TIcon">The type of icon to return (Icon or Bitmap) (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="hInstance">
     ///     A handle to the module containing the icon resource.
     ///     Use IntPtr.Zero to load a stock system icon.
@@ -507,7 +499,7 @@ public static class IconHelper
     ///     Loads an icon at the system-preferred size using LoadIconMetric.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric">LoadIconMetric function</a>
     /// </summary>
-    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <typeparam name="TIcon">The type of icon to return (Icon or Bitmap) (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="hInstance">
     ///     A handle to the module containing the icon resource.
     ///     Use IntPtr.Zero to load a stock system icon.
@@ -546,7 +538,7 @@ public static class IconHelper
     ///     If the icon is larger than the requested size, it will be scaled down.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconwithscaledown">LoadIconWithScaleDown function</a>
     /// </summary>
-    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <typeparam name="TIcon">The type of icon to return (Icon or Bitmap) (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="hInstance">
     ///     A handle to the module containing the icon resource.
     ///     Use IntPtr.Zero to load a stock system icon.
@@ -584,7 +576,7 @@ public static class IconHelper
     ///     If the icon is larger than the requested size, it will be scaled down.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconwithscaledown">LoadIconWithScaleDown function</a>
     /// </summary>
-    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <typeparam name="TIcon">The type of icon to return (Icon or Bitmap) (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="hInstance">
     ///     A handle to the module containing the icon resource.
     ///     Use IntPtr.Zero to load a stock system icon.

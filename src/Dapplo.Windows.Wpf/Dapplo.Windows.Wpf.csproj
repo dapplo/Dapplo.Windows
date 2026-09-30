@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Dapplo.Windows.Wpf contains the WPF specific extensions for Dapplo.Windows, e.g. conversions between the native structs and the WPF types, window message observables for WPF windows and DPI support for WPF windows.</Description>
+    <PackageTags>windows native wpf</PackageTags>
+    <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapplo.Log" Version="3.0.22" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+</Project>

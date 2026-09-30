@@ -2,14 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dapplo.Windows.Messages.Enumerations;
-#if !NETSTANDARD2_0
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Interop;
+using Dapplo.Windows.Messages;
 
-namespace Dapplo.Windows.Messages
+namespace Dapplo.Windows.Wpf.Messages
 {
     /// <summary>
     ///     A monitor for window messages
@@ -149,4 +149,3 @@ namespace Dapplo.Windows.Messages
         }
     }
 }
-#endif

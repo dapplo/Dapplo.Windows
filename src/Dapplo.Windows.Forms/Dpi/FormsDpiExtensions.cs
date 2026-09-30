@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD2_0
-
 using System;
 using System.Windows.Forms;
 using Dapplo.Windows.Messages;
+using Dapplo.Windows.Dpi;
+using Dapplo.Windows.Forms.Messages;
 
-namespace Dapplo.Windows.Dpi.Forms
+namespace Dapplo.Windows.Forms.Dpi
 {
     /// <summary>
     ///     Extensions for Windows Form
@@ -44,4 +44,3 @@ namespace Dapplo.Windows.Dpi.Forms
         }
     }
 }
-#endif

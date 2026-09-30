@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD2_0
 using Dapplo.Windows.Common.Structs;
 using System;
 using System.Drawing;
@@ -74,4 +73,3 @@ public class CapturedCursor: IDisposable
         };
     }
 }
-#endif

@@ -9,10 +9,10 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Extensions;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
+using Dapplo.Windows.Wpf;
 using Xunit;
 
 namespace Dapplo.Windows.Tests;

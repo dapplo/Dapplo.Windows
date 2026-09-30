@@ -1,15 +1,12 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD2_0
-
 using System;
 using System.Collections.Generic;
 using System.Security.Permissions;
 using System.Windows.Forms;
-using System.Windows.Interop;
 
-namespace Dapplo.Windows.Messages
+namespace Dapplo.Windows.Forms.Messages
 {
     /// <summary>
     ///     This is a Listener for WinProc messages of a Control, it subclasses the window of the control.
@@ -19,7 +16,7 @@ namespace Dapplo.Windows.Messages
     {
         private readonly object _lock = new object();
         private readonly Control _control;
-        private HwndSourceHook[] _hooks = Array.Empty<HwndSourceHook>();
+        private WinProcHook[] _hooks = Array.Empty<WinProcHook>();
 
         /// <summary>
         /// Is the WinProcListener already disposed?
@@ -54,7 +51,7 @@ namespace Dapplo.Windows.Messages
             _control.HandleDestroyed -= OnHandleDestroyed;
             lock (_lock)
             {
-                _hooks = Array.Empty<HwndSourceHook>();
+                _hooks = Array.Empty<WinProcHook>();
             }
             if (Handle != IntPtr.Zero)
             {
@@ -65,8 +62,8 @@ namespace Dapplo.Windows.Messages
         /// <summary>
         ///     Adds an event handler
         /// </summary>
-        /// <param name="hook">HwndSourceHook</param>
-        public void AddHook(HwndSourceHook hook)
+        /// <param name="hook">WinProcHook</param>
+        public void AddHook(WinProcHook hook)
         {
             if (hook == null)
             {
@@ -74,7 +71,7 @@ namespace Dapplo.Windows.Messages
             }
             lock (_lock)
             {
-                var newHooks = new List<HwndSourceHook>(_hooks) { hook };
+                var newHooks = new List<WinProcHook>(_hooks) { hook };
                 _hooks = newHooks.ToArray();
             }
         }
@@ -82,12 +79,12 @@ namespace Dapplo.Windows.Messages
         /// <summary>
         ///     Removes the event handlers that were added by AddHook
         /// </summary>
-        /// <param name="hook">HwndSourceHook, The event handler to remove.</param>
-        public void RemoveHook(HwndSourceHook hook)
+        /// <param name="hook">WinProcHook, The event handler to remove.</param>
+        public void RemoveHook(WinProcHook hook)
         {
             lock (_lock)
             {
-                var newHooks = new List<HwndSourceHook>(_hooks);
+                var newHooks = new List<WinProcHook>(_hooks);
                 newHooks.Remove(hook);
                 _hooks = newHooks.ToArray();
             }
@@ -157,4 +154,3 @@ namespace Dapplo.Windows.Messages
         }
     }
 }
-#endif

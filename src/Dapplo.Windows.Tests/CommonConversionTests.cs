@@ -9,6 +9,7 @@ using Dapplo.Windows.Common;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Wpf;
 using Xunit;
 
 namespace Dapplo.Windows.Tests;
@@ -126,8 +127,8 @@ public class CommonConversionTests
         Assert.Equal(new NativePoint(-1, 1), (NativePoint)new System.Drawing.PointF(-0.5f, 1.5f));
         // Sizes are rounded up
         Assert.Equal(new System.Drawing.Size(2, 3), (System.Drawing.Size)new NativeSizeFloat(1.2f, 3f));
-        Assert.Equal(new NativeSize(2, 3), (NativeSize)new System.Windows.Size(1.2, 3));
-        Assert.Equal(NativeSize.Empty, (NativeSize)System.Windows.Size.Empty);
+        Assert.Equal(new NativeSize(2, 3), new System.Windows.Size(1.2, 3).ToNativeSize());
+        Assert.Equal(NativeSize.Empty, System.Windows.Size.Empty.ToNativeSize());
         // Right does not drift: 0.6 + 0.6 = 1.2, so the containing rectangle is 0..2
         Assert.Equal(new NativeRect(0, 0, 2, 2), (NativeRect)new NativeRectFloat(0.6f, 0.6f, 0.6f, 0.6f));
     }
@@ -136,11 +137,11 @@ public class CommonConversionTests
     public void WpfRectConversion_NotNormalized_DoesNotThrow()
     {
         var notNormalized = new NativeRect(100, 100, -50, -20);
-        System.Windows.Rect rect = notNormalized;
+        var rect = notNormalized.ToRect();
         Assert.Equal(new System.Windows.Rect(50, 80, 50, 20), rect);
 
         var notNormalizedFloat = new NativeRectFloat(100f, 100f, -50f, -20f);
-        System.Windows.Rect rectFromFloat = notNormalizedFloat;
+        var rectFromFloat = notNormalizedFloat.ToRect();
         Assert.Equal(new System.Windows.Rect(50, 80, 50, 20), rectFromFloat);
     }
 

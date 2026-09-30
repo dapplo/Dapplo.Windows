@@ -7,9 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Runtime.InteropServices;
-#if !NETSTANDARD2_0
-using System.Windows;
-#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 namespace Dapplo.Windows.Common.Structs;
@@ -17,7 +14,7 @@ namespace Dapplo.Windows.Common.Structs;
 /// <summary>
 ///     NativeRect represents the native RECTF structure for calling native methods.
 ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms534497(v=vs.85).aspx">RectF class</a>
-///     It has conversions from and to System.Drawing.RectangleF or System.Windows.Rect
+///     It has conversions from and to System.Drawing.RectangleF (the conversions from and to the WPF types are extension methods in Dapplo.Windows.Wpf)
 ///
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
@@ -162,52 +159,6 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
         return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
     }
 
-#if !NETSTANDARD2_0
-    /// <summary>
-    ///     Cast Rect to NativeRectFloat
-    /// </summary>
-    /// <param name="rectangle">Rect</param>
-    /// <returns>NativeRectFloat</returns>
-    public static implicit operator NativeRectFloat(Rect rectangle)
-    {
-        return new NativeRectFloat((float)rectangle.Left, (float)rectangle.Top, (float)rectangle.Width, (float)rectangle.Height);
-    }
-
-    /// <summary>
-    ///     Cast Int32Rect to NativeRectFloat
-    /// </summary>
-    /// <param name="rectangle">Int32Rect</param>
-    /// <returns>NativeRectFloat</returns>
-    public static implicit operator NativeRectFloat(Int32Rect rectangle)
-    {
-        return new NativeRectFloat(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
-    }
-
-    /// <summary>
-    ///     Cast NativeRectFloat to Rect.
-    ///     A System.Windows.Rect cannot have a negative width or height, a not normalized NativeRectFloat is normalized.
-    /// </summary>
-    /// <param name="rectangle">NativeRectFloat</param>
-    /// <returns>Rect</returns>
-    public static implicit operator Rect(NativeRectFloat rectangle)
-    {
-        // The Rect(Point, Point) constructor normalizes, Rect(x, y, width, height) would throw an ArgumentException for a negative width or height
-        return new Rect(new System.Windows.Point(rectangle.Left, rectangle.Top), new System.Windows.Point(rectangle.Right, rectangle.Bottom));
-    }
-
-    /// <summary>
-    ///     Explicit (lossy) cast NativeRectFloat to Int32Rect, this results in the smallest integer rectangle which contains the NativeRectFloat (see <see cref="GetContainingIntegerBounds"/>).
-    /// </summary>
-    /// <param name="rectangle">NativeRectFloat</param>
-    /// <returns>Int32Rect</returns>
-    public static explicit operator Int32Rect(NativeRectFloat rectangle)
-    {
-        rectangle.GetContainingIntegerBounds(out var left, out var top, out var width, out var height);
-        return new Int32Rect(left, top, width, height);
-    }
-#endif
-
-
     /// <summary>
     ///     Cast RectangleF to NativeRectFloat
     /// </summary>
@@ -336,10 +287,6 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
         {
             case NativeRectFloat f:
                 return Equals(f);
-#if !NETSTANDARD2_0
-            case Rect rect1:
-                return Equals(rect1);
-#endif
             case RectangleF rectangleF:
                 return Equals(rectangleF);
         }

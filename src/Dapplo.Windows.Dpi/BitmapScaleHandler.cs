@@ -8,9 +8,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Threading;
-#if !NETSTANDARD2_0
-using System.Windows.Forms;
-#endif
 
 namespace Dapplo.Windows.Dpi
 {
@@ -134,24 +131,33 @@ namespace Dapplo.Windows.Dpi
             return this;
         }
 
-#if !NETSTANDARD2_0
         /// <summary>
-        ///     Add a Button as a Bitmap target
+        ///     Add a target, e.g. a Button, which gets a (new) bitmap applied when the DPI changes.
+        ///     The target is also the key for <see cref="RemoveTarget"/>, adding the same target again replaces the previous action.
+        ///     Dapplo.Windows.Forms has extensions to add a Windows Forms Button or ToolStripItem.
         /// </summary>
-        /// <param name="button">Button</param>
+        /// <param name="target">object which is the target, used as key</param>
         /// <param name="imageKey">key of the image</param>
-        /// <param name="valueConverter">func to deliver bitmaps for buttons</param>
+        /// <param name="apply">Action which applies the bitmap to the target</param>
         /// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
-        public BitmapScaleHandler<TKey, TValue> AddTarget(Button button, TKey imageKey, Func<TValue, Bitmap> valueConverter, bool execute = false)
+        public BitmapScaleHandler<TKey, TValue> AddTargetAction(object target, TKey imageKey, Action<TValue> apply, bool execute = false)
         {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+            if (apply == null)
+            {
+                throw new ArgumentNullException(nameof(apply));
+            }
             void ApplyAction()
             {
-                button.Image = valueConverter(GetBitmap(imageKey));
+                apply(GetBitmap(imageKey));
             }
             try
             {
                 _actionsLock.EnterWriteLock();
-                ApplyActions[button] = ApplyAction;
+                ApplyActions[target] = ApplyAction;
             }
             finally
             {
@@ -163,38 +169,6 @@ namespace Dapplo.Windows.Dpi
             }
             return this;
         }
-
-        /// <summary>
-        ///     Add a ButtonToolStripItem as a Bitmap target
-        /// </summary>
-        /// <param name="toolStripItem">ToolStripItem</param>
-        /// <param name="imageKey">key of the image</param>
-        /// <param name="valueConverter"></param>
-        /// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
-        public BitmapScaleHandler<TKey, TValue> AddTarget(ToolStripItem toolStripItem, TKey imageKey, Func<TValue, Bitmap> valueConverter, bool execute = false)
-        {
-            void ApplyAction()
-            {
-                toolStripItem.Image = valueConverter(GetBitmap(imageKey));
-            }
-            try
-            {
-                _actionsLock.EnterWriteLock();
-
-                ApplyActions[toolStripItem] = ApplyAction;
-            }
-            finally
-            {
-                _actionsLock.ExitWriteLock();
-            }
-            if (execute)
-            {
-                ApplyAction();
-            }
-
-            return this;
-        }
-#endif
 
         /// <summary>
         ///     Dispose implementation

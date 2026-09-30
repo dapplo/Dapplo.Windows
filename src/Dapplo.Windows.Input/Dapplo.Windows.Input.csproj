@@ -1,11 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.Input provides code to generate and get input from keyboard and mouse</Description>
     <PackageTags>windows native input</PackageTags>
-    <TargetFrameworks>net480;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
+    <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <UseWindowsForms>true</UseWindowsForms>
-    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
@@ -14,19 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Reactive" Version="6.1.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.6.2" />
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
-    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsBase" />
+    <PackageReference Include="System.Memory" Version="4.6.3" />
   </ItemGroup>
 </Project>

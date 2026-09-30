@@ -1,10 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.Icons has supporting code for icons.</Description>
     <PackageTags>windows native icons</PackageTags>
-    <TargetFrameworks>net480;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
-    <UseWindowsForms>true</UseWindowsForms>
-    <UseWPF>true</UseWPF>
+    <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
@@ -17,18 +15,13 @@
 	<ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj" />
 	<ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
-    <PackageReference Include="System.Drawing.Common" Version="10.0.3" />
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup Condition="!$(TargetFramework.StartsWith('net4'))">
+    <PackageReference Include="System.Drawing.Common" Version="10.0.3" />
   </ItemGroup>
 </Project>

@@ -2,14 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dapplo.Windows.Messages.Enumerations;
-#if !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Disposables;
 using System.Windows.Interop;
 
-namespace Dapplo.Windows.Messages
+namespace Dapplo.Windows.Wpf.Messages
 {
     /// <summary>
     ///     This can be used to handle WinProc messages, for instance when there is no running WinProc
@@ -192,4 +191,3 @@ namespace Dapplo.Windows.Messages
         }
     }
 }
-#endif

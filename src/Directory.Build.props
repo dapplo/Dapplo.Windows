@@ -7,15 +7,15 @@
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>http://www.dapplo.net/blocks/Dapplo.Windows/</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReleaseNotes>See https://github.com/dapplo/Dapplo.Windows/blob/master/CHANGELOG.md</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
-    <DisableImplicitFrameworkReferences Condition="$(TargetFramework.StartsWith('net4'))">true</DisableImplicitFrameworkReferences>
     <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(MSBuildProjectName.Contains('Dapplo')) And $(TargetFramework.StartsWith('net4')) And '$(Configuration)' == 'Release' And !$(MSBuildProjectName.Contains('Tests')) And !$(MSBuildProjectName.Contains('Example'))">
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Dapplo.Windows.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Dapplo.Windows.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   
@@ -57,6 +57,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103" PrivateAssets="All"/>
-    <None Include="$(SolutionDir)\icon.png" Pack="true" PackagePath="\"/>
+    <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="\" Visible="false"/>
   </ItemGroup>
 </Project>

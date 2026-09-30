@@ -10,6 +10,18 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 ## [Unreleased] - 3.0.0
 
 ### Changed
+- **Breaking:** targets are `net480` and `net10.0-windows` only; `netstandard2.0` and `net8.0-windows` are dropped (F-11).
+- **Breaking:** the core packages no longer depend on WinForms or WPF. WinForms helpers moved to the new **Dapplo.Windows.Forms** package, WPF helpers to the new **Dapplo.Windows.Wpf** package, under the `Dapplo.Windows.Forms.*` / `Dapplo.Windows.Wpf.*` namespaces (F-05, F-12).
+- **Breaking:** conversions between the native structs and WPF types are extension methods (`ToRect()`, `ToNativeRect()`, `ToSize()`, `ToInt32Rect()`, …) in Dapplo.Windows.Wpf.
+- **Breaking:** `WinProcListener` (now in Dapplo.Windows.Forms) takes a `WinProcHook` delegate instead of the WPF `HwndSourceHook`.
+- **Breaking:** `InteropWindowExtensions.PrintWindow()` returns a `Bitmap`; `PrintWindowAsBitmapSource()` is in Dapplo.Windows.Wpf.
+- **Breaking:** icon helpers support `Icon` and `Bitmap` only and throw `NotSupportedException` for other types instead of returning null; use `ToBitmapSource()` from Dapplo.Windows.Wpf.
+- **Breaking:** `DwmApi.ColorizationColor` (WPF `Color`) is removed; use `ColorizationSystemDrawingColor.ToMediaColor()`.
+- **Breaking:** `BitmapScaleHandler.AddTarget(Button / ToolStripItem)` moved to Dapplo.Windows.Forms extension methods; the core has `AddTargetAction`.
+- `DpiHandler.HandleWindowMessages`, `HandleContextMenuMessages` and `MessageHandler` are public, so other UI frameworks can feed messages to a `DpiHandler`.
+- `User32Api.GetCursorLocation()` falls back to `GetCursorPos` instead of WinForms `Cursor.Position`.
+- Packages are published to NuGet only from version tags (`v*`), each with a GitHub Release built from this changelog; other builds are prereleases. The API reference is generated again with docfx as a dotnet tool, and the wiki mirror removes deleted pages (F-02, F-07, F-16, F-19).
+- The tests also run on .NET Framework 4.8, and CI runs only the non-interactive tests (F-10). `global.json` is in the repository root.
 - **Breaking:** `InteropWindowExtensions.Fill()` now respects `ForceUpdate`, `AutoCorrectValues` and `Maximized`. Before, it always re-read every value, always auto-corrected and always queried the maximized state, so caching never worked (A-02).
 - **Breaking:** `WindowScroller.ScrollWheelLinesFromRegistry` is replaced by `WindowScroller.ScrollWheelLines`, read with `SystemParametersInfo(SPI_GETWHEELSCROLLLINES)`; the wheel delta is calculated by the new `WindowScroller.CalculateWheelDelta` (A-17).
 - **Breaking:** removed `NativeRectExtensions.Intersect2`, which returned wrong results; use `Intersect` (C-05).
@@ -64,6 +76,8 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - `WindowsSessionListener.IsRegistered` and `RegistrationFailed`; `DevBroadcastDeviceInterface.TryGetDevBroadcastPort` / `TryGetDevBroadcastHandle`; `PowerManagementApi.EnableShutdownPrivilege()`.
 
 ### Fixed
+- `dotnet pack` of a single project no longer fails on the missing icon; package release notes point to this changelog (F-09).
+- Benchmarks target the runtimes the project builds for (F-04); FormsExample embeds its app.manifest, so the DPI demos run Per Monitor v2 (F-18).
 - Reading a window's text (`GetTextFromWindow`, `GetText()`, `Fill()`) no longer crashes the process with a StackOverflowException when a control holds a very large text; texts over 1M characters are truncated (A-03).
 - Getting a window's text or title-bar info no longer blocks forever on a hung application; it times out after 500 ms (A-04).
 - `WindowScroller.End()` and `Start()` in MouseWheel mode can no longer loop forever; they stop when the position stops changing or after `MaxMouseWheelSteps`, and only return true when the end or start was reached (A-05).

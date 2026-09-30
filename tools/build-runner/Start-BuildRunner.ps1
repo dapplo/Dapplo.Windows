@@ -163,17 +163,21 @@ function Invoke-Request {
     }
 
     if ($action -eq 'test' -or ($action -eq 'verify' -and $summary.build_exit_code -eq 0)) {
-        $trx = "$id.trx"
-        $trxPath = Join-Path $ResultDir $trx
-        Remove-Item -Path $trxPath -Force -ErrorAction SilentlyContinue
+        # One trx per target framework: <id>_<tfm>_<timestamp>.trx
+        $trx = "$id*.trx"
+        Get-ChildItem -Path $ResultDir -Filter "$id*.trx" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
         $testArgs = @('test', "`"$TestProject`"", '-c', $configuration, '--no-build', '--nologo',
-            '--logger', "`"trx;LogFileName=$trx`"", '--logger', '"console;verbosity=normal"', '--results-directory', "`"$ResultDir`"",
+            '--logger', "`"trx;LogFilePrefix=$id`"", '--logger', '"console;verbosity=normal"', '--results-directory', "`"$ResultDir`"",
             '--blame-hang', '--blame-hang-timeout', $TestHangTimeout, '--blame-hang-dump-type', 'none',
             '--filter', "`"$filter`"")
         if ($framework) { $testArgs += @('--framework', $framework) }
         $summary.test_exit_code = Invoke-Step -Name 'test' -Exe $Dotnet -Log $log -Arguments $testArgs
         $summary.trx = $trx
-        $summary.tests = Get-TrxCounts -Path $trxPath
+        $summary.tests = @(Get-ChildItem -Path $ResultDir -Filter "$id*.trx" -File -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object {
+            $counts = Get-TrxCounts -Path $_.FullName
+            if ($counts) { $counts.file = $_.Name }
+            $counts
+        })
     }
 
     if ($action -eq 'pack') {

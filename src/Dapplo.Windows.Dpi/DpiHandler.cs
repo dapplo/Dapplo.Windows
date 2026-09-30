@@ -45,9 +45,10 @@ public sealed class DpiHandler : IDisposable
     public int Dpi { get; private set; }
 
     /// <summary>
-    ///     This is that which handles the windows messages, and needs to be disposed
+    ///     The subscription which feeds the window messages to this DpiHandler, e.g. set by the AttachDpiHandler extensions in Dapplo.Windows.Forms or Dapplo.Windows.Wpf.
+    ///     It is disposed together with this DpiHandler.
     /// </summary>
-    internal IDisposable MessageHandler { get; set; }
+    public IDisposable MessageHandler { get; set; }
 
     /// <summary>
     ///     This subject publishes whenever the dpi settings are changed, with some details
@@ -85,8 +86,8 @@ public sealed class DpiHandler : IDisposable
     ///     <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn312083(v=vs.85).aspx">WM_DPICHANGED message</a>
     /// </summary>
     /// <param name="windowMessageInfo">WindowMessageInfo</param>
-    /// <returns>IntPtr</returns>
-    internal bool HandleWindowMessages(WindowMessageInfo windowMessageInfo)
+    /// <returns>bool true if the message was handled</returns>
+    public bool HandleWindowMessages(WindowMessageInfo windowMessageInfo)
     {
         bool handled = false;
         var currentDpi = DpiCalculator.DefaultScreenDpi;
@@ -212,7 +213,7 @@ public sealed class DpiHandler : IDisposable
     /// </summary>
     /// <param name="windowMessageInfo">WindowMessageInfo</param>
     /// <returns>IntPtr</returns>
-    internal IntPtr HandleContextMenuMessages(WindowMessageInfo windowMessageInfo)
+    public IntPtr HandleContextMenuMessages(WindowMessageInfo windowMessageInfo)
     {
         var currentDpi = DpiCalculator.DefaultScreenDpi;
         bool isDpiMessage = false;

@@ -1,4 +1,4 @@
-﻿using Dapplo.Windows.Dpi.Forms;
+﻿using Dapplo.Windows.Forms.Dpi;
 using Dapplo.Windows.EmbeddedBrowser;
 
 namespace Dapplo.Windows.Example.FormsExample

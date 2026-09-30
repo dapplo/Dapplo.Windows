@@ -11,8 +11,6 @@ using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.Messages.Native;
 
-#if !NETSTANDARD2_0
-
 namespace Dapplo.Windows.Devices
 {
     /// <summary>
@@ -200,5 +198,3 @@ namespace Dapplo.Windows.Devices
         }
     }
 }
-
-#endif
