@@ -31,6 +31,11 @@ subscription.Dispose();
 `IsShift`, `IsAlt`, `IsWindows` and the left / right variants), the lock keys (`IsCapsLockActive`, ...), `ScanCode`,
 `IsExtended` and whether the event was injected by a program (`IsInjectedByProcess`).
 
+Text which is sent as Unicode characters (by `KeyboardInputGenerator.TypeText`, an IME, an on-screen keyboard or a
+remote desktop client) arrives as `VirtualKeyCode.Packet` (VK_PACKET) events: `IsPacket` is true and
+`PacketCharacter` is the UTF-16 code unit. A character outside the Basic Multilingual Plane, like most emoji, arrives
+as two packets (the surrogates). The key combination and sequence handlers ignore packets.
+
 ### The hook thread
 
 `KeyboardHook` and `MouseHook` run on their own background thread with a message loop. It doesn't matter which thread
@@ -135,7 +140,7 @@ var subscription = KeyboardHook.KeyboardEvents.Where(handler).Subscribe(_ => Con
 | `IsPassThrough` | `false` | `true` lets other applications see the keys too |
 | `CanRepeat` | `false` | `true` fires again for auto-repeat while the keys are held |
 | `IgnoreInjected` | `true` | `false` also reacts to keys sent by programs (`SendInput`) |
-| `TriggerOnKeyUp` | `false` | `true` fires on key-up instead of key-down, see below |
+| `TriggerMode` | `KeyDown` | `FirstKeyUp` or `AllKeysUp` fire on the release of the combination, see [Trigger mode](#trigger-mode) |
 | `KeyStateVerifier` | physical key state | checks on every key-down that the keys it considers pressed are still down, so a missed key-up (Win+L, UAC, Ctrl+Alt+Del) doesn't block the combination |
 
 Combinations can be parsed from text, for example from a settings file:
@@ -197,36 +202,63 @@ var handler = new KeySequenceHandler(
 var subscription = KeyboardHook.KeyboardEvents.Where(handler).Subscribe(_ => Console.WriteLine("Comment selection"));
 ```
 
-### TriggerOnKeyUp
+### Trigger mode
 
-With `TriggerOnKeyUp = true` the handler fires when the **first** key of the combination is released, if all keys were
-down together and no other key was pressed. At that moment the other keys of the combination can still be held down.
-In this mode the key events are never marked as handled: the key-downs already reached the active application, and
-swallowing only the key-up would leave a stuck key. `IsPassThrough` has no effect.
+`TriggerMode` sets when the handler fires:
 
-If you send input in reaction to the combination, wait until the user released the modifier keys, otherwise your input
-is combined with them (Ctrl+Shift+Home instead of Home):
+| `TriggerMode` | Fires | Key events |
+|---|---|---|
+| `KeyDown` (default) | on the key-down which completes the combination | swallowed, unless `IsPassThrough` |
+| `FirstKeyUp` | when the first key of the combination is released; the other keys can still be down | passed on |
+| `AllKeysUp` | once, when the last key of the combination is released | passed on |
 
-<!-- sample: InputSamples.WaitForReleasePInvoke -->
+In both key-up modes the key events are never marked as handled: the key-downs already reached the active
+application, and swallowing only the key-up would leave a stuck key. `IsPassThrough` has no effect. Choose a
+combination which doesn't mean anything in the applications of your users.
+
+A key-up mode only fires when all keys of the combination were down together, without another key. With `AllKeysUp`,
+another key pressed while a key of the combination is still down (Ctrl+A, then C while Ctrl is held) cancels the
+trigger; pressing the complete combination again arms it again (auto-repeat doesn't count).
+
+`AllKeysUp` is the mode for hotkeys which send input: when it fires, the user doesn't hold any key of the combination
+anymore, so your input isn't combined with it.
+
+<!-- sample: InputSamples.AllKeysUp -->
 ```csharp
-[DllImport("user32")]
-private static extern short GetAsyncKeyState(VirtualKeyCode key);
+// Ctrl+Alt+D types the date into the active application, when the user released all keys of the combination
+var handler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.KeyD)
+{
+    TriggerMode = TriggerMode.AllKeysUp
+};
 
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(handler)
+    // Leave the hook thread, sending input from there would block the keyboard
+    .ObserveOn(TaskPoolScheduler.Default)
+    // No key of the combination is down anymore, so the text isn't combined with Ctrl or Alt
+    .Subscribe(_ => KeyboardInputGenerator.TypeText(DateTime.Now.ToString("yyyy-MM-dd")));
+```
+
+With `FirstKeyUp` the other keys can still be down when the handler fires. If you send input in reaction, wait until
+the user released them, otherwise your input is combined with them (Ctrl+Shift+Home instead of Home):
+
+<!-- sample: InputSamples.WaitForRelease -->
+```csharp
 private static void WaitUntilReleased(params VirtualKeyCode[] keys)
 {
-    // The high bit is set while the key is down
-    while (keys.Any(key => (GetAsyncKeyState(key) & 0x8000) != 0))
+    // The asynchronous (current, system wide) key state, Control and Shift match the left and the right key
+    while (KeyboardState.IsAnyDown(keys))
     {
         Thread.Sleep(20);
     }
 }
 ```
 
-<!-- sample: InputSamples.TriggerOnKeyUp -->
+<!-- sample: InputSamples.FirstKeyUp -->
 ```csharp
-var handler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyD)
+var handler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyH)
 {
-    TriggerOnKeyUp = true
+    TriggerMode = TriggerMode.FirstKeyUp
 };
 
 var subscription = KeyboardHook.KeyboardEvents
@@ -236,9 +268,35 @@ var subscription = KeyboardHook.KeyboardEvents
     .Subscribe(_ =>
     {
         // The other keys of the combination can still be down, wait for them before sending input
-        WaitUntilReleased(VirtualKeyCode.LeftControl, VirtualKeyCode.RightControl, VirtualKeyCode.LeftShift, VirtualKeyCode.RightShift);
+        WaitUntilReleased(VirtualKeyCode.Control, VirtualKeyCode.Shift);
         KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Home);
     });
+```
+
+## Key state
+
+`KeyboardState` reads the state of a key. `Shift`, `Control`, `Menu` and `Win` check the left and the right key.
+Windows keeps two states:
+
+- **Asynchronous** (`IsDown`, `IsAnyDown`, GetAsyncKeyState): the state right now, system wide, including injected
+  input. Use it in background threads and hooks, e.g. to wait until the user released some keys. In a low-level hook
+  the key of the current event isn't updated yet (use `IsKeyDown` of the event), and while another desktop (UAC,
+  Win+L) is active all keys read as up.
+- **Per thread** (`IsDownForCurrentThread`, `IsToggled`, GetKeyState): the state at the time of the keyboard message
+  which the calling thread is processing. Use it in a key event handler of your UI. It lags behind when the thread
+  doesn't process keyboard messages. The toggle state (CapsLock, NumLock, ScrollLock) only exists here.
+
+<!-- sample: InputSamples.KeyStateQuery -->
+```csharp
+// Right now, system wide (GetAsyncKeyState): use this in background threads and hooks
+bool shiftDown = KeyboardState.IsDown(VirtualKeyCode.Shift);
+bool anyModifier = KeyboardState.IsAnyDown(VirtualKeyCode.Shift, VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.Win);
+
+// At the time of the keyboard message the UI thread is processing (GetKeyState): use this in a key event handler
+bool ctrlWithThisKey = KeyboardState.IsDownForCurrentThread(VirtualKeyCode.Control);
+
+// Toggle keys
+bool capsLock = KeyboardState.IsToggled(VirtualKeyCode.Capital);
 ```
 
 ## Generating keyboard input
@@ -263,8 +321,37 @@ KeyboardInputGenerator.KeyUp(VirtualKeyCode.Shift);
 KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Win, VirtualKeyCode.KeyD);
 ```
 
-There is no method to type text: virtual keys depend on the keyboard layout. To insert text, put it on the clipboard
-and send Ctrl+V (see [Common scenarios](common-scenarios.md#insert-text-with-a-hotkey)).
+### Typing text
+
+Virtual keys depend on the keyboard layout (`KeyPresses(VirtualKeyCode.KeyY)` types a "z" with a German layout).
+`TypeText` sends the text as Unicode characters instead (`SendInput` with `KEYEVENTF_UNICODE`), so every character
+arrives as it is, including accents and emoji:
+
+<!-- sample: InputSamples.TypeText -->
+```csharp
+// Types the text as Unicode characters, independent of the keyboard layout.
+// Line breaks become Enter, \t becomes Tab, other control characters are skipped.
+var text = "Grüße aus Köln 👋\r\nPrice:\t42 €";
+uint inserted = KeyboardInputGenerator.TypeText(text);
+
+// Two events (down and up) per UTF-16 code unit, Enter and Tab, fewer means the input was blocked
+if (inserted < KeyboardInput.ForText(text).Length)
+{
+    Console.Error.WriteLine("The input was blocked, e.g. by an elevated application");
+}
+```
+
+- Every UTF-16 code unit is a key-down and a key-up; a surrogate pair is sent as two code units, the high one first.
+- `"\r\n"`, `"\n"` and `"\r"` are sent as the Enter key, `"\t"` as the Tab key. All other control characters are
+  skipped, applications treat them as commands (Backspace, Escape, Ctrl+C in a console), not as text.
+- The text is sent in batches; the result is the number of inserted events. When the input is blocked (an elevated
+  foreground application, the secure desktop), the rest of the text isn't sent and the result is lower than
+  `KeyboardInput.ForText(text).Length`.
+- Keys the user holds are combined with the input: send text from a hotkey with `TriggerMode.AllKeysUp`, or wait until
+  the keys are released.
+- Low-level hooks see the characters as `VirtualKeyCode.Packet`. Some applications ignore such input: games, remote
+  desktop and virtual machine windows, and applications which read keys with raw input or GetAsyncKeyState. For those
+  use `KeyPresses` or paste via the clipboard.
 
 Input goes to the foreground window. Windows blocks input into windows of processes with a higher integrity level
 (e.g. an elevated application) unless your process is elevated too.

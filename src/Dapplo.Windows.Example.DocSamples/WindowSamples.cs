@@ -7,12 +7,15 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
 using Dapplo.Windows.Icons;
+using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.Software;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
@@ -104,14 +107,11 @@ public static class WindowSamples
     public static void ChildWindows(IInteropWindow window)
     {
         #region ChildWindows
-        // The direct children
+        // The direct children, from top to bottom (Z-order)
         foreach (var child in window.GetChildren())
         {
             Console.WriteLine($"Child {child.GetClassname()}");
         }
-
-        // The children from top to bottom
-        var zOrdered = window.GetZOrderedChildren();
 
         // Children, grandchildren, ...
         var descendants = window.GetDescendants();
@@ -183,11 +183,42 @@ public static class WindowSamples
     public static void AlwaysOnTop(IInteropWindow window)
     {
         #region AlwaysOnTop
-        IntPtr HwndTopmost = new IntPtr(-1), HwndNoTopmost = new IntPtr(-2);
-
         bool isTopmost = (window.GetInfo(forceUpdate: true).ExtendedStyle & ExtendedWindowStyleFlags.WS_EX_TOPMOST) != 0;
-        User32Api.SetWindowPos(window.Handle, isTopmost ? HwndNoTopmost : HwndTopmost, 0, 0, 0, 0,
+        User32Api.SetWindowPos(window.Handle, isTopmost ? WindowHandles.HWND_NOTOPMOST : WindowHandles.HWND_TOPMOST, 0, 0, 0, 0,
             WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE | WindowPos.SWP_NOACTIVATE);
+        #endregion
+    }
+
+    public static void ZOrder(IInteropWindow window, IInteropWindow other)
+    {
+        #region ZOrder
+        const WindowPos zOrderOnly = WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE | WindowPos.SWP_NOACTIVATE;
+
+        // Send a window behind all other windows, or bring it to the top without activating it
+        User32Api.SetWindowPos(window.Handle, WindowHandles.HWND_BOTTOM, 0, 0, 0, 0, zOrderOnly);
+        User32Api.SetWindowPos(window.Handle, WindowHandles.HWND_TOP, 0, 0, 0, 0, zOrderOnly);
+
+        // Place a window directly below another one
+        User32Api.SetWindowPos(window.Handle, other.Handle, 0, 0, 0, 0, zOrderOnly);
+
+        // A snapshot of the Z-order, index 0 is the top-most window
+        var zOrder = InteropWindowQuery.GetTopWindows().Select(w => w.Handle).ToList();
+        bool isAboveOther = zOrder.IndexOf(window.Handle) < zOrder.IndexOf(other.Handle);
+        #endregion
+    }
+
+    public static void PostMessages(IInteropWindow window)
+    {
+        #region PostMessages
+        // Ask a window to close, without waiting: an application which asks "Save changes?" doesn't block the caller
+        if (!window.PostMessage(WindowsMessages.WM_CLOSE))
+        {
+            Console.WriteLine($"Posting failed, error {Marshal.GetLastWin32Error()}");
+        }
+
+        // Post a registered message to all top-level windows, e.g. to the other instances of your application
+        uint showMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMainWindow");
+        User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
         #endregion
     }
 

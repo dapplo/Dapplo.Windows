@@ -57,9 +57,10 @@ public sealed class FolderPickerBuilder
     /// </returns>
     /// <exception cref="COMException">An unexpected COM error occurred.</exception>
     /// <exception cref="PlatformNotSupportedException">Called on a non-Windows platform.</exception>
+    /// <exception cref="InvalidOperationException">Called from a thread which is not an STA thread (e.g. a thread pool thread), checked before any COM object is created.</exception>
     public FileDialogResult ShowDialog(IntPtr ownerHandle = default)
     {
-        var dialog = ComDialogHelper.CreateDialog<IFileOpenDialog>(ComDialogHelper.ClsidFileOpenDialog);
+        var dialog = ComDialogHelper.CreateDialog<IFileOpenDialog>(ComDialogHelper.ClsidFileOpenDialog, nameof(FolderPickerBuilder));
         try
         {
             if (_title != null) dialog.SetTitle(_title);

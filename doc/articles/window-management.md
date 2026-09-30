@@ -10,7 +10,8 @@ dotnet add package Dapplo.Windows
 
 Namespaces used on this page: `Dapplo.Windows.Desktop`, `Dapplo.Windows.Enums`, `Dapplo.Windows.User32`,
 `Dapplo.Windows.User32.Enums`, `Dapplo.Windows.User32.Structs`, `Dapplo.Windows.Common.Structs`, `Dapplo.Windows.App`,
-`Dapplo.Windows.Icons`, `Dapplo.Windows.Software`, `System.Reactive.Linq`.
+`Dapplo.Windows.Icons`, `Dapplo.Windows.Software`, `Dapplo.Windows.Messages`, `Dapplo.Windows.Messages.Enumerations`,
+`System.Reactive.Linq`.
 
 ## Window information
 
@@ -63,7 +64,7 @@ NativeRect? bounds = window.Info?.Bounds;
 |---|---|
 | `CacheAll` | caption, class name, info, maximized, minimized, parent, owner, placement, process id, text, visible, scroll info |
 | `CacheAllAutoCorrect` (default of `Fill`) | the same, with the bounds corrected (DWM frame, clipped to the parent) |
-| `CacheAllWithChildren` / `CacheAllChildZorder` | `CacheAll` plus the children, in enumeration or Z-order |
+| `CacheAllWithChildren` | `CacheAll` plus the direct children, in Z-order |
 | `ForceUpdate` | combine with the above to read again |
 
 ## Finding windows
@@ -74,7 +75,14 @@ size, and must not be a tool window, a background store app or one of a few know
 `Progman`, `Button`, `Dwm`). The same test is available as `window.IsTopLevel()`. Change the list of ignored classes
 with `InteropWindowQuery.AddIgnoreClass` / `RemoveIgnoreClass`, or pass `false` to include them.
 
-`InteropWindowQuery.GetTopWindows()` returns *all* top-level windows in Z-order, without any filter.
+`InteropWindowQuery.GetTopWindows()` returns *all* top-level windows in Z-order (index 0 is the top-most window),
+without any filter. `GetTopWindows(parent)` returns the direct children of a window, also in Z-order.
+
+Both are a snapshot: the list is taken at once, with `EnumWindows` / `EnumChildWindows`, when you call the method.
+Windows builds the list before it reports the first window, so the result can't loop, skip or repeat windows when
+windows are activated, created or destroyed in the meantime (a `GetWindow(GW_HWNDNEXT)` walk can). The windows in the
+snapshot can of course still change or disappear afterwards; `GetTopLevelWindows()` takes the snapshot when it is called
+and applies its filter while you enumerate the result.
 
 <!-- sample: WindowSamples.TopLevelWindows -->
 ```csharp
@@ -121,14 +129,11 @@ never returns the owner, use `GetOwner()` for that.
 
 <!-- sample: WindowSamples.ChildWindows -->
 ```csharp
-// The direct children
+// The direct children, from top to bottom (Z-order)
 foreach (var child in window.GetChildren())
 {
     Console.WriteLine($"Child {child.GetClassname()}");
 }
-
-// The children from top to bottom
-var zOrdered = window.GetZOrderedChildren();
 
 // Children, grandchildren, ...
 var descendants = window.GetDescendants();
@@ -146,8 +151,9 @@ IInteropWindow owner = window.GetOwnerWindow();
 var linked = window.GetLinkedWindows();
 ```
 
-`GetChildren()` returns the direct children and stores them in `Children`. `GetDescendants()` returns all levels and
-doesn't store them.
+`GetChildren()` returns the direct children in Z-order (a snapshot, see above) and stores them in `Children`; pass
+`forceUpdate: true` to read them again. `GetDescendants()` returns all levels, depth-first (a child is followed by its
+own descendants), and doesn't store them.
 
 ## Changing windows
 
@@ -200,17 +206,53 @@ taskbar button flashes instead.
 await window.ToForegroundAsync();
 ```
 
-### Always on top
+### Z-order and always on top
 
-There is no helper for this, `SetWindowPos` with `HWND_TOPMOST` (-1) or `HWND_NOTOPMOST` (-2) does it:
+`SetWindowPos` changes the Z-order. `WindowHandles` has the special handles for its `hWndInsertAfter` argument:
+`HWND_TOP`, `HWND_BOTTOM`, `HWND_TOPMOST` and `HWND_NOTOPMOST` (and `HWND_MESSAGE` and `HWND_BROADCAST` for other APIs).
 
 <!-- sample: WindowSamples.AlwaysOnTop -->
 ```csharp
-IntPtr HwndTopmost = new IntPtr(-1), HwndNoTopmost = new IntPtr(-2);
-
 bool isTopmost = (window.GetInfo(forceUpdate: true).ExtendedStyle & ExtendedWindowStyleFlags.WS_EX_TOPMOST) != 0;
-User32Api.SetWindowPos(window.Handle, isTopmost ? HwndNoTopmost : HwndTopmost, 0, 0, 0, 0,
+User32Api.SetWindowPos(window.Handle, isTopmost ? WindowHandles.HWND_NOTOPMOST : WindowHandles.HWND_TOPMOST, 0, 0, 0, 0,
     WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE | WindowPos.SWP_NOACTIVATE);
+```
+
+<!-- sample: WindowSamples.ZOrder -->
+```csharp
+const WindowPos zOrderOnly = WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE | WindowPos.SWP_NOACTIVATE;
+
+// Send a window behind all other windows, or bring it to the top without activating it
+User32Api.SetWindowPos(window.Handle, WindowHandles.HWND_BOTTOM, 0, 0, 0, 0, zOrderOnly);
+User32Api.SetWindowPos(window.Handle, WindowHandles.HWND_TOP, 0, 0, 0, 0, zOrderOnly);
+
+// Place a window directly below another one
+User32Api.SetWindowPos(window.Handle, other.Handle, 0, 0, 0, 0, zOrderOnly);
+
+// A snapshot of the Z-order, index 0 is the top-most window
+var zOrder = InteropWindowQuery.GetTopWindows().Select(w => w.Handle).ToList();
+bool isAboveOther = zOrder.IndexOf(window.Handle) < zOrder.IndexOf(other.Handle);
+```
+
+### Posting messages
+
+`window.PostMessage(...)` (or `User32Api.PostMessage` for a handle) puts a message in the message queue of the window's
+thread and returns immediately, `SendMessage` waits until the message was processed. It returns `false` when the
+message couldn't be posted, `Marshal.GetLastWin32Error()` tells why (e.g. the window is gone, or UIPI blocks messages
+from a process with a lower integrity level). Only post messages with values in `wParam` / `lParam`, not with pointers
+to your memory. `User32Api.PostThreadMessage` posts to a thread (its message loop) instead of a window.
+
+<!-- sample: WindowSamples.PostMessages -->
+```csharp
+// Ask a window to close, without waiting: an application which asks "Save changes?" doesn't block the caller
+if (!window.PostMessage(WindowsMessages.WM_CLOSE))
+{
+    Console.WriteLine($"Posting failed, error {Marshal.GetLastWin32Error()}");
+}
+
+// Post a registered message to all top-level windows, e.g. to the other instances of your application
+uint showMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMainWindow");
+User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
 ```
 
 ## Window state
@@ -370,6 +412,8 @@ foreach (var software in InstallationInformation.InstalledSoftware().Where(s => 
 
 - An `IInteropWindow` is a snapshot. Values which change (title, bounds, state) need `forceUpdate: true` when you read
   them again later.
+- `GetTopWindows()`, `GetTopLevelWindows()`, `GetChildren()` and `WindowsEnumerator` return a snapshot of the windows
+  at the moment of the call; call them again for the current state.
 - Reading the text of a window which belongs to a hung application times out after 500 ms instead of blocking.
 - Keep WinEvent subscriptions narrow (event range, process) and throttle location events, they are frequent.
 

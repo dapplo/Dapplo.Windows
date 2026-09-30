@@ -170,9 +170,74 @@ if (clipboard.AvailableFormats().Contains("MyApp.Settings"))
 
 ## Writing
 
-Call `ClearContents()` first. It removes the previous content and makes the window of the token (by default the
-SharedMessageWindow) the clipboard owner; without it your formats are added to the content of another application.
-Then place one or more formats:
+Describe the complete content with a `ClipboardContents` and place it with `ClipboardNative.ReplaceContents`. That opens
+the clipboard, clears it (the window of the token, by default the SharedMessageWindow, becomes the owner), places all
+formats in one go and closes the clipboard again. Prepare the data before, so the clipboard is only open for a moment.
+If a format can't be placed, the clipboard is cleared again and the exception is rethrown: other applications never see
+half of your content. When the clipboard can't be opened, `ReplaceContents` throws a `ClipboardAccessDeniedException`.
+
+<!-- sample: ClipboardSamples.ReplaceContents -->
+```csharp
+// Prepare everything before the clipboard is opened
+using var pngStream = new MemoryStream();
+bitmap.Save(pngStream, System.Drawing.Imaging.ImageFormat.Png);
+pngStream.Position = 0;
+
+var contents = new ClipboardContents()
+    // The richest format first, the application which pastes picks the first one it understands
+    .AddStream("PNG", pngStream)
+    .AddUnicodeString("A screenshot")
+    .AddFileNames(new[] { @"C:\Temp\screenshot.png" })
+    // Optional: clipboard history (Win+V) and cloud clipboard
+    .WithCloudClipboardOptions(canUploadToCloud: false);
+
+// Opens the clipboard, clears it, places all formats and closes it again.
+// Throws a ClipboardAccessDeniedException when the clipboard can't be opened.
+ClipboardNative.ReplaceContents(contents);
+```
+
+| `ClipboardContents` method | Format |
+|---|---|
+| `AddUnicodeString(text)` / `AddUnicodeString(text, format)` | CF_UNICODETEXT, or the given format |
+| `AddBytes(bytes, format)` | any format |
+| `AddStream(format, stream, size)` | any format; the stream is read when the content is placed, keep it open until then |
+| `AddFileNames(fileNames)` | CF_HDROP |
+| `AddDelayedRendered(format)` | only announced, see [Delayed rendering](#delayed-rendering) |
+| `WithCloudClipboardOptions(...)`, `ExcludeFromMonitorProcessing()` | placed after the formats, see [Clipboard history and cloud clipboard](#clipboard-history-and-cloud-clipboard) |
+
+The formats are placed in the order they were added, put the richest first. Adding a format twice throws an
+`ArgumentException`. With a token you already hold, `token.ReplaceContents(contents)` does the same; it always clears
+first:
+
+<!-- sample: ClipboardSamples.ReplaceContentsAsync -->
+```csharp
+var contents = new ClipboardContents().AddUnicodeString("Hello, World!");
+// Only the waiting for the clipboard is asynchronous, the clipboard is written on the thread which continues after the await
+await ClipboardNative.ReplaceContentsAsync(contents);
+
+// With a token you already have: ReplaceContents always clears first
+using var clipboard = await ClipboardNative.AccessAsync();
+clipboard.ReplaceContents(new ClipboardContents().AddUnicodeString("Hello again"));
+```
+
+Adding formats to the current content, without clearing it, is only possible with the explicitly named
+`AddToCurrentContents`, and only while your window owns the content:
+
+<!-- sample: ClipboardSamples.AddToCurrentContents -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+// Adding to the current content is only allowed when you placed it (the window of the token owns the clipboard),
+// otherwise this throws an InvalidOperationException instead of mixing your format into the content of another application
+clipboard.AddToCurrentContents(new ClipboardContents().AddBytes(Encoding.UTF8.GetBytes("{\"id\":42}"), "MyApp.Reference"));
+```
+
+### Low level: ClearContents and Set...
+
+The `Set...` extension methods place one format each. Call `ClearContents()` first: it removes the previous content
+and makes the window of the token the clipboard owner. When the content belongs to another window, every `Set...`
+method throws an `InvalidOperationException` instead of silently adding your format to the content of another
+application. The check is reliable: while you hold the clipboard open, nobody else can empty it, so the owner can't
+change. Adding more formats to content you placed yourself (for example with the same token) is fine.
 
 <!-- sample: ClipboardSamples.WriteText -->
 ```csharp
@@ -228,7 +293,8 @@ clipboard.ClearContents();
 ## Delayed rendering
 
 With delayed rendering you announce a format and create the data only when an application pastes it. Register a
-renderer for the format first, then announce the format with `SetDelayedRenderedContent`.
+renderer for the format first, then announce the format with `ClipboardContents.AddDelayedRendered` (or, low level,
+`SetDelayedRenderedContent` after `ClearContents`).
 
 <!-- sample: ClipboardSamples.DelayedRendering -->
 ```csharp
@@ -241,23 +307,28 @@ IDisposable registration = ClipboardNative.RegisterDelayedRenderer("MyApp.LargeD
     request.AccessToken.SetAsBytes(data, request.RequestedFormatId);
 });
 
-// 2. Announce the format, the data is created only when somebody pastes it
-using (var clipboard = ClipboardNative.Access())
-{
-    // ClearContents makes the SharedMessageWindow the owner, which gets the render requests
-    clipboard.ClearContents();
-    clipboard.SetDelayedRenderedContent("MyApp.LargeData");
-}
+// 2. Announce the format, the data is created only when somebody pastes it.
+// ReplaceContents clears the clipboard, this makes the SharedMessageWindow the owner which gets the render requests.
+ClipboardNative.ReplaceContents(new ClipboardContents().AddDelayedRendered("MyApp.LargeData"));
 
-// 3. Later, when the data can't be provided anymore
+// 3. Keep the registration until the process exits: then the SharedMessageWindow is destroyed,
+// and the renderer is called for every format which nobody requested yet (WM_RENDERALLFORMATS), so the content survives your process.
+// Disposing it earlier means these formats can't be rendered anymore.
 registration.Dispose();
 ```
 
 - The renderer is called synchronously on the SharedMessageWindow thread when a format is requested (WM_RENDERFORMAT),
   and for all formats when the owner window is destroyed (WM_RENDERALLFORMATS, `request.RenderAllFormats` is `true`).
-- The SharedMessageWindow is not destroyed when the process exits, so it gets no WM_RENDERALLFORMATS then: formats
-  which nobody requested are gone from the clipboard when your process ends. Place content that must survive your
-  application directly.
+- When the process exits (`AppDomain.ProcessExit`), the SharedMessageWindow is destroyed on its own thread with
+  `SharedMessageWindow.Shutdown`. Windows then sends WM_RENDERALLFORMATS, and the renderers run for every format which
+  nobody requested yet, so the content survives your application. Keep the renderer registered until then.
+- ProcessExit has a limited time budget (on .NET Framework about 2 seconds for all handlers together). The automatic
+  shutdown waits at most `SharedMessageWindow.ProcessExitShutdownTimeout` (1.5 seconds). If rendering can take longer,
+  call `SharedMessageWindow.Shutdown(timeout)` yourself at the end of `Main`, see
+  [Shutdown](window-messages.md#shutdown). A process which is killed, or ends without ProcessExit
+  (`Environment.FailFast`, an unhandled exception on .NET Framework), loses the formats which were not rendered.
+- WM_DESTROYCLIPBOARD (another application cleared the clipboard) and the destruction of the window end the delayed
+  rendering: nothing is requested anymore for the old content.
 - Use `request.AccessToken`; it's only valid while the renderer runs. Don't call `Access()`, don't `await`, don't
   switch threads.
 - Only one renderer per format can be registered at a time. `SetDelayedRenderedContent` throws an
@@ -276,7 +347,9 @@ control this per content with special formats:
 | `CanIncludeInClipboardHistory` (DWORD 0 / 1) | 0 keeps it out of the history, 1 allows it |
 | `CanUploadToCloudClipboard` (DWORD 0 / 1) | 0 keeps it from being synced, 1 allows it |
 
-Place them after the content, with the same token. For passwords and other secrets use `ExcludeFromMonitorProcessing()`:
+With `ClipboardContents` use `WithCloudClipboardOptions(...)` or `ExcludeFromMonitorProcessing()`, they are placed after
+the formats. Low level, place them after the content, with the same token. For passwords and other secrets use
+`ExcludeFromMonitorProcessing()`:
 
 <!-- sample: ClipboardSamples.CloudOptionsSensitive -->
 ```csharp

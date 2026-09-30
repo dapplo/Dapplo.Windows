@@ -93,7 +93,8 @@ namespace Dapplo.Windows.Clipboard
         /// <summary>
         ///     Register a renderer for a clipboard format which is placed on the clipboard with delayed rendering (SetDelayedRenderedContent).
         ///     The renderer is called synchronously on the SharedMessageWindow thread when the format is requested (WM_RENDERFORMAT),
-        ///     or when all formats need to be rendered (WM_RENDERALLFORMATS), and needs to place the data via <see cref="ClipboardRenderFormatRequest.AccessToken"/>.
+        ///     or when all formats need to be rendered (WM_RENDERALLFORMATS, when the SharedMessageWindow is destroyed: at process exit or with SharedMessageWindow.Shutdown),
+        ///     and needs to place the data via <see cref="ClipboardRenderFormatRequest.AccessToken"/>.
         /// </summary>
         /// <remarks>
         ///     The renderer must render directly: don't switch threads, await or open the clipboard yourself, the token is only valid while the renderer runs.
@@ -157,6 +158,49 @@ namespace Dapplo.Windows.Clipboard
         public static ValueTask<IClipboardAccessToken> AccessAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
         {
             return ClipboardLockProvider.LockAsync(hWnd, retries, retryInterval, timeout, cancellationToken);
+        }
+
+        /// <summary>
+        /// Replace the content of the clipboard with the contents: opens the clipboard, clears it, places all formats and closes it again.
+        /// This is the recommended way to write to the clipboard, prepare the contents before calling this so the clipboard is only open briefly.
+        /// </summary>
+        /// <param name="contents">ClipboardContents with all formats</param>
+        /// <param name="hWnd">IntPtr with the windows handle which becomes the owner, default is the SharedMessageWindow (needed for delayed rendering)</param>
+        /// <param name="retries">int with the amount of open attempts which are made, default 5</param>
+        /// <param name="retryInterval">Timespan between retries, default 100ms</param>
+        /// <param name="timeout">Timeout for getting the in-process lock, default 200ms</param>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard couldn't be opened</exception>
+        public static void ReplaceContents(ClipboardContents contents, IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
+        {
+            if (contents == null)
+            {
+                throw new ArgumentNullException(nameof(contents));
+            }
+            using var clipboardAccessToken = Access(hWnd, retries, retryInterval, timeout);
+            clipboardAccessToken.ReplaceContents(contents);
+        }
+
+        /// <summary>
+        /// Replace the content of the clipboard with the contents, see <see cref="ReplaceContents(ClipboardContents, IntPtr, int, TimeSpan?, TimeSpan?)"/>.
+        /// Only the waiting for the clipboard is asynchronous, the clipboard is opened, written and closed on the thread which continues after the await.
+        /// </summary>
+        /// <param name="contents">ClipboardContents with all formats</param>
+        /// <param name="hWnd">IntPtr with the windows handle which becomes the owner, default is the SharedMessageWindow (needed for delayed rendering)</param>
+        /// <param name="retries">int with the amount of open attempts which are made, default 5</param>
+        /// <param name="retryInterval">Timespan between retries, default 100ms</param>
+        /// <param name="timeout">Timespan to wait for the in-process lock, default 200ms</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>Task</returns>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard couldn't be opened</exception>
+        public static async Task ReplaceContentsAsync(ClipboardContents contents, IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
+        {
+            if (contents == null)
+            {
+                throw new ArgumentNullException(nameof(contents));
+            }
+            // No ConfigureAwait(false): the clipboard is opened on the context of the caller, and must be used and closed there
+            using var clipboardAccessToken = await AccessAsync(hWnd, retries, retryInterval, timeout, cancellationToken);
+            clipboardAccessToken.ReplaceContents(contents);
         }
 
         /// <summary>

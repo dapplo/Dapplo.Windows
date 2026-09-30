@@ -11,6 +11,30 @@ namespace Dapplo.Windows.Clipboard.Internals;
 internal static class ClipboardInfoExtensions
 {
     /// <summary>
+    /// Throw an InvalidOperationException when the clipboard content is not owned by the window which opened the clipboard (the window of the token).
+    /// This is reliable: while the clipboard is open, no other application can call EmptyClipboard, so the owner can't change.
+    /// During delayed rendering the SharedMessageWindow is the owner, so the tokens of render requests pass.
+    /// </summary>
+    /// <param name="clipboardAccessToken">IClipboardAccessToken</param>
+    /// <exception cref="InvalidOperationException">When the content belongs to another window (or to nobody)</exception>
+    public static void ThrowWhenNotOwner(this IClipboardAccessToken clipboardAccessToken)
+    {
+        // Only our own tokens know the window which opened the clipboard
+        if (clipboardAccessToken is not ClipboardAccessToken { OwnerHandle: var ownerHandle } || ownerHandle == IntPtr.Zero)
+        {
+            return;
+        }
+        var currentOwner = NativeMethods.GetClipboardOwner();
+        if (currentOwner == ownerHandle)
+        {
+            return;
+        }
+        throw new InvalidOperationException(
+            $"The clipboard content belongs to another window (0x{currentOwner.ToInt64():X}), not to the window of the access token (0x{ownerHandle.ToInt64():X}): " +
+            "writing now would mix your format into the content of another application. Use ReplaceContents, or call ClearContents first.");
+    }
+
+    /// <summary>
     /// Try to create ClipboardNativeInfo to read
     /// </summary>
     /// <param name="clipboardAccessToken">IClipboardAccessToken</param>
@@ -93,6 +117,7 @@ internal static class ClipboardInfoExtensions
     public static ClipboardNativeInfo WriteInfo(this IClipboardAccessToken clipboardAccessToken, uint formatId, long size)
     {
         clipboardAccessToken.ThrowWhenNoAccess();
+        clipboardAccessToken.ThrowWhenNotOwner();
 
         var hGlobal = Kernel32Api.GlobalAlloc(GlobalMemorySettings.ZeroInit | GlobalMemorySettings.Movable, new UIntPtr((ulong)size));
         if (hGlobal == IntPtr.Zero)

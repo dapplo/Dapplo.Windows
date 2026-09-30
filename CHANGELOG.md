@@ -10,6 +10,13 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 ## [Unreleased] - 3.0.0
 
 ### Changed
+- **Breaking:** `KeyCombinationHandler.TriggerOnKeyUp` is replaced by `TriggerMode` (`KeyDown`, `FirstKeyUp`, `AllKeysUp`).
+- **Breaking:** `InteropWindowQuery.GetTopWindows()` / `GetTopWindows(parent)` take a snapshot with `EnumWindows` / `EnumChildWindows` and return `IReadOnlyList<IInteropWindow>`, so they can no longer skip, repeat or loop over windows when the Z-order changes during the walk. `GetTopLevelWindows()` takes its snapshot when called.
+- **Breaking:** `GetChildren()` returns the direct children in Z-order; `GetZOrderedChildren()`, `HasZOrderedChildren`, `InteropWindowRetrieveSettings.ZOrderedChildren` and `CacheAllChildZorder` are removed.
+- **Breaking:** the clipboard `Set*` methods throw `InvalidOperationException` when the content belongs to another window (you forgot `ClearContents`), instead of mixing your formats into another application's content.
+- **Breaking:** once the process is exiting and the shared window is gone, using `SharedMessageWindow` throws `ObjectDisposedException`.
+- **Breaking:** the file and folder dialogs throw `InvalidOperationException` on a non-STA thread instead of failing inside COM.
+- `KeyCombinationHandler` and `KeySequenceHandler` ignore VK_PACKET events, so typed text never interrupts a combination or sequence.
 - **Breaking:** targets are `net480` and `net10.0-windows` only; `netstandard2.0` and `net8.0-windows` are dropped (F-11).
 - **Breaking:** the core packages no longer depend on WinForms or WPF. WinForms helpers moved to the new **Dapplo.Windows.Forms** package, WPF helpers to the new **Dapplo.Windows.Wpf** package, under the `Dapplo.Windows.Forms.*` / `Dapplo.Windows.Wpf.*` namespaces (F-05, F-12).
 - **Breaking:** conversions between the native structs and WPF types are extension methods (`ToRect()`, `ToNativeRect()`, `ToSize()`, `ToInt32Rect()`, …) in Dapplo.Windows.Wpf.
@@ -89,6 +96,14 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - Tests that send input, replace the clipboard or write to the registry are tagged `Category=Interactive` and are excluded from default runs (F-06).
 
 ### Added
+- `KeyboardInputGenerator.TypeText(string)` types text as Unicode characters (KEYEVENTF_UNICODE), whatever the keyboard layout; line breaks become Enter, `\t` becomes Tab, other control characters are skipped. `KeyboardInput.ForText`, `ForUnicodeKeyDown` and `ForUnicodeKeyUp` build the input.
+- `KeyboardState` with `IsDown`, `IsAnyDown`, `IsDownForCurrentThread` and `IsToggled`.
+- `TriggerMode.AllKeysUp`: a `KeyCombinationHandler` can fire once all keys of the combination are released; another key pressed in between cancels it.
+- `KeyboardHookEventArgs.IsPacket`, `PacketCharacter` and `Packet(char, bool)` for VK_PACKET (Unicode) events.
+- `ClipboardContents` builder with `ClipboardNative.ReplaceContents` / `ReplaceContentsAsync`, `IClipboardAccessToken.ReplaceContents` (always clears first, all or nothing) and `AddToCurrentContents` (only while we own the content).
+- `SharedMessageWindow.Shutdown(timeout)`, `IsProcessExiting` and `ProcessExitShutdownTimeout`; the window is destroyed automatically on process exit.
+- `WindowHandles` with `HWND_TOP`, `HWND_BOTTOM`, `HWND_TOPMOST`, `HWND_NOTOPMOST`, `HWND_MESSAGE` and `HWND_BROADCAST`.
+- `User32Api.PostMessage` / `PostThreadMessage` and `IInteropWindow.PostMessage(...)`.
 - `tools/build-runner`: a local build and test runner driven by request files.
 - `User32Api.GetWheelScrollLines()`, `User32Api.MaxWindowTextLength`, `WindowScroller.MaxMouseWheelSteps`, `WindowScroller.WheelDeltaPerNotch`.
 - `MouseInput.NormalizeCoordinate()` and `KeyboardInput.IsExtendedKey()`.
@@ -103,6 +118,8 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - `WindowsSessionListener.IsRegistered` and `RegistrationFailed`; `DevBroadcastDeviceInterface.TryGetDevBroadcastPort` / `TryGetDevBroadcastHandle`; `PowerManagementApi.EnableShutdownPrivilege()`.
 
 ### Fixed
+- Delayed-rendered clipboard formats survive process exit: the shared window is destroyed on exit, so Windows sends WM_RENDERALLFORMATS.
+- The children of the desktop window no longer get the desktop as parent, so `IsTopLevel()` is correct for them.
 - Window information: `GetCaption` works for the calling thread's own windows without deadlocks (A-11); `GetTopWindows` / `GetZOrderedChildren` no longer yield handle 0 (A-13); `GetInfo` no longer overwrites `Children` as a side effect (A-15); `GetText` no longer truncates at 259 characters (A-21); `GetAppLauncher`, `AppVisible` and `IsLauncherVisible` give correct answers (A-23..A-25); `MonitorInfoEx.DeviceName` stays in its buffer (A-26); `GetVisibleLocation` returns the working-area origin (A-32); `InstalledSoftware()` reads both registry views and HKCU (A-33); `GetInfo` doesn't cache failures (A-34); `ToForegroundAsync` really waits for the restore (A-22); WPF `GetHandle()` works before the window is shown (A-45).
 - `PrintWindow` crops to the visible bounds instead of shifting the capture and uses `PW_RENDERFULLCONTENT` on Windows 8.1+, so DirectComposition, Chromium and UWP content is no longer black (A-16, A-27).
 - `ToBitmapSource` keeps the alpha channel (A-28, C-25).

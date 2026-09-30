@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 
@@ -21,6 +20,11 @@ namespace Dapplo.Windows.Input.Keyboard;
 /// So only decide <see cref="KeyboardHookEventArgs.Handled"/> in there (e.g. with an <see cref="IKeyboardHookEventHandler"/>) and keep it quick,
 /// move any other work away from the hook thread with ObserveOn, or use <see cref="KeyboardEventsNonBlocking"/>.
 /// Anything which touches the UI needs to be marshalled to the UI thread.
+/// </para>
+/// <para>
+/// Unicode characters which are sent with <see cref="KeyboardInputGenerator.TypeText"/> (KEYEVENTF_UNICODE), by an IME or a remote desktop client, arrive as
+/// <see cref="VirtualKeyCode.Packet"/> (VK_PACKET) events, see <see cref="KeyboardHookEventArgs.IsPacket"/> and <see cref="KeyboardHookEventArgs.PacketCharacter"/>.
+/// The modifier state of such an event reflects the keys the user holds, not the character.
 /// </para>
 /// <para>
 /// Exceptions thrown by subscribers never leave the hook callback, they are published on <see cref="SubscriberErrors"/>.
@@ -72,19 +76,19 @@ public static class KeyboardHook
         var key = keyboardLowLevelHookStruct.VirtualKeyCode;
 
         // Query the current state of modifiers
-        var leftShift = (GetAsyncKeyState(VirtualKeyCode.LeftShift) & 0x8000) != 0;
-        var rightShift = (GetAsyncKeyState(VirtualKeyCode.RightShift) & 0x8000) != 0;
-        var leftCtrl = (GetAsyncKeyState(VirtualKeyCode.LeftControl) & 0x8000) != 0;
-        var rightCtrl = (GetAsyncKeyState(VirtualKeyCode.RightControl) & 0x8000) != 0;
-        var leftAlt = (GetAsyncKeyState(VirtualKeyCode.LeftMenu) & 0x8000) != 0;
-        var rightAlt = (GetAsyncKeyState(VirtualKeyCode.RightMenu) & 0x8000) != 0;
-        var leftWin = (GetAsyncKeyState(VirtualKeyCode.LeftWin) & 0x8000) != 0;
-        var rightWin = (GetAsyncKeyState(VirtualKeyCode.RightWin) & 0x8000) != 0;
+        var leftShift = KeyboardState.IsDown(VirtualKeyCode.LeftShift);
+        var rightShift = KeyboardState.IsDown(VirtualKeyCode.RightShift);
+        var leftCtrl = KeyboardState.IsDown(VirtualKeyCode.LeftControl);
+        var rightCtrl = KeyboardState.IsDown(VirtualKeyCode.RightControl);
+        var leftAlt = KeyboardState.IsDown(VirtualKeyCode.LeftMenu);
+        var rightAlt = KeyboardState.IsDown(VirtualKeyCode.RightMenu);
+        var leftWin = KeyboardState.IsDown(VirtualKeyCode.LeftWin);
+        var rightWin = KeyboardState.IsDown(VirtualKeyCode.RightWin);
 
         // Query the current state of lock keys
-        var capsLock = (GetKeyState(VirtualKeyCode.Capital) & 1) != 0;
-        var numLock = (GetKeyState(VirtualKeyCode.NumLock) & 1) != 0;
-        var scrollLock = (GetKeyState(VirtualKeyCode.Scroll) & 1) != 0;
+        var capsLock = KeyboardState.IsToggled(VirtualKeyCode.Capital);
+        var numLock = KeyboardState.IsToggled(VirtualKeyCode.NumLock);
+        var scrollLock = KeyboardState.IsToggled(VirtualKeyCode.Scroll);
 
         // Override the state for the current key to ensure accuracy, the OS state isn't updated yet when the hook is called
         switch (key)
@@ -151,21 +155,4 @@ public static class KeyboardHook
             IsCapsLockActive = capsLock
         };
     }
-
-    /// <summary>
-    ///     Retrieve the state of a key (async)
-    /// </summary>
-    /// <param name="keyCode"></param>
-    /// <returns></returns>
-    [DllImport("user32.dll", ExactSpelling = true)]
-    internal static extern short GetAsyncKeyState(VirtualKeyCode keyCode);
-
-    /// <summary>
-    ///     Retrieve the state of a key
-    /// </summary>
-    /// <param name="keyCode"></param>
-    /// <returns></returns>
-    [DllImport("user32.dll", ExactSpelling = true)]
-    [ResourceExposure(ResourceScope.None)]
-    private static extern short GetKeyState(VirtualKeyCode keyCode);
 }

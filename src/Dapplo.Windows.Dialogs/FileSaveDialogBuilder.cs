@@ -109,9 +109,10 @@ public sealed class FileSaveDialogBuilder
     /// </returns>
     /// <exception cref="COMException">An unexpected COM error occurred.</exception>
     /// <exception cref="PlatformNotSupportedException">Called on a non-Windows platform.</exception>
+    /// <exception cref="InvalidOperationException">Called from a thread which is not an STA thread (e.g. a thread pool thread), checked before any COM object is created.</exception>
     public FileDialogResult ShowDialog(IntPtr ownerHandle = default)
     {
-        var dialog = ComDialogHelper.CreateDialog<IFileSaveDialog>(ComDialogHelper.ClsidFileSaveDialog);
+        var dialog = ComDialogHelper.CreateDialog<IFileSaveDialog>(ComDialogHelper.ClsidFileSaveDialog, nameof(FileSaveDialogBuilder));
         try
         {
             if (_title != null) dialog.SetTitle(_title);

@@ -17,6 +17,8 @@ Namespaces used on this page: `Dapplo.Windows.Messages`, `Dapplo.Windows.Message
 - It is created on first use (the first access to `Handle`, `Messages`, `Listen` or `Invoke`) on its own background
   STA thread with a message loop, and then lives until the process exits. Subscribing or disposing never creates or
   destroys it. If something destroys the window, it's created again on the next use.
+- When the process exits (`AppDomain.ProcessExit`) it is destroyed on its own thread, see [Shutdown](#shutdown), so
+  delayed rendered clipboard content is rendered and survives the process.
 - It is a hidden top-level window (`WS_POPUP` with `WS_EX_TOOLWINDOW`), not a message-only window: only top-level
   windows receive broadcasts such as `WM_QUERYENDSESSION`, `WM_POWERBROADCAST`, `WM_DISPLAYCHANGE` and
   `WM_SETTINGCHANGE`. It doesn't show up in the taskbar or in Alt+Tab.
@@ -124,8 +126,39 @@ deadlock.
 bool isWindowThread = false;
 SharedMessageWindow.Invoke(hwnd => isWindowThread = SharedMessageWindow.IsWindowThread);
 
-// The handle exists as soon as it's requested, and stays valid for the life of the process
+// The handle exists as soon as it's requested, and stays valid until the window is shut down (at process exit)
 IntPtr handle = SharedMessageWindow.Handle;
+```
+
+### Shutdown
+
+`SharedMessageWindow.Shutdown(timeout)` destroys the window on its own thread and waits until its message loop ended.
+Destroying it makes Windows send `WM_RENDERALLFORMATS` (when the window owns the clipboard) and `WM_DESTROY`: the
+[delayed clipboard renderers](clipboard-usage.md#delayed-rendering) run synchronously on the window thread before
+`Shutdown` returns. It returns `false` when the timeout elapsed.
+
+- It's called automatically on `AppDomain.ProcessExit`, with `ProcessExitShutdownTimeout` (default 1.5 seconds;
+  on .NET Framework all ProcessExit handlers together get about 2 seconds). ProcessExit runs on another thread, the
+  window thread is a background thread which is still running then. After that `IsProcessExiting` is `true` and the
+  window is not created again: using it throws an `ObjectDisposedException`.
+- Call it yourself at the end of `Main` when you want to choose the moment or need more time.
+- After an explicit `Shutdown` (not at process exit) the next use creates a new window, but the registrations of the
+  old window (`Listen`, `Invoke`: clipboard listener, hotkeys, session notifications) are gone and their `onTeardown`
+  is not called. It's meant for the end of the application.
+- Called on the window thread, it destroys the window directly and returns `true`; the loop ends right after.
+
+<!-- sample: MessagesSamples.Shutdown -->
+```csharp
+// Happens automatically on AppDomain.ProcessExit, with this timeout (default 1.5 seconds)
+SharedMessageWindow.ProcessExitShutdownTimeout = TimeSpan.FromSeconds(1);
+
+// Or at the end of Main, to control the moment and the timeout yourself:
+// the window is destroyed on its own thread, delayed rendered clipboard formats are rendered (WM_RENDERALLFORMATS)
+bool isShutDown = SharedMessageWindow.Shutdown(TimeSpan.FromSeconds(5));
+if (!isShutDown)
+{
+    Console.WriteLine("The window thread didn't end in time, e.g. a delayed renderer is still busy");
+}
 ```
 
 ### Errors in subscribers
@@ -160,7 +193,7 @@ var subscription = SharedMessageWindow.Messages
 
 | Feature | Message | Page |
 |---|---|---|
-| `ClipboardNative.OnUpdate`, delayed rendering | `WM_CLIPBOARDUPDATE`, `WM_RENDERFORMAT`, `WM_RENDERALLFORMATS` | [Clipboard](clipboard-usage.md) |
+| `ClipboardNative.OnUpdate`, delayed rendering | `WM_CLIPBOARDUPDATE`, `WM_RENDERFORMAT`, `WM_RENDERALLFORMATS`, `WM_DESTROYCLIPBOARD` | [Clipboard](clipboard-usage.md) |
 | `WinEventHook` | WinEvent callbacks (the hooks are installed on the window thread) | [Window management](window-management.md) |
 | `RawInputMonitor`, `RawInputDeviceMonitor` | `WM_INPUT`, `WM_INPUT_DEVICE_CHANGE` | [Keyboard and mouse](input-handling.md) |
 | `WindowsSessionListener` | `WM_WTSSESSION_CHANGE` | below |

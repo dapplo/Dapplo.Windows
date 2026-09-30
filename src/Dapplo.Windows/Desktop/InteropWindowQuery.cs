@@ -16,11 +16,6 @@ namespace Dapplo.Windows.Desktop;
 /// </summary>
 public static class InteropWindowQuery
 {
-    /// <summary>
-    ///     The maximum number of windows which GetTopWindows returns, this protects against endless loops when the Z-order changes during the walk
-    /// </summary>
-    private const int MaxWindowsInWalk = 65536;
-
     private static readonly object IgnoreClassesLock = new object();
 
     // Replaced as a whole (copy on write), so readers never need a lock. "Button" is e.g. the top-level Start button of Windows 7.
@@ -118,7 +113,8 @@ public static class InteropWindowQuery
     }
 
     /// <summary>
-    ///     Iterate the Top level windows, from top to bottom
+    ///     Get the top-level windows the user sees as application windows (see <see cref="IsTopLevel"/>), from top to bottom.
+    ///     The windows are a snapshot taken by <see cref="GetTopWindows"/> when this method is called, the filter is applied lazily while enumerating the result.
     /// </summary>
     /// <param name="ignoreKnownClasses">true to ignore windows with certain known classes</param>
     /// <returns>IEnumerable with all the top level windows</returns>
@@ -128,20 +124,36 @@ public static class InteropWindowQuery
     }
 
     /// <summary>
-    ///     Iterate the windows, from top to bottom
+    ///     Get the windows in Z-order, from top (front) to bottom (back), without any filter.
+    ///     This is a snapshot, taken at once when this method is called (it's not lazy): without a parent (or with the desktop window as parent)
+    ///     EnumWindows is used, with a parent EnumChildWindows, filtered to the direct children (GetAncestor with GA_PARENT is the parent).
+    ///     Windows builds the list when the enumeration starts, so unlike a GetWindow(GW_HWNDNEXT) walk the result can't loop, skip or repeat windows when the Z-order changes.
+    ///     The windows can still change or be destroyed after the snapshot was taken, use <see cref="InteropWindowExtensions.Exists"/> when that matters.
+    ///     Note: the EnumWindows documentation states that Windows 8 and later only enumerate the top-level windows of desktop apps, so windows of Windows 8 style immersive apps might be missing.
     /// </summary>
-    /// <param name="parent">InteropWindow as the parent, to iterate over its direct children, or null for the top-level windows</param>
-    /// <returns>IEnumerable with the windows, empty if there are none</returns>
-    public static IEnumerable<IInteropWindow> GetTopWindows(IInteropWindow parent = null)
+    /// <param name="parent">InteropWindow as the parent, to get its direct children, or null for the top-level windows</param>
+    /// <returns>IReadOnlyList with the windows, empty if there are none</returns>
+    public static IReadOnlyList<IInteropWindow> GetTopWindows(IInteropWindow parent = null)
     {
-        var windowPtr = parent == null ? User32Api.GetTopWindow(IntPtr.Zero) : User32Api.GetWindow(parent.Handle, GetWindowCommands.GW_CHILD);
-        // The Z-order can change during the walk, which could make it loop, so never visit a window twice
-        var visited = new HashSet<IntPtr>();
-        while (windowPtr != IntPtr.Zero && visited.Count < MaxWindowsInWalk && visited.Add(windowPtr))
+        var parentHandle = parent?.Handle ?? IntPtr.Zero;
+        if (parentHandle == User32Api.GetDesktopWindow())
         {
-            yield return InteropWindowFactory.CreateFor(windowPtr);
-            windowPtr = User32Api.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
+            // The children of the desktop window are the top-level windows, EnumWindows enumerates them without their descendants
+            parentHandle = IntPtr.Zero;
         }
+
+        var windows = new List<IInteropWindow>();
+        // EnumChildWindows enumerates depth-first in Z-order: a child is followed by its descendants and then its next sibling,
+        // so filtering the descendants to the direct children keeps the children in Z-order
+        WindowsEnumerator.EnumerateHandles(parentHandle, hWnd =>
+        {
+            if (parentHandle == IntPtr.Zero || User32Api.GetAncestor(hWnd, GetAncestorFlags.GA_PARENT) == parentHandle)
+            {
+                windows.Add(InteropWindowFactory.CreateFor(hWnd));
+            }
+            return true;
+        });
+        return windows;
     }
 
     /// <summary>

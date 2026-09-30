@@ -40,6 +40,22 @@ public class KeyboardHookEventArgs : EventArgs
     }
 
     /// <summary>
+    /// Generate KeyboardHookEventArgs for a VK_PACKET event, as a low-level hook reports a Unicode character which was sent with KEYEVENTF_UNICODE
+    /// </summary>
+    /// <param name="character">char, the UTF-16 code unit of the packet</param>
+    /// <param name="isKeyDown">bool true for the key-down, false for the key-up</param>
+    /// <returns>KeyboardHookEventArgs</returns>
+    public static KeyboardHookEventArgs Packet(char character, bool isKeyDown)
+    {
+        return new KeyboardHookEventArgs
+        {
+            Key = VirtualKeyCode.Packet,
+            ScanCode = unchecked((ScanCodes)(short)character),
+            IsKeyDown = isKeyDown
+        };
+    }
+
+    /// <summary>
     ///     Set this to true to swallow the key event, other applications will not see it.
     ///     Only honoured when set synchronously in a subscriber of <see cref="KeyboardHook.KeyboardEvents"/>, on the hook thread.
     /// </summary>
@@ -154,6 +170,19 @@ public class KeyboardHookEventArgs : EventArgs
     public ScanCodes ScanCode { get; internal set; }
 
     /// <summary>
+    ///     True if this is a VK_PACKET event: not a key, but a Unicode character (one UTF-16 code unit, see <see cref="PacketCharacter"/>) which was sent with KEYEVENTF_UNICODE,
+    ///     e.g. by <see cref="KeyboardInputGenerator.TypeText"/>, an IME, an on-screen keyboard or a remote desktop client.
+    ///     A character outside the Basic Multilingual Plane arrives as two packets (a high and a low surrogate).
+    ///     The <see cref="KeyCombinationHandler"/> and the <see cref="KeySequenceHandler"/> ignore these events.
+    /// </summary>
+    public bool IsPacket => Key == VirtualKeyCode.Packet;
+
+    /// <summary>
+    ///     The UTF-16 code unit of a VK_PACKET event (<see cref="IsPacket"/>), Windows passes it in the scan code. '\0' for all other events.
+    /// </summary>
+    public char PacketCharacter => IsPacket ? unchecked((char)(ushort)ScanCode) : '\0';
+
+    /// <summary>
     ///     True if this is an extended key (the scan code has an E0 prefix), e.g. NumpadEnter, RightControl or the arrow keys which are not on the numpad.
     /// </summary>
     public bool IsExtended => (Flags & ExtendedKeyFlags.Extended) != 0;
@@ -245,7 +274,12 @@ public class KeyboardHookEventArgs : EventArgs
             }
         }
 
-        dump.Append(Key).Append(IsKeyDown ? " down" : " up");
+        dump.Append(Key);
+        if (IsPacket)
+        {
+            dump.Append(" U+").Append(((int)PacketCharacter).ToString("X4"));
+        }
+        dump.Append(IsKeyDown ? " down" : " up");
         dump.Append(Handled ? " (" : " (not ").Append("handled)");
         if (IsScrollLockActive)
         {

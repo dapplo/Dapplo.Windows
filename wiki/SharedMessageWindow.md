@@ -7,6 +7,8 @@ input. The `SharedMessageWindow` is one hidden window, shared by all of Dapplo.W
 
 - It's created on first use on its own STA thread with a message loop, and lives until the process exits.
   `Handle` never returns 0.
+- At process exit it's destroyed on its own thread (`Shutdown`), so delayed rendered clipboard formats are rendered
+  (`WM_RENDERALLFORMATS`) and survive the process.
 - It's a hidden top-level window (not message-only), so it also gets broadcasts like `WM_QUERYENDSESSION`,
   `WM_POWERBROADCAST` and `WM_SETTINGCHANGE`.
 - `Messages` is called synchronously in the window procedure, on the window thread. Keep `OnNext` short.
@@ -84,15 +86,33 @@ subscription.Dispose();
 bool isWindowThread = false;
 SharedMessageWindow.Invoke(hwnd => isWindowThread = SharedMessageWindow.IsWindowThread);
 
-// The handle exists as soon as it's requested, and stays valid for the life of the process
+// The handle exists as soon as it's requested, and stays valid until the window is shut down (at process exit)
 IntPtr handle = SharedMessageWindow.Handle;
+```
+
+`Shutdown(timeout)` destroys the window on its own thread and waits for its loop; it runs automatically on
+`AppDomain.ProcessExit` (with `ProcessExitShutdownTimeout`, default 1.5 seconds), after which the window is not
+created again. After an explicit call the next use creates a new window, without the old registrations.
+
+<!-- sample: MessagesSamples.Shutdown -->
+```csharp
+// Happens automatically on AppDomain.ProcessExit, with this timeout (default 1.5 seconds)
+SharedMessageWindow.ProcessExitShutdownTimeout = TimeSpan.FromSeconds(1);
+
+// Or at the end of Main, to control the moment and the timeout yourself:
+// the window is destroyed on its own thread, delayed rendered clipboard formats are rendered (WM_RENDERALLFORMATS)
+bool isShutDown = SharedMessageWindow.Shutdown(TimeSpan.FromSeconds(5));
+if (!isShutDown)
+{
+    Console.WriteLine("The window thread didn't end in time, e.g. a delayed renderer is still busy");
+}
 ```
 
 ## Who uses it
 
 | Feature | Message |
 |---|---|
-| `ClipboardNative.OnUpdate`, delayed rendering | `WM_CLIPBOARDUPDATE`, `WM_RENDERFORMAT`, `WM_RENDERALLFORMATS` |
+| `ClipboardNative.OnUpdate`, delayed rendering | `WM_CLIPBOARDUPDATE`, `WM_RENDERFORMAT`, `WM_RENDERALLFORMATS`, `WM_DESTROYCLIPBOARD` |
 | `WinEventHook` | WinEvent callbacks |
 | `RawInputMonitor`, `RawInputDeviceMonitor` | `WM_INPUT`, `WM_INPUT_DEVICE_CHANGE` |
 | `WindowsSessionListener` | `WM_WTSSESSION_CHANGE` |

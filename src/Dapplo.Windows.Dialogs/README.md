@@ -119,7 +119,8 @@ FileDialogResult result = new FileOpenDialogBuilder()
 ## Errors and threading
 
 Cancel is not an error. Real failures throw a `COMException`. The dialogs need an STA thread: the UI thread of
-Windows Forms or WPF, `[STAThread]` on `Main` of a console application, or a dedicated STA thread.
+Windows Forms or WPF, `[STAThread]` on `Main` of a console application, or a dedicated STA thread. On any other thread
+(e.g. `Task.Run`) `ShowDialog` throws an `InvalidOperationException` before any COM object is created.
 
 <!-- sample: DialogSamples.StaThread -->
 ```csharp

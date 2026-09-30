@@ -24,6 +24,7 @@
     <ProjectReference Include="..\Dapplo.Windows.Com\Dapplo.Windows.Com.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.DesktopWindowsManager\Dapplo.Windows.DesktopWindowsManager.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Devices\Dapplo.Windows.Devices.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Dialogs\Dapplo.Windows.Dialogs.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj" />
     <ProjectReference Include="..\Dapplo.Windows.Icons\Dapplo.Windows.Icons.csproj" />

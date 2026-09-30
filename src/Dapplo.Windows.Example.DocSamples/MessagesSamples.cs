@@ -100,8 +100,24 @@ public static class MessagesSamples
         bool isWindowThread = false;
         SharedMessageWindow.Invoke(hwnd => isWindowThread = SharedMessageWindow.IsWindowThread);
 
-        // The handle exists as soon as it's requested, and stays valid for the life of the process
+        // The handle exists as soon as it's requested, and stays valid until the window is shut down (at process exit)
         IntPtr handle = SharedMessageWindow.Handle;
+        #endregion
+    }
+
+    public static void Shutdown()
+    {
+        #region Shutdown
+        // Happens automatically on AppDomain.ProcessExit, with this timeout (default 1.5 seconds)
+        SharedMessageWindow.ProcessExitShutdownTimeout = TimeSpan.FromSeconds(1);
+
+        // Or at the end of Main, to control the moment and the timeout yourself:
+        // the window is destroyed on its own thread, delayed rendered clipboard formats are rendered (WM_RENDERALLFORMATS)
+        bool isShutDown = SharedMessageWindow.Shutdown(TimeSpan.FromSeconds(5));
+        if (!isShutDown)
+        {
+            Console.WriteLine("The window thread didn't end in time, e.g. a delayed renderer is still busy");
+        }
         #endregion
     }
 

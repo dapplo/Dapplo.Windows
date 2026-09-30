@@ -95,7 +95,12 @@ internal static class DelayedRenderers
                     }
                     break;
                 case WindowsMessages.WM_DESTROYCLIPBOARD:
-                    // We are no longer the owner, nothing will be requested anymore
+                    // We are no longer the owner (the clipboard was emptied), nothing will be requested anymore
+                    PendingFormats.Clear();
+                    break;
+                case WindowsMessages.WM_NCDESTROY:
+                    // The window is gone (SharedMessageWindow.Shutdown or process exit), WM_RENDERALLFORMATS was processed before:
+                    // formats which were not rendered are removed from the clipboard by Windows. A new window never owns the old content.
                     PendingFormats.Clear();
                     break;
             }

@@ -5,13 +5,13 @@ using System;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Input;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Input.Mouse;
+using Dapplo.Windows.Input.Structs;
 using Dapplo.Windows.Messages.Enumerations;
 
 namespace Dapplo.Windows.Example.DocSamples;
@@ -151,26 +151,41 @@ public static class InputSamples
         #endregion
     }
 
-    #region WaitForReleasePInvoke
-    [DllImport("user32")]
-    private static extern short GetAsyncKeyState(VirtualKeyCode key);
+    public static void AllKeysUp()
+    {
+        #region AllKeysUp
+        // Ctrl+Alt+D types the date into the active application, when the user released all keys of the combination
+        var handler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.KeyD)
+        {
+            TriggerMode = TriggerMode.AllKeysUp
+        };
 
+        var subscription = KeyboardHook.KeyboardEvents
+            .Where(handler)
+            // Leave the hook thread, sending input from there would block the keyboard
+            .ObserveOn(TaskPoolScheduler.Default)
+            // No key of the combination is down anymore, so the text isn't combined with Ctrl or Alt
+            .Subscribe(_ => KeyboardInputGenerator.TypeText(DateTime.Now.ToString("yyyy-MM-dd")));
+        #endregion
+    }
+
+    #region WaitForRelease
     private static void WaitUntilReleased(params VirtualKeyCode[] keys)
     {
-        // The high bit is set while the key is down
-        while (keys.Any(key => (GetAsyncKeyState(key) & 0x8000) != 0))
+        // The asynchronous (current, system wide) key state, Control and Shift match the left and the right key
+        while (KeyboardState.IsAnyDown(keys))
         {
             Thread.Sleep(20);
         }
     }
     #endregion
 
-    public static void TriggerOnKeyUp()
+    public static void FirstKeyUp()
     {
-        #region TriggerOnKeyUp
-        var handler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyD)
+        #region FirstKeyUp
+        var handler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyH)
         {
-            TriggerOnKeyUp = true
+            TriggerMode = TriggerMode.FirstKeyUp
         };
 
         var subscription = KeyboardHook.KeyboardEvents
@@ -180,9 +195,24 @@ public static class InputSamples
             .Subscribe(_ =>
             {
                 // The other keys of the combination can still be down, wait for them before sending input
-                WaitUntilReleased(VirtualKeyCode.LeftControl, VirtualKeyCode.RightControl, VirtualKeyCode.LeftShift, VirtualKeyCode.RightShift);
+                WaitUntilReleased(VirtualKeyCode.Control, VirtualKeyCode.Shift);
                 KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Home);
             });
+        #endregion
+    }
+
+    public static void KeyStateQuery()
+    {
+        #region KeyStateQuery
+        // Right now, system wide (GetAsyncKeyState): use this in background threads and hooks
+        bool shiftDown = KeyboardState.IsDown(VirtualKeyCode.Shift);
+        bool anyModifier = KeyboardState.IsAnyDown(VirtualKeyCode.Shift, VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.Win);
+
+        // At the time of the keyboard message the UI thread is processing (GetKeyState): use this in a key event handler
+        bool ctrlWithThisKey = KeyboardState.IsDownForCurrentThread(VirtualKeyCode.Control);
+
+        // Toggle keys
+        bool capsLock = KeyboardState.IsToggled(VirtualKeyCode.Capital);
         #endregion
     }
 
@@ -218,6 +248,22 @@ public static class InputSamples
 
         // Win+D shows the desktop, Win is sent as the left Windows key
         KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Win, VirtualKeyCode.KeyD);
+        #endregion
+    }
+
+    public static void TypeText()
+    {
+        #region TypeText
+        // Types the text as Unicode characters, independent of the keyboard layout.
+        // Line breaks become Enter, \t becomes Tab, other control characters are skipped.
+        var text = "Grüße aus Köln 👋\r\nPrice:\t42 €";
+        uint inserted = KeyboardInputGenerator.TypeText(text);
+
+        // Two events (down and up) per UTF-16 code unit, Enter and Tab, fewer means the input was blocked
+        if (inserted < KeyboardInput.ForText(text).Length)
+        {
+            Console.Error.WriteLine("The input was blocked, e.g. by an elevated application");
+        }
         #endregion
     }
 

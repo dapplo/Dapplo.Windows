@@ -228,14 +228,14 @@ public class KeyboardHandlerTests
     }
 
     /// <summary>
-    /// Test that TriggerOnKeyUp triggers when all keys are released, not when pressed
+    /// Test that TriggerMode.FirstKeyUp triggers when a key is released, not when pressed
     /// </summary>
     [Fact]
-    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_SingleKey()
+    public void TestKeyHandler_KeyCombinationHandler_FirstKeyUp_SingleKey()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Print)
         {
-            TriggerOnKeyUp = true
+            TriggerMode = TriggerMode.FirstKeyUp
         };
 
         // Key down should not trigger
@@ -252,14 +252,14 @@ public class KeyboardHandlerTests
     }
 
     /// <summary>
-    /// Test that TriggerOnKeyUp still triggers when the key was auto-repeated before it was released (CanRepeat is false by default)
+    /// Test that TriggerMode.FirstKeyUp still triggers when the key was auto-repeated before it was released (CanRepeat is false by default)
     /// </summary>
     [Fact]
-    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_AfterAutoRepeat()
+    public void TestKeyHandler_KeyCombinationHandler_FirstKeyUp_AfterAutoRepeat()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.KeyT)
         {
-            TriggerOnKeyUp = true
+            TriggerMode = TriggerMode.FirstKeyUp
         };
 
         Assert.False(keyCombinationHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.LeftControl)));
@@ -273,7 +273,7 @@ public class KeyboardHandlerTests
     }
 
     /// <summary>
-    /// Test that, without TriggerOnKeyUp, a repeated key down is swallowed but doesn't trigger again
+    /// Test that, with TriggerMode.KeyDown, a repeated key down is swallowed but doesn't trigger again
     /// </summary>
     [Fact]
     public void TestKeyHandler_KeyCombinationHandler_Repeat_IsSwallowedButDoesNotTrigger()
@@ -294,14 +294,14 @@ public class KeyboardHandlerTests
     }
 
     /// <summary>
-    /// Test that TriggerOnKeyUp works correctly with key combinations
+    /// Test that TriggerMode.FirstKeyUp works correctly with key combinations
     /// </summary>
     [Fact]
-    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_Combination()
+    public void TestKeyHandler_KeyCombinationHandler_FirstKeyUp_Combination()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyA)
         {
-            TriggerOnKeyUp = true
+            TriggerMode = TriggerMode.FirstKeyUp
         };
 
         // Press all keys in the combination
@@ -327,14 +327,14 @@ public class KeyboardHandlerTests
     }
 
     /// <summary>
-    /// Test that TriggerOnKeyUp does not trigger if an extra key was pressed
+    /// Test that TriggerMode.FirstKeyUp does not trigger if an extra key was pressed
     /// </summary>
     [Fact]
-    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_WithExtraKey()
+    public void TestKeyHandler_KeyCombinationHandler_FirstKeyUp_WithExtraKey()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.KeyA)
         {
-            TriggerOnKeyUp = true
+            TriggerMode = TriggerMode.FirstKeyUp
         };
 
         // Press the combination keys
@@ -362,14 +362,14 @@ public class KeyboardHandlerTests
     }
 
     /// <summary>
-    /// Test that TriggerOnKeyUp does not trigger if not all combination keys were pressed
+    /// Test that TriggerMode.FirstKeyUp does not trigger if not all combination keys were pressed
     /// </summary>
     [Fact]
-    public void TestKeyHandler_KeyCombinationHandler_TriggerOnKeyUp_PartialPress()
+    public void TestKeyHandler_KeyCombinationHandler_FirstKeyUp_PartialPress()
     {
         var keyCombinationHandler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyA)
         {
-            TriggerOnKeyUp = true
+            TriggerMode = TriggerMode.FirstKeyUp
         };
 
         // Press only some keys

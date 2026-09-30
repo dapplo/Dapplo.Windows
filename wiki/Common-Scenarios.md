@@ -78,27 +78,17 @@ var subscription = ClipboardNative.OnUpdate
 
 ## Insert text with a hotkey
 
-There is no API to type text, so the text goes through the clipboard:
+`TypeText` types the text independent of the keyboard layout, `TriggerMode.AllKeysUp` waits until the hotkey is released:
 
 <!-- sample: CommonScenariosSamples.InsertTimestamp -->
 ```csharp
-// Ctrl+Alt+D types the current date into the active application: via the clipboard and Ctrl+V,
-// as there is no API to "type" text. TriggerOnKeyUp lets the keys through, so the user can't get stuck keys.
+// Ctrl+Alt+D types the current date into the active application.
+// AllKeysUp fires when the user released all keys of the combination, so the text isn't combined with Ctrl or Alt,
+// and the keys are passed on, so no key gets stuck.
 var subscription = KeyboardHook.KeyboardEvents
-    .Where(new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.KeyD) { TriggerOnKeyUp = true })
+    .Where(new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.KeyD) { TriggerMode = TriggerMode.AllKeysUp })
     .ObserveOn(TaskPoolScheduler.Default)
-    .Subscribe(_ =>
-    {
-        // Give the user a moment to release Ctrl and Alt, otherwise Ctrl+Alt+V is sent
-        Thread.Sleep(300);
-        using (var clipboard = ClipboardNative.Access())
-        {
-            clipboard.ClearContents();
-            clipboard.SetAsUnicodeString(DateTime.Now.ToString("yyyy-MM-dd"));
-            clipboard.ExcludeFromMonitorProcessing();
-        }
-        KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Control, VirtualKeyCode.KeyV);
-    });
+    .Subscribe(_ => KeyboardInputGenerator.TypeText(DateTime.Now.ToString("yyyy-MM-dd")));
 ```
 
 ## Single instance

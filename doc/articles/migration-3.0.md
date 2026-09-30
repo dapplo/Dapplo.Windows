@@ -70,7 +70,16 @@ var wpfRect = nativeRect.ToRect();
 | `WM_KEYFIRST`, `WM_MOUSEFIRST` | `WM_KEYDOWN`, `WM_MOUSEMOVE` |
 | `ApplicationRestartManager.MaxCommandLineLength` | `RestartMaxCmdLine` |
 
+| `new KeyCombinationHandler(...) { TriggerOnKeyUp = true }` | `{ TriggerMode = TriggerMode.FirstKeyUp }`, or `TriggerMode.AllKeysUp` when the hotkey sends input |
+| `window.GetZOrderedChildren(force)` | `window.GetChildren(force)` |
+| `InteropWindowRetrieveSettings.ZOrderedChildren` / `CacheAllChildZorder` | `Children` / `CacheAllWithChildren` |
+| `new IntPtr(-1)` / `new IntPtr(-2)` for `SetWindowPos` | `WindowHandles.HWND_TOPMOST` / `WindowHandles.HWND_NOTOPMOST` |
+| `token.SetAsUnicodeString(x)` without `ClearContents()` | `ClipboardNative.ReplaceContents(new ClipboardContents().AddUnicodeString(x))` |
+
 Behaviour changes to check:
+
+- **Dialogs** must be shown from an STA thread (the UI thread or a `[STAThread]` Main), not from `Task.Run`.
+- **`GetTopWindows()`** returns a list taken at call time; call it again for the current state.
 
 - **Owner vs parent:** `IsTopLevel` / `IsPopup` now accept owned windows, and `GetInfo(autoCorrect)` no longer crops owned dialogs.
 - **DPI:** `DpiAwareForm` lets WinForms scale on WM_DPICHANGED. Remove manual font or control scaling you did in `FormDpiHandler.OnDpiChanged`, or cancel `Form.DpiChanged`. DPI scaling now rounds (`ScaleWithDpi(3, 144)` is 5).

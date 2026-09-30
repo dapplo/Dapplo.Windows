@@ -152,6 +152,51 @@ public static class ClipboardSamples
         #endregion
     }
 
+    public static void ReplaceContents(Bitmap bitmap)
+    {
+        #region ReplaceContents
+        // Prepare everything before the clipboard is opened
+        using var pngStream = new MemoryStream();
+        bitmap.Save(pngStream, System.Drawing.Imaging.ImageFormat.Png);
+        pngStream.Position = 0;
+
+        var contents = new ClipboardContents()
+            // The richest format first, the application which pastes picks the first one it understands
+            .AddStream("PNG", pngStream)
+            .AddUnicodeString("A screenshot")
+            .AddFileNames(new[] { @"C:\Temp\screenshot.png" })
+            // Optional: clipboard history (Win+V) and cloud clipboard
+            .WithCloudClipboardOptions(canUploadToCloud: false);
+
+        // Opens the clipboard, clears it, places all formats and closes it again.
+        // Throws a ClipboardAccessDeniedException when the clipboard can't be opened.
+        ClipboardNative.ReplaceContents(contents);
+        #endregion
+    }
+
+    public static async Task ReplaceContentsAsync()
+    {
+        #region ReplaceContentsAsync
+        var contents = new ClipboardContents().AddUnicodeString("Hello, World!");
+        // Only the waiting for the clipboard is asynchronous, the clipboard is written on the thread which continues after the await
+        await ClipboardNative.ReplaceContentsAsync(contents);
+
+        // With a token you already have: ReplaceContents always clears first
+        using var clipboard = await ClipboardNative.AccessAsync();
+        clipboard.ReplaceContents(new ClipboardContents().AddUnicodeString("Hello again"));
+        #endregion
+    }
+
+    public static void AddToCurrentContents()
+    {
+        #region AddToCurrentContents
+        using var clipboard = ClipboardNative.Access();
+        // Adding to the current content is only allowed when you placed it (the window of the token owns the clipboard),
+        // otherwise this throws an InvalidOperationException instead of mixing your format into the content of another application
+        clipboard.AddToCurrentContents(new ClipboardContents().AddBytes(Encoding.UTF8.GetBytes("{\"id\":42}"), "MyApp.Reference"));
+        #endregion
+    }
+
     public static void WriteText()
     {
         #region WriteText
@@ -218,15 +263,13 @@ public static class ClipboardSamples
             request.AccessToken.SetAsBytes(data, request.RequestedFormatId);
         });
 
-        // 2. Announce the format, the data is created only when somebody pastes it
-        using (var clipboard = ClipboardNative.Access())
-        {
-            // ClearContents makes the SharedMessageWindow the owner, which gets the render requests
-            clipboard.ClearContents();
-            clipboard.SetDelayedRenderedContent("MyApp.LargeData");
-        }
+        // 2. Announce the format, the data is created only when somebody pastes it.
+        // ReplaceContents clears the clipboard, this makes the SharedMessageWindow the owner which gets the render requests.
+        ClipboardNative.ReplaceContents(new ClipboardContents().AddDelayedRendered("MyApp.LargeData"));
 
-        // 3. Later, when the data can't be provided anymore
+        // 3. Keep the registration until the process exits: then the SharedMessageWindow is destroyed,
+        // and the renderer is called for every format which nobody requested yet (WM_RENDERALLFORMATS), so the content survives your process.
+        // Disposing it earlier means these formats can't be rendered anymore.
         registration.Dispose();
         #endregion
     }

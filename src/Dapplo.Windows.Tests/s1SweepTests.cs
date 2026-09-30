@@ -60,7 +60,6 @@ public class S1SweepTests
     {
         var messageWindow = InteropWindowFactory.CreateFor(SharedMessageWindow.Handle);
         Assert.Empty(InteropWindowQuery.GetTopWindows(messageWindow));
-        Assert.Empty(messageWindow.GetZOrderedChildren());
         Assert.False(messageWindow.HasChildren);
         Assert.Empty(messageWindow.GetChildren());
         Assert.Empty(messageWindow.GetDescendants());

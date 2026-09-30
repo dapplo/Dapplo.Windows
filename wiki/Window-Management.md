@@ -23,7 +23,10 @@ Console.WriteLine($"Visible: {window.IsVisible()}, minimized: {window.IsMinimize
 ## Finding windows
 
 `GetTopLevelWindows()` returns the application windows a user sees: visible, not minimized, with a title, no tool
-windows. `GetTopWindows()` returns all top-level windows without a filter.
+windows. `GetTopWindows()` returns all top-level windows without a filter, `GetTopWindows(parent)` and
+`window.GetChildren()` the direct children. All of them are in Z-order (top-most first) and are a snapshot taken at
+once with `EnumWindows` / `EnumChildWindows` when you call them, so they can't loop or skip windows while the Z-order
+changes.
 
 <!-- sample: WindowSamples.TopLevelWindows -->
 ```csharp
@@ -96,6 +99,31 @@ window.SetPlacement(placement);
 // Restores a minimized window and makes it the foreground window. Windows may still refuse,
 // e.g. when the user is working in another application: then the taskbar button flashes.
 await window.ToForegroundAsync();
+```
+
+`WindowHandles` has the special handles `HWND_TOP`, `HWND_BOTTOM`, `HWND_TOPMOST`, `HWND_NOTOPMOST`, `HWND_MESSAGE`
+and `HWND_BROADCAST`:
+
+<!-- sample: WindowSamples.AlwaysOnTop -->
+```csharp
+bool isTopmost = (window.GetInfo(forceUpdate: true).ExtendedStyle & ExtendedWindowStyleFlags.WS_EX_TOPMOST) != 0;
+User32Api.SetWindowPos(window.Handle, isTopmost ? WindowHandles.HWND_NOTOPMOST : WindowHandles.HWND_TOPMOST, 0, 0, 0, 0,
+    WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE | WindowPos.SWP_NOACTIVATE);
+```
+
+`PostMessage` queues a message and returns immediately, `false` (see `Marshal.GetLastWin32Error()`) when it couldn't:
+
+<!-- sample: WindowSamples.PostMessages -->
+```csharp
+// Ask a window to close, without waiting: an application which asks "Save changes?" doesn't block the caller
+if (!window.PostMessage(WindowsMessages.WM_CLOSE))
+{
+    Console.WriteLine($"Posting failed, error {Marshal.GetLastWin32Error()}");
+}
+
+// Post a registered message to all top-level windows, e.g. to the other instances of your application
+uint showMessage = WindowsMessage.RegisterWindowsMessage("MyApp.ShowMainWindow");
+User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
 ```
 
 ## Screenshots

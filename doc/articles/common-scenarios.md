@@ -126,31 +126,23 @@ var subscription = ClipboardNative.OnUpdate
 
 ## Insert text with a hotkey
 
-There is no API to type text, keys depend on the keyboard layout. Put the text on the clipboard and send Ctrl+V.
-`TriggerOnKeyUp` passes the hotkey on, and the short wait lets the user release Ctrl and Alt before Ctrl+V is sent.
+`KeyboardInputGenerator.TypeText` types the text as Unicode characters, independent of the keyboard layout.
+`TriggerMode.AllKeysUp` fires when the user released the hotkey, so the text isn't combined with Ctrl and Alt, and it
+passes the keys on, so none gets stuck.
 
 <!-- sample: CommonScenariosSamples.InsertTimestamp -->
 ```csharp
-// Ctrl+Alt+D types the current date into the active application: via the clipboard and Ctrl+V,
-// as there is no API to "type" text. TriggerOnKeyUp lets the keys through, so the user can't get stuck keys.
+// Ctrl+Alt+D types the current date into the active application.
+// AllKeysUp fires when the user released all keys of the combination, so the text isn't combined with Ctrl or Alt,
+// and the keys are passed on, so no key gets stuck.
 var subscription = KeyboardHook.KeyboardEvents
-    .Where(new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.KeyD) { TriggerOnKeyUp = true })
+    .Where(new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.KeyD) { TriggerMode = TriggerMode.AllKeysUp })
     .ObserveOn(TaskPoolScheduler.Default)
-    .Subscribe(_ =>
-    {
-        // Give the user a moment to release Ctrl and Alt, otherwise Ctrl+Alt+V is sent
-        Thread.Sleep(300);
-        using (var clipboard = ClipboardNative.Access())
-        {
-            clipboard.ClearContents();
-            clipboard.SetAsUnicodeString(DateTime.Now.ToString("yyyy-MM-dd"));
-            clipboard.ExcludeFromMonitorProcessing();
-        }
-        KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Control, VirtualKeyCode.KeyV);
-    });
+    .Subscribe(_ => KeyboardInputGenerator.TypeText(DateTime.Now.ToString("yyyy-MM-dd")));
 ```
 
-This replaces the previous clipboard content. To be nice, read the old content first and put it back after the paste.
+Some applications ignore typed Unicode characters (games, remote desktop windows). For those, put the text on the
+clipboard and send Ctrl+V; read the old clipboard content first and put it back after the paste.
 
 ## Tile windows
 

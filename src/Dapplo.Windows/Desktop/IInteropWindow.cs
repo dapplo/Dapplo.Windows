@@ -24,7 +24,7 @@ public interface IInteropWindow
     string Caption { get; set; }
 
     /// <summary>
-    ///     Returns the children of this window
+    ///     The direct children of this window in Z-order from top to bottom, filled by GetChildren (null when they were not retrieved)
     /// </summary>
     IEnumerable<IInteropWindow> Children { get; set; }
 
@@ -37,11 +37,6 @@ public interface IInteropWindow
     ///     Handle (ID) of the window
     /// </summary>
     IntPtr Handle { get; }
-
-    /// <summary>
-    /// Checks if the children are retrieved in a Z-Order
-    /// </summary>
-    bool HasZOrderedChildren { get; set; }
 
     /// <summary>
     ///     Test if there are any children
@@ -91,7 +86,7 @@ public interface IInteropWindow
 
     /// <summary>
     ///     The actually IInteropWindow for the parent.
-    ///     This is filled when this window was retrieved via parent.GetChildren or parent.GetZOrderChildren
+    ///     This is filled when this window was retrieved via parent.GetChildren
     /// </summary>
     IInteropWindow ParentWindow { get; set; }
 

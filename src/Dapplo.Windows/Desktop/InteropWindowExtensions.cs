@@ -20,6 +20,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using Dapplo.Log;
 using Dapplo.Windows.Kernel32;
+using Dapplo.Windows.Messages.Enumerations;
 
 namespace Dapplo.Windows.Desktop;
 
@@ -50,10 +51,6 @@ public static class InteropWindowExtensions
     /// <returns>IInteropWindow for fluent calls</returns>
     public static IInteropWindow Fill(this IInteropWindow interopWindow, InteropWindowRetrieveSettings retrieveSettings = InteropWindowRetrieveSettings.CacheAllAutoCorrect)
     {
-        if ((retrieveSettings & InteropWindowRetrieveSettings.Children) != 0 && (retrieveSettings & InteropWindowRetrieveSettings.ZOrderedChildren) != 0)
-        {
-            throw new ArgumentException("Can't have both Children & ZOrderedChildren", nameof(retrieveSettings));
-        }
         var forceUpdate = (retrieveSettings & InteropWindowRetrieveSettings.ForceUpdate) != 0;
         var autoCorrect = (retrieveSettings & InteropWindowRetrieveSettings.AutoCorrectValues) != 0;
 
@@ -101,10 +98,6 @@ public static class InteropWindowExtensions
         {
             interopWindow.GetChildren(forceUpdate);
         }
-        if ((retrieveSettings & InteropWindowRetrieveSettings.ZOrderedChildren) != 0)
-        {
-            interopWindow.GetZOrderedChildren(forceUpdate);
-        }
         if ((retrieveSettings & InteropWindowRetrieveSettings.Placement) != 0)
         {
             interopWindow.GetPlacement(forceUpdate);
@@ -151,30 +144,30 @@ public static class InteropWindowExtensions
     }
 
     /// <summary>
-    ///     Get the direct children of the specified interopWindow, this is not lazy!
-    ///     The result is stored in <see cref="IInteropWindow.Children"/>, use <see cref="GetDescendants"/> to get the children of the children too.
+    ///     Get the direct children of the specified interopWindow in Z-order, from top (front) to bottom (back), this is not lazy!
+    ///     The children are a snapshot taken with <see cref="InteropWindowQuery.GetTopWindows"/>, the result is stored in <see cref="IInteropWindow.Children"/>
+    ///     and returned from there until forceUpdate is true. Use <see cref="GetDescendants"/> to get the children of the children too.
+    ///     The children of the desktop window are the top-level windows, these have no parent (<see cref="IInteropWindow.Parent"/> is IntPtr.Zero).
     /// </summary>
     /// <param name="interopWindow">InteropWindow</param>
     /// <param name="forceUpdate">True to force updating</param>
     /// <returns>IEnumerable with InteropWindow</returns>
     public static IEnumerable<IInteropWindow> GetChildren(this IInteropWindow interopWindow, bool forceUpdate = false)
     {
-        if (interopWindow.Children != null && !interopWindow.HasZOrderedChildren && !forceUpdate)
+        if (interopWindow.Children != null && !forceUpdate)
         {
             return interopWindow.Children;
         }
 
-        var parentHandle = interopWindow.Handle;
-        var children = new List<IInteropWindow>();
-        // EnumChildWindows also enumerates the descendants, only keep the direct children
-        foreach (var child in WindowsEnumerator.EnumerateWindows(interopWindow, window => User32Api.GetAncestor(window.Handle, GetAncestorFlags.GA_PARENT) == parentHandle))
+        var children = InteropWindowQuery.GetTopWindows(interopWindow);
+        // Top-level windows have no parent, see GetParent
+        var isDesktop = interopWindow.Handle == User32Api.GetDesktopWindow();
+        foreach (var child in children)
         {
-            child.Parent = parentHandle;
-            child.ParentWindow = interopWindow;
-            children.Add(child);
+            child.Parent = isDesktop ? IntPtr.Zero : interopWindow.Handle;
+            child.ParentWindow = isDesktop ? null : interopWindow;
         }
         // Store it in the Children property
-        interopWindow.HasZOrderedChildren = false;
         interopWindow.Children = children;
         return children;
     }
@@ -467,33 +460,6 @@ public static class InteropWindowExtensions
     }
 
     /// <summary>
-    ///     Get the children of the specified interopWindow, from top to bottom. This is not lazy
-    ///     This might get different results than the GetChildren
-    /// </summary>
-    /// <param name="interopWindow">InteropWindow</param>
-    /// <param name="forceUpdate">True to force updating</param>
-    /// <returns>IEnumerable with InteropWindow</returns>
-    public static IEnumerable<IInteropWindow> GetZOrderedChildren(this IInteropWindow interopWindow, bool forceUpdate = false)
-    {
-        if (interopWindow.Children != null && interopWindow.HasZOrderedChildren && !forceUpdate)
-        {
-            return interopWindow.Children;
-        }
-
-        var children = new List<IInteropWindow>();
-        foreach (var child in InteropWindowQuery.GetTopWindows(interopWindow))
-        {
-            child.Parent = interopWindow.Handle;
-            child.ParentWindow = interopWindow;
-            children.Add(child);
-        }
-        // Store it in the Children property
-        interopWindow.HasZOrderedChildren = true;
-        interopWindow.Children = children;
-        return children;
-    }
-
-    /// <summary>
     ///     Returns if the IInteropWindow is docked to the left of the other IInteropWindow
     /// </summary>
     /// <param name="window1">IInteropWindow</param>
@@ -609,6 +575,35 @@ public static class InteropWindowExtensions
         User32Api.ShowWindow(interopWindow.Handle, ShowWindowCommands.Minimize);
         interopWindow.IsMinimized = true;
         return interopWindow;
+    }
+
+    /// <summary>
+    ///     Post a message to the window: it is placed in the message queue of the thread which created the window, this doesn't wait until it's processed.
+    ///     Use this e.g. for WM_CLOSE, so a window which shows a "save changes?" dialog doesn't block the caller.
+    ///     Don't post messages with pointers to memory (e.g. WM_SETTEXT), the memory might be gone before the message is processed.
+    /// </summary>
+    /// <param name="interopWindow">InteropWindow</param>
+    /// <param name="windowsMessage">WindowsMessages</param>
+    /// <param name="wParam">IntPtr, pointer-sized message-specific information, default IntPtr.Zero</param>
+    /// <param name="lParam">IntPtr, pointer-sized message-specific information, default IntPtr.Zero</param>
+    /// <returns>true if the message was posted, false if not (e.g. the window doesn't exist, the message queue is full, or UIPI blocks it), use Marshal.GetLastWin32Error for the reason</returns>
+    public static bool PostMessage(this IInteropWindow interopWindow, WindowsMessages windowsMessage, IntPtr wParam = default, IntPtr lParam = default)
+    {
+        return User32Api.PostMessage(interopWindow.Handle, windowsMessage, wParam, lParam);
+    }
+
+    /// <summary>
+    ///     Post a message, e.g. one registered with RegisterWindowMessage, to the window: it is placed in the message queue of the thread which created the window, this doesn't wait until it's processed.
+    ///     Don't post messages with pointers to memory, the memory might be gone before the message is processed.
+    /// </summary>
+    /// <param name="interopWindow">InteropWindow</param>
+    /// <param name="message">uint with the message id</param>
+    /// <param name="wParam">IntPtr, pointer-sized message-specific information, default IntPtr.Zero</param>
+    /// <param name="lParam">IntPtr, pointer-sized message-specific information, default IntPtr.Zero</param>
+    /// <returns>true if the message was posted, false if not, use Marshal.GetLastWin32Error for the reason</returns>
+    public static bool PostMessage(this IInteropWindow interopWindow, uint message, IntPtr wParam = default, IntPtr lParam = default)
+    {
+        return User32Api.PostMessage(interopWindow.Handle, message, wParam, lParam);
     }
 
     /// <summary>

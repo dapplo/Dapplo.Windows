@@ -28,9 +28,6 @@ public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
     public IntPtr Handle { get; }
 
     /// <inheritdoc />
-    public bool HasZOrderedChildren { get; set; }
-
-    /// <inheritdoc />
     public WindowInfo? Info { get; set; }
 
     /// <inheritdoc />
@@ -155,8 +152,8 @@ public class InteropWindow : IEquatable<IInteropWindow>, IInteropWindow
             dump.AppendLine($"{indentation}{nameof(CanScroll)}={CanScroll}");
         }
 
-        // Fill already retrieved the (Z-ordered) children, when requested. Each child dumps its own children, so the complete tree is dumped.
-        if ((retrieveSettings & (InteropWindowRetrieveSettings.Children | InteropWindowRetrieveSettings.ZOrderedChildren)) != 0 && Children != null)
+        // Fill already retrieved the children, when requested. Each child dumps its own children, so the complete tree is dumped.
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Children) != 0 && Children != null)
         {
             foreach (var child in Children)
             {

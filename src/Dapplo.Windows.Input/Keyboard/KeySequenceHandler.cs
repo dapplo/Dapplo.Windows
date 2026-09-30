@@ -91,11 +91,18 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
     }
 
     /// <summary>
-    /// Check if the combinations are pressed
+    /// Check if the combinations are pressed.
+    /// VK_PACKET events (<see cref="KeyboardHookEventArgs.IsPacket"/>, e.g. text sent with <see cref="KeyboardInputGenerator.TypeText"/>) are ignored, they don't fail or advance the sequence.
+    /// The stages can use any <see cref="TriggerMode"/>, a stage counts as done when its handler triggered and all its keys are released.
     /// </summary>
     /// <param name="keyboardHookEventArgs">KeyboardHookEventArgs</param>
     public bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
     {
+        if (keyboardHookEventArgs.IsPacket)
+        {
+            return false;
+        }
+
         // Check the timeout before dispatching, so after a timeout this key press starts the sequence from the beginning, instead of being consumed by the stale stage
         if (IsExpired && !CurrentHandler.HasKeysPressed)
         {

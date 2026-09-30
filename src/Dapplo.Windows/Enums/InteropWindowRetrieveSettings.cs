@@ -76,14 +76,9 @@ public enum InteropWindowRetrieveSettings : uint
     ScrollInfo = 1 << 11,
 
     /// <summary>
-    ///     Retrieve the children
+    ///     Retrieve the direct children, in Z-order from top to bottom
     /// </summary>
     Children = 1 << 12,
-
-    /// <summary>
-    ///     Retrieve the children by z-order
-    /// </summary>
-    ZOrderedChildren = 1 << 13,
 
     /// <summary>
     /// Specify if values are auto corrected, e.g. the WindowInfo bounds are cropped to the parent
@@ -110,9 +105,4 @@ public enum InteropWindowRetrieveSettings : uint
     ///     Cache all, with children, don't force reloading
     /// </summary>
     CacheAllWithChildren = Children | Info | Caption | Classname | Maximized | Minimized | Parent | Owner | Placement | ProcessId | Text | Visible | ScrollInfo,
-
-    /// <summary>
-    ///     Cache all, don't force reloading
-    /// </summary>
-    CacheAllChildZorder = ZOrderedChildren | Info | Caption | Classname | Maximized | Minimized | Parent | Owner | Placement | ProcessId | Text | Visible | ScrollInfo
 }

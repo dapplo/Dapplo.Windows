@@ -73,9 +73,46 @@ var handler = new KeySequenceHandler(
 var subscription = KeyboardHook.KeyboardEvents.Where(handler).Subscribe(_ => Console.WriteLine("Comment selection"));
 ```
 
-`TriggerOnKeyUp = true` fires when the first key of the combination is released; the other keys can still be down, and
-the keys are passed on to the active application. Wait for the modifiers to be released before you send input, see the
-[documentation](https://www.dapplo.net/Dapplo.Windows/articles/input-handling.html#triggeronkeyup).
+`TriggerMode` sets when a `KeyCombinationHandler` fires: `KeyDown` (default), `FirstKeyUp` (the first key of the
+combination is released, the others can still be down) or `AllKeysUp` (the last key is released; another key pressed
+in between cancels it). In the key-up modes the keys are passed on to the active application. `AllKeysUp` is the mode
+for hotkeys which send input, see the
+[documentation](https://www.dapplo.net/Dapplo.Windows/articles/input-handling.html#trigger-mode).
+
+<!-- sample: InputSamples.AllKeysUp -->
+```csharp
+// Ctrl+Alt+D types the date into the active application, when the user released all keys of the combination
+var handler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.KeyD)
+{
+    TriggerMode = TriggerMode.AllKeysUp
+};
+
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(handler)
+    // Leave the hook thread, sending input from there would block the keyboard
+    .ObserveOn(TaskPoolScheduler.Default)
+    // No key of the combination is down anymore, so the text isn't combined with Ctrl or Alt
+    .Subscribe(_ => KeyboardInputGenerator.TypeText(DateTime.Now.ToString("yyyy-MM-dd")));
+```
+
+`KeyboardState.IsDown` / `IsAnyDown` read the current (asynchronous) key state, `IsDownForCurrentThread` and
+`IsToggled` the state of the calling thread's message queue:
+
+<!-- sample: InputSamples.KeyStateQuery -->
+```csharp
+// Right now, system wide (GetAsyncKeyState): use this in background threads and hooks
+bool shiftDown = KeyboardState.IsDown(VirtualKeyCode.Shift);
+bool anyModifier = KeyboardState.IsAnyDown(VirtualKeyCode.Shift, VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.Win);
+
+// At the time of the keyboard message the UI thread is processing (GetKeyState): use this in a key event handler
+bool ctrlWithThisKey = KeyboardState.IsDownForCurrentThread(VirtualKeyCode.Control);
+
+// Toggle keys
+bool capsLock = KeyboardState.IsToggled(VirtualKeyCode.Capital);
+```
+
+Text sent as Unicode characters (`TypeText`, an IME, remote desktop) arrives in the hook as `VirtualKeyCode.Packet`
+events (`IsPacket`, `PacketCharacter`); the handlers ignore them.
 
 ## Generating input
 
@@ -96,7 +133,22 @@ KeyboardInputGenerator.KeyUp(VirtualKeyCode.Shift);
 KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Win, VirtualKeyCode.KeyD);
 ```
 
-There is no method to type text; put the text on the clipboard and send Ctrl+V (see [[Common-Scenarios]]).
+`TypeText` types text as Unicode characters, independent of the keyboard layout. Line breaks become Enter, `\t`
+becomes Tab, other control characters are skipped. Keys the user holds are combined with the input.
+
+<!-- sample: InputSamples.TypeText -->
+```csharp
+// Types the text as Unicode characters, independent of the keyboard layout.
+// Line breaks become Enter, \t becomes Tab, other control characters are skipped.
+var text = "Grüße aus Köln 👋\r\nPrice:\t42 €";
+uint inserted = KeyboardInputGenerator.TypeText(text);
+
+// Two events (down and up) per UTF-16 code unit, Enter and Tab, fewer means the input was blocked
+if (inserted < KeyboardInput.ForText(text).Length)
+{
+    Console.Error.WriteLine("The input was blocked, e.g. by an elevated application");
+}
+```
 
 <!-- sample: InputSamples.GenerateMouse -->
 ```csharp

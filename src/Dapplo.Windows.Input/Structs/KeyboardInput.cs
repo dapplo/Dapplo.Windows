@@ -133,6 +133,88 @@ public struct KeyboardInput
     }
 
     /// <summary>
+    ///     Create a KeyboardInput for the key down of a Unicode character (KEYEVENTF_UNICODE), the application receives it as a VK_PACKET key which
+    ///     TranslateMessage turns into WM_CHAR with the character, independent of the keyboard layout.
+    /// </summary>
+    /// <param name="character">char, one UTF-16 code unit. A character outside the Basic Multilingual Plane needs two, the high and the low surrogate, in that order</param>
+    /// <param name="timestamp">optional Timestamp, null or 0 lets the system provide the time stamp</param>
+    /// <returns>KeyboardInput</returns>
+    public static KeyboardInput ForUnicodeKeyDown(char character, uint? timestamp = null)
+    {
+        return new KeyboardInput
+        {
+            VirtualKeyCode = VirtualKeyCode.None,
+            ScanCode = unchecked((ScanCodes)(short)character),
+            KeyEventFlags = KeyEventFlags.Unicode,
+            Timestamp = timestamp ?? 0
+        };
+    }
+
+    /// <summary>
+    ///     Create a KeyboardInput for the key up of a Unicode character (KEYEVENTF_UNICODE | KEYEVENTF_KEYUP), see <see cref="ForUnicodeKeyDown"/>.
+    /// </summary>
+    /// <param name="character">char, one UTF-16 code unit</param>
+    /// <param name="timestamp">optional Timestamp, null or 0 lets the system provide the time stamp</param>
+    /// <returns>KeyboardInput</returns>
+    public static KeyboardInput ForUnicodeKeyUp(char character, uint? timestamp = null)
+    {
+        return new KeyboardInput
+        {
+            VirtualKeyCode = VirtualKeyCode.None,
+            ScanCode = unchecked((ScanCodes)(short)character),
+            KeyEventFlags = KeyEventFlags.Unicode | KeyEventFlags.KeyUp,
+            Timestamp = timestamp ?? 0
+        };
+    }
+
+    /// <summary>
+    ///     Create the KeyboardInputs which type the text, as used by <see cref="Keyboard.KeyboardInputGenerator.TypeText"/>.
+    ///     Every UTF-16 code unit becomes a Unicode key down and key up (<see cref="ForUnicodeKeyDown"/>, <see cref="ForUnicodeKeyUp"/>),
+    ///     a surrogate pair becomes two of these, the high surrogate first.
+    ///     Line breaks ("\r\n", "\n" or "\r") become a press of <see cref="VirtualKeyCode.Return"/>, "\t" a press of <see cref="VirtualKeyCode.Tab"/>,
+    ///     as most applications ignore these characters when they arrive as WM_CHAR without the key.
+    ///     All other control characters (<see cref="char.IsControl(char)"/>, e.g. \0, \b, escape, form feed) are skipped:
+    ///     applications treat them as editing commands (backspace, cancel, Ctrl+C in a console) and not as text.
+    /// </summary>
+    /// <param name="text">string with the text</param>
+    /// <returns>KeyboardInput array, two for every typed character</returns>
+    public static KeyboardInput[] ForText(string text)
+    {
+        if (text is null) throw new ArgumentNullException(nameof(text));
+
+        var keyboardInputs = new System.Collections.Generic.List<KeyboardInput>(text.Length * 2);
+        for (var i = 0; i < text.Length; i++)
+        {
+            var character = text[i];
+            switch (character)
+            {
+                case '\r':
+                    // \r\n is one line break
+                    if (i + 1 < text.Length && text[i + 1] == '\n')
+                    {
+                        i++;
+                    }
+                    keyboardInputs.AddRange(ForKeyPress(VirtualKeyCode.Return));
+                    continue;
+                case '\n':
+                    keyboardInputs.AddRange(ForKeyPress(VirtualKeyCode.Return));
+                    continue;
+                case '\t':
+                    keyboardInputs.AddRange(ForKeyPress(VirtualKeyCode.Tab));
+                    continue;
+            }
+
+            if (char.IsControl(character))
+            {
+                continue;
+            }
+            keyboardInputs.Add(ForUnicodeKeyDown(character));
+            keyboardInputs.Add(ForUnicodeKeyUp(character));
+        }
+        return keyboardInputs.ToArray();
+    }
+
+    /// <summary>
     ///     Check if the specified VirtualKeyCode is an extended key (E0 prefixed scan code), these need KEYEVENTF_EXTENDEDKEY
     ///     when they are injected, otherwise Windows uses the non-extended (numpad) equivalent.
     ///     Examples are the arrow keys, Insert, Delete, Home, End, PageUp, PageDown, RightControl, RightMenu (AltGr), Divide, NumLock, the Windows keys and the media keys.

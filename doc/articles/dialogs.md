@@ -143,7 +143,7 @@ try
 }
 catch (COMException ex)
 {
-    // Not a cancel: something went wrong, e.g. a shell extension failed or the thread is not STA
+    // Not a cancel: something went wrong, e.g. a shell extension failed
     Console.WriteLine($"The dialog failed: 0x{ex.ErrorCode:X8}");
     return;
 }
@@ -170,7 +170,23 @@ thread.Start();
 thread.Join();
 ```
 
-The library doesn't check the apartment; on an MTA thread the dialog can fail with a `COMException` or misbehave.
+On any other thread `ShowDialog` (and the `FileDialog` methods) throw an `InvalidOperationException` which says so,
+before any COM object is created. Thread pool threads (`Task.Run`, `await` continuations without a UI
+`SynchronizationContext`) are always MTA:
+
+<!-- sample: DialogSamples.StaCheck -->
+```csharp
+try
+{
+    // Task.Run uses a thread pool thread, which is MTA: the builder throws before any COM object is created
+    await Task.Run(() => new FolderPickerBuilder().ShowDialog());
+}
+catch (InvalidOperationException ex)
+{
+    // "FolderPickerBuilder.ShowDialog must be called from an STA thread, but the current thread (...) is MTA. ..."
+    Console.WriteLine(ex.Message);
+}
+```
 
 ## Not covered
 

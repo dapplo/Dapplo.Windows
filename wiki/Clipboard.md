@@ -64,7 +64,32 @@ using (var clipboard = ClipboardNative.Access())
 }
 ```
 
-Call `ClearContents()` before you write, it makes you the owner of the clipboard:
+Write with `ClipboardNative.ReplaceContents`: it clears the clipboard and places all formats of a `ClipboardContents`
+in one short operation. Formats can only be added to the current content with `AddToCurrentContents`, and only while
+you own it.
+
+<!-- sample: ClipboardSamples.ReplaceContents -->
+```csharp
+// Prepare everything before the clipboard is opened
+using var pngStream = new MemoryStream();
+bitmap.Save(pngStream, System.Drawing.Imaging.ImageFormat.Png);
+pngStream.Position = 0;
+
+var contents = new ClipboardContents()
+    // The richest format first, the application which pastes picks the first one it understands
+    .AddStream("PNG", pngStream)
+    .AddUnicodeString("A screenshot")
+    .AddFileNames(new[] { @"C:\Temp\screenshot.png" })
+    // Optional: clipboard history (Win+V) and cloud clipboard
+    .WithCloudClipboardOptions(canUploadToCloud: false);
+
+// Opens the clipboard, clears it, places all formats and closes it again.
+// Throws a ClipboardAccessDeniedException when the clipboard can't be opened.
+ClipboardNative.ReplaceContents(contents);
+```
+
+Low level: call `ClearContents()` before the `Set...` methods, it makes you the owner of the clipboard. On content of
+another window the `Set...` methods throw an `InvalidOperationException`.
 
 <!-- sample: ClipboardSamples.WriteText -->
 ```csharp
@@ -87,6 +112,9 @@ clipboard.SetAsBytes(Encoding.UTF8.GetBytes("{\"greeting\":\"Hello\"}"), "MyApp.
 
 ## Delayed rendering
 
+The renderer runs when an application pastes the format, and at process exit for every format nobody requested yet:
+the SharedMessageWindow is destroyed then (`SharedMessageWindow.Shutdown`), so the content survives your application.
+
 <!-- sample: ClipboardSamples.DelayedRendering -->
 ```csharp
 // 1. Register the renderer, keep the registration as long as the content can be requested
@@ -98,15 +126,13 @@ IDisposable registration = ClipboardNative.RegisterDelayedRenderer("MyApp.LargeD
     request.AccessToken.SetAsBytes(data, request.RequestedFormatId);
 });
 
-// 2. Announce the format, the data is created only when somebody pastes it
-using (var clipboard = ClipboardNative.Access())
-{
-    // ClearContents makes the SharedMessageWindow the owner, which gets the render requests
-    clipboard.ClearContents();
-    clipboard.SetDelayedRenderedContent("MyApp.LargeData");
-}
+// 2. Announce the format, the data is created only when somebody pastes it.
+// ReplaceContents clears the clipboard, this makes the SharedMessageWindow the owner which gets the render requests.
+ClipboardNative.ReplaceContents(new ClipboardContents().AddDelayedRendered("MyApp.LargeData"));
 
-// 3. Later, when the data can't be provided anymore
+// 3. Keep the registration until the process exits: then the SharedMessageWindow is destroyed,
+// and the renderer is called for every format which nobody requested yet (WM_RENDERALLFORMATS), so the content survives your process.
+// Disposing it earlier means these formats can't be rendered anymore.
 registration.Dispose();
 ```
 

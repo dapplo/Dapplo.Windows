@@ -856,6 +856,67 @@ public static class User32Api
     public static extern IntPtr SendMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
     /// <summary>
+    ///     Places (posts) a message in the message queue of the thread that created the window and returns without waiting for it to be processed.
+    ///     See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-postmessagew">PostMessageW</a>.
+    ///     Don't post messages with pointers to memory (e.g. WM_SETTEXT), the memory might be gone before the message is processed; use SendMessage for those.
+    /// </summary>
+    /// <param name="hWnd">
+    ///     IntPtr, the window whose window procedure receives the message. <see cref="WindowHandles.HWND_BROADCAST"/> posts it to all top-level windows,
+    ///     IntPtr.Zero posts a thread message to the calling thread (like <see cref="PostThreadMessage(int, uint, IntPtr, IntPtr)"/> with the current thread).
+    /// </param>
+    /// <param name="windowsMessage">WindowsMessages</param>
+    /// <param name="wParam">IntPtr, pointer-sized message-specific information</param>
+    /// <param name="lParam">IntPtr, pointer-sized message-specific information</param>
+    /// <returns>true if the message was posted, false if not: use <see cref="Marshal.GetLastWin32Error"/> for the reason, e.g. ERROR_NOT_ENOUGH_QUOTA when the queue is full or ERROR_ACCESS_DENIED when UIPI blocks it</returns>
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "PostMessageW", ExactSpelling = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool PostMessage(IntPtr hWnd, WindowsMessages windowsMessage, IntPtr wParam, IntPtr lParam);
+
+    /// <summary>
+    ///     Places (posts) a message, e.g. one registered with RegisterWindowMessage, in the message queue of the thread that created the window and returns without waiting for it to be processed.
+    ///     See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-postmessagew">PostMessageW</a>.
+    ///     Don't post messages with pointers to memory, the memory might be gone before the message is processed; use SendMessage for those.
+    /// </summary>
+    /// <param name="hWnd">
+    ///     IntPtr, the window whose window procedure receives the message. <see cref="WindowHandles.HWND_BROADCAST"/> posts it to all top-level windows,
+    ///     IntPtr.Zero posts a thread message to the calling thread.
+    /// </param>
+    /// <param name="message">uint with the message id</param>
+    /// <param name="wParam">IntPtr, pointer-sized message-specific information</param>
+    /// <param name="lParam">IntPtr, pointer-sized message-specific information</param>
+    /// <returns>true if the message was posted, false if not: use <see cref="Marshal.GetLastWin32Error"/> for the reason</returns>
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "PostMessageW", ExactSpelling = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool PostMessage(IntPtr hWnd, uint message, IntPtr wParam, IntPtr lParam);
+
+    /// <summary>
+    ///     Posts a message to the message queue of the specified thread, it returns without waiting for the thread to process the message.
+    ///     The message has no window (hWnd is IntPtr.Zero), so it is not dispatched to a window procedure: the message loop of that thread must handle it, e.g. WM_QUIT to end it.
+    ///     See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-postthreadmessagew">PostThreadMessageW</a>.
+    /// </summary>
+    /// <param name="threadId">int with the id of the thread, as returned by <see cref="GetWindowThreadProcessId(IntPtr, IntPtr)"/> or GetCurrentThreadId (not the managed thread id)</param>
+    /// <param name="windowsMessage">WindowsMessages</param>
+    /// <param name="wParam">IntPtr, pointer-sized message-specific information</param>
+    /// <param name="lParam">IntPtr, pointer-sized message-specific information</param>
+    /// <returns>true if the message was posted, false if not: use <see cref="Marshal.GetLastWin32Error"/> for the reason, e.g. ERROR_INVALID_THREAD_ID when the thread has no message queue (yet)</returns>
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "PostThreadMessageW", ExactSpelling = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool PostThreadMessage(int threadId, WindowsMessages windowsMessage, IntPtr wParam, IntPtr lParam);
+
+    /// <summary>
+    ///     Posts a message, e.g. one registered with RegisterWindowMessage, to the message queue of the specified thread, it returns without waiting for the thread to process the message.
+    ///     See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-postthreadmessagew">PostThreadMessageW</a>.
+    /// </summary>
+    /// <param name="threadId">int with the id of the thread, as returned by <see cref="GetWindowThreadProcessId(IntPtr, IntPtr)"/> or GetCurrentThreadId (not the managed thread id)</param>
+    /// <param name="message">uint with the message id</param>
+    /// <param name="wParam">IntPtr, pointer-sized message-specific information</param>
+    /// <param name="lParam">IntPtr, pointer-sized message-specific information</param>
+    /// <returns>true if the message was posted, false if not: use <see cref="Marshal.GetLastWin32Error"/> for the reason</returns>
+    [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "PostThreadMessageW", ExactSpelling = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool PostThreadMessage(int threadId, uint message, IntPtr wParam, IntPtr lParam);
+
+    /// <summary>
     ///     GetWindowLongW, only exported by the 32-bit user32, use <see cref="GetWindowLongWrapper"/>
     /// </summary>
     [DllImport(User32, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "GetWindowLongW", ExactSpelling = true)]
@@ -1059,7 +1120,9 @@ public static class User32Api
     /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633545(v=vs.85).aspx">SetWindowPos</a>
     /// </summary>
     /// <param name="hWnd">IntPtr, a handle to the window.</param>
-    /// <param name="hWndInsertAfter">IntPtr, a handle to the window to precede the positioned window in the Z order. This parameter must be a window handle or one of the following values. (see link)</param>
+    /// <param name="hWndInsertAfter">IntPtr, a handle to the window to precede the positioned window in the Z order. This parameter must be a window handle or one of
+    /// <see cref="WindowHandles.HWND_TOP"/>, <see cref="WindowHandles.HWND_BOTTOM"/>, <see cref="WindowHandles.HWND_TOPMOST"/> or <see cref="WindowHandles.HWND_NOTOPMOST"/>.
+    /// It is ignored when uFlags contains SWP_NOZORDER.</param>
     /// <param name="x">int</param>
     /// <param name="y">int</param>
     /// <param name="cx">int</param>
@@ -1124,7 +1187,7 @@ public static class User32Api
     /// <param name="hWndParent">
     /// IntPtr, A handle to the parent window whose child windows are to be searched.
     /// If hWndParent is NULL, the function uses the desktop window as the parent window. The function searches among windows that are child windows of the desktop.
-    /// If hWndParent is HWND_MESSAGE (-3), the function searches all message-only windows.
+    /// If hWndParent is <see cref="WindowHandles.HWND_MESSAGE"/>, the function searches all message-only windows.
     /// </param>
     /// <param name="hWndChildAfter">
     /// IntPtr, a handle to a child window. The search begins with the next child window in the Z order. The child window must be a direct child window of hWndParent, not just a descendant window.

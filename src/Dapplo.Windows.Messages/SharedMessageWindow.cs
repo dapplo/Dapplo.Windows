@@ -25,7 +25,12 @@ namespace Dapplo.Windows.Messages;
 /// only top-level windows receive broadcasts like WM_QUERYENDSESSION, WM_POWERBROADCAST, WM_DISPLAYCHANGE and WM_SETTINGCHANGE.
 /// <para>
 /// The window is created lazily on first use (the first access to <see cref="Handle"/>, <see cref="Messages"/>, <see cref="Listen"/> or <see cref="Invoke"/>)
-/// and then lives until the process exits. If it is destroyed externally, it is recreated on the next use.
+/// and then lives until the process exits. If it is destroyed externally, or with <see cref="Shutdown"/>, it is recreated on the next use.
+/// </para>
+/// <para>
+/// When the process exits (<see cref="AppDomain.ProcessExit"/>) the window is destroyed on its own thread with <see cref="Shutdown"/>,
+/// so Windows sends WM_RENDERALLFORMATS and WM_DESTROYCLIPBOARD and delayed rendered clipboard content survives the process.
+/// From then on the window is not created again, see <see cref="IsProcessExiting"/>.
 /// </para>
 /// <para>
 /// Registrations which need a window handle and must happen on the thread of that window (clipboard format listener, session notifications, raw input, device notifications, ...)
@@ -64,6 +69,9 @@ public static class SharedMessageWindow
 
     [DllImport("user32", EntryPoint = "SendMessageW")]
     private static extern nint SendMessage(nint hWnd, uint msg, nint wParam, nint lParam);
+
+    [DllImport("user32", EntryPoint = "SendMessageTimeoutW", SetLastError = true)]
+    private static extern nint SendMessageTimeout(nint hWnd, uint msg, nint wParam, nint lParam, uint flags, uint timeout, out nint result);
 
     [DllImport("user32")]
     private static extern void PostQuitMessage(int nExitCode);
@@ -136,6 +144,9 @@ public static class SharedMessageWindow
     }
 
     private const int CreationTimeoutMilliseconds = 10000;
+    // SendMessageTimeout flag: wait for the result, but not longer than the timeout
+    private const uint SmtoNormal = 0x0000;
+    private static readonly TimeSpan DefaultShutdownTimeout = TimeSpan.FromSeconds(5);
     private const string WindowName = "Dapplo.SharedMessageWindow";
     private static readonly object Lock = new();
     // Keep the delegate in a static field, so the function pointer handed to Windows is never garbage collected
@@ -148,6 +159,9 @@ public static class SharedMessageWindow
     private static IObserver<WindowMessage>[] _observers = Array.Empty<IObserver<WindowMessage>>();
     private static WindowState _current;
     private static int _invokeCounter;
+    private static int _processExitRegistered;
+    private static volatile bool _isProcessExiting;
+    private static long _processExitShutdownTimeoutTicks = TimeSpan.FromMilliseconds(1500).Ticks;
 
     [ThreadStatic]
     private static WindowState _threadState;
@@ -157,12 +171,34 @@ public static class SharedMessageWindow
     /// </summary>
     /// <exception cref="Win32Exception">When registering the window class or creating the window failed</exception>
     /// <exception cref="TimeoutException">When the window was not created in time</exception>
+    /// <exception cref="ObjectDisposedException">When the process is exiting and the window was already shut down, see <see cref="IsProcessExiting"/></exception>
     public static nint Handle => EnsureWindow().Hwnd;
 
     /// <summary>
     /// True when the current thread is the thread of the shared window.
     /// </summary>
     public static bool IsWindowThread => _threadState != null;
+
+    /// <summary>
+    /// True when the process is exiting: <see cref="AppDomain.ProcessExit"/> was raised, and the window is (being) shut down.
+    /// From then on the window is not created again: using the SharedMessageWindow when it doesn't exist anymore throws an <see cref="ObjectDisposedException"/>.
+    /// </summary>
+    public static bool IsProcessExiting => _isProcessExiting;
+
+    /// <summary>
+    /// The maximum time the automatic <see cref="Shutdown"/> on <see cref="AppDomain.ProcessExit"/> waits, this includes the time the delayed clipboard renderers need (WM_RENDERALLFORMATS).
+    /// Default is 1.5 seconds: on .NET Framework all ProcessExit handlers together only get about 2 seconds.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">When the value is negative (<see cref="Timeout.InfiniteTimeSpan"/> is allowed)</exception>
+    public static TimeSpan ProcessExitShutdownTimeout
+    {
+        get => TimeSpan.FromTicks(Interlocked.Read(ref _processExitShutdownTimeoutTicks));
+        set
+        {
+            ValidateTimeout(value, nameof(value));
+            Interlocked.Exchange(ref _processExitShutdownTimeoutTicks, value.Ticks);
+        }
+    }
 
     /// <summary>
     /// A hot observable sequence of all window messages received by the shared window.
@@ -213,16 +249,7 @@ public static class SharedMessageWindow
             }
 
             var invokeItem = new InvokeItem(action);
-            var id = Interlocked.Increment(ref _invokeCounter);
-            PendingInvokes[id] = invokeItem;
-            try
-            {
-                SendMessage(state.Hwnd, InvokeMessageId, id, 0);
-            }
-            finally
-            {
-                PendingInvokes.TryRemove(id, out _);
-            }
+            SendInvoke(state, invokeItem, Timeout.InfiniteTimeSpan);
 
             if (!invokeItem.Executed)
             {
@@ -238,10 +265,185 @@ public static class SharedMessageWindow
     }
 
     /// <summary>
+    /// Destroys the shared window on its own thread, and waits until its message loop ended.
+    /// </summary>
+    /// <remarks>
+    /// Destroying the window makes Windows send WM_RENDERALLFORMATS (when the window owns the clipboard) and WM_DESTROY / WM_NCDESTROY:
+    /// the delayed clipboard renderers of Dapplo.Windows.Clipboard run synchronously on the window thread, before this returns.
+    /// This is called automatically when the process exits (<see cref="AppDomain.ProcessExit"/>, with <see cref="ProcessExitShutdownTimeout"/>),
+    /// call it yourself when you want to control the moment, e.g. at the end of your Main.
+    /// <para>
+    /// After an explicit Shutdown the next use of the SharedMessageWindow creates a new window, but registrations which were made
+    /// with <see cref="Listen"/> or <see cref="Invoke"/> (clipboard listener, hotkeys, session notifications, ...) belonged to the old window and are gone:
+    /// their onTeardown actions are not called anymore. Shutdown is meant for the end of the application.
+    /// During process exit the window is not created again (<see cref="IsProcessExiting"/>).
+    /// </para>
+    /// <para>
+    /// Called on the window thread itself, the window is destroyed directly and the message loop ends when control returns to it.
+    /// </para>
+    /// </remarks>
+    /// <param name="timeout">The maximum time to wait for the window thread, default 5 seconds. <see cref="Timeout.InfiniteTimeSpan"/> waits forever.</param>
+    /// <returns>true when the window doesn't exist anymore and its thread ended (or when there was no window), false when the timeout elapsed</returns>
+    /// <exception cref="ArgumentOutOfRangeException">When the timeout is negative (<see cref="Timeout.InfiniteTimeSpan"/> is allowed)</exception>
+    public static bool Shutdown(TimeSpan? timeout = null)
+    {
+        var waitTime = timeout ?? DefaultShutdownTimeout;
+        ValidateTimeout(waitTime, nameof(timeout));
+
+        WindowState state;
+        lock (Lock)
+        {
+            state = _current;
+        }
+        if (state == null)
+        {
+            return true;
+        }
+
+        if (ReferenceEquals(_threadState, state))
+        {
+            // On the window thread: WM_RENDERALLFORMATS etc. are processed synchronously inside DestroyWindow,
+            // the message loop ends as soon as control returns to it (WM_QUIT is posted on WM_NCDESTROY).
+            DestroyOwnWindow(state);
+            return true;
+        }
+
+        var stopwatch = Stopwatch.StartNew();
+        if (!state.Created.Wait(waitTime))
+        {
+            return false;
+        }
+
+        if (!state.IsDead)
+        {
+            var invokeItem = new InvokeItem(_ => DestroyOwnWindow(state));
+            SendInvoke(state, invokeItem, Remaining(waitTime, stopwatch));
+            if (invokeItem.Error != null)
+            {
+                Trace.TraceError("Dapplo.Windows.Messages.SharedMessageWindow: destroying the window failed: {0}", invokeItem.Error);
+            }
+        }
+
+        var thread = state.Thread;
+        return thread == null || thread.Join(Remaining(waitTime, stopwatch));
+    }
+
+    /// <summary>
+    /// Called when the process exits: destroy the window, so WM_RENDERALLFORMATS is sent, and don't create a new one anymore.
+    /// ProcessExit runs on another thread than the window thread (unless Environment.Exit was called on the window thread),
+    /// the window thread is a background thread and is still running at that moment.
+    /// </summary>
+    private static void OnProcessExit(object sender, EventArgs e)
+    {
+        _isProcessExiting = true;
+        try
+        {
+            if (!Shutdown(ProcessExitShutdownTimeout))
+            {
+                Trace.TraceWarning("Dapplo.Windows.Messages.SharedMessageWindow: the window was not destroyed within {0} while the process exits.", ProcessExitShutdownTimeout);
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.TraceError("Dapplo.Windows.Messages.SharedMessageWindow: the shutdown while the process exits failed: {0}", ex);
+        }
+    }
+
+    /// <summary>
+    /// Destroy the window, this must be called on the window thread
+    /// </summary>
+    private static void DestroyOwnWindow(WindowState state)
+    {
+        if (state.IsDestroyed || state.Hwnd == 0)
+        {
+            return;
+        }
+        if (!DestroyWindow(state.Hwnd))
+        {
+            Trace.TraceWarning("Dapplo.Windows.Messages.SharedMessageWindow: DestroyWindow failed with error {0}", Marshal.GetLastWin32Error());
+        }
+    }
+
+    /// <summary>
+    /// Send the invoke item to the window of the state, and wait (at most the timeout) until it was processed.
+    /// When the item was not executed (window destroyed, timeout) <see cref="InvokeItem.Executed"/> is false, the item is never executed afterwards.
+    /// </summary>
+    private static void SendInvoke(WindowState state, InvokeItem invokeItem, TimeSpan timeout)
+    {
+        var id = Interlocked.Increment(ref _invokeCounter);
+        PendingInvokes[id] = invokeItem;
+        try
+        {
+            if (timeout == Timeout.InfiniteTimeSpan)
+            {
+                SendMessage(state.Hwnd, InvokeMessageId, id, 0);
+            }
+            else
+            {
+                var milliseconds = (uint)Math.Min(Math.Ceiling(timeout.TotalMilliseconds), uint.MaxValue - 1);
+                SendMessageTimeout(state.Hwnd, InvokeMessageId, id, 0, SmtoNormal, milliseconds, out _);
+            }
+        }
+        finally
+        {
+            PendingInvokes.TryRemove(id, out _);
+        }
+    }
+
+    /// <summary>
+    /// Run the action on the thread of the window of the state, if that window still exists. Never creates a window.
+    /// </summary>
+    /// <returns>true if the action was executed, exceptions of the action are rethrown</returns>
+    private static bool InvokeOnExistingWindow(WindowState state, Action<nint> action)
+    {
+        if (state == null || state.IsDead)
+        {
+            return false;
+        }
+        if (ReferenceEquals(_threadState, state))
+        {
+            action(state.Hwnd);
+            return true;
+        }
+        var invokeItem = new InvokeItem(action);
+        SendInvoke(state, invokeItem, Timeout.InfiniteTimeSpan);
+        if (invokeItem.Error != null)
+        {
+            ExceptionDispatchInfo.Capture(invokeItem.Error).Throw();
+        }
+        return invokeItem.Executed;
+    }
+
+    /// <summary>
+    /// Validate a timeout: not negative, except infinite
+    /// </summary>
+    private static void ValidateTimeout(TimeSpan timeout, string parameterName)
+    {
+        if (timeout < TimeSpan.Zero && timeout != Timeout.InfiniteTimeSpan)
+        {
+            throw new ArgumentOutOfRangeException(parameterName, timeout, "The timeout must not be negative, use Timeout.InfiniteTimeSpan to wait forever.");
+        }
+    }
+
+    /// <summary>
+    /// The rest of the timeout, which is left after the elapsed time of the stopwatch
+    /// </summary>
+    private static TimeSpan Remaining(TimeSpan timeout, Stopwatch stopwatch)
+    {
+        if (timeout == Timeout.InfiniteTimeSpan)
+        {
+            return timeout;
+        }
+        var remaining = timeout - stopwatch.Elapsed;
+        return remaining < TimeSpan.Zero ? TimeSpan.Zero : remaining;
+    }
+
+    /// <summary>
     /// Subscribes to the messages of the shared window, with optional registration actions which run on the window thread.
     /// </summary>
     /// <param name="onSetup">Invoked on the window thread with the HWND when subscribing. If it throws, the exception is passed to the subscriber and onTeardown is not called.</param>
-    /// <param name="onTeardown">Invoked on the window thread with the same HWND when the subscription is disposed, exactly once per subscription.
+    /// <param name="onTeardown">Invoked on the window thread with the same HWND when the subscription is disposed, at most once per subscription.
+    /// It is not called when the window was destroyed in the meantime (e.g. by <see cref="Shutdown"/>), as the registrations were removed with the window.
     /// Exceptions are published on <see cref="SubscriberErrors"/>.</param>
     /// <returns>IObservable of WindowMessage, see <see cref="Messages"/> for the semantics</returns>
     public static IObservable<WindowMessage> Listen(Action<nint> onSetup = null, Action<nint> onTeardown = null)
@@ -256,11 +458,13 @@ public static class SharedMessageWindow
             // Subscribe before the setup, so messages which are caused by the setup are not missed
             var messageSubscription = Messages.Subscribe(observer);
             nint setupHwnd = 0;
+            WindowState setupState = null;
             try
             {
                 Invoke(hwnd =>
                 {
                     setupHwnd = hwnd;
+                    setupState = _threadState;
                     onSetup?.Invoke(hwnd);
                 });
             }
@@ -280,7 +484,8 @@ public static class SharedMessageWindow
                 }
                 try
                 {
-                    Invoke(_ => onTeardown(setupHwnd));
+                    // Only on the window which was set up: never create a new window for a teardown, the registrations died with the old window
+                    InvokeOnExistingWindow(setupState, _ => onTeardown(setupHwnd));
                 }
                 catch (Exception ex)
                 {
@@ -345,6 +550,14 @@ public static class SharedMessageWindow
             state = _current;
             if (state == null || state.IsDead)
             {
+                if (_isProcessExiting)
+                {
+                    throw new ObjectDisposedException(nameof(SharedMessageWindow), "The process is exiting, the shared message window was shut down and is not created again.");
+                }
+                if (Interlocked.Exchange(ref _processExitRegistered, 1) == 0)
+                {
+                    AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+                }
                 state = new WindowState();
                 var thread = new Thread(WindowThread)
                 {

@@ -58,7 +58,8 @@ if (!result.WasCancelled)
 ```
 
 A cancel is not an error (`WasCancelled`, or `null` from `FileDialog`); real failures throw a `COMException`. The
-dialogs need an STA thread:
+dialogs need an STA thread, on any other thread (e.g. `Task.Run`) they throw an `InvalidOperationException` before any
+COM object is created:
 
 <!-- sample: DialogSamples.StaThread -->
 ```csharp
