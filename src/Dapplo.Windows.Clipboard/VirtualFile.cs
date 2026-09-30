@@ -31,9 +31,47 @@ public sealed class VirtualFile
     public int Index { get; }
 
     /// <summary>
-    /// The file name, it can contain a relative path (e.g. "folder\file.txt") when a folder structure is transferred
+    /// The file name as the source supplied it. It can contain a relative path (e.g. "folder\file.txt") when a folder structure
+    /// is transferred, but also "..\" or an absolute path from a malicious source: never combine it with a target folder directly,
+    /// use <see cref="SafeFileName"/>.
     /// </summary>
     public string Name { get; }
+
+    /// <summary>
+    /// <see cref="Name"/> reduced to a file name which can be created in any folder: only the last path segment, invalid characters
+    /// replaced with '_', no trailing dots or spaces, reserved device names (CON, NUL, COM1, …) prefixed with '_', never empty.
+    /// </summary>
+    public string SafeFileName => MakeSafeFileName(Name);
+
+    internal static string MakeSafeFileName(string name)
+    {
+        name ??= "";
+        var lastSeparator = name.LastIndexOfAny(new[] { '\\', '/', ':' });
+        var fileName = lastSeparator >= 0 ? name.Substring(lastSeparator + 1) : name;
+        var invalid = Path.GetInvalidFileNameChars();
+        var chars = fileName.ToCharArray();
+        for (var i = 0; i < chars.Length; i++)
+        {
+            if (Array.IndexOf(invalid, chars[i]) >= 0 || chars[i] < 32)
+            {
+                chars[i] = '_';
+            }
+        }
+        fileName = new string(chars).TrimEnd('.', ' ').TrimStart(' ');
+        if (fileName.Length == 0)
+        {
+            return "file";
+        }
+        var baseName = fileName.Split('.')[0].TrimEnd(' ');
+        string[] reserved = { "CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$",
+            "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+            "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
+        if (Array.Exists(reserved, r => string.Equals(r, baseName, StringComparison.OrdinalIgnoreCase)))
+        {
+            fileName = "_" + fileName;
+        }
+        return fileName.Length > 240 ? fileName.Substring(0, 240) : fileName;
+    }
 
     /// <summary>
     /// The size in bytes, null when the producer didn't supply it

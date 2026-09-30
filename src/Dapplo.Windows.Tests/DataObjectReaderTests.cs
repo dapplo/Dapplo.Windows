@@ -138,6 +138,88 @@ public class DataObjectReaderTests
         Assert.Equal("12345", new StreamReader(content).ReadToEnd());
     }
 
+    // ── A hostile data source ────────────────────────────────────────────────
+
+    [Fact]
+    public void HostileStream_ClaimsToReadMoreThanAsked_ReturnsFalse()
+    {
+        var dataObject = new TestDataObject();
+        dataObject.AddStream("Dapplo.Windows.Tests.Hostile", -1, () => new HostileStream(HostileStream.Mode.LieAboutBytesRead));
+        using var reader = new DataObjectReader(dataObject);
+        Assert.False(reader.TryGetStream("Dapplo.Windows.Tests.Hostile", out _));
+    }
+
+    [Fact]
+    public void HostileStream_FailsWhileReading_ReturnsFalse()
+    {
+        var dataObject = new TestDataObject();
+        dataObject.AddStream("Dapplo.Windows.Tests.Hostile", -1, () => new HostileStream(HostileStream.Mode.Fail));
+        using var reader = new DataObjectReader(dataObject);
+        Assert.False(reader.TryGetStream("Dapplo.Windows.Tests.Hostile", out _));
+        Assert.Null(reader.GetAsBytes("Dapplo.Windows.Tests.Hostile"));
+    }
+
+    [Fact]
+    public void HostileStream_Endless_StopsAtMaxDataSize()
+    {
+        var dataObject = new TestDataObject();
+        dataObject.AddStream(DataObjectReader.FileContentsFormat, 0, () => new HostileStream(HostileStream.Mode.Endless));
+        dataObject.Add(DataObjectReader.FileContentsFormat, 1, TYMED.TYMED_HGLOBAL, new byte[2 * 1024 * 1024]);
+        using var reader = new DataObjectReader(dataObject) { MaxDataSize = 1024 * 1024 };
+        Assert.False(reader.TryGetStream(DataObjectReader.FileContentsFormat, 0, out _));
+        // HGLOBAL larger than the limit
+        Assert.False(reader.TryGetStream(DataObjectReader.FileContentsFormat, 1, out _));
+    }
+
+    [Fact]
+    public void HostileEnumerator_Endless_DoesNotHang()
+    {
+        var dataObject = new TestDataObject { Enumerator = new EndlessEnumFormatEtc() };
+        using var reader = new DataObjectReader(dataObject);
+        var task = Task.Run(() => reader.Formats);
+        Assert.True(task.Wait(TimeSpan.FromSeconds(10)), "Enumerating the formats must stop");
+        Assert.Single(task.Result);
+    }
+
+    [Theory]
+    [InlineData(@"..\..\Windows\System32\evil.dll", "evil.dll")]
+    [InlineData(@"C:\Users\Public\x.txt", "x.txt")]
+    [InlineData("C:x.txt", "x.txt")]
+    [InlineData("../../etc/passwd", "passwd")]
+    [InlineData("report.pdf. . .", "report.pdf")]
+    [InlineData("a|b<c>d?.txt", "a_b_c_d_.txt")]
+    [InlineData("CON", "_CON")]
+    [InlineData("nul.txt", "_nul.txt")]
+    [InlineData("..", "file")]
+    [InlineData("", "file")]
+    [InlineData("folder\\", "file")]
+    [InlineData("tab\tname.txt", "tab_name.txt")]
+    public void VirtualFile_SafeFileName(string name, string expected)
+    {
+        name = name.Replace("\\t", "\t");
+        var descriptor = new byte[4 + 592];
+        BitConverter.GetBytes(1).CopyTo(descriptor, 0);
+        Encoding.Unicode.GetBytes(name).CopyTo(descriptor, 4 + 72);
+        var dataObject = new TestDataObject();
+        dataObject.Add(DataObjectReader.FileGroupDescriptorWFormat, -1, TYMED.TYMED_HGLOBAL, descriptor);
+        using var reader = new DataObjectReader(dataObject);
+        var file = Assert.Single(reader.GetVirtualFiles());
+        Assert.Equal(name, file.Name);
+        Assert.Equal(expected, file.SafeFileName);
+    }
+
+    [Fact]
+    public void HostileDescriptor_CountLargerThanTheData_ReadsWhatIsThere()
+    {
+        var descriptor = new byte[4 + 592 + 100];
+        BitConverter.GetBytes(int.MaxValue).CopyTo(descriptor, 0);
+        Encoding.Unicode.GetBytes("only.txt").CopyTo(descriptor, 4 + 72);
+        var dataObject = new TestDataObject();
+        dataObject.Add(DataObjectReader.FileGroupDescriptorWFormat, -1, TYMED.TYMED_HGLOBAL, descriptor);
+        using var reader = new DataObjectReader(dataObject);
+        Assert.Equal("only.txt", Assert.Single(reader.GetVirtualFiles()).Name);
+    }
+
     [Fact]
     public async Task GetOleDataObject_OnMtaThread_Throws()
     {
@@ -213,6 +295,22 @@ public sealed class TestDataObject : IDataObject
     private const int DataSSameFormatEtc = 0x00040130;
 
     private readonly List<(short Format, int Index, TYMED Tymed, byte[] Data, int ExtraAllocation)> _entries = new();
+    private readonly Dictionary<(short Format, int Index), Func<IStream>> _streams = new();
+
+    /// <summary>
+    /// Deliver a format as a custom IStream, e.g. a misbehaving one
+    /// </summary>
+    public void AddStream(string format, int index, Func<IStream> stream)
+    {
+        var formatId = unchecked((short)ClipboardFormatExtensions.MapFormatToId(format));
+        _entries.Add((formatId, index, TYMED.TYMED_ISTREAM, Array.Empty<byte>(), 0));
+        _streams[(formatId, index)] = stream;
+    }
+
+    /// <summary>
+    /// When set, EnumFormatEtc returns this enumerator
+    /// </summary>
+    public IEnumFORMATETC Enumerator { get; set; }
 
     public void Add(string format, int index, TYMED tymed, byte[] data, int extraAllocation = 0) =>
         _entries.Add((unchecked((short)ClipboardFormatExtensions.MapFormatToId(format)), index, tymed, data, extraAllocation));
@@ -245,7 +343,8 @@ public sealed class TestDataObject : IDataObject
         }
         else
         {
-            medium.unionmember = Marshal.GetComInterfaceForObject(new TestStream(entry.Data), typeof(IStream));
+            var stream = _streams.TryGetValue((entry.Format, entry.Index), out var factory) ? factory() : new TestStream(entry.Data);
+            medium.unionmember = Marshal.GetComInterfaceForObject(stream, typeof(IStream));
         }
     }
 
@@ -271,6 +370,10 @@ public sealed class TestDataObject : IDataObject
         if (direction != DATADIR.DATADIR_GET)
         {
             throw new NotImplementedException();
+        }
+        if (Enumerator != null)
+        {
+            return Enumerator;
         }
         var formats = _entries
             .GroupBy(e => e.Format)
@@ -344,6 +447,74 @@ public sealed class TestEnumFormatEtc : IEnumFORMATETC
     }
 
     public void Clone(out IEnumFORMATETC newEnum) => newEnum = new TestEnumFormatEtc(_formats) { };
+}
+
+/// <summary>
+/// An IStream which misbehaves
+/// </summary>
+[ComVisible(true)]
+public sealed class HostileStream : IStream
+{
+    public enum Mode
+    {
+        LieAboutBytesRead,
+        Fail,
+        Endless
+    }
+
+    private readonly Mode _mode;
+
+    public HostileStream(Mode mode) => _mode = mode;
+
+    public void Read(byte[] pv, int cb, IntPtr pcbRead)
+    {
+        switch (_mode)
+        {
+            case Mode.Fail:
+                throw new COMException("Read failed", unchecked((int)0x80030005));
+            case Mode.LieAboutBytesRead:
+                Marshal.WriteInt32(pcbRead, cb * 1000);
+                return;
+            default:
+                Marshal.WriteInt32(pcbRead, cb);
+                return;
+        }
+    }
+
+    public void Write(byte[] pv, int cb, IntPtr pcbWritten) => throw new NotImplementedException();
+    public void Seek(long dlibMove, int dwOrigin, IntPtr plibNewPosition) => throw new NotImplementedException();
+    public void SetSize(long libNewSize) => throw new NotImplementedException();
+    public void CopyTo(IStream pstm, long cb, IntPtr pcbRead, IntPtr pcbWritten) => throw new NotImplementedException();
+    public void Commit(int grfCommitFlags) { }
+    public void Revert() => throw new NotImplementedException();
+    public void LockRegion(long libOffset, long cb, int dwLockType) => throw new NotImplementedException();
+    public void UnlockRegion(long libOffset, long cb, int dwLockType) => throw new NotImplementedException();
+    public void Stat(out STATSTG pstatstg, int grfStatFlag) => pstatstg = new STATSTG { type = 2 };
+    public void Clone(out IStream ppstm) => ppstm = new HostileStream(_mode);
+}
+
+/// <summary>
+/// An enumerator which never ends, always returning CF_UNICODETEXT
+/// </summary>
+[ComVisible(true)]
+public sealed class EndlessEnumFormatEtc : IEnumFORMATETC
+{
+    public int Next(int celt, FORMATETC[] rgelt, int[] pceltFetched)
+    {
+        for (var i = 0; i < celt; i++)
+        {
+            rgelt[i] = new FORMATETC { cfFormat = (short)StandardClipboardFormats.UnicodeText, dwAspect = DVASPECT.DVASPECT_CONTENT, lindex = -1, tymed = TYMED.TYMED_HGLOBAL };
+        }
+        if (pceltFetched != null && pceltFetched.Length > 0)
+        {
+            pceltFetched[0] = celt;
+        }
+        return 0;
+    }
+
+    public int Skip(int celt) => 0;
+    public int Reset() => 0;
+    public void Clone(out IEnumFORMATETC newEnum) => newEnum = new EndlessEnumFormatEtc();
 }
 
 /// <summary>

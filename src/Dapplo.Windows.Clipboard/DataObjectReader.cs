@@ -22,6 +22,10 @@ namespace Dapplo.Windows.Clipboard;
 /// OLE data objects are COM objects: use the reader on the thread which got the data object (usually the STA UI thread), and only
 /// while the data object is valid (during the drop, or until the clipboard changes). Copy what you need, e.g. with <see cref="TryGetStream(string, int, out Stream)"/>.
 /// TYMED_HGLOBAL and TYMED_ISTREAM are supported; TYMED_ISTORAGE (e.g. an Outlook message attached to a message), GDI and metafile handles are not.
+/// <para>
+/// The data comes from another application: treat it as untrusted. Failing or misbehaving sources make the Try methods return false,
+/// data larger than <see cref="MaxDataSize"/> isn't read, and virtual file names can contain paths: use <see cref="VirtualFile.SafeFileName"/> to create files.
+/// </para>
 /// </remarks>
 public sealed class DataObjectReader : IClipboardDataSource, IDisposable
 {
@@ -41,6 +45,8 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
     public const string FileContentsFormat = "FileContents";
 
     private const int DvAspectContent = 1;
+    // A data source which keeps returning formats must not hang the reader
+    private const int MaxFormats = 10_000;
     private const int SOk = 0;
     // FILEDESCRIPTORW is 592 bytes, FILEDESCRIPTORA 332
     private const int FileDescriptorWSize = 592;
@@ -65,6 +71,13 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
 
     private IDataObject DataObject => _dataObject ?? throw new ObjectDisposedException(nameof(DataObjectReader));
 
+    /// <summary>
+    /// The maximum size of the data of one format (or one virtual file) in bytes, default 512 MiB. Larger data isn't read:
+    /// <see cref="TryGetStream(string, int, out Stream)"/> returns false and <see cref="VirtualFile.OpenContent"/> null.
+    /// This protects against data sources which claim or stream huge amounts of data.
+    /// </summary>
+    public long MaxDataSize { get; set; } = 512L * 1024 * 1024;
+
     /// <inheritdoc />
     public IReadOnlyCollection<string> Formats
     {
@@ -88,14 +101,24 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
             {
                 var formatEtc = new FORMATETC[1];
                 var fetched = new int[1];
-                while (enumerator.Next(1, formatEtc, fetched) == SOk && fetched[0] == 1)
+                for (var count = 0; count < MaxFormats && enumerator.Next(1, formatEtc, fetched) == SOk && fetched[0] == 1; count++)
                 {
+                    // The caller owns the target device structure
+                    if (formatEtc[0].ptd != IntPtr.Zero)
+                    {
+                        Marshal.FreeCoTaskMem(formatEtc[0].ptd);
+                        formatEtc[0].ptd = IntPtr.Zero;
+                    }
                     var name = ClipboardFormatExtensions.MapIdToFormat(unchecked((ushort)formatEtc[0].cfFormat));
                     if (!string.IsNullOrEmpty(name) && !formats.Contains(name))
                     {
                         formats.Add(name);
                     }
                 }
+            }
+            catch (Exception ex) when (ex is COMException or InvalidCastException)
+            {
+                // A broken enumerator: return what was read so far
             }
             finally
             {
@@ -113,7 +136,14 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
             return false;
         }
         var formatEtc = CreateFormatEtc(format, -1);
-        return DataObject.QueryGetData(ref formatEtc) == SOk;
+        try
+        {
+            return DataObject.QueryGetData(ref formatEtc) == SOk;
+        }
+        catch (Exception ex) when (ex is COMException or NotImplementedException)
+        {
+            return false;
+        }
     }
 
     /// <inheritdoc />
@@ -188,14 +218,20 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
             switch (medium.tymed)
             {
                 case TYMED.TYMED_HGLOBAL:
-                    bytes = ReadHGlobal(medium.unionmember);
+                    bytes = ReadHGlobal(medium.unionmember, MaxDataSize);
                     return bytes != null;
                 case TYMED.TYMED_ISTREAM:
-                    bytes = ReadIStream(medium.unionmember);
+                    bytes = ReadIStream(medium.unionmember, MaxDataSize);
                     return bytes != null;
                 default:
                     return false;
             }
+        }
+        catch (Exception ex) when (ex is COMException or InvalidCastException or NotImplementedException)
+        {
+            // The data source failed while the data was read, e.g. IStream.Read returned an error
+            bytes = null;
+            return false;
         }
         finally
         {
@@ -212,14 +248,14 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
         tymed = TYMED.TYMED_HGLOBAL | TYMED.TYMED_ISTREAM
     };
 
-    private static byte[] ReadHGlobal(IntPtr hGlobal)
+    private static byte[] ReadHGlobal(IntPtr hGlobal, long maxSize)
     {
         if (hGlobal == IntPtr.Zero)
         {
             return null;
         }
         var size = (long)Kernel32Api.GlobalSize(hGlobal).ToUInt64();
-        if (size > int.MaxValue)
+        if (size > int.MaxValue || size > maxSize)
         {
             return null;
         }
@@ -240,7 +276,7 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
         }
     }
 
-    private static byte[] ReadIStream(IntPtr streamPointer)
+    private static byte[] ReadIStream(IntPtr streamPointer, long maxSize)
     {
         if (streamPointer == IntPtr.Zero)
         {
@@ -266,6 +302,11 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
                     if (bytesRead <= 0)
                     {
                         break;
+                    }
+                    // Don't trust the stream: it can't have read more than was asked, and must stay below the limit
+                    if (bytesRead > buffer.Length || result.Length + bytesRead > maxSize || result.Length + bytesRead > int.MaxValue)
+                    {
+                        return null;
                     }
                     result.Write(buffer, 0, bytesRead);
                 }

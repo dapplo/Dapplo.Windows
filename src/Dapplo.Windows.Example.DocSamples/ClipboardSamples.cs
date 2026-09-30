@@ -273,7 +273,7 @@ public static class ClipboardSamples
                 {
                     continue;
                 }
-                using var target = File.Create(Path.Combine(@"C:\Temp", Path.GetFileName(file.Name)));
+                using var target = File.Create(Path.Combine(@"C:\Temp", file.SafeFileName));
                 content.CopyTo(target);
             }
 

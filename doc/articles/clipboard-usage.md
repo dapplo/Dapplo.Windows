@@ -468,6 +468,9 @@ attachments or images dragged from some browsers. `DataObjectReader` reads them:
 - `GetVirtualFiles()` returns name (can contain a relative path), size, attributes and times; `OpenContent()` copies the
   content (HGLOBAL or IStream) into a stream. `TryGetStream(format, index, out stream)` reads any format with an index.
 - It is an `IClipboardDataSource`, so `GetAsUnicodeString`, `GetFileNames`, `TryGetAsHtml`, `TryGetAsDib`, … work on it.
+- The data comes from another application, treat it as untrusted: file names can contain `..\` or absolute paths, so
+  create files with `VirtualFile.SafeFileName`, never `Name`. Data larger than `MaxDataSize` (default 512 MiB) isn't
+  read, and a failing or misbehaving source makes the `Try...` methods return `false` instead of throwing.
 - **OLE needs an STA thread with OLE initialized** (every WinForms / WPF UI thread), unlike the rest of this library;
   `GetOleDataObject` throws an `InvalidOperationException` elsewhere. Read what you need right away, and dispose the
   reader. `TYMED_ISTORAGE` (e.g. an Outlook message attached to a message) isn't supported.
@@ -489,7 +492,7 @@ using (DataObjectReader reader = ClipboardNative.GetOleDataObject())
         {
             continue;
         }
-        using var target = File.Create(Path.Combine(@"C:\Temp", Path.GetFileName(file.Name)));
+        using var target = File.Create(Path.Combine(@"C:\Temp", file.SafeFileName));
         content.CopyTo(target);
     }
 
