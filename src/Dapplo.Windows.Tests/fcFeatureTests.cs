@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Keyboard;
 using Dapplo.Windows.Input.Structs;
@@ -506,7 +507,7 @@ public class FcFeatureInteractiveTests
     /// Type text into a TextBox of a form owned by the test, the form needs the keyboard focus
     /// </summary>
     [StaFact]
-    public async Task TypeText_IntoTextBox()
+    public void TypeText_IntoTextBox()
     {
         const string text = "Hé €\U0001F44D\r\nx\ty\b!";
         // The backspace is skipped, the TextBox turns the Enter into \r\n and inserts the tab
@@ -528,29 +529,36 @@ public class FcFeatureInteractiveTests
         };
         form.Controls.Add(textBox);
         form.Show();
+        // A background process may not take the foreground itself (foreground lock), ToForegroundAsync works around that.
+        // It continues on the thread pool, so keep pumping this thread's messages until it's done instead of blocking.
+        var toForeground = InteropWindowFactory.CreateFor(form.Handle).ToForegroundAsync().AsTask();
+        PumpUntil(() => toForeground.IsCompleted, "ToForegroundAsync didn't finish");
+        toForeground.GetAwaiter().GetResult();
         form.Activate();
         textBox.Focus();
 
-        await PumpUntilAsync(() => textBox.Focused && System.Windows.Forms.Form.ActiveForm == form, "The test form didn't get the keyboard focus");
+        PumpUntil(() => textBox.Focused && System.Windows.Forms.Form.ActiveForm == form, "The test form didn't get the keyboard focus");
 
         using (KeyboardHook.KeyboardEventsNonBlocking.Where(args => args.IsPacket && args.IsKeyDown).Subscribe(args => packets.Enqueue(args.PacketCharacter)))
         {
             // Wait until no key is held anymore, keys of the user would be combined with the input
-            await PumpUntilAsync(() => !KeyboardState.IsAnyDown(VirtualKeyCode.Shift, VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.Win), "Modifier keys are held down");
+            PumpUntil(() => !KeyboardState.IsAnyDown(VirtualKeyCode.Shift, VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.Win), "Modifier keys are held down");
 
             var expectedEvents = (uint)KeyboardInput.ForText(text).Length;
             Assert.Equal(expectedEvents, KeyboardInputGenerator.TypeText(text));
 
-            await PumpUntilAsync(() => textBox.Text == expected, $"The TextBox didn't get the text, it has: \"{textBox.Text}\"");
+            PumpUntil(() => textBox.Text == expected, $"The TextBox didn't get the text, it has: \"{textBox.Text}\"");
             // The hook sees every UTF-16 code unit as a packet, the thumbs up as two surrogates
-            await PumpUntilAsync(() => packets.Contains('é') && packets.Contains('\uD83D') && packets.Contains('\uDC4D'), "The keyboard hook didn't see the VK_PACKET events");
+            PumpUntil(() => packets.Contains('é') && packets.Contains('\uD83D') && packets.Contains('\uDC4D'), "The keyboard hook didn't see the VK_PACKET events");
         }
     }
 
     /// <summary>
-    /// Wait for the condition and keep the message loop of the STA thread running meanwhile
+    /// Wait for the condition and keep the message loop of the STA thread running meanwhile.
+    /// This is synchronous on purpose: creating the form installs the WindowsFormsSynchronizationContext on this thread,
+    /// an await would post its continuation to that context, which is never pumped by the test runner (the test hangs).
     /// </summary>
-    private static async Task PumpUntilAsync(Func<bool> condition, string message)
+    private static void PumpUntil(Func<bool> condition, string message)
     {
         var stopwatch = Stopwatch.StartNew();
         while (!condition())
@@ -560,7 +568,7 @@ public class FcFeatureInteractiveTests
                 Assert.Fail(message);
             }
             System.Windows.Forms.Application.DoEvents();
-            await Task.Delay(10, TestContext.Current.CancellationToken);
+            Thread.Sleep(10);
         }
     }
 }
