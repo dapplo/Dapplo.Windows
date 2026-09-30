@@ -1,7 +1,7 @@
 name: Build
 
 # Normal pushes and pull requests build, test and build the docs only.
-# A pushed tag "v<version>" (for example v3.0.12, created with `nbgv tag`) additionally
+# A pushed tag "v<major>.<minor>.<patch>" (for example v3.0.0, created with `git tag v3.0.0`) additionally
 # publishes the NuGet packages, creates the GitHub Release and publishes gh-pages and the wiki.
 on:
   push:
@@ -192,13 +192,16 @@ jobs:
     - name: Check tag and package versions
       id: version
       run: |
-        if (-not ($env:TAG -match '^v(\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?)$')) { throw "Tag '$env:TAG' is not of the form v<major>.<minor>.<patch>[-prerelease]" }
+        if (-not ($env:TAG -match '^v(\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?)$')) {
+          # nbgv tag adds the git height as a fourth number when version.json has three, e.g. v3.0.0.0
+          throw "Tag '$env:TAG' is not of the form v<major>.<minor>.<patch>[-prerelease]. Delete it and tag with the package version, e.g. 'git tag v3.0.0' (not 'nbgv tag')."
+        }
         $version = $Matches[1]
         $packages = @(Get-ChildItem -Path artifacts -Filter *.nupkg -File)
         if ($packages.Count -eq 0) { throw "No packages to publish" }
         $wrong = @($packages | Where-Object { -not $_.Name.EndsWith(".$version.nupkg") })
         if ($wrong.Count -gt 0) {
-          throw "Package versions don't match tag $($env:TAG): $($wrong.Name -join ', '). Create the tag with 'nbgv tag' on the commit to release, so it matches the version Nerdbank.GitVersioning calculates."
+          throw "Package versions don't match tag $($env:TAG): $($wrong.Name -join ', '). Tag the commit whose version.json produces this version, e.g. 'git tag v3.0.0' for 'version: 3.0.0' in src/version.json."
         }
         "version=$version" >> $env:GITHUB_OUTPUT
 
@@ -207,7 +210,8 @@ jobs:
         VERSION: ${{ steps.version.outputs.version }}
       run: |
         $lines = Get-Content -Path CHANGELOG.md -Encoding utf8
-        $header = '^## \[' + [regex]::Escape($env:VERSION) + '\]'
+        # Accepts "## [3.0.0] - date" (Keep a Changelog) and "## 3.0.0"
+        $header = '^## \[?' + [regex]::Escape($env:VERSION) + '(\]|\s|$)'
         $start = -1
         for ($i = 0; $i -lt $lines.Count; $i++) { if ($lines[$i] -match $header) { $start = $i; break } }
         if ($start -lt 0) { throw "CHANGELOG.md has no '## [$env:VERSION]' section. Rename '## [Unreleased]' to '## [$env:VERSION] - <date>' before tagging." }
@@ -312,7 +316,8 @@ jobs:
         $wikiUrl = "https://x-access-token:$env:GH_TOKEN@github.com/$env:GITHUB_REPOSITORY.wiki.git"
         $wikiDir = Join-Path $env:RUNNER_TEMP 'wiki'
 
-        git clone --quiet --depth 1 $wikiUrl $wikiDir
+        # Clone without line-ending conversion: the Windows runner has core.autocrlf=true, which makes every page look modified
+        git -c core.autocrlf=false clone --quiet --depth 1 $wikiUrl $wikiDir
         if ($LASTEXITCODE -ne 0) {
           # GitHub creates the wiki repository only when the first page is saved in the web UI; it can't be created by a push.
           Write-Host "::error title=Wiki not available::Could not clone $env:GITHUB_REPOSITORY.wiki.git. Enable the wiki and create the first page in the GitHub web UI, then re-run this job."
@@ -324,8 +329,8 @@ jobs:
         git -C $wikiDir config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git -C $wikiDir config core.autocrlf false
 
-        # Mirror wiki/: remove every tracked page first, so deleted or renamed pages disappear from the wiki.
-        git -C $wikiDir rm -r -q --ignore-unmatch -- .
+        # Mirror wiki/: delete every page first (git add -A records the deletions), so deleted or renamed pages disappear from the wiki.
+        Get-ChildItem -Path $wikiDir -Force | Where-Object { $_.Name -ne '.git' } | Remove-Item -Recurse -Force
         Copy-Item -Path (Join-Path $env:GITHUB_WORKSPACE 'wiki/*') -Destination $wikiDir -Recurse -Force
         git -C $wikiDir add -A
 

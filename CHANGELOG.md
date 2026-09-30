@@ -7,7 +7,7 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
-## 3.0.0
+## [3.0.0] - 2026-09-30
 
 ### Changed
 - **Breaking:** the Windows message types are unambiguous: `WindowMessage` lives in `Dapplo.Windows.Messages` and is also what the Forms/WPF `WinProcMessages()` and `DpiHandler` use (`WindowMessageInfo` is gone); `WindowsMessage` is now `RegisteredWindowMessages` (`Register`, `GetName`); `Dapplo.Windows.Messages.Enumerations` is now `.Enums`; `Msg.wParam` / `lParam` are `WParam` / `LParam`.
