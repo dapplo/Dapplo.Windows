@@ -76,12 +76,9 @@ internal sealed class ClipboardSemaphore : IDisposable
 
             if (!isOpened)
             {
+                var blocker = ClipboardBlocker.Detect();
                 _semaphoreSlim.Release();
-                return new ClipboardAccessToken
-                {
-                    CanAccess = false,
-                    IsOpenTimeout = true
-                };
+                return ClipboardAccessToken.OpenTimeout(blocker);
             }
         }
         catch
@@ -153,13 +150,10 @@ internal sealed class ClipboardSemaphore : IDisposable
 
             if (!isOpened)
             {
+                var blocker = ClipboardBlocker.Detect();
                 _semaphoreSlim.Release();
                 // Timeout
-                return new ClipboardAccessToken
-                {
-                    CanAccess = false,
-                    IsOpenTimeout = true
-                };
+                return ClipboardAccessToken.OpenTimeout(blocker);
             }
         }
         catch
@@ -193,7 +187,7 @@ internal sealed class ClipboardSemaphore : IDisposable
         // Don't use ConfigureAwait(false): the work runs on the context of the caller
         if (!await _semaphoreSlim.WaitAsync(options.LockTimeout, cancellationToken))
         {
-            throw new ClipboardAccessDeniedException("The clipboard was already locked by another thread or task in your application, a timeout occured.");
+            throw ClipboardAccessToken.CreateLockTimeoutException();
         }
 
         try
@@ -233,7 +227,8 @@ internal sealed class ClipboardSemaphore : IDisposable
                 retries--;
                 if (retries < 0)
                 {
-                    throw new ClipboardAccessDeniedException("The clipboard couldn't be opened for usage, it's probably locked by another process");
+                    var blocker = ClipboardBlocker.Detect();
+                    throw ClipboardAccessToken.CreateOpenTimeoutException(blocker.Window, blocker.ProcessId, blocker.Describe());
                 }
                 await Task.Delay(options.RetryInterval, cancellationToken);
             }

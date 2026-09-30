@@ -131,6 +131,35 @@ clipboard.SetAsBytes(Encoding.ASCII.GetBytes(@"{\rtf1\ansi Hello, {\b World}!}")
 clipboard.SetAsBytes(Encoding.UTF8.GetBytes("{\"greeting\":\"Hello\"}"), "MyApp.Settings");
 ```
 
+## Snapshots
+
+`ClipboardNative.ReadSnapshotAsync(formats)` copies formats into memory in one short session; decode or upload them
+afterwards. `ClipboardSnapshot` and `clipboard.AsDataSource()` both implement `IClipboardDataSource`, so the same
+`GetAsUnicodeString` / `GetAsBytes` / `GetFileNames` code reads both.
+
+<!-- sample: ClipboardSamples.Snapshot -->
+```csharp
+// Copy the formats you need in one short clipboard session...
+ClipboardSnapshot snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "PNG", StandardClipboardFormats.UnicodeText.AsString() });
+
+// ...then decode, save or upload while other applications can use the clipboard again
+if (snapshot.TryGetStream("PNG", out var pngStream))
+{
+    using (pngStream)
+    using (var file = File.Create(@"C:\Temp\pasted.png"))
+    {
+        await pngStream.CopyToAsync(file);
+    }
+}
+string text = snapshot.GetAsUnicodeString();
+
+// Has the clipboard changed since?
+bool changed = snapshot.SequenceNumber != ClipboardNative.SequenceNumber;
+```
+
+When the clipboard stays busy, `ClipboardAccessDeniedException.BlockingWindow` / `BlockingProcessId` (also on the token)
+tell which application keeps it open.
+
 ## Delayed rendering
 
 The renderer runs when an application pastes the format, and at process exit for every format nobody requested yet:

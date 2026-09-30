@@ -57,6 +57,43 @@ internal sealed class ClipboardAccessToken : IClipboardAccessToken
     /// <inheritdoc />
     public bool IsLockTimeout { get; internal set; }
 
+    /// <inheritdoc />
+    public IntPtr BlockingWindow { get; private set; }
+
+    /// <inheritdoc />
+    public int BlockingProcessId { get; private set; }
+
+    /// <summary>
+    /// Create a token for a failed open, with the window which blocks the clipboard
+    /// </summary>
+    internal static ClipboardAccessToken OpenTimeout(ClipboardBlocker blocker) => new()
+    {
+        CanAccess = false,
+        IsOpenTimeout = true,
+        BlockingWindow = blocker.Window,
+        BlockingProcessId = blocker.ProcessId
+    };
+
+    /// <summary>
+    /// Create the exception for a failed open
+    /// </summary>
+    internal static ClipboardAccessDeniedException CreateOpenTimeoutException(IntPtr blockingWindow, int blockingProcessId, string description) =>
+        new("The clipboard couldn't be opened for usage, it's probably locked by another process." + description)
+        {
+            IsOpenTimeout = true,
+            BlockingWindow = blockingWindow,
+            BlockingProcessId = blockingProcessId
+        };
+
+    /// <summary>
+    /// Create the exception for a timeout of the in-process lock
+    /// </summary>
+    internal static ClipboardAccessDeniedException CreateLockTimeoutException() =>
+        new("The clipboard was already locked by another thread or task in your application, a timeout occured.")
+        {
+            IsLockTimeout = true
+        };
+
     /// <summary>
     /// True if the current thread is the thread which opened the clipboard
     /// </summary>
@@ -72,11 +109,12 @@ internal sealed class ClipboardAccessToken : IClipboardAccessToken
 
         if (IsLockTimeout)
         {
-            throw new ClipboardAccessDeniedException("The clipboard was already locked by another thread or task in your application, a timeout occured.");
+            throw CreateLockTimeoutException();
         }
         if (IsOpenTimeout)
         {
-            throw new ClipboardAccessDeniedException("The clipboard couldn't be opened for usage, it's probably locked by another process");
+            var description = BlockingWindow == IntPtr.Zero ? "" : $" It was in use by window 0x{BlockingWindow.ToInt64():X} of process {BlockingProcessId}.";
+            throw CreateOpenTimeoutException(BlockingWindow, BlockingProcessId, description);
         }
         if (_canAccess)
         {

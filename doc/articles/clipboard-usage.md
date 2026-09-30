@@ -173,6 +173,64 @@ using var clipboard = await ClipboardNative.AccessAsync();
 string text = clipboard.CanAccess ? clipboard.GetAsUnicodeString() : null;
 ```
 
+## Snapshots: read now, process later
+
+`ClipboardNative.ReadSnapshotAsync(formats)` copies the formats into memory in one short clipboard session. Decoding
+an image, saving a file or uploading happens afterwards, while other applications can use the clipboard again. A
+snapshot never changes, and can be used on any thread.
+
+- `formats == null` copies every format which is stored in memory. Handle formats (`CF_BITMAP`, `CF_ENHMETAFILE`,
+  `CF_PALETTE`, `CF_METAFILEPICT`, the display, private and GDI object formats) are skipped; Windows synthesizes
+  `CF_DIB` / `CF_DIBV5` from `CF_BITMAP`, and those are copied. Reading a format makes the copying application render
+  it when it uses delayed rendering, so pass the formats you need.
+- `ReadSnapshotAsync(formats, maxBytesPerFormat)` skips larger formats; `SkippedFormats` lists everything which was
+  requested but isn't in the snapshot.
+- `SequenceNumber` tells whether the clipboard changed since; `ToContents()` writes the snapshot back, e.g. to restore
+  the clipboard after using it temporarily. With an open token use `clipboard.ReadSnapshot(formats)`.
+
+<!-- sample: ClipboardSamples.Snapshot -->
+```csharp
+// Copy the formats you need in one short clipboard session...
+ClipboardSnapshot snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "PNG", StandardClipboardFormats.UnicodeText.AsString() });
+
+// ...then decode, save or upload while other applications can use the clipboard again
+if (snapshot.TryGetStream("PNG", out var pngStream))
+{
+    using (pngStream)
+    using (var file = File.Create(@"C:\Temp\pasted.png"))
+    {
+        await pngStream.CopyToAsync(file);
+    }
+}
+string text = snapshot.GetAsUnicodeString();
+
+// Has the clipboard changed since?
+bool changed = snapshot.SequenceNumber != ClipboardNative.SequenceNumber;
+```
+
+### One reader for every source: IClipboardDataSource
+
+`IClipboardDataSource` (`Formats`, `HasFormat`, `TryGetStream`) is implemented by `ClipboardSnapshot` and by
+`clipboard.AsDataSource()` for an open clipboard. The extension methods `GetAsUnicodeString`, `TryGetAsUtf8String`,
+`GetAsBytes` / `TryGetAsBytes` and `GetFileNames` work on every source; missing formats return `null` or an empty list.
+
+<!-- sample: ClipboardSamples.DataSource -->
+```csharp
+// Written once, works for the open clipboard, a snapshot and other IClipboardDataSource implementations
+static string Describe(IClipboardDataSource source)
+{
+    IReadOnlyList<string> files = source.GetFileNames();
+    if (files.Count > 0)
+    {
+        return $"{files.Count} file(s)";
+    }
+    return source.GetAsUnicodeString() ?? $"Formats: {string.Join(", ", source.Formats)}";
+}
+
+string fromClipboard = await ClipboardNative.UseAsync(clipboard => Describe(clipboard.AsDataSource()));
+string fromSnapshot = Describe(await ClipboardNative.ReadSnapshotAsync());
+```
+
 ## Reading
 
 | Content | Method |
@@ -448,6 +506,27 @@ try
 catch (ClipboardAccessDeniedException ex)
 {
     Console.WriteLine($"The clipboard is in use: {ex.Message}");
+}
+```
+
+### Who blocks the clipboard?
+
+When the clipboard can't be opened, `ClipboardAccessDeniedException` and the token (`IsOpenTimeout`) tell which window
+kept it open: `BlockingWindow` and `BlockingProcessId` (zero when unknown, e.g. when the clipboard was opened without a
+window). `ClipboardNative.OpenClipboardWindow` returns that window at any time. `IsLockTimeout` means another thread of
+your own process holds the in-process lock.
+
+<!-- sample: ClipboardSamples.WhoBlocks -->
+```csharp
+try
+{
+    await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents().AddUnicodeString("Hello")));
+}
+catch (ClipboardAccessDeniedException ex) when (ex.IsOpenTimeout && ex.BlockingProcessId != 0)
+{
+    // Tell the user which application keeps the clipboard open
+    using var process = Process.GetProcessById(ex.BlockingProcessId);
+    Console.WriteLine($"The clipboard is in use by {process.ProcessName}");
 }
 ```
 

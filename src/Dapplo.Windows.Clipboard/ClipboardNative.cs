@@ -2,7 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Threading;
@@ -272,6 +274,45 @@ namespace Dapplo.Windows.Clipboard
             // No ConfigureAwait(false): the clipboard is opened on the context of the caller, and must be used and closed there
             using var clipboardAccessToken = await AccessAsync(hWnd, retries, retryInterval, timeout, cancellationToken);
             clipboardAccessToken.ReplaceContents(contents);
+        }
+
+        /// <summary>
+        /// The window which has the clipboard open right now (GetOpenClipboardWindow), IntPtr.Zero when the clipboard isn't open
+        /// or was opened without a window. Use it to tell the user which application blocks the clipboard,
+        /// see also <see cref="IClipboardAccessToken.BlockingWindow"/> and <see cref="ClipboardAccessDeniedException.BlockingWindow"/>.
+        /// </summary>
+        public static IntPtr OpenClipboardWindow => NativeMethods.GetOpenClipboardWindow();
+
+        /// <summary>
+        /// Read the formats into memory in one short clipboard session, see <see cref="ClipboardSnapshotExtensions.ReadSnapshot"/>.
+        /// Decode or send the data afterwards, while the clipboard is available for other applications again.
+        /// </summary>
+        /// <param name="formats">The formats to read, null reads every format which is stored in memory (handle formats like CF_BITMAP, CF_ENHMETAFILE and CF_PALETTE are skipped).
+        /// Pass the formats you need: reading all formats makes the copying application render every delayed rendered format.</param>
+        /// <param name="options">optional ClipboardAccessOptions</param>
+        /// <param name="cancellationToken">CancellationToken, cancels the waiting for the clipboard</param>
+        /// <returns>Task with the ClipboardSnapshot</returns>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard couldn't be opened</exception>
+        public static Task<ClipboardSnapshot> ReadSnapshotAsync(IEnumerable<string> formats = null, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            return ReadSnapshotAsync(formats, long.MaxValue, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// Read the formats into memory in one short clipboard session, formats larger than <paramref name="maxBytesPerFormat"/> are skipped
+        /// (see <see cref="ClipboardSnapshot.SkippedFormats"/>).
+        /// </summary>
+        /// <param name="formats">The formats to read, null reads every format which is stored in memory</param>
+        /// <param name="maxBytesPerFormat">long with the maximum size of one format in bytes</param>
+        /// <param name="options">optional ClipboardAccessOptions</param>
+        /// <param name="cancellationToken">CancellationToken, cancels the waiting for the clipboard</param>
+        /// <returns>Task with the ClipboardSnapshot</returns>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard couldn't be opened</exception>
+        public static Task<ClipboardSnapshot> ReadSnapshotAsync(IEnumerable<string> formats, long maxBytesPerFormat, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            // Resolve (and register) the format names before the clipboard is opened
+            var formatList = formats?.ToList();
+            return UseAsync(clipboard => clipboard.ReadSnapshot(formatList, maxBytesPerFormat), options, cancellationToken);
         }
 
         /// <summary>

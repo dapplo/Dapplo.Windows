@@ -7,6 +7,16 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.2.0]
+
+### Added
+- `ClipboardNative.ReadSnapshotAsync(formats, [maxBytesPerFormat])` and `clipboard.ReadSnapshot(...)`: copy clipboard formats into a `ClipboardSnapshot` in one short session, so decoding or uploading never happens while the clipboard is open. `null` reads every global-memory format (handle formats like `CF_BITMAP`, `CF_ENHMETAFILE`, `CF_PALETTE` are skipped); `SkippedFormats`, `SequenceNumber`, `OwnerHandle`, `GetSize` and `ToContents()` (restore the clipboard).
+- `IClipboardDataSource` (`Formats`, `HasFormat`, `TryGetStream`), implemented by `ClipboardSnapshot` and by `clipboard.AsDataSource()` for the open clipboard, with the extensions `GetAsUnicodeString`, `TryGetAsUtf8String`, `GetAsBytes` / `TryGetAsBytes` and `GetFileNames` (Unicode and ANSI `DROPFILES`), so one piece of code reads every source.
+- Who blocks the clipboard: `ClipboardNative.OpenClipboardWindow` (`GetOpenClipboardWindow`), and `BlockingWindow` / `BlockingProcessId` on the access token and on `ClipboardAccessDeniedException` when opening failed. The exception also has `IsOpenTimeout` / `IsLockTimeout`, and its message names the blocking process.
+
+### Changed
+- **Breaking** for your own implementations of `IClipboardAccessToken` (the library's tokens are internal): the interface has the new `BlockingWindow` and `BlockingProcessId` properties.
+
 ## [3.1.0]
 
 ### Added

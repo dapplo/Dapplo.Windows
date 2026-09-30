@@ -30,7 +30,7 @@ public class ClipboardThreadingTests
     /// Keeps the clipboard open on a separate thread, bypassing the in-process lock of Dapplo.Windows.Clipboard,
     /// like another application would. Returns when the clipboard is open, the returned task completes when it's closed again.
     /// </summary>
-    private static Task BlockClipboard(TimeSpan duration)
+    internal static Task BlockClipboard(TimeSpan duration, IntPtr owner = default)
     {
         var opened = new ManualResetEventSlim();
         var closed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -39,7 +39,7 @@ public class ClipboardThreadingTests
             try
             {
                 var deadline = DateTime.UtcNow.AddSeconds(5);
-                while (!OpenClipboard(IntPtr.Zero))
+                while (!OpenClipboard(owner))
                 {
                     if (DateTime.UtcNow > deadline)
                     {
@@ -246,7 +246,7 @@ public class ClipboardThreadingTests
     /// <summary>
     /// Open and close the clipboard via the Win32 API, bypassing the in-process lock
     /// </summary>
-    private static bool OpenAndCloseOnThisThread()
+    internal static bool OpenAndCloseOnThisThread()
     {
         for (var attempt = 0; attempt < 20; attempt++)
         {

@@ -34,6 +34,17 @@ public interface IClipboardAccessToken : IDisposable
     bool IsOpenTimeout { get; }
 
     /// <summary>
+    /// When <see cref="IsOpenTimeout"/>: the window which had the clipboard open when the last attempt failed, IntPtr.Zero when unknown
+    /// (the clipboard was opened without a window, or was already closed again).
+    /// </summary>
+    IntPtr BlockingWindow { get; }
+
+    /// <summary>
+    /// When <see cref="IsOpenTimeout"/>: the process ID of <see cref="BlockingWindow"/>, 0 when unknown
+    /// </summary>
+    int BlockingProcessId { get; }
+
+    /// <summary>
     /// This throws a <see cref="ClipboardAccessDeniedException"/> when the clipboard couldn't be opened or is no longer open,
     /// and an <see cref="System.InvalidOperationException"/> when it's used on another thread than the one which opened it.
     /// </summary>

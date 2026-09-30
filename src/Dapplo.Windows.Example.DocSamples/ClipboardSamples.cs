@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -133,6 +135,63 @@ public static class ClipboardSamples
         catch (ClipboardAccessDeniedException ex)
         {
             Console.WriteLine($"The clipboard is in use: {ex.Message}");
+        }
+        #endregion
+    }
+
+    public static async Task Snapshot()
+    {
+        #region Snapshot
+        // Copy the formats you need in one short clipboard session...
+        ClipboardSnapshot snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "PNG", StandardClipboardFormats.UnicodeText.AsString() });
+
+        // ...then decode, save or upload while other applications can use the clipboard again
+        if (snapshot.TryGetStream("PNG", out var pngStream))
+        {
+            using (pngStream)
+            using (var file = File.Create(@"C:\Temp\pasted.png"))
+            {
+                await pngStream.CopyToAsync(file);
+            }
+        }
+        string text = snapshot.GetAsUnicodeString();
+
+        // Has the clipboard changed since?
+        bool changed = snapshot.SequenceNumber != ClipboardNative.SequenceNumber;
+        #endregion
+    }
+
+    public static async Task DataSource()
+    {
+        #region DataSource
+        // Written once, works for the open clipboard, a snapshot and other IClipboardDataSource implementations
+        static string Describe(IClipboardDataSource source)
+        {
+            IReadOnlyList<string> files = source.GetFileNames();
+            if (files.Count > 0)
+            {
+                return $"{files.Count} file(s)";
+            }
+            return source.GetAsUnicodeString() ?? $"Formats: {string.Join(", ", source.Formats)}";
+        }
+
+        string fromClipboard = await ClipboardNative.UseAsync(clipboard => Describe(clipboard.AsDataSource()));
+        string fromSnapshot = Describe(await ClipboardNative.ReadSnapshotAsync());
+        #endregion
+    }
+
+    public static async Task WhoBlocks()
+    {
+        #region WhoBlocks
+        try
+        {
+            await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents().AddUnicodeString("Hello")));
+        }
+        catch (ClipboardAccessDeniedException ex) when (ex.IsOpenTimeout && ex.BlockingProcessId != 0)
+        {
+            // Tell the user which application keeps the clipboard open
+            using var process = Process.GetProcessById(ex.BlockingProcessId);
+            Console.WriteLine($"The clipboard is in use by {process.ProcessName}");
         }
         #endregion
     }
