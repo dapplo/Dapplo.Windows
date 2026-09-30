@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Threading;
@@ -314,6 +315,63 @@ namespace Dapplo.Windows.Clipboard
             var formatList = formats?.ToList();
             return UseAsync(clipboard => clipboard.ReadSnapshot(formatList, maxBytesPerFormat), options, cancellationToken);
         }
+
+        /// <summary>
+        /// Get the OLE data object of the clipboard (OleGetClipboard), for what the Win32 clipboard API can't read: formats with an index,
+        /// IStream data and virtual files (FileGroupDescriptorW + FileContents, e.g. Outlook attachments).
+        /// </summary>
+        /// <remarks>
+        /// OLE requires an STA thread on which OLE is initialized (every WinForms / WPF UI thread is one), unlike the rest of this library.
+        /// Use the reader on that thread, keep the usage short and dispose it: the data object is a snapshot of the clipboard at this moment.
+        /// </remarks>
+        /// <param name="retries">int with the number of retries when another application has the clipboard open (CLIPBRD_E_CANT_OPEN), default 5</param>
+        /// <param name="retryInterval">TimeSpan between the retries, default 100ms. The retries block the calling thread, like <see cref="Access"/>.</param>
+        /// <returns>DataObjectReader, dispose it to release the data object</returns>
+        /// <exception cref="InvalidOperationException">When called on a thread which isn't STA, or on which OLE isn't initialized</exception>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard stays open by another application, with the blocking window</exception>
+        /// <exception cref="COMException">When OleGetClipboard fails otherwise</exception>
+        public static DataObjectReader GetOleDataObject(int retries = 5, TimeSpan? retryInterval = null)
+        {
+            if (retries < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(retries), retries, "Retries must not be negative.");
+            }
+            retryInterval ??= TimeSpan.FromMilliseconds(100);
+            if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
+            {
+                throw new InvalidOperationException("OleGetClipboard needs an STA thread with OLE initialized, e.g. the UI thread. The Win32 clipboard API of ClipboardNative works on any thread.");
+            }
+            const int clipboardCantOpen = unchecked((int)0x800401D0);
+            int hResult;
+            System.Runtime.InteropServices.ComTypes.IDataObject dataObject;
+            while (true)
+            {
+                hResult = OleGetClipboard(out dataObject);
+                if (hResult != clipboardCantOpen)
+                {
+                    break;
+                }
+                if (retries-- <= 0)
+                {
+                    var blocker = ClipboardBlocker.Detect();
+                    throw ClipboardAccessToken.CreateOpenTimeoutException(blocker.Window, blocker.ProcessId, blocker.Describe());
+                }
+                Thread.Sleep(retryInterval.Value);
+            }
+            // CO_E_NOTINITIALIZED
+            if (hResult == unchecked((int)0x800401F0))
+            {
+                throw new InvalidOperationException("OLE is not initialized on this thread: call OleInitialize first (a WinForms [STAThread] UI thread and WPF do this).");
+            }
+            if (hResult != 0)
+            {
+                Marshal.ThrowExceptionForHR(hResult);
+            }
+            return new DataObjectReader(dataObject, true);
+        }
+
+        [DllImport("ole32")]
+        private static extern int OleGetClipboard(out System.Runtime.InteropServices.ComTypes.IDataObject dataObject);
 
         /// <summary>
         /// Retrieves the current owner

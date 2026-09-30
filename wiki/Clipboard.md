@@ -181,6 +181,11 @@ if (snapshot.TryGetAsHtml(out ClipboardHtml html))
 }
 ```
 
+## Drag and drop and virtual files
+
+`DataObjectReader` reads an OLE data object (a drop, or `ClipboardNative.GetOleDataObject()`): formats with an index,
+`IStream` data and virtual files (`GetVirtualFiles()`, e.g. Outlook attachments). OLE needs an STA UI thread.
+
 ## Delayed rendering
 
 The renderer runs when an application pastes the format, and at process exit for every format nobody requested yet:

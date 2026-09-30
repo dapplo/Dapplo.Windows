@@ -7,6 +7,12 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.4.0]
+
+### Added
+- `DataObjectReader` for OLE data objects (`System.Runtime.InteropServices.ComTypes.IDataObject`, e.g. from drag and drop): `TryGetStream(format, index, out stream)` with `lindex` support for `TYMED_HGLOBAL` and `TYMED_ISTREAM`, and `GetVirtualFiles()` which parses `FileGroupDescriptorW` (and the ANSI `FileGroupDescriptor`) into `VirtualFile` (name, size, attributes, times, lazy `OpenContent()` from `FileContents`). It's an `IClipboardDataSource`, so all read helpers work on it.
+- `ClipboardNative.GetOleDataObject()` (OleGetClipboard): needs an STA thread with OLE initialized, retries while another application has the clipboard open and then throws a `ClipboardAccessDeniedException` naming the blocking window.
+
 ## [3.3.0]
 
 ### Added

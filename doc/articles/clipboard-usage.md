@@ -457,6 +457,50 @@ if (emf != null)
 }
 ```
 
+## OLE data objects: drag and drop and virtual files
+
+Some data only exists in an OLE data object (`System.Runtime.InteropServices.ComTypes.IDataObject`): formats with an
+index (`lindex`), data in an `IStream`, and virtual files (`FileGroupDescriptorW` + `FileContents`), e.g. Outlook
+attachments or images dragged from some browsers. `DataObjectReader` reads them:
+
+- `new DataObjectReader(dataObject)` for a drop; `ClipboardNative.GetOleDataObject()` for the clipboard (OleGetClipboard,
+  retries while another application has the clipboard open).
+- `GetVirtualFiles()` returns name (can contain a relative path), size, attributes and times; `OpenContent()` copies the
+  content (HGLOBAL or IStream) into a stream. `TryGetStream(format, index, out stream)` reads any format with an index.
+- It is an `IClipboardDataSource`, so `GetAsUnicodeString`, `GetFileNames`, `TryGetAsHtml`, `TryGetAsDib`, … work on it.
+- **OLE needs an STA thread with OLE initialized** (every WinForms / WPF UI thread), unlike the rest of this library;
+  `GetOleDataObject` throws an `InvalidOperationException` elsewhere. Read what you need right away, and dispose the
+  reader. `TYMED_ISTORAGE` (e.g. an Outlook message attached to a message) isn't supported.
+
+<!-- sample: ClipboardSamples.VirtualFiles -->
+```csharp
+// On the UI thread (STA with OLE initialized), e.g. in a drop handler or for a paste
+using (DataObjectReader reader = ClipboardNative.GetOleDataObject())
+{
+    foreach (VirtualFile file in reader.GetVirtualFiles())
+    {
+        if (file.IsDirectory)
+        {
+            continue;
+        }
+        // Read the content now, the data object is only valid for a short time
+        using Stream content = file.OpenContent();
+        if (content == null)
+        {
+            continue;
+        }
+        using var target = File.Create(Path.Combine(@"C:\Temp", Path.GetFileName(file.Name)));
+        content.CopyTo(target);
+    }
+
+    // It's an IClipboardDataSource too: the same helpers as for the clipboard and snapshots
+    string text = reader.GetAsUnicodeString();
+}
+
+// A data object from a drop event (System.Runtime.InteropServices.ComTypes.IDataObject): the reader doesn't release it
+// var reader = new DataObjectReader((System.Runtime.InteropServices.ComTypes.IDataObject)e.Data);
+```
+
 ## Delayed rendering
 
 With delayed rendering you announce a format and create the data only when an application pastes it. Register a

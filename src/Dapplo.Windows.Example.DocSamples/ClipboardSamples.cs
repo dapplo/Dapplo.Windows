@@ -255,6 +255,37 @@ public static class ClipboardSamples
         #endregion
     }
 
+    public static void VirtualFiles()
+    {
+        #region VirtualFiles
+        // On the UI thread (STA with OLE initialized), e.g. in a drop handler or for a paste
+        using (DataObjectReader reader = ClipboardNative.GetOleDataObject())
+        {
+            foreach (VirtualFile file in reader.GetVirtualFiles())
+            {
+                if (file.IsDirectory)
+                {
+                    continue;
+                }
+                // Read the content now, the data object is only valid for a short time
+                using Stream content = file.OpenContent();
+                if (content == null)
+                {
+                    continue;
+                }
+                using var target = File.Create(Path.Combine(@"C:\Temp", Path.GetFileName(file.Name)));
+                content.CopyTo(target);
+            }
+
+            // It's an IClipboardDataSource too: the same helpers as for the clipboard and snapshots
+            string text = reader.GetAsUnicodeString();
+        }
+
+        // A data object from a drop event (System.Runtime.InteropServices.ComTypes.IDataObject): the reader doesn't release it
+        // var reader = new DataObjectReader((System.Runtime.InteropServices.ComTypes.IDataObject)e.Data);
+        #endregion
+    }
+
     public static async Task ReadTextAsync()
     {
         #region ReadTextAsync
