@@ -1,0 +1,18 @@
+Version:0.9
+StartHTML:00000163
+EndHTML:00000377
+StartFragment:00000245
+EndFragment:00000347
+StartSelection:00000245
+EndSelection:00000347
+<!DOCTYPE>
+<HTML>
+<HEAD>
+<TITLE>Greenshot capture</TITLE>
+</HEAD>
+<BODY>
+<!--StartFragment -->
+<img border='0' src='file:///C:/Users/test/AppData/Local/Temp/capture.png' width='20' height='10'>
+<!--EndFragment -->
+</BODY>
+</HTML>

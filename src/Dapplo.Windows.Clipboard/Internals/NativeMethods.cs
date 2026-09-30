@@ -153,6 +153,19 @@ internal static class NativeMethods
     internal static extern IntPtr GetClipboardOwner();
 
     /// <summary>
+    /// See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-getopenclipboardwindow">GetOpenClipboardWindow</a>,
+    /// the window which currently has the clipboard open. This is IntPtr.Zero when the clipboard isn't open, or was opened without a window.
+    /// </summary>
+    [DllImport("user32")]
+    internal static extern IntPtr GetOpenClipboardWindow();
+
+    /// <summary>
+    /// See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-getwindowthreadprocessid">GetWindowThreadProcessId</a>
+    /// </summary>
+    [DllImport("user32", SetLastError = true)]
+    internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+    /// <summary>
     /// Retrieves the sequence number of the clipboard
     /// </summary>
     /// <returns>sequence number or 0 if this cannot be retrieved</returns>

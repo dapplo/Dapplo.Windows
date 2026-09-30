@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -99,6 +101,188 @@ public static class ClipboardSamples
                 Console.WriteLine(text);
             }
         }
+        #endregion
+    }
+
+    public static async Task UseAsync()
+    {
+        #region UseAsync
+        // Waits asynchronously until the clipboard can be opened, then opens it, runs the work and closes it again:
+        // all on one thread, so the token can't end up on another thread. The work must not await.
+        string text = await ClipboardNative.UseAsync(clipboard => clipboard.GetAsUnicodeString());
+
+        // Write: prepare the content first, only place it inside the work
+        var contents = new ClipboardContents().AddUnicodeString("Hello, World!");
+        await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(contents));
+        #endregion
+    }
+
+    public static async Task UseAsyncOptions(CancellationToken cancellationToken)
+    {
+        #region UseAsyncOptions
+        try
+        {
+            var options = new ClipboardAccessOptions
+            {
+                // Try to open the clipboard 20 times, 50ms apart (asynchronously), wait up to 1 second for other threads of this process
+                Retries = 20,
+                RetryInterval = TimeSpan.FromMilliseconds(50),
+                LockTimeout = TimeSpan.FromSeconds(1)
+            };
+            // Read the raw data while the clipboard is open, decode it afterwards
+            byte[] png = await ClipboardNative.UseAsync(clipboard => ClipboardNative.HasFormat("PNG") ? clipboard.GetAsBytes("PNG") : null, options, cancellationToken);
+        }
+        catch (ClipboardAccessDeniedException ex)
+        {
+            Console.WriteLine($"The clipboard is in use: {ex.Message}");
+        }
+        #endregion
+    }
+
+    public static async Task Snapshot()
+    {
+        #region Snapshot
+        // Copy the formats you need in one short clipboard session...
+        ClipboardSnapshot snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "PNG", StandardClipboardFormats.UnicodeText.AsString() });
+
+        // ...then decode, save or upload while other applications can use the clipboard again
+        if (snapshot.TryGetStream("PNG", out var pngStream))
+        {
+            using (pngStream)
+            using (var file = File.Create(@"C:\Temp\pasted.png"))
+            {
+                await pngStream.CopyToAsync(file);
+            }
+        }
+        string text = snapshot.GetAsUnicodeString();
+
+        // Has the clipboard changed since?
+        bool changed = snapshot.SequenceNumber != ClipboardNative.SequenceNumber;
+        #endregion
+    }
+
+    public static async Task DataSource()
+    {
+        #region DataSource
+        // Written once, works for the open clipboard, a snapshot and other IClipboardDataSource implementations
+        static string Describe(IClipboardDataSource source)
+        {
+            IReadOnlyList<string> files = source.GetFileNames();
+            if (files.Count > 0)
+            {
+                return $"{files.Count} file(s)";
+            }
+            return source.GetAsUnicodeString() ?? $"Formats: {string.Join(", ", source.Formats)}";
+        }
+
+        string fromClipboard = await ClipboardNative.UseAsync(clipboard => Describe(clipboard.AsDataSource()));
+        string fromSnapshot = Describe(await ClipboardNative.ReadSnapshotAsync());
+        #endregion
+    }
+
+    public static async Task WhoBlocks()
+    {
+        #region WhoBlocks
+        try
+        {
+            await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents().AddUnicodeString("Hello")));
+        }
+        catch (ClipboardAccessDeniedException ex) when (ex.IsOpenTimeout && ex.BlockingProcessId != 0)
+        {
+            // Tell the user which application keeps the clipboard open
+            using var process = Process.GetProcessById(ex.BlockingProcessId);
+            Console.WriteLine($"The clipboard is in use by {process.ProcessName}");
+        }
+        #endregion
+    }
+
+    public static async Task Html()
+    {
+        #region Html
+        // Write: the header with the UTF-8 byte offsets is created for you
+        await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents()
+            .AddHtml("<p>Hello <b>World</b></p>", new Uri("https://example.com/"))
+            .AddUnicodeString("Hello World")));
+
+        // Read: what a browser or Word copied
+        var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { ClipboardHtml.FormatName });
+        if (snapshot.TryGetAsHtml(out ClipboardHtml html))
+        {
+            Console.WriteLine($"Copied from {html.SourceUrl}: {html.Fragment}");
+        }
+        #endregion
+    }
+
+    public static async Task Dib()
+    {
+        #region Dib
+        // Read a bitmap as top-down BGRA32 pixels (CF_DIBV5, or CF_DIB), and hand them to any imaging library
+        var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "CF_DIBV5", "CF_DIB" });
+        if (snapshot.TryGetAsDib(out DibImage image))
+        {
+            Console.WriteLine($"{image.Width}x{image.Height}, alpha: {image.HasAlpha}, {image.Pixels.Length} bytes");
+        }
+
+        // Write BGRA32 pixels as CF_DIBV5 (with alpha) and CF_DIB (for older applications)
+        byte[] pixels = new byte[16 * 16 * 4];
+        await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(new ClipboardContents()
+            .AddDib(pixels, 16, 16, 16 * 4, premultipliedAlpha: false)));
+        #endregion
+    }
+
+    public static async Task EnhancedMetafile()
+    {
+        #region EnhancedMetafile
+        // Vector graphics from Office or Visio, as the bytes of an .emf file
+        byte[] emf = await ClipboardNative.UseAsync(clipboard => clipboard.TryGetEnhancedMetafileBits(out var bits) ? bits : null);
+        if (emf != null)
+        {
+            File.WriteAllBytes(@"C:\Temp\copied.emf", emf);
+        }
+        #endregion
+    }
+
+    public static async Task DelayedRenderingFunc()
+    {
+        #region DelayedRenderingFunc
+        await ClipboardNative.UseAsync(clipboard =>
+        {
+            clipboard.ClearContents();
+            clipboard.SetAsUnicodeString("A large export");
+            // Rendered only when an application pastes the format; the renderer is dropped when the content is replaced
+            clipboard.SetDelayedRenderedContent("MyApp.Export", () => new MemoryStream(CreateLargeData()));
+        });
+        #endregion
+    }
+
+    public static void VirtualFiles()
+    {
+        #region VirtualFiles
+        // On the UI thread (STA with OLE initialized), e.g. in a drop handler or for a paste
+        using (DataObjectReader reader = ClipboardNative.GetOleDataObject())
+        {
+            foreach (VirtualFile file in reader.GetVirtualFiles())
+            {
+                if (file.IsDirectory)
+                {
+                    continue;
+                }
+                // Read the content now, the data object is only valid for a short time
+                using Stream content = file.OpenContent();
+                if (content == null)
+                {
+                    continue;
+                }
+                using var target = File.Create(Path.Combine(@"C:\Temp", file.SafeFileName));
+                content.CopyTo(target);
+            }
+
+            // It's an IClipboardDataSource too: the same helpers as for the clipboard and snapshots
+            string text = reader.GetAsUnicodeString();
+        }
+
+        // A data object from a drop event (System.Runtime.InteropServices.ComTypes.IDataObject): the reader doesn't release it
+        // var reader = new DataObjectReader((System.Runtime.InteropServices.ComTypes.IDataObject)e.Data);
         #endregion
     }
 

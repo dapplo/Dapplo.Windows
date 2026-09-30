@@ -9,9 +9,12 @@ namespace Dapplo.Windows.Clipboard;
 /// When you got a IClipboardAccessToken, you can access the clipboard, until it's disposed. Don't forget to dispose this!!!
 /// </summary>
 /// <remarks>
-/// Windows ties an opened clipboard to the thread which opened it: the token can only be used on the thread which opened the clipboard,
-/// and must be disposed on that thread. Don't await, ObserveOn or otherwise switch threads while holding the token, keep the usage short:
-/// while the token is held, no other application can access the clipboard.
+/// The clipboard can be used from any thread, no STA thread is needed. But Windows ties an opened clipboard to the thread which opened it:
+/// the token can only be used on the thread which opened the clipboard, and must be disposed on that thread (disposing it elsewhere throws an
+/// InvalidOperationException and leaves the clipboard open). Never await, ObserveOn or otherwise switch threads while holding the token,
+/// keep the usage short: while the token is held, no other application can access the clipboard.
+/// Prefer <see cref="ClipboardNative.UseAsync{T}(System.Func{IClipboardAccessToken, T}, ClipboardAccessOptions, System.Threading.CancellationToken)"/>,
+/// which guarantees this.
 /// </remarks>
 public interface IClipboardAccessToken : IDisposable
 {
@@ -31,7 +34,19 @@ public interface IClipboardAccessToken : IDisposable
     bool IsOpenTimeout { get; }
 
     /// <summary>
-    /// This throws a ClipboardAccessDeniedException when the clipboard can't be accessed
+    /// When <see cref="IsOpenTimeout"/>: the window which had the clipboard open when the last attempt failed, IntPtr.Zero when unknown
+    /// (the clipboard was opened without a window, or was already closed again).
+    /// </summary>
+    IntPtr BlockingWindow { get; }
+
+    /// <summary>
+    /// When <see cref="IsOpenTimeout"/>: the process ID of <see cref="BlockingWindow"/>, 0 when unknown
+    /// </summary>
+    int BlockingProcessId { get; }
+
+    /// <summary>
+    /// This throws a <see cref="ClipboardAccessDeniedException"/> when the clipboard couldn't be opened or is no longer open,
+    /// and an <see cref="System.InvalidOperationException"/> when it's used on another thread than the one which opened it.
     /// </summary>
     void ThrowWhenNoAccess();
 }

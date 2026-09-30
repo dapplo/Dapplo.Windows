@@ -1,0 +1,11 @@
+Version:0.9
+StartHTML:0000000149
+EndHTML:0000000276
+StartFragment:0000000185
+EndFragment:0000000240
+SourceURL:https://example.com/page?a=1&b=2
+<html>
+<body>
+<!--StartFragment--><h1>Überschrift</h1><p>Hello <b>wörld</b> – ✓</p><!--EndFragment-->
+</body>
+</html>

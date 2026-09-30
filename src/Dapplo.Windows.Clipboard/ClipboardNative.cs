@@ -2,7 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Threading;
@@ -161,6 +164,77 @@ namespace Dapplo.Windows.Clipboard
         }
 
         /// <summary>
+        /// Use the clipboard: wait asynchronously until it can be opened, then open it, run <paramref name="work"/> and close it again,
+        /// synchronously on one thread. This is the recommended way to access the clipboard from async code.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item>Works on any thread, no STA thread is needed.</item>
+        /// <item>Only the waiting is asynchronous. The awaits run on the context of the caller, so the work runs there too (e.g. the UI thread).</item>
+        /// <item><paramref name="work"/> must not be async: never await while the clipboard is open, the token is only valid until the work returns.
+        /// Read the data into memory and process it after UseAsync returns; prepare the data to write before calling UseAsync.</item>
+        /// <item>Don't call <see cref="Access"/>, <see cref="AccessAsync"/> or UseAsync inside the work, the in-process lock isn't reentrant.</item>
+        /// </list>
+        /// </remarks>
+        /// <typeparam name="T">Type of the result</typeparam>
+        /// <param name="work">Func which reads or writes the clipboard via the token and returns a result</param>
+        /// <param name="options">optional ClipboardAccessOptions (owner, retries, retry interval, lock timeout)</param>
+        /// <param name="cancellationToken">CancellationToken, cancels the waiting</param>
+        /// <returns>Task with the result of the work</returns>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard couldn't be opened, or the in-process lock timed out</exception>
+        public static Task<T> UseAsync<T>(Func<IClipboardAccessToken, T> work, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            if (work == null)
+            {
+                throw new ArgumentNullException(nameof(work));
+            }
+            options ??= new ClipboardAccessOptions();
+            options.Validate();
+            return ClipboardLockProvider.UseAsync(work, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// Use the clipboard, see <see cref="UseAsync{T}(Func{IClipboardAccessToken, T}, ClipboardAccessOptions, CancellationToken)"/>.
+        /// </summary>
+        /// <param name="work">Action which reads or writes the clipboard via the token, it must not be async</param>
+        /// <param name="options">optional ClipboardAccessOptions (owner, retries, retry interval, lock timeout)</param>
+        /// <param name="cancellationToken">CancellationToken, cancels the waiting</param>
+        /// <returns>Task</returns>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard couldn't be opened, or the in-process lock timed out</exception>
+        public static Task UseAsync(Action<IClipboardAccessToken> work, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            if (work == null)
+            {
+                throw new ArgumentNullException(nameof(work));
+            }
+            return UseAsync<bool>(token =>
+            {
+                work(token);
+                return true;
+            }, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// Not supported: the work must not be async, the clipboard is closed when it returns. This overload only exists to turn an async lambda into a compile error.
+        /// </summary>
+        [Obsolete("The work must not be async: never await while the clipboard is open. Read or write synchronously and do the asynchronous work before or after UseAsync.", true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Task UseAsync(Func<IClipboardAccessToken, Task> work, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException("The work must not be async.");
+        }
+
+        /// <summary>
+        /// Not supported: the work must not be async, the clipboard is closed when it returns. This overload only exists to turn an async lambda into a compile error.
+        /// </summary>
+        [Obsolete("The work must not be async: never await while the clipboard is open. Read or write synchronously and do the asynchronous work before or after UseAsync.", true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Task<T> UseAsync<T>(Func<IClipboardAccessToken, Task<T>> work, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException("The work must not be async.");
+        }
+
+        /// <summary>
         /// Replace the content of the clipboard with the contents: opens the clipboard, clears it, places all formats and closes it again.
         /// This is the recommended way to write to the clipboard, prepare the contents before calling this so the clipboard is only open briefly.
         /// </summary>
@@ -202,6 +276,102 @@ namespace Dapplo.Windows.Clipboard
             using var clipboardAccessToken = await AccessAsync(hWnd, retries, retryInterval, timeout, cancellationToken);
             clipboardAccessToken.ReplaceContents(contents);
         }
+
+        /// <summary>
+        /// The window which has the clipboard open right now (GetOpenClipboardWindow), IntPtr.Zero when the clipboard isn't open
+        /// or was opened without a window. Use it to tell the user which application blocks the clipboard,
+        /// see also <see cref="IClipboardAccessToken.BlockingWindow"/> and <see cref="ClipboardAccessDeniedException.BlockingWindow"/>.
+        /// </summary>
+        public static IntPtr OpenClipboardWindow => NativeMethods.GetOpenClipboardWindow();
+
+        /// <summary>
+        /// Read the formats into memory in one short clipboard session, see <see cref="ClipboardSnapshotExtensions.ReadSnapshot"/>.
+        /// Decode or send the data afterwards, while the clipboard is available for other applications again.
+        /// </summary>
+        /// <param name="formats">The formats to read, null reads every format which is stored in memory (handle formats like CF_BITMAP, CF_ENHMETAFILE and CF_PALETTE are skipped).
+        /// Pass the formats you need: reading all formats makes the copying application render every delayed rendered format.</param>
+        /// <param name="options">optional ClipboardAccessOptions</param>
+        /// <param name="cancellationToken">CancellationToken, cancels the waiting for the clipboard</param>
+        /// <returns>Task with the ClipboardSnapshot</returns>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard couldn't be opened</exception>
+        public static Task<ClipboardSnapshot> ReadSnapshotAsync(IEnumerable<string> formats = null, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            return ReadSnapshotAsync(formats, long.MaxValue, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// Read the formats into memory in one short clipboard session, formats larger than <paramref name="maxBytesPerFormat"/> are skipped
+        /// (see <see cref="ClipboardSnapshot.SkippedFormats"/>).
+        /// </summary>
+        /// <param name="formats">The formats to read, null reads every format which is stored in memory</param>
+        /// <param name="maxBytesPerFormat">long with the maximum size of one format in bytes</param>
+        /// <param name="options">optional ClipboardAccessOptions</param>
+        /// <param name="cancellationToken">CancellationToken, cancels the waiting for the clipboard</param>
+        /// <returns>Task with the ClipboardSnapshot</returns>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard couldn't be opened</exception>
+        public static Task<ClipboardSnapshot> ReadSnapshotAsync(IEnumerable<string> formats, long maxBytesPerFormat, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)
+        {
+            // Resolve (and register) the format names before the clipboard is opened
+            var formatList = formats?.ToList();
+            return UseAsync(clipboard => clipboard.ReadSnapshot(formatList, maxBytesPerFormat), options, cancellationToken);
+        }
+
+        /// <summary>
+        /// Get the OLE data object of the clipboard (OleGetClipboard), for what the Win32 clipboard API can't read: formats with an index,
+        /// IStream data and virtual files (FileGroupDescriptorW + FileContents, e.g. Outlook attachments).
+        /// </summary>
+        /// <remarks>
+        /// OLE requires an STA thread on which OLE is initialized (every WinForms / WPF UI thread is one), unlike the rest of this library.
+        /// Use the reader on that thread, keep the usage short and dispose it: the data object is a snapshot of the clipboard at this moment.
+        /// </remarks>
+        /// <param name="retries">int with the number of retries when another application has the clipboard open (CLIPBRD_E_CANT_OPEN), default 5</param>
+        /// <param name="retryInterval">TimeSpan between the retries, default 100ms. The retries block the calling thread, like <see cref="Access"/>.</param>
+        /// <returns>DataObjectReader, dispose it to release the data object</returns>
+        /// <exception cref="InvalidOperationException">When called on a thread which isn't STA, or on which OLE isn't initialized</exception>
+        /// <exception cref="ClipboardAccessDeniedException">When the clipboard stays open by another application, with the blocking window</exception>
+        /// <exception cref="COMException">When OleGetClipboard fails otherwise</exception>
+        public static DataObjectReader GetOleDataObject(int retries = 5, TimeSpan? retryInterval = null)
+        {
+            if (retries < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(retries), retries, "Retries must not be negative.");
+            }
+            retryInterval ??= TimeSpan.FromMilliseconds(100);
+            if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
+            {
+                throw new InvalidOperationException("OleGetClipboard needs an STA thread with OLE initialized, e.g. the UI thread. The Win32 clipboard API of ClipboardNative works on any thread.");
+            }
+            const int clipboardCantOpen = unchecked((int)0x800401D0);
+            int hResult;
+            System.Runtime.InteropServices.ComTypes.IDataObject dataObject;
+            while (true)
+            {
+                hResult = OleGetClipboard(out dataObject);
+                if (hResult != clipboardCantOpen)
+                {
+                    break;
+                }
+                if (retries-- <= 0)
+                {
+                    var blocker = ClipboardBlocker.Detect();
+                    throw ClipboardAccessToken.CreateOpenTimeoutException(blocker.Window, blocker.ProcessId, blocker.Describe());
+                }
+                Thread.Sleep(retryInterval.Value);
+            }
+            // CO_E_NOTINITIALIZED
+            if (hResult == unchecked((int)0x800401F0))
+            {
+                throw new InvalidOperationException("OLE is not initialized on this thread: call OleInitialize first (a WinForms [STAThread] UI thread and WPF do this).");
+            }
+            if (hResult != 0)
+            {
+                Marshal.ThrowExceptionForHR(hResult);
+            }
+            return new DataObjectReader(dataObject, true);
+        }
+
+        [DllImport("ole32")]
+        private static extern int OleGetClipboard(out System.Runtime.InteropServices.ComTypes.IDataObject dataObject);
 
         /// <summary>
         /// Retrieves the current owner

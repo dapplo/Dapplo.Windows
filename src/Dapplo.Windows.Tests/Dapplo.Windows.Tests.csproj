@@ -41,6 +41,9 @@
     <ProjectReference Include="..\Dapplo.Windows.Wpf\Dapplo.Windows.Wpf.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Samples\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="System.Reactive" Version="6.1.0" />
     <PackageReference Include="Dapplo.Log.Loggers" Version="3.0.22" />
     <PackageReference Include="Dapplo.Log.XUnit" Version="3.0.22" />
