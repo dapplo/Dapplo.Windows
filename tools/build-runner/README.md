@@ -20,6 +20,7 @@ test filter.
 | `configuration` | `Debug` (default) or `Release` |
 | `framework` | optional, e.g. `net10.0-windows` or `net480` |
 | `filter` | optional `dotnet test --filter` expression |
+| `coverage` | `true` to collect code coverage with coverlet, like the CI build; use it with `"framework": "net10.0-windows"`, coverlet 8 doesn't work on .NET Framework |
 | `interactive` | `true` to include tests with `Category=Interactive` (they send input, replace the clipboard or write to the registry) |
 
 Example `.build-runner\requests\baseline.json`:

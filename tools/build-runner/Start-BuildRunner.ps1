@@ -146,6 +146,7 @@ function Invoke-Request {
     $filter = [string]$request.filter
     if ($filter -and $filter -notmatch '^[A-Za-z0-9_.=~!&|(),* -]{1,300}$') { throw "Invalid test filter." }
     $interactive = [bool]$request.interactive
+    $coverage = [bool]$request.coverage
     if (-not $interactive) {
         $filter = if ($filter) { "($filter)&Category!=Interactive" } else { 'Category!=Interactive' }
     }
@@ -171,6 +172,8 @@ function Invoke-Request {
             '--blame-hang', '--blame-hang-timeout', $TestHangTimeout, '--blame-hang-dump-type', 'none',
             '--filter', "`"$filter`"")
         if ($framework) { $testArgs += @('--framework', $framework) }
+        # Same coverage options as the CI build (coverlet rewrites the assemblies before the tests run)
+        if ($coverage) { $testArgs += @('/p:CollectCoverage=true', '/p:CoverletOutputFormat=lcov', "`"/p:CoverletOutput=$ResultDir\coverage\`"") }
         $summary.test_exit_code = Invoke-Step -Name 'test' -Exe $Dotnet -Log $log -Arguments $testArgs
         $summary.trx = $trx
         $summary.tests = @(Get-ChildItem -Path $ResultDir -Filter "$id*.trx" -File -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object {

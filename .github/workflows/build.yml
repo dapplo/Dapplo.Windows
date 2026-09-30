@@ -53,13 +53,22 @@ jobs:
     - name: Build
       run: dotnet build $env:SOLUTION --configuration $env:BUILD_CONFIGURATION "/p:Platform=$env:BUILD_PLATFORM" --no-restore
 
-    - name: Test
-      # Runs every target framework of the test project; tests that drive the real desktop are tagged Interactive.
+    # Tests that drive the real desktop are tagged Interactive and excluded.
+    # Coverage is only collected on .NET 10: coverlet.msbuild 8 injects a tracker that references System.Runtime 8.0,
+    # which doesn't exist on .NET Framework, so every instrumented call would fail there.
+    - name: Test (net10.0-windows, with coverage)
       run: >
-        dotnet test $env:SOLUTION --configuration $env:BUILD_CONFIGURATION "/p:Platform=$env:BUILD_PLATFORM"
-        --no-build --filter "Category!=Interactive"
+        dotnet test src/Dapplo.Windows.Tests/Dapplo.Windows.Tests.csproj --configuration $env:BUILD_CONFIGURATION
+        --framework net10.0-windows --no-build --filter "Category!=Interactive"
         --logger "trx;LogFilePrefix=Dapplo.Windows.Tests" --results-directory "$env:GITHUB_WORKSPACE/TestResults"
         /p:CollectCoverage=true /p:CoverletOutputFormat=lcov "/p:CoverletOutput=$env:GITHUB_WORKSPACE/TestResults/coverage/"
+
+    - name: Test (net480)
+      if: success() || failure()
+      run: >
+        dotnet test src/Dapplo.Windows.Tests/Dapplo.Windows.Tests.csproj --configuration $env:BUILD_CONFIGURATION
+        --framework net480 --no-build --filter "Category!=Interactive"
+        --logger "trx;LogFilePrefix=Dapplo.Windows.Tests" --results-directory "$env:GITHUB_WORKSPACE/TestResults"
 
     - name: Upload test results
       if: always()

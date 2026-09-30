@@ -125,6 +125,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - `WindowsSessionListener.IsRegistered` and `RegistrationFailed`; `DevBroadcastDeviceInterface.TryGetDevBroadcastPort` / `TryGetDevBroadcastHandle`; `PowerManagementApi.EnableShutdownPrivilege()`.
 
 ### Fixed
+- CI collects code coverage only on .NET 10 and runs the .NET Framework 4.8 tests without coverlet, whose version 8 injects a `System.Runtime 8.0` reference that breaks every instrumented call on .NET Framework.
 - `KeyHelper.VirtualKeyCodeFromString` still parses the removed alias names `Snapshot`, `Hangul`, `Hangeul` and `Kanji`, so hotkeys stored by 2.x keep working.
 - Delayed-rendered clipboard formats survive process exit: the shared window is destroyed on exit, so Windows sends WM_RENDERALLFORMATS.
 - The children of the desktop window no longer get the desktop as parent, so `IsVisibleApplicationWindow()` is correct for them.
