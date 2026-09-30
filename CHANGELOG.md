@@ -7,39 +7,27 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
-## [3.4.0]
+## [3.1.0]
+
+The clipboard package becomes a complete, async-friendly replacement for WinForms/OLE clipboard code, without System.Drawing, WinForms or WPF in its API.
 
 ### Added
-- `DataObjectReader` for OLE data objects (`System.Runtime.InteropServices.ComTypes.IDataObject`, e.g. from drag and drop): `TryGetStream(format, index, out stream)` with `lindex` support for `TYMED_HGLOBAL` and `TYMED_ISTREAM`, and `GetVirtualFiles()` which parses `FileGroupDescriptorW` (and the ANSI `FileGroupDescriptor`) into `VirtualFile` (name, size, attributes, times, lazy `OpenContent()` from `FileContents`). It's an `IClipboardDataSource`, so all read helpers work on it.
-- `ClipboardNative.GetOleDataObject()` (OleGetClipboard): needs an STA thread with OLE initialized, retries while another application has the clipboard open and then throws a `ClipboardAccessDeniedException` naming the blocking window.
-
-## [3.3.0]
-
-### Added
+- `ClipboardNative.UseAsync(work)` and `UseAsync<T>(work)` with `ClipboardAccessOptions` (owner, retries, retry interval, lock timeout): wait asynchronously until the clipboard can be opened, then open it, run the work and close it again synchronously on one thread, so an opened clipboard can never end up on another thread. The work runs on the context of the caller; an async lambda is a compile error and work returning a `Task` throws.
+- `ClipboardNative.ReadSnapshotAsync(formats, [maxBytesPerFormat])` and `clipboard.ReadSnapshot(...)`: copy clipboard formats into a `ClipboardSnapshot` in one short session, so decoding or uploading never happens while the clipboard is open. `null` reads every global-memory format (handle formats like `CF_BITMAP`, `CF_ENHMETAFILE`, `CF_PALETTE` are skipped); `SkippedFormats`, `SequenceNumber`, `OwnerHandle`, `GetSize` and `ToContents()` (restore the clipboard).
+- `IClipboardDataSource` (`Formats`, `HasFormat`, `TryGetStream`), implemented by `ClipboardSnapshot` and by `clipboard.AsDataSource()` for the open clipboard, with the extensions `GetAsUnicodeString`, `TryGetAsUtf8String`, `GetAsBytes` / `TryGetAsBytes` and `GetFileNames` (Unicode and ANSI `DROPFILES`), so one piece of code reads every source.
+- Who blocks the clipboard: `ClipboardNative.OpenClipboardWindow` (`GetOpenClipboardWindow`), and `BlockingWindow` / `BlockingProcessId` on the access token and on `ClipboardAccessDeniedException` when opening failed. The exception also has `IsOpenTimeout` / `IsLockTimeout`, and its message names the blocking process.
 - CF_HTML: `ClipboardHtml.Create` / `TryParse`, `AddHtml` / `SetAsHtml` and `TryGetAsHtml` (any `IClipboardDataSource`) with correct UTF-8 byte offsets, `SourceURL`, `Fragment` and `FullHtml`. Offsets which don't match the `StartFragment` / `EndFragment` comments (producers which count characters) fall back to the comments; version 1.0 without context (`StartHTML:-1`) is supported.
 - CF_DIB / CF_DIBV5 without System.Drawing: `DibImage` (top-down BGRA32, straight alpha, `HasAlpha`), `DibImage.TryDecode` / `CreateDibV5` / `CreateDib`, `AddDib` / `SetAsDib` (`DibFormats`) and `TryGetAsDib`. Reads BITMAPINFOHEADER / V4 / V5, BI_RGB 1-32 bpp and BI_BITFIELDS 16/32 bpp, bottom-up and top-down, and masks repeated after a V5 header (Greenshot's byte-reversed ones included).
 - `TryGetEnhancedMetafileBits`: CF_ENHMETAFILE as EMF bytes.
 - `SetDelayedRenderedContent(format, Func<Stream>)`: delayed rendering for the current content without a registration, dropped on `WM_DESTROYCLIPBOARD`, rendered at exit with `WM_RENDERALLFORMATS`.
-
-## [3.2.0]
-
-### Added
-- `ClipboardNative.ReadSnapshotAsync(formats, [maxBytesPerFormat])` and `clipboard.ReadSnapshot(...)`: copy clipboard formats into a `ClipboardSnapshot` in one short session, so decoding or uploading never happens while the clipboard is open. `null` reads every global-memory format (handle formats like `CF_BITMAP`, `CF_ENHMETAFILE`, `CF_PALETTE` are skipped); `SkippedFormats`, `SequenceNumber`, `OwnerHandle`, `GetSize` and `ToContents()` (restore the clipboard).
-- `IClipboardDataSource` (`Formats`, `HasFormat`, `TryGetStream`), implemented by `ClipboardSnapshot` and by `clipboard.AsDataSource()` for the open clipboard, with the extensions `GetAsUnicodeString`, `TryGetAsUtf8String`, `GetAsBytes` / `TryGetAsBytes` and `GetFileNames` (Unicode and ANSI `DROPFILES`), so one piece of code reads every source.
-- Who blocks the clipboard: `ClipboardNative.OpenClipboardWindow` (`GetOpenClipboardWindow`), and `BlockingWindow` / `BlockingProcessId` on the access token and on `ClipboardAccessDeniedException` when opening failed. The exception also has `IsOpenTimeout` / `IsLockTimeout`, and its message names the blocking process.
-
-### Changed
-- **Breaking** for your own implementations of `IClipboardAccessToken` (the library's tokens are internal): the interface has the new `BlockingWindow` and `BlockingProcessId` properties.
-
-## [3.1.0]
-
-### Added
-- `ClipboardNative.UseAsync(work)` and `UseAsync<T>(work)` with `ClipboardAccessOptions` (owner, retries, retry interval, lock timeout): wait asynchronously until the clipboard can be opened, then open it, run the work and close it again synchronously on one thread, so an opened clipboard can never end up on another thread. The work runs on the context of the caller; an async lambda is a compile error and work returning a `Task` throws.
+- `DataObjectReader` for OLE data objects (`System.Runtime.InteropServices.ComTypes.IDataObject`, e.g. from drag and drop): `TryGetStream(format, index, out stream)` with `lindex` support for `TYMED_HGLOBAL` and `TYMED_ISTREAM`, and `GetVirtualFiles()` which parses `FileGroupDescriptorW` (and the ANSI `FileGroupDescriptor`) into `VirtualFile` (name, size, attributes, times, lazy `OpenContent()` from `FileContents`). It's an `IClipboardDataSource`, so all read helpers work on it.
+- `ClipboardNative.GetOleDataObject()` (OleGetClipboard): needs an STA thread with OLE initialized, retries while another application has the clipboard open and then throws a `ClipboardAccessDeniedException` naming the blocking window.
 
 ### Changed
 - **Behaviour change:** using a clipboard access token on another thread than the one which opened the clipboard throws an `InvalidOperationException` (was `ClipboardAccessDeniedException`), and disposing it there throws an `InvalidOperationException` instead of failing to close the clipboard silently, which left the clipboard open for every application. The token stays valid and can still be disposed on the owner thread.
 - The clipboard documentation states the threading rules: any thread, no STA; never await while the clipboard is open; prefer `UseAsync`.
 - New tests cover `AccessAsync` when it has to retry, with and without a `SynchronizationContext`: the token is usable after the await and disposing it closes the clipboard. `AccessAsync` stays supported.
+- **Breaking** for your own implementations of `IClipboardAccessToken` (the library's tokens are internal): the interface has the new `BlockingWindow` and `BlockingProcessId` properties.
 
 ## [3.0.3]
 
