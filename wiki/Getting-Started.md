@@ -1,132 +1,102 @@
-# Getting Started
+# Getting started
 
-This guide will help you install Dapplo.Windows and start using its packages.
+Full version: [Getting started](https://www.dapplo.net/Dapplo.Windows/articles/intro.html) in the documentation.
 
-## Prerequisites
+## Requirements
 
-- Windows operating system
-- .NET Framework 4.6.2+ **or** .NET Core 3.1+ / .NET 5+
-- Visual Studio 2019+ or any compatible IDE
+- Windows
+- .NET Framework 4.8 or .NET 10 (`net480` and `net10.0-windows`)
 
 ## Installation
 
-Dapplo.Windows is distributed as multiple NuGet packages. Install only the packages you need:
+Install the package for the feature you need, the [[Home]] page lists them with their dependencies.
 
 ```powershell
-# Window management and WinEvent hooks
-Install-Package Dapplo.Windows
-
-# Reactive clipboard monitoring and manipulation
-Install-Package Dapplo.Windows.Clipboard
-
-# DPI awareness and scaling
-Install-Package Dapplo.Windows.Dpi
-
-# Low-level keyboard and mouse hooks, input generation
-Install-Package Dapplo.Windows.Input
+dotnet add package Dapplo.Windows            # windows and window events
+dotnet add package Dapplo.Windows.Clipboard  # clipboard
+dotnet add package Dapplo.Windows.Input      # keyboard and mouse hooks
+dotnet add package Dapplo.Windows.Dpi        # DPI awareness (plus .Forms or .Wpf)
 ```
 
-Or with the .NET CLI:
+## First steps
 
-```bash
-dotnet add package Dapplo.Windows
-dotnet add package Dapplo.Windows.Clipboard
-dotnet add package Dapplo.Windows.Dpi
-dotnet add package Dapplo.Windows.Input
-```
+List the visible application windows:
 
-## Your First Window Query
-
-Get information about the currently active window:
-
+<!-- sample: GettingStartedSamples.FirstWindowQuery -->
 ```csharp
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.User32;
-
-// Get the foreground window
-var handle = User32Api.GetForegroundWindow();
-var window = InteropWindow.FromHandle(handle);
-window.Fill();
-
-Console.WriteLine($"Title:   {window.Caption}");
-Console.WriteLine($"Class:   {window.Classname}");
-Console.WriteLine($"Bounds:  {window.Bounds}");
-Console.WriteLine($"Visible: {window.IsVisible()}");
-```
-
-## Your First Clipboard Monitor
-
-Subscribe to clipboard changes reactively:
-
-```csharp
-using Dapplo.Windows.Clipboard;
-using System.Reactive.Linq;
-
-var subscription = ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains("Text"))
-    .Subscribe(info =>
-    {
-        using var clipboard = ClipboardNative.Access();
-        Console.WriteLine($"New clipboard text: {clipboard.GetAsString()}");
-    });
-
-// Keep the application alive (e.g., Console.ReadLine()) then clean up:
-subscription.Dispose();
-```
-
-## Your First Keyboard Hook
-
-React to keyboard input system-wide:
-
-```csharp
-using Dapplo.Windows.Input.Keyboard;
-using System.Reactive.Linq;
-
-using var keyboardHook = KeyboardHook.Create();
-
-var subscription = keyboardHook.KeyboardEvents
-    .Where(e => e.Key == VirtualKeyCode.Snapshot && e.IsDown)
-    .Subscribe(_ => Console.WriteLine("Print Screen pressed!"));
-
-Console.ReadLine();
-```
-
-## Resource Management
-
-Always dispose subscriptions and hooks when you are done:
-
-```csharp
-// IDisposable-based hooks and subscriptions
-using var keyboardHook = KeyboardHook.Create();
-using var subscription = keyboardHook.KeyboardEvents.Subscribe(...);
-
-// Clipboard access uses a lock — always release it
-using (var clipboard = ClipboardNative.Access())
+// using Dapplo.Windows.Desktop;
+foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows())
 {
-    var text = clipboard.GetAsString();
+    Console.WriteLine($"{window.GetCaption()} - {window.GetClassname()} at {window.GetInfo().Bounds}");
 }
 ```
 
-## Threading
+Get told when a window title changes:
 
-Many Windows APIs must be called from the correct thread. Use `ObserveOn` to marshal events to the UI thread when needed:
-
+<!-- sample: GettingStartedSamples.WindowTitles -->
 ```csharp
-using System.Reactive.Concurrency;
-
-ClipboardNative.OnUpdate
-    .ObserveOn(SynchronizationContext.Current)   // switch to UI thread
-    .Subscribe(info => labelStatus.Text = "Clipboard changed");
+// using Dapplo.Windows.Desktop; using System.Reactive.Linq;
+IDisposable subscription = WinEventHook.WindowTitleChangeObservable()
+    .Subscribe(info =>
+    {
+        var window = InteropWindowFactory.CreateFor(info.Handle);
+        Console.WriteLine($"Title changed: {window.GetCaption(forceUpdate: true)}");
+    });
 ```
 
-## Next Steps
+Log the text that is copied to the clipboard:
 
-| Topic | What you will learn |
-|-------|---------------------|
-| [[Window-Management]] | Enumerate, query, and manipulate windows |
-| [[Clipboard]] | Full clipboard API — read, write, formats, Cloud Clipboard |
-| [[Input-Handling]] | Keyboard/mouse hooks and input generation |
-| [[DPI-Awareness]] | Build crisp applications on high-DPI displays |
-| [[Restart-Manager]] | Register for automatic restart with Windows |
-| [[Icon-Creation]] | Extract and convert icons |
-| [[Common-Scenarios]] | Real-world recipes using multiple packages |
+<!-- sample: GettingStartedSamples.FirstClipboardMonitor -->
+```csharp
+// using Dapplo.Windows.Clipboard; using System.Reactive.Linq;
+IDisposable subscription = ClipboardNative.OnUpdate
+    .Where(info => info.FormatIds.Contains((uint)StandardClipboardFormats.UnicodeText))
+    .Throttle(TimeSpan.FromMilliseconds(100))
+    .Subscribe(info =>
+    {
+        using var clipboard = ClipboardNative.Access();
+        Console.WriteLine($"Copied: {clipboard.GetAsUnicodeString()}");
+    });
+```
+
+A global hotkey:
+
+<!-- sample: GettingStartedSamples.FirstKeyboardHook -->
+```csharp
+// using Dapplo.Windows.Input.Enums; using Dapplo.Windows.Input.Keyboard; using System.Reactive.Linq;
+// Ctrl+Shift+S anywhere in Windows. The handler runs on the hook thread, ObserveOn moves the work to the UI thread.
+IDisposable subscription = KeyboardHook.KeyboardEvents
+    .Where(new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyS))
+    .ObserveOn(SynchronizationContext.Current)
+    .Subscribe(_ => Console.WriteLine("Ctrl+Shift+S pressed"));
+```
+
+## Rules that apply everywhere
+
+- **Subscribing installs, disposing removes.** Hooks and registrations exist while you're subscribed. Keep the
+  `IDisposable` and dispose it.
+- **Events arrive on background threads.** Window messages (clipboard, power, session, devices, WinEvents, raw input)
+  arrive on the thread of the [[SharedMessageWindow]], keyboard and mouse events on the hook thread. Keep `OnNext`
+  short and use `ObserveOn` for UI or slow work.
+- **Answer synchronously.** Set `Handled` / `Result` inside `OnNext`, before any `ObserveOn`, `Throttle` or `await`.
+- **A failing subscriber doesn't break the others.** Its exception ends only its own subscription and is published on
+  `SubscriberErrors`.
+
+<!-- sample: GettingStartedSamples.Dispose -->
+```csharp
+// Hooks and registrations are made when you subscribe, and removed when you dispose the subscription
+IDisposable subscription = ClipboardNative.OnUpdate.Subscribe(info => { });
+// ...
+subscription.Dispose();
+
+// Clipboard access is a lock for all applications: hold it briefly and always dispose it
+using (var clipboard = ClipboardNative.Access())
+{
+    // ...
+}
+```
+
+## Next
+
+- [[Window-Management]], [[Input-Handling]], [[Clipboard]], [[DPI-Awareness]]
+- [Migrating to 3.0](https://www.dapplo.net/Dapplo.Windows/articles/migration-3.0.html)

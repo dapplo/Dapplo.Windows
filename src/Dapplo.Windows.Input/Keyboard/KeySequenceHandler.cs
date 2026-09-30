@@ -15,6 +15,8 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
     private bool[] _isHandled;
     private int _offset;
     private DateTimeOffset? _expireAfter;
+    // True when a non-modifier key went down during the current (not first) stage without completing it
+    private bool _currentStageFailed;
 
     /// <summary>
     /// This sets the timeout time between key presses.
@@ -57,11 +59,17 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
     {
         _expireAfter = null;
         _offset = 0;
+        _currentStageFailed = false;
         for (var i = 0; i < _isHandled.Length; i++)
         {
             _isHandled[i] = false;
         }
     }
+
+    /// <summary>
+    /// True if the time between the stages of the sequence expired
+    /// </summary>
+    private bool IsExpired => _expireAfter.HasValue && _expireAfter.Value < DateTimeOffset.Now;
 
     /// <summary>
     /// Get the current handler
@@ -78,38 +86,59 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
         {
             _expireAfter = DateTimeOffset.Now.Add(Timeout.Value);
         }
+        _currentStageFailed = false;
         return ++_offset < _keyboardHookEventHandlers.Length;
     }
 
     /// <summary>
-    /// Check if the combinations are pressed
+    /// Check if the combinations are pressed.
+    /// VK_PACKET events (<see cref="KeyboardHookEventArgs.IsPacket"/>, e.g. text sent with <see cref="KeyboardInputGenerator.TypeText"/>) are ignored, they don't fail or advance the sequence.
+    /// The stages can use any <see cref="TriggerMode"/>, a stage counts as done when its handler triggered and all its keys are released.
     /// </summary>
     /// <param name="keyboardHookEventArgs">KeyboardHookEventArgs</param>
     public bool Handle(KeyboardHookEventArgs keyboardHookEventArgs)
     {
+        if (keyboardHookEventArgs.IsPacket)
+        {
+            return false;
+        }
+
+        // Check the timeout before dispatching, so after a timeout this key press starts the sequence from the beginning, instead of being consumed by the stale stage
+        if (IsExpired && !CurrentHandler.HasKeysPressed)
+        {
+            Reset();
+        }
+
         var currentHandled = CurrentHandler.Handle(keyboardHookEventArgs);
         var currentNotPressed = !CurrentHandler.HasKeysPressed;
         if (currentHandled)
         {
             _isHandled[_offset] = true;
         }
-        else if (!keyboardHookEventArgs.IsKeyDown && _offset > 0 && currentNotPressed && !keyboardHookEventArgs.IsModifier)
+        else
         {
-            Reset();
+            if (keyboardHookEventArgs.IsKeyDown && _offset > 0 && !keyboardHookEventArgs.IsModifier && !_isHandled[_offset])
+            {
+                // A wrong key was pressed in this stage
+                _currentStageFailed = true;
+            }
+            // Reset when all keys of a failed stage are released. The key-up of a modifier alone doesn't reset the sequence,
+            // because a modifier of the previous stage can be released after the sequence advanced. The order in which the keys
+            // are released must not matter, so a failed stage also resets on the key-up of a modifier.
+            if (!keyboardHookEventArgs.IsKeyDown && _offset > 0 && currentNotPressed && (!keyboardHookEventArgs.IsModifier || _currentStageFailed))
+            {
+                Reset();
+            }
         }
 
         // Check if timeout passed, to reset the sequence
-        if (_expireAfter.HasValue)
+        if (IsExpired)
         {
-            var isExpired = _expireAfter.Value < DateTimeOffset.Now;
-            if (isExpired)
+            if (currentNotPressed)
             {
-                if (currentNotPressed)
-                {
-                    Reset();
-                }
-                return false;
+                Reset();
             }
+            return false;
         }
 
         var allHandled = _isHandled.All(b => b);

@@ -91,14 +91,9 @@ public enum VirtualKeyCode : ushort
     Capital = 0x14,
 
     /// <summary>
-    ///     Input Method Editor (IME) Kana mode
+    ///     Input Method Editor (IME) Kana mode, this is also VK_HANGUL (IME Hangul mode), which has the same value
     /// </summary>
     Kana = 0x15,
-
-    /// <summary>
-    ///     IME Hangul mode
-    /// </summary>
-    Hangul = 0x15,
 
     /// <summary>
     ///     IME Junja mode
@@ -111,14 +106,9 @@ public enum VirtualKeyCode : ushort
     Final = 0x18,
 
     /// <summary>
-    ///     IME Hanja mode
+    ///     IME Hanja mode, this is also VK_KANJI (IME Kanji mode), which has the same value
     /// </summary>
     Hanja = 0x19,
-
-    /// <summary>
-    ///     IME Kanji mode
-    /// </summary>
-    Kanji = 0x19,
 
     /// <summary>
     ///     ESC key
@@ -196,7 +186,7 @@ public enum VirtualKeyCode : ushort
     Select = 0x29,
 
     /// <summary>
-    ///     PRINT key
+    ///     PRINT key (VK_PRINT), this is NOT the PrintScreen key which is used for screenshots, that is <see cref="PrintScreen"/>
     /// </summary>
     Print = 0x2A,
 
@@ -206,14 +196,9 @@ public enum VirtualKeyCode : ushort
     Execute = 0x2B,
 
     /// <summary>
-    ///     This is the PrintScreen key, which is also called Snapshot
+    ///     This is the PrintScreen key, which is also called Snapshot (VK_SNAPSHOT)
     /// </summary>
     PrintScreen = 0x2C,
-
-    /// <summary>
-    ///     This is the PrintScreen key, which is also called Snapshot
-    /// </summary>
-    Snapshot = 0x2C,
 
     /// <summary>
     ///     INS key
@@ -881,5 +866,13 @@ public enum VirtualKeyCode : ushort
     /// <summary>
     ///     Clear key
     /// </summary>
-    OemClear = 0xFE
+    OemClear = 0xFE,
+
+    /// <summary>
+    ///     Pseudo key code, this is NOT a Windows virtual-key code: either Windows key (LeftWin or RightWin).
+    ///     Use this in key combinations, e.g. with the KeyCombinationHandler, to match both Windows keys like Shift, Control and Menu do for their left and right variants.
+    ///     Windows never reports this code, when it's used with the KeyboardInputGenerator LeftWin is sent.
+    ///     The value is outside of the range of the real virtual-key codes (1-254), so it can never collide with one.
+    /// </summary>
+    Win = 0x0100
 }

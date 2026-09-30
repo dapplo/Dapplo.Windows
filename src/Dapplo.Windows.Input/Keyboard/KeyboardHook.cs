@@ -2,76 +2,64 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 
 namespace Dapplo.Windows.Input.Keyboard;
 
 /// <summary>
-///     A global keyboard hook, using System.Reactive
+///     A global (low-level) keyboard hook, using System.Reactive
 /// </summary>
-public sealed class KeyboardHook
+/// <remarks>
+/// The hook is installed when the first subscriber subscribes and removed when the last one unsubscribes.
+/// It runs on a dedicated background thread with its own message loop, it doesn't matter which thread subscribes.
+/// <para>
+/// Subscribers of <see cref="KeyboardEvents"/> are called synchronously inside the hook callback, on the hook thread, and every keyboard event of the whole system waits for them.
+/// Windows silently removes a low-level hook which takes longer than the LowLevelHooksTimeout (at most 1 second, often less), after that no events arrive anymore.
+/// So only decide <see cref="KeyboardHookEventArgs.Handled"/> in there (e.g. with an <see cref="IKeyboardHookEventHandler"/>) and keep it quick,
+/// move any other work away from the hook thread with ObserveOn, or use <see cref="KeyboardEventsNonBlocking"/>.
+/// Anything which touches the UI needs to be marshalled to the UI thread.
+/// </para>
+/// <para>
+/// Unicode characters which are sent with <see cref="KeyboardInputGenerator.TypeText"/> (KEYEVENTF_UNICODE), by an IME or a remote desktop client, arrive as
+/// <see cref="VirtualKeyCode.Packet"/> (VK_PACKET) events, see <see cref="KeyboardHookEventArgs.IsPacket"/> and <see cref="KeyboardHookEventArgs.PacketCharacter"/>.
+/// The modifier state of such an event reflects the keys the user holds, not the character.
+/// </para>
+/// <para>
+/// Exceptions thrown by subscribers never leave the hook callback, they are published on <see cref="SubscriberErrors"/>.
+/// When the hook cannot be installed, the subscriber gets OnError with a <see cref="System.ComponentModel.Win32Exception"/>.
+/// </para>
+/// </remarks>
+public static class KeyboardHook
 {
-    /// <summary>
-    ///     The singleton of the KeyboardHook
-    /// </summary>
-    private static readonly Lazy<KeyboardHook> Singleton = new Lazy<KeyboardHook>(() => new KeyboardHook());
+    private const long WmKeyDown = 0x0100;
+    private const long WmSysKeyDown = 0x0104;
+    private const long WmSysKeyUp = 0x0105;
+
+    private static readonly LowLevelHook<KeyboardHookEventArgs> Hook = new(HookTypes.WH_KEYBOARD_LL, "Dapplo.Windows.Input.KeyboardHook", CreateKeyboardEventArgs, eventArgs => eventArgs.Handled);
+
+    // Only used on the hook thread: the previous down state of the toggle keys, to ignore auto-repeat
+    private static bool _isCapsLockDown;
+    private static bool _isNumLockDown;
+    private static bool _isScrollLockDown;
 
     /// <summary>
-    ///     Used to store the observable
+    ///     The keyboard events, OnNext is called synchronously on the hook thread.
+    ///     Setting <see cref="KeyboardHookEventArgs.Handled"/> to true in OnNext swallows the key event, keep the processing short.
     /// </summary>
-    private readonly IObservable<KeyboardHookEventArgs> _keyObservable;
+    public static IObservable<KeyboardHookEventArgs> KeyboardEvents => Hook.Events;
 
     /// <summary>
-    ///     Store the handler, otherwise it might be GCed
+    ///     The keyboard events, delivered in order on a separate background thread so slow subscribers never delay the keyboard input of the system.
+    ///     Setting <see cref="KeyboardHookEventArgs.Handled"/> has no effect here, the event was already passed on.
     /// </summary>
-    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-    private LowLevelKeyboardProc _callback;
+    public static IObservable<KeyboardHookEventArgs> KeyboardEventsNonBlocking => Hook.NonBlockingEvents;
 
     /// <summary>
-    ///     Private constructor to create the observable
+    ///     Exceptions thrown by subscribers of <see cref="KeyboardEvents"/> or <see cref="KeyboardEventsNonBlocking"/>, these are also written to System.Diagnostics.Trace.
     /// </summary>
-    private KeyboardHook()
-    {
-        _keyObservable = Observable.Create<KeyboardHookEventArgs>(observer =>
-            {
-                var hookId = IntPtr.Zero;
-                // Need to hold onto this callback, otherwise it will get garbage collected as it is an un-manged callback
-                _callback = (nCode, wParam, lParam) =>
-                {
-                    if (nCode >= 0)
-                    {
-                        var eventArgs = CreateKeyboardEventArgs(wParam, lParam);
-                        observer.OnNext(eventArgs);
-                        if (eventArgs.Handled)
-                        {
-                            return (IntPtr) 1;
-                        }
-                    }
-                    // ReSharper disable once AccessToModifiedClosure
-                    return CallNextHookEx(hookId, nCode, wParam, lParam);
-                };
-
-                hookId = SetWindowsHookEx(HookTypes.WH_KEYBOARD_LL, _callback, IntPtr.Zero, 0);
-
-                return Disposable.Create(() =>
-                {
-                    UnhookWindowsHookEx(hookId);
-                    _callback = null;
-                });
-            })
-            .Publish()
-            .RefCount();
-    }
-
-    /// <summary>
-    ///     The actual keyboard hook observable
-    /// </summary>
-    public static IObservable<KeyboardHookEventArgs> KeyboardEvents => Singleton.Value._keyObservable;
+    public static IObservable<Exception> SubscriberErrors => Hook.SubscriberErrors;
 
     /// <summary>
     ///     Create the KeyboardHookEventArgs from the parameters which where in the event
@@ -81,26 +69,28 @@ public sealed class KeyboardHook
     /// <returns>KeyboardHookEventArgs</returns>
     private static KeyboardHookEventArgs CreateKeyboardEventArgs(IntPtr wParam, IntPtr lParam)
     {
-        var isKeyDown = wParam == (IntPtr) WmKeyDown || wParam == (IntPtr) WmSysKeyDown;
-        var keyboardLowLevelHookStruct = (KeyboardLowLevelHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardLowLevelHookStruct));
+        var message = wParam.ToInt64();
+        var isKeyDown = message is WmKeyDown or WmSysKeyDown;
+        var isSystemKey = message is WmSysKeyDown or WmSysKeyUp;
+        var keyboardLowLevelHookStruct = Marshal.PtrToStructure<KeyboardLowLevelHookStruct>(lParam);
         var key = keyboardLowLevelHookStruct.VirtualKeyCode;
 
         // Query the current state of modifiers
-        var leftShift = (GetAsyncKeyState(VirtualKeyCode.LeftShift) & 0x8000) != 0;
-        var rightShift = (GetAsyncKeyState(VirtualKeyCode.RightShift) & 0x8000) != 0;
-        var leftCtrl = (GetAsyncKeyState(VirtualKeyCode.LeftControl) & 0x8000) != 0;
-        var rightCtrl = (GetAsyncKeyState(VirtualKeyCode.RightControl) & 0x8000) != 0;
-        var leftAlt = (GetAsyncKeyState(VirtualKeyCode.LeftMenu) & 0x8000) != 0;
-        var rightAlt = (GetAsyncKeyState(VirtualKeyCode.RightMenu) & 0x8000) != 0;
-        var leftWin = (GetAsyncKeyState(VirtualKeyCode.LeftWin) & 0x8000) != 0;
-        var rightWin = (GetAsyncKeyState(VirtualKeyCode.RightWin) & 0x8000) != 0;
+        var leftShift = KeyboardState.IsDown(VirtualKeyCode.LeftShift);
+        var rightShift = KeyboardState.IsDown(VirtualKeyCode.RightShift);
+        var leftCtrl = KeyboardState.IsDown(VirtualKeyCode.LeftControl);
+        var rightCtrl = KeyboardState.IsDown(VirtualKeyCode.RightControl);
+        var leftAlt = KeyboardState.IsDown(VirtualKeyCode.LeftMenu);
+        var rightAlt = KeyboardState.IsDown(VirtualKeyCode.RightMenu);
+        var leftWin = KeyboardState.IsDown(VirtualKeyCode.LeftWin);
+        var rightWin = KeyboardState.IsDown(VirtualKeyCode.RightWin);
 
         // Query the current state of lock keys
-        var capsLock = (GetKeyState(VirtualKeyCode.Capital) & 1) != 0;
-        var numLock = (GetKeyState(VirtualKeyCode.NumLock) & 1) != 0;
-        var scrollLock = (GetKeyState(VirtualKeyCode.Scroll) & 1) != 0;
+        var capsLock = KeyboardState.IsToggled(VirtualKeyCode.Capital);
+        var numLock = KeyboardState.IsToggled(VirtualKeyCode.NumLock);
+        var scrollLock = KeyboardState.IsToggled(VirtualKeyCode.Scroll);
 
-        // Override the state for the current key to ensure accuracy even if the OS state hasn't updated yet
+        // Override the state for the current key to ensure accuracy, the OS state isn't updated yet when the hook is called
         switch (key)
         {
             case VirtualKeyCode.LeftShift:
@@ -128,23 +118,30 @@ public sealed class KeyboardHook
                 rightWin = isKeyDown;
                 break;
             case VirtualKeyCode.Capital:
-                if (isKeyDown) capsLock = !capsLock;
+                // The toggle only flips on the transition from up to down, not on auto-repeat
+                if (isKeyDown && !_isCapsLockDown) capsLock = !capsLock;
+                _isCapsLockDown = isKeyDown;
                 break;
             case VirtualKeyCode.NumLock:
-                if (isKeyDown) numLock = !numLock;
+                if (isKeyDown && !_isNumLockDown) numLock = !numLock;
+                _isNumLockDown = isKeyDown;
                 break;
             case VirtualKeyCode.Scroll:
-                if (isKeyDown) scrollLock = !scrollLock;
+                if (isKeyDown && !_isScrollLockDown) scrollLock = !scrollLock;
+                _isScrollLockDown = isKeyDown;
                 break;
         }
 
-        var keyEventArgs = new KeyboardHookEventArgs
+        return new KeyboardHookEventArgs
         {
             TimeStamp = keyboardLowLevelHookStruct.TimeStamp,
             Key = key,
+            ScanCode = keyboardLowLevelHookStruct.ScanCode,
             Flags = keyboardLowLevelHookStruct.Flags,
-            IsModifier = key.IsModifier(),
+            IsFromKeyboardHook = true,
             IsKeyDown = isKeyDown,
+            // WM_SYSKEYDOWN / WM_SYSKEYUP: F10, or a key while Alt is down. Use Flags (AltDown) for the Alt context, this doesn't change the Alt state.
+            IsSystemKey = isSystemKey,
             IsLeftShift = leftShift,
             IsRightShift = rightShift,
             IsLeftAlt = leftAlt,
@@ -157,74 +154,5 @@ public sealed class KeyboardHook
             IsNumLockActive = numLock,
             IsCapsLockActive = capsLock
         };
-
-        // Handle system keys (Alt combinations)
-        if (!keyEventArgs.IsAlt && (wParam == (IntPtr) WmSysKeyDown || wParam == (IntPtr) WmSysKeyUp))
-        {
-            keyEventArgs.IsLeftAlt = true;
-            keyEventArgs.IsSystemKey = true;
-        }
-        return keyEventArgs;
     }
-
-    private const int WmKeyDown = 256;
-    private const int WmSysKeyUp = 261;
-    private const int WmSysKeyDown = 260;
-
-    /// <summary>
-    ///     Retrieve the state of a key (async)
-    /// </summary>
-    /// <param name="keyCode"></param>
-    /// <returns></returns>
-    [DllImport("user32.dll", ExactSpelling = true)]
-    private static extern short GetAsyncKeyState(VirtualKeyCode keyCode);
-
-    /// <summary>
-    ///     Retrieve the state of a key
-    /// </summary>
-    /// <param name="keyCode"></param>
-    /// <returns></returns>
-    [DllImport("user32.dll", ExactSpelling = true)]
-    [ResourceExposure(ResourceScope.None)]
-    private static extern short GetKeyState(VirtualKeyCode keyCode);
-
-    /// <summary>
-    ///     The actual delegate for the p
-    /// </summary>
-    /// <param name="nCode"></param>
-    /// <param name="wParam"></param>
-    /// <param name="lParam"></param>
-    /// <returns></returns>
-    private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
-
-    /// <summary>
-    ///     Register a windows hook
-    /// </summary>
-    /// <param name="hookType">HookTypes</param>
-    /// <param name="lowLevelKeyboardProc">LowLevelKeyboardProc</param>
-    /// <param name="hMod">IntPtr</param>
-    /// <param name="dwThreadId">uint</param>
-    /// <returns>ID to be able to unhook it again</returns>
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr SetWindowsHookEx(HookTypes hookType, LowLevelKeyboardProc lowLevelKeyboardProc, IntPtr hMod, uint dwThreadId);
-
-    /// <summary>
-    ///     Used to remove a hook which was set with SetWindowsHookEx
-    /// </summary>
-    /// <param name="hhk"></param>
-    /// <returns></returns>
-    [DllImport("user32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool UnhookWindowsHookEx(IntPtr hhk);
-
-    /// <summary>
-    ///     Used to call the next hook in the list, if there was any
-    /// </summary>
-    /// <param name="hhk"></param>
-    /// <param name="nCode"></param>
-    /// <param name="wParam"></param>
-    /// <param name="lParam"></param>
-    /// <returns>IntPtr</returns>
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
 }

@@ -19,10 +19,8 @@ using Dapplo.Windows.User32.Structs;
 using System.Drawing.Imaging;
 using System.Linq;
 using Dapplo.Log;
-#if !NETSTANDARD2_0
-using Dapplo.Windows.Extensions;
-#endif
 using Dapplo.Windows.Kernel32;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Desktop;
 
@@ -53,12 +51,8 @@ public static class InteropWindowExtensions
     /// <returns>IInteropWindow for fluent calls</returns>
     public static IInteropWindow Fill(this IInteropWindow interopWindow, InteropWindowRetrieveSettings retrieveSettings = InteropWindowRetrieveSettings.CacheAllAutoCorrect)
     {
-        if ((retrieveSettings & InteropWindowRetrieveSettings.Children) != 0 && (retrieveSettings & InteropWindowRetrieveSettings.ZOrderedChildren) != 0)
-        {
-            throw new ArgumentException("Can't have both Children & ZOrderedChildren", nameof(retrieveSettings));
-        }
-        var forceUpdate = (retrieveSettings | InteropWindowRetrieveSettings.ForceUpdate) != 0;
-        var autoCorrect = (retrieveSettings | InteropWindowRetrieveSettings.AutoCorrectValues) != 0;
+        var forceUpdate = (retrieveSettings & InteropWindowRetrieveSettings.ForceUpdate) != 0;
+        var autoCorrect = (retrieveSettings & InteropWindowRetrieveSettings.AutoCorrectValues) != 0;
 
         if ((retrieveSettings & InteropWindowRetrieveSettings.Info) != 0)
         {
@@ -80,11 +74,15 @@ public static class InteropWindowExtensions
         {
             interopWindow.GetParent(forceUpdate);
         }
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Owner) != 0)
+        {
+            interopWindow.GetOwner(forceUpdate);
+        }
         if ((retrieveSettings & InteropWindowRetrieveSettings.Visible) != 0)
         {
             interopWindow.IsVisible(forceUpdate);
         }
-        if ((retrieveSettings | InteropWindowRetrieveSettings.Maximized) != 0)
+        if ((retrieveSettings & InteropWindowRetrieveSettings.Maximized) != 0)
         {
             interopWindow.IsMaximized(forceUpdate);
         }
@@ -99,10 +97,6 @@ public static class InteropWindowExtensions
         if ((retrieveSettings & InteropWindowRetrieveSettings.Children) != 0)
         {
             interopWindow.GetChildren(forceUpdate);
-        }
-        if ((retrieveSettings & InteropWindowRetrieveSettings.ZOrderedChildren) != 0)
-        {
-            interopWindow.GetZOrderedChildren(forceUpdate);
         }
         if ((retrieveSettings & InteropWindowRetrieveSettings.Placement) != 0)
         {
@@ -128,44 +122,65 @@ public static class InteropWindowExtensions
             return interopWindow.Caption;
         }
 
-        // Calling User32Api.GetText (GetWindowText) for the current Process will hang, deadlock, this should be ignored
+        string caption;
         if (interopWindow.IsOwnedByCurrentThread())
         {
-            // TODO: it might have a value, but can't get it. Returning null would be bad... so return empty
-            interopWindow.Caption = string.Empty;
-            Log.Warn().WriteLine("Do not call GetWindowText for a Window ({0}) which belongs the current thread! An empty string is returned.", interopWindow.Handle);
+            // GetWindowText sends WM_GETTEXT, for a window of the calling thread this is a direct call of the window procedure, which can't deadlock
+            caption = User32Api.GetText(interopWindow.Handle);
+        }
+        else if (interopWindow.IsOwnedByCurrentProcess())
+        {
+            // GetWindowText would send WM_GETTEXT to another thread of this process, which deadlocks when that thread waits for the caller.
+            // InternalGetWindowText reads the stored caption without sending a message.
+            caption = User32Api.GetInternalText(interopWindow.Handle);
         }
         else
         {
-            var caption = User32Api.GetText(interopWindow.Handle);
-            interopWindow.Caption = caption;
+            // For windows of other processes GetWindowText doesn't send a message, it reads the stored caption
+            caption = User32Api.GetText(interopWindow.Handle);
         }
-        return interopWindow.Caption;
+        interopWindow.Caption = caption;
+        return caption;
     }
 
     /// <summary>
-    ///     Get the children of the specified interopWindow, this is not lazy!
+    ///     Get the direct children of the specified interopWindow in Z-order, from top (front) to bottom (back), this is not lazy!
+    ///     The children are a snapshot taken with <see cref="InteropWindowQuery.GetTopWindows"/>, the result is stored in <see cref="IInteropWindow.Children"/>
+    ///     and returned from there until forceUpdate is true. Use <see cref="GetDescendants"/> to get the children of the children too.
+    ///     The children of the desktop window are the top-level windows, these have no parent (<see cref="IInteropWindow.Parent"/> is IntPtr.Zero).
     /// </summary>
     /// <param name="interopWindow">InteropWindow</param>
     /// <param name="forceUpdate">True to force updating</param>
     /// <returns>IEnumerable with InteropWindow</returns>
     public static IEnumerable<IInteropWindow> GetChildren(this IInteropWindow interopWindow, bool forceUpdate = false)
     {
-        if (interopWindow.HasChildren && !interopWindow.HasZOrderedChildren && !forceUpdate)
+        if (interopWindow.Children != null && !forceUpdate)
         {
             return interopWindow.Children;
         }
-        interopWindow.HasZOrderedChildren = false;
 
-        var children = new List<IInteropWindow>();
+        var children = InteropWindowQuery.GetTopWindows(interopWindow);
+        // Top-level windows have no parent, see GetParent
+        var isDesktop = interopWindow.Handle == User32Api.GetDesktopWindow();
+        foreach (var child in children)
+        {
+            child.Parent = isDesktop ? IntPtr.Zero : interopWindow.Handle;
+            child.ParentWindow = isDesktop ? null : interopWindow;
+        }
         // Store it in the Children property
         interopWindow.Children = children;
-        foreach (var child in WindowsEnumerator.EnumerateWindows(interopWindow))
-        {
-            child.ParentWindow = interopWindow;
-            children.Add(child);
-        }
         return children;
+    }
+
+    /// <summary>
+    ///     Get all the descendants (children, their children etc.) of the specified interopWindow, as EnumChildWindows returns them. This is not lazy!
+    ///     The result is not stored in the interopWindow, and the ParentWindow of the returned windows is not set.
+    /// </summary>
+    /// <param name="interopWindow">InteropWindow</param>
+    /// <returns>IReadOnlyList with IInteropWindow</returns>
+    public static IReadOnlyList<IInteropWindow> GetDescendants(this IInteropWindow interopWindow)
+    {
+        return WindowsEnumerator.EnumerateWindows(interopWindow);
     }
 
     /// <summary>
@@ -201,7 +216,13 @@ public static class InteropWindowExtensions
         }
 
         var windowInfo = WindowInfo.Create();
-        User32Api.GetWindowInfo(interopWindow.Handle, ref windowInfo);
+        if (!User32Api.GetWindowInfo(interopWindow.Handle, ref windowInfo))
+        {
+            // e.g. the window doesn't exist (anymore), don't cache the empty information
+            Log.Debug().WriteLine("Couldn't retrieve the WindowInfo for window {0}", interopWindow.Handle);
+            interopWindow.Info = null;
+            return windowInfo;
+        }
 
         // Test if we need to correct some values
         if (autoCorrect)
@@ -217,8 +238,9 @@ public static class InteropWindowExtensions
                 }
             }
 
-            var parentWindow = interopWindow.GetParentWindow();
-            if (interopWindow.HasParent)
+            // Only a real parent (child windows), not the owner, clips the window
+            var parentWindow = interopWindow.GetParentWindow(forceUpdate);
+            if (parentWindow != null)
             {
                 var parentInfo = parentWindow.GetInfo(forceUpdate, true);
                 windowInfo.Bounds = windowInfo.Bounds.Intersect(parentInfo.Bounds);
@@ -231,25 +253,66 @@ public static class InteropWindowExtensions
     }
 
     /// <summary>
-    ///     Get the parent
+    ///     Get the (real) parent of the window, this is IntPtr.Zero for a top-level window.
+    ///     Unlike the Win32 GetParent function this never returns the owner, use <see cref="GetOwner"/> for that.
     /// </summary>
     /// <param name="interopWindow">InteropWindow</param>
     /// <param name="forceUpdate">set to true to make sure the value is updated</param>
-    /// <returns>IntPtr for the parent</returns>
+    /// <returns>IntPtr for the parent, IntPtr.Zero if there is none</returns>
     public static IntPtr GetParent(this IInteropWindow interopWindow, bool forceUpdate = false)
     {
         if (interopWindow.Parent.HasValue && !forceUpdate)
         {
             return interopWindow.Parent.Value;
         }
-        var parent = User32Api.GetParent(interopWindow.Handle);
+        // Like the Win32 GetParent, only a window with WS_CHILD has a parent. Other windows are top-level (also message-only windows),
+        // for these GetParent would return the owner and GetAncestor(GA_PARENT) the desktop (or message-only root) window.
+        var parent = IntPtr.Zero;
+        var style = unchecked((WindowStyleFlags)(int)User32Api.GetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE).ToInt64());
+        if ((style & WindowStyleFlags.WS_CHILD) != 0)
+        {
+            parent = User32Api.GetAncestor(interopWindow.Handle, GetAncestorFlags.GA_PARENT);
+            if (parent == User32Api.GetDesktopWindow())
+            {
+                parent = IntPtr.Zero;
+            }
+        }
         // Invalidate ParentWindow if the value changed or is IntPtr.Zero
         if (interopWindow.ParentWindow?.Handle != parent)
         {
             interopWindow.ParentWindow = null;
         }
         interopWindow.Parent = parent;
-        return interopWindow.Parent.Value;
+        return parent;
+    }
+
+    /// <summary>
+    ///     Get the owner of the window (GetWindow with GW_OWNER), e.g. the main window of the application for a dialog.
+    /// </summary>
+    /// <param name="interopWindow">InteropWindow</param>
+    /// <param name="forceUpdate">set to true to make sure the value is updated</param>
+    /// <returns>IntPtr for the owner, IntPtr.Zero if there is none</returns>
+    public static IntPtr GetOwner(this IInteropWindow interopWindow, bool forceUpdate = false)
+    {
+        if (interopWindow.Owner.HasValue && !forceUpdate)
+        {
+            return interopWindow.Owner.Value;
+        }
+        var owner = User32Api.GetWindow(interopWindow.Handle, GetWindowCommands.GW_OWNER);
+        interopWindow.Owner = owner;
+        return owner;
+    }
+
+    /// <summary>
+    ///     Get the owner of the window as IInteropWindow, a new instance is created every call.
+    /// </summary>
+    /// <param name="interopWindow">InteropWindow</param>
+    /// <param name="forceUpdate">set to true to make sure the owner is retrieved again</param>
+    /// <returns>IInteropWindow for the owner, or null if there is none</returns>
+    public static IInteropWindow GetOwnerWindow(this IInteropWindow interopWindow, bool forceUpdate = false)
+    {
+        var owner = interopWindow.GetOwner(forceUpdate);
+        return owner == IntPtr.Zero ? null : InteropWindowFactory.CreateFor(owner);
     }
 
     /// <summary>
@@ -257,7 +320,7 @@ public static class InteropWindowExtensions
     /// </summary>
     /// <param name="interopWindow">InteropWindow</param>
     /// <param name="forceUpdate">set to true to make sure the value is updated</param>
-    /// <returns>IInteropWindow for the parent</returns>
+    /// <returns>IInteropWindow for the parent, or null if there is none</returns>
     public static IInteropWindow GetParentWindow(this IInteropWindow interopWindow, bool forceUpdate = false)
     {
         if (interopWindow.ParentWindow != null && !forceUpdate)
@@ -265,8 +328,15 @@ public static class InteropWindowExtensions
             return interopWindow.ParentWindow;
         }
 
-        var parent = interopWindow.Parent ?? interopWindow.GetParent(forceUpdate);
-        interopWindow.ParentWindow = parent == IntPtr.Zero ? null : InteropWindowFactory.CreateFor(parent);
+        var parent = interopWindow.GetParent(forceUpdate);
+        if (parent == IntPtr.Zero)
+        {
+            interopWindow.ParentWindow = null;
+        }
+        else if (interopWindow.ParentWindow?.Handle != parent)
+        {
+            interopWindow.ParentWindow = InteropWindowFactory.CreateFor(parent);
+        }
         return interopWindow.ParentWindow;
     }
 
@@ -367,7 +437,7 @@ public static class InteropWindowExtensions
                 ScrollBarWindow = interopWindow,
                 ScrollBarType = scrollBarType,
                 InitialScrollInfo = initialScrollInfo,
-                WheelDelta = (int) (120 * (initialScrollInfo.PageSize / WindowScroller.ScrollWheelLinesFromRegistry))
+                WheelDelta = WindowScroller.CalculateWheelDelta(initialScrollInfo.PageSize, WindowScroller.ScrollWheelLines)
             };
             interopWindow.CanScroll = true;
             return windowScroller;
@@ -380,39 +450,13 @@ public static class InteropWindowExtensions
                 ScrollBarWindow = interopWindow,
                 ScrollBarType = ScrollBarTypes.Control,
                 InitialScrollInfo = initialScrollInfo,
-                WheelDelta = (int) (120 * (initialScrollInfo.PageSize / WindowScroller.ScrollWheelLinesFromRegistry))
+                WheelDelta = WindowScroller.CalculateWheelDelta(initialScrollInfo.PageSize, WindowScroller.ScrollWheelLines)
             };
             interopWindow.CanScroll = true;
             return windowScroller;
         }
         interopWindow.CanScroll = false;
         return null;
-    }
-
-    /// <summary>
-    ///     Get the children of the specified interopWindow, from top to bottom. This is not lazy
-    ///     This might get different results than the GetChildren
-    /// </summary>
-    /// <param name="interopWindow">InteropWindow</param>
-    /// <param name="forceUpdate">True to force updating</param>
-    /// <returns>IEnumerable with InteropWindow</returns>
-    public static IEnumerable<IInteropWindow> GetZOrderedChildren(this IInteropWindow interopWindow, bool forceUpdate = false)
-    {
-        if (interopWindow.HasChildren && interopWindow.HasZOrderedChildren && !forceUpdate)
-        {
-            return interopWindow.Children;
-        }
-        interopWindow.HasZOrderedChildren = true;
-
-        var children = new List<IInteropWindow>();
-        // Store it in the Children property
-        interopWindow.Children = children;
-        foreach (var child in InteropWindowQuery.GetTopWindows(interopWindow))
-        {
-            child.ParentWindow = interopWindow;
-            children.Add(child);
-        }
-        return children;
     }
 
     /// <summary>
@@ -534,6 +578,35 @@ public static class InteropWindowExtensions
     }
 
     /// <summary>
+    ///     Post a message to the window: it is placed in the message queue of the thread which created the window, this doesn't wait until it's processed.
+    ///     Use this e.g. for WM_CLOSE, so a window which shows a "save changes?" dialog doesn't block the caller.
+    ///     Don't post messages with pointers to memory (e.g. WM_SETTEXT), the memory might be gone before the message is processed.
+    /// </summary>
+    /// <param name="interopWindow">InteropWindow</param>
+    /// <param name="windowsMessage">WindowsMessages</param>
+    /// <param name="wParam">IntPtr, pointer-sized message-specific information, default IntPtr.Zero</param>
+    /// <param name="lParam">IntPtr, pointer-sized message-specific information, default IntPtr.Zero</param>
+    /// <returns>true if the message was posted, false if not (e.g. the window doesn't exist, the message queue is full, or UIPI blocks it), use Marshal.GetLastWin32Error for the reason</returns>
+    public static bool PostMessage(this IInteropWindow interopWindow, WindowsMessages windowsMessage, IntPtr wParam = default, IntPtr lParam = default)
+    {
+        return User32Api.PostMessage(interopWindow.Handle, windowsMessage, wParam, lParam);
+    }
+
+    /// <summary>
+    ///     Post a message, e.g. one registered with RegisterWindowMessage, to the window: it is placed in the message queue of the thread which created the window, this doesn't wait until it's processed.
+    ///     Don't post messages with pointers to memory, the memory might be gone before the message is processed.
+    /// </summary>
+    /// <param name="interopWindow">InteropWindow</param>
+    /// <param name="message">uint with the message id</param>
+    /// <param name="wParam">IntPtr, pointer-sized message-specific information, default IntPtr.Zero</param>
+    /// <param name="lParam">IntPtr, pointer-sized message-specific information, default IntPtr.Zero</param>
+    /// <returns>true if the message was posted, false if not, use Marshal.GetLastWin32Error for the reason</returns>
+    public static bool PostMessage(this IInteropWindow interopWindow, uint message, IntPtr wParam = default, IntPtr lParam = default)
+    {
+        return User32Api.PostMessage(interopWindow.Handle, message, wParam, lParam);
+    }
+
+    /// <summary>
     ///     Restore (Un-Minimize/Maximize) the Window
     /// </summary>
     /// <param name="interopWindow">InteropWindow</param>
@@ -603,37 +676,40 @@ public static class InteropWindowExtensions
         {
             return;
         }
-        if (interopWindow.IsMinimized())
+        if (interopWindow.IsMinimized(true))
         {
             interopWindow.Restore();
-            while (interopWindow.IsMinimized())
+            // Wait until the window is restored, but not forever
+            var waitUntil = DateTime.UtcNow + RestoreTimeout;
+            while (interopWindow.IsMinimized(true) && DateTime.UtcNow < waitUntil)
             {
                 await Task.Delay(50).ConfigureAwait(false);
             }
         }
 
-        // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms633539(v=vs.85).aspx
-        // It was advised to use the menu (ALT) key, but this was a solution which Jan Karger showed me
-
-        var threadId1 = User32Api.GetWindowThreadProcessId(foregroundWindow, IntPtr.Zero);
-        var threadId2 = User32Api.GetWindowThreadProcessId(interopWindow.Handle, IntPtr.Zero);
-
-        // Show window in foreground.
-        if (threadId1 != threadId2)
+        // See https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setforegroundwindow
+        // Attaching the input of the calling thread to the thread of the current foreground window allows the calling thread to change the foreground window
+        var currentThreadId = Kernel32Api.GetCurrentThreadId();
+        var foregroundThreadId = foregroundWindow == IntPtr.Zero ? 0 : User32Api.GetWindowThreadProcessId(foregroundWindow, IntPtr.Zero);
+        var isAttached = foregroundThreadId != 0 && foregroundThreadId != currentThreadId && User32Api.AttachThreadInput(currentThreadId, foregroundThreadId, true);
+        try
         {
-            User32Api.AttachThreadInput(threadId1, threadId2, 1);
-            User32Api.SetForegroundWindow(interopWindow.Handle);
-            User32Api.AttachThreadInput(threadId1, threadId2, 0);
-        }
-        else
-        {
+            User32Api.BringWindowToTop(interopWindow.Handle);
             User32Api.SetForegroundWindow(interopWindow.Handle);
         }
-
-        // Show window in foreground.
-        User32Api.BringWindowToTop(interopWindow.Handle);
-        User32Api.SetForegroundWindow(interopWindow.Handle);
+        finally
+        {
+            if (isAttached)
+            {
+                User32Api.AttachThreadInput(currentThreadId, foregroundThreadId, false);
+            }
+        }
     }
+
+    /// <summary>
+    ///     The maximum time ToForegroundAsync waits for a minimized window to be restored
+    /// </summary>
+    private static readonly TimeSpan RestoreTimeout = TimeSpan.FromSeconds(2);
 
     /// <summary>
     /// Move the specified window to a new location
@@ -656,7 +732,7 @@ public static class InteropWindowExtensions
     public static IEnumerable<IInteropWindow> GetLinkedWindows(this IInteropWindow windowToLinkTo)
     {
         int processIdSelectedWindow = windowToLinkTo.GetProcessId();
-        return InteropWindowQuery.GetTopLevelWindows().Where(window => window.Handle != windowToLinkTo.Handle && window.GetProcessId() == processIdSelectedWindow);
+        return InteropWindowQuery.GetVisibleApplicationWindows().Where(window => window.Handle != windowToLinkTo.Handle && window.GetProcessId() == processIdSelectedWindow);
     }
 
     /// <summary>
@@ -673,30 +749,31 @@ public static class InteropWindowExtensions
         var windowRectangle = interopWindow.GetInfo().Bounds;
         // assume own location
         formLocation = windowRectangle.Location;
-        var primaryDisplay = DisplayInfo.AllDisplayInfos.First(x => x.IsPrimary);
-        using (var workingArea = new Region(primaryDisplay.Bounds))
+        var displays = DisplayInfo.AllDisplayInfos;
+        if (displays.Length == 0)
         {
-            // Create a region with the screens working area
-            foreach (var display in DisplayInfo.AllDisplayInfos)
+            return false;
+        }
+        using (var workingArea = new Region(Rectangle.Empty))
+        {
+            // Create a region with the bounds of all screens
+            foreach (var display in displays)
             {
-                if (!display.IsPrimary)
-                {
-                    workingArea.Union(display.Bounds);
-                }
+                workingArea.Union(display.Bounds);
             }
 
             // If the formLocation is not inside the visible area
-            if (!workingArea.AreRectangleCornersVisisble(windowRectangle))
+            if (!workingArea.AreRectangleCornersVisible(windowRectangle))
             {
-                // If none found we find the biggest screen
-                foreach (var display in DisplayInfo.AllDisplayInfos)
+                // Try to place the window at the top-left of the working area (not below a taskbar) of one of the displays, the primary first
+                foreach (var display in displays.OrderByDescending(display => display.IsPrimary))
                 {
                     var newWindowRectangle = new Rectangle(display.WorkingArea.Location, windowRectangle.Size);
-                    if (!workingArea.AreRectangleCornersVisisble(newWindowRectangle))
+                    if (!workingArea.AreRectangleCornersVisible(newWindowRectangle))
                     {
                         continue;
                     }
-                    formLocation = display.Bounds.Location;
+                    formLocation = display.WorkingArea.Location;
                     doesWindowFit = true;
                     break;
                 }
@@ -710,13 +787,30 @@ public static class InteropWindowExtensions
     }
 
     /// <summary>
-    /// Return an Image representing the Window!
+    /// Return a Bitmap representing the Window!
     /// As GDI+ draws it, it will be without Aero borders!
+    /// The window is printed with its complete window rectangle, and cropped to the (DWM corrected) bounds of <see cref="GetInfo"/>,
+    /// so the invisible resize borders are not part of the result.
+    /// Dapplo.Windows.Wpf has PrintWindowAsBitmapSource for a WPF BitmapSource.
     /// </summary>
-    public static TBitmap PrintWindow<TBitmap>(this IInteropWindow interopWindow) where TBitmap : class
+    /// <param name="interopWindow">IInteropWindow</param>
+    /// <returns>Bitmap, which the caller needs to dispose, or null if the window couldn't be printed</returns>
+    public static Bitmap PrintWindow(this IInteropWindow interopWindow)
     {
-        var windowRect = interopWindow.GetInfo().Bounds;
-        // Start the capture
+        // PrintWindow draws the window with the origin at the window rectangle, which includes the invisible borders.
+        // GetInfo().Bounds might be the DWM extended frame bounds, which excludes these, so the uncorrected window rectangle is needed for the bitmap.
+        var rawWindowInfo = WindowInfo.Create();
+        if (!User32Api.GetWindowInfo(interopWindow.Handle, ref rawWindowInfo))
+        {
+            Log.Error().WriteLine("Error calling print window, couldn't get the window rectangle: {0}", new Win32Exception().Message);
+            return null;
+        }
+        var windowRect = rawWindowInfo.Bounds;
+        if (windowRect.Width <= 0 || windowRect.Height <= 0)
+        {
+            return null;
+        }
+
         Exception exceptionOccured = null;
         Bitmap printWindowBitmap;
         using (var region = interopWindow.GetRegion())
@@ -732,7 +826,9 @@ public static class InteropWindowExtensions
             {
                 using (var graphicsDc = graphics.GetSafeDeviceContext())
                 {
-                    bool printSucceeded = User32Api.PrintWindow(interopWindow.Handle, graphicsDc.DangerousGetHandle(), PrintWindowFlags.PW_COMPLETE);
+                    // PW_RENDERFULLCONTENT (Windows 8.1 and later) is needed for DirectComposition content, e.g. browsers and UWP apps, otherwise this is black
+                    var printWindowFlags = WindowsVersion.IsWindows81OrLater ? PrintWindowFlags.PW_RENDERFULLCONTENT : PrintWindowFlags.PW_COMPLETE;
+                    bool printSucceeded = User32Api.PrintWindow(interopWindow.Handle, graphicsDc.DangerousGetHandle(), printWindowFlags);
                     if (!printSucceeded)
                     {
                         // something went wrong, most likely a "0x80004005" (Acess Denied) when using UAC
@@ -740,7 +836,7 @@ public static class InteropWindowExtensions
                     }
                 }
 
-                // Apply the region "transparency"
+                // Apply the region "transparency", the region is relative to the window rectangle
                 if (region != null && !region.IsEmpty(graphics))
                 {
                     graphics.ExcludeClip(region);
@@ -756,23 +852,23 @@ public static class InteropWindowExtensions
         {
             Log.Error().WriteLine("Error calling print window: {0}", exceptionOccured.Message);
             printWindowBitmap.Dispose();
-            return default;
+            return null;
         }
-        if (typeof(TBitmap).IsAssignableFrom(typeof(Bitmap)))
+
+        // Crop to the visible bounds, e.g. without the invisible resize borders
+        var visibleBounds = interopWindow.GetInfo().Bounds.Intersect(windowRect);
+        if (visibleBounds.IsEmpty || visibleBounds.Equals(windowRect))
         {
-            return printWindowBitmap as TBitmap;
+            return printWindowBitmap;
         }
-#if !NETSTANDARD2_0
+        var cropRectangle = new Rectangle(visibleBounds.X - windowRect.X, visibleBounds.Y - windowRect.Y, visibleBounds.Width, visibleBounds.Height);
         try
         {
-            return printWindowBitmap.ToBitmapSource() as TBitmap;
+            return printWindowBitmap.Clone(cropRectangle, printWindowBitmap.PixelFormat);
         }
         finally
         {
             printWindowBitmap.Dispose();
         }
-#else
-            return default;
-#endif
     }
 }

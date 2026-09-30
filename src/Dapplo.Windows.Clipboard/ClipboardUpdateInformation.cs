@@ -3,19 +3,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dapplo.Windows.Messages;
+using Dapplo.Windows.Clipboard.Internals;
 
 namespace Dapplo.Windows.Clipboard;
 
 /// <summary>
 /// Information about what the clipboard contained at the most recent clipboard update.
+/// This information is collected without opening the clipboard (GetClipboardSequenceNumber, GetClipboardOwner and GetUpdatedClipboardFormats),
+/// to read the content use <see cref="ClipboardNative.Access"/> or <see cref="ClipboardNative.AccessAsync"/>.
 /// </summary>
-public class ClipboardUpdateInformation
+public sealed class ClipboardUpdateInformation
 {
+    private readonly uint[] _formatIds;
+
+    private ClipboardUpdateInformation(uint id, IntPtr ownerHandle, uint[] formatIds)
+    {
+        Id = id;
+        OwnerHandle = ownerHandle;
+        _formatIds = formatIds;
+    }
+
     /// <summary>
-    /// Sequence-number of the clipboard, starts at 0 when the Windows session starts
+    /// Sequence-number of the clipboard, starts at 0 when the Windows session starts.
+    /// This is 0 when the process has no WINSTA_ACCESSCLIPBOARD access.
     /// </summary>
-    public uint Id { get; } = ClipboardNative.SequenceNumber;
+    public uint Id { get; }
 
     /// <summary>
     /// Timestamp of the clipboard update event, this value will not be correct for the first event
@@ -25,40 +37,27 @@ public class ClipboardUpdateInformation
     /// <summary>
     /// The handle of the window which owns the clipboard content
     /// </summary>
-    public IntPtr OwnerHandle { get; } = ClipboardNative.CurrentOwner;
+    public IntPtr OwnerHandle { get; }
 
     /// <summary>
     /// The formats in this clipboard contents as strings
     /// </summary>
-    public IEnumerable<string> Formats => FormatIds
+    public IEnumerable<string> Formats => _formatIds
         .Select(ClipboardFormatExtensions.MapIdToFormat)
         .Where(format => !string.IsNullOrEmpty(format));
 
     /// <summary>
     /// The formats in this clipboard contents as IDs
     /// </summary>
-    public IEnumerable<uint> FormatIds { get; }
+    public IEnumerable<uint> FormatIds => _formatIds;
 
     /// <summary>
-    /// This class can only be instantiated when there is a clipboard lock, that is why the constructor is private.
+    /// Factory method, this retrieves the current clipboard information without opening the clipboard.
     /// </summary>
-    private ClipboardUpdateInformation(IClipboardAccessToken clipboardAccessToken)
-    {
-        FormatIds = clipboardAccessToken.AvailableFormatIds().ToList();
-    }
-
-    /// <summary>
-    /// Factory method
-    /// </summary>
-    /// <param name="hWnd">IntPtr, optional, with the hWnd for the clipboard lock</param>
     /// <returns>ClipboardUpdateInformation</returns>
-    public static ClipboardUpdateInformation Create(IntPtr hWnd = default)
+    /// <exception cref="System.ComponentModel.Win32Exception">When the available formats could not be retrieved</exception>
+    public static ClipboardUpdateInformation Create()
     {
-        if (hWnd == IntPtr.Zero)
-        {
-            hWnd = (IntPtr)SharedMessageWindow.Handle;
-        }
-        using var clipboard = ClipboardNative.Access(hWnd);
-        return new ClipboardUpdateInformation(clipboard);
+        return new ClipboardUpdateInformation(ClipboardNative.SequenceNumber, ClipboardNative.CurrentOwner, NativeMethods.GetUpdatedClipboardFormats());
     }
 }

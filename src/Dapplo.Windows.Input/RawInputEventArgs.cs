@@ -11,7 +11,7 @@ namespace Dapplo.Windows.Input;
 public class RawInputEventArgs : EventArgs
 {
     /// <summary>
-    ///     If true the application was in the foreground
+    ///     If true the application was in the foreground (RIM_INPUT), false if the input was received in the background (RIM_INPUTSINK)
     /// </summary>
     public bool IsForeground { get; set; }
 
@@ -19,4 +19,10 @@ public class RawInputEventArgs : EventArgs
     ///     The actual raw input
     /// </summary>
     public RawInput RawInput { get; set; }
+
+    /// <summary>
+    ///     For HID devices: the raw data of all HID input reports (<see cref="RawHID.Count"/> reports of <see cref="RawHID.SizeHid"/> bytes each),
+    ///     null for a mouse or keyboard.
+    /// </summary>
+    public byte[] HidData { get; set; }
 }

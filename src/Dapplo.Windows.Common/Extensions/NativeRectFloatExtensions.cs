@@ -102,32 +102,16 @@ public static class NativeRectFloatExtensions
     }
 
     /// <summary>
-    ///     Check that two rectangles overlap with each other
+    ///     Check that two rectangles overlap with each other, this means they share a non-empty area.
+    ///     Right and Bottom are exclusive, so adjacent rectangles (e.g. rect1.Right == rect2.Left) do not overlap,
+    ///     a rectangle which contains the other (or is contained) does overlap.
+    ///     This is the same as <see cref="IntersectsWith"/>.
     /// </summary>
     /// <param name="rect1">The first rectangle</param>
     /// <param name="rect2">The second rectangle</param>
     /// <returns>The rectangles overlap</returns>
     [Pure]
-    public static bool HasOverlap(this NativeRectFloat rect1, NativeRectFloat rect2)
-    {
-        if (rect1.IsAdjacent(rect2) != AdjacentTo.None)
-        {
-            // If it's adjacent than there is no overlap?
-            return true;
-        }
-
-        var leftOfRect1InsideRect2Width = IsBetween(rect1.X, rect2.Left, rect2.Right);
-        var leftOfRect2InsideRect1Width = IsBetween(rect2.X, rect1.Left, rect1.Right);
-        var xOverlap = leftOfRect1InsideRect2Width || leftOfRect2InsideRect1Width;
-
-        var topOfRect1InsideRect2Height = IsBetween(rect1.Y, rect2.Y, rect2.Y + rect2.Height);
-        var topOfRect2InsideRect1Height = IsBetween(rect2.Y, rect1.Y, rect1.Y + rect1.Height);
-        var yOverlap = topOfRect1InsideRect2Height || topOfRect2InsideRect1Height;
-
-        var rectanglesIntersect = xOverlap && yOverlap && !(rect1.Contains(rect2) || rect2.Contains(rect1));
-
-        return rectanglesIntersect;
-    }
+    public static bool HasOverlap(this NativeRectFloat rect1, NativeRectFloat rect2) => rect1.IntersectsWith(rect2);
 
     /// <summary>
     ///     True if either rectangle is adjacent to the other rectangle
@@ -179,8 +163,8 @@ public static class NativeRectFloatExtensions
     [Pure]
     public static bool IsDockedToLeftOf(this NativeRectFloat rect1, NativeRectFloat rect2)
     {
-        // Test if the right is one pixel to the left, and if top or bottom is within the rect2 height.
-        return Math.Abs(rect1.Right - (rect2.Left - 1)) < float.Epsilon && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect1.Bottom, rect2.Top, rect2.Bottom));
+        // Right is exclusive, so a flush rect1 ends where rect2 starts (the same test as IsAdjacent). The vertical ranges must overlap.
+        return rect1.Right.Equals(rect2.Left) && rect1.Top < rect2.Bottom && rect2.Top < rect1.Bottom;
     }
 
     /// <summary>
@@ -192,19 +176,28 @@ public static class NativeRectFloatExtensions
     [Pure]
     public static bool IsDockedToRightOf(this NativeRectFloat rect1, NativeRectFloat rect2)
     {
-        // Test if the right is one pixel to the left, and if top or bottom is within the rect2 height.
-        return Math.Abs(rect1.Left - (rect2.Right + 1)) < float.Epsilon && (IsBetween(rect1.Top, rect2.Top, rect2.Bottom) || IsBetween(rect1.Bottom, rect2.Top, rect2.Bottom));
+        // Right is exclusive, so a flush rect1 starts where rect2 ends (the same test as IsAdjacent). The vertical ranges must overlap.
+        return rect1.Left.Equals(rect2.Right) && rect1.Top < rect2.Bottom && rect2.Top < rect1.Bottom;
     }
 
     /// <summary>
-    /// Creates a new NativeRectFloat which is the union of rect1 and rect2
+    /// Creates a new NativeRectFloat which is the union of rect1 and rect2.
+    /// Like the Win32 UnionRect, empty rectangles (see <see cref="NativeRectFloat.IsEmpty"/>) are ignored, so accumulating from NativeRectFloat.Empty works.
     /// </summary>
     /// <param name="rect1">NativeRectFloat</param>
     /// <param name="rect2">NativeRectFloat</param>
-    /// <returns>NativeRectFloat which is the union of rect1 and rect2</returns>
+    /// <returns>NativeRectFloat which is the union of rect1 and rect2, or NativeRectFloat.Empty if both are empty</returns>
     [Pure]
     public static NativeRectFloat Union(this NativeRectFloat rect1, NativeRectFloat rect2)
     {
+        if (rect1.IsEmpty)
+        {
+            return rect2.IsEmpty ? NativeRectFloat.Empty : rect2;
+        }
+        if (rect2.IsEmpty)
+        {
+            return rect1;
+        }
         var minX1 = Math.Min(rect1.Left, rect1.Right);
         var minX2 = Math.Min(rect2.Left, rect2.Right);
         var minX = Math.Min(minX1, minX2);
@@ -387,24 +380,6 @@ public static class NativeRectFloatExtensions
     {
         return new NativeRect((int)Math.Round(rect.X), (int)Math.Round(rect.Y), (int)Math.Round(rect.Width), (int)Math.Round(rect.Height));
     }
-
-#if !NETSTANDARD2_0
-    /// <summary>
-    /// Transform the specified NativeRectFloat
-    /// </summary>
-    /// <param name="rect">NativeRectFloat</param>
-    /// <param name="matrix">Matrix</param>
-    /// <returns>NativeRectFloat</returns>
-    [Pure]
-    public static NativeRectFloat Transform(this NativeRectFloat rect, System.Windows.Media.Matrix matrix)
-    {
-        System.Windows.Point[] myPointArray = { rect.TopLeft, rect.BottomRight };
-        matrix.Transform(myPointArray);
-        NativePointFloat topLeft = myPointArray[0];
-        NativePointFloat bottomRight = myPointArray[1];
-        return new NativeRectFloat(topLeft, bottomRight);
-    }
-#endif
 
     /// <summary>
     /// Normalize the NativeRectFloat by making a negative width and or height absolute

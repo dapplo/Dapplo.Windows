@@ -3,6 +3,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 using Dapplo.Windows.SystemState.Enums;
 
 namespace Dapplo.Windows.SystemState;
@@ -20,12 +21,16 @@ public static class SystemStateApi
     /// from entering sleep or turning off the display while the application is running.
     /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate">SetThreadExecutionState function</a>
     /// </summary>
+    /// <remarks>
+    /// The state set with ES_CONTINUOUS belongs to the calling thread: it is only reset by a call on the same thread, and it ends when that thread exits.
+    /// Don't use this from thread pool threads or async code, use <see cref="PreventSleep"/> / <see cref="SleepBlocker"/> instead.
+    /// </remarks>
     /// <param name="esFlags">The thread's execution requirements. Can be a combination of <see cref="ThreadExecutionStateFlags"/>.</param>
     /// <returns>
     /// If the function succeeds, the return value is the previous thread execution state.
     /// If the function fails, the return value is <c>0</c>.
     /// </returns>
-    [DllImport(Kernel32Dll, SetLastError = true)]
+    [DllImport(Kernel32Dll)]
     public static extern ThreadExecutionStateFlags SetThreadExecutionState(ThreadExecutionStateFlags esFlags);
 
     /// <summary>
@@ -41,11 +46,11 @@ public static class SystemStateApi
     /// </param>
     /// <param name="lpTimerName">The name of the timer object. If <c>null</c>, creates an unnamed timer.</param>
     /// <returns>
-    /// If the function succeeds, the return value is a handle to the timer object.
-    /// If the function fails, the return value is <see cref="IntPtr.Zero"/>. Call GetLastError for extended error information.
+    /// If the function succeeds, the return value is a handle to the timer object, which is closed when the SafeWaitHandle is disposed.
+    /// If the function fails, the returned handle is invalid (<see cref="SafeHandle.IsInvalid"/>). Call GetLastError for extended error information.
     /// </returns>
     [DllImport(Kernel32Dll, SetLastError = true, CharSet = CharSet.Unicode)]
-    public static extern IntPtr CreateWaitableTimer(IntPtr lpTimerAttributes, [MarshalAs(UnmanagedType.Bool)] bool bManualReset, string lpTimerName);
+    public static extern SafeWaitHandle CreateWaitableTimer(IntPtr lpTimerAttributes, [MarshalAs(UnmanagedType.Bool)] bool bManualReset, string lpTimerName);
 
     /// <summary>
     /// Opens an existing named waitable timer object.
@@ -57,11 +62,11 @@ public static class SystemStateApi
     /// </param>
     /// <param name="lpTimerName">The name of the timer object to open.</param>
     /// <returns>
-    /// If the function succeeds, the return value is a handle to the timer object.
-    /// If the function fails, the return value is <see cref="IntPtr.Zero"/>.
+    /// If the function succeeds, the return value is a handle to the timer object, which is closed when the SafeWaitHandle is disposed.
+    /// If the function fails, the returned handle is invalid (<see cref="SafeHandle.IsInvalid"/>).
     /// </returns>
     [DllImport(Kernel32Dll, SetLastError = true, CharSet = CharSet.Unicode)]
-    public static extern IntPtr OpenWaitableTimer(uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, string lpTimerName);
+    public static extern SafeWaitHandle OpenWaitableTimer(uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, string lpTimerName);
 
     /// <summary>
     /// Activates the specified waitable timer. When the due time arrives, the timer is signaled
@@ -86,12 +91,13 @@ public static class SystemStateApi
     /// </param>
     /// <param name="fResume">
     /// If <c>true</c> and the system supports it, restores a system in suspended sleep or hibernation when the timer fires.
-    /// Requires the SE_SYSTEMTIME_NAME privilege.
+    /// No privilege is needed, but the wake only happens when the "Allow wake timers" power setting is enabled.
+    /// If the system does not support a restore, the call succeeds but GetLastError returns ERROR_NOT_SUPPORTED.
     /// </param>
     /// <returns><c>true</c> if the function succeeds; otherwise <c>false</c>.</returns>
     [DllImport(Kernel32Dll, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool SetWaitableTimer(IntPtr hTimer, ref long pDueTime, int lPeriod, IntPtr pfnCompletionRoutine, IntPtr lpArgToCompletionRoutine, [MarshalAs(UnmanagedType.Bool)] bool fResume);
+    public static extern bool SetWaitableTimer(SafeWaitHandle hTimer, ref long pDueTime, int lPeriod, IntPtr pfnCompletionRoutine, IntPtr lpArgToCompletionRoutine, [MarshalAs(UnmanagedType.Bool)] bool fResume);
 
     /// <summary>
     /// Sets a cancel on a waitable timer, so it is no longer activated.
@@ -101,43 +107,23 @@ public static class SystemStateApi
     /// <returns><c>true</c> if the function succeeds; otherwise <c>false</c>.</returns>
     [DllImport(Kernel32Dll, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool CancelWaitableTimer(IntPtr hTimer);
+    public static extern bool CancelWaitableTimer(SafeWaitHandle hTimer);
 
     /// <summary>
-    /// Closes an open object handle.
+    /// Keeps the system awake and prevents the screen from turning off until the returned <see cref="SleepBlocker"/> is disposed.
+    /// This uses a power request, it is not bound to the calling thread and can be disposed on any thread.
     /// </summary>
-    /// <param name="hObject">A valid handle to an open object.</param>
-    /// <returns><c>true</c> if the function succeeds; otherwise <c>false</c>.</returns>
-    [DllImport(Kernel32Dll, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool CloseHandle(IntPtr hObject);
+    /// <param name="reason">Optional reason, shown by <c>powercfg /requests</c></param>
+    /// <returns>SleepBlocker, dispose it to allow sleep again</returns>
+    /// <exception cref="System.ComponentModel.Win32Exception">When the power request could not be created</exception>
+    public static SleepBlocker PreventSleep(string reason = null) => new SleepBlocker(keepDisplayOn: true, reason);
 
     /// <summary>
-    /// Keeps the system awake and prevents the screen from turning off until <see cref="AllowSleep"/> is called.
-    /// Equivalent to calling SetThreadExecutionState with ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED.
+    /// Keeps the system awake (without keeping the screen on) until the returned <see cref="SleepBlocker"/> is disposed.
+    /// This uses a power request, it is not bound to the calling thread and can be disposed on any thread.
     /// </summary>
-    /// <returns>The previous execution state, or <c>0</c> on failure.</returns>
-    public static ThreadExecutionStateFlags PreventSleep() =>
-        SetThreadExecutionState(
-            ThreadExecutionStateFlags.ES_CONTINUOUS |
-            ThreadExecutionStateFlags.ES_SYSTEM_REQUIRED |
-            ThreadExecutionStateFlags.ES_DISPLAY_REQUIRED);
-
-    /// <summary>
-    /// Keeps the system awake (without keeping the screen on) until <see cref="AllowSleep"/> is called.
-    /// Equivalent to calling SetThreadExecutionState with ES_CONTINUOUS | ES_SYSTEM_REQUIRED.
-    /// </summary>
-    /// <returns>The previous execution state, or <c>0</c> on failure.</returns>
-    public static ThreadExecutionStateFlags PreventSystemSleep() =>
-        SetThreadExecutionState(
-            ThreadExecutionStateFlags.ES_CONTINUOUS |
-            ThreadExecutionStateFlags.ES_SYSTEM_REQUIRED);
-
-    /// <summary>
-    /// Allows the system to sleep and the screen to turn off when idle.
-    /// Equivalent to calling SetThreadExecutionState with ES_CONTINUOUS.
-    /// </summary>
-    /// <returns>The previous execution state, or <c>0</c> on failure.</returns>
-    public static ThreadExecutionStateFlags AllowSleep() =>
-        SetThreadExecutionState(ThreadExecutionStateFlags.ES_CONTINUOUS);
+    /// <param name="reason">Optional reason, shown by <c>powercfg /requests</c></param>
+    /// <returns>SleepBlocker, dispose it to allow sleep again</returns>
+    /// <exception cref="System.ComponentModel.Win32Exception">When the power request could not be created</exception>
+    public static SleepBlocker PreventSystemSleep(string reason = null) => new SleepBlocker(keepDisplayOn: false, reason);
 }

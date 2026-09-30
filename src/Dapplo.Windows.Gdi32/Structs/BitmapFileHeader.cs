@@ -49,23 +49,41 @@ public struct BitmapFileHeader
     }
 
     /// <summary>
-    /// Create a BitmapFileHeader which needs a BitmapInfoHeader to calculate the values
+    /// Create a BitmapFileHeader for a DIB with the specified header, color masks and color table sizes
     /// </summary>
-    /// <param name="bitmapV5Header">BitmapV5Header</param>
-    public static BitmapFileHeader Create(BitmapV5Header bitmapV5Header)
+    /// <param name="offsetToPixels">uint with the offset from the start of the info header to the pixels, see e.g. BitmapInfoHeader.OffsetToPixels</param>
+    /// <param name="sizeImage">uint with the size of the pixels in bytes</param>
+    /// <returns>BitmapFileHeader</returns>
+    private static BitmapFileHeader Create(uint offsetToPixels, uint sizeImage)
     {
-        var bitmapFileHeaderSize = Marshal.SizeOf(typeof(BitmapFileHeader));
+        var bitmapFileHeaderSize = (uint)Marshal.SizeOf(typeof(BitmapFileHeader));
+        var offsetToBitmapBits = bitmapFileHeaderSize + offsetToPixels;
         return new BitmapFileHeader
         {
             // Fill with "BM"
             FileType = 0x4d42,
-            // Size of the file, is the size of this, the size of a BitmapInfoHeader and the size of the image itself.
-            Size = (int) (bitmapFileHeaderSize + bitmapV5Header.Size + bitmapV5Header.SizeImage),
+            // Size of the file: this header, the info header, the color masks, the color table and the image itself.
+            Size = checked((int)(offsetToBitmapBits + sizeImage)),
             _reserved1 = 0,
             _reserved2 = 0,
             // Specify on what offset the bits are found
-            OffsetToBitmapBits = (int) (bitmapFileHeaderSize + bitmapV5Header.Size + bitmapV5Header.ColorsUsed * 4)
+            OffsetToBitmapBits = checked((int)offsetToBitmapBits)
         };
+    }
+
+    /// <summary>
+    /// Create a BitmapFileHeader which needs a BitmapV5Header to calculate the values
+    /// </summary>
+    /// <param name="bitmapV5Header">BitmapV5Header</param>
+    public static BitmapFileHeader Create(BitmapV5Header bitmapV5Header)
+    {
+        var sizeImage = bitmapV5Header.SizeImage;
+        if (sizeImage == 0)
+        {
+            // May be 0 for BI_RGB bitmaps, calculate it
+            sizeImage = BitmapInfoHeader.CalculateImageSize(bitmapV5Header.Width, bitmapV5Header.Height, bitmapV5Header.BitCount);
+        }
+        return Create(bitmapV5Header.OffsetToPixels, sizeImage);
     }
 
     /// <summary>
@@ -74,17 +92,12 @@ public struct BitmapFileHeader
     /// <param name="bitmapInfoHeader">BitmapInfoHeader</param>
     public static BitmapFileHeader Create(BitmapInfoHeader bitmapInfoHeader)
     {
-        var bitmapFileHeaderSize = Marshal.SizeOf(typeof(BitmapFileHeader));
-        return new BitmapFileHeader
+        var sizeImage = bitmapInfoHeader.SizeImage;
+        if (sizeImage == 0)
         {
-            // Fill with "BM"
-            FileType = 0x4d42,
-            // Size of the file, is the size of this, the size of a BitmapInfoHeader and the size of the image itself.
-            Size = (int)(bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.SizeImage),
-            _reserved1 = 0,
-            _reserved2 = 0,
-            // Specify on what offset the bits are found
-            OffsetToBitmapBits = (int)(bitmapFileHeaderSize + bitmapInfoHeader.Size + bitmapInfoHeader.ColorsUsed * 4)
-        };
+            // May be 0 for BI_RGB bitmaps, calculate it
+            sizeImage = BitmapInfoHeader.CalculateImageSize(bitmapInfoHeader.Width, bitmapInfoHeader.Height, bitmapInfoHeader.BitCount);
+        }
+        return Create(bitmapInfoHeader.OffsetToPixels, sizeImage);
     }
 }

@@ -1,0 +1,29 @@
+﻿<Project>
+  <!--
+    Every library package gets a README (shown on nuget.org):
+    the README.md in the project directory when there is one, otherwise a short one generated from the Description.
+  -->
+  <PropertyGroup Condition="'$(IsDapploLibrary)' == 'true'">
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <_DapploProjectReadme>$(MSBuildProjectDirectory)\README.md</_DapploProjectReadme>
+    <_DapploGeneratedReadme>$(BaseIntermediateOutputPath)PackageReadme\README.md</_DapploGeneratedReadme>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsDapploLibrary)' == 'true' And Exists('$(_DapploProjectReadme)')">
+    <None Remove="$(_DapploProjectReadme)" />
+    <None Include="$(_DapploProjectReadme)" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsDapploLibrary)' == 'true' And !Exists('$(_DapploProjectReadme)')">
+    <None Include="$(_DapploGeneratedReadme)" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="DapploGeneratePackageReadme"
+          BeforeTargets="_GetPackageFiles;GenerateNuspec"
+          Condition="'$(IsDapploLibrary)' == 'true' And !Exists('$(_DapploProjectReadme)')">
+    <PropertyGroup>
+      <_DapploReadmeText># $(PackageId)%0D%0A%0D%0A$(Description)%0D%0A%0D%0AThis package is part of [Dapplo.Windows]($(RepositoryUrl)), see the [documentation]($(PackageProjectUrl)) and the [changelog]($(RepositoryUrl)/blob/master/CHANGELOG.md).</_DapploReadmeText>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(_DapploGeneratedReadme)" Lines="$(_DapploReadmeText)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+</Project>

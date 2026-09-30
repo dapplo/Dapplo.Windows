@@ -24,7 +24,7 @@ public interface IInteropWindow
     string Caption { get; set; }
 
     /// <summary>
-    ///     Returns the children of this window
+    ///     The direct children of this window in Z-order from top to bottom, filled by GetChildren (null when they were not retrieved)
     /// </summary>
     IEnumerable<IInteropWindow> Children { get; set; }
 
@@ -39,11 +39,6 @@ public interface IInteropWindow
     IntPtr Handle { get; }
 
     /// <summary>
-    /// Checks if the children are retrieved in a Z-Order
-    /// </summary>
-    bool HasZOrderedChildren { get; set; }
-
-    /// <summary>
     ///     Test if there are any children
     /// </summary>
     bool HasChildren { get; }
@@ -54,9 +49,14 @@ public interface IInteropWindow
     bool HasClassname { get; }
 
     /// <summary>
-    ///     Does this window have parent?
+    ///     Does this window have a (real) parent, this is true for child windows. The owner of a window is not its parent, see <see cref="HasOwner"/>.
     /// </summary>
     bool HasParent { get; }
+
+    /// <summary>
+    ///     Does this window have an owner, e.g. a dialog which is owned by the main window of an application.
+    /// </summary>
+    bool HasOwner { get; }
 
     /// <summary>
     ///     WindowInfo for the Window
@@ -79,15 +79,22 @@ public interface IInteropWindow
     bool? IsVisible { get; set; }
 
     /// <summary>
-    ///     The handle for the parent to which this window belongs
+    ///     The handle of the (real) parent of this window, IntPtr.Zero for a top-level window.
+    ///     This is retrieved with GetAncestor(GA_PARENT) and is never the owner, unlike the result of the Win32 GetParent function.
     /// </summary>
     IntPtr? Parent { get; set; }
 
     /// <summary>
     ///     The actually IInteropWindow for the parent.
-    ///     This is filled when this window was retrieved via parent.GetChildren or parent.GetZOrderChildren
+    ///     This is filled when this window was retrieved via parent.GetChildren
     /// </summary>
     IInteropWindow ParentWindow { get; set; }
+
+    /// <summary>
+    ///     The handle of the owner of this window (GetWindow with GW_OWNER), IntPtr.Zero if the window has no owner.
+    ///     Only top-level windows can be owned, e.g. dialogs, message boxes and tool windows.
+    /// </summary>
+    IntPtr? Owner { get; set; }
 
     /// <summary>
     ///     WindowPlacement for the Window

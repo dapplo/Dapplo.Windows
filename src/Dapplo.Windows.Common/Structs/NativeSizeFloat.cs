@@ -66,88 +66,15 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
         _height = (float)height;
     }
 
-#if !NETSTANDARD2_0
-        /// <summary>
-        ///     Constructor from S.W.Size
-        /// </summary>
-        /// <param name="size"></param>
-        public NativeSizeFloat(System.Windows.Size size) : this((float) size.Width, (float) size.Height)
-        {
-        }
-
-        /// <summary>
-        ///     Implicit cast from NativeSizeFloat to System.Windows.Size
-        /// </summary>
-        /// <param name="size">NativeSize</param>
-        /// <returns>System.Windows.Size</returns>
-        public static implicit operator System.Windows.Size(NativeSizeFloat size)
-        {
-            return new System.Windows.Size(size.Width, size.Height);
-        }
-
-        /// <summary>
-        ///     Implicit cast from Size to NativeSizeFloat
-        /// </summary>
-        /// <param name="size">System.Windows.Size</param>
-        /// <returns>NativeSizeFloat</returns>
-        public static implicit operator NativeSizeFloat(System.Windows.Size size)
-        {
-            return new NativeSizeFloat((float)size.Width, (float)size.Height);
-        }
-
-        /// <summary>
-        /// Equals operator
-        /// </summary>
-        /// <param name="float1">NativeSizeFloat</param>
-        /// <param name="float2">System.Windows.Size</param>
-        /// <returns>bool</returns>
-        public static bool operator ==(NativeSizeFloat float1, System.Windows.Size float2)
-        {
-            return float1.Equals(float2);
-        }
-
-        /// <summary>
-        /// Not equals operator
-        /// </summary>
-        /// <param name="float1">NativeSizeFloat</param>
-        /// <param name="float2">System.Windows.Size</param>
-        /// <returns>bool</returns>
-        public static bool operator !=(NativeSizeFloat float1, System.Windows.Size float2)
-        {
-            return !float1.Equals(float2);
-        }
-
-        /// <summary>
-        /// Equals operator
-        /// </summary>
-        /// <param name="float1">System.Windows.Size</param>
-        /// <param name="float2">NativeSizeFloat</param>
-        /// <returns>bool</returns>
-        public static bool operator ==(System.Windows.Size float1, NativeSizeFloat float2)
-        {
-            return float2.Equals(float1);
-        }
-
-        /// <summary>
-        /// Not equals operator
-        /// </summary>
-        /// <param name="float1">System.Windows.Size</param>
-        /// <param name="float2">NativeSizeFloat</param>
-        /// <returns>bool</returns>
-        public static bool operator !=(System.Windows.Size float1, NativeSizeFloat float2)
-        {
-            return !float2.Equals(float1);
-        }
-#endif
-
     /// <summary>
-    ///     Implicit cast from NativeSize to System.Drawing.Size
+    ///     Explicit (lossy) cast from NativeSizeFloat to System.Drawing.Size.
+    ///     The width and height are rounded up to the smallest integer size which contains the size. Use Round() to round instead.
     /// </summary>
     /// <param name="size">NativeSizeFloat</param>
     /// <returns>System.Drawing.Size</returns>
-    public static implicit operator System.Drawing.Size(NativeSizeFloat size)
+    public static explicit operator System.Drawing.Size(NativeSizeFloat size)
     {
-        return new System.Drawing.Size((int)size.Width, (int)size.Height);
+        return new System.Drawing.Size((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
     }
 
     /// <summary>
@@ -216,7 +143,7 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
     /// Equals operator
     /// </summary>
     /// <param name="float1">NativeSizeFloat</param>
-    /// <param name="float2">System.Windows.Size</param>
+    /// <param name="float2">System.Drawing.Size</param>
     /// <returns>bool</returns>
     public static bool operator ==(NativeSizeFloat float1, System.Drawing.Size float2)
     {
@@ -227,7 +154,7 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
     /// Not equals operator
     /// </summary>
     /// <param name="float1">NativeSizeFloat</param>
-    /// <param name="float2">System.Windows.Size</param>
+    /// <param name="float2">System.Drawing.Size</param>
     /// <returns>bool</returns>
     public static bool operator !=(NativeSizeFloat float1, System.Drawing.Size float2)
     {
@@ -237,7 +164,7 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
     /// <summary>
     /// Equals operator
     /// </summary>
-    /// <param name="float1">System.Windows.Size</param>
+    /// <param name="float1">System.Drawing.Size</param>
     /// <param name="float2">NativeSizeFloat</param>
     /// <returns>bool</returns>
     public static bool operator ==(System.Drawing.Size float1, NativeSizeFloat float2)
@@ -248,7 +175,7 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
     /// <summary>
     /// Not equals operator
     /// </summary>
-    /// <param name="float1">System.Windows.Size</param>
+    /// <param name="float1">System.Drawing.Size</param>
     /// <param name="float2">NativeSizeFloat</param>
     /// <returns>bool</returns>
     public static bool operator !=(System.Drawing.Size float1, NativeSizeFloat float2)
@@ -257,11 +184,11 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
     }
 
     /// <summary>
-    ///     Checks if the width * height are 0
+    ///     Checks if the size is empty, this is the case when the width or height is zero, negative or NaN
     /// </summary>
     /// <returns>true if the size is empty</returns>
     [Pure]
-    public bool IsEmpty => Math.Abs(_width * _height) < float.Epsilon;
+    public bool IsEmpty => !(_width > 0) || !(_height > 0);
 
     /// <inheritdoc />
     [Pure]
@@ -271,10 +198,6 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
         {
             case NativeSizeFloat f:
                 return Equals(f);
-#if !NETSTANDARD2_0
-                case System.Windows.Size size:
-                    return Equals(size);
-#endif
             case System.Drawing.Size drawingSize:
                 return Equals(drawingSize);
         }
@@ -286,13 +209,13 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
     [Pure]
     public bool Equals(NativeSizeFloat other)
     {
-        return Math.Abs(_width - other._width) < float.Epsilon &&
-               Math.Abs(_height - other._height) < float.Epsilon;
+        return _width.Equals(other._width) && _height.Equals(other._height);
     }
 
     /// <inheritdoc />
+    /// <remarks>Sizes are ordered by area (width * height, calculated as double), smallest first.</remarks>
     [Pure]
-    public int CompareTo(NativeSizeFloat other) => unchecked(other.Width * other.Height).CompareTo(unchecked (Width * Height));
+    public int CompareTo(NativeSizeFloat other) => ((double)_width * _height).CompareTo((double)other._width * other._height);
 
     /// <inheritdoc />
     [Pure]
@@ -300,7 +223,7 @@ public readonly struct NativeSizeFloat : IEquatable<NativeSizeFloat>, IComparabl
     {
         unchecked
         {
-            return (_width.GetHashCode() * 397) ^ _height.GetHashCode();
+            return (FloatHelper.GetHashCode(_width) * 397) ^ FloatHelper.GetHashCode(_height);
         }
     }
 

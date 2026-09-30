@@ -8,15 +8,19 @@
             "**/*.csproj"
           ],
           "exclude": [
-			"**/bin/**",
-			"**/obj/**",
-			"**Tests/*.csproj",
-			"**Example/*.csproj"
+            "**/bin/**",
+            "**/obj/**",
+            "**/*Tests*/**",
+            "**/*Benchmark*/**",
+            "**/*Example*/**"
           ]
         }
       ],
       "dest": "api",
-	  "filter": "filterConfig.yml"
+      "filter": "filterConfig.yml",
+      "properties": {
+        "TargetFramework": "net10.0-windows"
+      }
     }
   ],
   "build": {
@@ -26,6 +30,7 @@
           "api/**.md",
           "api/**.yml",
           "articles/**.md",
+          "ai/**.md",
           "articles/**/toc.yml",
           "toc.yml",
           "*.md"
@@ -43,24 +48,18 @@
         ]
       }
     ],
-    "overwrite": [
-      {
-        "files": [
-          "apidoc/**.md"
-        ]
-      }
-    ],
     "dest": "_site",
 	"globalMetadata": {
 		"_appTitle": "Dapplo.Windows",
 		"_appLogoPath": "images/d.svg",
 		"_appFaviconPath": "images/favicon.ico",
-		"_appFooter": "Copyright © 2017 Dapplo"
+		"_appFooter": "Copyright © 2016-2026 Dapplo",
+		"_enableSearch": true
 	},
     "globalMetadataFiles": [],
-	"template": [
-      "statictoc",
-	  "template"
+    "template": [
+      "default",
+      "modern"
     ],
     "fileMetadataFiles": [],
     "postProcessors": [],

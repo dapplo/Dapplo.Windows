@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -17,11 +18,12 @@ public static class ClipboardFormatExtensions
 {
     private const int SuccessError = 0;
 
-    // Used for internal locking
+    // Used for internal locking, all access to the caches below is done while holding this lock
     private static readonly object Lock = new object();
     // Cache for all the known clipboard format names
     private static readonly Dictionary<uint, string> Id2Format = new Dictionary<uint, string>();
-    private static readonly Dictionary<string, uint> Format2Id = new Dictionary<string, uint>();
+    // Windows compares clipboard format names case-insensitive
+    private static readonly Dictionary<string, uint> Format2Id = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Initialize the static data of the class
@@ -54,32 +56,39 @@ public static class ClipboardFormatExtensions
     }
 
     /// <summary>
-    /// Method to map a clipboard format to an ID
+    /// Method to map a clipboard format to an ID, unknown formats are registered
     /// </summary>
     /// <param name="format">clipboard format</param>
     /// <returns>uint with the id</returns>
     public static uint MapFormatToId(string format)
     {
-        if (!Format2Id.TryGetValue(format, out var formatId))
+        lock (Lock)
         {
-            formatId = RegisterFormat(format);
+            if (format != null && Format2Id.TryGetValue(format, out var formatId))
+            {
+                return formatId;
+            }
         }
 
-        return formatId;
+        return RegisterFormat(format);
     }
 
     /// <summary>
     /// Method to map a clipboard ID to a format name
     /// </summary>
     /// <param name="formatId">clipboard format ID</param>
-    /// <returns>string with the format</returns>
+    /// <returns>string with the format, or null if the format has no name</returns>
     public static string MapIdToFormat(uint formatId)
     {
-        if (Id2Format.TryGetValue(formatId, out var format))
+        lock (Lock)
         {
-            return format;
+            if (Id2Format.TryGetValue(formatId, out var knownFormat))
+            {
+                return knownFormat;
+            }
         }
 
+        string format;
         unsafe
         {
             const int capacity = 256;
@@ -87,12 +96,24 @@ public static class ClipboardFormatExtensions
             var nrCharacters = NativeMethods.GetClipboardFormatName(formatId, clipboardFormatName, capacity);
             if (nrCharacters <= 0)
             {
+                // No name
                 return null;
             }
-            // No name
             format = new string(clipboardFormatName, 0, nrCharacters);
+        }
+
+        lock (Lock)
+        {
+            // Another thread might have been faster, keep the first
+            if (Id2Format.TryGetValue(formatId, out var knownFormat))
+            {
+                return knownFormat;
+            }
             Id2Format[formatId] = format;
-            Format2Id[format] = formatId;
+            if (!Format2Id.ContainsKey(format))
+            {
+                Format2Id[format] = formatId;
+            }
         }
 
         return format;
@@ -103,8 +124,14 @@ public static class ClipboardFormatExtensions
     /// </summary>
     /// <param name="format">string with the format to register</param>
     /// <returns>uint for the format</returns>
+    /// <exception cref="ArgumentException">When the format is null or empty</exception>
+    /// <exception cref="Win32Exception">When RegisterClipboardFormat failed</exception>
     public static uint RegisterFormat(string format)
     {
+        if (string.IsNullOrEmpty(format))
+        {
+            throw new ArgumentException("The clipboard format name must not be null or empty.", nameof(format));
+        }
         uint clipboardFormatId;
         lock (Lock)
         {
@@ -114,9 +141,16 @@ public static class ClipboardFormatExtensions
             }
 
             clipboardFormatId = NativeMethods.RegisterClipboardFormat(format);
+            if (clipboardFormatId == 0)
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
 
-            // Make sure the format is known
-            Id2Format[clipboardFormatId] = format;
+            // Make sure the format is known, keep the first name for the ID (the names are case-insensitive)
+            if (!Id2Format.ContainsKey(clipboardFormatId))
+            {
+                Id2Format[clipboardFormatId] = format;
+            }
             Format2Id[format] = clipboardFormatId;
         }
 

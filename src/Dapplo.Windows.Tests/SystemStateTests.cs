@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.SystemState;
@@ -23,38 +24,33 @@ public class SystemStateTests
     }
 
     /// <summary>
-    /// Test that SetThreadExecutionState can be called and returns a valid previous state.
+    /// Test that a SleepBlocker for the system can be created and disposed, also on another thread.
     /// </summary>
     [Fact]
-    public void Test_SetThreadExecutionState_PreventAndAllowSleep()
+    public async Task Test_PreventSystemSleep_DisposeOnOtherThread()
     {
-        // Prevent the system from sleeping (keep the system awake)
-        var previousState = SystemStateApi.PreventSystemSleep();
-        Log.Info().WriteLine($"Previous execution state: {previousState}");
+        var sleepBlocker = SystemStateApi.PreventSystemSleep("Dapplo.Windows.Tests");
+        Assert.True(sleepBlocker.IsActive);
+        Assert.False(sleepBlocker.KeepsDisplayOn);
+        Assert.Equal("Dapplo.Windows.Tests", sleepBlocker.Reason);
 
-        // Allow the system to sleep again
-        var restoredState = SystemStateApi.AllowSleep();
-        Log.Info().WriteLine($"Restored execution state: {restoredState}");
-
-        // A successful call should return a non-zero value
-        Assert.True(restoredState != 0, "SetThreadExecutionState should return a non-zero previous state on success.");
+        // A power request is not bound to a thread
+        await Task.Run(() => sleepBlocker.Dispose(), TestContext.Current.CancellationToken);
+        Assert.False(sleepBlocker.IsActive);
+        // Disposing twice is harmless
+        sleepBlocker.Dispose();
     }
 
     /// <summary>
-    /// Test that SetThreadExecutionState can be called with display required flag.
+    /// Test that a SleepBlocker which also keeps the display on can be created and disposed.
     /// </summary>
     [Fact]
-    public void Test_SetThreadExecutionState_PreventDisplaySleep()
+    public void Test_PreventSleep_KeepsDisplayOn()
     {
-        // Prevent the display from turning off
-        var previousState = SystemStateApi.PreventSleep();
-        Log.Info().WriteLine($"Previous execution state: {previousState}");
-
-        // Allow the system to sleep again
-        var restoredState = SystemStateApi.AllowSleep();
-        Log.Info().WriteLine($"Restored execution state: {restoredState}");
-
-        Assert.True(restoredState != 0, "SetThreadExecutionState should return a non-zero previous state on success.");
+        using var sleepBlocker = SystemStateApi.PreventSleep();
+        Assert.True(sleepBlocker.IsActive);
+        Assert.True(sleepBlocker.KeepsDisplayOn);
+        Assert.False(string.IsNullOrEmpty(sleepBlocker.Reason));
     }
 
     /// <summary>

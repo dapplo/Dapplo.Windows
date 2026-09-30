@@ -9,10 +9,10 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Extensions;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.User32.Structs;
+using Dapplo.Windows.Wpf;
 using Xunit;
 
 namespace Dapplo.Windows.Tests;
@@ -36,36 +36,11 @@ public class User32Tests
     }
 
     /// <summary>
-    ///     Test GetWindow
-    /// </summary>
-    /// <returns></returns>
-    //[Fact]
-    private void TestDetectChanges()
-    {
-        bool foundWindow;
-        var initialWindows = InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()).ToList();
-
-        while (true)
-        {
-            Thread.Sleep(1000);
-            var newWindow = InteropWindowQuery.GetTopWindows().FirstOrDefault(window => window.IsVisible() && !initialWindows.Contains(window));
-            if (newWindow != null)
-            {
-                foundWindow = true;
-                Log.Debug().WriteLine("{0}", newWindow.Dump());
-                break;
-            }
-        }
-
-        Assert.True(foundWindow);
-    }
-
-    /// <summary>
-    ///     Test GetWindow
+    ///     Test GetTopWindows finds at least one visible window
     /// </summary>
     /// <returns></returns>
     [Fact]
-    private void TestGetTopLevelWindows()
+    public void TestGetTopWindows()
     {
         var foundWindow = false;
         foreach (var window in InteropWindowQuery.GetTopWindows().Where(window => window.IsVisible()))
@@ -84,7 +59,7 @@ public class User32Tests
     /// </summary>
     /// <returns></returns>
     [Fact]
-    private void TestWindowPlacement_TypeConverter()
+    public void TestWindowPlacement_TypeConverter()
     {
         var windowPlacement = WindowPlacement.Create();
         windowPlacement.MinPosition = new NativePoint(10, 10);
@@ -108,7 +83,8 @@ public class User32Tests
     ///     Test GetTextFromWindow
     /// </summary>
     [WpfFact]
-    private void Test_GetTextFromWindow()
+    [Trait("Category", "Interactive")]
+    public void Test_GetTextFromWindow()
     {
         const string title = "1234567890";
         var window = new Window
@@ -121,5 +97,25 @@ public class User32Tests
         var text = User32Api.GetTextFromWindow(handle);
         window.Close();
         Assert.Equal(title, text);
+    }
+
+    /// <summary>
+    ///     Test GetTextFromWindow with a text which is too large for the stack
+    /// </summary>
+    [WpfFact]
+    [Trait("Category", "Interactive")]
+    public void Test_GetTextFromWindow_LargeText()
+    {
+        var largeText = new string('x', 600_000);
+        using var textBox = new System.Windows.Forms.TextBox
+        {
+            Multiline = true,
+            MaxLength = 0
+        };
+        var handle = textBox.Handle;
+        textBox.Text = largeText;
+
+        var text = User32Api.GetTextFromWindow(handle);
+        Assert.Equal(largeText, text);
     }
 }

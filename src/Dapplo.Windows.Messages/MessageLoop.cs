@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Messages.Structs;
 
@@ -42,18 +43,21 @@ public static class MessageLoop
     /// Use WM_INPUT here and in wMsgFilterMin to specify only the WM_INPUT messages.
     /// 
     /// If wMsgFilterMin and wMsgFilterMax are both zero, GetMessage returns all available messages (that is, no range filtering is performed).</param>
-    /// <returns></returns>
+    /// <returns>BOOL: nonzero for a message, 0 for WM_QUIT and -1 for an error</returns>
     [DllImport("user32.dll", SetLastError = true)]
-    private static extern sbyte GetMessage(out Msg lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
+    private static extern int GetMessage(out Msg lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
 
     /// <summary>
     /// This processes messages, so a console application can use message based functionality, like low level keyboard events.
-    /// The loop is very basic,
+    /// The loop is very basic: it ends when WM_QUIT is received (e.g. after PostQuitMessage) or when the handler returns false.
     /// </summary>
-    /// <param name="handler">An optional function to process the message, return false to stop handling</param>
+    /// <remarks>The handler is called AFTER the message was translated and dispatched to its window procedure,
+    /// so it can observe messages (and stop the loop) but not filter or intercept them.</remarks>
+    /// <param name="handler">An optional function which is called after each message was dispatched, return false to stop the loop</param>
     /// <param name="hWnd">IntPtr with the window handle to get the messages for</param>
     /// <param name="wMsgFilterMin">The integer value of the lowest message value to be retrieved. Use WM_KEYFIRST (0x0100) to specify the first keyboard message or WM_MOUSEFIRST (0x0200) to specify the first mouse message.</param>
     /// <param name="wMsgFilterMax">The integer value of the highest message value to be retrieved. Use WM_KEYLAST to specify the last keyboard message or WM_MOUSELAST to specify the last mouse message.</param>
+    /// <exception cref="Win32Exception">When GetMessage fails, e.g. because hWnd is not a valid window of this thread</exception>
     public static void ProcessMessages(MessageProc handler = null, IntPtr hWnd = default, uint? wMsgFilterMin = null, uint? wMsgFilterMax = null)
     {
         do
@@ -61,12 +65,12 @@ public static class MessageLoop
             var hasMessage = GetMessage(out var msg, hWnd, wMsgFilterMin ?? 0, wMsgFilterMax ?? 0);
             if (hasMessage == -1)
             {
-                // Error!
-                break;
+                // Error, e.g. an invalid window handle
+                throw new Win32Exception(Marshal.GetLastWin32Error());
             }
             if (hasMessage == 0)
             {
-                // Error!
+                // WM_QUIT was received, end the loop
                 break;
             }
 

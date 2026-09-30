@@ -109,14 +109,16 @@ public sealed class FileSaveDialogBuilder
     /// </returns>
     /// <exception cref="COMException">An unexpected COM error occurred.</exception>
     /// <exception cref="PlatformNotSupportedException">Called on a non-Windows platform.</exception>
+    /// <exception cref="InvalidOperationException">Called from a thread which is not an STA thread (e.g. a thread pool thread), checked before any COM object is created.</exception>
     public FileDialogResult ShowDialog(IntPtr ownerHandle = default)
     {
-        var dialog = ComDialogHelper.CreateDialog<IFileSaveDialog>(ComDialogHelper.ClsidFileSaveDialog);
+        var dialog = ComDialogHelper.CreateDialog<IFileSaveDialog>(ComDialogHelper.ClsidFileSaveDialog, nameof(FileSaveDialogBuilder));
         try
         {
             if (_title != null) dialog.SetTitle(_title);
-            // OverwritePrompt is the default for save dialogs; set it explicitly.
-            dialog.SetOptions(FileOpenOptions.OverwritePrompt);
+            // OverwritePrompt is one of the save dialog defaults; the defaults are kept and it is added explicitly.
+            dialog.GetOptions(out var currentOptions);
+            dialog.SetOptions(ComDialogHelper.CombineOptions(currentOptions, FileOpenOptions.OverwritePrompt));
             ComDialogHelper.ApplyFilters(dialog.SetFileTypes, dialog.SetFileTypeIndex, _filters);
             if (_suggestedFileName != null) dialog.SetFileName(_suggestedFileName);
             if (_defaultExtension != null) dialog.SetDefaultExtension(_defaultExtension);
@@ -128,9 +130,7 @@ public sealed class FileSaveDialogBuilder
             if (hr != 0) Marshal.ThrowExceptionForHR(hr);
 
             dialog.GetResult(out var item);
-            var path = ComDialogHelper.GetFileSysPath(item);
-            Marshal.ReleaseComObject(item);
-            return FileDialogResult.FromPath(path);
+            return FileDialogResult.FromPath(ComDialogHelper.GetFileSysPathAndRelease(item));
         }
         finally
         {

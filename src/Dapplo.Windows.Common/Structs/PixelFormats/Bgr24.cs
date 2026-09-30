@@ -1,7 +1,6 @@
-// Copyright (c) Dapplo and contributors. All rights reserved.
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD2_0
 using System;
 using System.Runtime.InteropServices;
 
@@ -69,6 +68,7 @@ public struct Bgr24 : IEquatable<Bgr24>
     /// <summary>
     /// Alpha blends a source pixel with alpha channel onto this target pixel.
     /// Since Bgr24 has no alpha channel, the result is always opaque.
+    /// The source must use straight (non-premultiplied) alpha, convert premultiplied pixels with <see cref="Bgra32.ToStraight"/> first.
     /// </summary>
     /// <param name="target">The target pixel to blend onto (modified in place).</param>
     /// <param name="source">The source pixel to blend from (with alpha channel).</param>
@@ -92,10 +92,9 @@ public struct Bgr24 : IEquatable<Bgr24>
             // Alpha blending onto opaque background
             int alpha = source.A;
             int invAlpha = 255 - alpha;
-            target.B = (byte)((source.B * alpha + target.B * invAlpha) / 255);
-            target.G = (byte)((source.G * alpha + target.G * invAlpha) / 255);
-            target.R = (byte)((source.R * alpha + target.R * invAlpha) / 255);
+            target.B = (byte)Bgra32.Div255(source.B * alpha + target.B * invAlpha);
+            target.G = (byte)Bgra32.Div255(source.G * alpha + target.G * invAlpha);
+            target.R = (byte)Bgra32.Div255(source.R * alpha + target.R * invAlpha);
         }
     }
 }
-#endif

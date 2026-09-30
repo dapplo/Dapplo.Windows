@@ -8,7 +8,6 @@ using Dapplo.Windows.Gdi32.Structs;
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Windows;
 
 namespace Dapplo.Windows.Gdi32;
 
@@ -259,6 +258,17 @@ public static class Gdi32Api
     /// <returns>The number of bytes copied to the buffer if successful; otherwise, zero if the function fails.</returns>
     [DllImport(GDI32Dll, SetLastError = true)]
     public static extern int GetObject(SafeHBitmapHandle hgdiobj, int cbBuffer, ref Structs.GdiBitmap lpvObject);
+
+    /// <summary>
+    /// Retrieves information for the specified graphics object, using a raw (non-owning) handle.
+    /// Use this for handles which are owned by something else, e.g. the raw bitmaps of IconInfo / IconInfoEx.
+    /// </summary>
+    /// <param name="hgdiobj">IntPtr with the handle to the graphics object for which information is to be retrieved.</param>
+    /// <param name="cbBuffer">The size, in bytes, of the buffer that receives the information.</param>
+    /// <param name="lpvObject">A reference to a Bitmap structure that receives the information about the graphics object.</param>
+    /// <returns>The number of bytes copied to the buffer if successful; otherwise, zero if the function fails.</returns>
+    [DllImport(GDI32Dll, SetLastError = true)]
+    public static extern int GetObject(IntPtr hgdiobj, int cbBuffer, ref Structs.GdiBitmap lpvObject);
 
     /// <summary>
     /// The DeleteObject function deletes a logical pen, brush, font, bitmap, region, or palette, freeing all system resources associated with the object. After the object is deleted, the specified handle is no longer valid.

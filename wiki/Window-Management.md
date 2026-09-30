@@ -1,264 +1,183 @@
-# Window Management
+# Window management
 
-The `Dapplo.Windows` package provides the `InteropWindow` class for querying, enumerating, and manipulating windows through native Windows APIs.
+Package **Dapplo.Windows**. Full version: [Window management](https://www.dapplo.net/Dapplo.Windows/articles/window-management.html).
 
-## Installation
+`InteropWindowFactory.CreateFor(handle)` wraps a window handle in an `IInteropWindow`. The `Get...` extension methods
+read a value once and cache it; pass `forceUpdate: true` to read it again.
 
-```powershell
-Install-Package Dapplo.Windows
+<!-- sample: WindowSamples.WindowInformation -->
+```csharp
+// Wrap a window handle, nothing is read yet
+IInteropWindow window = InteropWindowFactory.CreateFor(User32Api.GetForegroundWindow());
+// Or: IInteropWindow window = InteropWindowQuery.GetForegroundWindow();
+
+// The Get... methods read the value once and cache it in the window object, pass forceUpdate: true to read it again
+Console.WriteLine($"Title: {window.GetCaption()}");
+Console.WriteLine($"Class: {window.GetClassname()}");
+Console.WriteLine($"Bounds: {window.GetInfo().Bounds}");
+Console.WriteLine($"Client bounds: {window.GetInfo().ClientBounds}");
+Console.WriteLine($"Process: {window.GetProcessId()}");
+Console.WriteLine($"Visible: {window.IsVisible()}, minimized: {window.IsMinimized()}, maximized: {window.IsMaximized()}");
 ```
 
-## Getting Window Information
+## Finding windows
 
-### From Window Handle
+`GetVisibleApplicationWindows()` returns the application windows a user sees: visible, not minimized, with a title, no tool
+windows. `GetTopWindows()` returns all top-level windows without a filter, `GetTopWindows(parent)` and
+`window.GetChildren()` the direct children. All of them are in Z-order (top-most first) and are a snapshot taken at
+once with `EnumWindows` / `EnumChildWindows` when you call them, so they can't loop or skip windows while the Z-order
+changes.
 
+<!-- sample: WindowSamples.ApplicationWindows -->
 ```csharp
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.User32;
-
-// Get the foreground window
-IntPtr handle = User32Api.GetForegroundWindow();
-IInteropWindow window = InteropWindow.FromHandle(handle);
-
-// Populate all window properties
-window.Fill();
-
-Console.WriteLine($"Title:    {window.Caption}");
-Console.WriteLine($"Class:    {window.Classname}");
-Console.WriteLine($"PID:      {window.ProcessId}");
-Console.WriteLine($"Bounds:   {window.Bounds}");
-```
-
-### Selective Property Loading
-
-For better performance, load only the properties you need:
-
-```csharp
-using Dapplo.Windows.Desktop;
-
-var window = InteropWindow.FromHandle(handle);
-window.Fill(InteropWindowRetrieveSettings.Caption |
-            InteropWindowRetrieveSettings.Info);
-
-Console.WriteLine($"{window.Caption} at {window.Bounds}");
-```
-
-## Enumerating Windows
-
-### All Top-Level Windows
-
-```csharp
-using Dapplo.Windows.Desktop;
-
-var windows = InteropWindowQuery.GetTopLevelWindows();
-foreach (var window in windows)
+// The application windows the user sees (visible, with a title, not minimized), from top to bottom
+foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows())
 {
-    Console.WriteLine($"{window.Caption} ({window.Classname})");
+    Console.WriteLine($"{window.GetCaption()} ({window.GetClassname()})");
 }
 ```
 
-### Filtered Windows
-
+<!-- sample: WindowSamples.FilterWindows -->
 ```csharp
-using Dapplo.Windows.Desktop;
-using System.Linq;
-
-// Visible windows only
-var visible = InteropWindowQuery.GetTopLevelWindows()
-    .Where(w => w.IsVisible())
+// All visible Notepad windows
+var notepads = InteropWindowQuery.GetVisibleApplicationWindows()
+    .Where(window => window.GetClassname() == "Notepad")
     .ToList();
 
-// By process executable name
-var notepadWindows = InteropWindowQuery.GetTopLevelWindows()
-    .Where(w => w.GetProcessPath()?.Contains("notepad.exe") ?? false)
-    .ToList();
+// All top-level windows of a process
+var ownWindows = InteropWindowQuery.GetWindowsForProcess(Process.GetCurrentProcess().Id);
 
-// By window class
-var explorerWindows = InteropWindowQuery.GetTopLevelWindows()
-    .Where(w => w.GetClassname() == "CabinetWClass")
-    .ToList();
+// Enumerate with a predicate and stop early: the first window with "Dapplo" in the title
+var firstMatch = WindowsEnumerator.EnumerateWindows(
+        wherePredicate: window => window.GetCaption().Contains("Dapplo"),
+        takeWhileFunc: (window, count) => count < 1)
+    .FirstOrDefault();
 ```
 
-### Child Windows
+Children live inside their parent; dialogs have an owner, not a parent. `GetParent()` never returns the owner.
 
+<!-- sample: WindowSamples.ParentAndOwner -->
 ```csharp
-using Dapplo.Windows.Desktop;
+// The parent is the window a child window lives in, top-level windows have none (IntPtr.Zero)
+IInteropWindow parent = window.GetParentWindow();
 
-var parent = InteropWindow.FromHandle(handle);
-parent.Fill(InteropWindowRetrieveSettings.Children);
+// The owner is the window a dialog or tool window belongs to, e.g. the main window of the application
+IInteropWindow owner = window.GetOwnerWindow();
 
-foreach (var child in parent.Children)
-{
-    Console.WriteLine($"  {child.Caption} ({child.Classname})");
-}
+// All other top-level windows of the same process
+var linked = window.GetLinkedWindows();
 ```
 
-## Window Manipulation
+## Changing windows
 
-### Show, Hide, and State Changes
-
+<!-- sample: WindowSamples.ShowHide -->
 ```csharp
-using Dapplo.Windows.Desktop;
-
-var window = InteropWindow.FromHandle(handle);
-
-window.Show();
-window.Hide();
 window.Minimize();
 window.Maximize();
 window.Restore();
+
+// Anything else ShowWindow supports
+User32Api.ShowWindow(window.Handle, ShowWindowCommands.Hide);
+User32Api.ShowWindow(window.Handle, ShowWindowCommands.ShowNoActivation);
 ```
 
-### Move and Resize
-
+<!-- sample: WindowSamples.MoveResize -->
 ```csharp
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Common.Structs;
-
-var window = InteropWindow.FromHandle(handle);
-
+// Move, keeping the size
 window.MoveTo(new NativePoint(100, 100));
-window.Resize(new NativeSize(800, 600));
-window.SetPlacement(new NativeRect(100, 100, 900, 700));
+
+// Move and resize
+User32Api.SetWindowPos(window.Handle, IntPtr.Zero, 100, 100, 800, 600, WindowPos.SWP_NOZORDER | WindowPos.SWP_NOACTIVATE);
+
+// Placement: the normal (restored) bounds and the show state, e.g. to save and restore a layout
+WindowPlacement placement = window.GetPlacement();
+window.SetPlacement(placement);
 ```
 
-### Bring to Front
-
+<!-- sample: WindowSamples.ToForeground -->
 ```csharp
-var window = InteropWindow.FromHandle(handle);
-window.ToForeground();
-window.Flash();    // Flash in the taskbar
+// Restores a minimized window and makes it the foreground window. Windows may still refuse,
+// e.g. when the user is working in another application: then the taskbar button flashes.
+await window.ToForegroundAsync();
 ```
 
-## Monitoring Window Events
+`WindowHandles` has the special handles `HWND_TOP`, `HWND_BOTTOM`, `HWND_TOPMOST`, `HWND_NOTOPMOST`, `HWND_MESSAGE`
+and `HWND_BROADCAST`:
 
-`WinEventHook` provides a reactive stream of WinEvents. Dispose the subscription when you no longer need it.
-
-### Window Creation and Destruction
-
+<!-- sample: WindowSamples.AlwaysOnTop -->
 ```csharp
-using Dapplo.Windows.Desktop;
-
-var createSub = WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE)
-    .Subscribe(e =>
-    {
-        var w = InteropWindow.FromHandle(e.Handle);
-        Console.WriteLine($"Created: {w.GetCaption()}");
-    });
-
-var destroySub = WinEventHook.Create(WinEvents.EVENT_OBJECT_DESTROY)
-    .Subscribe(e => Console.WriteLine($"Destroyed: {e.Handle}"));
-
-// Clean up
-createSub.Dispose();
-destroySub.Dispose();
+bool isTopmost = (window.GetInfo(forceUpdate: true).ExtendedStyle & ExtendedWindowStyleFlags.WS_EX_TOPMOST) != 0;
+User32Api.SetWindowPos(window.Handle, isTopmost ? WindowHandles.HWND_NOTOPMOST : WindowHandles.HWND_TOPMOST, 0, 0, 0, 0,
+    WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE | WindowPos.SWP_NOACTIVATE);
 ```
 
-### Title Changes
+`PostMessage` queues a message and returns immediately, `false` (see `Marshal.GetLastWin32Error()`) when it couldn't:
 
+<!-- sample: WindowSamples.PostMessages -->
 ```csharp
-WinEventHook.Create(WinEvents.EVENT_OBJECT_NAMECHANGE)
-    .Subscribe(e =>
-    {
-        var w = InteropWindow.FromHandle(e.Handle);
-        Console.WriteLine($"Title changed: {w.GetCaption()}");
-    });
-```
-
-### Foreground Window Changes
-
-```csharp
-WinEventHook.Create(WinEvents.EVENT_SYSTEM_FOREGROUND)
-    .Subscribe(e =>
-    {
-        var w = InteropWindow.FromHandle(e.Handle);
-        Console.WriteLine($"Active window: {w.GetCaption()}");
-    });
-```
-
-### Location / Size Changes
-
-```csharp
-WinEventHook.Create(WinEvents.EVENT_OBJECT_LOCATIONCHANGE)
-    .Subscribe(e =>
-    {
-        var w = InteropWindow.FromHandle(e.Handle);
-        w.Fill(InteropWindowRetrieveSettings.Info);
-        Console.WriteLine($"Moved/resized: {w.Caption} → {w.Bounds}");
-    });
-```
-
-### Filtering Events
-
-Use Rx operators to narrow the stream:
-
-```csharp
-using System.Reactive.Linq;
-
-// Only events for a specific window
-WinEventHook.Create(WinEvents.EVENT_OBJECT_NAMECHANGE)
-    .Where(e => e.Handle == targetHandle)
-    .Subscribe(e => Console.WriteLine("Target title changed"));
-
-// Only events for a specific process
-WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE)
-    .Where(e => InteropWindow.FromHandle(e.Handle).GetProcessId() == myPid)
-    .Subscribe(e => Console.WriteLine("Window created in my process"));
-```
-
-## Advanced Scenarios
-
-### Find a Window by Title
-
-```csharp
-var window = InteropWindowQuery.GetTopLevelWindows()
-    .FirstOrDefault(w => w.GetCaption()?.Contains("Notepad") ?? false);
-```
-
-### Z-Order (Stacking Order)
-
-```csharp
-var desktop = InteropWindow.GetDesktopWindow();
-desktop.Fill(InteropWindowRetrieveSettings.ZOrderedChildren);
-
-foreach (var w in desktop.ZOrderedChildren.Where(w => w.IsVisible()))
+// Ask a window to close, without waiting: an application which asks "Save changes?" doesn't block the caller
+if (!window.PostMessage(WindowsMessages.WM_CLOSE))
 {
-    Console.WriteLine(w.Caption);
+    Console.WriteLine($"Posting failed, error {Marshal.GetLastWin32Error()}");
 }
+
+// Post a registered message to all top-level windows, e.g. to the other instances of your application
+uint showMessage = RegisteredWindowMessages.Register("MyApp.ShowMainWindow");
+User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
 ```
 
-### Check Window State
+## Screenshots
 
+<!-- sample: WindowSamples.Screenshot -->
 ```csharp
-var window = InteropWindow.FromHandle(handle);
-
-Console.WriteLine($"Visible:    {window.IsVisible()}");
-Console.WriteLine($"Minimized:  {window.IsMinimized()}");
-Console.WriteLine($"Maximized:  {window.IsMaximized()}");
-Console.WriteLine($"App window: {window.IsAppWindow()}");
+// Renders the window, also when it's covered by other windows (not when it's minimized).
+// The result is cropped to the visible frame, without the invisible resize borders.
+using Bitmap bitmap = window.PrintWindow();
+bitmap?.Save("window.png", ImageFormat.Png);
 ```
 
-## Best Practices
+## Window events
 
-1. **Always check validity** before using a window handle — windows can be destroyed at any time:
+`WinEventHook` events arrive on the thread of the [[SharedMessageWindow]]. Filter on
+`ObjectIdentifier == ObjectIdentifiers.Window` when you only want windows.
 
-   ```csharp
-   if (window.Exists())
-       Console.WriteLine(window.GetCaption());
-   ```
+<!-- sample: WindowSamples.MonitorCreateDestroy -->
+```csharp
+// Created and destroyed top-level and child windows, events arrive on the SharedMessageWindow thread
+IDisposable subscription = WinEventHook.WindowCreateDestroyObservable()
+    .Subscribe(info =>
+    {
+        if (info.WinEvent == WinEvents.EVENT_OBJECT_CREATE)
+        {
+            Console.WriteLine($"Created {info.Handle}");
+        }
+        else
+        {
+            // The window is gone, only the handle is left
+            Console.WriteLine($"Destroyed {info.Handle}");
+        }
+    });
 
-2. **Dispose subscriptions** to avoid memory leaks:
+// Removes the hook
+subscription.Dispose();
+```
 
-   ```csharp
-   using var sub = WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE).Subscribe(...);
-   ```
+<!-- sample: WindowSamples.MonitorForeground -->
+```csharp
+// The user switched to another window
+var subscription = WinEventHook.Create(WinEvents.EVENT_SYSTEM_FOREGROUND)
+    .Subscribe(info => Console.WriteLine($"Active: {InteropWindowFactory.CreateFor(info.Handle).GetCaption()}"));
+```
 
-3. **Cache properties** — call `Fill()` once and use the cached values rather than making repeated API calls.
+<!-- sample: WindowSamples.MonitorLocation -->
+```csharp
+// Moved or resized windows, this also fires for the caret and the cursor: filter on the window itself
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_LOCATIONCHANGE)
+    .Where(info => info.ObjectIdentifier == ObjectIdentifiers.Window && info.IsSelf)
+    // Many events arrive while dragging, only take the last one
+    .Throttle(TimeSpan.FromMilliseconds(100))
+    .Subscribe(info => Console.WriteLine($"Moved: {InteropWindowFactory.CreateFor(info.Handle).GetInfo(forceUpdate: true).Bounds}"));
+```
 
-4. **Handle `Win32Exception`** — windows may become invalid between your check and use.
-
-## See Also
-
-- [[Getting-Started]]
-- [[Common-Scenarios]]
-- [GitHub Repository](https://github.com/dapplo/Dapplo.Windows)
+More: filling several values at once, Z-order, always on top, scrolling, displays, installed software, see the
+[documentation](https://www.dapplo.net/Dapplo.Windows/articles/window-management.html).

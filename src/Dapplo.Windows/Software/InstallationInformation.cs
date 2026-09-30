@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Dapplo.Log;
@@ -84,7 +85,7 @@ public static class InstallationInformation
                         {
                             continue;
                         }
-                        var value = Convert.ChangeType(propertyValue, propertyInfo.PropertyType);
+                        var value = Convert.ChangeType(propertyValue, propertyInfo.PropertyType, CultureInfo.InvariantCulture);
                         propertyInfo.SetValue(softwareDetails, value);
                         break;
                 }
@@ -98,24 +99,50 @@ public static class InstallationInformation
     }
 
     /// <summary>
-    /// Retrieves all the installed software
+    /// Retrieves all the installed software: the 64-bit and 32-bit machine wide installations and the installations for the current user.
     /// </summary>
-    /// <returns>IEnumerable with SoftwareDetails</returns>
+    /// <returns>IEnumerable with SoftwareDetails, never with null entries</returns>
     public static IEnumerable<SoftwareDetails> InstalledSoftware()
     {
-        string uninstallKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-        using (var registryKey = Registry.LocalMachine.OpenSubKey(uninstallKey))
+        const string uninstallKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+        // On a 32-bit OS there is only one view, requesting the 64-bit view would return the same keys twice
+        var machineViews = Environment.Is64BitOperatingSystem ? new[] { RegistryView.Registry64, RegistryView.Registry32 } : new[] { RegistryView.Default };
+        foreach (var machineView in machineViews)
         {
-            if (registryKey == null)
+            foreach (var softwareDetails in InstalledSoftware(RegistryHive.LocalMachine, machineView, uninstallKey))
             {
-                yield break;
+                yield return softwareDetails;
             }
-            foreach (var subKeyName in registryKey.GetSubKeyNames())
+        }
+        // The per-user installations, HKCU is shared between the views
+        foreach (var softwareDetails in InstalledSoftware(RegistryHive.CurrentUser, RegistryView.Default, uninstallKey))
+        {
+            yield return softwareDetails;
+        }
+    }
+
+    /// <summary>
+    /// Retrieves the installed software from the specified hive and view
+    /// </summary>
+    /// <param name="hive">RegistryHive</param>
+    /// <param name="view">RegistryView</param>
+    /// <param name="uninstallKey">string with the path of the uninstall key</param>
+    /// <returns>IEnumerable with SoftwareDetails</returns>
+    private static IEnumerable<SoftwareDetails> InstalledSoftware(RegistryHive hive, RegistryView view, string uninstallKey)
+    {
+        using var baseKey = RegistryKey.OpenBaseKey(hive, view);
+        using var registryKey = baseKey.OpenSubKey(uninstallKey);
+        if (registryKey == null)
+        {
+            yield break;
+        }
+        foreach (var subKeyName in registryKey.GetSubKeyNames())
+        {
+            using var subKey = registryKey.OpenSubKey(subKeyName);
+            var softwareDetails = MapFromRegistryKey(subKeyName, subKey);
+            if (softwareDetails != null)
             {
-                using (var subKey = registryKey.OpenSubKey(subKeyName))
-                {
-                    yield return MapFromRegistryKey(subKeyName, subKey);
-                }
+                yield return softwareDetails;
             }
         }
     }

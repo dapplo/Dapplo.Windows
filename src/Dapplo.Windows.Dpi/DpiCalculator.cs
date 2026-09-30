@@ -7,7 +7,8 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Dpi;
 
 /// <summary>
-///     Calculate with DPI
+///     Calculate with DPI.
+///     Results which are converted to int are rounded to the nearest integer (halfway away from zero, like the Win32 MulDiv), not truncated.
 /// </summary>
 public sealed class DpiCalculator
 {
@@ -15,6 +16,13 @@ public sealed class DpiCalculator
     ///     This is the default DPI for the screen
     /// </summary>
     public const int DefaultScreenDpi = 96;
+
+    /// <summary>
+    ///     Round to the nearest integer, halfway values are rounded away from zero (like the Win32 MulDiv does)
+    /// </summary>
+    /// <param name="value">float</param>
+    /// <returns>int</returns>
+    private static int Round(float value) => (int)Math.Round(value, MidpointRounding.AwayFromZero);
 
     /// <summary>
     /// Calculate a DPI scale factor
@@ -30,11 +38,11 @@ public sealed class DpiCalculator
     /// <summary>
     /// Calculate a DPI scale factor based on the default
     /// </summary>
-    /// <param name="dpi">int</param>
+    /// <param name="dpi">int, 0 or less is treated as the default screen DPI (the DPI is not known yet)</param>
     /// <returns>float</returns>
     public static float DpiScaleFactor(int dpi)
     {
-        return (float) dpi / DefaultScreenDpi;
+        return dpi <= 0 ? 1f : (float) dpi / DefaultScreenDpi;
     }
 
     /// <summary>
@@ -86,7 +94,7 @@ public sealed class DpiCalculator
         {
             dpiScaleFactor = scaleModifier(dpiScaleFactor);
         }
-        return (int)(dpiScaleFactor * number);
+        return Round(dpiScaleFactor * number);
     }
 
     /// <summary>
@@ -103,7 +111,7 @@ public sealed class DpiCalculator
         {
             dpiScaleFactor = scaleModifier(dpiScaleFactor);
         }
-        return new NativeSize((int)(dpiScaleFactor * size.Width), (int)(dpiScaleFactor * size.Height));
+        return new NativeSize(Round(dpiScaleFactor * size.Width), Round(dpiScaleFactor * size.Height));
     }
 
     /// <summary>
@@ -120,7 +128,7 @@ public sealed class DpiCalculator
         {
             dpiScaleFactor = scaleModifier(dpiScaleFactor);
         }
-        return new NativePoint((int)(dpiScaleFactor * size.X), (int)(dpiScaleFactor * size.Y));
+        return new NativePoint(Round(dpiScaleFactor * size.X), Round(dpiScaleFactor * size.Y));
     }
 
     /// <summary>
@@ -141,6 +149,23 @@ public sealed class DpiCalculator
     }
 
     /// <summary>
+    ///     Scale the supplied NativePointFloat according to the supplied dpi
+    /// </summary>
+    /// <param name="point">NativePointFloat to scale</param>
+    /// <param name="dpi">current dpi, normal is 96.</param>
+    /// <param name="scaleModifier">A function which can modify the scale factor</param>
+    /// <returns>NativePointFloat scaled</returns>
+    public static NativePointFloat ScaleWithDpi(NativePointFloat point, int dpi, Func<float, float> scaleModifier = null)
+    {
+        var dpiScaleFactor = DpiScaleFactor(dpi);
+        if (scaleModifier != null)
+        {
+            dpiScaleFactor = scaleModifier(dpiScaleFactor);
+        }
+        return new NativePointFloat(dpiScaleFactor * point.X, dpiScaleFactor * point.Y);
+    }
+
+    /// <summary>
     /// Calculate a DPI unscale factor
     /// </summary>
     /// <param name="oldDpi">int with the old dpi</param>
@@ -154,9 +179,9 @@ public sealed class DpiCalculator
     /// <summary>
     /// Calculate a DPI unscale factor against the default screen DPI
     /// </summary>
-    /// <param name="dpi">int</param>
+    /// <param name="dpi">int, 0 or less is treated as the default screen DPI (the DPI is not known yet)</param>
     /// <returns>float with the unscale factor</returns>
-    public static float DpiUnscaleFactor(int dpi) => DpiUnscaleFactor(DefaultScreenDpi, dpi);
+    public static float DpiUnscaleFactor(int dpi) => dpi <= 0 ? 1f : DpiUnscaleFactor(DefaultScreenDpi, dpi);
 
     /// <summary>
     ///     Unscale the supplied number according to the supplied dpi
@@ -189,7 +214,7 @@ public sealed class DpiCalculator
         {
             dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
         }
-        return (int)(dpiUnscaleFactor * number);
+        return Round(dpiUnscaleFactor * number);
     }
 
     /// <summary>
@@ -206,7 +231,7 @@ public sealed class DpiCalculator
         {
             dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
         }
-        return new NativeSize((int)(dpiUnscaleFactor * size.Width), (int)(dpiUnscaleFactor * size.Height));
+        return new NativeSize(Round(dpiUnscaleFactor * size.Width), Round(dpiUnscaleFactor * size.Height));
     }
 
     /// <summary>
@@ -223,7 +248,7 @@ public sealed class DpiCalculator
         {
             dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
         }
-        return new NativePoint((int)(dpiUnscaleFactor * size.X), (int)(dpiUnscaleFactor * size.Y));
+        return new NativePoint(Round(dpiUnscaleFactor * size.X), Round(dpiUnscaleFactor * size.Y));
     }
 
     /// <summary>
@@ -241,5 +266,22 @@ public sealed class DpiCalculator
             dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
         }
         return new NativeSizeFloat(dpiUnscaleFactor * size.Width, dpiUnscaleFactor * size.Height);
+    }
+
+    /// <summary>
+    ///     Unscale the supplied NativePointFloat according to the supplied dpi
+    /// </summary>
+    /// <param name="point">NativePointFloat to unscale</param>
+    /// <param name="dpi">current dpi, normal is 96.</param>
+    /// <param name="scaleModifier">A function which can modify the scale factor</param>
+    /// <returns>NativePointFloat unscaled</returns>
+    public static NativePointFloat UnscaleWithDpi(NativePointFloat point, int dpi, Func<float, float> scaleModifier = null)
+    {
+        var dpiUnscaleFactor = DpiUnscaleFactor(dpi);
+        if (scaleModifier != null)
+        {
+            dpiUnscaleFactor = scaleModifier(dpiUnscaleFactor);
+        }
+        return new NativePointFloat(dpiUnscaleFactor * point.X, dpiUnscaleFactor * point.Y);
     }
 }

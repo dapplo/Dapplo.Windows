@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD2_0
 using System;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.User32.Enums;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.Messages;
 
 namespace Dapplo.Windows.Desktop
@@ -17,7 +16,7 @@ namespace Dapplo.Windows.Desktop
     public class EnvironmentMonitor
     {
         /// <summary>
-        ///     The singleton of the KeyboardHook
+        ///     The singleton of the EnvironmentMonitor
         /// </summary>
         private static readonly Lazy<EnvironmentMonitor> Singleton = new(() => new EnvironmentMonitor());
 
@@ -35,19 +34,18 @@ namespace Dapplo.Windows.Desktop
                 .Where(m => m.Msg == WindowsMessages.WM_SETTINGCHANGE)
                 .Select(m =>
                 {
-                    var action = (SystemParametersInfoActions)(int)m.WParam;
-                    var area = Marshal.PtrToStringAuto((IntPtr)m.LParam);
+                    // lParam is only valid while the message is processed: the string is copied here, synchronously on the window thread
+                    var action = unchecked((SystemParametersInfoActions)(int)m.WParam);
+                    var area = m.LParam == 0 ? null : Marshal.PtrToStringUni((IntPtr)m.LParam);
                     return EnvironmentChangedEventArgs.Create(action, area);
                 })
                 .Publish()
                 .RefCount();
         }
 
-
         /// <summary>
-        ///     The actual clipboard hook observable
+        ///     The WM_SETTINGCHANGE messages of the SharedMessageWindow, produced on the thread of that window
         /// </summary>
         public static IObservable<EnvironmentChangedEventArgs> EnvironmentUpdateEvents => Singleton.Value._environmentObservable;
     }
 }
-#endif

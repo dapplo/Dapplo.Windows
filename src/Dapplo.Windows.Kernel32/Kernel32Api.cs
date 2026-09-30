@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -24,20 +25,38 @@ public static class Kernel32Api
     private const uint AttachParentProcess = 0xff_ff_ff_ff;
 
     /// <summary>
-    /// A helper method to prevent Dll Hijacking, this drastically reduces the DLL search paths!
-    /// This will not help against a version.dll attack..
+    /// A helper method to prevent Dll Hijacking, this drastically reduces the DLL search paths for the rest of the process lifetime!
+    /// This will not help against a version.dll attack (DLLs which are loaded before this can be called).
     /// </summary>
-    /// <param name="allowDllDirectory">An optional single directory where additional  DLL searches are made</param>
-    public static void PreventDllHijacking(string allowDllDirectory = "")
+    /// <remarks>
+    /// After this call DLLs which are loaded by name (LoadLibrary, and on .NET Framework DllImport of native DLLs) are only searched in System32,
+    /// the optionally specified directory and, when <paramref name="searchApplicationDirectory"/> is true, the application directory.
+    /// The current directory and the PATH are no longer searched. So when you ship native DLLs next to your application, pass searchApplicationDirectory: true.
+    /// </remarks>
+    /// <param name="allowDllDirectory">An optional single directory where additional DLL searches are made</param>
+    /// <param name="searchApplicationDirectory">bool, true to also search the directory of the application</param>
+    /// <exception cref="Win32Exception">When the search path couldn't be changed</exception>
+    public static void PreventDllHijacking(string allowDllDirectory = "", bool searchApplicationDirectory = false)
     {
-        SetDllDirectory(allowDllDirectory);
-        if (string.IsNullOrWhiteSpace(allowDllDirectory))
+        var hasDllDirectory = !string.IsNullOrWhiteSpace(allowDllDirectory);
+        // An empty string removes the current directory from the search order
+        if (!SetDllDirectory(hasDllDirectory ? allowDllDirectory : string.Empty))
         {
-            SetDefaultDllDirectories(DefaultDllDirectories.SearchSystem32Directory);
+            throw new Win32Exception();
         }
-        else
+
+        var directories = DefaultDllDirectories.SearchSystem32Directory;
+        if (hasDllDirectory)
         {
-            SetDefaultDllDirectories(DefaultDllDirectories.SearchSystem32Directory | DefaultDllDirectories.SearchUserDirectories);
+            directories |= DefaultDllDirectories.SearchUserDirectories;
+        }
+        if (searchApplicationDirectory)
+        {
+            directories |= DefaultDllDirectories.SearchApplicationDirectory;
+        }
+        if (!SetDefaultDllDirectories(directories))
+        {
+            throw new Win32Exception();
         }
     }
 
@@ -52,77 +71,122 @@ public static class Kernel32Api
     }
 
     /// <summary>
-    ///     Method to get the process path
+    ///     Method to get the path of the executable of a process, this also works for processes of other users and with a different bitness.
     /// </summary>
     /// <param name="processId">int with the process ID</param>
-    /// <returns>string</returns>
+    /// <returns>string with the path, or null if it can't be retrieved</returns>
     public static string GetProcessPath(int processId)
     {
-        // Try the GetModuleFileName method first since it's the fastest. 
-        // May return ACCESS_DENIED (due to VM_READ flag) if the process is not owned by the current user.
-        // Will fail if we are compiled as x86 and we're trying to open a 64 bit process...not allowed.
-        var hProcess = OpenProcess(ProcessAccessRights.QueryInformation | ProcessAccessRights.VirtualMemoryRead, false, processId);
-        if (hProcess != IntPtr.Zero)
-        {
-            try
-            {
-                var path = PsApi.GetModuleFilename(hProcess, IntPtr.Zero);
-                if (path != null)
-                {
-                    return path;
-                }
-            }
-            finally
-            {
-                CloseHandle(hProcess);
-            }
-        }
-
-        hProcess = OpenProcess(ProcessAccessRights.QueryInformation, false, processId);
+        // PROCESS_QUERY_LIMITED_INFORMATION is enough for QueryFullProcessImageName and GetProcessImageFileName, and is granted for more processes
+        var hProcess = OpenProcess(ProcessAccessRights.QueryLimitedInformation, false, processId);
         if (hProcess == IntPtr.Zero)
         {
             return null;
         }
 
-        unsafe
+        try
         {
-            const int capacity = 512;
-            var pathBuffer = stackalloc char[capacity];
-
-            try
+            var path = QueryFullProcessImageName(hProcess);
+            if (path != null)
             {
-                // Try this method for Vista or higher operating systems
-                int bufferSize = capacity;
-                if (Environment.OSVersion.Version.Major >= 6 && QueryFullProcessImageName(hProcess, 0, pathBuffer, ref bufferSize) && bufferSize > 0)
-                {
-                    return new string(pathBuffer, 0 , bufferSize);
-                }
+                return path;
+            }
 
-                // Try the GetProcessImageFileName method
-                var dosPath = PsApi.GetProcessImageFileName(hProcess);
-                    
-                if (dosPath != null)
+            // Fallback: the GetProcessImageFileName method, which returns a device path
+            var devicePath = PsApi.GetProcessImageFileName(hProcess);
+            return devicePath == null ? null : DevicePathToDosPath(devicePath);
+        }
+        finally
+        {
+            CloseHandle(hProcess);
+        }
+    }
+
+    /// <summary>
+    ///     Retrieve the full path of the executable of the process, in the Win32 format
+    /// </summary>
+    /// <param name="hProcess">IntPtr with a process handle which has at least PROCESS_QUERY_LIMITED_INFORMATION</param>
+    /// <returns>string or null if it failed</returns>
+    public static string QueryFullProcessImageName(IntPtr hProcess)
+    {
+        const int errorInsufficientBuffer = 122;
+        const int maxCapacity = 32768;
+        var capacity = 260;
+        while (true)
+        {
+            var pathBuffer = new char[capacity];
+            unsafe
+            {
+                fixed (char* pathBufferPtr = pathBuffer)
                 {
-                    foreach (var drive in Environment.GetLogicalDrives())
+                    int bufferSize = capacity;
+                    if (QueryFullProcessImageName(hProcess, 0, pathBufferPtr, ref bufferSize))
                     {
-                        var nrChars = QueryDosDevice(drive.TrimEnd(DirectorySeparator), pathBuffer, capacity);
-                        if (nrChars == 0)
-                        {
-                            continue;
-                        }
-                        var dosDevice = new string(pathBuffer, 0, nrChars);
-                        if (dosPath.StartsWith(dosDevice))
-                        {
-                            return drive + dosPath.Remove(0, nrChars);
-                        }
+                        return bufferSize > 0 ? new string(pathBufferPtr, 0, bufferSize) : null;
                     }
                 }
             }
-            finally
-            {
-                CloseHandle(hProcess);
-            }
 
+            if (Marshal.GetLastWin32Error() != errorInsufficientBuffer || capacity >= maxCapacity)
+            {
+                return null;
+            }
+            capacity = Math.Min(capacity * 4, maxCapacity);
+        }
+    }
+
+    /// <summary>
+    ///     Retrieve the (current) target of an MS-DOS device name, e.g. "C:" gives "\Device\HarddiskVolume3"
+    /// </summary>
+    /// <param name="deviceName">string with the MS-DOS device name, without trailing backslash e.g. "C:"</param>
+    /// <returns>string or null if it failed</returns>
+    public static string QueryDosDevice(string deviceName)
+    {
+        const int capacity = 1024;
+        unsafe
+        {
+            var buffer = stackalloc char[capacity];
+            var nrChars = QueryDosDevice(deviceName, buffer, capacity);
+            if (nrChars <= 0)
+            {
+                return null;
+            }
+            // The buffer contains one or more null-terminated strings, followed by an extra NUL. Only the first is the current mapping.
+            var length = 0;
+            while (length < nrChars && buffer[length] != '\0')
+            {
+                length++;
+            }
+            return length == 0 ? null : new string(buffer, 0, length);
+        }
+    }
+
+    /// <summary>
+    ///     Convert a device path, like GetProcessImageFileName returns ("\Device\HarddiskVolume3\Windows\notepad.exe"), to a path with a drive letter ("C:\Windows\notepad.exe")
+    /// </summary>
+    /// <param name="devicePath">string with the device path</param>
+    /// <returns>string with the drive letter path, or null if no drive matches</returns>
+    public static string DevicePathToDosPath(string devicePath)
+    {
+        if (string.IsNullOrEmpty(devicePath))
+        {
+            return null;
+        }
+        foreach (var drive in Environment.GetLogicalDrives())
+        {
+            // drive is e.g. "C:\"
+            var driveName = drive.TrimEnd(DirectorySeparator);
+            var dosDevice = QueryDosDevice(driveName);
+            if (dosDevice == null)
+            {
+                continue;
+            }
+            // Compare including the separator, so \Device\HarddiskVolume1 doesn't match \Device\HarddiskVolume10\...
+            var devicePrefix = dosDevice.TrimEnd(DirectorySeparator) + "\\";
+            if (devicePath.StartsWith(devicePrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return driveName + "\\" + devicePath.Substring(devicePrefix.Length);
+            }
         }
 
         return null;
@@ -161,7 +225,7 @@ public static class Kernel32Api
     /// If the function succeeds, the return value is nonzero.
     /// If the function fails, the return value is zero. To get extended error information, call GetLastError.
     /// </returns>
-    [DllImport(Kernel32Dll, SetLastError = true)]
+    [DllImport(Kernel32Dll, SetLastError = true, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetDllDirectory(string lpPathName);
 
@@ -287,7 +351,7 @@ public static class Kernel32Api
     /// <param name="lpFileName">string with the library</param>
     /// <returns>IntPtr for the module, IntPtr.Zero if this failed, use last error to see what went wrong</returns>
     [DllImport(Kernel32Dll, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "LoadLibraryW")]
-    public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)] string lpFileName);
+    public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
 
     /// <summary>
     /// Opens an existing local process object.
@@ -368,10 +432,10 @@ public static class Kernel32Api
     /// <summary>
     /// Retrieves the current size of the specified global memory object, in bytes.
     /// </summary>
-    /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory blockk</param>
-    /// <returns>int with the size</returns>
+    /// <param name="hMem">IntPtr with a hGlobal, handle for a global memory block</param>
+    /// <returns>UIntPtr (SIZE_T) with the size in bytes, 0 if the handle is invalid or the object was discarded</returns>
     [DllImport(Kernel32Dll, SetLastError = true)]
-    public static extern int GlobalSize(IntPtr hMem);
+    public static extern UIntPtr GlobalSize(IntPtr hMem);
 
     /// <summary>
     /// Retrieves the number of milliseconds that have elapsed since the system was started.

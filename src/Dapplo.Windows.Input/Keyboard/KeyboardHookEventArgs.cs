@@ -21,8 +21,7 @@ public class KeyboardHookEventArgs : EventArgs
         return new KeyboardHookEventArgs
         {
             Key = virtualKeyCode,
-            IsKeyDown = true,
-            IsModifier = virtualKeyCode.IsModifier()
+            IsKeyDown = true
         };
     }
 
@@ -36,26 +35,38 @@ public class KeyboardHookEventArgs : EventArgs
         return new KeyboardHookEventArgs
         {
             Key = virtualKeyCode,
-            IsKeyDown = false,
-            IsModifier = virtualKeyCode.IsModifier()
+            IsKeyDown = false
         };
     }
 
     /// <summary>
-    ///     Set this to true if the event is handled, other event-handlers in the chain will not be called
+    /// Generate KeyboardHookEventArgs for a VK_PACKET event, as a low-level hook reports a Unicode character which was sent with KEYEVENTF_UNICODE
+    /// </summary>
+    /// <param name="character">char, the UTF-16 code unit of the packet</param>
+    /// <param name="isKeyDown">bool true for the key-down, false for the key-up</param>
+    /// <returns>KeyboardHookEventArgs</returns>
+    public static KeyboardHookEventArgs Packet(char character, bool isKeyDown)
+    {
+        return new KeyboardHookEventArgs
+        {
+            Key = VirtualKeyCode.Packet,
+            ScanCode = unchecked((ScanCodes)(short)character),
+            IsKeyDown = isKeyDown
+        };
+    }
+
+    /// <summary>
+    ///     Set this to true to swallow the key event, other applications will not see it.
+    ///     Only honoured when set synchronously in a subscriber of <see cref="KeyboardHook.KeyboardEvents"/>, on the hook thread.
     /// </summary>
     public bool Handled { get; set; }
 
-    private bool? _isModifier;
-
     /// <summary>
-    /// Specifies if this event is for a modifier key (shift, control, alt etc)
+    /// Specifies if this event is for a modifier key: Shift, Control, Alt (Menu) or Windows, left, right or generic.
+    /// The lock/toggle keys (CapsLock, NumLock, ScrollLock) are not modifiers, see <see cref="IsToggleKey"/>.
+    /// This is computed from <see cref="Key"/>.
     /// </summary>
-    public bool IsModifier
-    {
-        get => _isModifier ?? Key.IsModifier();
-        internal set => _isModifier = value;
-    }
+    public bool IsModifier => Key.IsModifier();
 
     /// <summary>
     /// Returns true if the key is a lock/toggle key (CapsLock, NumLock, ScrollLock).
@@ -138,12 +149,13 @@ public class KeyboardHookEventArgs : EventArgs
     public bool IsShift => IsLeftShift || IsRightShift;
 
     /// <summary>
-    ///     Is this a system key
+    ///     Is this a system key: the event came as WM_SYSKEYDOWN or WM_SYSKEYUP, which happens for F10 and for keys pressed while Alt is down.
+    ///     This does not change the Alt state, use <see cref="IsAlt"/> or <see cref="Flags"/> (<see cref="ExtendedKeyFlags.AltDown"/>) for that.
     /// </summary>
     public bool IsSystemKey { get; internal set; }
 
     /// <summary>
-    ///     True if shift is pressed
+    ///     True if a windows key is pressed
     /// </summary>
     public bool IsWindows => IsLeftWindows || IsRightWindows;
 
@@ -151,6 +163,34 @@ public class KeyboardHookEventArgs : EventArgs
     ///     The key code itself
     /// </summary>
     public VirtualKeyCode Key { get; internal set; } = VirtualKeyCode.None;
+
+    /// <summary>
+    ///     The hardware scan code of the key, together with <see cref="IsExtended"/> this distinguishes e.g. Enter from NumpadEnter or the arrow keys from the numpad arrows.
+    /// </summary>
+    public ScanCodes ScanCode { get; internal set; }
+
+    /// <summary>
+    ///     True if this is a VK_PACKET event: not a key, but a Unicode character (one UTF-16 code unit, see <see cref="PacketCharacter"/>) which was sent with KEYEVENTF_UNICODE,
+    ///     e.g. by <see cref="KeyboardInputGenerator.TypeText"/>, an IME, an on-screen keyboard or a remote desktop client.
+    ///     A character outside the Basic Multilingual Plane arrives as two packets (a high and a low surrogate).
+    ///     The <see cref="KeyCombinationHandler"/> and the <see cref="KeySequenceHandler"/> ignore these events.
+    /// </summary>
+    public bool IsPacket => Key == VirtualKeyCode.Packet;
+
+    /// <summary>
+    ///     The UTF-16 code unit of a VK_PACKET event (<see cref="IsPacket"/>), Windows passes it in the scan code. '\0' for all other events.
+    /// </summary>
+    public char PacketCharacter => IsPacket ? unchecked((char)(ushort)ScanCode) : '\0';
+
+    /// <summary>
+    ///     True if this is an extended key (the scan code has an E0 prefix), e.g. NumpadEnter, RightControl or the arrow keys which are not on the numpad.
+    /// </summary>
+    public bool IsExtended => (Flags & ExtendedKeyFlags.Extended) != 0;
+
+    /// <summary>
+    ///     True if this event was created by the <see cref="KeyboardHook"/>, false for synthetic events (e.g. created with <see cref="KeyDown"/> or <see cref="KeyUp"/>).
+    /// </summary>
+    public bool IsFromKeyboardHook { get; internal set; }
 
     /// <summary>
     /// Timestamp of the event, a DateTime can be calculated by using EventTime instead
@@ -164,7 +204,8 @@ public class KeyboardHookEventArgs : EventArgs
     {
         get
         {
-            var runningTimeSpan = TimeSpan.FromMilliseconds(Environment.TickCount - TimeStamp);
+            // Modular (unchecked) uint arithmetic, so this stays correct when the tick count wraps (every 49.7 days)
+            var runningTimeSpan = TimeSpan.FromMilliseconds(unchecked((uint)Environment.TickCount - TimeStamp));
             return DateTimeOffset.Now.Subtract(runningTimeSpan);
         }
     }
@@ -182,7 +223,7 @@ public class KeyboardHookEventArgs : EventArgs
     /// <summary>
     /// Test if this event is injected by another process with a lower integrity level
     /// </summary>
-    public bool IsInjectedByLowerIntegrityLevelProcess => (Flags & ExtendedKeyFlags.Injected) != 0 && (Flags & ExtendedKeyFlags.LowerIntegretyInjected) != 0;
+    public bool IsInjectedByLowerIntegrityLevelProcess => (Flags & ExtendedKeyFlags.Injected) != 0 && (Flags & ExtendedKeyFlags.LowerIntegrityInjected) != 0;
 
     /// <inheritdoc />
     public override string ToString()
@@ -233,7 +274,12 @@ public class KeyboardHookEventArgs : EventArgs
             }
         }
 
-        dump.Append(Key).Append(IsKeyDown ? " down" : " up");
+        dump.Append(Key);
+        if (IsPacket)
+        {
+            dump.Append(" U+").Append(((int)PacketCharacter).ToString("X4"));
+        }
+        dump.Append(IsKeyDown ? " down" : " up");
         dump.Append(Handled ? " (" : " (not ").Append("handled)");
         if (IsScrollLockActive)
         {

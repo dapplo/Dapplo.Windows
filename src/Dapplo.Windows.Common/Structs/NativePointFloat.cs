@@ -6,20 +6,17 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
-#if !NETSTANDARD2_0
-using System.Windows;
-#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 namespace Dapplo.Windows.Common.Structs;
 
 /// <summary>
 ///     NativePoint represents the native POINT structure for calling native methods.
-///     It has conversions from and to System.Drawing.Point or System.Windows.Point
+///     It has conversions from and to System.Drawing.Point (the conversions from and to the WPF types are extension methods in Dapplo.Windows.Wpf)
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 [Serializable]
-[TypeConverter(typeof(NativePointTypeConverter))]
+[TypeConverter(typeof(NativePointFloatTypeConverter))]
 [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
 public readonly struct NativePointFloat : IEquatable<NativePointFloat>
 {
@@ -47,33 +44,14 @@ public readonly struct NativePointFloat : IEquatable<NativePointFloat>
         _y = y;
     }
 
-#if !NETSTANDARD2_0
     /// <summary>
-    ///     Implicit cast from NativePoint to Point
+    ///     Explicit (lossy) cast from NativePointFloat to System.Drawing.Point.
+    ///     The coordinates are floored, so the result is the pixel which contains the point. Use Round() to round instead.
     /// </summary>
     /// <param name="point">NativePointFloat</param>
-    public static implicit operator Point(NativePointFloat point)
+    public static explicit operator System.Drawing.Point(NativePointFloat point)
     {
-        return new Point(point.X, point.Y);
-    }
-    
-    /// <summary>
-    ///     Implicit cast from Point to NativePointFloat
-    /// </summary>
-    /// <param name="point">Point</param>
-    public static implicit operator NativePointFloat(Point point)
-    {
-        return new NativePointFloat((float) point.X, (float) point.Y);
-    }
-#endif
-
-    /// <summary>
-    ///     Implicit cast from NativePoint to System.Drawing.Point
-    /// </summary>
-    /// <param name="point">NativePointFloat</param>
-    public static implicit operator System.Drawing.Point(NativePointFloat point)
-    {
-        return new System.Drawing.Point((int) point.X, (int) point.Y);
+        return new System.Drawing.Point((int)Math.Floor(point.X), (int)Math.Floor(point.Y));
     }
 
     /// <summary>
@@ -124,10 +102,6 @@ public readonly struct NativePointFloat : IEquatable<NativePointFloat>
                 return Equals(drawingPoint);
             case NativePoint nativePoint:
                 return Equals(nativePoint);
-#if !NETSTANDARD2_0
-            case Point point:
-                return Equals(point);
-#endif
         }
 
         return false;
@@ -139,7 +113,7 @@ public readonly struct NativePointFloat : IEquatable<NativePointFloat>
     {
         unchecked
         {
-            return (_x.GetHashCode() * 397) ^ _y.GetHashCode();
+            return (FloatHelper.GetHashCode(_x) * 397) ^ FloatHelper.GetHashCode(_y);
         }
     }
 
@@ -151,7 +125,7 @@ public readonly struct NativePointFloat : IEquatable<NativePointFloat>
     [Pure]
     public bool Equals(NativePointFloat other)
     {
-        return Math.Abs(X - other.X) < float.Epsilon && Math.Abs(Y - other.Y) < float.Epsilon;
+        return _x.Equals(other._x) && _y.Equals(other._y);
     }
 
     /// <summary>

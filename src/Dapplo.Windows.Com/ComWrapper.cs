@@ -14,7 +14,14 @@ namespace Dapplo.Windows.Com
 {
     /// <summary>
     ///     Wraps a late-bound COM server.
+    ///     This is only available for .NET Framework (it's based on RealProxy / .NET Remoting, which doesn't exist on .NET).
     /// </summary>
+    /// <remarks>
+    ///     Dispose releases the one RCW reference of this wrapper (Marshal.ReleaseComObject once, not a final release), other users of the same RCW are not affected.
+    ///     A wrapper which is not disposed doesn't release anything, the RCW is cleaned up by the runtime.
+    ///     COM events (add_/remove_ of an event on the interface) are not supported, a NotSupportedException is thrown.
+    ///     Calls which are rejected by the COM server (RPC_E_CALL_REJECTED, e.g. because it's busy) are not retried, the COMException is thrown to the caller.
+    /// </remarks>
     public sealed class ComWrapper : RealProxy, IDisposable, IRemotingTypeInfo
     {
         private const int MK_E_UNAVAILABLE = -2147221021;
@@ -24,10 +31,7 @@ namespace Dapplo.Windows.Com
         /// </summary>
         public const int RPC_E_CALL_REJECTED = unchecked((int) 0x80010001);
 
-        /// <summary>
-        /// This is a more hard error, but we are processing this like RPC_E_CALL_REJECTED
-        /// </summary>
-        public const int RPC_E_FAIL = unchecked((int) 0x80004005);
+        private bool _isDisposed;
         private static readonly LogSource Log = new LogSource();
 
         /// <summary>
@@ -117,13 +121,12 @@ namespace Dapplo.Windows.Com
             }
             else if (1 == argCount && typeof(void) == returnType && (methodName.StartsWith("add_") || methodName.StartsWith("remove_")))
             {
-                var removeHandler = methodName.StartsWith("remove_");
-                methodName = methodName.Substring(removeHandler ? 7 : 4);
-                // TODO: Something is missing here
-                if (callMessage.InArgs[0] is not Delegate handler)
+                if (callMessage.InArgs[0] is not Delegate)
                 {
-                    return new ReturnMessage(new ArgumentNullException(nameof(handler)), callMessage);
+                    return new ReturnMessage(new ArgumentNullException(methodName), callMessage);
                 }
+                // Events are not implemented, don't pretend the handler was registered
+                return new ReturnMessage(new NotSupportedException($"COM events are not supported by the ComWrapper, {methodName} of {_interceptType.FullName} can't be processed."), callMessage);
             }
             else
             {
@@ -220,45 +223,38 @@ namespace Dapplo.Windows.Com
                     }
                 }
 
-                do
+                try
                 {
-                    try
+                    returnValue = invokeType.InvokeMember(methodName, flags, null, invokeObject, args, argModifiers, null, null);
+                }
+                catch (InvalidComObjectException icoEx)
+                {
+                    Log.Warn().WriteLine(
+                        "COM object {0} has been separated from its underlying RCW cannot be used. The COM object was released while it was still in use.",
+                        _interceptType.FullName);
+                    return new ReturnMessage(icoEx, callMessage);
+                }
+                catch (Exception ex)
+                {
+                    // Test for rejected
+                    var comEx = ex as COMException ?? ex.InnerException as COMException;
+                    if (comEx != null && comEx.ErrorCode == RPC_E_CALL_REJECTED)
                     {
-                        returnValue = invokeType.InvokeMember(methodName, flags, null, invokeObject, args, argModifiers, null, null);
-                        break;
-                    }
-                    catch (InvalidComObjectException icoEx)
-                    {
-                        // Should assist BUG-1616 and others
-                        Log.Warn().WriteLine(
-                            "COM object {0} has been separated from its underlying RCW cannot be used. The COM object was released while it was still in use on another thread.",
-                            _interceptType.FullName);
-                        return new ReturnMessage(icoEx, callMessage);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Test for rejected
-                        var comEx = ex as COMException ?? ex.InnerException as COMException;
-                        if (comEx != null && (comEx.ErrorCode == RPC_E_CALL_REJECTED || comEx.ErrorCode == RPC_E_FAIL))
+                        var destinationName = _targetName;
+                        // Try to find a "catchy" name for the rejecting application
+                        if (destinationName != null && destinationName.Contains("."))
                         {
-                            var destinationName = _targetName;
-                            // Try to find a "catchy" name for the rejecting application
-                            if (destinationName != null && destinationName.Contains("."))
-                            {
-                                destinationName = destinationName.Substring(0, destinationName.IndexOf(".", StringComparison.Ordinal));
-                            }
-                            if (destinationName == null)
-                            {
-                                destinationName = _interceptType.FullName;
-                            }
-
-                            // TODO: Log destinationName and rejected information
-                            Log.Error().WriteLine("Error while creating {0}: {1}", destinationName, comEx.ErrorCode);
+                            destinationName = destinationName.Substring(0, destinationName.IndexOf(".", StringComparison.Ordinal));
                         }
-                        // Not rejected OR pressed cancel
-                        return new ReturnMessage(ex, callMessage);
+                        if (destinationName == null)
+                        {
+                            destinationName = _interceptType.FullName;
+                        }
+
+                        Log.Warn().WriteLine("The call to {0} was rejected by {1} (RPC_E_CALL_REJECTED), the application is probably busy.", methodName, destinationName);
                     }
-                } while (true);
+                    return new ReturnMessage(ex, callMessage);
+                }
 
                 // Handle enum and interface return types
                 if (null != returnValue)
@@ -315,7 +311,7 @@ namespace Dapplo.Windows.Com
                             wrapper = originalArgs[i];
                             if (null != wrapper && wrapper._comObject != arg)
                             {
-                                wrapper.Dispose();
+                                // A different object came back, the wrapper which was passed in still belongs to the caller
                                 wrapper = null;
                             }
 
@@ -715,49 +711,25 @@ namespace Dapplo.Windows.Com
         }
 
         /// <summary>
-        ///     If <see cref="Dispose()" /> is not called, we need to make
-        ///     sure that the COM object is still cleaned up.
-        /// </summary>
-        ~ComWrapper()
-        {
-            Log.Debug().WriteLine("Finalize {0}", _interceptType);
-            Dispose(false);
-        }
-
-        /// <summary>
-        ///     Cleans up the COM object.
+        ///     Release the reference to the COM object, this decrements the RCW reference count once.
+        ///     Call this on the thread which uses the COM object (for STA objects the thread which created it).
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        ///     Release the COM reference
-        /// </summary>
-        /// <param name="disposing">
-        ///     <see langword="true" /> if this was called from the
-        ///     <see cref="IDisposable" /> interface.
-        /// </param>
-        private void Dispose(bool disposing)
-        {
-            if (null == _comObject)
+            if (_isDisposed || null == _comObject)
             {
                 return;
             }
+            _isDisposed = true;
 
             Log.Debug().WriteLine("Disposing {0}", _interceptType);
             if (Marshal.IsComObject(_comObject))
             {
                 try
                 {
-                    int count;
-                    do
-                    {
-                        count = Marshal.ReleaseComObject(_comObject);
-                        Log.Debug().WriteLine("RCW count for {0} now is {1}", _interceptType, count);
-                    } while (count > 0);
+                    // Release only our reference, a final release would break other users of the same RCW
+                    var count = Marshal.ReleaseComObject(_comObject);
+                    Log.Debug().WriteLine("RCW count for {0} now is {1}", _interceptType, count);
                 }
                 catch (Exception ex)
                 {

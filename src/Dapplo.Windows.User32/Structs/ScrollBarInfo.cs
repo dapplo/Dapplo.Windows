@@ -21,8 +21,8 @@ public struct ScrollBarInfo
 
 	private NativeRect _rcScrollBar;
 	private int _dxyLineButton;
-	private int _thumbBottom;
 	private int _thumbTop;
+	private int _thumbBottom;
 	private int _reserved;
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
 	private ObjectStates[] _states;
@@ -33,9 +33,9 @@ public struct ScrollBarInfo
 	public NativeRect Bounds => _rcScrollBar;
 
 	/// <summary>
-	///     Height or width of the thumb.
+	///     Height or width of the arrow (line) buttons of the scroll bar.
 	/// </summary>
-	public int ThumbSize => _dxyLineButton;
+	public int LineButtonSize => _dxyLineButton;
 
 	/// <summary>
 	///     Position of the bottom or right of the thumb.
@@ -57,7 +57,7 @@ public struct ScrollBarInfo
 	public override string ToString()
 	{
 		var statesString = string.Join(",", States);
-		return $"{{Bounds = {Bounds}; ThumbSize = {ThumbSize};ThumbBottom = {ThumbBottom};ThumbTop = {ThumbTop};States = {statesString};}}";
+		return $"{{Bounds = {Bounds}; LineButtonSize = {LineButtonSize};ThumbBottom = {ThumbBottom};ThumbTop = {ThumbTop};States = {statesString};}}";
 	}
 
 	/// <summary>
@@ -71,8 +71,8 @@ public struct ScrollBarInfo
 			_states = new ObjectStates[6],
 			_rcScrollBar = new NativeRect(),
 			_dxyLineButton = 0,
-			_thumbBottom = 0,
 			_thumbTop = 0,
+			_thumbBottom = 0,
 			_reserved = 0
 		};
 	}

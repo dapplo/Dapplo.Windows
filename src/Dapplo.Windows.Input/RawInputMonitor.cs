@@ -1,16 +1,12 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-#if !NETSTANDARD2_0
 using Dapplo.Windows.Input.Enums;
-using Dapplo.Windows.Input.Structs;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using System;
-using System.Reactive.Disposables;
+using System.Linq;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Input;
 
@@ -19,62 +15,67 @@ namespace Dapplo.Windows.Input;
 /// </summary>
 public static class RawInputMonitor
 {
-    private static IObservable<RawInputEventArgs> _rawInputObservable;
+    private const RawInputDeviceFlags ListenFlags = RawInputDeviceFlags.InputSink;
+
+    // Only used on the window thread of the SharedMessageWindow: the event args of the last WM_INPUT,
+    // so the data is read once and every subscriber gets the same instance.
+    private static WindowMessage _lastMessage;
+    private static RawInputEventArgs _lastEventArgs;
 
     /// <summary>
-    /// Gets the shared observable for Raw Input.
-    /// Multiple subscribers will share the same underlying hook, and the hook 
-    /// is automatically disposed when the subscriber count reaches zero.
+    /// Listen to the raw input (WM_INPUT) of the specified devices, also when the application is not in the foreground (RIDEV_INPUTSINK).
     /// </summary>
+    /// <remarks>
+    /// The devices are registered, on the <see cref="SharedMessageWindow"/>, when subscribing and unregistered when the last subscription which needs them is disposed.
+    /// Multiple listeners (also <see cref="RawInputDeviceMonitor"/>) can be active at the same time, their registrations are combined.
+    /// OnNext is called on the thread of the SharedMessageWindow, keep it short and use ObserveOn for other work.
+    /// Only input from devices of the requested type (mouse, keyboard or HID) is passed on.
+    /// </remarks>
+    /// <param name="devices">RawInputDevices to listen to, at least one</param>
+    /// <returns>IObservable with RawInputEventArgs</returns>
     public static IObservable<RawInputEventArgs> Listen(params RawInputDevices[] devices)
     {
-        if (_rawInputObservable != null)
+        if (devices == null || devices.Length == 0)
         {
-            RawInputApi.RegisterRawInput(SharedMessageWindow.Handle, RawInputDeviceFlags.InputSink | RawInputDeviceFlags.DeviceNotify, devices);
-            return _rawInputObservable;
+            throw new ArgumentException("At least one device is needed.", nameof(devices));
+        }
+        var registeredDevices = devices.Distinct().ToArray();
+        var deviceTypes = registeredDevices.Select(RawInputApi.GetDeviceType).Distinct().ToArray();
+
+        return SharedMessageWindow.Listen(
+                hWnd => RawInputRegistrations.Add(hWnd, ListenFlags, registeredDevices),
+                hWnd => RawInputRegistrations.Remove(hWnd, ListenFlags, registeredDevices))
+            // Don't set Handled for WM_INPUT, DefWindowProc must run to clean up
+            .Where(windowMessage => windowMessage.Msg == WindowsMessages.WM_INPUT)
+            .Select(GetEventArgs)
+            .Where(eventArgs => eventArgs != null && deviceTypes.Contains(eventArgs.RawInput.Header.Type));
+    }
+
+    /// <summary>
+    /// Create the RawInputEventArgs for the WM_INPUT, once per message
+    /// </summary>
+    /// <param name="windowMessage">WindowMessage</param>
+    /// <returns>RawInputEventArgs or null if the data couldn't be read</returns>
+    private static RawInputEventArgs GetEventArgs(WindowMessage windowMessage)
+    {
+        if (ReferenceEquals(windowMessage, _lastMessage))
+        {
+            return _lastEventArgs;
         }
 
-        _rawInputObservable = Observable.Create<RawInputEventArgs>(observer =>
+        RawInputEventArgs eventArgs = null;
+        if (RawInputApi.TryGetRawInputData(windowMessage.LParam, out var rawInput, out var hidData))
         {
-            // Subscribe to the SharedMessageWindow for handling the WM_INPUT
-            var messageSubscription = SharedMessageWindow.Messages
-                .Where(windowsMessage => windowsMessage.Msg == WindowsMessages.WM_INPUT) // filter for raw input
-                .Subscribe(windowsMessage =>
-                {
-                    windowsMessage.Handled = true;
-                    int outSize;
-                    int size = Marshal.SizeOf<RawInput>();
-
-                    outSize = RawInputApi.GetRawInputData(windowsMessage.LParam, RawInputDataCommands.Input, out var rawInput, ref size, Marshal.SizeOf<RawInputHeader>());
-                    if (outSize != -1)
-                    {
-                        observer.OnNext(new RawInputEventArgs
-                        {
-                            IsForeground = (int)windowsMessage.WParam == 0,
-                            RawInput = rawInput
-                        });
-                    }
-                });
-
-            RawInputApi.RegisterRawInput(SharedMessageWindow.Handle, RawInputDeviceFlags.InputSink | RawInputDeviceFlags.DeviceNotify, devices);
-
-            // Return the disposal logic
-            return Disposable.Create(() =>
+            eventArgs = new RawInputEventArgs
             {
-                // Unregister raw input devices from the OS here if necessary
-                // UnregisterRawInputDevices(...);
-                _rawInputObservable = null; // Clear the cached observable so it can be recreated if Listen() is called again.
-                // Dispose the SharedMessageWindow subscription
-                messageSubscription.Dispose();
-            });
-        })
-        // This is the magic part:
-        // .Publish() multicasts the observable to all subscribers.
-        // .RefCount() keeps track of subscribers and automatically disposes 
-        // the inner subscription when the count reaches 0.
-        .Publish()
-        .RefCount();
-        return _rawInputObservable;
+                // GET_RAWINPUT_CODE_WPARAM: RIM_INPUT (0) foreground, RIM_INPUTSINK (1) background
+                IsForeground = ((long)windowMessage.WParam & 0xFF) == 0,
+                RawInput = rawInput,
+                HidData = hidData
+            };
+        }
+        _lastMessage = windowMessage;
+        _lastEventArgs = eventArgs;
+        return eventArgs;
     }
 }
-#endif

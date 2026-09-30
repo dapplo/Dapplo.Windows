@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,13 +22,13 @@ internal sealed class ClipboardSemaphore : IDisposable
     private bool _disposedValue;
 
     /// <summary>
-    /// Get a lock to the clipboard
+    /// Get a lock to the clipboard, the clipboard is opened on the calling thread and can only be used (and must be disposed) on this thread.
     /// </summary>
-    /// <param name="hWnd">IntPtr with a hWnd for the potential new owner</param>
+    /// <param name="hWnd">IntPtr with a hWnd for the potential new owner, default is the SharedMessageWindow</param>
     /// <param name="retries">int with number of retries, default is 5</param>
-    /// <param name="retryInterval">TimeSpan for the time between retries</param>
-    /// <param name="timeout">optional TimeSpan for the timeout, default is 400ms</param>
-    /// <returns>IClipboardLock</returns>
+    /// <param name="retryInterval">TimeSpan for the time between retries, default is 100ms</param>
+    /// <param name="timeout">optional TimeSpan for the timeout to get the in-process lock, default is 200ms</param>
+    /// <returns>IClipboardAccessToken</returns>
     public IClipboardAccessToken Lock(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)
     {
         // Set default retry interval
@@ -37,7 +38,7 @@ internal sealed class ClipboardSemaphore : IDisposable
 
         if (hWnd == IntPtr.Zero)
         {
-            // Take the default; if the window is still being created, wait for it reactively
+            // The shared window is the owner, it's always available and it receives the delayed rendering messages
             hWnd = SharedMessageWindow.Handle;
         }
 
@@ -52,48 +53,57 @@ internal sealed class ClipboardSemaphore : IDisposable
             };
         }
 
-        // Create the clipboard lock itself
-        bool isOpened = false;
-        do
+        // From here on the semaphore is held: every path must either hand it over to a token, or release it.
+        try
         {
-            if (OpenClipboard(hWnd))
+            // Create the clipboard lock itself
+            bool isOpened = false;
+            do
             {
-                isOpened = true;
-                break;
-            }
-            retries--;
-            // No reason to sleep, if there are no more retries
-            if (retries >= 0)
+                if (OpenClipboard(hWnd))
+                {
+                    isOpened = true;
+                    break;
+                }
+                retries--;
+                // No reason to sleep, if there are no more retries
+                if (retries >= 0)
+                {
+                    Thread.Sleep(retryInterval.Value);
+                }
+
+            } while (retries >= 0);
+
+            if (!isOpened)
             {
-                Thread.Sleep(retryInterval.Value);
+                _semaphoreSlim.Release();
+                return new ClipboardAccessToken
+                {
+                    CanAccess = false,
+                    IsOpenTimeout = true
+                };
             }
-
-        } while (retries >= 0);
-
-        if (!isOpened)
+        }
+        catch
         {
-            return new ClipboardAccessToken
-            {
-                CanAccess = false,
-                IsOpenTimeout = true
-            };
+            _semaphoreSlim.Release();
+            throw;
         }
         // Return a disposable which cleans up the current state.
-        return new ClipboardAccessToken(() => {
-            CloseClipboard();
-            _semaphoreSlim.Release();
-        });
+        return CreateOpenToken(hWnd);
     }
 
     /// <summary>
     /// Lock the clipboard, return a disposable which can free this again.
+    /// Only the waiting is asynchronous: every OpenClipboard attempt runs on the context of the caller (no ConfigureAwait(false)),
+    /// so the clipboard is opened on the thread which continues after the await. Use and dispose the token on that thread.
     /// </summary>
-    /// <param name="hWnd">IntPtr with the hWnd of the potential new owner</param>
-    /// <param name="retries">int with the number of retries</param>
-    /// <param name="retryInterval">optional TimeSpan</param>
-    /// <param name="timeout">optional TimeSpan for the timeout, default is 400ms</param>
+    /// <param name="hWnd">IntPtr with the hWnd of the potential new owner, default is the SharedMessageWindow</param>
+    /// <param name="retries">int with the number of retries, default is 5</param>
+    /// <param name="retryInterval">optional TimeSpan between retries, default is 100ms</param>
+    /// <param name="timeout">optional TimeSpan for the timeout to get the in-process lock, default is 200ms</param>
     /// <param name="cancellationToken">CancellationToken</param>
-    /// <returns>Task with IClipboardLock</returns>
+    /// <returns>ValueTask with IClipboardAccessToken</returns>
     public async ValueTask<IClipboardAccessToken> LockAsync(IntPtr hWnd = default, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
     {
         // Set default retry interval
@@ -103,12 +113,13 @@ internal sealed class ClipboardSemaphore : IDisposable
 
         if (hWnd == IntPtr.Zero)
         {
-            // Take the default; if the window is still being created, wait for it reactively
+            // The shared window is the owner, it's always available and it receives the delayed rendering messages
             hWnd = SharedMessageWindow.Handle;
         }
 
-        // Await the semaphore, until the timeout is triggered
-        if (!await _semaphoreSlim.WaitAsync(timeout.Value, cancellationToken).ConfigureAwait(false))
+        // Await the semaphore, until the timeout is triggered.
+        // Don't use ConfigureAwait(false): OpenClipboard must run on the thread which will use the token.
+        if (!await _semaphoreSlim.WaitAsync(timeout.Value, cancellationToken))
         {
             // Timeout
             return new ClipboardAccessToken
@@ -118,41 +129,74 @@ internal sealed class ClipboardSemaphore : IDisposable
             };
         }
 
-        bool isOpened = false;
-        do
+        // From here on the semaphore is held: every path must either hand it over to a token, or release it.
+        try
         {
-            if (cancellationToken.IsCancellationRequested)
+            bool isOpened = false;
+            do
             {
-                break;
-            }
-            if (OpenClipboard(hWnd))
-            {
-                isOpened = true;
-                break;
-            }
-            retries--;
-            // Break if there are no more retries
-            if (retries < 0)
-            {
-                break;
-            }
-            await Task.Delay(retryInterval.Value, cancellationToken).ConfigureAwait(false);
-        } while (true);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (OpenClipboard(hWnd))
+                {
+                    isOpened = true;
+                    break;
+                }
+                retries--;
+                // Break if there are no more retries
+                if (retries < 0)
+                {
+                    break;
+                }
+                // Don't use ConfigureAwait(false), the next OpenClipboard attempt must run on the caller's context
+                await Task.Delay(retryInterval.Value, cancellationToken);
+            } while (true);
 
-        if (!isOpened)
-        {
-            // Timeout
-            return new ClipboardAccessToken
+            if (!isOpened)
             {
-                CanAccess = false,
-                IsOpenTimeout = true
-            };
+                _semaphoreSlim.Release();
+                // Timeout
+                return new ClipboardAccessToken
+                {
+                    CanAccess = false,
+                    IsOpenTimeout = true
+                };
+            }
+        }
+        catch
+        {
+            // e.g. OperationCanceledException
+            _semaphoreSlim.Release();
+            throw;
         }
 
+        return CreateOpenToken(hWnd);
+    }
+
+    /// <summary>
+    /// Create the token for an opened clipboard, disposing it closes the clipboard and releases the semaphore (once).
+    /// </summary>
+    /// <param name="hWnd">IntPtr with the window handle which was used to open the clipboard</param>
+    /// <returns>ClipboardAccessToken</returns>
+    private ClipboardAccessToken CreateOpenToken(IntPtr hWnd)
+    {
+        var ownerThreadId = Environment.CurrentManagedThreadId;
         return new ClipboardAccessToken(() => {
-            CloseClipboard();
-            _semaphoreSlim.Release();
-        });
+            try
+            {
+                if (!CloseClipboard())
+                {
+                    Trace.TraceWarning("Dapplo.Windows.Clipboard: CloseClipboard failed with error {0}, the clipboard was opened on thread {1} and closed on thread {2}.",
+                        Marshal.GetLastWin32Error(), ownerThreadId, Environment.CurrentManagedThreadId);
+                }
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
+        })
+        {
+            OwnerHandle = hWnd
+        };
     }
 
 

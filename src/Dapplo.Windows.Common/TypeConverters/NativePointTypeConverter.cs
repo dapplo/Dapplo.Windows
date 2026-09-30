@@ -9,7 +9,7 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Common.TypeConverters;
 
 /// <summary>
-/// This implements a TypeConverter for the NativePoint structur
+/// This implements a TypeConverter for the NativePoint structure, the format is "X,Y" using the invariant culture
 /// </summary>
 public class NativePointTypeConverter : TypeConverter
 {
@@ -50,7 +50,8 @@ public class NativePointTypeConverter : TypeConverter
     {
         if (destinationType == typeof(string) && value is NativePoint nativePoint)
         {
-            return $"{nativePoint.X},{nativePoint.Y}";
+            // Always use the invariant culture, ConvertFrom parses with it (e.g. sv-SE would write U+2212 as negative sign)
+            return string.Concat(nativePoint.X.ToString(CultureInfo.InvariantCulture), ",", nativePoint.Y.ToString(CultureInfo.InvariantCulture));
         }
         return base.ConvertTo(context, culture, value, destinationType);
     }

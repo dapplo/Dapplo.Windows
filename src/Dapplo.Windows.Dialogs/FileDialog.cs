@@ -29,6 +29,7 @@ public static class FileDialog
     /// <param name="defaultExtension">Extension appended when the user omits one (no leading dot, e.g. <c>"txt"</c>).</param>
     /// <exception cref="System.Runtime.InteropServices.COMException">Unexpected COM failure.</exception>
     /// <exception cref="PlatformNotSupportedException">Called on a non-Windows platform.</exception>
+    /// <exception cref="InvalidOperationException">Called from a thread which is not an STA thread (e.g. a thread pool thread).</exception>
     public static string PickFileToOpen(
         IntPtr ownerHandle = default,
         string title = null,
@@ -56,6 +57,7 @@ public static class FileDialog
     /// <param name="filters">File-type filters, e.g. <c>new[] { ("Images", "*.png;*.jpg") }</c>.</param>
     /// <exception cref="System.Runtime.InteropServices.COMException">Unexpected COM failure.</exception>
     /// <exception cref="PlatformNotSupportedException">Called on a non-Windows platform.</exception>
+    /// <exception cref="InvalidOperationException">Called from a thread which is not an STA thread (e.g. a thread pool thread).</exception>
     public static IReadOnlyList<string> PickFilesToOpen(
         IntPtr ownerHandle = default,
         string title = null,
@@ -83,6 +85,7 @@ public static class FileDialog
     /// <param name="defaultExtension">Extension appended when the user omits one (no leading dot, e.g. <c>"png"</c>).</param>
     /// <exception cref="System.Runtime.InteropServices.COMException">Unexpected COM failure.</exception>
     /// <exception cref="PlatformNotSupportedException">Called on a non-Windows platform.</exception>
+    /// <exception cref="InvalidOperationException">Called from a thread which is not an STA thread (e.g. a thread pool thread).</exception>
     public static string PickFileToSave(
         IntPtr ownerHandle = default,
         string title = null,
@@ -111,6 +114,7 @@ public static class FileDialog
     /// <param name="initialDirectory">Folder shown on open; <see langword="null"/> reuses the last-visited folder.</param>
     /// <exception cref="System.Runtime.InteropServices.COMException">Unexpected COM failure.</exception>
     /// <exception cref="PlatformNotSupportedException">Called on a non-Windows platform.</exception>
+    /// <exception cref="InvalidOperationException">Called from a thread which is not an STA thread (e.g. a thread pool thread).</exception>
     public static string PickFolder(
         IntPtr ownerHandle = default,
         string title = null,

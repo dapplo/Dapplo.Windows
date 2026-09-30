@@ -34,20 +34,22 @@ public static class Win32
     private static extern unsafe int FormatMessage(uint dwFlags, IntPtr lpSource, uint dwMessageId, uint dwLanguageId, [Out] char* lpBuffer, int nSize, IntPtr arguments);
 
     /// <summary>
-    ///     Get the error code from the Win32Error
+    ///     Convert a Win32Error to an HResult, this is the equivalent of the HRESULT_FROM_WIN32 macro.
+    ///     Success (0) maps to S_OK, values which already are an HRESULT (negative when interpreted as int) are returned unchanged,
+    ///     all other values are mapped to 0x8007xxxx (FACILITY_WIN32 with the severity bit set).
     /// </summary>
-    /// <param name="errorCode"></param>
-    /// <returns></returns>
-    public static long GetHResult(Win32Error errorCode)
+    /// <param name="errorCode">Win32Error</param>
+    /// <returns>HResult</returns>
+    public static HResult GetHResult(Win32Error errorCode)
     {
-        var error = (int)errorCode;
+        var error = unchecked((int)errorCode);
 
-        if ((error & 0x80000000) == 0x80000000)
+        if (error <= 0)
         {
-            return error;
+            return (HResult)error;
         }
 
-        return 0x80070000 | (uint)(error & 0xffff);
+        return (HResult)unchecked((int)(0x80070000u | ((uint)error & 0xffffu)));
     }
 
     /// <summary>

@@ -1,270 +1,178 @@
 # SharedMessageWindow
 
-`SharedMessageWindow` is one of the most important low-level building blocks in the Dapplo.Windows library. Almost every feature that requires receiving Windows messages — clipboard monitoring, raw keyboard/mouse input, device change notifications, session events, and more — is powered by it.
+Package **Dapplo.Windows.Messages**. Full version: [Window messages](https://www.dapplo.net/Dapplo.Windows/articles/window-messages.html).
 
-**Package:** `Dapplo.Windows.Messages`
+Many notifications arrive as window messages: clipboard changes, power, session and device changes, hotkeys, raw
+input. The `SharedMessageWindow` is one hidden window, shared by all of Dapplo.Windows, which receives them:
 
-```powershell
-Install-Package Dapplo.Windows.Messages
-```
+- It's created on first use on its own STA thread with a message loop, and lives until the process exits.
+  `Handle` never returns 0.
+- At process exit it's destroyed on its own thread (`Shutdown`), so delayed rendered clipboard formats are rendered
+  (`WM_RENDERALLFORMATS`) and survive the process.
+- It's a hidden top-level window (not message-only), so it also gets broadcasts like `WM_QUERYENDSESSION`,
+  `WM_POWERBROADCAST` and `WM_SETTINGCHANGE`.
+- `Messages` is called synchronously in the window procedure, on the window thread. Keep `OnNext` short.
+- Set `Handled` and `Result` synchronously in `OnNext` to answer a message.
+- An exception in a subscriber ends only that subscription; it's published on `SubscriberErrors`.
 
-## What Is It?
-
-Many Windows APIs deliver asynchronous notifications by posting a message to a **window handle (HWND)**. To receive those messages from non-UI (background/console) applications, you need a dedicated message-processing window and a thread that runs its message loop.
-
-`SharedMessageWindow` manages all of that transparently:
-
-1. It creates a hidden, invisible window on a **dedicated STA background thread**.
-2. It exposes every received message as an **`IObservable<WindowMessage>`** stream (`Messages` property).
-3. It uses `Publish().RefCount()` to **share the window and its thread across all subscribers** — the window is created on the first subscription and destroyed automatically when the last subscriber disposes.
-4. The `Listen()` overload lets consumers register and unregister Windows APIs that require an HWND, tied to the exact lifetime of the window.
-
-## Key API Surface
-
+<!-- sample: MessagesSamples.SimpleFilter -->
 ```csharp
-public static class SharedMessageWindow
-{
-    // The HWND of the currently active message window (0 if not yet started).
-    public static nint Handle { get; }
-
-    // Shared observable of all messages received by the window.
-    // The window exists only while there is at least one subscriber.
-    public static IObservable<WindowMessage> Messages { get; }
-
-    // Like Messages, but also invokes callbacks when the window is created (onSetup)
-    // or destroyed / subscription disposed (onTeardown).
-    // Use this when you need to call a Windows API that requires an HWND.
-    public static IObservable<WindowMessage> Listen(
-        Action<nint> onSetup   = null,
-        Action<nint> onTeardown = null);
-}
-```
-
-`WindowMessage` exposes:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Hwnd` | `nint` | Window handle that received the message |
-| `Msg` | `WindowsMessages` | The Windows message identifier (e.g. `WM_CLIPBOARDUPDATE`) |
-| `WParam` | `nint` | First message parameter |
-| `LParam` | `nint` | Second message parameter |
-| `Handled` | `bool` | Set to `true` to prevent `DefWindowProc` from processing the message |
-| `Result` | `nuint` | The return value forwarded to the OS when `Handled == true` |
-
-## The `Listen()` Pattern
-
-Many Windows notification APIs (clipboard, device changes, session events, raw input) follow the same pattern:
-
-1. Call a **register** function with your HWND when the window is ready.
-2. Process incoming messages.
-3. Call an **unregister** function with the same HWND when you are done.
-
-`Listen(onSetup, onTeardown)` automates steps 1 and 3:
-
-```csharp
-SharedMessageWindow.Listen(
-    onSetup:    hwnd => RegisterSomeApi(hwnd),   // called when HWND is ready
-    onTeardown: hwnd => UnregisterSomeApi(hwnd)) // called on dispose or shutdown
-.Where(m => m.Msg == WindowsMessages.WM_SOME_MESSAGE)
-.Subscribe(m => HandleMessage(m));
-```
-
-## Who Uses It?
-
-Every major Dapplo.Windows feature that receives system notifications is built on `SharedMessageWindow`.
-
-### Clipboard — `WM_CLIPBOARDUPDATE`
-
-`ClipboardNative.OnUpdate` registers the message window as a clipboard format listener and filters `WM_CLIPBOARDUPDATE` messages:
-
-```csharp
-// Inside Dapplo.Windows.Clipboard
-SharedMessageWindow.Listen(
-    onSetup:    hwnd => NativeMethods.AddClipboardFormatListener(hwnd),
-    onTeardown: hwnd => NativeMethods.RemoveClipboardFormatListener(hwnd))
-.Where(m => m.Msg == WindowsMessages.WM_CLIPBOARDUPDATE)
-.Subscribe(m => NotifyClipboardChanged(m));
-```
-
-**User-facing API:** [[Clipboard]]
-
-### Raw Input — `WM_INPUT`
-
-`RawInputMonitor.Listen()` registers devices for raw input (e.g., high-frequency mouse/keyboard hardware data) and filters `WM_INPUT`:
-
-```csharp
-// Inside Dapplo.Windows.Input
-RawInputApi.RegisterRawInput(
-    SharedMessageWindow.Handle,
-    RawInputDeviceFlags.InputSink | RawInputDeviceFlags.DeviceNotify,
-    devices);
-
-SharedMessageWindow.Messages
-    .Where(m => m.Msg == WindowsMessages.WM_INPUT)
-    .Subscribe(m =>
-    {
-        m.Handled = true;
-        var rawInput = RawInputApi.GetRawInputData(m.LParam);
-        observer.OnNext(rawInput);
-    });
-```
-
-**User-facing API:** [[Input-Handling]]
-
-### Device Change Notifications — `WM_DEVICECHANGE`
-
-`DeviceNotification.OnNotification` registers the window with `RegisterDeviceNotification` and filters `WM_DEVICECHANGE`:
-
-```csharp
-// Inside Dapplo.Windows.Devices
-SharedMessageWindow.Listen(
-    onSetup:    hwnd => RegisterDeviceNotification(hwnd, filter, flags),
-    onTeardown: hwnd => UnregisterDeviceNotification(handle))
-.Where(m => m.Msg == WindowsMessages.WM_DEVICECHANGE && m.LParam != 0)
-.Subscribe(m => observer.OnNext(new DeviceNotificationEvent(m.WParam, m.LParam)));
-```
-
-### Session Changes — `WM_WTSSESSION_CHANGE`
-
-`WindowsSessionListener` registers for Terminal Services session events (lock/unlock, logon/logoff):
-
-```csharp
-// Inside Dapplo.Windows.Messages
-SharedMessageWindow.Listen(
-    onSetup:    hwnd => WTSRegisterSessionNotification(hwnd, NOTIFY_FOR_THIS_SESSION),
-    onTeardown: hwnd => WTSUnRegisterSessionNotification(hwnd))
-.Where(m => m.Msg == WindowsMessages.WM_WTSSESSION_CHANGE)
-.Subscribe(m => DispatchSessionEvent(m));
-```
-
-### Application End Session — `WM_QUERYENDSESSION` / `WM_ENDSESSION`
-
-`ApplicationRestartManager.ListenForEndSession()` intercepts system shutdown and Restart Manager close requests:
-
-```csharp
-// Inside Dapplo.Windows.AppRestartManager
-SharedMessageWindow.Messages
-    .Where(m => m.Msg.IsIn(WindowsMessages.WM_QUERYENDSESSION, WindowsMessages.WM_ENDSESSION))
-    .Subscribe(m =>
-    {
-        var reason = (EndSessionReasons)m.LParam;
-        // optionally set m.Result and m.Handled to control the OS response
-        observer.OnNext(new EndSessionMessage(m.Msg, reason));
-    });
-```
-
-**User-facing API:** [[Restart-Manager]]
-
-### Power State Changes — `WM_POWERBROADCAST`
-
-`PowerBroadcastListener` in `Dapplo.Windows.SystemState` exposes power state changes (suspend, resume, battery status) as `IObservable<PowerBroadcastEvent>` streams:
-
-```csharp
-// Inside Dapplo.Windows.SystemState
-SharedMessageWindow.Messages
-    .Where(m => m.Msg == WindowsMessages.WM_POWERBROADCAST)
-    .Select(m => (PowerBroadcastEvent)(uint)m.WParam)
-    .Publish().RefCount();
-```
-
-**User-facing API:** [[System-State]]
-
-
-
-`EnvironmentMonitor.EnvironmentUpdateEvents` detects system-wide setting changes (theme, fonts, locale, etc.):
-
-```csharp
-// Inside Dapplo.Windows
-SharedMessageWindow.Messages
-    .Where(m => m.Msg == WindowsMessages.WM_SETTINGCHANGE)
-    .Select(m => EnvironmentChangedEventArgs.Create(
-        (SystemParametersInfoActions)(int)m.WParam,
-        Marshal.PtrToStringAuto((IntPtr)m.LParam)))
-    .Publish().RefCount();
-```
-
-### Display Changes — `WM_DISPLAYCHANGE`
-
-`DisplayInfo` detects monitor configuration changes (resolution, DPI, connection/disconnection):
-
-```csharp
-// Inside Dapplo.Windows.User32
-SharedMessageWindow.Listen()
+// Called on the SharedMessageWindow thread: keep it short, and never block it
+IDisposable subscription = SharedMessageWindow.Messages
     .Where(m => m.Msg == WindowsMessages.WM_DISPLAYCHANGE)
-    .Subscribe(m => RefreshDisplayInfo());
+    .Subscribe(m => Console.WriteLine($"Display changed, new resolution {(int)m.LParam & 0xFFFF}x{((int)m.LParam >> 16) & 0xFFFF}"));
+
+// Stop listening, the window itself stays alive
+subscription.Dispose();
 ```
 
-## Using `SharedMessageWindow` Directly
-
-If you need to react to a Windows message not already wrapped by a Dapplo package, you can subscribe to `Messages` or `Listen()` yourself:
-
-### Simple Message Filter
-
+<!-- sample: MessagesSamples.HandleMessage -->
 ```csharp
-using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
-using System.Reactive.Linq;
-
-// React to WM_POWERBROADCAST (power state changes)
-var sub = SharedMessageWindow.Messages
-    .Where(m => m.Msg == WindowsMessages.WM_POWERBROADCAST)
-    .Subscribe(m =>
-    {
-        Console.WriteLine($"Power event: wParam={m.WParam}");
-    });
-
-Console.ReadLine();
-sub.Dispose(); // disposes the window if this was the last subscriber
-```
-
-### Registration-Required APIs
-
-Use `Listen()` when you need to pass the HWND to a Windows API:
-
-```csharp
-using Dapplo.Windows.Messages;
-using System.Runtime.InteropServices;
-
-// Hypothetical: register for some custom notification
-[DllImport("someapi.dll")] static extern void RegisterForNotification(nint hwnd);
-[DllImport("someapi.dll")] static extern void UnregisterNotification(nint hwnd);
-
-var sub = SharedMessageWindow.Listen(
-        onSetup:    hwnd => RegisterForNotification(hwnd),
-        onTeardown: hwnd => UnregisterNotification(hwnd))
-    .Where(m => m.Msg == (WindowsMessages)0xC001) // custom message
-    .Subscribe(m => Console.WriteLine("Custom notification received"));
-```
-
-### Responding to a Message
-
-Set `Handled = true` and assign `Result` to control what the OS sees as the return value:
-
-```csharp
-SharedMessageWindow.Messages
+// Handled and Result must be set synchronously in OnNext, before any ObserveOn
+var subscription = SharedMessageWindow.Messages
     .Where(m => m.Msg == WindowsMessages.WM_QUERYENDSESSION)
     .Subscribe(m =>
     {
-        bool canShutdown = AskUser();
-        m.Result  = canShutdown ? 1u : 0u;
-        m.Handled = true;  // prevents DefWindowProc from being called
+        m.Result = 1;    // TRUE: the session may end
+        m.Handled = true; // don't call DefWindowProc
     });
 ```
 
-## Design Notes
+## Registrations: Listen
 
-| Detail | Explanation |
-|--------|-------------|
-| **STA thread** | The window runs on a Single-Threaded Apartment thread, as required by COM and many Windows APIs |
-| **Real HWND, not HWND_MESSAGE** | Uses a real but invisible window (`WS_POPUP + WS_EX_TOOLWINDOW`) rather than `HWND_MESSAGE`, which ensures compatibility with broadcast messages and some notification APIs that don't work with message-only windows |
-| **Hidden from Alt+Tab** | `WS_EX_TOOLWINDOW` hides the window from the taskbar and Alt+Tab switcher |
-| **Shared / ref-counted** | `Publish().RefCount()` means all consumers share one thread and one window; the window is only alive while something is subscribed |
-| **Thread-safe handle access** | `Handle` is a `BehaviorSubject<nint>` under the hood; `Listen()` handles the race between window creation and caller setup |
+`Listen(onSetup, onTeardown)` runs both callbacks on the window thread, once per subscription, for APIs that register
+a window, like `RegisterHotKey`:
 
-## See Also
+<!-- sample: MessagesSamples.ListenHotkeyPInvoke -->
+```csharp
+[DllImport("user32", SetLastError = true)]
+private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint modifiers, uint virtualKey);
 
-- [[Clipboard]] — built on `WM_CLIPBOARDUPDATE`
-- [[Input-Handling]] — raw input via `WM_INPUT`
-- [[Restart-Manager]] — session/shutdown via `WM_QUERYENDSESSION` / `WM_ENDSESSION`
-- [[System-State]] — power events via `WM_POWERBROADCAST`
-- [[Getting-Started]]
+[DllImport("user32", SetLastError = true)]
+private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+```
+
+<!-- sample: MessagesSamples.ListenHotkey -->
+```csharp
+const int hotkeyId = 1;
+const uint modControl = 0x0002, modShift = 0x0004, modNoRepeat = 0x4000;
+
+// RegisterHotKey must be called on the thread of the window which gets WM_HOTKEY:
+// Listen runs onSetup and onTeardown on the SharedMessageWindow thread
+var subscription = SharedMessageWindow.Listen(
+        onSetup: hwnd =>
+        {
+            if (!RegisterHotKey(hwnd, hotkeyId, modControl | modShift | modNoRepeat, (uint)'P'))
+            {
+                // The exception goes to OnError of this subscription
+                throw new System.ComponentModel.Win32Exception();
+            }
+        },
+        onTeardown: hwnd => UnregisterHotKey(hwnd, hotkeyId))
+    .Where(m => m.Msg == WindowsMessages.WM_HOTKEY && m.WParam == hotkeyId)
+    .Subscribe(
+        m => Console.WriteLine("Ctrl+Shift+P pressed"),
+        ex => Console.WriteLine($"Registering the hotkey failed: {ex.Message}"));
+
+// Disposing the subscription runs onTeardown (UnregisterHotKey) on the window thread
+subscription.Dispose();
+```
+
+`Invoke(action)` runs any code on the window thread:
+
+<!-- sample: MessagesSamples.Invoke -->
+```csharp
+// Run code on the window thread and wait for it, exceptions are rethrown here
+bool isWindowThread = false;
+SharedMessageWindow.Invoke(hwnd => isWindowThread = SharedMessageWindow.IsWindowThread);
+
+// The handle exists as soon as it's requested, and stays valid until the window is shut down (at process exit)
+IntPtr handle = SharedMessageWindow.Handle;
+```
+
+`Shutdown(timeout)` destroys the window on its own thread and waits for its loop; it runs automatically on
+`AppDomain.ProcessExit` (with `ProcessExitShutdownTimeout`, default 1.5 seconds), after which the window is not
+created again. After an explicit call the next use creates a new window, without the old registrations.
+
+<!-- sample: MessagesSamples.Shutdown -->
+```csharp
+// Happens automatically on AppDomain.ProcessExit, with this timeout (default 1.5 seconds)
+SharedMessageWindow.ProcessExitShutdownTimeout = TimeSpan.FromSeconds(1);
+
+// Or at the end of Main, to control the moment and the timeout yourself:
+// the window is destroyed on its own thread, delayed rendered clipboard formats are rendered (WM_RENDERALLFORMATS)
+bool isShutDown = SharedMessageWindow.Shutdown(TimeSpan.FromSeconds(5));
+if (!isShutDown)
+{
+    Console.WriteLine("The window thread didn't end in time, e.g. a delayed renderer is still busy");
+}
+```
+
+## Who uses it
+
+| Feature | Message |
+|---|---|
+| `ClipboardNative.OnUpdate`, delayed rendering | `WM_CLIPBOARDUPDATE`, `WM_RENDERFORMAT`, `WM_RENDERALLFORMATS`, `WM_DESTROYCLIPBOARD` |
+| `WinEventHook` | WinEvent callbacks |
+| `RawInputMonitor`, `RawInputDeviceMonitor` | `WM_INPUT`, `WM_INPUT_DEVICE_CHANGE` |
+| `WindowsSessionListener` | `WM_WTSSESSION_CHANGE` |
+| `EnvironmentMonitor` | `WM_SETTINGCHANGE` |
+| `DisplayInfo` | `WM_DISPLAYCHANGE`, `WM_SETTINGCHANGE`, `WM_DPICHANGED` |
+| `PowerBroadcastListener` | `WM_POWERBROADCAST` |
+| `ApplicationRestartManager.ListenForEndSession` | `WM_QUERYENDSESSION`, `WM_ENDSESSION` |
+| `DeviceNotification` | `WM_DEVICECHANGE` |
+
+## Session changes
+
+<!-- sample: MessagesSamples.SessionListener -->
+```csharp
+var sessionListener = new WindowsSessionListener();
+
+// The events are raised on the SharedMessageWindow thread
+sessionListener.SessionLockChange += (sender, args) =>
+{
+    if (args.EventType == WtsSessionChangeEvents.WTS_SESSION_LOCK)
+    {
+        Console.WriteLine($"Session {args.SessionId} locked");
+    }
+    else if (args.EventType == WtsSessionChangeEvents.WTS_SESSION_UNLOCK)
+    {
+        Console.WriteLine($"Session {args.SessionId} unlocked");
+    }
+};
+
+sessionListener.SessionLogonChange += (sender, args) =>
+    Console.WriteLine(args.EventType == WtsSessionChangeEvents.WTS_SESSION_LOGON ? "Logged on" : "Logged off");
+
+// Early at logon the registration can fail, it's retried for about 2 minutes before this is raised
+sessionListener.RegistrationFailed += (sender, args) =>
+    Console.WriteLine($"No session notifications: {args.GetException().Message}");
+
+sessionListener.Start();
+
+// Ignore events for a while, without unregistering
+sessionListener.Pause();
+sessionListener.Resume();
+
+// Stop listening and unregister
+sessionListener.Dispose();
+```
+
+## Your own windows
+
+For the messages of your own forms or WPF windows use `WinProcMessages()` (Dapplo.Windows.Forms) or
+`WinProcMessages()` (Dapplo.Windows.Wpf):
+
+<!-- sample: MessagesSamples.FormsMessages -->
+```csharp
+// Subclasses the form's window. Runs on the UI thread, you may set Handled / Result.
+// The sequence follows handle re-creation and completes when the form is disposed.
+var subscription = form.WinProcMessages()
+    .Where(m => m.Msg == WindowsMessages.WM_NCHITTEST)
+    .Subscribe(m =>
+    {
+        // HTCAPTION: the whole window can be dragged like its title bar
+        m.Result = new IntPtr(2);
+        m.Handled = true;
+    });
+```

@@ -116,16 +116,18 @@ public sealed class FileOpenDialogBuilder
     /// </returns>
     /// <exception cref="COMException">An unexpected COM error occurred.</exception>
     /// <exception cref="PlatformNotSupportedException">Called on a non-Windows platform.</exception>
+    /// <exception cref="InvalidOperationException">Called from a thread which is not an STA thread (e.g. a thread pool thread), checked before any COM object is created.</exception>
     public FileDialogResult ShowDialog(IntPtr ownerHandle = default)
     {
-        var dialog = ComDialogHelper.CreateDialog<IFileOpenDialog>(ComDialogHelper.ClsidFileOpenDialog);
+        var dialog = ComDialogHelper.CreateDialog<IFileOpenDialog>(ComDialogHelper.ClsidFileOpenDialog, nameof(FileOpenDialogBuilder));
         try
         {
             if (_title != null) dialog.SetTitle(_title);
 
             var options = FileOpenOptions.FileMustExist;
             if (_allowMultiSelect) options |= FileOpenOptions.AllowMultiSelect;
-            dialog.SetOptions(options);
+            dialog.GetOptions(out var currentOptions);
+            dialog.SetOptions(ComDialogHelper.CombineOptions(currentOptions, options));
 
             ComDialogHelper.ApplyFilters(dialog.SetFileTypes, dialog.SetFileTypeIndex, _filters);
             if (_defaultExtension != null) dialog.SetDefaultExtension(_defaultExtension);
@@ -143,9 +145,7 @@ public sealed class FileOpenDialogBuilder
             }
 
             dialog.GetResult(out var item);
-            var path = ComDialogHelper.GetFileSysPath(item);
-            Marshal.ReleaseComObject(item);
-            return FileDialogResult.FromPath(path);
+            return FileDialogResult.FromPath(ComDialogHelper.GetFileSysPathAndRelease(item));
         }
         finally
         {

@@ -1,30 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dapplo.Windows.Advapi32 is a library for accessing the Advanced Windows 32 Base API</Description>
     <PackageTags>windows native Advapi32</PackageTags>
-    <TargetFrameworks>net480;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
-    <UseWindowsForms>true</UseWindowsForms>
-    <UseWPF>true</UseWPF>
+    <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="System.Reactive" Version="6.1.0" />
-    <PackageReference Include="Dapplo.Log" Version="3.0.22" />
-    <PackageReference Include="System.ValueTuple" Version="4.6.2" />
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
-    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
 </Project>

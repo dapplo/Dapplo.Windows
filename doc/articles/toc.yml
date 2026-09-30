@@ -1,14 +1,28 @@
-- name: Introduction
+- name: Getting started
   href: intro.md
-- name: Window Management
+- name: Window management
   href: window-management.md
-- name: Clipboard Usage
-  href: clipboard-usage.md
-- name: DPI Awareness
-  href: dpi-awareness.md
-- name: Input Handling
+- name: Window messages
+  href: window-messages.md
+- name: Keyboard and mouse
   href: input-handling.md
-- name: System State
+- name: Clipboard
+  href: clipboard-usage.md
+- name: DPI awareness
+  href: dpi-awareness.md
+- name: Power and system state
   href: system-state.md
-- name: Common Scenarios
+- name: Restart Manager
+  href: restart-manager.md
+- name: Icons and cursors
+  href: icons.md
+- name: File and folder dialogs
+  href: dialogs.md
+- name: Windows Forms and WPF
+  href: forms-and-wpf.md
+- name: More packages
+  href: more-packages.md
+- name: Common scenarios
   href: common-scenarios.md
+- name: Migrating to 3.0
+  href: migration-3.0.md

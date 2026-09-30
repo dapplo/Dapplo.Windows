@@ -13,14 +13,14 @@ namespace Dapplo.Windows.Input.Keyboard;
 /// </summary>
 public static class KeyHelper
 {
-    private const int DoNotCareLeftRight = 0b_00000010_00000000_00000000_00000000;
-    private const int Extended = 0b_00000001_00000000_00000000_00000000;
+    private const uint DoNotCareLeftRight = 0b_00000010_00000000_00000000_00000000;
+    private const uint Extended = 0b_00000001_00000000_00000000_00000000;
 
     /// <summary>
     ///     Get the name of a key, in the keyboard locale
     /// </summary>
     /// <param name="givenKey">VirtualKeyCode</param>
-    /// <param name="doNotCare">bool, default true</param>
+    /// <param name="doNotCare">bool, default true: don't distinguish between the left and right variant of Shift, Control, Alt and Windows</param>
     /// <returns>string</returns>
     public static string VirtualCodeToLocaleDisplayText(VirtualKeyCode givenKey, bool doNotCare = true)
     {
@@ -28,7 +28,7 @@ public static class KeyHelper
         {
             const int capacity = 100;
             var keyName = stackalloc char[capacity];
-            const uint numpad = 55;
+            const uint numpadMultiplyScanCode = 0x37;
             uint scancodeModifier = 0;
 
             var virtualKey = givenKey;
@@ -52,30 +52,34 @@ public static class KeyHelper
                     case VirtualKeyCode.RightShift:
                         virtualKey = VirtualKeyCode.Shift;
                         break;
+                    case VirtualKeyCode.LeftWin:
+                    case VirtualKeyCode.RightWin:
+                        virtualKey = VirtualKeyCode.Win;
+                        break;
                 }
             }
             // Map virtual key codes to real keys
             switch (virtualKey)
             {
+                case VirtualKeyCode.Win:
+                    // Windows has no side independent name for the Windows keys
+                    return "Win";
                 case VirtualKeyCode.Multiply:
-                    nrCharacters = GetKeyNameText(numpad << 16, keyName, 100);
-
-                    keyString = new string(keyName,0, nrCharacters).Replace("*", "").Trim().ToLower();
-                    if (keyString.IndexOf("(", StringComparison.Ordinal) >= 0)
-                    {
-                        return "* " + keyString;
-                    }
-                    keyString = keyString.Substring(0, 1).ToUpper() + keyString.Substring(1).ToLower();
-                    return keyString + " *";
                 case VirtualKeyCode.Divide:
-                    nrCharacters = GetKeyNameText(numpad << 16, keyName, capacity);
-                    keyString = new string(keyName, 0, nrCharacters).Replace("*", "").Trim().ToLower();
+                    // Take the name of the numpad * key (e.g. "Num *") and replace the operator
+                    var operatorText = virtualKey == VirtualKeyCode.Multiply ? "*" : "/";
+                    nrCharacters = GetKeyNameText(numpadMultiplyScanCode << 16, keyName, capacity);
+                    keyString = new string(keyName, 0, nrCharacters).Replace("*", "").Trim().ToLowerInvariant();
+                    if (keyString.Length == 0)
+                    {
+                        return operatorText;
+                    }
                     if (keyString.IndexOf("(", StringComparison.Ordinal) >= 0)
                     {
-                        return "/ " + keyString;
+                        return operatorText + " " + keyString;
                     }
-                    keyString = keyString.Substring(0, 1).ToUpper() + keyString.Substring(1).ToLower();
-                    return keyString + " /";
+                    keyString = keyString.Substring(0, 1).ToUpperInvariant() + keyString.Substring(1);
+                    return keyString + " " + operatorText;
             }
 
             var keyboardLayout = GetKeyboardLayout(0);
@@ -85,6 +89,13 @@ public static class KeyHelper
             if (scanCode == 0)
             {
                 return givenKey.ToString();
+            }
+
+            // MAPVK_VK_TO_VSC_EX returns extended scan codes with an E0 or E1 prefix in the high byte, GetKeyNameText wants the extended bit (24) instead
+            if ((scanCode & 0xFF00) is 0xE000 or 0xE100)
+            {
+                scanCode &= 0xFF;
+                scancodeModifier |= Extended;
             }
 
             // because MapVirtualKey strips the extended bit for some keys
@@ -103,18 +114,20 @@ public static class KeyHelper
                 case VirtualKeyCode.NumLock:
                     scancodeModifier |= Extended; // set extended bit
                     break;
-                case VirtualKeyCode.Print: // PrintScreen
-                    scanCode = 311;
+                case VirtualKeyCode.PrintScreen: // PrintScreen, also known as Snapshot: E0 37
+                    scanCode = 0x37;
+                    scancodeModifier |= Extended;
                     break;
-                case VirtualKeyCode.Pause: // Pause
-                    scanCode = 69;
+                case VirtualKeyCode.Pause: // Pause: E1 1D 45, GetKeyNameText knows it as the non-extended 45
+                    scanCode = 0x45;
+                    scancodeModifier &= ~(uint)Extended;
                     break;
             }
 
             scanCode <<= 16;
             scanCode |= scancodeModifier;
             nrCharacters = GetKeyNameText(scanCode, keyName, capacity);
-            if (nrCharacters == 0)
+            if (nrCharacters <= 0)
             {
                 return givenKey.ToString();
             }
@@ -122,7 +135,7 @@ public static class KeyHelper
             var visibleName = new string(keyName, 0, nrCharacters);
             if (visibleName.Length > 1)
             {
-                visibleName = visibleName.Substring(0, 1) + visibleName.Substring(1).ToLower();
+                visibleName = visibleName.Substring(0, 1) + visibleName.Substring(1).ToLowerInvariant();
             }
             return visibleName;
         }
@@ -172,13 +185,17 @@ public static class KeyHelper
 
         keyDescription = keyDescription.ToLowerInvariant();
             
-        // Border cases
+        // Border cases, and the names of enum aliases removed in 3.0, so key descriptions stored by older versions still parse
         return keyDescription switch
         {
             "alt" => VirtualKeyCode.Menu,
             "ctrl" => VirtualKeyCode.Control,
-            "win" => VirtualKeyCode.LeftWin,
+            "win" => VirtualKeyCode.Win,
             "shift" => VirtualKeyCode.Shift,
+            "snapshot" => VirtualKeyCode.PrintScreen,
+            "hangul" => VirtualKeyCode.Kana,
+            "hangeul" => VirtualKeyCode.Kana,
+            "kanji" => VirtualKeyCode.Hanja,
             _ => VirtualKeyCode.None
         };
     }

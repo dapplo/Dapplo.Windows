@@ -1,24 +1,43 @@
-// Copyright (c) Dapplo and contributors. All rights reserved.
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
+using Microsoft.Win32.SafeHandles;
 
 namespace Dapplo.Windows.SystemState;
 
 /// <summary>
 /// A managed wrapper around a Windows waitable timer that can optionally wake the system from sleep or hibernation.
 /// See <a href="https://learn.microsoft.com/en-us/windows/win32/sync/waitable-timer-objects">Waitable Timer Objects</a>
+/// The native handle is owned by a <see cref="SafeWaitHandle"/>, so it is released even when Dispose is forgotten,
+/// and disposing while another thread waits does not close the handle under the wait.
 /// </summary>
 public sealed class WaitableTimer : IDisposable
 {
-    private IntPtr _handle;
+    private readonly SafeWaitHandle _handle;
+    private readonly TimerWaitHandle _waitHandle;
     private bool _disposed;
 
     /// <summary>
-    /// Gets a value indicating whether the timer has been created successfully.
+    /// Gets a value indicating whether the timer has been created successfully and is not disposed.
     /// </summary>
-    public bool IsValid => _handle != IntPtr.Zero;
+    public bool IsValid => !_handle.IsInvalid && !_handle.IsClosed;
+
+    /// <summary>
+    /// Gets a <see cref="System.Threading.WaitHandle"/> for the timer, e.g. for <c>WaitHandle.WaitAny</c>
+    /// or <c>ThreadPool.RegisterWaitForSingleObject</c>.
+    /// It is owned by this WaitableTimer, don't dispose it.
+    /// </summary>
+    public WaitHandle WaitHandle
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _waitHandle;
+        }
+    }
 
     /// <summary>
     /// Creates a new unnamed waitable timer.
@@ -30,10 +49,11 @@ public sealed class WaitableTimer : IDisposable
     public WaitableTimer(bool manualReset = false)
     {
         _handle = SystemStateApi.CreateWaitableTimer(IntPtr.Zero, manualReset, null);
-        if (_handle == IntPtr.Zero)
+        if (_handle.IsInvalid)
         {
-            throw new InvalidOperationException($"Failed to create waitable timer. Error: {System.Runtime.InteropServices.Marshal.GetLastWin32Error()}");
+            throw new InvalidOperationException($"Failed to create waitable timer. Error: {Marshal.GetLastWin32Error()}");
         }
+        _waitHandle = new TimerWaitHandle(_handle);
     }
 
     /// <summary>
@@ -47,10 +67,11 @@ public sealed class WaitableTimer : IDisposable
     public WaitableTimer(string name, bool manualReset = false)
     {
         _handle = SystemStateApi.CreateWaitableTimer(IntPtr.Zero, manualReset, name);
-        if (_handle == IntPtr.Zero)
+        if (_handle.IsInvalid)
         {
-            throw new InvalidOperationException($"Failed to create waitable timer '{name}'. Error: {System.Runtime.InteropServices.Marshal.GetLastWin32Error()}");
+            throw new InvalidOperationException($"Failed to create waitable timer '{name}'. Error: {Marshal.GetLastWin32Error()}");
         }
+        _waitHandle = new TimerWaitHandle(_handle);
     }
 
     /// <summary>
@@ -59,7 +80,7 @@ public sealed class WaitableTimer : IDisposable
     /// <param name="delay">The delay before the timer fires.</param>
     /// <param name="wakeSystem">
     /// If <c>true</c>, the system will be woken from sleep or hibernation when the timer fires.
-    /// Requires the SE_SYSTEMTIME_NAME privilege.
+    /// No privilege is needed, but this only works when the "Allow wake timers" power setting is enabled.
     /// </param>
     /// <returns><c>true</c> if the timer was set successfully.</returns>
     public bool SetOnce(TimeSpan delay, bool wakeSystem = false)
@@ -73,10 +94,10 @@ public sealed class WaitableTimer : IDisposable
     /// <summary>
     /// Sets the timer to fire at the specified absolute UTC time.
     /// </summary>
-    /// <param name="dueTime">The UTC time at which the timer should fire.</param>
+    /// <param name="dueTime">The point in time at which the timer should fire, the offset is taken into account (it is converted to UTC).</param>
     /// <param name="wakeSystem">
     /// If <c>true</c>, the system will be woken from sleep or hibernation when the timer fires.
-    /// Requires the SE_SYSTEMTIME_NAME privilege.
+    /// No privilege is needed, but this only works when the "Allow wake timers" power setting is enabled.
     /// </param>
     /// <returns><c>true</c> if the timer was set successfully.</returns>
     public bool SetAt(DateTimeOffset dueTime, bool wakeSystem = false)
@@ -93,7 +114,7 @@ public sealed class WaitableTimer : IDisposable
     /// <param name="period">The period between subsequent firings, in milliseconds.</param>
     /// <param name="wakeSystem">
     /// If <c>true</c>, the system will be woken from sleep or hibernation on the first firing.
-    /// Requires the SE_SYSTEMTIME_NAME privilege.
+    /// No privilege is needed, but this only works when the "Allow wake timers" power setting is enabled.
     /// </param>
     /// <returns><c>true</c> if the timer was set successfully.</returns>
     public bool SetPeriodic(TimeSpan initialDelay, int period, bool wakeSystem = false)
@@ -121,8 +142,8 @@ public sealed class WaitableTimer : IDisposable
     public bool Wait(TimeSpan timeout)
     {
         ThrowIfDisposed();
-        using var waitHandle = new WaitableTimerWaitHandle(_handle);
-        return waitHandle.WaitOne(timeout);
+        // WaitOne keeps a reference on the SafeWaitHandle, a concurrent Dispose closes the handle only after the wait returns
+        return _waitHandle.WaitOne(timeout);
     }
 
     /// <summary>
@@ -150,21 +171,19 @@ public sealed class WaitableTimer : IDisposable
         }
 
         _disposed = true;
-        if (_handle != IntPtr.Zero)
-        {
-            SystemStateApi.CloseHandle(_handle);
-            _handle = IntPtr.Zero;
-        }
+        // Disposing the WaitHandle disposes the owned SafeWaitHandle, which closes the timer handle
+        _waitHandle?.Dispose();
+        _handle.Dispose();
     }
 
     /// <summary>
-    /// A WaitHandle wrapper for the waitable timer that does not own the handle (no close on finalize).
+    /// A WaitHandle for the waitable timer, which uses the SafeWaitHandle of the WaitableTimer.
     /// </summary>
-    private sealed class WaitableTimerWaitHandle : WaitHandle
+    private sealed class TimerWaitHandle : WaitHandle
     {
-        public WaitableTimerWaitHandle(IntPtr handle)
+        public TimerWaitHandle(SafeWaitHandle handle)
         {
-            SafeWaitHandle = new Microsoft.Win32.SafeHandles.SafeWaitHandle(handle, ownsHandle: false);
+            SafeWaitHandle = handle;
         }
     }
 }

@@ -8,9 +8,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Threading;
-#if !NETSTANDARD2_0
-using System.Windows.Forms;
-#endif
 
 namespace Dapplo.Windows.Dpi
 {
@@ -73,7 +70,10 @@ namespace Dapplo.Windows.Dpi
 
     /// <summary>
     ///     This provides bitmaps scaled according to the current DPI.
-    ///     If the DPI changes, it will reapply the bitmaps and dispose the old ones (if needed).
+    ///     If the DPI changes, it will reapply the bitmaps and dispose the old ones.
+    ///     The BitmapScaleHandler owns every value which the provider and the scaler return: they are cached per DPI, and disposed when the DPI changes or the handler is disposed.
+    ///     When the scaler returns a new instance, the one from the provider is disposed directly. So the provider must return a new instance for every call (not a shared one).
+    ///     Dispose the handler on the UI thread (e.g. when the form closes), it assigns the default value to all targets.
     /// </summary>
     public sealed class BitmapScaleHandler<TKey, TValue> : IDisposable where TValue : IDisposable
     {
@@ -134,24 +134,33 @@ namespace Dapplo.Windows.Dpi
             return this;
         }
 
-#if !NETSTANDARD2_0
         /// <summary>
-        ///     Add a Button as a Bitmap target
+        ///     Add a target, e.g. a Button, which gets a (new) bitmap applied when the DPI changes.
+        ///     The target is also the key for <see cref="RemoveTarget"/>, adding the same target again replaces the previous action.
+        ///     Dapplo.Windows.Forms has extensions to add a Windows Forms Button or ToolStripItem.
         /// </summary>
-        /// <param name="button">Button</param>
+        /// <param name="target">object which is the target, used as key</param>
         /// <param name="imageKey">key of the image</param>
-        /// <param name="valueConverter">func to deliver bitmaps for buttons</param>
+        /// <param name="apply">Action which applies the bitmap to the target</param>
         /// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
-        public BitmapScaleHandler<TKey, TValue> AddTarget(Button button, TKey imageKey, Func<TValue, Bitmap> valueConverter, bool execute = false)
+        public BitmapScaleHandler<TKey, TValue> AddTargetAction(object target, TKey imageKey, Action<TValue> apply, bool execute = false)
         {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+            if (apply == null)
+            {
+                throw new ArgumentNullException(nameof(apply));
+            }
             void ApplyAction()
             {
-                button.Image = valueConverter(GetBitmap(imageKey));
+                apply(GetBitmap(imageKey));
             }
             try
             {
                 _actionsLock.EnterWriteLock();
-                ApplyActions[button] = ApplyAction;
+                ApplyActions[target] = ApplyAction;
             }
             finally
             {
@@ -165,45 +174,18 @@ namespace Dapplo.Windows.Dpi
         }
 
         /// <summary>
-        ///     Add a ButtonToolStripItem as a Bitmap target
-        /// </summary>
-        /// <param name="toolStripItem">ToolStripItem</param>
-        /// <param name="imageKey">key of the image</param>
-        /// <param name="valueConverter"></param>
-        /// <param name="execute">Execute specifies if the assignment needs to be done right away</param>
-        public BitmapScaleHandler<TKey, TValue> AddTarget(ToolStripItem toolStripItem, TKey imageKey, Func<TValue, Bitmap> valueConverter, bool execute = false)
-        {
-            void ApplyAction()
-            {
-                toolStripItem.Image = valueConverter(GetBitmap(imageKey));
-            }
-            try
-            {
-                _actionsLock.EnterWriteLock();
-
-                ApplyActions[toolStripItem] = ApplyAction;
-            }
-            finally
-            {
-                _actionsLock.ExitWriteLock();
-            }
-            if (execute)
-            {
-                ApplyAction();
-            }
-
-            return this;
-        }
-#endif
-
-        /// <summary>
-        ///     Dispose implementation
+        ///     Stop processing DPI changes, assign the default value to all targets, and dispose all cached bitmaps.
+        ///     Call this on the UI thread.
         /// </summary>
         public void Dispose()
         {
+            if (_areWeDisposing)
+            {
+                return;
+            }
             _dpiChangeSubscription?.Dispose();
-            ReleaseUnmanagedResources();
-            GC.SuppressFinalize(this);
+            _dpiChangeSubscription = null;
+            ReleaseResources();
         }
 
         /// <summary>
@@ -249,13 +231,6 @@ namespace Dapplo.Windows.Dpi
             }
         }
 
-        /// <inheritdoc />
-        ~BitmapScaleHandler()
-        {
-            _dpiChangeSubscription?.Dispose();
-            ReleaseUnmanagedResources();
-        }
-
         /// <summary>
         ///     Get bitmaps for displaying
         /// </summary>
@@ -281,14 +256,18 @@ namespace Dapplo.Windows.Dpi
                     return default;
                 }
 
+                result = image;
                 if (BitmapScaler != null)
                 {
-                    result = BitmapScaler.Invoke(image, _dpi);
+                    var scaled = BitmapScaler.Invoke(image, _dpi);
+                    if (scaled != null && !ReferenceEquals(image, scaled))
+                    {
+                        // The original is replaced by the scaled one, and no longer needed
+                        image.Dispose();
+                        result = scaled;
+                    }
                 }
-                if (result == null || Equals(image, result))
-                {
-                    return image;
-                }
+                // Cache what is returned, so it is reused and disposed when the DPI changes
                 try
                 {
                     _imagesLock.EnterWriteLock();
@@ -314,8 +293,9 @@ namespace Dapplo.Windows.Dpi
         /// <param name="bitmapScaler">A function to provide a newly scaled bitmap</param>
         internal void Initialize(DpiHandler dpiHandler, Func<TKey, int, TValue> bitmapProvider, Func<TValue, int, TValue> bitmapScaler = null)
         {
-            BitmapProvider = bitmapProvider;
+            BitmapProvider = bitmapProvider ?? throw new ArgumentNullException(nameof(bitmapProvider));
             BitmapScaler = bitmapScaler;
+            _dpi = dpiHandler?.Dpi ?? DpiCalculator.DefaultScreenDpi;
             if (dpiHandler != null)
             {
                 _dpiChangeSubscription = dpiHandler.OnDpiChanged.Subscribe(ProcessDpiChange);
@@ -325,7 +305,7 @@ namespace Dapplo.Windows.Dpi
         /// <summary>
         ///     Cleanup the images, they are no longer needed
         /// </summary>
-        private void ReleaseUnmanagedResources()
+        private void ReleaseResources()
         {
             _areWeDisposing = true;
 

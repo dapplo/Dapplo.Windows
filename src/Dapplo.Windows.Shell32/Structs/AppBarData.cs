@@ -29,7 +29,7 @@ public struct AppBarData
     private AppBarEdges _uEdge;
 
     private NativeRect _rc;
-    private int _lParam;
+    private IntPtr _lParam;
 
     /// <summary>
     /// Sets the handle to the appbar window.  Not all messages use this member.
@@ -76,17 +76,18 @@ public struct AppBarData
     /// </summary>
     public bool AutoHide
     {
-        get { return _lParam != 0; }
-        set { _lParam = value? 1 : 0; }
+        get { return _lParam != IntPtr.Zero; }
+        set { _lParam = value ? new IntPtr(1) : IntPtr.Zero; }
     }
 
     /// <summary>
-    /// Used for the ABM_SETAUTOHIDEBAR, ABM_SETAUTOHIDEBAREX message
+    /// Used for the ABM_SETSTATE message.
+    /// ABM_GETSTATE does not fill this, it returns the state as the result of SHAppBarMessage, use <see cref="Shell32Api.GetTaskbarState"/>.
     /// </summary>
     public AppBarStates State
     {
-        get { return (AppBarStates) _lParam; }
-        set { _lParam = (int)value; }
+        get { return (AppBarStates) _lParam.ToInt64(); }
+        set { _lParam = new IntPtr((int)value); }
     }
 
     /// <summary>

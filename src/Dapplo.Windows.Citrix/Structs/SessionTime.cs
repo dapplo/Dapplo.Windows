@@ -1,43 +1,47 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using System;
 using System.Runtime.InteropServices;
 
 namespace Dapplo.Windows.Citrix.Structs;
 
 /// <summary>
-///     This structure is returned when WFQuerySessionInformation is called with WFInfoClasses.SessionTime
+///     This structure (WF_SESSION_TIME) is returned when WFQuerySessionInformation is called with WFInfoClasses.SessionTime.
+///     All values are LARGE_INTEGER FILETIME values (100-nanosecond intervals since 1601-01-01 UTC).
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public struct SessionTime
 {
-    private readonly double _connectTime;
-    private readonly double _disconnectTime;
-    private readonly double _lastInputTime;
-    private readonly double _logonTime;
-    private readonly double _currentTime;
+    private readonly long _connectTime;
+    private readonly long _disconnectTime;
+    private readonly long _lastInputTime;
+    private readonly long _logonTime;
+    private readonly long _currentTime;
 
     /// <summary>
-    ///     Return the username
+    ///     Return the time the session was (last) connected, in UTC, or null when not available
     /// </summary>
-    public double ConnectTime => _connectTime;
+    public DateTime? ConnectTime => FromFileTime(_connectTime);
 
     /// <summary>
-    ///     Return the last disconnect time
+    ///     Return the last disconnect time, in UTC, or null when the session was never disconnected
     /// </summary>
-    public double DisconnectTime => _disconnectTime;
+    public DateTime? DisconnectTime => FromFileTime(_disconnectTime);
 
     /// <summary>
-    ///     Return the last input time
+    ///     Return the last input time, in UTC, or null when not available
     /// </summary>
-    public double LastInputTime => _lastInputTime;
+    public DateTime? LastInputTime => FromFileTime(_lastInputTime);
 
     /// <summary>
-    ///     Return the logon time
+    ///     Return the logon time, in UTC, or null when not available
     /// </summary>
-    public double LogonTime => _logonTime;
+    public DateTime? LogonTime => FromFileTime(_logonTime);
 
     /// <summary>
-    ///     Return the current time
+    ///     Return the current time, in UTC, or null when not available
     /// </summary>
-    public double CurrentTime => _currentTime;
+    public DateTime? CurrentTime => FromFileTime(_currentTime);
+
+    private static DateTime? FromFileTime(long fileTime) => fileTime <= 0 ? null : DateTime.FromFileTimeUtc(fileTime);
 }

@@ -1,427 +1,128 @@
-# Common Scenarios
+# Common scenarios
 
-Real-world recipes that combine multiple Dapplo.Windows packages to accomplish common tasks.
+Recipes which combine several packages. More in the [documentation](https://www.dapplo.net/Dapplo.Windows/articles/common-scenarios.html).
 
-## Application Monitoring
+## Screenshot of the active window with a hotkey
 
-### Detect When a Specific Application Starts
-
-**Packages:** `Dapplo.Windows`
-
+<!-- sample: CommonScenariosSamples.ScreenshotHotkey -->
 ```csharp
-using Dapplo.Windows.Desktop;
-using System.Reactive.Linq;
-
-var sub = WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE)
-    .Where(e =>
+// Alt+PrintScreen replacement: capture the active window as PNG onto the clipboard
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(new KeyCombinationHandler(VirtualKeyCode.Menu, VirtualKeyCode.PrintScreen))
+    // Leave the hook thread before doing the work
+    .ObserveOn(TaskPoolScheduler.Default)
+    .Subscribe(_ =>
     {
-        var window = InteropWindow.FromHandle(e.Handle);
-        return window.GetProcessPath()?.Contains("notepad.exe") ?? false;
-    })
-    .Subscribe(_ => Console.WriteLine("Notepad started!"));
-```
-
-### Track Which Application Is Active (Time Tracking)
-
-**Packages:** `Dapplo.Windows`
-
-```csharp
-using Dapplo.Windows.Desktop;
-
-string currentApp = "";
-
-WinEventHook.Create(WinEvents.EVENT_SYSTEM_FOREGROUND)
-    .Subscribe(e =>
-    {
-        var window = InteropWindow.FromHandle(e.Handle);
-        string appName = window.GetCaption();
-
-        if (appName != currentApp)
+        var window = InteropWindowQuery.GetForegroundWindow();
+        using var bitmap = window.PrintWindow();
+        if (bitmap == null)
         {
-            LogTimeSpent(currentApp);           // record previous app duration
-            currentApp = appName;
-            Console.WriteLine($"Switched to: {currentApp}");
+            return;
         }
+        using var png = new MemoryStream();
+        bitmap.Save(png, ImageFormat.Png);
+        png.Position = 0;
+
+        using var clipboard = ClipboardNative.Access();
+        clipboard.ClearContents();
+        clipboard.SetAsStream("PNG", png);
     });
 ```
 
-### Detect Screen Lock / Unlock
+## Time tracking
 
-**Packages:** `Dapplo.Windows.Messages`
-
+<!-- sample: CommonScenariosSamples.ActiveWindowTracking -->
 ```csharp
-using Dapplo.Windows.Messages;
+// How long is each application in the foreground?
+var usage = new Dictionary<string, TimeSpan>();
+string currentProcess = null;
+var since = DateTimeOffset.Now;
 
-WinProcHandler.Instance.Subscribe(new WinProcHandlerHook(
-    (hwnd, msg, wparam, lparam, ref handled) =>
+var subscription = WinEventHook.Create(WinEvents.EVENT_SYSTEM_FOREGROUND)
+    // Don't query the process on the SharedMessageWindow thread
+    .ObserveOn(TaskPoolScheduler.Default)
+    .Subscribe(info =>
     {
-        if ((uint)msg == WindowsMessages.WM_WTSSESSION_CHANGE)
+        var now = DateTimeOffset.Now;
+        if (currentProcess != null)
         {
-            switch (wparam.ToInt32())
-            {
-                case 0x7: Console.WriteLine("Screen locked");   break;
-                case 0x8: Console.WriteLine("Screen unlocked"); break;
-            }
+            usage[currentProcess] = (usage.TryGetValue(currentProcess, out var total) ? total : TimeSpan.Zero) + (now - since);
         }
-        return IntPtr.Zero;
-    }));
-```
-
----
-
-## Screenshot Tool with Hotkey
-
-**Packages:** `Dapplo.Windows`, `Dapplo.Windows.Input`, `Dapplo.Windows.Dpi`
-
-```csharp
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Dpi;
-using Dapplo.Windows.Input.Keyboard;
-using System.Drawing.Imaging;
-using System.Reactive.Linq;
-
-using var keyboardHook = KeyboardHook.Create();
-
-keyboardHook.KeyboardEvents
-    .Where(e => e.IsDown && e.Key == VirtualKeyCode.PrintScreen)
-    .Subscribe(e =>
-    {
-        var handle = User32Api.GetForegroundWindow();
-        var window = InteropWindow.FromHandle(handle);
-
-        using var bitmap = window.Capture();
-        var dpi = DpiHandler.GetDpiForWindow(handle);
-        bitmap.SetResolution(dpi, dpi);
-
-        var filename = $"screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png";
-        bitmap.Save(filename, ImageFormat.Png);
-        Console.WriteLine($"Saved: {filename}");
-
-        e.Handled = true;  // suppress default Print Screen
+        using var process = Process.GetProcessById(InteropWindowFactory.CreateFor(info.Handle).GetProcessId());
+        currentProcess = process.ProcessName;
+        since = now;
     });
-
-Console.ReadLine();
 ```
 
----
+## Clipboard history
 
-## Clipboard History Logger
-
-**Packages:** `Dapplo.Windows.Clipboard`
-
+<!-- sample: CommonScenariosSamples.ClipboardHistory -->
 ```csharp
-using Dapplo.Windows.Clipboard;
-using System.Collections.Generic;
-using System.Reactive.Linq;
-
 var history = new List<string>();
-
-ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains(StandardClipboardFormats.UnicodeText.AsString()))
-    .Throttle(TimeSpan.FromMilliseconds(300))
+var subscription = ClipboardNative.OnUpdate
+    // Skip the current content, only log changes
+    .Skip(1)
+    .Where(info => info.FormatIds.Contains((uint)StandardClipboardFormats.UnicodeText))
+    // Respect passwords and other excluded content
+    .Where(info => !info.Formats.Contains(ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat))
+    .ObserveOn(TaskPoolScheduler.Default)
     .Subscribe(info =>
     {
         using var clipboard = ClipboardNative.Access();
-        var text = clipboard.GetAsUnicodeString();
-
-        if (!string.IsNullOrEmpty(text) && !history.Contains(text))
+        if (clipboard.CanAccess)
         {
-            if (history.Count >= 100) history.RemoveAt(0);
-            history.Add(text);
-            Console.WriteLine($"[{history.Count}] {text[..Math.Min(60, text.Length)]}");
+            history.Add(clipboard.GetAsUnicodeString());
         }
     });
-
-Console.ReadLine();
 ```
 
-### Automatically Save Clipboard Images
+## Insert text with a hotkey
 
-**Packages:** `Dapplo.Windows.Clipboard`
+`TypeText` types the text independent of the keyboard layout, `TriggerMode.AllKeysUp` waits until the hotkey is released:
 
+<!-- sample: CommonScenariosSamples.InsertTimestamp -->
 ```csharp
-using Dapplo.Windows.Clipboard;
-using System.IO;
-using System.Reactive.Linq;
-
-ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains("PNG"))
-    .Subscribe(info =>
-    {
-        using var clipboard = ClipboardNative.Access();
-        using var stream = clipboard.GetAsStream("PNG");
-        var filename = $"clipboard_{DateTime.Now:yyyyMMdd_HHmmss}.png";
-        using var file = File.Create(filename);
-        stream.CopyTo(file);
-        Console.WriteLine($"Saved image: {filename}");
-    });
+// Ctrl+Alt+D types the current date into the active application.
+// AllKeysUp fires when the user released all keys of the combination, so the text isn't combined with Ctrl or Alt,
+// and the keys are passed on, so no key gets stuck.
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.KeyD) { TriggerMode = TriggerMode.AllKeysUp })
+    .ObserveOn(TaskPoolScheduler.Default)
+    .Subscribe(_ => KeyboardInputGenerator.TypeText(DateTime.Now.ToString("yyyy-MM-dd")));
 ```
 
-### Protect Sensitive Clipboard Data
+## Single instance
 
-**Packages:** `Dapplo.Windows.Clipboard`
-
+<!-- sample: CommonScenariosSamples.SingleInstance -->
 ```csharp
-using Dapplo.Windows.Clipboard;
-
-void CopyPassword(string password)
+// The first instance listens, a second instance broadcasts and exits
+uint showMessage = RegisteredWindowMessages.Register("MyApp.ShowMainWindow");
+using var mutex = new Mutex(true, "MyApp.SingleInstance", out var isFirstInstance);
+if (!isFirstInstance)
 {
-    using var clipboard = ClipboardNative.Access();
-    clipboard.SetAsUnicodeString(password);
-    clipboard.SetCloudClipboardOptions(
-        canIncludeInHistory: false,
-        canUploadToCloud:    false,
-        excludeFromMonitoring: true);
+    // HWND_BROADCAST: every top-level window gets it, also the SharedMessageWindow of the first instance
+    User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
+    return;
 }
+var subscription = SharedMessageWindow.Messages
+    .Where(m => (uint)m.Msg == showMessage)
+    .ObserveOn(SynchronizationContext.Current)
+    .Subscribe(_ => showMainWindow());
 ```
 
----
+## Handling many events
 
-## Text Expansion (AutoHotKey-style)
-
-**Packages:** `Dapplo.Windows.Input`
-
+<!-- sample: CommonScenariosSamples.Debounce -->
 ```csharp
-using Dapplo.Windows.Input.Keyboard;
-using System.Collections.Generic;
+// Location changes arrive by the hundred while a window is dragged: wait until it is quiet for 250ms
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_LOCATIONCHANGE)
+    .Where(info => info.ObjectIdentifier == ObjectIdentifiers.Window)
+    .Throttle(TimeSpan.FromMilliseconds(250))
+    .Subscribe(info => Console.WriteLine("A window stopped moving"));
 
-var expansions = new Dictionary<string, string>
-{
-    ["btw"] = "by the way",
-    ["brb"] = "be right back",
-    ["thx"] = "thanks"
-};
-
-using var hook = KeyboardHook.Create();
-string buffer = "";
-
-hook.KeyboardEvents
-    .Where(e => e.IsDown)
-    .Subscribe(e =>
-    {
-        if (e.Key >= VirtualKeyCode.A && e.Key <= VirtualKeyCode.Z)
-        {
-            buffer += (char)('a' + (e.Key - VirtualKeyCode.A));
-        }
-        else if (e.Key == VirtualKeyCode.Space)
-        {
-            if (expansions.TryGetValue(buffer, out var expansion))
-            {
-                for (int i = 0; i < buffer.Length; i++)
-                    KeyboardInputGenerator.KeyPress(VirtualKeyCode.Back);
-                KeyboardInputGenerator.TypeText(expansion);
-            }
-            buffer = "";
-        }
-        else if (e.Key == VirtualKeyCode.Back && buffer.Length > 0)
-        {
-            buffer = buffer[..^1];
-        }
-        else
-        {
-            buffer = "";
-        }
-    });
-
-Console.ReadLine();
-```
-
----
-
-## Global Hotkey with Timestamp Insertion
-
-**Packages:** `Dapplo.Windows.Input`
-
-Uses `TriggerOnKeyUp` to ensure modifier keys are released before typing, so the inserted text is not accidentally modified.
-
-```csharp
-using Dapplo.Windows.Input.Keyboard;
-
-using var hook = KeyboardHook.Create();
-
-var handler = new KeyCombinationHandler(
-    VirtualKeyCode.Control,
-    VirtualKeyCode.Menu,   // Alt
-    VirtualKeyCode.LeftWin,
-    VirtualKeyCode.T)
-{
-    TriggerOnKeyUp = true
-};
-
-hook.KeyboardEvents
-    .Where(handler)
-    .Subscribe(e =>
-    {
-        KeyboardInputGenerator.TypeText(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-        e.Handled = true;
-    });
-
-Console.ReadLine();
-```
-
----
-
-## Window Tiling
-
-**Packages:** `Dapplo.Windows`, `Dapplo.Windows.User32`
-
-```csharp
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Common.Structs;
-using Dapplo.Windows.User32;
-using System.Linq;
-
-void TileAllVisibleWindows()
-{
-    var windows = InteropWindowQuery.GetTopLevelWindows()
-        .Where(w => w.IsVisible() && w.IsAppWindow())
-        .ToList();
-
-    if (windows.Count == 0) return;
-
-    var workArea = User32Api.GetWorkArea();
-    int cols = (int)Math.Ceiling(Math.Sqrt(windows.Count));
-    int rows = (int)Math.Ceiling(windows.Count / (double)cols);
-    int w = workArea.Width  / cols;
-    int h = workArea.Height / rows;
-
-    for (int i = 0; i < windows.Count; i++)
-    {
-        int col = i % cols;
-        int row = i / cols;
-        windows[i].SetPlacement(new NativeRect(col * w, row * h, (col + 1) * w, (row + 1) * h));
-    }
-}
-```
-
----
-
-## DPI-Aware Application Bootstrap
-
-**Packages:** `Dapplo.Windows`, `Dapplo.Windows.Dpi`
-
-Combines window management with DPI handling for an application that looks crisp on any display:
-
-```csharp
-using Dapplo.Windows.Dpi;
-using Dapplo.Windows.Dpi.Forms;
-using System.Windows.Forms;
-
-static class Program
-{
-    [STAThread]
-    static void Main()
-    {
-        // Enable per-monitor v2 DPI awareness before any UI is created
-        DpiHandler.SetProcessDpiAwareness(DpiAwarenessContext.PerMonitorAwareV2);
-
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new MainForm());
-    }
-}
-
-// Extend DpiAwareForm so fonts, bitmaps, and layout scale automatically
-public class MainForm : DpiAwareForm
-{
-    public MainForm()
-    {
-        InitializeComponent();
-    }
-}
-```
-
----
-
-## Citrix-Aware Application
-
-**Packages:** `Dapplo.Windows.Citrix`
-
-Detect whether the app is running in a Citrix session and adapt behavior accordingly:
-
-```csharp
-using Dapplo.Windows.Citrix;
-
-if (WinFrame.IsAvailable)
-{
-    var clientName    = WinFrame.QuerySessionInformation(InfoClasses.ClientName);
-    var clientAddress = WinFrame.QuerySessionInformation(InfoClasses.ClientAddress);
-    Console.WriteLine($"Citrix client: {clientName} ({clientAddress})");
-
-    // Disable GPU-intensive features, reduce network calls, etc.
-    EnableCitrixMode();
-}
-```
-
----
-
-## Application with Automatic Restart (Installer Integration)
-
-**Packages:** `Dapplo.Windows.AppRestartManager`
-
-```csharp
-using Dapplo.Windows.AppRestartManager;
-using Dapplo.Windows.AppRestartManager.Enums;
-
-static class Program
-{
-    [STAThread]
-    static void Main(string[] args)
-    {
-        // Register so Windows Restart Manager can restart us after an update
-        ApplicationRestartManager.RegisterForRestart("/restore");
-
-        if (ApplicationRestartManager.WasRestartRequested())
-            RestorePreviousState();
-
-        var shutdownSub = ApplicationRestartManager.ListenForEndSession()
-            .Subscribe(reason =>
-            {
-                if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
-                    SaveApplicationState();
-            });
-
-        Application.Run(new MainForm());
-
-        shutdownSub.Dispose();
-        ApplicationRestartManager.UnregisterForRestart();
-    }
-}
-```
-
----
-
-## Performance Tips
-
-### Debounce High-Frequency Events
-
-```csharp
-// Window moves fire many events — debounce to 100 ms
-WinEventHook.Create(WinEvents.EVENT_OBJECT_LOCATIONCHANGE)
-    .Throttle(TimeSpan.FromMilliseconds(100))
-    .Subscribe(e => UpdateLayout(e.Handle));
-```
-
-### Batch Clipboard Events
-
-```csharp
-ClipboardNative.OnUpdate
-    .Buffer(TimeSpan.FromSeconds(5))
+// Or collect them and process them in batches
+var batches = ClipboardNative.OnUpdate
+    .Buffer(TimeSpan.FromSeconds(1))
     .Where(batch => batch.Count > 0)
-    .Subscribe(batch => SaveBatchToDatabase(batch));
+    .Subscribe(batch => Console.WriteLine($"{batch.Count} clipboard changes in the last second"));
 ```
-
-### Load Only What You Need
-
-```csharp
-// Loading all window properties has a cost — request only what you need
-window.Fill(InteropWindowRetrieveSettings.Caption | InteropWindowRetrieveSettings.Info);
-```
-
-## See Also
-
-- [[Window-Management]]
-- [[Clipboard]]
-- [[Input-Handling]]
-- [[DPI-Awareness]]
-- [[Restart-Manager]]

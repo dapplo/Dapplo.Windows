@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Every code sample of the documentation (README.md, doc/articles, wiki) lives in this project, so the samples are compiled with every build.
+    The markdown contains a copy of the code between the matching "#region" markers, see doc/articles/intro.md "About the samples".
+    The samples are not meant to be run.
+  -->
+  <PropertyGroup>
+    <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
+    <OutputType>Library</OutputType>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+    <!-- Samples declare variables to show what a call returns -->
+    <NoWarn>$(NoWarn);CS0168;CS0219;CS1998</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Advapi32\Dapplo.Windows.Advapi32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.AppRestartManager\Dapplo.Windows.AppRestartManager.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Citrix\Dapplo.Windows.Citrix.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Clipboard\Dapplo.Windows.Clipboard.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Com\Dapplo.Windows.Com.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.DesktopWindowsManager\Dapplo.Windows.DesktopWindowsManager.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Devices\Dapplo.Windows.Devices.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Dialogs\Dapplo.Windows.Dialogs.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Dpi\Dapplo.Windows.Dpi.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.EmbeddedBrowser\Dapplo.Windows.EmbeddedBrowser.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Forms\Dapplo.Windows.Forms.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Gdi32\Dapplo.Windows.Gdi32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Icons\Dapplo.Windows.Icons.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Input\Dapplo.Windows.Input.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.InstallerManager\Dapplo.Windows.InstallerManager.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Kernel32\Dapplo.Windows.Kernel32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Messages\Dapplo.Windows.Messages.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Multimedia\Dapplo.Windows.Multimedia.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Shell32\Dapplo.Windows.Shell32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.SystemState\Dapplo.Windows.SystemState.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Wpf\Dapplo.Windows.Wpf.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+  </ItemGroup>
+</Project>

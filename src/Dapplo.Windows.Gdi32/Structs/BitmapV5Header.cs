@@ -46,7 +46,7 @@ public struct BitmapV5Header
     [FieldOffset(56)]
     private ColorSpace _bV5CSType;
     [FieldOffset(60)]
-    private CieXyzTripple _bV5Endpoints;
+    private CieXyzTriple _bV5Endpoints;
     [FieldOffset(96)]
     private uint _bV5GammaRed;
     [FieldOffset(100)]
@@ -54,7 +54,7 @@ public struct BitmapV5Header
     [FieldOffset(104)]
     private uint _bV5GammaBlue;
     [FieldOffset(108)]
-    private ColorSpace _bV5Intent;
+    private ColorSpaceIntent _bV5Intent;
     [FieldOffset(112)]
     private uint _bV5ProfileData;
     [FieldOffset(116)]
@@ -271,7 +271,7 @@ public struct BitmapV5Header
     ///     green, and blue endpoints for the logical color space associated with the bitmap. This member is ignored unless the
     ///     bV5CSType member specifies LCS_CALIBRATED_RGB.
     /// </summary>
-    public CieXyzTripple Endpoints
+    public CieXyzTriple Endpoints
     {
         get => _bV5Endpoints;
         set => _bV5Endpoints = value;
@@ -295,7 +295,7 @@ public struct BitmapV5Header
     public uint GammaGreen
     {
         get => _bV5GammaGreen;
-        set => _bV5GammaRed = value;
+        set => _bV5GammaGreen = value;
     }
 
     /// <summary>
@@ -312,7 +312,7 @@ public struct BitmapV5Header
     ///     Rendering intent for bitmap. This can be one of the following values:
     ///     LCS_GM_ABS_COLORIMETRIC, LCS_GM_BUSINESS, LCS_GM_GRAPHICS, LCS_GM_IMAGES
     /// </summary>
-    public ColorSpace Intent
+    public ColorSpaceIntent Intent
     {
         get => _bV5Intent;
         set => _bV5Intent = value;
@@ -355,6 +355,7 @@ public struct BitmapV5Header
     /// <param name="width">int with the width of the bitmap</param>
     /// <param name="height">int with the height of the bitmap</param>
     /// <param name="bpp">int with the bits per pixel of the bitmap</param>
+    /// <remarks>The compression is BI_RGB, which means GDI ignores the color masks which are set, set Compression to BI_BITFIELDS to use them.</remarks>
     public static BitmapV5Header Create(int width, int height, ushort bpp)
     {
         return new BitmapV5Header
@@ -367,7 +368,7 @@ public struct BitmapV5Header
             _biWidth = width,
             _biHeight = height,
             _biBitCount = bpp,
-            _biSizeImage = (uint) (width * height * (bpp >> 3)),
+            _biSizeImage = BitmapInfoHeader.CalculateImageSize(width, height, bpp),
             _biXPelsPerMeter = 0,
             _biYPelsPerMeter = 0,
             _biClrUsed = 0,
@@ -379,7 +380,7 @@ public struct BitmapV5Header
             _bV5BlueMask = 255,
             _bV5AlphaMask = (uint) 255 << 24,
             _bV5CSType = ColorSpace.LCS_sRGB,
-            _bV5Endpoints = new CieXyzTripple
+            _bV5Endpoints = new CieXyzTriple
             {
                 Blue = CieXyz.Create(0),
                 Green = CieXyz.Create(0),
@@ -388,7 +389,7 @@ public struct BitmapV5Header
             _bV5GammaRed = 0,
             _bV5GammaGreen = 0,
             _bV5GammaBlue = 0,
-            _bV5Intent = ColorSpace.LCS_GM_IMAGES,
+            _bV5Intent = ColorSpaceIntent.LCS_GM_IMAGES,
             _bV5ProfileData = 0,
             _bV5ProfileSize = 0,
             _bV5Reserved = 0
@@ -420,18 +421,9 @@ public struct BitmapV5Header
     }
 
     /// <summary>
-    ///     Calculate the offset to the pixels
+    ///     Calculate the offset, from the start of this header, to the pixels.
+    ///     This includes the BI_BITFIELDS color masks which follow a 40 byte header and the color table.
+    ///     Add the size of the BitmapFileHeader for the offset in a .bmp file.
     /// </summary>
-    public uint OffsetToPixels
-    {
-        get
-        {
-            if (_biCompression == BitmapCompressionMethods.BI_BITFIELDS)
-            {
-                // Add 3x4 bytes for the bitfield color mask
-                return _biSize + 3 * 4;
-            }
-            return _biSize;
-        }
-    }
+    public uint OffsetToPixels => BitmapInfoHeader.CalculateOffsetToPixels(_biSize, _biCompression, _biBitCount, _biClrUsed);
 }

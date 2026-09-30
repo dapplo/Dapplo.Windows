@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Messages.Native;
 
@@ -16,5 +16,5 @@ namespace Dapplo.Windows.Messages.Native;
 /// <param name="msg">WindowsMessages that specifies the type of message being sent.</param>
 /// <param name="wParam">Additional message-specific information. The meaning depends on the value of the msg parameter.</param>
 /// <param name="lParam">Additional message-specific information. The meaning depends on the value of the msg parameter.</param>
-/// <returns>A value that indicates the result of the message processing, as defined by the message being handled.</returns>
-public delegate nuint WndProc(nint hWnd, WindowsMessages msg, nint wParam, nint lParam);
+/// <returns>The LRESULT (a signed, pointer sized value) that indicates the result of the message processing, as defined by the message being handled.</returns>
+public delegate nint WndProc(nint hWnd, WindowsMessages msg, nint wParam, nint lParam);

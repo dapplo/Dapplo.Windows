@@ -2,13 +2,9 @@
   <PropertyGroup>
     <Description>Dapplo.Windows.Shell32 provides logic of the Windows Shell32 API</Description>
     <PackageTags>windows native shell32</PackageTags>
-    <TargetFrameworks>net480;netstandard2.0;net8.0-windows;net10.0-windows</TargetFrameworks>
+    <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
   </ItemGroup>
 </Project>

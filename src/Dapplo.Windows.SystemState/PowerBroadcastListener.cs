@@ -1,11 +1,10 @@
-// Copyright (c) Dapplo and contributors. All rights reserved.
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD2_0
 using System;
 using System.Reactive.Linq;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.SystemState.Enums;
 
 namespace Dapplo.Windows.SystemState;
@@ -25,7 +24,8 @@ public static class PowerBroadcastListener
     {
         _powerBroadcastEvents = SharedMessageWindow.Messages
             .Where(m => m.Msg == WindowsMessages.WM_POWERBROADCAST)
-            .Select(m => (PowerBroadcastEvent)(uint)m.WParam)
+            // Only the event type is passed on, lParam is only valid during the message
+            .Select(m => unchecked((PowerBroadcastEvent)(uint)m.WParam))
             .Publish()
             .RefCount();
     }
@@ -34,6 +34,8 @@ public static class PowerBroadcastListener
     /// Gets an observable sequence of power broadcast events.
     /// Subscribe to this to be notified of system power state changes such as
     /// suspend, resume, battery status changes, etc.
+    /// The events are produced on the thread of the SharedMessageWindow, while WM_POWERBROADCAST is processed.
+    /// For PBT_APMSUSPEND the system waits (max. about 2 seconds) until the subscribers return, so save state synchronously.
     /// </summary>
     /// <example>
     /// <code>
@@ -72,4 +74,3 @@ public static class PowerBroadcastListener
     public static IObservable<PowerBroadcastEvent> PowerStatusChanged =>
         _powerBroadcastEvents.Where(e => e == PowerBroadcastEvent.PBT_APMPOWERSTATUSCHANGE);
 }
-#endif

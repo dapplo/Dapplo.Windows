@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System.Linq;
-using System.Windows.Media.Imaging;
+using System.Drawing;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.App;
@@ -31,19 +31,19 @@ public class AppWindowTests
         {
             Log.Debug().WriteLine("{0} - {1}", interopWindow.GetCaption(), interopWindow.GetClassname());
             Assert.True(interopWindow.IsApp());
-            var iconBitmapSource = interopWindow.GetIcon<BitmapSource>();
+            var iconBitmapSource = interopWindow.GetIcon<Bitmap>();
             Assert.NotNull(iconBitmapSource);
         }
     }
 
     /// <summary>
-    ///     Make sure GetTopLevelWindows doesn't return an App Window.
+    ///     Make sure GetVisibleApplicationWindows doesn't return an App Window.
     /// </summary>
     /// <returns></returns>
     [WpfFact]
     public void TestApp_TopLevel()
     {
-        var topLevelWindows = InteropWindowQuery.GetTopLevelWindows().ToList();
+        var topLevelWindows = InteropWindowQuery.GetVisibleApplicationWindows().ToList();
         Assert.DoesNotContain(topLevelWindows, window => window.IsApp());
     }
 }

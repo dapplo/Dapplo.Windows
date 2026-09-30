@@ -8,7 +8,7 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Common.TypeConverters;
 
 /// <summary>
-/// This implements a TypeConverter for the NativeRect structur
+/// This implements a TypeConverter for the NativeRectFloat structure, the format is "Left,Top,Width,Height" using the invariant culture
 /// </summary>
 public class NativeRectFloatTypeConverter : TypeConverter
 {
@@ -31,10 +31,10 @@ public class NativeRectFloatTypeConverter : TypeConverter
         {
             string[] xywh = nativeRectFStringValue.Split(',');
             if (xywh.Length == 4 &&
-                float.TryParse(xywh[0], NumberStyles.Number, CultureInfo.InvariantCulture, out var x) &&
-                float.TryParse(xywh[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var y) &&
-                float.TryParse(xywh[2], NumberStyles.Number, CultureInfo.InvariantCulture, out var w) &&
-                float.TryParse(xywh[3], NumberStyles.Number, CultureInfo.InvariantCulture, out var h))
+                float.TryParse(xywh[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var x) &&
+                float.TryParse(xywh[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var y) &&
+                float.TryParse(xywh[2], NumberStyles.Float, CultureInfo.InvariantCulture, out var w) &&
+                float.TryParse(xywh[3], NumberStyles.Float, CultureInfo.InvariantCulture, out var h))
             {
                 return new NativeRectFloat(x, y, w, h);
             }
@@ -47,7 +47,8 @@ public class NativeRectFloatTypeConverter : TypeConverter
     {
         if (destinationType == typeof(string) && value is NativeRectFloat nativeRectF)
         {
-            return $"{nativeRectF.Left.ToString(CultureInfo.InvariantCulture)},{nativeRectF.Top.ToString(CultureInfo.InvariantCulture)},{nativeRectF.Width.ToString(CultureInfo.InvariantCulture)},{nativeRectF.Height.ToString(CultureInfo.InvariantCulture)}";
+            // "R" makes sure the value round-trips on .NET Framework too
+            return string.Join(",", nativeRectF.Left.ToString("R", CultureInfo.InvariantCulture), nativeRectF.Top.ToString("R", CultureInfo.InvariantCulture), nativeRectF.Width.ToString("R", CultureInfo.InvariantCulture), nativeRectF.Height.ToString("R", CultureInfo.InvariantCulture));
         }
         return base.ConvertTo(context, culture, value, destinationType);
     }

@@ -27,7 +27,12 @@ public enum MouseStates : ushort
     VirtualDesktop = 0x0002,
 
     /// <summary>
-    ///     The left button was released.
+    ///     Mouse attributes changed; application needs to query the mouse attributes.
     /// </summary>
-    AttributesChanged = 0x0004
+    AttributesChanged = 0x0004,
+
+    /// <summary>
+    ///     This mouse movement event was not coalesced. Mouse movement events can be coalesced by default.
+    /// </summary>
+    MoveNoCoalesce = 0x0008
 }

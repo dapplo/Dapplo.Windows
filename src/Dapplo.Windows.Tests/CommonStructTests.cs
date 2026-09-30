@@ -7,6 +7,7 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
+using Dapplo.Windows.Wpf;
 using Xunit;
 
 namespace Dapplo.Windows.Tests;
@@ -22,7 +23,7 @@ public class CommonStructTests
     ///     Test NativeRect Properties
     /// </summary>
     [Fact]
-    private void Test_NativeRect_Properties()
+    public void Test_NativeRect_Properties()
     {
         const int left = 100;
         const int top = 200;
@@ -55,7 +56,7 @@ public class CommonStructTests
     ///     Test NativePoint TypeConverter
     /// </summary>
     [Fact]
-    private void Test_NativePoint_TypeConverter()
+    public void Test_NativePoint_TypeConverter()
     {
         var nativePoint = new NativePoint(123, 456);
 
@@ -75,7 +76,7 @@ public class CommonStructTests
     ///     Test NativeSize operators
     /// </summary>
     [Fact]
-    private void Test_NativeSize_Operators()
+    public void Test_NativeSize_Operators()
     {
         var nativeSize1 = new NativeSize(123, 456);
         var nativeSize2 = new NativeSize(123, 456);
@@ -90,18 +91,16 @@ public class CommonStructTests
         Assert.False(drawingSize != nativeSize1);
         Assert.True(drawingSizeNotEqual != nativeSize1);
 
-        Assert.True(nativeSize1 == windowsSize);
-        Assert.True(windowsSize == nativeSize1);
-        Assert.False(nativeSize1 != windowsSize);
-        Assert.False(windowsSize != nativeSize1);
-        Assert.True(windowsSizeNotEqual != nativeSize1);
+        Assert.Equal(windowsSize, nativeSize1.ToSize());
+        Assert.True(windowsSize.ToNativeSize() == nativeSize1);
+        Assert.True(windowsSizeNotEqual.ToNativeSize() != nativeSize1);
     }
 
     /// <summary>
     ///     Test NativeSize operators
     /// </summary>
     [Fact]
-    private void Test_NativeSizeFloat_Operators()
+    public void Test_NativeSizeFloat_Operators()
     {
         var nativeSize1 = new NativeSizeFloat(123, 456);
         var nativeSize2 = new NativeSizeFloat(123, 456);
@@ -116,18 +115,16 @@ public class CommonStructTests
         Assert.False(drawingSize != nativeSize1);
         Assert.True(drawingSizeNotEqual != nativeSize1);
 
-        Assert.True(nativeSize1 == windowsSize);
-        Assert.True(windowsSize == nativeSize1);
-        Assert.False(nativeSize1 != windowsSize);
-        Assert.False(windowsSize != nativeSize1);
-        Assert.True(windowsSizeNotEqual != nativeSize1);
+        Assert.Equal(windowsSize, nativeSize1.ToSize());
+        Assert.True(windowsSize.ToNativeSizeFloat() == nativeSize1);
+        Assert.True(windowsSizeNotEqual.ToNativeSizeFloat() != nativeSize1);
     }
 
     /// <summary>
     ///     Test NativeRect TypeConverter
     /// </summary>
     [Fact]
-    private void Test_NativeRect_TypeConverter()
+    public void Test_NativeRect_TypeConverter()
     {
         var nativeRect = new NativeRect(123, 456, 457, 876);
 
@@ -147,7 +144,7 @@ public class CommonStructTests
     ///     Test NativeRectFloat TypeConverter
     /// </summary>
     [Fact]
-    private void Test_NativeRectFloat_TypeConverter()
+    public void Test_NativeRectFloat_TypeConverter()
     {
         var nativeRect = new NativeRectFloat(123.1f, 456.2f, 457.3f, 876.4f);
 
@@ -167,7 +164,7 @@ public class CommonStructTests
     ///     Test NativeRect Transform
     /// </summary>
     [Fact]
-    private void Test_NativeRect_Transform()
+    public void Test_NativeRect_Transform()
     {
         const int offsetX = 20;
         const int offsetY = 30;
@@ -179,10 +176,10 @@ public class CommonStructTests
     }
 
     /// <summary>
-    /// Test implicit conversion for NativeRectFloat
+    /// Test implicit and explicit conversion for NativeRectFloat
     /// </summary>
     [Fact]
-    private void Test_NativeRectFloat_ImplicitConversion()
+    public void Test_NativeRectFloat_ImplicitConversion()
     {
         var nativeRectFloat = new NativeRectFloat(10.5f, 20.5f, 30.5f, 40.5f);
 
@@ -191,37 +188,36 @@ public class CommonStructTests
         NativeRectFloat nativeRectFloatConverted1 = nativeRect;
         Assert.Equal(nativeRectFloatExpected1, nativeRectFloatConverted1);
 
-        var nativeRectExpected = new NativeRect(10, 20, 30, 40);
-        NativeRect nativeRectConverted = nativeRectFloat;
+        // The explicit conversion results in the smallest integer rectangle containing the float rectangle: 10.5..41 x 20.5..61
+        var nativeRectExpected = new NativeRect(10, 20, 31, 41);
+        var nativeRectConverted = (NativeRect)nativeRectFloat;
         Assert.Equal(nativeRectExpected, nativeRectConverted);
 
-#if !NETSTANDARD2_0
         var rect = new Rect(10.0, 20.0, 30.0, 40.0);
         var nativeRectFloatExpected2 = new NativeRectFloat(10.0f, 20.0f, 30.0f, 40.0f);
-        NativeRectFloat nativeRectFloatConverted2 = rect;
+        var nativeRectFloatConverted2 = rect.ToNativeRectFloat();
         Assert.Equal(nativeRectFloatExpected2, nativeRectFloatConverted2);
 
         var rectExpected = new Rect(10.5, 20.5, 30.5, 40.5);
-        Rect rectConverted = nativeRectFloat;
+        var rectConverted = nativeRectFloat.ToRect();
         Assert.Equal(rectExpected, rectConverted);
 
         var int32Rect = new Int32Rect(10, 20, 30, 40);
         var nativeRectFloatExpected3 = new NativeRectFloat(10, 20, 30, 40);
-        NativeRectFloat nativeRectFloatConverted3 = int32Rect;
+        var nativeRectFloatConverted3 = int32Rect.ToNativeRectFloat();
         Assert.Equal(nativeRectFloatExpected3, nativeRectFloatConverted3);
 
-        var int32RectExpected = new Int32Rect(10, 20, 30, 40);
-        Int32Rect int32RectConverted = nativeRectFloat;
+        var int32RectExpected = new Int32Rect(10, 20, 31, 41);
+        var int32RectConverted = nativeRectFloat.ToInt32Rect();
         Assert.Equal(int32RectExpected, int32RectConverted);
-#endif
 
         var rectangle = new Rectangle(10, 20, 30, 40);
         var nativeRectFloatExpected4 = new NativeRectFloat(10, 20, 30, 40);
         NativeRectFloat nativeRectFloatConverted4 = rectangle;
         Assert.Equal(nativeRectFloatExpected4, nativeRectFloatConverted4);
 
-        var rectangleExpected = new Rectangle(10, 20, 30, 40);
-        Rectangle rectangleConverted = nativeRectFloat;
+        var rectangleExpected = new Rectangle(10, 20, 31, 41);
+        var rectangleConverted = (Rectangle)nativeRectFloat;
         Assert.Equal(rectangleExpected, rectangleConverted);
 
         var rectangleF = new RectangleF(10.5f, 20.5f, 30.5f, 40.5f);
@@ -243,7 +239,7 @@ public class CommonStructTests
     [InlineData(100, 200, -20, -40, 20, 10)]
     [InlineData(100, 100, 40, 40, -10, 10)]
     [InlineData(100, 100, 40, 40, 10, -10)]
-    private void Test_NativeRect_Inflate(int x, int y, int width, int height, int inflateX, int inflateY)
+    public void Test_NativeRect_Inflate(int x, int y, int width, int height, int inflateX, int inflateY)
     {
         var nativeRect = new NativeRect(x, y, width, height);
         var nativeSize = new NativeSize(inflateX, inflateY);
@@ -262,7 +258,7 @@ public class CommonStructTests
     [Theory]
     [InlineData(10, 10, 40, 40, 20, 20, 10,10)]
     [InlineData(150, 150, 100, 100, 100, 100, 100, 100)]
-    private void Test_NativeRect_Union(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
+    public void Test_NativeRect_Union(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
     {
         var nativeRect1 = new NativeRect(x1, y1, width1, height1);
         var nativeRect2 = new NativeRect(x2, y2, width2, height2);
@@ -278,7 +274,7 @@ public class CommonStructTests
     [Theory]
     [InlineData(10, 10, 40, 40, 20, 20, 10, 10)]
     [InlineData(150, 150, 100, 100, 100, 100, 100, 100)]
-    private void Test_NativeRect_Intersect(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
+    public void Test_NativeRect_Intersect(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
     {
         var nativeRect1 = new NativeRect(x1, y1, width1, height1);
         var nativeRect2 = new NativeRect(x2, y2, width2, height2);
@@ -286,5 +282,34 @@ public class CommonStructTests
         var intersectRectangle = Rectangle.Intersect(nativeRect1, nativeRect2);
 
         Assert.Equal(intersectRectangle, intersectNativeRect);
+    }
+
+    /// <summary>
+    /// Test that NativePoint.Offset keeps the coordinate when an offset is not specified
+    /// </summary>
+    [Fact]
+    public void Test_NativePoint_Offset_Nullable()
+    {
+        var point = new NativePoint(100, 100);
+        Assert.Equal(new NativePoint(100, 105), point.Offset(offsetY: 5));
+        Assert.Equal(new NativePoint(105, 100), point.Offset(offsetX: 5));
+        Assert.Equal(new NativePoint(105, 110), point.Offset(5, 10));
+        Assert.Equal(point, point.Offset());
+    }
+
+    /// <summary>
+    /// Test that NativePointFloat.Offset and NativeRectFloat.Offset keep the coordinate when an offset is not specified
+    /// </summary>
+    [Fact]
+    public void Test_NativePointFloat_Offset_Nullable()
+    {
+        var point = new NativePointFloat(100.5f, 100.5f);
+        Assert.Equal(new NativePointFloat(100.5f, 105.5f), point.Offset(offsetY: 5f));
+        Assert.Equal(new NativePointFloat(105.5f, 100.5f), point.Offset(offsetX: 5f));
+        Assert.Equal(point, point.Offset());
+
+        var rect = new NativeRectFloat(100.5f, 100.5f, 10f, 20f);
+        Assert.Equal(new NativeRectFloat(100.5f, 105.5f, 10f, 20f), rect.Offset(offsetY: 5f));
+        Assert.Equal(new NativeRectFloat(105.5f, 100.5f, 10f, 20f), rect.Offset(offsetX: 5f));
     }
 }

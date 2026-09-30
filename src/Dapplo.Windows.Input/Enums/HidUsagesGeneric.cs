@@ -45,10 +45,6 @@ public enum HidUsagesGeneric : ushort
     /// </summary>
     Tablet = 0x09,
     /// <summary>
-    /// Consumer
-    /// </summary>
-    Consumer = 0x0C,
-    /// <summary>
     /// X
     /// </summary>
     X = 0x30,

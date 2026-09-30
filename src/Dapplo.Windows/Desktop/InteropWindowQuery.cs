@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Dapplo.Windows.App;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
@@ -16,10 +16,62 @@ namespace Dapplo.Windows.Desktop;
 /// </summary>
 public static class InteropWindowQuery
 {
+    private static readonly object IgnoreClassesLock = new object();
+
+    // Replaced as a whole (copy on write), so readers never need a lock. "Button" is e.g. the top-level Start button of Windows 7.
+    private static HashSet<string> _ignoreClasses = new HashSet<string>(StringComparer.Ordinal) {"Progman", "Button", "Dwm"}; //"MS-SDIa"
+
     /// <summary>
-    ///     Window classes which can be ignored
+    ///     Window classes which can be ignored, this is a snapshot, use <see cref="AddIgnoreClass"/> and <see cref="RemoveIgnoreClass"/> to change it.
     /// </summary>
-    public static ConcurrentBag<string> IgnoreClasses { get; } = new ConcurrentBag<string>(new[] {"Progman", "Button", "Dwm"}); //"MS-SDIa"
+    public static IReadOnlyCollection<string> IgnoreClasses => Volatile.Read(ref _ignoreClasses);
+
+    /// <summary>
+    ///     Add a window class to the classes which are ignored
+    /// </summary>
+    /// <param name="classname">string with the window class</param>
+    /// <returns>true if it was added, false if it was already ignored</returns>
+    public static bool AddIgnoreClass(string classname)
+    {
+        if (classname == null)
+        {
+            throw new ArgumentNullException(nameof(classname));
+        }
+        lock (IgnoreClassesLock)
+        {
+            if (_ignoreClasses.Contains(classname))
+            {
+                return false;
+            }
+            var newIgnoreClasses = new HashSet<string>(_ignoreClasses, StringComparer.Ordinal) { classname };
+            Volatile.Write(ref _ignoreClasses, newIgnoreClasses);
+            return true;
+        }
+    }
+
+    /// <summary>
+    ///     Remove a window class from the classes which are ignored
+    /// </summary>
+    /// <param name="classname">string with the window class</param>
+    /// <returns>true if it was removed, false if it wasn't ignored</returns>
+    public static bool RemoveIgnoreClass(string classname)
+    {
+        if (classname == null)
+        {
+            throw new ArgumentNullException(nameof(classname));
+        }
+        lock (IgnoreClassesLock)
+        {
+            if (!_ignoreClasses.Contains(classname))
+            {
+                return false;
+            }
+            var newIgnoreClasses = new HashSet<string>(_ignoreClasses, StringComparer.Ordinal);
+            newIgnoreClasses.Remove(classname);
+            Volatile.Write(ref _ignoreClasses, newIgnoreClasses);
+            return true;
+        }
+    }
 
     /// <summary>
     ///     Get the window with which the user is currently working
@@ -61,29 +113,48 @@ public static class InteropWindowQuery
     }
 
     /// <summary>
-    ///     Iterate the Top level windows, from top to bottom
+    ///     Get the windows the user sees as application windows (see <see cref="IsVisibleApplicationWindow"/>), from top to bottom:
+    ///     visible, not minimized, with a title and a size, no tool window and no child window.
+    ///     The windows are a snapshot taken by <see cref="GetTopWindows"/> when this method is called, the filter is applied lazily while enumerating the result.
     /// </summary>
-    /// <param name="ignoreKnownClasses">true to ignore windows with certain known classes</param>
-    /// <returns>IEnumerable with all the top level windows</returns>
-    public static IEnumerable<IInteropWindow> GetTopLevelWindows(bool ignoreKnownClasses = true)
+    /// <param name="ignoreKnownClasses">true (default) to ignore windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <returns>IEnumerable with the visible application windows</returns>
+    public static IEnumerable<IInteropWindow> GetVisibleApplicationWindows(bool ignoreKnownClasses = true)
     {
-        return GetTopWindows().Where(possibleTopLevel => possibleTopLevel.IsTopLevel(ignoreKnownClasses));
+        return GetTopWindows().Where(window => window.IsVisibleApplicationWindow(ignoreKnownClasses));
     }
 
     /// <summary>
-    ///     Iterate the windows, from top to bottom
+    ///     Get the windows in Z-order, from top (front) to bottom (back), without any filter.
+    ///     This is a snapshot, taken at once when this method is called (it's not lazy): without a parent (or with the desktop window as parent)
+    ///     EnumWindows is used, with a parent EnumChildWindows, filtered to the direct children (GetAncestor with GA_PARENT is the parent).
+    ///     Windows builds the list when the enumeration starts, so unlike a GetWindow(GW_HWNDNEXT) walk the result can't loop, skip or repeat windows when the Z-order changes.
+    ///     The windows can still change or be destroyed after the snapshot was taken, use <see cref="InteropWindowExtensions.Exists"/> when that matters.
+    ///     Note: the EnumWindows documentation states that Windows 8 and later only enumerate the top-level windows of desktop apps, so windows of Windows 8 style immersive apps might be missing.
     /// </summary>
-    /// <param name="parent">InteropWindow as the parent, to iterate over the children, or null for all</param>
-    /// <returns>IEnumerable with all the top level windows</returns>
-    public static IEnumerable<IInteropWindow> GetTopWindows(IInteropWindow parent = null)
+    /// <param name="parent">InteropWindow as the parent, to get its direct children, or null for the top-level windows</param>
+    /// <returns>IReadOnlyList with the windows, empty if there are none</returns>
+    public static IReadOnlyList<IInteropWindow> GetTopWindows(IInteropWindow parent = null)
     {
-        // TODO: Guard against looping
-        var windowPtr = parent == null ? User32Api.GetTopWindow(IntPtr.Zero) : User32Api.GetWindow(parent.Handle, GetWindowCommands.GW_CHILD);
-        do
+        var parentHandle = parent?.Handle ?? IntPtr.Zero;
+        if (parentHandle == User32Api.GetDesktopWindow())
         {
-            yield return InteropWindowFactory.CreateFor(windowPtr);
-            windowPtr = User32Api.GetWindow(windowPtr, GetWindowCommands.GW_HWNDNEXT);
-        } while (windowPtr != IntPtr.Zero);
+            // The children of the desktop window are the top-level windows, EnumWindows enumerates them without their descendants
+            parentHandle = IntPtr.Zero;
+        }
+
+        var windows = new List<IInteropWindow>();
+        // EnumChildWindows enumerates depth-first in Z-order: a child is followed by its descendants and then its next sibling,
+        // so filtering the descendants to the direct children keeps the children in Z-order
+        WindowsEnumerator.EnumerateHandles(parentHandle, hWnd =>
+        {
+            if (parentHandle == IntPtr.Zero || User32Api.GetAncestor(hWnd, GetAncestorFlags.GA_PARENT) == parentHandle)
+            {
+                windows.Add(InteropWindowFactory.CreateFor(hWnd));
+            }
+            return true;
+        });
+        return windows;
     }
 
     /// <summary>
@@ -93,18 +164,20 @@ public static class InteropWindowQuery
     /// <returns>bool</returns>
     public static bool CanIgnoreClass(this IInteropWindow interopWindow)
     {
-        return IgnoreClasses.Contains(interopWindow.GetClassname());
+        var classname = interopWindow.GetClassname();
+        return classname != null && Volatile.Read(ref _ignoreClasses).Contains(classname);
     }
 
     /// <summary>
-    /// Is the specified window a visible popup
+    /// Is the specified window a visible popup: a top-level window (it can be owned, it has no parent) with the WS_POPUP style,
+    /// which has a size, is rendered normally, is visible (WS_VISIBLE) and is not minimized. Unlike <see cref="IsVisibleApplicationWindow"/> tool windows and windows without a title are included.
     /// </summary>
     /// <param name="interopWindow">IInteropWindow</param>
-    /// <param name="ignoreKnowClasses">true (default) to ignore some known internal windows classes</param>
-    /// <returns>true if the IInteropWindow is a popup</returns>
-    public static bool IsPopup(this IInteropWindow interopWindow, bool ignoreKnowClasses = true)
+    /// <param name="ignoreKnownClasses">true (default) to ignore windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <returns>true if the IInteropWindow is a visible popup</returns>
+    public static bool IsVisiblePopup(this IInteropWindow interopWindow, bool ignoreKnownClasses = true)
     {
-        if (ignoreKnowClasses && interopWindow.CanIgnoreClass())
+        if (ignoreKnownClasses && interopWindow.CanIgnoreClass())
         {
             return false;
         }
@@ -115,7 +188,7 @@ public static class InteropWindowQuery
             return false;
         }
 
-        // Windows without parent
+        // Only top-level windows, child windows (which have a parent) are no popups. The owner is not the parent, so owned popups are popups.
         if (interopWindow.GetParent() != IntPtr.Zero)
         {
             return false;
@@ -148,15 +221,17 @@ public static class InteropWindowQuery
     }
 
     /// <summary>
-    ///     Check if the window is a top level window.
+    ///     Check if the window is what the user sees as an application window (e.g. what Alt+Tab shows):
+    ///     a top-level window (it can be owned, it has no parent) with a size, which is not a tool window (WS_EX_TOOLWINDOW), is rendered normally,
+    ///     is not a background Windows 10 app, is visible (WS_VISIBLE), has a title and is not minimized.
     ///     This method will retrieve all information, and fill it to the interopWindow, it needs to make the decision.
     /// </summary>
     /// <param name="interopWindow">InteropWindow</param>
-    /// <param name="ignoreKnowClasses">true (default) to ignore classes from the IgnoreClasses list</param>
-    /// <returns>bool</returns>
-    public static bool IsTopLevel(this IInteropWindow interopWindow, bool ignoreKnowClasses = true)
+    /// <param name="ignoreKnownClasses">true (default) to ignore windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <returns>true if the window is a visible application window</returns>
+    public static bool IsVisibleApplicationWindow(this IInteropWindow interopWindow, bool ignoreKnownClasses = true)
     {
-        if (ignoreKnowClasses && interopWindow.CanIgnoreClass())
+        if (ignoreKnownClasses && interopWindow.CanIgnoreClass())
         {
             return false;
         }
@@ -168,7 +243,7 @@ public static class InteropWindowQuery
             return false;
         }
 
-        // Ignore windows with a parent
+        // Ignore child windows, these have a parent. The owner is not the parent, so owned windows (e.g. dialogs) are top-level.
         if (interopWindow.GetParent() != IntPtr.Zero)
         {
             return false;

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Dapplo.Windows.Dialogs.Interop;
 
 namespace Dapplo.Windows.Dialogs;
@@ -23,12 +24,37 @@ internal static class ComDialogHelper
     internal const int HResultCancelled = unchecked((int)0x800704C7);
 
     /// <summary>
+    /// Throws an <see cref="InvalidOperationException"/> when the current thread is not an STA thread.
+    /// The Common Item Dialog is an apartment-threaded COM object with UI: on an MTA thread (thread pool, Task.Run, a console Main without [STAThread])
+    /// COM would create it on a hidden STA host thread, where it can't have the caller's window as owner and can hang or fail.
+    /// </summary>
+    /// <param name="dialogName">Name of the dialog for the message</param>
+    /// <exception cref="InvalidOperationException">When the current thread is not an STA thread</exception>
+    internal static void EnsureStaThread(string dialogName)
+    {
+        var apartmentState = Thread.CurrentThread.GetApartmentState();
+        if (apartmentState == ApartmentState.STA)
+        {
+            return;
+        }
+        throw new InvalidOperationException(
+            $"{dialogName}.ShowDialog must be called from an STA thread, but the current thread (managed id {Environment.CurrentManagedThreadId}) is {apartmentState}. " +
+            "Call it from the UI thread, mark Main with [STAThread], or start a dedicated Thread with SetApartmentState(ApartmentState.STA). " +
+            "Thread pool threads (Task.Run, await continuations without a UI SynchronizationContext) are always MTA.");
+    }
+
+    /// <summary>
     /// Creates a COM dialog coclass instance and casts it to <typeparamref name="T"/>.
     /// </summary>
+    /// <param name="clsid">The CLSID of the dialog</param>
+    /// <param name="dialogName">Name of the dialog (builder) for the error message</param>
+    /// <exception cref="InvalidOperationException">Called from a thread which is not an STA thread.</exception>
     /// <exception cref="PlatformNotSupportedException">Called on a non-Windows platform.</exception>
     /// <exception cref="COMException">The COM object could not be instantiated.</exception>
-    internal static T CreateDialog<T>(Guid clsid) where T : class
+    internal static T CreateDialog<T>(Guid clsid, string dialogName) where T : class
     {
+        // Check before any COM object is created
+        EnsureStaThread(dialogName);
         var type = Type.GetTypeFromCLSID(clsid)
             ?? throw new PlatformNotSupportedException(
                 "The Windows Common Item Dialog is only available on Windows Vista or later.");
@@ -67,8 +93,14 @@ internal static class ComDialogHelper
         try
         {
             var shellItem = ShellItemFromPath(path);
-            setFolder(shellItem);
-            Marshal.ReleaseComObject(shellItem);
+            try
+            {
+                setFolder(shellItem);
+            }
+            finally
+            {
+                Marshal.ReleaseComObject(shellItem);
+            }
         }
         catch (COMException)
         {
@@ -92,8 +124,14 @@ internal static class ComDialogHelper
             try
             {
                 var shellItem = ShellItemFromPath(path);
-                addPlace(shellItem, atTop ? FileDialogAddPlaceFlags.Top : FileDialogAddPlaceFlags.Bottom);
-                Marshal.ReleaseComObject(shellItem);
+                try
+                {
+                    addPlace(shellItem, atTop ? FileDialogAddPlaceFlags.Top : FileDialogAddPlaceFlags.Bottom);
+                }
+                finally
+                {
+                    Marshal.ReleaseComObject(shellItem);
+                }
             }
             catch (COMException)
             {
@@ -101,6 +139,15 @@ internal static class ComDialogHelper
             }
         }
     }
+
+    /// <summary>
+    /// Combines the dialog's current options (from <c>GetOptions</c>) with <paramref name="wanted"/>, keeping the dialog's defaults
+    /// (e.g. PathMustExist, FileMustExist, NoReadOnlyReturn). Always adds <see cref="FileOpenOptions.ForceFileSystem"/>,
+    /// so only file-system items can be picked, and <see cref="FileOpenOptions.NoChangeDir"/>,
+    /// so the dialog never changes the process's current directory.
+    /// </summary>
+    internal static FileOpenOptions CombineOptions(FileOpenOptions current, FileOpenOptions wanted) =>
+        current | wanted | FileOpenOptions.ForceFileSystem | FileOpenOptions.NoChangeDir;
 
     /// <summary>Returns the file-system path string for the given <see cref="IShellItem"/>.</summary>
     internal static string GetFileSysPath(IShellItem item)
@@ -110,21 +157,42 @@ internal static class ComDialogHelper
     }
 
     /// <summary>
+    /// Returns the file-system path string for the given <see cref="IShellItem"/> and releases the item,
+    /// also when <c>GetDisplayName</c> throws.
+    /// </summary>
+    internal static string GetFileSysPathAndRelease(IShellItem item)
+    {
+        try
+        {
+            return GetFileSysPath(item);
+        }
+        finally
+        {
+            Marshal.ReleaseComObject(item);
+        }
+    }
+
+    /// <summary>
     /// Collects file-system paths from all items in an <see cref="IShellItemArray"/>,
     /// releasing each item and the array itself before returning.
     /// </summary>
     internal static IReadOnlyList<string> CollectPaths(IShellItemArray items)
     {
-        items.GetCount(out var count);
-        var result = new List<string>((int)count);
-        for (uint i = 0; i < count; i++)
+        try
         {
-            items.GetItemAt(i, out var item);
-            result.Add(GetFileSysPath(item));
-            Marshal.ReleaseComObject(item);
+            items.GetCount(out var count);
+            var result = new List<string>((int)count);
+            for (uint i = 0; i < count; i++)
+            {
+                items.GetItemAt(i, out var item);
+                result.Add(GetFileSysPathAndRelease(item));
+            }
+            return result;
         }
-        Marshal.ReleaseComObject(items);
-        return result;
+        finally
+        {
+            Marshal.ReleaseComObject(items);
+        }
     }
 
     /// <summary>Creates an <see cref="IShellItem"/> from a file-system path.</summary>

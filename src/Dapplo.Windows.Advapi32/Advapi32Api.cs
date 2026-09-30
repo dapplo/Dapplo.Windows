@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Dapplo.Windows.Advapi32.Enums;
 using Dapplo.Windows.Advapi32.Structs;
-using Dapplo.Windows.Kernel32;
 
 namespace Dapplo.Windows.Advapi32;
 
@@ -17,47 +16,54 @@ public static class Advapi32Api
     private const uint SeGroupLogonId = 0xC0000000; // from winnt.h
 
     /// <summary>
-    /// Get the current Session-ID SID
+    /// Get the logon SID (the SE_GROUP_LOGON_ID group, S-1-5-5-X-Y) of the current process token, as a string.
+    /// Note: this is not the Terminal Services session id, for that use <c>Process.GetCurrentProcess().SessionId</c>.
     /// </summary>
-    /// <returns>string with SessionId as SID</returns>
-    public static string CurrentSessionId
+    /// <returns>string with the logon SID, or string.Empty when it could not be determined</returns>
+    public static string CurrentLogonSid
     {
         get
         {
-            int tokenInfLength = 0;
-            // first call gets lenght of TokenInformation
-            GetTokenInformation(WindowsIdentity.GetCurrent().Token, TokenInformationClasses.TokenGroups, IntPtr.Zero, tokenInfLength, out tokenInfLength);
+            using var identity = WindowsIdentity.GetCurrent();
+            var token = identity.Token;
+            // first call gets the length of the TokenInformation, it "fails" with ERROR_INSUFFICIENT_BUFFER
+            GetTokenInformation(token, TokenInformationClasses.TokenGroups, IntPtr.Zero, 0, out var tokenInfLength);
+            if (tokenInfLength <= 0)
+            {
+                return string.Empty;
+            }
             var tokenInformation = Marshal.AllocHGlobal(tokenInfLength);
             try
             {
-                var result = GetTokenInformation(WindowsIdentity.GetCurrent().Token, TokenInformationClasses.TokenGroups, tokenInformation, tokenInfLength, out tokenInfLength);
-                if (!result)
+                if (!GetTokenInformation(token, TokenInformationClasses.TokenGroups, tokenInformation, tokenInfLength, out tokenInfLength))
                 {
                     return string.Empty;
                 }
-                string retVal = string.Empty;
                 var groups = (TokenGroups)Marshal.PtrToStructure(tokenInformation, typeof(TokenGroups));
-                int sidAndAttrSize = Marshal.SizeOf(new SidAndAttributes());
+                int sidAndAttrSize = Marshal.SizeOf(typeof(SidAndAttributes));
                 for (int i = 0; i < groups.GroupCount; i++)
                 {
+                    // The SID_AND_ATTRIBUTES array starts after the GroupCount DWORD, aligned to the pointer size
                     var sidAndAttributes = (SidAndAttributes)Marshal.PtrToStructure(new IntPtr(tokenInformation.ToInt64() + i * sidAndAttrSize + IntPtr.Size), typeof(SidAndAttributes));
                     if ((sidAndAttributes.Attributes & SeGroupLogonId) != SeGroupLogonId)
                     {
                         continue;
                     }
 
-                    ConvertSidToStringSid(sidAndAttributes.Sid, out var pstr);
+                    if (!ConvertSidToStringSid(sidAndAttributes.Sid, out var pstr))
+                    {
+                        return string.Empty;
+                    }
                     try
                     {
-                        retVal = Marshal.PtrToStringAuto(pstr);
+                        return Marshal.PtrToStringAuto(pstr) ?? string.Empty;
                     }
                     finally
                     {
-                        Kernel32Api.LocalFree(pstr);
+                        LocalFree(pstr);
                     }
-                    break;
                 }
-                return retVal;
+                return string.Empty;
             }
             finally
             {
@@ -67,6 +73,14 @@ public static class Advapi32Api
     }
 
     /// <summary>
+    /// Frees the memory which ConvertSidToStringSid allocated, see <a href="https://learn.microsoft.com/windows/win32/api/winbase/nf-winbase-localfree">LocalFree function</a>
+    /// </summary>
+    /// <param name="hMem">IntPtr</param>
+    /// <returns>IntPtr.Zero when successful</returns>
+    [DllImport("kernel32", SetLastError = true)]
+    private static extern IntPtr LocalFree(IntPtr hMem);
+
+    /// <summary>
     /// See more about <a href="https://docs.microsoft.com/en-us/windows/desktop/api/sddl/nf-sddl-convertsidtostringsida">ConvertSidToStringSidA function</a>
     /// The ConvertSidToStringSid function converts a security identifier (SID) to a string format suitable for display, storage, or transmission.
     /// </summary>
@@ -74,6 +88,7 @@ public static class Advapi32Api
     /// <param name="ptrSid">IntPtr</param>
     /// <returns>bool</returns>
     [DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool ConvertSidToStringSid(IntPtr pSid, out IntPtr ptrSid);
 
     /// <summary>
@@ -88,6 +103,7 @@ public static class Advapi32Api
     /// If the value of the TokenInformationClass parameter is TokenDefaultDacl and the token has no default DACL, the function sets the variable pointed to by ReturnLength to sizeof(TOKEN_DEFAULT_DACL) and sets the DefaultDacl member of the TOKEN_DEFAULT_DACL structure to NULL.</param>
     /// <returns>If the function succeeds, the return value is nonzero.</returns>
     [DllImport("advapi32", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool GetTokenInformation(
         IntPtr tokenHandle,
         TokenInformationClasses tokenInformationClasses,
@@ -104,7 +120,7 @@ public static class Advapi32Api
     /// <param name="hEvent"></param>
     /// <param name="asynchronous">If this parameter is TRUE, the function returns immediately and reports changes by signaling the specified event. If this parameter is FALSE, the function does not return until a change has occurred.</param>
     /// <returns></returns>
-    [DllImport("advapi32", SetLastError = true)]
+    [DllImport("advapi32")]
     public static extern int RegNotifyChangeKeyValue(IntPtr hKey, bool watchSubtree, RegistryNotifyFilter notifyFilter, IntPtr hEvent, bool asynchronous);
 
     /// <summary>
@@ -122,7 +138,7 @@ public static class Advapi32Api
     /// <param name="samDesired">RegistryKeySecurityAccessRights</param>
     /// <param name="hOpenedKey">UIntPtr a handle to the registry key</param>
     /// <returns></returns>
-    [DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
+    [DllImport("advapi32", EntryPoint = "RegOpenKeyExW", CharSet = CharSet.Unicode)]
     public static extern int RegOpenKeyEx(IntPtr hKey, string subKey, RegistryOpenOptions ulOptions, RegistryKeySecurityAccessRights samDesired, out IntPtr hOpenedKey);
 
     /// <summary>
@@ -130,6 +146,6 @@ public static class Advapi32Api
     /// </summary>
     /// <param name="hKey">UIntPtr a handle to the registry key</param>
     /// <returns></returns>
-    [DllImport("advapi32", SetLastError = true)]
+    [DllImport("advapi32")]
     public static extern int RegCloseKey(IntPtr hKey);
 }

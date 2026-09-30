@@ -77,6 +77,9 @@ public static class ClipboardStringExtensions
     public static string GetAsUnicodeString(this IClipboardAccessToken clipboardAccessToken, uint formatId = (uint)StandardClipboardFormats.UnicodeText)
     {
         var bytes = clipboardAccessToken.GetAsBytes(formatId);
-        return Encoding.Unicode.GetString(bytes, 0, bytes.Length).TrimEnd('\0');
+        var text = Encoding.Unicode.GetString(bytes, 0, bytes.Length);
+        // The memory allocation can be larger than the string, and it's not always zero initialized: the string ends at the first NUL
+        var terminatorIndex = text.IndexOf('\0');
+        return terminatorIndex >= 0 ? text.Substring(0, terminatorIndex) : text;
     }
 }

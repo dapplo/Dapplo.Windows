@@ -12,12 +12,12 @@ using Xunit;
 
 namespace Dapplo.Windows.Tests;
 
-public class DispayTests
+public class DisplayTests
 {
     private static readonly LogSource Log = new LogSource();
     private NativeRect _screenboundsAllScreens;
 
-    public DispayTests(ITestOutputHelper testOutputHelper)
+    public DisplayTests(ITestOutputHelper testOutputHelper)
     {
         LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
         _screenboundsAllScreens = GetScreenBoundsAllScreens();
@@ -46,38 +46,13 @@ public class DispayTests
     {
         var screenboundsDisplayInfo = DisplayInfo.ScreenBounds;
 
-        // The following scales the screenboundsAllScreens which comes from build in code without DPI awareness
-        // with the current DPI so it should also work when running with a different DPI setting
-        //var monitorHandle = DisplayInfo.AllDisplayInfos.First().MonitorHandle;
-        //NativeDpiMethods.GetDpiForMonitor(monitorHandle, Dpi.Enums.MonitorDpiType.EffectiveDpi, out var xDpi, out var yDpi);
-        //if (xDpi != DpiHandler.DefaultScreenDpi) {
-        //    var newSize = DpiHandler.ScaleWithDpi(_screenboundsAllScreens.Size, xDpi);
-        //    _screenboundsAllScreens = new NativeRect(_screenboundsAllScreens.Location, newSize);
-        //}
-
+        // Screen.AllScreens is only comparable with the native values because the test executable is per-monitor DPI aware (app.manifest)
         Assert.Equal(_screenboundsAllScreens, screenboundsDisplayInfo);
     }
 
     /// <summary>
-    /// This is a manual test, it should be started and something needs to change the display settings, it should be detected correctly
-    /// </summary>
-    //[WpfFact]
-    public async Task TestScreenboundsSubscription()
-    {
-        var screenboundsDisplayInfoBefore = DisplayInfo.ScreenBounds;
-        TestAllDisplays();
-
-        await Task.Delay(10000);
-        var screenboundsDisplayInfoAfter = DisplayInfo.ScreenBounds;
-        TestAllDisplays();
-
-        Assert.NotEqual(screenboundsDisplayInfoBefore, screenboundsDisplayInfoAfter);
-    }
-
-
-    /// <summary>
     ///     Get the bounds of all screens combined, via build in Screen.AllScreens.
-    ///     This has issues when running with alternative DPI settings
+    ///     This only matches the native values when the process is per-monitor DPI aware, which the app.manifest of the tests takes care of
     /// </summary>
     /// <returns>A NativeRect of the bounds of the entire display area.</returns>
     private NativeRect GetScreenBoundsAllScreens()

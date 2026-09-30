@@ -8,10 +8,8 @@ using System.Runtime.InteropServices;
 using Dapplo.Windows.Devices.Enums;
 using Dapplo.Windows.Devices.Structs;
 using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.Messages.Native;
-
-#if !NETSTANDARD2_0
 
 namespace Dapplo.Windows.Devices
 {
@@ -36,12 +34,14 @@ namespace Dapplo.Windows.Devices
         /// </summary>
         /// <param name="handle">IntPtr with device notification handle from RegisterDeviceNotification</param>
         /// <returns></returns>
-        [DllImport("user32.dll")]
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool UnregisterDeviceNotification(IntPtr handle);
 
         /// <summary>
-        ///     This observable publishes the current clipboard contents after every paste action.
-        ///     Best to use SubscribeOn with the UI SynchronizationContext.
+        ///     This observable publishes a DeviceNotificationEvent for every WM_DEVICECHANGE, for all device interface classes.
+        ///     The events are produced on the thread of the SharedMessageWindow, use ObserveOn with the UI SynchronizationContext to process them on the UI thread.
+        ///     The DeviceNotificationEvent is a copy of the information, so it can be used after the message was processed.
         /// </summary>
         public static IObservable<DeviceNotificationEvent> OnNotification { get; }
 
@@ -89,18 +89,27 @@ namespace Dapplo.Windows.Devices
                             deviceNotificationHandle = RegisterDeviceNotification((IntPtr)hwnd, devBroadcastDeviceInterface, deviceNotifyFlags);
                             if (deviceNotificationHandle == IntPtr.Zero)
                             {
-                                observer.OnError(new Win32Exception());
+                                // Listen passes this to the subscriber with OnError, and doesn't call onTeardown
+                                throw new Win32Exception(Marshal.GetLastWin32Error(), "RegisterDeviceNotification failed");
                             }
                         },
-                        onTeardown: hwnd => UnregisterDeviceNotification(deviceNotificationHandle)
+                        onTeardown: hwnd =>
+                        {
+                            if (deviceNotificationHandle != IntPtr.Zero)
+                            {
+                                UnregisterDeviceNotification(deviceNotificationHandle);
+                                deviceNotificationHandle = IntPtr.Zero;
+                            }
+                        }
                     )
                     .Where(m => m.Msg == WindowsMessages.WM_DEVICECHANGE && m.LParam != 0)
                     .Subscribe(m =>
                     {
+                        // lParam is only valid while the message is processed: DeviceNotificationEvent copies everything synchronously here
                         observer.OnNext(new DeviceNotificationEvent((IntPtr)m.WParam, (IntPtr)m.LParam));
                     }, observer.OnError, observer.OnCompleted);
                 })
-                // Make sure there is always a value produced when connecting
+                // Share one registration between all subscribers, it is removed when the last subscriber disposes
                 .Publish()
                 .RefCount();
         }
@@ -189,5 +198,3 @@ namespace Dapplo.Windows.Devices
         }
     }
 }
-
-#endif

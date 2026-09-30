@@ -7,9 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Runtime.InteropServices;
-#if !NETSTANDARD2_0
-using System.Windows;
-#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 namespace Dapplo.Windows.Common.Structs;
@@ -17,7 +14,7 @@ namespace Dapplo.Windows.Common.Structs;
 /// <summary>
 ///     NativeRect represents the native RECTF structure for calling native methods.
 ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms534497(v=vs.85).aspx">RectF class</a>
-///     It has conversions from and to System.Drawing.RectangleF or System.Windows.Rect
+///     It has conversions from and to System.Drawing.RectangleF (the conversions from and to the WPF types are extension methods in Dapplo.Windows.Wpf)
 ///
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
@@ -162,49 +159,6 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
         return new NativeRectFloat(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
     }
 
-#if !NETSTANDARD2_0
-    /// <summary>
-    ///     Cast Rect to NativeRectFloat
-    /// </summary>
-    /// <param name="rectangle">Rect</param>
-    /// <returns>NativeRectFloat</returns>
-    public static implicit operator NativeRectFloat(Rect rectangle)
-    {
-        return new NativeRectFloat((float)rectangle.Left, (float)rectangle.Top, (float)rectangle.Width, (float)rectangle.Height);
-    }
-
-    /// <summary>
-    ///     Cast Int32Rect to NativeRectFloat
-    /// </summary>
-    /// <param name="rectangle">Int32Rect</param>
-    /// <returns>NativeRectFloat</returns>
-    public static implicit operator NativeRectFloat(Int32Rect rectangle)
-    {
-        return new NativeRectFloat(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
-    }
-
-    /// <summary>
-    ///     Cast NativeRectFloat to Rect
-    /// </summary>
-    /// <param name="rectangle">NativeRectFloat</param>
-    /// <returns>Rect</returns>
-    public static implicit operator Rect(NativeRectFloat rectangle)
-    {
-        return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
-    }
-
-    /// <summary>
-    ///     Cast NativeRectFloat to Int32Rect
-    /// </summary>
-    /// <param name="rectangle">NativeRectFloat</param>
-    /// <returns>Int32Rect</returns>
-    public static implicit operator Int32Rect(NativeRectFloat rectangle)
-    {
-        return new Int32Rect((int)rectangle.Left, (int)rectangle.Top, (int)rectangle.Width, (int)rectangle.Height);
-    }
-#endif
-
-
     /// <summary>
     ///     Cast RectangleF to NativeRectFloat
     /// </summary>
@@ -226,13 +180,32 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     }
 
     /// <summary>
-    ///     Cast NativeRectFloat to NativeRect
+    ///     Calculate the smallest integer rectangle which contains this NativeRectFloat:
+    ///     left and top are floored, right and bottom are rounded up. The result is normalized (no negative width or height).
+    ///     This makes sure that Right does not drift, as it would when truncating left and width independently.
+    /// </summary>
+    /// <param name="left">int</param>
+    /// <param name="top">int</param>
+    /// <param name="width">int</param>
+    /// <param name="height">int</param>
+    public void GetContainingIntegerBounds(out int left, out int top, out int width, out int height)
+    {
+        left = (int)Math.Floor(Math.Min(Left, Right));
+        top = (int)Math.Floor(Math.Min(Top, Bottom));
+        width = (int)Math.Ceiling(Math.Max(Left, Right)) - left;
+        height = (int)Math.Ceiling(Math.Max(Top, Bottom)) - top;
+    }
+
+    /// <summary>
+    ///     Explicit (lossy) cast NativeRectFloat to NativeRect, this results in the smallest integer rectangle which contains the NativeRectFloat (see <see cref="GetContainingIntegerBounds"/>).
+    ///     Use Round() to round the location and size instead.
     /// </summary>
     /// <param name="rectangle">NativeRectFloat</param>
     /// <returns>NativeRect</returns>
-    public static implicit operator NativeRect(NativeRectFloat rectangle)
+    public static explicit operator NativeRect(NativeRectFloat rectangle)
     {
-        return new NativeRect((int)rectangle.Left, (int)rectangle.Top, (int)rectangle.Width, (int)rectangle.Height);
+        rectangle.GetContainingIntegerBounds(out var left, out var top, out var width, out var height);
+        return new NativeRect(left, top, width, height);
     }
 
     /// <summary>
@@ -246,13 +219,14 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     }
 
     /// <summary>
-    ///     Cast NativeRectFloat to Rectangle
+    ///     Explicit (lossy) cast NativeRectFloat to Rectangle, this results in the smallest integer rectangle which contains the NativeRectFloat (see <see cref="GetContainingIntegerBounds"/>).
     /// </summary>
     /// <param name="rectangle">NativeRectFloat</param>
     /// <returns>Rectangle</returns>
-    public static implicit operator Rectangle(NativeRectFloat rectangle)
+    public static explicit operator Rectangle(NativeRectFloat rectangle)
     {
-        return new Rectangle((int) rectangle.X, (int) rectangle.Y, (int) rectangle.Width, (int) rectangle.Height);
+        rectangle.GetContainingIntegerBounds(out var left, out var top, out var width, out var height);
+        return new Rectangle(left, top, width, height);
     }
 
     /// <summary>
@@ -292,18 +266,18 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     [Pure]
     public bool Equals(NativeRectFloat rectangle)
     {
-        return Math.Abs(rectangle._x - _x) < float.Epsilon
-               && Math.Abs(rectangle._y - _y) < float.Epsilon
-               && Math.Abs(rectangle._width - _width) < float.Epsilon
-               && Math.Abs(rectangle._height - _height) < float.Epsilon;
+        return rectangle._x.Equals(_x)
+               && rectangle._y.Equals(_y)
+               && rectangle._width.Equals(_width)
+               && rectangle._height.Equals(_height);
     }
 
     /// <summary>
-    ///     Checks if this NativeRectFloat is empty
+    ///     Checks if this NativeRectFloat is empty, this is the case when the width or height is zero, negative or NaN
     /// </summary>
     /// <returns>true when empty</returns>
     [Pure]
-    public bool IsEmpty => Math.Abs(_width * _height) < float.Epsilon;
+    public bool IsEmpty => !(_width > 0) || !(_height > 0);
 
     /// <inheritdoc />
     [Pure]
@@ -313,10 +287,6 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
         {
             case NativeRectFloat f:
                 return Equals(f);
-#if !NETSTANDARD2_0
-            case Rect rect1:
-                return Equals(rect1);
-#endif
             case RectangleF rectangleF:
                 return Equals(rectangleF);
         }
@@ -330,11 +300,10 @@ public readonly struct NativeRectFloat : IEquatable<NativeRectFloat>
     {
         unchecked
         {
-            var hashCode = _x.GetHashCode();
-            hashCode = (hashCode * 397) ^ _x.GetHashCode();
-            hashCode = (hashCode * 397) ^ _y.GetHashCode();
-            hashCode = (hashCode * 397) ^ _width.GetHashCode();
-            hashCode = (hashCode * 397) ^ _height.GetHashCode();
+            var hashCode = FloatHelper.GetHashCode(_x);
+            hashCode = (hashCode * 397) ^ FloatHelper.GetHashCode(_y);
+            hashCode = (hashCode * 397) ^ FloatHelper.GetHashCode(_width);
+            hashCode = (hashCode * 397) ^ FloatHelper.GetHashCode(_height);
             return hashCode;
         }
     }

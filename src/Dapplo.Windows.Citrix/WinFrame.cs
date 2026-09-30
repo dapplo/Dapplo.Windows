@@ -21,16 +21,15 @@ public static class WinFrame
     /// <summary>
     ///     Checks if WinFrame, the API for Citrix, is available
     /// </summary>
-    public static bool IsAvailabe
+    public static bool IsAvailable
     {
         get
         {
             try
             {
-                QuerySessionConnectState();
-                return true;
+                return QuerySessionConnectState().HasValue;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException or BadImageFormatException)
             {
                 Log.Warn().WriteLine("Couldn't load WFAPI.DLL, this only means that the process is not running on Citrix and could be okay. Error: {0}", ex.Message);
             }
@@ -68,7 +67,8 @@ public static class WinFrame
         }
         try
         {
-            return (ConnectStates)state.ToInt32();
+            // ppBuffer points to an INT with the connect state
+            return (ConnectStates)Marshal.ReadInt32(state);
         }
         finally
         {
@@ -110,6 +110,7 @@ public static class WinFrame
         {
             return result;
         }
+        // WFWaitSystemEvent sets the last error (SetLastError = true on the import), Win32Exception() picks it up
         throw new Win32Exception();
     }
 
@@ -147,7 +148,8 @@ public static class WinFrame
     /// <param name="ppBuffer">IntPtr to the buffer where the string, struct or whatever resides</param>
     /// <param name="pBytesReturned">number of bytes returned</param>
     /// <returns>bool if ok</returns>
-    [DllImport("WFAPI", EntryPoint = "WFQuerySessionInformationW")]
+    [DllImport("WFAPI", EntryPoint = "WFQuerySessionInformationW", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool WFQuerySessionInformation(IntPtr hServer, int iSessionId, InfoClasses infotype, out IntPtr ppBuffer, out int pBytesReturned);
 
     /// <summary>
@@ -168,7 +170,7 @@ public static class WinFrame
     /// <param name="eventMask">EventMask mask</param>
     /// <param name="pEventFlags">EventMask as result</param>
     /// <returns>bool</returns>
-    [DllImport("WFAPI")]
+    [DllImport("WFAPI", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool WFWaitSystemEvent(IntPtr hServer, EventMask eventMask, out EventMask pEventFlags);
 }

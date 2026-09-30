@@ -21,7 +21,7 @@ public class CitrixTests
     [Fact]
     public void TestCitrix_NotAvailable()
     {
-        Assert.False(WinFrame.IsAvailabe, "We are running on Citrix????");
+        Assert.False(WinFrame.IsAvailable, "We are running on Citrix????");
             
     }
 }

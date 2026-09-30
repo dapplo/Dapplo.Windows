@@ -1,190 +1,338 @@
-name: Build and Deploy
+name: Build
 
+# Normal pushes and pull requests build, test and build the docs only.
+# A pushed tag "v<version>" (for example v3.0.12, created with `nbgv tag`) additionally
+# publishes the NuGet packages, creates the GitHub Release and publishes gh-pages and the wiki.
 on:
   push:
     branches-ignore:
       - 'gh-pages'
+    tags:
+      - 'v*'
   pull_request:
     branches-ignore:
       - 'gh-pages'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  SOLUTION: 'src/Dapplo.Windows.sln'
+  BUILD_PLATFORM: 'Any CPU'
+  BUILD_CONFIGURATION: 'Release'
+  DOCFX_VERSION: '2.81.0'
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+
+defaults:
+  run:
+    shell: pwsh
 
 jobs:
   build:
     runs-on: windows-latest
-    
-    permissions:
-      contents: write  # Required for pushing to gh-pages
-      actions: read
-      checks: write
-
-    env:
-      SOLUTION: 'src/Dapplo.Windows.sln'
-      BUILD_PLATFORM: 'Any CPU'
-      BUILD_CONFIGURATION: 'Release'
-    
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
-        fetch-depth: 0
-    
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@v2
-      with:
-        nuget-version: '7.0.1'
-    
+        fetch-depth: 0  # Nerdbank.GitVersioning needs the history to calculate the version
+
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: '10.0.101'
-    
+        global-json-file: global.json
+
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION }}
-    
+      run: dotnet restore $env:SOLUTION
+
     - name: Build
-      run: dotnet build ${{ env.solution }} --configuration ${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}" --no-restore
-    
-    - name: Test
-      run: dotnet test ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM}}" --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
-    
+      run: dotnet build $env:SOLUTION --configuration $env:BUILD_CONFIGURATION "/p:Platform=$env:BUILD_PLATFORM" --no-restore
+
+    # Tests that drive the real desktop are tagged Interactive and excluded.
+    # Coverage is only collected on .NET 10: coverlet.msbuild 8 injects a tracker that references System.Runtime 8.0,
+    # which doesn't exist on .NET Framework, so every instrumented call would fail there.
+    - name: Test (net10.0-windows, with coverage)
+      run: >
+        dotnet test src/Dapplo.Windows.Tests/Dapplo.Windows.Tests.csproj --configuration $env:BUILD_CONFIGURATION
+        --framework net10.0-windows --no-build --filter "Category!=Interactive"
+        --logger "trx;LogFilePrefix=Dapplo.Windows.Tests" --results-directory "$env:GITHUB_WORKSPACE/TestResults"
+        /p:CollectCoverage=true /p:CoverletOutputFormat=lcov "/p:CoverletOutput=$env:GITHUB_WORKSPACE/TestResults/coverage/"
+
+    - name: Test (net480)
+      if: success() || failure()
+      run: >
+        dotnet test src/Dapplo.Windows.Tests/Dapplo.Windows.Tests.csproj --configuration $env:BUILD_CONFIGURATION
+        --framework net480 --no-build --filter "Category!=Interactive"
+        --logger "trx;LogFilePrefix=Dapplo.Windows.Tests" --results-directory "$env:GITHUB_WORKSPACE/TestResults"
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: test-results
+        retention-days: 7
+        if-no-files-found: warn
+        path: |
+          TestResults/**/*.trx
+          TestResults/coverage/*.info
+
+    - name: Find coverage files
+      id: coverage
+      if: always()
+      env:
+        HAS_COVERALLS_TOKEN: ${{ secrets.COVERALLS_SECRET != '' }}
+      run: |
+        $files = @(Get-ChildItem -Path TestResults/coverage -Filter *.info -File -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })
+        $enabled = ($env:HAS_COVERALLS_TOKEN -eq 'true') -and ($files.Count -gt 0)
+        if ($env:HAS_COVERALLS_TOKEN -ne 'true') { Write-Host "COVERALLS_SECRET is not configured, skipping the coverage upload." }
+        if ($files.Count -eq 0) { Write-Host "No coverage files found, skipping the coverage upload." }
+        "enabled=$($enabled.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+        "files=$($files -join ' ')" >> $env:GITHUB_OUTPUT
+
     - name: Upload coverage to Coveralls
-      if: github.event_name != 'pull_request'
+      if: always() && steps.coverage.outputs.enabled == 'true'
+      continue-on-error: true
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.COVERALLS_SECRET }}
         fail-on-error: false
-        file: src\Dapplo.Windows.Tests\coverage.info
-    
-    - name: Install DocFX
-      run: choco install docfx -y
-    
-    - name: Build Documentation
-      run: docfx doc/docfx.json
-    
-    - name: Copy NuGet packages to artifacts
-      shell: pwsh
+        format: lcov
+        files: ${{ steps.coverage.outputs.files }}
+
+    - name: Collect NuGet packages
       run: |
-        New-Item -ItemType Directory -Force -Path artifacts
-        Get-ChildItem -Path src -Include "*nupkg" -Recurse -File | Where-Object { $_.FullName -match "\\bin\\${{ env.BUILD_CONFIGURATION }}\\" } | Copy-Item -Destination artifacts
-    
-    - name: Copy coverage files to artifacts
-      shell: pwsh
-      run: |
-        Get-ChildItem -Path src -Include "coverage.*" -Recurse -File | Copy-Item -Destination artifacts
-      continue-on-error: true
-    
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+        New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+        $packages = @(Get-ChildItem -Path src -Recurse -File -Include *.nupkg, *.snupkg |
+          Where-Object { $_.FullName -match "\\bin\\$env:BUILD_CONFIGURATION\\" })
+        if ($packages.Count -eq 0) { throw "No NuGet packages were produced by the build." }
+        $packages | Copy-Item -Destination artifacts
+        $packages | ForEach-Object { Write-Host $_.Name }
+
+    - name: Upload NuGet packages
+      uses: actions/upload-artifact@v7
       with:
-        name: build-artifacts
-        retention-days: 1
-        path: artifacts/**/*
+        name: nuget-packages
+        retention-days: 7
+        if-no-files-found: error
+        path: artifacts/
+
+  docs:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+      with:
+        fetch-depth: 0  # Nerdbank.GitVersioning runs while docfx loads the projects
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
+      with:
+        global-json-file: global.json
+
+    - name: Restore dependencies
+      run: dotnet restore $env:SOLUTION
+
+    - name: Install docfx
+      run: |
+        dotnet tool install --global docfx --version $env:DOCFX_VERSION
+        if ($LASTEXITCODE -ne 0) { throw "Installing docfx failed" }
+        Join-Path $env:USERPROFILE '.dotnet\tools' >> $env:GITHUB_PATH
+
+    - name: Generate API metadata
+      run: |
+        docfx metadata doc/docfx.json
+        if ($LASTEXITCODE -ne 0) { throw "docfx metadata failed with exit code $LASTEXITCODE" }
+        # Guard against an "empty" API reference (the old docfx produced none without failing).
+        if (-not (Test-Path doc/api/toc.yml)) { throw "docfx did not generate doc/api/toc.yml" }
+        $pages = @(Get-ChildItem -Path doc/api -Filter *.yml -File | Where-Object { $_.Name -ne 'toc.yml' })
+        Write-Host "Generated $($pages.Count) API pages."
+        if ($pages.Count -eq 0) { throw "docfx generated no API pages" }
+        $unwanted = @($pages | Where-Object { $_.Name -like 'Dapplo.Windows.Tests*' -or $_.Name -like 'Dapplo.Windows.Example*' })
+        if ($unwanted.Count -gt 0) { throw "API reference contains test or example types: $($unwanted.Name -join ', ')" }
+
+    - name: Build documentation
+      run: |
+        docfx build doc/docfx.json
+        if ($LASTEXITCODE -ne 0) { throw "docfx build failed with exit code $LASTEXITCODE" }
 
     - name: Upload documentation site
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: documentation-site
-        retention-days: 1
-        path: doc/_site/**/*
+        retention-days: 7
+        if-no-files-found: error
+        path: doc/_site/
 
-    - name: Publish documentation to gh-pages
-      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-      shell: cmd
-      run: |
-        git config --local user.name "github-actions[bot]"
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local core.autocrlf false
-        git config --local core.safecrlf false
-        git checkout -B docfx
-        del .gitignore
-        git add doc/_site
-        git commit -m "Generated documentation for ${{ github.run_number }}"
-        git subtree split --prefix doc/_site -b gh-pages
-        git push -f origin gh-pages:gh-pages
-
-    - name: Publish wiki to GitHub Wiki
-      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-      shell: pwsh
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        $wikiUrl = "https://x-access-token:$env:GH_TOKEN@github.com/${{ github.repository }}.wiki.git"
-        $wikiDir = "${{ runner.temp }}/wiki"
-
-        git clone $wikiUrl $wikiDir 2>&1
-        if ($LASTEXITCODE -ne 0) {
-          # Wiki not yet initialised — create the directory and init a new repo
-          New-Item -ItemType Directory -Force -Path $wikiDir | Out-Null
-          Set-Location $wikiDir
-          git init
-          git remote add origin $wikiUrl
-        } else {
-          Set-Location $wikiDir
-        }
-
-        git config user.name  "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-
-        # Copy wiki pages, overwriting existing ones
-        Copy-Item -Path "${{ github.workspace }}/wiki/*" -Destination $wikiDir -Force
-
-        git add -A
-        $status = git status --porcelain
-        if ($status) {
-          git commit -m "Update wiki for run ${{ github.run_number }}"
-          git push origin HEAD:master
-        } else {
-          Write-Host "No wiki changes to publish."
-        }
-
-  deploy:
-    runs-on: windows-latest
+  release:
+    # Only a pushed version tag publishes packages; a manual run on a tag does not.
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     needs: build
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-    permissions:
-      contents: read
-    
-    environment: 
+    runs-on: windows-latest
+    environment:
       name: NuGet
-    
+    permissions:
+      contents: write  # gh release create
+    env:
+      TAG: ${{ github.ref_name }}
     steps:
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
+    - name: Checkout code
+      uses: actions/checkout@v7
+
+    - name: Download NuGet packages
+      uses: actions/download-artifact@v8
       with:
-        name: build-artifacts
+        name: nuget-packages
         path: artifacts
 
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v2
-      with:
-        nuget-version: '7.0.1'
-    
-    - name: Push to NuGet
-      shell: pwsh
+    - name: Check tag and package versions
+      id: version
       run: |
-        $packages = Get-ChildItem -Path artifacts -Filter "*nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
-        if ($packages.Count -eq 0) {
-          Write-Host "No packages found to publish"
-          exit 0
+        if (-not ($env:TAG -match '^v(\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?)$')) { throw "Tag '$env:TAG' is not of the form v<major>.<minor>.<patch>[-prerelease]" }
+        $version = $Matches[1]
+        $packages = @(Get-ChildItem -Path artifacts -Filter *.nupkg -File)
+        if ($packages.Count -eq 0) { throw "No packages to publish" }
+        $wrong = @($packages | Where-Object { -not $_.Name.EndsWith(".$version.nupkg") })
+        if ($wrong.Count -gt 0) {
+          throw "Package versions don't match tag $($env:TAG): $($wrong.Name -join ', '). Create the tag with 'nbgv tag' on the commit to release, so it matches the version Nerdbank.GitVersioning calculates."
         }
-        
-        $failed = 0
-        foreach ($package in $packages) {
-          Write-Host "Pushing $($package.Name)..."
-          $result = & nuget push $package.FullName -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }} -SkipDuplicate 2>&1
-          if ($LASTEXITCODE -ne 0) {
-            if ($result -match "already exists") {
-              Write-Host "Package already exists (skipped): $($package.Name)"
-            } else {
-              Write-Error "Failed to push $($package.Name): $result"
-              $failed++
-            }
-          } else {
-            Write-Host "Successfully pushed: $($package.Name)"
-          }
+        "version=$version" >> $env:GITHUB_OUTPUT
+
+    - name: Extract release notes from CHANGELOG.md
+      env:
+        VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        $lines = Get-Content -Path CHANGELOG.md -Encoding utf8
+        $header = '^## \[' + [regex]::Escape($env:VERSION) + '\]'
+        $start = -1
+        for ($i = 0; $i -lt $lines.Count; $i++) { if ($lines[$i] -match $header) { $start = $i; break } }
+        if ($start -lt 0) { throw "CHANGELOG.md has no '## [$env:VERSION]' section. Rename '## [Unreleased]' to '## [$env:VERSION] - <date>' before tagging." }
+        $end = $lines.Count
+        for ($i = $start + 1; $i -lt $lines.Count; $i++) {
+          # The next version section, or the link reference definitions at the end of the file
+          if ($lines[$i] -match '^## ' -or $lines[$i] -match '^\[[^\]]+\]:\s') { $end = $i; break }
         }
-        
-        if ($failed -gt 0) {
-          Write-Error "Failed to push $failed package(s)"
+        $notes = ''
+        if ($end -gt $start + 1) { $notes = ($lines[($start + 1)..($end - 1)] -join "`n").Trim() }
+        if ([string]::IsNullOrWhiteSpace($notes)) { throw "The '## [$env:VERSION]' section in CHANGELOG.md is empty." }
+        $notesFile = Join-Path $env:RUNNER_TEMP 'release-notes.md'
+        Set-Content -Path $notesFile -Value $notes -Encoding utf8NoBOM
+        Get-Content $notesFile
+
+    - name: Push to NuGet
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      run: |
+        if ([string]::IsNullOrEmpty($env:NUGET_API_KEY)) { throw "The NUGET_API_KEY secret is not configured." }
+        # dotnet nuget push also pushes the .snupkg next to each .nupkg
+        foreach ($package in Get-ChildItem -Path artifacts -Filter *.nupkg -File) {
+          dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+          if ($LASTEXITCODE -ne 0) { throw "Failed to push $($package.Name)" }
+        }
+
+    - name: Create GitHub Release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        $notesFile = Join-Path $env:RUNNER_TEMP 'release-notes.md'
+        $assets = @(Get-ChildItem -Path artifacts -File -Include *.nupkg, *.snupkg -Recurse | ForEach-Object { $_.FullName })
+        gh release view $env:TAG *> $null
+        if ($LASTEXITCODE -eq 0) {
+          # Re-run of the job: update the existing release
+          gh release edit $env:TAG --notes-file $notesFile
+          if ($LASTEXITCODE -ne 0) { throw "gh release edit failed" }
+          gh release upload $env:TAG @assets --clobber
+        } else {
+          $prerelease = @()
+          if ($env:VERSION.Contains('-')) { $prerelease = @('--prerelease') }
+          gh release create $env:TAG @assets --verify-tag --title "Dapplo.Windows $env:VERSION" --notes-file $notesFile @prerelease
+        }
+        if ($LASTEXITCODE -ne 0) { throw "Creating the GitHub release failed" }
+
+  # The documentation site and the wiki describe the released API, so they are published from
+  # version tags, or manually (workflow_dispatch) from master, never from every push.
+  publish-docs:
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
+    needs: [build, docs]
+    runs-on: windows-latest
+    concurrency:
+      group: publish-docs
+      cancel-in-progress: false
+    permissions:
+      contents: write  # push to gh-pages
+    steps:
+    - name: Download documentation site
+      uses: actions/download-artifact@v8
+      with:
+        name: documentation-site
+        path: ${{ runner.temp }}/site
+
+    - name: Publish documentation to gh-pages
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $PSNativeCommandUseErrorActionPreference = $true
+        $site = Join-Path $env:RUNNER_TEMP 'site'
+        if (-not (Test-Path (Join-Path $site 'index.html'))) { throw "The documentation site has no index.html" }
+        New-Item -ItemType File -Force -Path (Join-Path $site '.nojekyll') | Out-Null
+        Set-Location $site
+        git init -q -b gh-pages
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config core.autocrlf false
+        git add -A
+        git commit -q -m "Documentation for $env:GITHUB_REF_NAME ($env:GITHUB_SHA)"
+        # The gh-pages branch holds only the generated site, so it is replaced as a whole.
+        git push -f "https://x-access-token:$env:GH_TOKEN@github.com/$env:GITHUB_REPOSITORY.git" HEAD:gh-pages
+
+  publish-wiki:
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
+    needs: build
+    runs-on: windows-latest
+    concurrency:
+      group: publish-wiki
+      cancel-in-progress: false
+    permissions:
+      contents: write  # push to the wiki repository
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+
+    - name: Publish wiki/ to the GitHub wiki
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $wikiUrl = "https://x-access-token:$env:GH_TOKEN@github.com/$env:GITHUB_REPOSITORY.wiki.git"
+        $wikiDir = Join-Path $env:RUNNER_TEMP 'wiki'
+
+        git clone --quiet --depth 1 $wikiUrl $wikiDir
+        if ($LASTEXITCODE -ne 0) {
+          # GitHub creates the wiki repository only when the first page is saved in the web UI; it can't be created by a push.
+          Write-Host "::error title=Wiki not available::Could not clone $env:GITHUB_REPOSITORY.wiki.git. Enable the wiki and create the first page in the GitHub web UI, then re-run this job."
           exit 1
+        }
+        $PSNativeCommandUseErrorActionPreference = $true
+
+        git -C $wikiDir config user.name "github-actions[bot]"
+        git -C $wikiDir config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git -C $wikiDir config core.autocrlf false
+
+        # Mirror wiki/: remove every tracked page first, so deleted or renamed pages disappear from the wiki.
+        git -C $wikiDir rm -r -q --ignore-unmatch -- .
+        Copy-Item -Path (Join-Path $env:GITHUB_WORKSPACE 'wiki/*') -Destination $wikiDir -Recurse -Force
+        git -C $wikiDir add -A
+
+        $status = git -C $wikiDir status --porcelain
+        if ($status) {
+          git -C $wikiDir commit -q -m "Update wiki from $env:GITHUB_REF_NAME ($env:GITHUB_SHA)"
+          git -C $wikiDir push origin HEAD
+        } else {
+          Write-Host "No wiki changes to publish."
         }

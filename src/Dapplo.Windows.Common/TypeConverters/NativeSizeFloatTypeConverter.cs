@@ -8,7 +8,7 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Common.TypeConverters;
 
 /// <summary>
-/// This implements a TypeConverter for the NativeSizeFloat structur
+/// This implements a TypeConverter for the NativeSizeFloat structure, the format is "Width,Height" using the invariant culture
 /// </summary>
 public class NativeSizeFloatTypeConverter : TypeConverter
 {
@@ -29,12 +29,12 @@ public class NativeSizeFloatTypeConverter : TypeConverter
     {
         if (value is string sizeStringValue)
         {
-            string[] hw = sizeStringValue.Split(',');
-            if (hw.Length == 2 &&
-                float.TryParse(hw[0], NumberStyles.Number, CultureInfo.InvariantCulture, out var h) &&
-                float.TryParse(hw[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var w))
+            string[] wh = sizeStringValue.Split(',');
+            if (wh.Length == 2 &&
+                float.TryParse(wh[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var w) &&
+                float.TryParse(wh[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var h))
             {
-                return new NativeSizeFloat(h, w);
+                return new NativeSizeFloat(w, h);
             }
         }
         return base.ConvertFrom(context, culture, value);
@@ -45,7 +45,8 @@ public class NativeSizeFloatTypeConverter : TypeConverter
     {
         if (destinationType == typeof(string) && value is NativeSizeFloat nativeSizeFloat)
         {
-            return $"{nativeSizeFloat.Width.ToString(CultureInfo.InvariantCulture)},{nativeSizeFloat.Height.ToString(CultureInfo.InvariantCulture)}";
+            // "R" makes sure the value round-trips on .NET Framework too
+            return string.Concat(nativeSizeFloat.Width.ToString("R", CultureInfo.InvariantCulture), ",", nativeSizeFloat.Height.ToString("R", CultureInfo.InvariantCulture));
         }
         return base.ConvertTo(context, culture, value, destinationType);
     }

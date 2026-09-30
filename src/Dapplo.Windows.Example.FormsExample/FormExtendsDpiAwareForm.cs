@@ -4,7 +4,7 @@
 using Dapplo.Log;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Dpi;
-using Dapplo.Windows.Dpi.Forms;
+using Dapplo.Windows.Forms.Dpi;
 using System;
 using System.ComponentModel;
 using System.Drawing;

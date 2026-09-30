@@ -29,5 +29,5 @@ public enum DialogDpiChangeBehaviors
     /// <summary>
     ///     Prevents the dialog manager from re-layouting all of the dialogue's immediate children HWNDs in response to a DPI change.
     /// </summary>
-    DisableControlRelayout = 3
+    DisableControlRelayout = 4
 }

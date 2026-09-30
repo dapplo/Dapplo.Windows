@@ -52,7 +52,8 @@ public enum ExitWindowsFlags : uint
     EWX_FORCEIFHUNG = 0x00000010,
 
     /// <summary>
-    /// The system is restarted using the ExitProcess function.
+    /// Used with EWX_REBOOT or EWX_POWEROFF: after the restart, the system restarts the applications which were registered for restart
+    /// with RegisterApplicationRestart (see Dapplo.Windows.AppRestartManager).
     /// </summary>
     EWX_RESTARTAPPS = 0x00000040,
 

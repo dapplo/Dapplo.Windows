@@ -14,6 +14,7 @@ public class SafeGraphicsDcHandle : SafeDcHandle
 {
     private readonly bool _disposeGraphics;
     private readonly Graphics _graphics;
+    private volatile bool _isDisposing;
 
     /// <summary>
     ///     Default constructor is needed to support marshalling!!
@@ -49,11 +50,30 @@ public class SafeGraphicsDcHandle : SafeDcHandle
     }
 
     /// <summary>
-    ///     Call graphics.ReleaseHdc
+    ///     Remember that the handle is disposed explicitly, and not finalized
+    /// </summary>
+    /// <param name="disposing">true when called from Dispose</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _isDisposing = true;
+        }
+        base.Dispose(disposing);
+    }
+
+    /// <summary>
+    ///     Call graphics.ReleaseHdc, and dispose the Graphics if this was requested.
+    ///     This only touches the (managed) Graphics when this handle was disposed explicitly,
+    ///     when this handle is finalized the Graphics might already be finalized, which also releases the HDC.
     /// </summary>
     /// <returns>always true</returns>
     protected override bool ReleaseHandle()
     {
+        if (!_isDisposing || _graphics == null)
+        {
+            return true;
+        }
         _graphics.ReleaseHdc(handle);
         if (_disposeGraphics)
         {

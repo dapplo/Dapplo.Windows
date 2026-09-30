@@ -1,6 +1,7 @@
 // Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.SystemState.Enums;
 
@@ -13,6 +14,49 @@ public static class PowerManagementApi
 {
     private const string PowrprofDll = "powrprof.dll";
     private const string User32Dll = "user32.dll";
+    private const string Advapi32Dll = "advapi32.dll";
+    private const string Kernel32Dll = "kernel32.dll";
+    private const string SeShutdownName = "SeShutdownPrivilege";
+    private const uint TokenAdjustPrivileges = 0x0020;
+    private const uint TokenQuery = 0x0008;
+    private const uint SePrivilegeEnabled = 0x00000002;
+    private const int ErrorNotAllAssigned = 1300;
+
+    /// <summary>
+    /// The shutdown reason which is used by <see cref="Shutdown"/> and <see cref="Restart"/>:
+    /// SHTDN_REASON_MAJOR_OTHER | SHTDN_REASON_MINOR_OTHER | SHTDN_REASON_FLAG_PLANNED, which logs a planned shutdown.
+    /// See <a href="https://learn.microsoft.com/en-us/windows/win32/shutdown/system-shutdown-reason-codes">System Shutdown Reason Codes</a>
+    /// </summary>
+    public const uint ShutdownReasonPlannedOther = 0x80000000;
+
+    // TOKEN_PRIVILEGES with one LUID_AND_ATTRIBUTES, the LUID is 4 byte aligned
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    private struct TokenPrivileges
+    {
+        public uint PrivilegeCount;
+        public long Luid;
+        public uint Attributes;
+    }
+
+    [DllImport(Advapi32Dll, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool OpenProcessToken(IntPtr processHandle, uint desiredAccess, out IntPtr tokenHandle);
+
+    [DllImport(Advapi32Dll, EntryPoint = "LookupPrivilegeValueW", SetLastError = true, CharSet = CharSet.Unicode)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool LookupPrivilegeValue(string systemName, string name, out long luid);
+
+    [DllImport(Advapi32Dll, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool AdjustTokenPrivileges(IntPtr tokenHandle, [MarshalAs(UnmanagedType.Bool)] bool disableAllPrivileges, ref TokenPrivileges newState, uint bufferLength, IntPtr previousState, IntPtr returnLength);
+
+    [DllImport(Kernel32Dll)]
+    private static extern IntPtr GetCurrentProcess();
+
+    // No SetLastError: this must not overwrite the last error of the privilege adjustment
+    [DllImport(Kernel32Dll)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool CloseHandle(IntPtr handle);
 
     /// <summary>
     /// Suspends the system by transitioning it to sleep mode or hibernation.
@@ -31,11 +75,11 @@ public static class PowerManagementApi
     /// </param>
     /// <returns><c>true</c> if the function succeeds, otherwise <c>false</c>.</returns>
     [DllImport(PowrprofDll, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static extern bool SetSuspendState(
-        [MarshalAs(UnmanagedType.Bool)] bool hibernate,
-        [MarshalAs(UnmanagedType.Bool)] bool forceCritical,
-        [MarshalAs(UnmanagedType.Bool)] bool disableWakeEvent);
+        [MarshalAs(UnmanagedType.U1)] bool hibernate,
+        [MarshalAs(UnmanagedType.U1)] bool forceCritical,
+        [MarshalAs(UnmanagedType.U1)] bool disableWakeEvent);
 
     /// <summary>
     /// Logs off the interactive user, shuts down the system, or shuts down and restarts the system.
@@ -82,35 +126,79 @@ public static class PowerManagementApi
         SetSuspendState(hibernate: true, forceCritical: false, disableWakeEvent: disableWakeEvent);
 
     /// <summary>
-    /// Shuts down the system.
-    /// The calling process must have the SE_SHUTDOWN_NAME privilege.
+    /// Enables the SE_SHUTDOWN_NAME privilege for the current process. Interactive users hold this privilege, but it is disabled by default,
+    /// and ExitWindowsEx (shutdown / restart) or InitiateSystemShutdown require it to be enabled.
     /// </summary>
-    /// <param name="force">If <c>true</c>, forces running applications to close.</param>
-    /// <returns><c>true</c> if the operation was initiated successfully.</returns>
-    public static bool Shutdown(bool force = false)
+    /// <returns><c>true</c> if the privilege is enabled, <c>false</c> if the user doesn't hold it or the token could not be adjusted (see Marshal.GetLastWin32Error).</returns>
+    public static bool EnableShutdownPrivilege()
     {
-        var flags = ExitWindowsFlags.EWX_SHUTDOWN;
-        if (force)
+        if (!OpenProcessToken(GetCurrentProcess(), TokenAdjustPrivileges | TokenQuery, out var tokenHandle))
         {
-            flags |= ExitWindowsFlags.EWX_FORCE;
+            return false;
         }
-        return ExitWindowsEx(flags);
+        try
+        {
+            if (!LookupPrivilegeValue(null, SeShutdownName, out var luid))
+            {
+                return false;
+            }
+            var tokenPrivileges = new TokenPrivileges
+            {
+                PrivilegeCount = 1,
+                Luid = luid,
+                Attributes = SePrivilegeEnabled
+            };
+            if (!AdjustTokenPrivileges(tokenHandle, false, ref tokenPrivileges, 0, IntPtr.Zero, IntPtr.Zero))
+            {
+                return false;
+            }
+            // AdjustTokenPrivileges also succeeds when the privilege is not held, this is signalled with ERROR_NOT_ALL_ASSIGNED
+            return Marshal.GetLastWin32Error() != ErrorNotAllAssigned;
+        }
+        finally
+        {
+            CloseHandle(tokenHandle);
+        }
     }
 
     /// <summary>
-    /// Restarts the system.
-    /// The calling process must have the SE_SHUTDOWN_NAME privilege.
+    /// Shuts down the system and turns off the power (EWX_POWEROFF).
+    /// This enables the SE_SHUTDOWN_NAME privilege of the process, which the user must hold.
     /// </summary>
-    /// <param name="force">If <c>true</c>, forces running applications to close.</param>
-    /// <returns><c>true</c> if the operation was initiated successfully.</returns>
-    public static bool Restart(bool force = false)
+    /// <param name="force">If <c>true</c>, forces running applications to close (EWX_FORCE), which can cause them to lose data.
+    /// Otherwise applications which don't respond are only terminated after a timeout (EWX_FORCEIFHUNG).</param>
+    /// <param name="reason">The shutdown reason which is logged, default is a planned shutdown with <see cref="ShutdownReasonPlannedOther"/></param>
+    /// <returns><c>true</c> if the operation was initiated successfully, otherwise see Marshal.GetLastWin32Error (e.g. 1314 ERROR_PRIVILEGE_NOT_HELD).</returns>
+    public static bool Shutdown(bool force = false, uint reason = ShutdownReasonPlannedOther)
     {
-        var flags = ExitWindowsFlags.EWX_REBOOT;
-        if (force)
+        return ExitWindows(ExitWindowsFlags.EWX_POWEROFF, force, reason);
+    }
+
+    /// <summary>
+    /// Restarts the system (EWX_REBOOT).
+    /// This enables the SE_SHUTDOWN_NAME privilege of the process, which the user must hold.
+    /// </summary>
+    /// <param name="force">If <c>true</c>, forces running applications to close (EWX_FORCE), which can cause them to lose data.
+    /// Otherwise applications which don't respond are only terminated after a timeout (EWX_FORCEIFHUNG).</param>
+    /// <param name="reason">The shutdown reason which is logged, default is a planned shutdown with <see cref="ShutdownReasonPlannedOther"/></param>
+    /// <returns><c>true</c> if the operation was initiated successfully, otherwise see Marshal.GetLastWin32Error (e.g. 1314 ERROR_PRIVILEGE_NOT_HELD).</returns>
+    public static bool Restart(bool force = false, uint reason = ShutdownReasonPlannedOther)
+    {
+        return ExitWindows(ExitWindowsFlags.EWX_REBOOT, force, reason);
+    }
+
+    /// <summary>
+    /// Enable the shutdown privilege and call ExitWindowsEx
+    /// </summary>
+    private static bool ExitWindows(ExitWindowsFlags flags, bool force, uint reason)
+    {
+        if (!EnableShutdownPrivilege())
         {
-            flags |= ExitWindowsFlags.EWX_FORCE;
+            // The last error of the privilege adjustment is preserved for the caller
+            return false;
         }
-        return ExitWindowsEx(flags);
+        flags |= force ? ExitWindowsFlags.EWX_FORCE : ExitWindowsFlags.EWX_FORCEIFHUNG;
+        return ExitWindowsEx(flags, reason);
     }
 
     /// <summary>

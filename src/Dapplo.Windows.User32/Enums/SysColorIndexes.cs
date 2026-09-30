@@ -159,9 +159,9 @@ public enum SysColorIndexes
     /// </summary>
     ColorDesktop = 1,
     /// <summary>
-    /// Shadow color for three-dimensional display elements (for edges facing away from the light source).
+    /// Face color for three-dimensional display elements and for dialog box backgrounds (same as COLOR_BTNFACE).
     /// </summary>
-    Color3Dface = 16,
+    Color3Dface = 15,
     /// <summary>
     /// Shadow color for three-dimensional display elements (for edges facing away from the light source).
     /// </summary>

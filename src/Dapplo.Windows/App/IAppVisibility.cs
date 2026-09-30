@@ -13,5 +13,10 @@ namespace Dapplo.Windows.App;
 internal interface IAppVisibility
 {
     MonitorAppVisibility GetAppVisibilityOnMonitor(IntPtr hMonitor);
-    bool IsLauncherVisible { get; }
+    // The native signature is HRESULT IsLauncherVisible([out] BOOL*), a 4 byte BOOL and not a VARIANT_BOOL
+    bool IsLauncherVisible
+    {
+        [return: MarshalAs(UnmanagedType.Bool)]
+        get;
+    }
 }

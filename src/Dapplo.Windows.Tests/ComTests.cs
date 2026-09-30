@@ -20,14 +20,17 @@ public class ComTests
     /// <summary>
     ///     Test the clsId and progId conversion code, works only when Excel is installed
     /// </summary>
-    //[Fact]
+    /// <remarks>Interactive: this starts Excel</remarks>
+    [Fact]
+    [Trait("Category", "Interactive")]
     public void Test_ClsIdProgId()
     {
         const string progId = "Excel.Application";
+        Assert.SkipWhen(Type.GetTypeFromProgID(progId) == null, "Excel is not installed");
         var clsId = Ole32Api.ClassIdFromProgId(progId);
         Log.Info().WriteLine("The prog-id {0} has clsid {1}", progId, clsId);
-        Assert.False(clsId == default);
-        var progIdResolve = Ole32Api.ProgIdFromClassId(clsId);
+        Assert.True(clsId.HasValue);
+        var progIdResolve = Ole32Api.ProgIdFromClassId(clsId.Value);
         Log.Info().WriteLine("The prog-id {0}, resolve back from {1}, is: {2}", progId, clsId, progIdResolve);
         Assert.StartsWith(progId, progIdResolve);
 

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
+using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using Microsoft.Win32;
 
 namespace Dapplo.Windows.EmbeddedBrowser;
@@ -76,13 +76,22 @@ public static class InternetExplorerVersion
     }
 
     /// <summary>
-    ///     Change browser version to the highest possible
+    ///     Change browser version to the highest possible, for the executable of the current process
+    ///     (this is the actual process, e.g. dotnet.exe when started via "dotnet app.dll", which is what the browser emulation setting is matched against).
     /// </summary>
     /// <param name="ignoreDoctype">true to ignore the doctype when loading a page</param>
     public static void ChangeEmbeddedVersion(bool ignoreDoctype = true)
     {
-        var applicationName = Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
-        ChangeEmbeddedVersion(applicationName, ignoreDoctype);
+        string processPath;
+        using (var currentProcess = Process.GetCurrentProcess())
+        {
+            processPath = currentProcess.MainModule?.FileName;
+        }
+        if (string.IsNullOrEmpty(processPath))
+        {
+            return;
+        }
+        ChangeEmbeddedVersion(Path.GetFileNameWithoutExtension(processPath), ignoreDoctype);
     }
 
     /// <summary>
@@ -106,13 +115,10 @@ public static class InternetExplorerVersion
     public static void ChangeEmbeddedVersion(string applicationName, int ieVersion)
     {
         ModifyRegistry("HKEY_CURRENT_USER", applicationName + ".exe", ieVersion);
-#if DEBUG
-        ModifyRegistry("HKEY_CURRENT_USER", applicationName + ".vshost.exe", ieVersion);
-#endif
     }
 
     /// <summary>
-    ///     Make the change to the registry
+    ///     Make the change to the registry, failures (e.g. missing access rights) are ignored
     /// </summary>
     /// <param name="root">HKEY_CURRENT_USER or something</param>
     /// <param name="applicationName">Name of the executable</param>
@@ -126,9 +132,7 @@ public static class InternetExplorerVersion
         }
         catch (Exception)
         {
-            // some config will hit access rights exceptions
-            // this is why we try with both LOCAL_MACHINE and CURRENT_USER
-            // Ignore
+            // Some configurations will hit access rights exceptions, there is no fallback: the embedded browser just keeps the default (IE7) emulation
         }
     }
 }

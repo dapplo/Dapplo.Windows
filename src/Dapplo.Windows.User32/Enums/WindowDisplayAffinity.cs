@@ -18,5 +18,11 @@ public enum WindowDisplayAffinity
     /// <summary>
     /// Enable window contents to be displayed on a monitor.
     /// </summary>
-    Monitor = 1
+    Monitor = 1,
+
+    /// <summary>
+    /// The window is displayed only on a monitor. Everywhere else, the window does not appear at all, it is excluded from screen captures.
+    /// Available since Windows 10, version 2004.
+    /// </summary>
+    ExcludeFromCapture = 0x11
 }

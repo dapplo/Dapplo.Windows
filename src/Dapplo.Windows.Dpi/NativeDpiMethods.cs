@@ -28,8 +28,10 @@ public static class NativeDpiMethods
 
     /// <summary>
     /// Make the current process DPI Aware, this should be done via the manifest but sometimes this is not possible.
+    /// This tries Per Monitor v2, then Per Monitor (v1) via SetProcessDpiAwarenessContext (Windows 10 1703 and later) and falls back to SetProcessDpiAwareness.
+    /// If the DPI awareness of the process was already set (e.g. via the manifest), the result reflects <see cref="IsDpiAware"/>.
     /// </summary>
-    /// <returns>bool true if it was possible to change the DPI awareness</returns>
+    /// <returns>bool true if the process is DPI aware after this call</returns>
     public static bool EnableDpiAware()
     {
         // We can only test this for Windows 8.1 or later
@@ -41,18 +43,50 @@ public static class NativeDpiMethods
 
         if (WindowsVersion.IsWindows10BuildOrLater(15063))
         {
-            if (IsValidDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2))
+            foreach (var dpiAwarenessContext in new[] { DpiAwarenessContext.PerMonitorAwareV2, DpiAwarenessContext.PerMonitorAware })
             {
-                SetProcessDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2);
-            }
-            else
-            {
-                SetProcessDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2);
-            }
+                if (!IsValidDpiAwarenessContext(dpiAwarenessContext))
+                {
+                    continue;
+                }
 
+                if (SetProcessDpiAwarenessContext(dpiAwarenessContext))
+                {
+                    return true;
+                }
+
+                var error = Win32.GetLastErrorCode();
+                if (error == Win32Error.AccessDenied)
+                {
+                    // The DPI awareness was already set, e.g. via the manifest or a previous call
+                    return IsDpiAware;
+                }
+
+                if (Log.IsVerboseEnabled())
+                {
+                    Log.Verbose().WriteLine("SetProcessDpiAwarenessContext({0}) failed: {1}", dpiAwarenessContext, Win32.GetMessage(error));
+                }
+            }
+        }
+
+        var result = SetProcessDpiAwareness(DpiAwareness.PerMonitorAware);
+        if (result.Succeeded())
+        {
             return true;
         }
-        return SetProcessDpiAwareness(DpiAwareness.PerMonitorAware).Succeeded();
+
+        if (result == HResult.E_ACCESSDENIED)
+        {
+            // The DPI awareness was already set, e.g. via the manifest or a previous call
+            return IsDpiAware;
+        }
+
+        if (Log.IsVerboseEnabled())
+        {
+            Log.Verbose().WriteLine("SetProcessDpiAwareness failed with {0}", result);
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -94,8 +128,8 @@ public static class NativeDpiMethods
             return DpiCalculator.DefaultScreenDpi;
         }
 
-        // Use the easiest method, but this only works for Windows 10
-        if (WindowsVersion.IsWindows10OrLater)
+        // Use the easiest method, but this only works for Windows 10 1607 and later
+        if (WindowsVersion.IsWindows10BuildOrLater(14393))
         {
             return (int)GetDpiForWindow(hWnd);
         }
@@ -155,34 +189,47 @@ public static class NativeDpiMethods
     }
 
     /// <summary>
-    /// Create a scope for the DpiAwarenessContext
+    /// Create a scope for the DpiAwarenessContext of the current thread.
+    /// Keep the scope as small as possible (e.g. only around the creation of a window) and dispose it on the same thread, this restores the previous DPI awareness context.
     /// </summary>
     /// <param name="dpiAwarenessContext">DpiAwarenessContext</param>
     /// <param name="alternativeAwarenessContext">DpiAwarenessContext when the first isn't accepted</param>
     /// <returns>IDisposable</returns>
     public static IDisposable ScopedThreadDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext, DpiAwarenessContext? alternativeAwarenessContext = null)
     {
-        DpiAwarenessContext? previousDpiAwarenessContext = null;
         if (!WindowsVersion.IsWindows10BuildOrLater(14393))
         {
             return Disposable.Empty;
         }
 
+        var previousDpiAwarenessContext = DpiAwarenessContext.Null;
         if (IsValidDpiAwarenessContext(dpiAwarenessContext))
         {
             previousDpiAwarenessContext = SetThreadDpiAwarenessContext(dpiAwarenessContext);
         }
-        else if (alternativeAwarenessContext.HasValue && IsValidDpiAwarenessContext(alternativeAwarenessContext.Value))
+
+        if (previousDpiAwarenessContext.IsNull && alternativeAwarenessContext.HasValue && IsValidDpiAwarenessContext(alternativeAwarenessContext.Value))
         {
             previousDpiAwarenessContext = SetThreadDpiAwarenessContext(alternativeAwarenessContext.Value);
         }
-        // Make the scope disposable
+
+        if (previousDpiAwarenessContext.IsNull)
+        {
+            // Nothing was changed, so there is nothing to restore
+            return Disposable.Empty;
+        }
+
+        // The DPI awareness context is a thread setting, it needs to be restored on the same thread
+        var threadId = Environment.CurrentManagedThreadId;
+        // Make the scope disposable, Disposable.Create makes sure this is only called once
         return Disposable.Create(() =>
         {
-            if (previousDpiAwarenessContext.HasValue)
+            if (threadId != Environment.CurrentManagedThreadId)
             {
-                SetThreadDpiAwarenessContext(previousDpiAwarenessContext.Value);
+                Log.Warn().WriteLine("The DPI awareness context scope was disposed on a different thread than it was created on, the thread DPI awareness context can't be restored.");
+                return;
             }
+            SetThreadDpiAwarenessContext(previousDpiAwarenessContext);
         });
     }
 
@@ -216,9 +263,15 @@ public static class NativeDpiMethods
     /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt807676(v=vs.85).aspx">SetProcessDpiAwarenessContext function</a>
     /// </summary>
     /// <param name="dpiAwarenessContext">DpiAwarenessContext</param>
-    /// <returns>bool</returns>
-    [DllImport(User32Api.User32, SetLastError = true)]
-    public static extern bool SetProcessDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext);
+    /// <returns>bool, when false use GetLastError: ERROR_ACCESS_DENIED means the DPI awareness was already set (e.g. via the manifest)</returns>
+    public static bool SetProcessDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext)
+    {
+        return SetProcessDpiAwarenessContextNative(dpiAwarenessContext.Value);
+    }
+
+    [DllImport(User32Api.User32, SetLastError = true, EntryPoint = "SetProcessDpiAwarenessContext")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetProcessDpiAwarenessContextNative(IntPtr dpiAwarenessContext);
 
     /// <summary>
     /// See more at <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt748624(v=vs.85).aspx">GetDpiForWindow function</a>
@@ -244,11 +297,14 @@ public static class NativeDpiMethods
 
     /// <summary>
     ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt748621(v=vs.85).aspx">EnableNonClientDpiScaling function</a>
+    ///     In high-DPI displays, enables automatic display scaling of the non-client area portions of the specified top-level window. Must be called during the initialization of that window (WM_NCCREATE).
+    ///     Available starting with Windows 10 version 1607 (build 14393), not needed for Per Monitor v2 windows.
     /// </summary>
     /// <param name="hWnd">IntPtr</param>
-    /// <returns>bool</returns>
+    /// <returns>bool true if successful, otherwise use GetLastError</returns>
     [DllImport(User32Api.User32, SetLastError = true)]
-    public static extern HResult EnableNonClientDpiScaling(IntPtr hWnd);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool EnableNonClientDpiScaling(IntPtr hWnd);
 
     /// <summary>
     /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt748623(v=vs.85).aspx">GetDpiForSystem function</a>
@@ -304,51 +360,111 @@ public static class NativeDpiMethods
     /// Gets the DPI_AWARENESS_CONTEXT for the current thread.
     ///
     /// This method will return the latest DPI_AWARENESS_CONTEXT sent to SetThreadDpiAwarenessContext. If SetThreadDpiAwarenessContext was never called for this thread, then the return value will equal the default DPI_AWARENESS_CONTEXT for the process.
+    /// Note: the returned value is a real handle, not one of the pseudo handles, use <see cref="AreDpiAwarenessContextsEqual"/> to compare it.
     /// </summary>
     /// <returns>DpiAwarenessContext</returns>
-    [DllImport(User32Api.User32)]
-    public static extern DpiAwarenessContext GetThreadDpiAwarenessContext();
+    public static DpiAwarenessContext GetThreadDpiAwarenessContext()
+    {
+        return new DpiAwarenessContext(GetThreadDpiAwarenessContextNative());
+    }
+
+    [DllImport(User32Api.User32, EntryPoint = "GetThreadDpiAwarenessContext")]
+    private static extern IntPtr GetThreadDpiAwarenessContextNative();
 
     /// <summary>
     /// Set the DPI awareness for the current thread to the provided value.
+    /// Prefer <see cref="ScopedThreadDpiAwarenessContext"/> which restores the previous value.
     /// </summary>
     /// <param name="dpiAwarenessContext">DpiAwarenessContext the new value for the current thread</param>
-    /// <returns>DpiAwarenessContext previous value</returns>
-    [DllImport(User32Api.User32)]
-    public static extern DpiAwarenessContext SetThreadDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext);
+    /// <returns>DpiAwarenessContext previous value (a real handle which can be passed to restore), <see cref="DpiAwarenessContext.IsNull"/> is true if the call failed</returns>
+    public static DpiAwarenessContext SetThreadDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext)
+    {
+        return new DpiAwarenessContext(SetThreadDpiAwarenessContextNative(dpiAwarenessContext.Value));
+    }
+
+    [DllImport(User32Api.User32, EntryPoint = "SetThreadDpiAwarenessContext")]
+    private static extern IntPtr SetThreadDpiAwarenessContextNative(IntPtr dpiAwarenessContext);
+
+    /// <summary>
+    /// Returns the DPI_AWARENESS_CONTEXT associated with a window.
+    /// Note: the returned value is a real handle, not one of the pseudo handles, use <see cref="AreDpiAwarenessContextsEqual"/> to compare it.
+    /// </summary>
+    /// <param name="hWnd">IntPtr with the window handle</param>
+    /// <returns>DpiAwarenessContext, <see cref="DpiAwarenessContext.IsNull"/> is true if the window handle is invalid</returns>
+    public static DpiAwarenessContext GetWindowDpiAwarenessContext(IntPtr hWnd)
+    {
+        return new DpiAwarenessContext(GetWindowDpiAwarenessContextNative(hWnd));
+    }
+
+    [DllImport(User32Api.User32, EntryPoint = "GetWindowDpiAwarenessContext")]
+    private static extern IntPtr GetWindowDpiAwarenessContextNative(IntPtr hWnd);
+
+    /// <summary>
+    /// Determines whether two DPI_AWARENESS_CONTEXT values are identical.
+    /// This is the only reliable way to compare DPI awareness contexts, as the values returned by Windows are not the pseudo handles.
+    /// </summary>
+    /// <param name="dpiContextA">DpiAwarenessContext</param>
+    /// <param name="dpiContextB">DpiAwarenessContext</param>
+    /// <returns>bool true if the values are equal</returns>
+    public static bool AreDpiAwarenessContextsEqual(DpiAwarenessContext dpiContextA, DpiAwarenessContext dpiContextB)
+    {
+        return AreDpiAwarenessContextsEqualNative(dpiContextA.Value, dpiContextB.Value);
+    }
+
+    [DllImport(User32Api.User32, EntryPoint = "AreDpiAwarenessContextsEqual")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool AreDpiAwarenessContextsEqualNative(IntPtr dpiContextA, IntPtr dpiContextB);
 
     /// <summary>
     /// Retrieves the DpiAwareness value from a DpiAwarenessContext.
     /// </summary>
     /// <param name="dpiAwarenessContext">DpiAwarenessContext</param>
     /// <returns>DpiAwareness</returns>
-    [DllImport(User32Api.User32)]
-    public static extern DpiAwareness GetAwarenessFromDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext);
+    public static DpiAwareness GetAwarenessFromDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext)
+    {
+        return GetAwarenessFromDpiAwarenessContextNative(dpiAwarenessContext.Value);
+    }
+
+    [DllImport(User32Api.User32, EntryPoint = "GetAwarenessFromDpiAwarenessContext")]
+    private static extern DpiAwareness GetAwarenessFromDpiAwarenessContextNative(IntPtr dpiAwarenessContext);
 
     /// <summary>
     /// Retrieves the DPI from a given DPI_AWARENESS_CONTEXT handle. This enables you to determine the DPI of a thread without needed to examine a window created within that thread.
+    /// Available starting with Windows 10 version 1803 (build 17134).
     /// </summary>
     /// <param name="dpiAwarenessContext">DpiAwarenessContext</param>
-    /// <returns>uint with dpi value</returns>
-    [DllImport(User32Api.User32)]
-    public static extern uint GetDpiFromDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext);
+    /// <returns>uint with dpi value, 0 for per monitor aware contexts</returns>
+    public static uint GetDpiFromDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext)
+    {
+        return GetDpiFromDpiAwarenessContextNative(dpiAwarenessContext.Value);
+    }
+
+    [DllImport(User32Api.User32, EntryPoint = "GetDpiFromDpiAwarenessContext")]
+    private static extern uint GetDpiFromDpiAwarenessContextNative(IntPtr dpiAwarenessContext);
 
     /// <summary>
     /// Determines if a specified DPI_AWARENESS_CONTEXT is valid and supported by the current system.
     /// </summary>
     /// <param name="dpiAwarenessContext">DpiAwarenessContext The context that you want to determine if it is supported.</param>
     /// <returns>bool true if supported otherwise false</returns>
-    [DllImport(User32Api.User32)]
-    public static extern bool IsValidDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext);
+    public static bool IsValidDpiAwarenessContext(DpiAwarenessContext dpiAwarenessContext)
+    {
+        return IsValidDpiAwarenessContextNative(dpiAwarenessContext.Value);
+    }
+
+    [DllImport(User32Api.User32, EntryPoint = "IsValidDpiAwarenessContext")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool IsValidDpiAwarenessContextNative(IntPtr dpiAwarenessContext);
 
     /// <summary>
     /// Returns the DPI_HOSTING_BEHAVIOR of the specified window.
     ///
     /// This API allows you to examine the hosting behavior of a window after it has been created. A window's hosting behavior is the hosting behavior of the thread in which the window was created, as set by a call to SetThreadDpiHostingBehavior. This is a permanent value and cannot be changed after the window is created, even if the thread's hosting behavior is changed.
     /// </summary>
+    /// <param name="hWnd">IntPtr with the handle of the window to examine</param>
     /// <returns>DpiHostingBehavior</returns>
     [DllImport(User32Api.User32)]
-    public static extern DpiHostingBehavior GetWindowDpiHostingBehavior();
+    public static extern DpiHostingBehavior GetWindowDpiHostingBehavior(IntPtr hWnd);
 
     /// <summary>
     /// See more at <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt845775.aspx">SetThreadDpiHostingBehavior function</a>
@@ -403,6 +519,30 @@ public static class NativeDpiMethods
     /// <returns>DialogScalingBehaviors</returns>
     [DllImport(User32Api.User32)]
     public static extern DialogScalingBehaviors GetDialogControlDpiChangeBehavior(IntPtr hWnd);
+
+    /// <summary>
+    /// Dialogs in Per-Monitor v2 contexts are automatically DPI scaled. This method lets you customize their DPI change behavior.
+    /// This function returns TRUE if the operation was successful, and FALSE otherwise. To get extended error information, call GetLastError.
+    /// Possible errors are ERROR_INVALID_HANDLE if passed an invalid HWND, and ERROR_ACCESS_DENIED if the windows belongs to another process.
+    /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setdialogdpichangebehavior">SetDialogDpiChangeBehavior function</a>
+    /// </summary>
+    /// <param name="hDlg">IntPtr A handle for the dialog whose behavior will be modified.</param>
+    /// <param name="mask">DialogDpiChangeBehaviors A mask specifying the subset of flags to be changed.</param>
+    /// <param name="values">DialogDpiChangeBehaviors The desired value to be set for the specified subset of flags.</param>
+    /// <returns>bool</returns>
+    [DllImport(User32Api.User32, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetDialogDpiChangeBehavior(IntPtr hDlg, DialogDpiChangeBehaviors mask, DialogDpiChangeBehaviors values);
+
+    /// <summary>
+    /// Returns the flags that might have been set on a given dialog by an earlier call to SetDialogDpiChangeBehavior.
+    /// If passed an invalid handle, this function will return zero, and set its last error to ERROR_INVALID_HANDLE.
+    /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdialogdpichangebehavior">GetDialogDpiChangeBehavior function</a>
+    /// </summary>
+    /// <param name="hDlg">IntPtr The handle for the dialog to examine.</param>
+    /// <returns>DialogDpiChangeBehaviors</returns>
+    [DllImport(User32Api.User32, SetLastError = true)]
+    public static extern DialogDpiChangeBehaviors GetDialogDpiChangeBehavior(IntPtr hDlg);
 
     /// <summary>
     /// Retrieves the value of one of the system metrics, taking into account the provided DPI value.

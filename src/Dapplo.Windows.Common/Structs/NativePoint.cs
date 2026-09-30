@@ -6,16 +6,13 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
-#if !NETSTANDARD2_0
-using System.Windows;
-#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 namespace Dapplo.Windows.Common.Structs;
 
 /// <summary>
 ///     NativePoint represents the native POINT structure for calling native methods.
-///     It has conversions from and to System.Drawing.Point or System.Windows.Point
+///     It has conversions from and to System.Drawing.Point (the conversions from and to the WPF types are extension methods in Dapplo.Windows.Wpf)
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 [Serializable]
@@ -47,17 +44,6 @@ public readonly struct NativePoint : IEquatable<NativePoint>
         _y = y;
     }
 
-#if !NETSTANDARD2_0
-    /// <summary>
-    ///     Implicit cast from NativePoint to Point
-    /// </summary>
-    /// <param name="point">NativePoint</param>
-    public static implicit operator Point(NativePoint point)
-    {
-        return new Point(point.X, point.Y);
-    }
-#endif
-
     /// <summary>
     ///     Implicit cast from NativePoint to System.Drawing.Point
     /// </summary>
@@ -77,21 +63,23 @@ public readonly struct NativePoint : IEquatable<NativePoint>
     }
 
     /// <summary>
-    ///     Implicit cast from System.Drawing.PointF to NativePoint
+    ///     Explicit (lossy) cast from System.Drawing.PointF to NativePoint.
+    ///     The coordinates are floored, so the result is the pixel which contains the point. Use Round() on a NativePointFloat to round instead.
     /// </summary>
     /// <param name="point">System.Drawing.PointF</param>
-    public static implicit operator NativePoint(System.Drawing.PointF point)
+    public static explicit operator NativePoint(System.Drawing.PointF point)
     {
-        return new NativePoint((int) point.X, (int) point.Y);
+        return new NativePoint((int)Math.Floor(point.X), (int)Math.Floor(point.Y));
     }
 
     /// <summary>
-    /// Implicit cast from NativePointFloat to NativePoint
+    ///     Explicit (lossy) cast from NativePointFloat to NativePoint.
+    ///     The coordinates are floored, so the result is the pixel which contains the point. Use Round() to round instead.
     /// </summary>
     /// <param name="nativePointFloat">NativePointFloat</param>
-    public static implicit operator NativePoint(NativePointFloat nativePointFloat)
+    public static explicit operator NativePoint(NativePointFloat nativePointFloat)
     {
-        return new NativePoint((int)nativePointFloat.X, (int)nativePointFloat.Y);
+        return new NativePoint((int)Math.Floor(nativePointFloat.X), (int)Math.Floor(nativePointFloat.Y));
     }
 
     /// <summary>

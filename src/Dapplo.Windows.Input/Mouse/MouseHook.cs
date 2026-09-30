@@ -1,78 +1,50 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
-using Dapplo.Windows.Messages;
-using Dapplo.Windows.Messages.Enumerations;
+using Dapplo.Windows.Messages.Enums;
 
 namespace Dapplo.Windows.Input.Mouse;
 
 /// <summary>
-///     A glocal mouse hook, using System.Reactive
+///     A global (low-level) mouse hook, using System.Reactive
 /// </summary>
-public sealed class MouseHook
+/// <remarks>
+/// The hook is installed when the first subscriber subscribes and removed when the last one unsubscribes.
+/// It runs on a dedicated background thread with its own message loop, it doesn't matter which thread subscribes.
+/// <para>
+/// Subscribers of <see cref="MouseEvents"/> are called synchronously inside the hook callback, on the hook thread, and every mouse event of the whole system (including every move) waits for them.
+/// Windows silently removes a low-level hook which takes longer than the LowLevelHooksTimeout (at most 1 second, often less), after that no events arrive anymore.
+/// So only decide <see cref="MouseHookEventArgs.Handled"/> in there and keep it quick, move any other work away from the hook thread with ObserveOn,
+/// or use <see cref="MouseEventsNonBlocking"/>. Anything which touches the UI needs to be marshalled to the UI thread.
+/// </para>
+/// <para>
+/// Exceptions thrown by subscribers never leave the hook callback, they are published on <see cref="SubscriberErrors"/>.
+/// When the hook cannot be installed, the subscriber gets OnError with a <see cref="System.ComponentModel.Win32Exception"/>.
+/// </para>
+/// </remarks>
+public static class MouseHook
 {
-    /// <summary>
-    ///     The singleton of the MouseHook
-    /// </summary>
-    private static readonly Lazy<MouseHook> Singleton = new Lazy<MouseHook>(() => new MouseHook());
+    private static readonly LowLevelHook<MouseHookEventArgs> Hook = new(HookTypes.WH_MOUSE_LL, "Dapplo.Windows.Input.MouseHook", CreateMouseEventArgs, eventArgs => eventArgs.Handled);
 
     /// <summary>
-    ///     Used to store the observable
+    ///     The mouse events, OnNext is called synchronously on the hook thread.
+    ///     Setting <see cref="MouseHookEventArgs.Handled"/> to true in OnNext swallows the mouse event, keep the processing short.
     /// </summary>
-    private readonly IObservable<MouseHookEventArgs> _mouseObservable;
+    public static IObservable<MouseHookEventArgs> MouseEvents => Hook.Events;
 
     /// <summary>
-    ///     Store the handler, otherwise it might be GCed
+    ///     The mouse events, delivered in order on a separate background thread so slow subscribers never delay the mouse input of the system.
+    ///     Setting <see cref="MouseHookEventArgs.Handled"/> has no effect here, the event was already passed on.
     /// </summary>
-    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-    private LowLevelMouseProc _callback;
+    public static IObservable<MouseHookEventArgs> MouseEventsNonBlocking => Hook.NonBlockingEvents;
 
     /// <summary>
-    ///     Private constructor to create the observable
+    ///     Exceptions thrown by subscribers of <see cref="MouseEvents"/> or <see cref="MouseEventsNonBlocking"/>, these are also written to System.Diagnostics.Trace.
     /// </summary>
-    private MouseHook()
-    {
-        _mouseObservable = Observable.Create<MouseHookEventArgs>(observer =>
-            {
-                var hookId = IntPtr.Zero;
-                // Need to hold onto this callback, otherwise it will get GC'd as it is an unmanged callback
-                _callback = (nCode, wParam, lParam) =>
-                {
-                    if (nCode >= 0)
-                    {
-                        var eventArgs = CreateMouseEventArgs(wParam, lParam);
-                        observer.OnNext(eventArgs);
-                        if (eventArgs.Handled)
-                        {
-                            return (IntPtr) 1;
-                        }
-                    }
-
-                    // ReSharper disable once AccessToModifiedClosure
-                    return CallNextHookEx(hookId, nCode, wParam, lParam);
-                };
-
-                hookId = SetWindowsHookEx(HookTypes.WH_MOUSE_LL, _callback, IntPtr.Zero, 0);
-
-                return Disposable.Create(() =>
-                {
-                    UnhookWindowsHookEx(hookId);
-                    _callback = null;
-                });
-            })
-            .Publish()
-            .RefCount();
-    }
-
-    /// <summary>
-    ///     The actual keyboard hook observable
-    /// </summary>
-    public static IObservable<MouseHookEventArgs> MouseEvents => Singleton.Value._mouseObservable;
+    public static IObservable<Exception> SubscriberErrors => Hook.SubscriberErrors;
 
     /// <summary>
     ///     Create the MouseEventArgs from the parameters which where in the event
@@ -82,55 +54,15 @@ public sealed class MouseHook
     /// <returns>MouseEventArgs</returns>
     private static MouseHookEventArgs CreateMouseEventArgs(IntPtr wParam, IntPtr lParam)
     {
-        var mouseLowLevelHookStruct = (MouseLowLevelHookStruct) Marshal.PtrToStructure(lParam, typeof(MouseLowLevelHookStruct));
+        var mouseLowLevelHookStruct = Marshal.PtrToStructure<MouseLowLevelHookStruct>(lParam);
 
-
-        var mouseEventArgs = new MouseHookEventArgs
+        return new MouseHookEventArgs
         {
-            WindowsMessage = (WindowsMessages) wParam.ToInt32(),
-            Point = mouseLowLevelHookStruct.pt
+            WindowsMessage = (WindowsMessages) wParam.ToInt64(),
+            Point = mouseLowLevelHookStruct.pt,
+            MouseData = mouseLowLevelHookStruct.MouseData,
+            Flags = mouseLowLevelHookStruct.Flags,
+            TimeStamp = mouseLowLevelHookStruct.TimeStamp
         };
-
-        return mouseEventArgs;
     }
-
-    /// <summary>
-    ///     The actual delegate for the p
-    /// </summary>
-    /// <param name="nCode"></param>
-    /// <param name="wParam"></param>
-    /// <param name="lParam"></param>
-    /// <returns></returns>
-    private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
-
-    /// <summary>
-    ///     Register a windows hook
-    /// </summary>
-    /// <param name="hookType">HookTypes</param>
-    /// <param name="lpfn">LowLevelMouseProc</param>
-    /// <param name="hMod">IntPtr</param>
-    /// <param name="dwThreadId">uint</param>
-    /// <returns>ID to be able to unhook it again</returns>
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr SetWindowsHookEx(HookTypes hookType, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
-
-    /// <summary>
-    ///     Used to remove a hook which was set with SetWindowsHookEx
-    /// </summary>
-    /// <param name="hhk"></param>
-    /// <returns></returns>
-    [DllImport("user32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool UnhookWindowsHookEx(IntPtr hhk);
-
-    /// <summary>
-    ///     Used to call the next hook in the list, if there was any
-    /// </summary>
-    /// <param name="hhk"></param>
-    /// <param name="nCode"></param>
-    /// <param name="wParam"></param>
-    /// <param name="lParam"></param>
-    /// <returns>IntPtr</returns>
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
 }

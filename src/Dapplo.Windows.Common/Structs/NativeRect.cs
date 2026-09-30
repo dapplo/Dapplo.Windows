@@ -7,9 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Runtime.InteropServices;
-#if !NETSTANDARD2_0
-using System.Windows;
-#endif
 using Dapplo.Windows.Common.TypeConverters;
 
 namespace Dapplo.Windows.Common.Structs;
@@ -17,7 +14,7 @@ namespace Dapplo.Windows.Common.Structs;
 /// <summary>
 ///     NativeRect represents the native RECT structure for calling native methods.
 ///     See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd162897.aspx">RECT struct</a>
-///     It has conversions from and to System.Drawing.Rectangle or System.Windows.Rect
+///     It has conversions from and to System.Drawing.Rectangle (the conversions from and to the WPF types are extension methods in Dapplo.Windows.Wpf)
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 [Serializable]
@@ -147,38 +144,6 @@ public readonly struct NativeRect : IEquatable<NativeRect>
     /// </summary>
     public NativePoint TopRight => new NativePoint(X + Width, Y);
 
-#if !NETSTANDARD2_0
-        /// <summary>
-        ///     Cast NativeRect to Rect
-        /// </summary>
-        /// <param name="rectangle">NativeRect</param>
-        /// <returns>Rect</returns>
-        public static implicit operator Rect(NativeRect rectangle)
-        {
-            return new Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
-        }
-    
-        /// <summary>
-        ///     Cast NativeRect to Int32Rect
-        /// </summary>
-        /// <param name="rectangle">NativeRect</param>
-        /// <returns>Int32Rect</returns>
-        public static implicit operator Int32Rect(NativeRect rectangle)
-        {
-            return new Int32Rect(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);
-        }
-
-        /// <summary>
-        ///     Cast Int32Rect to NativeRect
-        /// </summary>
-        /// <param name="rectangle">Int32Rect</param>
-        /// <returns>NativeRect</returns>
-        public static implicit operator NativeRect(Int32Rect rectangle)
-        {
-            return new NativeRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
-        }
-#endif
-
     /// <summary>
     ///     Cast NativeRect to RectangleF
     /// </summary>
@@ -250,10 +215,10 @@ public readonly struct NativeRect : IEquatable<NativeRect>
     }
 
     /// <summary>
-    ///     Checks if this NativeRect is empty
+    ///     Checks if this NativeRect is empty, like the Win32 IsRectEmpty this is the case when the width or height is zero or negative
     /// </summary>
     /// <returns>true when empty</returns>
-    public bool IsEmpty => unchecked (Width * Height) == 0;
+    public bool IsEmpty => _right <= _left || _bottom <= _top;
 
     /// <inheritdoc />
     [Pure]

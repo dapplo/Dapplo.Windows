@@ -207,5 +207,5 @@ public enum ObjectStates : uint
     /// <summary>
     ///     A bitmask representing all valid state flags
     /// </summary>
-    STATE_SYSTEM_VALID = 0x3FFFFFFF
+    STATE_SYSTEM_VALID = 0x7FFFFFFF
 }

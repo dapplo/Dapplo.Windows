@@ -16,30 +16,56 @@ public static class Shell32Api
     private const string Shell32Dll = "shell32.dll";
 
     /// <summary>
-    /// Returns an AppBarData struct which describes the Taskbar bounds etc
+    /// Retrieves the bounds and edge of the Windows taskbar (ABM_GETTASKBARPOS).
     /// </summary>
-    /// <returns>AppBarData</returns>
-    public static AppBarData TaskbarPosition
+    /// <param name="appBarData">AppBarData which describes the taskbar bounds and edge, default when the call failed</param>
+    /// <returns>true if the taskbar position could be retrieved</returns>
+    public static bool TryGetTaskbarPosition(out AppBarData appBarData)
     {
-        get
+        appBarData = AppBarData.Create();
+        if (SHAppBarMessage(AppBarMessages.GetTaskbarPosition, ref appBarData) != IntPtr.Zero)
         {
-            var appBarData = AppBarData.Create();
-            SHAppBarMessage(AppBarMessages.GetTaskbarPosition, ref appBarData);
-            return appBarData;
+            return true;
         }
+        appBarData = default;
+        return false;
     }
 
     /// <summary>
-    ///     Get the Icon from a file
+    /// Retrieves the autohide and always-on-top states of the Windows taskbar (ABM_GETSTATE).
+    /// The state is the return value of SHAppBarMessage, it is not returned in the AppBarData.
     /// </summary>
-    /// <param name="sFile">string</param>
-    /// <param name="iIndex">int</param>
-    /// <param name="piLargeVersion">IntPtr</param>
-    /// <param name="piSmallVersion">IntPtr</param>
-    /// <param name="amountIcons">int</param>
-    /// <returns></returns>
-    [DllImport(Shell32Dll, CharSet = CharSet.Unicode)]
-    public static extern int ExtractIconEx(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
+    /// <returns>AppBarStates</returns>
+    public static AppBarStates GetTaskbarState()
+    {
+        var appBarData = AppBarData.Create();
+        return (AppBarStates)SHAppBarMessage(AppBarMessages.GetState, ref appBarData).ToInt64();
+    }
+
+    /// <summary>
+    ///     Extracts icons from an executable, DLL or icon file.
+    ///     See <a href="https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-extracticonexw">ExtractIconExW function</a>
+    ///     The caller owns the returned icon handles and must destroy them with DestroyIcon.
+    /// </summary>
+    /// <param name="lpszFile">Path of the executable, DLL or icon file</param>
+    /// <param name="nIconIndex">Zero-based index of the first icon to extract, a negative value is a resource ID</param>
+    /// <param name="phiconLarge">Array which receives the large icon handles, must have at least <paramref name="nIcons"/> elements, or null</param>
+    /// <param name="phiconSmall">Array which receives the small icon handles, must have at least <paramref name="nIcons"/> elements, or null</param>
+    /// <param name="nIcons">Number of icons to extract</param>
+    /// <returns>The number of icons successfully extracted</returns>
+    [DllImport(Shell32Dll, CharSet = CharSet.Unicode, EntryPoint = "ExtractIconExW", ExactSpelling = true)]
+    public static extern uint ExtractIconEx(string lpszFile, int nIconIndex, [Out] IntPtr[] phiconLarge, [Out] IntPtr[] phiconSmall, uint nIcons);
+
+    /// <summary>
+    ///     Returns the number of icons in an executable, DLL or icon file,
+    ///     this uses ExtractIconEx with nIconIndex -1 and both icon arrays NULL, as documented.
+    /// </summary>
+    /// <param name="lpszFile">Path of the executable, DLL or icon file</param>
+    /// <returns>The number of icons in the file</returns>
+    public static uint CountIcons(string lpszFile) => ExtractIconExCount(lpszFile, -1, IntPtr.Zero, IntPtr.Zero, 0);
+
+    [DllImport(Shell32Dll, CharSet = CharSet.Unicode, EntryPoint = "ExtractIconExW", ExactSpelling = true)]
+    private static extern uint ExtractIconExCount(string lpszFile, int nIconIndex, IntPtr phiconLarge, IntPtr phiconSmall, uint nIcons);
 
 
     /// <summary>
@@ -49,9 +75,9 @@ public static class Shell32Api
     /// <param name="dwMessage">AppBarMessages - Appbar message value to send.</param>
     /// <param name="pData">A pointer to an AppBarData structure. The content of the structure on entry and on exit depends on the value set in the dwMessage parameter.
     /// See the individual message pages for specifics.</param>
-    /// <returns></returns>
-    [DllImport(Shell32Dll, SetLastError = true)]
-    private static extern IntPtr SHAppBarMessage(AppBarMessages dwMessage, [In] ref AppBarData pData);
+    /// <returns>A message-dependent value, see the individual message pages. For ABM_GETSTATE this is the AppBarStates, for most other messages 0 means failure.</returns>
+    [DllImport(Shell32Dll)]
+    public static extern IntPtr SHAppBarMessage(AppBarMessages dwMessage, ref AppBarData pData);
 
     /// <summary>
     /// Retrieves information about an object in the file system, such as a file, folder, directory, or drive root.

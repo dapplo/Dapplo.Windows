@@ -10,6 +10,8 @@ using Xunit;
 
 namespace Dapplo.Windows.Tests;
 
+/// <remarks>Interactive: these tests change the real desktop (input, clipboard or registry). They are excluded by default, run them with --filter Category=Interactive.</remarks>
+[Trait("Category", "Interactive")]
 public class RegistryTests
 {
     private static readonly LogSource Log = new LogSource();

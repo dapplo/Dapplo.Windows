@@ -4,18 +4,12 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-#if !NETSTANDARD2_0
-using System.Windows.Media.Imaging;
-#endif
 using System.Xml.Linq;
-using Dapplo.Windows.App;
-using Dapplo.Windows.Desktop;
 using Dapplo.Windows.User32;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Icons.Enums;
 using Dapplo.Windows.Icons.SafeHandles;
-using Dapplo.Windows.Kernel32;
 using Dapplo.Windows.Shell32;
 using Dapplo.Windows.Shell32.Enums;
 using Dapplo.Windows.Shell32.Structs;
@@ -30,14 +24,15 @@ public static class IconHelper
     /// <summary>
     /// Helper method to get the app logo from the applications AppxManifest
     /// </summary>
-    /// <typeparam name="TBitmap">Type for the Bitmap, i.e. BitmapSource or Bitmap</typeparam>
-    /// <param name="interopWindow">IInteropWindow</param>
+    /// <typeparam name="TBitmap">Type for the Bitmap, only Bitmap is supported (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
+    /// <param name="exePath">string with the path of the executable of the app, the AppxManifest.xml is expected in the same directory. For a window use GetAppLogo in Dapplo.Windows.</param>
     /// <param name="scale">int with scale, 100 is default</param>
     /// <returns>instance of TBitmap or null if nothing found</returns>
-    public static TBitmap GetAppLogo<TBitmap>(IInteropWindow interopWindow, int scale = 100) where TBitmap : class
+    /// <exception cref="NotSupportedException">when TBitmap is not Icon or Bitmap</exception>
+    public static TBitmap GetAppLogo<TBitmap>(string exePath, int scale = 100) where TBitmap : class
     {
+        ThrowIfUnsupportedIconType<TBitmap>();
         // get folder where actual app resides
-        var exePath = GetAppProcessPath(interopWindow);
         if (exePath == null)
         {
             return default;
@@ -74,7 +69,8 @@ public static class IconHelper
         var possibleLogos = Directory.GetFiles(logoDirectory, Path.GetFileNameWithoutExtension(pathToLogo) + "*" + logoExtension);
 
         // Find the best matching logo, this could be one with a scale in it, or just the first
-        string finalLogoPath = possibleLogos.FirstOrDefault(logoFile => logoFile.EndsWith($".scale-{scale}.{logoExtension}")) ?? possibleLogos.FirstOrDefault();
+        // Path.GetExtension already includes the dot
+        string finalLogoPath = possibleLogos.FirstOrDefault(logoFile => logoFile.EndsWith($".scale-{scale}{logoExtension}", StringComparison.OrdinalIgnoreCase)) ?? possibleLogos.FirstOrDefault();
 
         if (finalLogoPath == null || !File.Exists(finalLogoPath))
         {
@@ -82,46 +78,16 @@ public static class IconHelper
         }
         using (var fileStream = File.OpenRead(finalLogoPath))
         {
-#if !NETSTANDARD2_0
-            if (typeof(BitmapSource).IsAssignableFrom(typeof(TBitmap)))
-            {
-                var img = new BitmapImage();
-                img.BeginInit();
-                img.StreamSource = fileStream;
-                img.CacheOption = BitmapCacheOption.OnLoad;
-                img.EndInit();
-                return img as TBitmap;
-            }
-#endif
             if (typeof(Bitmap) != typeof(TBitmap))
             {
                 return default;
             }
-            using (var bitmap = Image.FromStream(fileStream))
+            using (var image = Image.FromStream(fileStream))
             {
-                return bitmap.Clone() as TBitmap;
+                // Make a copy which doesn't depend on the stream, which is closed after this
+                return new Bitmap(image) as TBitmap;
             }
         }
-    }
-
-    /// <summary>
-    /// Get the path for the real modern app process belonging to the window
-    /// </summary>
-    /// <param name="interopWindow">IInteropWindow</param>
-    /// <returns>string</returns>
-    private static string GetAppProcessPath(IInteropWindow interopWindow)
-    {
-        User32Api.GetWindowThreadProcessId(interopWindow.Handle, out var pid);
-        if (string.Equals(interopWindow.GetClassname(), AppQuery.AppFrameWindowClass))
-        {
-            pid = interopWindow.GetChildren().FirstOrDefault(window => string.Equals(AppQuery.AppWindowClass, window.GetClassname()))?.GetProcessId() ?? 0;
-        }
-        if (pid <= 0)
-        {
-            return null;
-        }
-
-        return Kernel32Api.GetProcessPath(pid);
     }
 
     /// <summary>
@@ -144,38 +110,57 @@ public static class IconHelper
     /// <returns>Bitmap with the Vista Icon (256x256)</returns>
     public static Bitmap ExtractVistaIcon(this Stream iconStream)
     {
+        if (iconStream == null)
+        {
+            throw new ArgumentNullException(nameof(iconStream));
+        }
         const int sizeIconDir = 6;
         const int sizeIconDirEntry = 16;
-        Bitmap bmpPngExtracted = null;
         try
         {
-            var srcBuf = new byte[iconStream.Length];
-            _ = iconStream.Read(srcBuf, 0, (int)iconStream.Length);
-            int iCount = BitConverter.ToInt16(srcBuf, 4);
+            // Read the complete stream, from the current position, a single Read might return less than requested
+            byte[] srcBuf;
+            using (var bufferStream = new MemoryStream())
+            {
+                iconStream.CopyTo(bufferStream);
+                srcBuf = bufferStream.ToArray();
+            }
+            if (srcBuf.Length < sizeIconDir)
+            {
+                return null;
+            }
+            int iCount = BitConverter.ToUInt16(srcBuf, 4);
             for (var iIndex = 0; iIndex < iCount; iIndex++)
             {
-                int iWidth = srcBuf[sizeIconDir + sizeIconDirEntry * iIndex];
-                int iHeight = srcBuf[sizeIconDir + sizeIconDirEntry * iIndex + 1];
+                var entryOffset = sizeIconDir + sizeIconDirEntry * iIndex;
+                if (entryOffset + sizeIconDirEntry > srcBuf.Length)
+                {
+                    break;
+                }
+                int iWidth = srcBuf[entryOffset];
+                int iHeight = srcBuf[entryOffset + 1];
+                // 0 means 256
                 if (iWidth != 0 || iHeight != 0)
                 {
                     continue;
                 }
-                var iImageSize = BitConverter.ToInt32(srcBuf, sizeIconDir + sizeIconDirEntry * iIndex + 8);
-                var iImageOffset = BitConverter.ToInt32(srcBuf, sizeIconDir + sizeIconDirEntry * iIndex + 12);
-                using (var destStream = new MemoryStream())
+                var iImageSize = BitConverter.ToInt32(srcBuf, entryOffset + 8);
+                var iImageOffset = BitConverter.ToInt32(srcBuf, entryOffset + 12);
+                if (iImageSize <= 0 || iImageOffset < 0 || iImageOffset > srcBuf.Length - iImageSize)
                 {
-                    destStream.Write(srcBuf, iImageOffset, iImageSize);
-                    destStream.Seek(0, SeekOrigin.Begin);
-                    bmpPngExtracted = new Bitmap(destStream); // This is PNG! :)
+                    continue;
                 }
-                break;
+                // GDI+ needs the stream for the lifetime of a Bitmap, so make a copy which doesn't depend on the stream
+                using var imageStream = new MemoryStream(srcBuf, iImageOffset, iImageSize, false);
+                using var streamBitmap = new Bitmap(imageStream); // This is PNG! :)
+                return new Bitmap(streamBitmap);
             }
         }
-        catch
+        catch (Exception)
         {
             return null;
         }
-        return bmpPngExtracted;
+        return null;
     }
 
     /// <summary>
@@ -205,7 +190,11 @@ public static class IconHelper
         {
             return null;
         }
-        Shell32Api.ExtractIconEx(filePath, index, out var large, out var small, 1);
+        var largeIcons = new IntPtr[1];
+        var smallIcons = new IntPtr[1];
+        Shell32Api.ExtractIconEx(filePath, index, largeIcons, smallIcons, 1);
+        var large = largeIcons[0];
+        var small = smallIcons[0];
         TIcon returnIcon = null;
         try
         {
@@ -243,24 +232,31 @@ public static class IconHelper
     /// <returns>int with the number of icons in the file</returns>
     public static int CountAssociatedIcons(string location)
     {
-        return Shell32Api.ExtractIconEx(location, -1, out _, out _, 0);
+        return (int)Shell32Api.CountIcons(location);
     }
 
     /// <summary>
-    /// Create a TIcon from the specified iconHandle
+    /// Create a TIcon from the specified iconHandle.
+    /// The returned TIcon is always an independent copy, the caller keeps ownership of the iconHandle and may destroy it afterwards.
     /// </summary>
-    /// <typeparam name="TIcon">Bitmap, Icon or BitmapSource</typeparam>
+    /// <typeparam name="TIcon">Bitmap or Icon (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="iconHandle">IntPtr</param>
     /// <returns>TIcon</returns>
+    /// <exception cref="NotSupportedException">when TIcon is not Icon or Bitmap</exception>
     public static TIcon IconHandleTo<TIcon>(IntPtr iconHandle) where TIcon : class
     {
+        ThrowIfUnsupportedIconType<TIcon>();
         if (iconHandle == IntPtr.Zero)
         {
             return default;
         }
         if (typeof(TIcon) == typeof(Icon))
         {
-            return Icon.FromHandle(iconHandle) as TIcon;
+            // Icon.FromHandle does not own the handle, clone it so the returned Icon has its own copy (CopyImage)
+            using (var icon = Icon.FromHandle(iconHandle))
+            {
+                return icon.Clone() as TIcon;
+            }
         }
         if (typeof(TIcon) == typeof(Bitmap))
         {
@@ -269,18 +265,20 @@ public static class IconHelper
                 return icon.ToBitmap() as TIcon;
             }
         }
-#if !NETSTANDARD2_0
-        if (typeof(TIcon) != typeof(BitmapSource))
+        return default;
+    }
+
+    /// <summary>
+    ///     Make sure the requested icon type is supported, this prevents that e.g. a WPF BitmapSource silently results in null.
+    /// </summary>
+    /// <typeparam name="TIcon">Icon or Bitmap</typeparam>
+    /// <exception cref="NotSupportedException">when TIcon is not Icon or Bitmap</exception>
+    public static void ThrowIfUnsupportedIconType<TIcon>()
+    {
+        if (typeof(TIcon) != typeof(Icon) && typeof(TIcon) != typeof(Bitmap))
         {
-            return default;
+            throw new NotSupportedException($"{typeof(TIcon).FullName} is not supported, only {typeof(Icon).FullName} and {typeof(Bitmap).FullName} are. Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource.");
         }
-        using (var icon = Icon.FromHandle(iconHandle))
-        {
-            return icon.ToBitmapSource() as TIcon;
-        }
-#else
-            return default;
-#endif
     }
 
     /// <summary>
@@ -464,7 +462,7 @@ public static class IconHelper
     ///     Loads an icon at the system-preferred size using LoadIconMetric.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric">LoadIconMetric function</a>
     /// </summary>
-    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <typeparam name="TIcon">The type of icon to return (Icon or Bitmap) (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="hInstance">
     ///     A handle to the module containing the icon resource.
     ///     Use IntPtr.Zero to load a stock system icon.
@@ -502,7 +500,7 @@ public static class IconHelper
     ///     Loads an icon at the system-preferred size using LoadIconMetric.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric">LoadIconMetric function</a>
     /// </summary>
-    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <typeparam name="TIcon">The type of icon to return (Icon or Bitmap) (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="hInstance">
     ///     A handle to the module containing the icon resource.
     ///     Use IntPtr.Zero to load a stock system icon.
@@ -541,7 +539,7 @@ public static class IconHelper
     ///     If the icon is larger than the requested size, it will be scaled down.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconwithscaledown">LoadIconWithScaleDown function</a>
     /// </summary>
-    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <typeparam name="TIcon">The type of icon to return (Icon or Bitmap) (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="hInstance">
     ///     A handle to the module containing the icon resource.
     ///     Use IntPtr.Zero to load a stock system icon.
@@ -579,7 +577,7 @@ public static class IconHelper
     ///     If the icon is larger than the requested size, it will be scaled down.
     ///     See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconwithscaledown">LoadIconWithScaleDown function</a>
     /// </summary>
-    /// <typeparam name="TIcon">The type of icon to return (Icon, Bitmap, or BitmapSource)</typeparam>
+    /// <typeparam name="TIcon">The type of icon to return (Icon or Bitmap) (Dapplo.Windows.Wpf has ToBitmapSource() to convert these to a WPF BitmapSource)</typeparam>
     /// <param name="hInstance">
     ///     A handle to the module containing the icon resource.
     ///     Use IntPtr.Zero to load a stock system icon.

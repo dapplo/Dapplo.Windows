@@ -8,7 +8,7 @@ using Dapplo.Windows.Common.Structs;
 namespace Dapplo.Windows.Common.TypeConverters;
 
 /// <summary>
-/// This implements a TypeConverter for the NativeSize structur
+/// This implements a TypeConverter for the NativeSize structure, the format is "Width,Height" using the invariant culture
 /// </summary>
 public class NativeSizeTypeConverter : TypeConverter
 {
@@ -29,12 +29,12 @@ public class NativeSizeTypeConverter : TypeConverter
     {
         if (value is string sizeStringValue)
         {
-            string[] hw = sizeStringValue.Split(',');
-            if (hw.Length == 2 &&
-                int.TryParse(hw[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var h) &&
-                int.TryParse(hw[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var w))
+            string[] wh = sizeStringValue.Split(',');
+            if (wh.Length == 2 &&
+                int.TryParse(wh[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var w) &&
+                int.TryParse(wh[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var h))
             {
-                return new NativeSize(h, w);
+                return new NativeSize(w, h);
             }
         }
         return base.ConvertFrom(context, culture, value);
@@ -45,7 +45,8 @@ public class NativeSizeTypeConverter : TypeConverter
     {
         if (destinationType == typeof(string) && value is NativeSize nativeSize)
         {
-            return $"{nativeSize.Height},{nativeSize.Width}";
+            // Always use the invariant culture, ConvertFrom parses with it (e.g. sv-SE would write U+2212 as negative sign)
+            return string.Concat(nativeSize.Width.ToString(CultureInfo.InvariantCulture), ",", nativeSize.Height.ToString(CultureInfo.InvariantCulture));
         }
         return base.ConvertTo(context, culture, value, destinationType);
     }

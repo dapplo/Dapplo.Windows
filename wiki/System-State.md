@@ -1,253 +1,141 @@
-# System State
+# System state
 
-`Dapplo.Windows.SystemState` provides modern, idiomatic C# APIs for controlling and monitoring the Windows power state — sleep, hibernate, shutdown, restart, logoff, workstation lock, thread execution state, and scheduled wake-up timers.
+Package **Dapplo.Windows.SystemState**. Full version: [Power and system state](https://www.dapplo.net/Dapplo.Windows/articles/system-state.html).
 
-**Package:** `Dapplo.Windows.SystemState`
+## Preventing sleep
 
-```powershell
-Install-Package Dapplo.Windows.SystemState
-```
+`PreventSleep` / `PreventSystemSleep` return a `SleepBlocker`; the system can sleep again when it's disposed. It isn't
+bound to a thread, so it works around `await`.
 
----
-
-## In This Page
-
-- [Putting the System to Sleep or Hibernate](#putting-the-system-to-sleep-or-hibernate)
-- [Shutdown, Restart, and Logoff](#shutdown-restart-and-logoff)
-- [Locking the Workstation](#locking-the-workstation)
-- [Thread Execution State — Preventing Sleep](#thread-execution-state--preventing-sleep)
-- [WaitableTimer — Scheduled Wake-Up](#waitabletimer--scheduled-wake-up)
-- [PowerBroadcastListener — Reacting to Power Events](#powerbroadcastlistener--reacting-to-power-events)
-- [Combining Wake Timers with Power Events](#combining-wake-timers-with-power-events)
-
----
-
-## Putting the System to Sleep or Hibernate
-
-`PowerManagementApi.Sleep()` and `PowerManagementApi.Hibernate()` wrap `SetSuspendState` from `powrprof.dll`.
-
+<!-- sample: SystemStateSamples.PreventSleep -->
 ```csharp
-using Dapplo.Windows.SystemState;
-
-// Put the system to sleep (suspend to RAM)
-PowerManagementApi.Sleep();
-
-// Hibernate (suspend to disk)
-PowerManagementApi.Hibernate();
-
-// Sleep but disable any previously scheduled wake events
-PowerManagementApi.Sleep(disableWakeEvent: true);
-```
-
----
-
-## Shutdown, Restart, and Logoff
-
-`PowerManagementApi` wraps `ExitWindowsEx` from `user32.dll`.
-
-> Shutdown and reboot require the `SE_SHUTDOWN_NAME` privilege.
-
-```csharp
-using Dapplo.Windows.SystemState;
-
-PowerManagementApi.LogOff();
-PowerManagementApi.Shutdown();
-PowerManagementApi.Restart();
-
-// Force close hung applications before shutting down
-PowerManagementApi.Shutdown(force: true);
-
-// Raw call with explicit flags
-using Dapplo.Windows.SystemState.Enums;
-
-PowerManagementApi.ExitWindowsEx(
-    ExitWindowsFlags.EWX_SHUTDOWN | ExitWindowsFlags.EWX_FORCEIFHUNG);
-```
-
----
-
-## Locking the Workstation
-
-```csharp
-using Dapplo.Windows.SystemState;
-
-// Equivalent to pressing Win+L
-PowerManagementApi.LockWorkStation();
-```
-
----
-
-## Thread Execution State — Preventing Sleep
-
-`SystemStateApi` wraps `SetThreadExecutionState` from `kernel32.dll`.
-
-```csharp
-using Dapplo.Windows.SystemState;
-
-// Prevent the system AND screen from sleeping while a task runs
-SystemStateApi.PreventSleep();
-DoLongRunningWork();
-SystemStateApi.AllowSleep(); // always restore when done
-
-// Prevent only the system from sleeping (screen may still turn off)
-SystemStateApi.PreventSystemSleep();
-DoBackgroundSync();
-SystemStateApi.AllowSleep();
-```
-
-| Method | Flags Set |
-|---|---|
-| `PreventSleep()` | `ES_CONTINUOUS \| ES_SYSTEM_REQUIRED \| ES_DISPLAY_REQUIRED` |
-| `PreventSystemSleep()` | `ES_CONTINUOUS \| ES_SYSTEM_REQUIRED` |
-| `AllowSleep()` | `ES_CONTINUOUS` (clears all other flags) |
-
-> Always call `AllowSleep()` when finished — if you forget, the system will not sleep until your process exits.
-
----
-
-## WaitableTimer — Scheduled Wake-Up
-
-`WaitableTimer` is a managed `IDisposable` wrapper around the kernel32 waitable timer APIs (`CreateWaitableTimer`, `SetWaitableTimer`, `CancelWaitableTimer`).
-
-### One-Shot (relative delay)
-
-```csharp
-using var timer = new WaitableTimer();
-
-timer.SetOnce(TimeSpan.FromMinutes(30));
-bool fired = timer.Wait(TimeSpan.FromHours(1));
-```
-
-### One-Shot (absolute UTC time)
-
-```csharp
-using var timer = new WaitableTimer();
-
-timer.SetAt(DateTimeOffset.UtcNow.AddHours(6));
-timer.Wait(TimeSpan.FromHours(7));
-```
-
-### Periodic timer
-
-```csharp
-using var timer = new WaitableTimer();
-
-// Start in 1 second, repeat every 10 seconds
-timer.SetPeriodic(TimeSpan.FromSeconds(1), period: 10_000);
-
-for (int i = 0; i < 5; i++)
+// Keep the system and the display on until the blocker is disposed
+using (SystemStateApi.PreventSleep("Recording the screen"))
 {
-    timer.Wait(TimeSpan.FromSeconds(15));
-    DoPeriodicWork();
+    await RecordAsync();
 }
 
-timer.Cancel();
+// Keep only the system awake, the display may turn off
+using (SystemStateApi.PreventSystemSleep("Uploading files"))
+{
+    await UploadAsync();
+}
 ```
 
-### System Wake-Up
+## Sleep, shut down, log off, lock
 
-Pass `wakeSystem: true` to schedule the system to wake from sleep or hibernate when the timer fires. This requires the `SE_SYSTEMTIME_NAME` privilege (typically available to elevated processes and services).
+<!-- sample: SystemStateSamples.SleepAndHibernate -->
+```csharp
+// Sleep (suspend to RAM), applications get PBT_APMSUSPEND first
+bool ok = PowerManagementApi.Sleep();
 
+// Hibernate (suspend to disk)
+ok = PowerManagementApi.Hibernate();
+
+// Sleep, and don't let wake timers wake the system
+ok = PowerManagementApi.Sleep(disableWakeEvent: true);
+```
+
+`Shutdown` / `Restart` enable the shutdown privilege, log a planned shutdown, and only force hung applications unless
+you pass `force: true`.
+
+<!-- sample: SystemStateSamples.ShutdownRestartLogOff -->
+```csharp
+// Log off the current user
+PowerManagementApi.LogOff();
+
+// Power off; applications which don't respond are terminated after a timeout
+if (!PowerManagementApi.Shutdown())
+{
+    // e.g. 1314 (ERROR_PRIVILEGE_NOT_HELD) when the user may not shut down
+    Console.WriteLine($"Shutdown failed: {System.Runtime.InteropServices.Marshal.GetLastWin32Error()}");
+}
+
+// Restart
+PowerManagementApi.Restart();
+
+// Close all applications without asking them, they can lose data
+PowerManagementApi.Shutdown(force: true);
+```
+
+<!-- sample: SystemStateSamples.LockWorkStation -->
+```csharp
+// The same as Win+L. true means the lock was started, the screen might not be locked yet.
+bool started = PowerManagementApi.LockWorkStation();
+```
+
+## Wake timers
+
+`WaitableTimer` can wake the PC; the power option "Allow wake timers" must be enabled, no privilege is needed.
+
+<!-- sample: SystemStateSamples.TimerOnce -->
 ```csharp
 using var timer = new WaitableTimer();
 
-// Wake the PC in 2 hours (even if it is sleeping)
-timer.SetOnce(TimeSpan.FromHours(2), wakeSystem: true);
+// Fire once, in 30 seconds
+timer.SetOnce(TimeSpan.FromSeconds(30));
+
+// Block this thread until the timer fires, but wait at most 60 seconds
+bool signaled = timer.Wait(TimeSpan.FromSeconds(60));
+Console.WriteLine(signaled ? "Timer fired" : "Timed out");
+```
+
+<!-- sample: SystemStateSamples.TimerWakeSystem -->
+```csharp
+using var timer = new WaitableTimer();
+
+// Wake the PC from sleep or hibernation in 2 hours.
+// No privilege is needed, but the "Allow wake timers" power setting must be enabled.
+if (!timer.SetOnce(TimeSpan.FromHours(2), wakeSystem: true))
+{
+    Console.WriteLine("Could not set the timer");
+    return;
+}
+
+// After the wake-up Windows broadcasts PBT_APMRESUMEAUTOMATIC, and the wait returns
 timer.Wait(TimeSpan.FromHours(3));
-Console.WriteLine("System woke up");
 ```
 
-See also: [System Wake-Up Events (Microsoft Docs)](https://learn.microsoft.com/en-us/windows/win32/power/system-wake-up-events)
+## Power events
 
----
+Events arrive on the [[SharedMessageWindow]] thread while Windows waits; save state synchronously on suspend.
 
-## PowerBroadcastListener — Reacting to Power Events
-
-`PowerBroadcastListener` exposes `WM_POWERBROADCAST` messages as `IObservable<PowerBroadcastEvent>` streams.
-It is built on top of [[SharedMessageWindow]] and requires no extra registration step.
-
-> Available on `net480`, `net8.0-windows`, `net10.0-windows` only (not `netstandard2.0`).
-
+<!-- sample: SystemStateSamples.SuspendResume -->
 ```csharp
-using Dapplo.Windows.SystemState;
-using Dapplo.Windows.SystemState.Enums;
+// Called on the SharedMessageWindow thread while Windows waits (about 2 seconds): save your state synchronously
+var suspendSubscription = PowerBroadcastListener.Suspending
+    .Subscribe(_ => SaveState());
 
-// React just before the system suspends
-var suspendSub = PowerBroadcastListener.Suspending
-    .Subscribe(_ => FlushApplicationState());
+// The user is back (opened the lid, pressed a key); this is the moment to reconnect
+var resumeSubscription = PowerBroadcastListener.ResumedFromSuspend
+    .Subscribe(_ => Reconnect());
 
-// React when the user wakes the PC
-var resumeSub = PowerBroadcastListener.ResumedFromSuspend
-    .Subscribe(_ => ReconnectServices());
-
-// React to a programmatic (timer-triggered) wake — no user present
-var autoResumeSub = PowerBroadcastListener.ResumedAutomatically
-    .Subscribe(_ => PerformScheduledBackgroundTask());
-
-// React to AC/battery power source changes
-var powerStatusSub = PowerBroadcastListener.PowerStatusChanged
-    .Subscribe(_ => UpdateBatteryIndicator());
-
-// Filter the full event stream for anything not covered above
-var allSub = PowerBroadcastListener.PowerEvents
-    .Subscribe(e => Log.Info($"Power event: {e}"));
-
-// Dispose subscriptions when done
-suspendSub.Dispose();
-resumeSub.Dispose();
-autoResumeSub.Dispose();
-powerStatusSub.Dispose();
-allSub.Dispose();
+// Stop listening
+suspendSubscription.Dispose();
+resumeSubscription.Dispose();
 ```
 
-### Available Observables
-
-| Property | Event(s) filtered |
-|---|---|
-| `PowerEvents` | All `WM_POWERBROADCAST` events |
-| `Suspending` | `PBT_APMSUSPEND` |
-| `ResumedFromSuspend` | `PBT_APMRESUMESUSPEND` |
-| `ResumedAutomatically` | `PBT_APMRESUMEAUTOMATIC` |
-| `PowerStatusChanged` | `PBT_APMPOWERSTATUSCHANGE` |
-
----
-
-## Combining Wake Timers with Power Events
-
-A common pattern is to schedule work to run on a wake-timer event:
-
+<!-- sample: SystemStateSamples.WakeTimerWithPowerEvents -->
 ```csharp
-using Dapplo.Windows.SystemState;
-using System.Reactive.Linq;
+var timer = new WaitableTimer();
 
-// 1. Subscribe to the automatic resume event BEFORE setting the timer
-var wakeHandlerSub = PowerBroadcastListener.ResumedAutomatically
-    .Take(1) // handle only the next automatic resume
+// Do the nightly work when the PC woke up for it ...
+var subscription = PowerBroadcastListener.ResumedAutomatically
+    .Take(1)
     .Subscribe(_ =>
     {
-        Console.WriteLine("Wake timer fired — performing backup");
-        PerformNightlyBackup();
+        // ... on another thread, the SharedMessageWindow thread must not be blocked
+        Task.Run(() =>
+        {
+            // ... and keep the PC awake until the work is done
+            using (SystemStateApi.PreventSystemSleep("Nightly backup"))
+            {
+                RunScheduledWork();
+            }
+            timer.Dispose();
+        });
     });
 
-// 2. Schedule the wake-up
-using var timer = new WaitableTimer();
-timer.SetAt(DateTimeOffset.UtcNow.Date.AddDays(1).AddHours(3), wakeSystem: true); // 3 AM tomorrow
-
-// 3. Optionally sleep the system now
-PowerManagementApi.Sleep();
-
-// 4. Dispose when no longer needed
-wakeHandlerSub.Dispose();
+// Wake up tomorrow at 03:00 local time
+timer.SetAt(new DateTimeOffset(DateTime.Today.AddDays(1).AddHours(3)), wakeSystem: true);
 ```
-
----
-
-## See Also
-
-- [[SharedMessageWindow]] — powers `PowerBroadcastListener`
-- [[Restart-Manager]] — react to `WM_QUERYENDSESSION` / `WM_ENDSESSION`
-- [[Common-Scenarios]]
-- [WM_POWERBROADCAST (Microsoft Docs)](https://learn.microsoft.com/en-us/windows/win32/power/wm-powerbroadcast)
-- [SetSuspendState (Microsoft Docs)](https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-setsuspendstate)
-- [SetThreadExecutionState (Microsoft Docs)](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate)
-- [System Wake-Up Events (Microsoft Docs)](https://learn.microsoft.com/en-us/windows/win32/power/system-wake-up-events)

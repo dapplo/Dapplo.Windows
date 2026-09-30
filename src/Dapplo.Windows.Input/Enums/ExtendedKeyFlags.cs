@@ -28,7 +28,7 @@ public enum ExtendedKeyFlags : uint
     /// <summary>
     ///     Test the event-injected (from a process running at lower integrity level) flag.
     /// </summary>
-    LowerIntegretyInjected = 0x02,
+    LowerIntegrityInjected = 0x02,
 
     /// <summary>
     ///     Test the event-injected (from any process) flag.

@@ -1,193 +1,102 @@
 # Restart Manager
 
-Windows Restart Manager minimizes application downtime during software installations and updates. It identifies which applications have locked files, shuts them down gracefully, and restarts them once the update is complete.
+Packages **Dapplo.Windows.AppRestartManager** (applications) and **Dapplo.Windows.InstallerManager** (installers).
+Full version: [Restart Manager](https://www.dapplo.net/Dapplo.Windows/articles/restart-manager.html).
 
-Dapplo.Windows provides two packages for Restart Manager integration:
+## Application side
 
-| Package | Use case |
-|---------|----------|
-| `Dapplo.Windows.AppRestartManager` | Your **application** registers to be restarted after an update |
-| `Dapplo.Windows.InstallerManager` | Your **installer** coordinates shutting down and restarting other processes |
-
-## Application-Side (`Dapplo.Windows.AppRestartManager`)
-
-### Installation
-
-```powershell
-Install-Package Dapplo.Windows.AppRestartManager
-```
-
-### Register for Automatic Restart
-
-Call this early in your application's startup — before any windows are shown:
-
+<!-- sample: RestartManagerSamples.Register -->
 ```csharp
-using Dapplo.Windows.AppRestartManager;
+// Early in Main: restart me with "/restore" when an installer or Windows Update closes me.
+// Don't include the executable, Windows adds it. At most RestartMaxCmdLine (1024) characters.
+ApplicationRestartManager.RegisterForRestart("/restore");
 
-// Register with command-line arguments that restore the previous state
-ApplicationRestartManager.RegisterForRestart("/restore /minimized");
-
-// Register without arguments
-ApplicationRestartManager.RegisterForRestart();
-```
-
-### Check Whether the App Was Restarted
-
-```csharp
-if (ApplicationRestartManager.WasRestartRequested())
+// Windows can't tell a process that it was restarted, check for your own argument instead
+// (a manual start with the same argument returns true too)
+if (ApplicationRestartManager.WasRestartRequested("/restore"))
 {
-    Console.WriteLine("Restarted after update — restoring previous state.");
-    RestorePreviousState();
+    RestoreDocuments();
 }
 ```
 
-### Control When Not to Restart
+`ListenForEndSession()` reports `WM_QUERYENDSESSION` / `WM_ENDSESSION` on the [[SharedMessageWindow]] thread. Answer
+synchronously; after `WM_ENDSESSION` the process can end at any moment.
 
+<!-- sample: RestartManagerSamples.EndSession -->
 ```csharp
-using Dapplo.Windows.Kernel32.Enums;
-
-ApplicationRestartManager.RegisterForRestart(
-    commandLineArgs: "/restore",
-    flags: ApplicationRestartFlags.RestartNoCrash   // do not restart on crash
-          | ApplicationRestartFlags.RestartNoHang); // do not restart on hang
-```
-
-| Flag | Meaning |
-|------|---------|
-| `RestartNoCrash` | Do not restart if the process crashed |
-| `RestartNoHang` | Do not restart if the process was unresponsive |
-| `RestartNoPatch` | Do not restart as part of a software patch |
-| `RestartNoReboot` | Do not restart as part of a system reboot |
-
-### Unregister
-
-```csharp
-ApplicationRestartManager.UnregisterForRestart();
-```
-
-### Listen for Shutdown Events
-
-`ApplicationRestartManager.ListenForEndSession()` returns an `IObservable<EndSessionReasons>` that fires when Windows sends `WM_QUERYENDSESSION` or `WM_ENDSESSION`:
-
-```csharp
-using Dapplo.Windows.AppRestartManager;
-using Dapplo.Windows.AppRestartManager.Enums;
-
-var sub = ApplicationRestartManager.ListenForEndSession()
-    .Subscribe(reason =>
+// WM_QUERYENDSESSION and WM_ENDSESSION, received by the SharedMessageWindow.
+// OnNext runs on the SharedMessageWindow thread, answer synchronously: no ObserveOn before the answer.
+IDisposable subscription = ApplicationRestartManager.ListenForEndSession()
+    .Subscribe(message =>
     {
-        if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
+        if (message.IsQuery)
         {
-            // Restart Manager is shutting us down for an update
-            SaveApplicationState();
+            // ENDSESSION_CLOSEAPP: an installer (Restart Manager) wants to replace files which this process uses
+            bool isRestartManager = (message.EndSessionReason & EndSessionReasons.ENDSESSION_CLOSEAPP) != 0;
+            if (HasUnsavedWork() && !isRestartManager)
+            {
+                // Windows shows the reason in its "apps are preventing shutdown" screen
+                message.Veto("Unsaved changes");
+            }
+            // Not answering allows the session to end
         }
-        else if (reason.HasFlag(EndSessionReasons.ENDSESSION_LOGOFF))
+        else if (message.IsSessionEnding)
         {
-            SaveUserSettings();
+            // WM_ENDSESSION: the process can be terminated as soon as this returns, save synchronously
+            SaveState();
         }
     });
-
-// Dispose on application exit
-sub.Dispose();
 ```
 
-#### `EndSessionReasons` Flags
+## Installer side
 
-| Flag | Value | Description |
-|------|-------|-------------|
-| `ENDSESSION_CLOSEAPP` | `0x1` | App is being closed so a locked file can be replaced |
-| `ENDSESSION_CRITICAL` | `0x40000000` | Critical system component update — forced close |
-| `ENDSESSION_LOGOFF` | `0x80000000` | User is logging off |
-
-### Complete Example
-
+<!-- sample: RestartManagerSamples.FindLockingProcesses -->
 ```csharp
-using Dapplo.Windows.AppRestartManager;
-using System;
-using System.Windows.Forms;
+using var session = InstallerRestartManager.CreateSession();
+session.RegisterFiles(@"C:\Program Files\MyApp\MyApp.exe", @"C:\Program Files\MyApp\MyApp.Core.dll");
 
-static class Program
+var processes = session.GetProcessesUsingResources(out RmRebootReason rebootReason);
+foreach (var process in processes)
 {
-    [STAThread]
-    static void Main(string[] args)
-    {
-        // 1. Register early
-        ApplicationRestartManager.RegisterForRestart("/restore");
-
-        // 2. Check if restarted
-        if (ApplicationRestartManager.WasRestartRequested())
-            RestorePreviousState();
-
-        // 3. Listen for shutdown
-        var shutdownSub = ApplicationRestartManager.ListenForEndSession()
-            .Subscribe(reason =>
-            {
-                if (reason.HasFlag(EndSessionReasons.ENDSESSION_CLOSEAPP))
-                    SaveApplicationState();
-            });
-
-        Application.Run(new MainForm());
-
-        shutdownSub.Dispose();
-        ApplicationRestartManager.UnregisterForRestart();
-    }
+    Console.WriteLine($"{process.AppName} (PID {process.Process.ProcessId}, {process.ApplicationType}), can be restarted: {process.IsRestartable}");
+}
+if (rebootReason != RmRebootReason.RmRebootReasonNone)
+{
+    Console.WriteLine($"Replacing the files needs a reboot: {rebootReason}");
 }
 ```
 
-## Installer-Side (`Dapplo.Windows.InstallerManager`)
+`Shutdown()` is graceful by default: it fails when an application refuses to close. `RmShutdownType.Force`
+is opt-in.
 
-### Installation
-
-```powershell
-Install-Package Dapplo.Windows.InstallerManager
-```
-
-### Start a Restart Manager Session
-
+<!-- sample: RestartManagerSamples.UpdateFiles -->
 ```csharp
-using Dapplo.Windows.InstallerManager;
+using var session = InstallerRestartManager.CreateSession();
+session.RegisterFiles(Directory.GetFiles(installDirectory, "*.dll"));
 
-using var session = InstallerRestartManager.StartSession();
-
-// Register the files your installer needs to replace
-session.RegisterResources(new[]
+if (session.IsRebootRequired())
 {
-    @"C:\Program Files\MyApp\MyApp.exe",
-    @"C:\Program Files\MyApp\MyApp.dll"
-});
-```
-
-### Enumerate Affected Processes
-
-```csharp
-foreach (var process in session.GetAffectedApplications())
-{
-    Console.WriteLine($"Affected: {process.ApplicationName} (PID {process.ProcessId})");
+    Console.WriteLine("Can't update without a reboot, schedule the update instead");
+    return;
 }
-```
 
-### Shut Down Affected Applications
-
-```csharp
-session.ShutdownApplications(RestartManagerShutdownType.ForceShutdown, progress =>
+try
 {
-    Console.WriteLine($"Shutdown progress: {progress}%");
-});
-```
-
-### Replace Files and Restart
-
-```csharp
-// Install new files here...
-
-session.RestartApplications(progress =>
+    // Graceful (the default): asks the applications to close, fails when one of them refuses (e.g. unsaved work)
+    session.Shutdown(statusCallback: percent => Console.WriteLine($"Closing applications: {percent}%"));
+}
+catch (Win32Exception ex)
 {
-    Console.WriteLine($"Restart progress: {progress}%");
-});
+    Console.WriteLine($"An application refused to close: {ex.Message}");
+    // Only when you must: RmShutdownType.Force kills unresponsive applications, which can lose data
+    return;
+}
+
+foreach (var file in Directory.GetFiles(newFilesDirectory))
+{
+    File.Copy(file, Path.Combine(installDirectory, Path.GetFileName(file)), overwrite: true);
+}
+
+// Restart the applications which registered for restart (RegisterApplicationRestart)
+session.Restart();
 ```
-
-## See Also
-
-- [[Getting-Started]]
-- [[Common-Scenarios]]
-- [Windows Restart Manager (MSDN)](https://docs.microsoft.com/en-us/windows/win32/rstmgr/restart-manager-portal)
