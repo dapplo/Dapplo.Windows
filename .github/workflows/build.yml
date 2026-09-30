@@ -215,7 +215,9 @@ jobs:
       env:
         VERSION: ${{ steps.version.outputs.version }}
       run: |
-        # Uses the "## [<version>]" section, otherwise "## [Unreleased]"; without either, GitHub generates notes from the merged PRs.
+        # The patch number comes from the git height, so it isn't known when the changelog is written. Uses, in this order:
+        #   "## [<version>]" (e.g. 3.2.4), "## [Unreleased]", and for the first release of a minor version the section
+        #   of that minor version ("## [3.2.0]" or "## [3.2]"). Without any of them, GitHub generates notes from the merged PRs.
         $lines = Get-Content -Path CHANGELOG.md -Encoding utf8
         function Get-Section([string]$pattern) {
           $start = -1
@@ -228,6 +230,15 @@ jobs:
         }
         $notes = Get-Section ('^## \[?' + [regex]::Escape($env:VERSION) + '(\]|\s|$)')
         if (-not $notes) { $notes = Get-Section '^## \[?Unreleased(\]|\s|$)' }
+        if (-not $notes) {
+          $minor = ($env:VERSION -split '\.')[0..1] -join '.'
+          # The version step fetched the tags; a tag of this minor version means this isn't its first release
+          $released = @(git tag --list "v$minor.*")
+          $global:LASTEXITCODE = 0
+          if ($released.Count -eq 0) {
+            $notes = Get-Section ('^## \[?' + [regex]::Escape($minor) + '(\.0)?(\]|\s|$)')
+          }
+        }
         $notesFile = Join-Path $env:RUNNER_TEMP 'release-notes.md'
         Set-Content -Path $notesFile -Value $notes -Encoding utf8NoBOM
         if ($notes) { Get-Content $notesFile } else { Write-Host "No changelog section found, GitHub will generate the notes." }

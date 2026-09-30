@@ -33,6 +33,11 @@ namespace Dapplo.Windows.Messages;
 /// From then on the window is not created again, see <see cref="IsProcessExiting"/>.
 /// </para>
 /// <para>
+/// On .NET Framework, in an AppDomain which is not the default AppDomain (e.g. a test host), the same happens on <see cref="AppDomain.DomainUnload"/>:
+/// the window is destroyed and its thread ends before the CLR aborts the threads of the unloaded AppDomain.
+/// On .NET (Core) there is only one AppDomain, there nothing changes.
+/// </para>
+/// <para>
 /// Registrations which need a window handle and must happen on the thread of that window (clipboard format listener, session notifications, raw input, device notifications, ...)
 /// should use <see cref="Listen"/> with an onSetup and onTeardown action, or <see cref="Invoke"/>.
 /// </para>
@@ -75,6 +80,10 @@ public static class SharedMessageWindow
 
     [DllImport("user32")]
     private static extern void PostQuitMessage(int nExitCode);
+
+    [DllImport("user32", EntryPoint = "PostMessageW", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool PostMessage(nint hWnd, WindowsMessages msg, nint wParam, nint lParam);
 
     [DllImport("user32", EntryPoint = "RegisterWindowMessageW", SetLastError = true, CharSet = CharSet.Unicode)]
     private static extern uint RegisterWindowMessage(string lpString);
@@ -183,11 +192,16 @@ public static class SharedMessageWindow
     /// True when the process is exiting: <see cref="AppDomain.ProcessExit"/> was raised, and the window is (being) shut down.
     /// From then on the window is not created again: using the SharedMessageWindow when it doesn't exist anymore throws an <see cref="ObjectDisposedException"/>.
     /// </summary>
+    /// <remarks>
+    /// On .NET Framework this is also true when the (non-default) AppDomain of the SharedMessageWindow is being unloaded (<see cref="AppDomain.DomainUnload"/>):
+    /// for the code in that AppDomain it's the end of the process.
+    /// </remarks>
     public static bool IsProcessExiting => _isProcessExiting;
 
     /// <summary>
     /// The maximum time the automatic <see cref="Shutdown"/> on <see cref="AppDomain.ProcessExit"/> waits, this includes the time the delayed clipboard renderers need (WM_RENDERALLFORMATS).
     /// Default is 1.5 seconds: on .NET Framework all ProcessExit handlers together only get about 2 seconds.
+    /// The same timeout is used for the automatic shutdown on <see cref="AppDomain.DomainUnload"/> of a non-default AppDomain (.NET Framework).
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">When the value is negative (<see cref="Timeout.InfiniteTimeSpan"/> is allowed)</exception>
     public static TimeSpan ProcessExitShutdownTimeout
@@ -270,7 +284,8 @@ public static class SharedMessageWindow
     /// <remarks>
     /// Destroying the window makes Windows send WM_RENDERALLFORMATS (when the window owns the clipboard) and WM_DESTROY / WM_NCDESTROY:
     /// the delayed clipboard renderers of Dapplo.Windows.Clipboard run synchronously on the window thread, before this returns.
-    /// This is called automatically when the process exits (<see cref="AppDomain.ProcessExit"/>, with <see cref="ProcessExitShutdownTimeout"/>),
+    /// This is called automatically when the process exits (<see cref="AppDomain.ProcessExit"/>, with <see cref="ProcessExitShutdownTimeout"/>)
+    /// and, on .NET Framework, when a non-default AppDomain is unloaded (<see cref="AppDomain.DomainUnload"/>),
     /// call it yourself when you want to control the moment, e.g. at the end of your Main.
     /// <para>
     /// After an explicit Shutdown the next use of the SharedMessageWindow creates a new window, but registrations which were made
@@ -335,17 +350,59 @@ public static class SharedMessageWindow
     /// </summary>
     private static void OnProcessExit(object sender, EventArgs e)
     {
-        _isProcessExiting = true;
+        FinalShutdown("the process exits", false);
+    }
+
+    /// <summary>
+    /// Called when a non-default AppDomain is unloaded (.NET Framework only, e.g. test hosts): ProcessExit is not raised for it,
+    /// after DomainUnload the CLR aborts all threads of the AppDomain. The window thread must have ended before that:
+    /// an abort while it's in GetMessage is raised in the window procedure, inside a user32 callback, and crashes the process.
+    /// DomainUnload runs on the thread which unloads the AppDomain, the window thread is still running at that moment.
+    /// </summary>
+    private static void OnDomainUnload(object sender, EventArgs e)
+    {
+        FinalShutdown("the AppDomain is unloaded", true);
+    }
+
+    /// <summary>
+    /// The shutdown for ProcessExit and DomainUnload: destroy the window with <see cref="ProcessExitShutdownTimeout"/>, and don't create a new one anymore.
+    /// </summary>
+    /// <param name="reason">string for the log</param>
+    /// <param name="closeWhenTimedOut">true to post WM_CLOSE when the shutdown timed out, so the window thread ends as soon as it's back in its message loop</param>
+    private static void FinalShutdown(string reason, bool closeWhenTimedOut)
+    {
+        lock (Lock)
+        {
+            // Under the lock: EnsureWindow either sees the flag, or created the window which Shutdown destroys
+            _isProcessExiting = true;
+        }
         try
         {
-            if (!Shutdown(ProcessExitShutdownTimeout))
+            var timeout = ProcessExitShutdownTimeout;
+            if (Shutdown(timeout))
             {
-                Trace.TraceWarning("Dapplo.Windows.Messages.SharedMessageWindow: the window was not destroyed within {0} while the process exits.", ProcessExitShutdownTimeout);
+                return;
+            }
+            Trace.TraceWarning("Dapplo.Windows.Messages.SharedMessageWindow: the window was not destroyed within {0} while {1}.", timeout, reason);
+            if (!closeWhenTimedOut)
+            {
+                return;
+            }
+            WindowState state;
+            lock (Lock)
+            {
+                state = _current;
+            }
+            // The window thread is still busy (e.g. a delayed renderer), the destroy request timed out and is dropped.
+            // WM_CLOSE (DefWindowProc calls DestroyWindow) makes the window thread destroy the window and end its loop when it gets back to it.
+            if (state != null && !state.IsDead && state.Hwnd != 0)
+            {
+                PostMessage(state.Hwnd, WindowsMessages.WM_CLOSE, 0, 0);
             }
         }
         catch (Exception ex)
         {
-            Trace.TraceError("Dapplo.Windows.Messages.SharedMessageWindow: the shutdown while the process exits failed: {0}", ex);
+            Trace.TraceError("Dapplo.Windows.Messages.SharedMessageWindow: the shutdown while {0} failed: {1}", reason, ex);
         }
     }
 
@@ -552,11 +609,17 @@ public static class SharedMessageWindow
             {
                 if (_isProcessExiting)
                 {
-                    throw new ObjectDisposedException(nameof(SharedMessageWindow), "The process is exiting, the shared message window was shut down and is not created again.");
+                    throw new ObjectDisposedException(nameof(SharedMessageWindow), "The process is exiting (or the AppDomain is unloaded), the shared message window was shut down and is not created again.");
                 }
                 if (Interlocked.Exchange(ref _processExitRegistered, 1) == 0)
                 {
                     AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+                    // A non-default AppDomain (.NET Framework only, e.g. xunit / vstest) is unloaded without ProcessExit, see OnDomainUnload.
+                    // On .NET (Core) there is only the default AppDomain, DomainUnload is never raised there.
+                    if (!AppDomain.CurrentDomain.IsDefaultAppDomain())
+                    {
+                        AppDomain.CurrentDomain.DomainUnload += OnDomainUnload;
+                    }
                 }
                 state = new WindowState();
                 var thread = new Thread(WindowThread)
@@ -653,6 +716,17 @@ public static class SharedMessageWindow
                 DispatchMessage(ref msg);
             }
         }
+#if NETFRAMEWORK
+        catch (ThreadAbortException)
+        {
+            // The AppDomain is unloaded while the window was not shut down in time, the finally block destroys the window
+            Trace.TraceWarning("Dapplo.Windows.Messages.SharedMessageWindow: the window thread was aborted.");
+            if (!state.Created.IsSet)
+            {
+                state.Fail(0, "The shared message window thread was aborted.");
+            }
+        }
+#endif
         catch (Exception ex)
         {
             Trace.TraceError("Dapplo.Windows.Messages.SharedMessageWindow: the window thread failed: {0}", ex);
@@ -681,9 +755,38 @@ public static class SharedMessageWindow
     }
 
     /// <summary>
-    /// The window procedure of the shared window, this must never throw.
+    /// The window procedure of the shared window, this must never throw: it's called by user32, an exception can't pass that callback.
     /// </summary>
     private static nint WindowProcedure(nint hWnd, WindowsMessages msg, nint wParam, nint lParam)
+    {
+#if NETFRAMEWORK
+        // A ThreadAbortException (AppDomain unload while the window thread is busy, e.g. the shutdown timed out) can't be swallowed:
+        // it's raised again at the end of every catch, and Thread.ResetAbort doesn't cancel the abort of an AppDomain unload.
+        // The CLR delays a (non-rude) thread abort while the thread runs a finally block, so the whole window procedure runs in one:
+        // the abort is raised when the window thread is back in managed code of its message loop, which ends the thread normally.
+        nint result = 0;
+        try
+        {
+        }
+        finally
+        {
+            result = WindowProcedureCore(hWnd, msg, wParam, lParam);
+            if ((Thread.CurrentThread.ThreadState & System.Threading.ThreadState.AbortRequested) != 0)
+            {
+                // The thread is being aborted: end the message loop, so the abort isn't postponed until the next message arrives
+                PostQuitMessage(0);
+            }
+        }
+        return result;
+#else
+        return WindowProcedureCore(hWnd, msg, wParam, lParam);
+#endif
+    }
+
+    /// <summary>
+    /// The implementation of the window procedure, this never throws.
+    /// </summary>
+    private static nint WindowProcedureCore(nint hWnd, WindowsMessages msg, nint wParam, nint lParam)
     {
         try
         {

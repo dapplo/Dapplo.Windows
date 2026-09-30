@@ -141,6 +141,11 @@ Destroying it makes Windows send `WM_RENDERALLFORMATS` (when the window owns the
   on .NET Framework all ProcessExit handlers together get about 2 seconds). ProcessExit runs on another thread, the
   window thread is a background thread which is still running then. After that `IsProcessExiting` is `true` and the
   window is not created again: using it throws an `ObjectDisposedException`.
+- On .NET Framework, in a non-default AppDomain (e.g. a test host such as vstest or xunit), the same happens on
+  `AppDomain.DomainUnload`, with the same timeout: the window thread must have ended before the CLR aborts the threads
+  of the unloaded AppDomain, and `IsProcessExiting` is `true` from then on. If the shutdown times out (e.g. a delayed
+  renderer is still busy), `WM_CLOSE` is posted and the thread abort is postponed until the window procedure returned,
+  so it never passes the user32 callback. On .NET (Core) there is only one AppDomain, nothing changes there.
 - Call it yourself at the end of `Main` when you want to choose the moment or need more time.
 - After an explicit `Shutdown` (not at process exit) the next use creates a new window, but the registrations of the
   old window (`Listen`, `Invoke`: clipboard listener, hotkeys, session notifications) are gone and their `onTeardown`
