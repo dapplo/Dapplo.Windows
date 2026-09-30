@@ -5,7 +5,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/dapplo/Dapplo.Windows</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>http://www.dapplo.net/blocks/Dapplo.Windows/</PackageProjectUrl>
+    <PackageProjectUrl>https://www.dapplo.net/Dapplo.Windows/</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReleaseNotes>See https://github.com/dapplo/Dapplo.Windows/blob/master/CHANGELOG.md</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>

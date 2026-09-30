@@ -1,621 +1,350 @@
-# Clipboard Usage Guide
+# Clipboard
 
-This guide covers clipboard monitoring and manipulation using the `Dapplo.Windows.Clipboard` package.
-
-## Overview
-
-The Clipboard package provides a reactive API for monitoring and manipulating the Windows clipboard. It uses [Reactive Extensions](https://github.com/dotnet/reactive) (System.Reactive) for event handling.
-
-## Installation
+**Dapplo.Windows.Clipboard** monitors the clipboard with an observable and reads and writes its content in any
+format, with support for delayed rendering and the Windows clipboard history / cloud clipboard options.
 
 ```powershell
-Install-Package Dapplo.Windows.Clipboard
+dotnet add package Dapplo.Windows.Clipboard
 ```
 
-## Monitoring Clipboard Changes
+Namespaces used on this page: `Dapplo.Windows.Clipboard`, `System.Reactive.Linq`.
 
-### Basic Monitoring
+## Monitoring changes
 
+`ClipboardNative.OnUpdate` reports every clipboard change. A subscriber first gets the current state, then one
+`ClipboardUpdateInformation` per change. The information (`Id`, `OwnerHandle`, `Formats`, `FormatIds`, `Timestamp`) is
+collected *without* opening the clipboard, so it never blocks and never fails because another application has the
+clipboard open.
+
+<!-- sample: ClipboardSamples.Monitor -->
 ```csharp
-using Dapplo.Windows.Clipboard;
-using System;
-
-// Subscribe to all clipboard changes
-var subscription = ClipboardNative.OnUpdate.Subscribe(info =>
+// Every subscriber first gets the current state, then one update per clipboard change.
+// The information is collected without opening the clipboard, on the SharedMessageWindow thread.
+IDisposable subscription = ClipboardNative.OnUpdate.Subscribe(info =>
 {
-    Console.WriteLine($"Clipboard changed!");
-    Console.WriteLine($"Available formats: {string.Join(", ", info.Formats)}");
-    Console.WriteLine($"Sequence ID: {info.Id}");
+    Console.WriteLine($"Clipboard #{info.Id} from window {info.OwnerHandle}: {string.Join(", ", info.Formats)}");
 });
 
-// Dispose when done
+// Stop monitoring
 subscription.Dispose();
 ```
 
-Every subscriber first receives the current state, then one update per clipboard change. The information (`Id`, `OwnerHandle`, `Formats`/`FormatIds`) is collected without opening the clipboard (GetClipboardSequenceNumber, GetClipboardOwner, GetUpdatedClipboardFormats), so it never blocks or fails when another application holds the clipboard.
+Standard formats are named like the Win32 constants (`"CF_UNICODETEXT"`, `"CF_HDROP"`), registered formats by their
+registered name (`"PNG"`, `"HTML Format"`). Compare IDs for standard formats, or use `StandardClipboardFormats.X.AsString()`:
 
-### Filter by Format
-
+<!-- sample: ClipboardSamples.FilterByFormat -->
 ```csharp
-using Dapplo.Windows.Clipboard;
-using System.Reactive.Linq;
+// Standard formats have names like "CF_UNICODETEXT", compare the IDs or use AsString()
+var textChanges = ClipboardNative.OnUpdate
+    .Where(info => info.FormatIds.Contains((uint)StandardClipboardFormats.UnicodeText))
+    .Subscribe(info => Console.WriteLine("Text was copied"));
 
-// Only react to text changes
-var textSubscription = ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains(StandardClipboardFormats.Text.AsString()) || info.Formats.Contains(StandardClipboardFormats.UnicodeText.AsString()))
-    .Subscribe(info =>
-    {
-        Console.WriteLine("Text copied to clipboard");
-    });
-
-// Only react to image changes
-var imageSubscription = ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains("PNG") || info.Formats.Contains(StandardClipboardFormats.Bitmap.AsString()))
-    .Subscribe(info =>
-    {
-        Console.WriteLine("Image copied to clipboard");
-    });
-
-// Only react to files
-var fileSubscription = ClipboardNative.OnUpdate
+var fileChanges = ClipboardNative.OnUpdate
     .Where(info => info.Formats.Contains(StandardClipboardFormats.Drop.AsString()))
-    .Subscribe(info =>
-    {
-        Console.WriteLine("Files copied to clipboard");
-    });
+    .Subscribe(info => Console.WriteLine("Files were copied"));
+
+// Registered formats are compared by name, e.g. "PNG" or "HTML Format"
+var imageChanges = ClipboardNative.OnUpdate
+    .Where(info => info.Formats.Contains("PNG"))
+    .Subscribe(info => Console.WriteLine("A PNG was copied"));
 ```
 
-### Thread Synchronization
+### Threading
 
-`OnUpdate` publishes on the thread of the SharedMessageWindow. Keep handlers short, and use `ObserveOn` before doing real work, especially before opening the clipboard with `ClipboardNative.Access()`:
+`OnUpdate` publishes on the SharedMessageWindow thread. Don't open the clipboard there and don't do slow work there:
+move to another thread first. `Throttle` does that and also gives the copying application time to finish:
 
+<!-- sample: ClipboardSamples.ReadOnChange -->
 ```csharp
-using Dapplo.Windows.Clipboard;
-using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-
-// In a WPF or Windows Forms application
 var subscription = ClipboardNative.OnUpdate
-    .ObserveOn(SynchronizationContext.Current) // Run on UI thread
-    .Subscribe(info =>
-    {
-        // Safe to update UI here
-        UpdateClipboardStatus(info.Formats);
-    });
-```
-
-## Reading Clipboard Content
-
-### Access Clipboard
-
-Always use the `Access()` method (or `await AccessAsync()`) to safely access the clipboard.
-Windows ties an opened clipboard to the thread which opened it: use and dispose the token on that thread, and don't `await` while holding it
-(`AccessAsync()` only waits asynchronously, the clipboard is opened on the thread which continues after the `await`).
-On another thread `CanAccess` is `false` and the extension methods throw a `ClipboardAccessDeniedException`.
-
-```csharp
-using Dapplo.Windows.Clipboard;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    // Clipboard is now locked for your exclusive use
-    var formats = clipboard.AvailableFormats();
-    Console.WriteLine($"Available formats: {string.Join(", ", formats)}");
-}
-// Clipboard is automatically released
-```
-
-### Read Text
-
-```csharp
-using Dapplo.Windows.Clipboard;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    if (ClipboardNative.HasFormat(StandardClipboardFormats.UnicodeText))
-    {
-        string text = clipboard.GetAsUnicodeString();
-        Console.WriteLine($"Clipboard text: {text}");
-    }
-}
-```
-
-### Read Files
-
-```csharp
-using Dapplo.Windows.Clipboard;
-using System.Collections.Generic;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    if (ClipboardNative.HasFormat(StandardClipboardFormats.Drop))
-    {
-        IEnumerable<string> files = clipboard.GetFileNames();
-        foreach (var file in files)
-        {
-            Console.WriteLine($"File: {file}");
-        }
-    }
-}
-```
-
-### Read Images
-
-```csharp
-using Dapplo.Windows.Clipboard;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    // Read as stream (PNG format)
-    if (clipboard.AvailableFormats().Contains("PNG"))
-    {
-        // The stream reads the clipboard memory directly, use it inside the using block of the access token
-        using var stream = clipboard.GetAsStream("PNG");
-        using var fileStream = File.Create("clipboard_image.png");
-        stream.CopyTo(fileStream);
-    }
-
-    // Read as bitmap
-    if (ClipboardNative.HasFormat(StandardClipboardFormats.Bitmap))
-    {
-        // Note: Direct bitmap reading may require additional code
-        using var stream = clipboard.GetAsStream(StandardClipboardFormats.Bitmap);
-        // Process bitmap stream
-    }
-}
-```
-
-### Read Custom Formats
-
-```csharp
-using Dapplo.Windows.Clipboard;
-using System.IO;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    string customFormat = "MyApplication.CustomFormat";
-    
-    if (clipboard.AvailableFormats().Contains(customFormat))
-    {
-        // Read as stream
-        using var stream = clipboard.GetAsStream(customFormat);
-        
-        // Read as bytes, note: this is the complete memory block, which can be larger than the data which was placed
-        byte[] data = clipboard.GetAsBytes(customFormat);
-        
-        Console.WriteLine($"Custom data size: {data.Length} bytes");
-    }
-}
-```
-
-## Writing to Clipboard
-
-Call `ClearContents()` before placing new content: this removes the formats of the previous owner (otherwise they are mixed with yours)
-and makes the window of the token (by default the SharedMessageWindow) the clipboard owner.
-
-### Set Text
-
-```csharp
-using Dapplo.Windows.Clipboard;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    clipboard.ClearContents();
-    clipboard.SetAsUnicodeString("Hello, World!");
-}
-```
-
-### Set Files
-
-```csharp
-using Dapplo.Windows.Clipboard;
-using System.Collections.Generic;
-
-var files = new List<string>
-{
-    @"C:\path\to\file1.txt",
-    @"C:\path\to\file2.txt"
-};
-
-using (var clipboard = ClipboardNative.Access())
-{
-    clipboard.ClearContents();
-    clipboard.SetFileNames(files);
-}
-```
-
-### Set Custom Format
-
-```csharp
-using Dapplo.Windows.Clipboard;
-using System.Text;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    string customFormat = "MyApplication.CustomFormat";
-    byte[] data = Encoding.UTF8.GetBytes("Custom clipboard data");
-
-    clipboard.ClearContents();
-    clipboard.SetAsBytes(data, customFormat);
-}
-```
-
-### Set Multiple Formats
-
-You can set multiple formats at once:
-
-```csharp
-using Dapplo.Windows.Clipboard;
-using System.Text;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    string text = "Hello, World!";
-
-    clipboard.ClearContents();
-    // Set as both Unicode text and RTF
-    clipboard.SetAsUnicodeString(text);
-    clipboard.SetAsBytes(Encoding.ASCII.GetBytes(@"{\rtf1\ansi Hello, World!}"), "Rich Text Format");
-}
-```
-
-Note: "HTML Format" (CF_HTML) is not plain HTML, it needs a header with `Version`, `StartHTML`, `EndHTML`, `StartFragment` and `EndFragment` byte offsets,
-see [HTML Clipboard Format](https://learn.microsoft.com/en-us/windows/win32/dataxchg/html-clipboard-format).
-
-## Advanced Scenarios
-
-### Delayed Rendering
-
-Delayed rendering allows you to provide clipboard data only when it's actually requested.
-Register a renderer for the format first, then advertise the format:
-
-```csharp
-using Dapplo.Windows.Clipboard;
-using System;
-
-// Keep the registration as long as the content can be requested, dispose it afterwards
-IDisposable renderer = ClipboardNative.RegisterDelayedRenderer("MyFormat", request =>
-{
-    // Called synchronously on the SharedMessageWindow thread, Windows needs the data before this returns.
-    // Use the AccessToken of the request, it's only valid during this call:
-    // do NOT call ClipboardNative.Access(), await or ObserveOn here.
-    // request.RenderAllFormats is true when the owner window is destroyed and all not yet requested formats must be rendered.
-    byte[] data = GenerateLargeData(); // Only generate when needed
-    request.AccessToken.SetAsBytes(data, request.RequestedFormatId);
-});
-
-// Set clipboard with delayed rendering, ClearContents makes the SharedMessageWindow the owner which receives the requests
-using (var clipboard = ClipboardNative.Access())
-{
-    clipboard.ClearContents();
-    clipboard.SetDelayedRenderedContent("MyFormat");
-}
-```
-
-`SetDelayedRenderedContent` throws an `InvalidOperationException` if no renderer is registered for the format, or if the clipboard isn't owned by the window of the token (call `ClearContents()` first).
-The library answers WM_RENDERFORMAT without opening the clipboard, and opens/closes the clipboard itself for WM_RENDERALLFORMATS.
-Exceptions thrown by a renderer are written to `System.Diagnostics.Trace`.
-
-### Clear Clipboard
-
-```csharp
-using Dapplo.Windows.Clipboard;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    clipboard.ClearContents();
-}
-```
-
-### Monitor Clipboard in Reactive Pipeline
-
-```csharp
-using Dapplo.Windows.Clipboard;
-using System;
-using System.Reactive.Linq;
-
-var subscription = ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains(StandardClipboardFormats.UnicodeText.AsString()))
-    .Throttle(TimeSpan.FromMilliseconds(500)) // Avoid rapid updates
+    .Where(info => info.FormatIds.Contains((uint)StandardClipboardFormats.UnicodeText))
+    // Don't open the clipboard on the SharedMessageWindow thread, and wait until the copying application is done
+    .Throttle(TimeSpan.FromMilliseconds(200))
     .Subscribe(info =>
     {
         using var clipboard = ClipboardNative.Access();
-        var text = clipboard.GetAsUnicodeString();
-        ProcessClipboardText(text);
+        if (clipboard.CanAccess)
+        {
+            Console.WriteLine($"Copied: {clipboard.GetAsUnicodeString()}");
+        }
     });
 ```
 
-### Get Clipboard Owner
+In a UI application, `ObserveOn` the UI thread:
 
+<!-- sample: ClipboardSamples.MonitorOnUi -->
 ```csharp
-using Dapplo.Windows.Clipboard;
-
-var subscription = ClipboardNative.OnUpdate.Subscribe(info =>
-{
-    Console.WriteLine($"Clipboard owner handle: {info.OwnerHandle}");
-});
+// Call on the UI thread: the handler then runs on the UI thread, where the clipboard can be opened and the UI updated
+var subscription = ClipboardNative.OnUpdate
+    .ObserveOn(SynchronizationContext.Current)
+    .Subscribe(info => UpdatePasteButton(ClipboardNative.HasFormat(StandardClipboardFormats.UnicodeText)));
 ```
 
-## Error Handling
+## Access: the clipboard lock
 
-### Handle Access Denied
+The clipboard is one resource for all applications. To read or write it, open it with `ClipboardNative.Access()`, do
+your work, and dispose the returned `IClipboardAccessToken`. While you hold it, no other application can use the
+clipboard, so keep it short.
 
+- Windows ties the opened clipboard to the thread which opened it. Use and dispose the token on that thread; on another
+  thread `CanAccess` is `false`.
+- `Access()` doesn't throw when the clipboard is busy. It retries opening it (5 times, 100 ms apart by default) and
+  returns a token with `CanAccess == false` and `IsOpenTimeout` (another application has it) or `IsLockTimeout`
+  (another thread of your process has it).
+- The `Get...` / `Set...` extension methods throw a `ClipboardAccessDeniedException` when the token has no access.
+
+<!-- sample: ClipboardSamples.ReadText -->
 ```csharp
-using Dapplo.Windows.Clipboard;
+// Access opens the clipboard on this thread, dispose the token on the same thread
+using (var clipboard = ClipboardNative.Access())
+{
+    if (!clipboard.CanAccess)
+    {
+        // Another application kept the clipboard open (IsOpenTimeout), or another thread of this process has it (IsLockTimeout)
+        return;
+    }
+    Console.WriteLine($"Formats: {string.Join(", ", clipboard.AvailableFormats())}");
+    if (ClipboardNative.HasFormat(StandardClipboardFormats.UnicodeText))
+    {
+        string text = clipboard.GetAsUnicodeString();
+        Console.WriteLine(text);
+    }
+}
+```
 
+`AccessAsync()` waits asynchronously for the in-process lock, but opens the clipboard on the thread which continues
+after the `await`. Don't `await` anything else while you hold the token. Cancelling throws an
+`OperationCanceledException`.
+
+<!-- sample: ClipboardSamples.ReadTextAsync -->
+```csharp
+// Only the waiting for the clipboard is asynchronous, the clipboard is opened on the thread which continues after the await.
+// Don't await again while holding the token.
+using var clipboard = await ClipboardNative.AccessAsync();
+string text = clipboard.CanAccess ? clipboard.GetAsUnicodeString() : null;
+```
+
+## Reading
+
+| Content | Method |
+|---|---|
+| Text | `GetAsUnicodeString()` (CF_UNICODETEXT), or `GetAsUnicodeString(format)` for other text formats |
+| Files | `GetFileNames()` (CF_HDROP) |
+| Any format as bytes | `GetAsBytes(format)` |
+| Any format as stream | `GetAsStream(format)` / `TryGetAsStream(format, out stream)`; the stream is a copy and stays valid after the token is disposed |
+| Which formats | `AvailableFormats()`, `AvailableFormatIds()`, or `ClipboardNative.HasFormat(format)` without opening the clipboard |
+
+<!-- sample: ClipboardSamples.ReadFiles -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+foreach (var fileName in clipboard.GetFileNames())
+{
+    Console.WriteLine(fileName);
+}
+```
+
+<!-- sample: ClipboardSamples.ReadImage -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+// Most applications also place a PNG, which keeps the transparency
+if (clipboard.TryGetAsStream("PNG", out var pngStream))
+{
+    // The stream is a copy, it stays valid after the token is disposed
+    using (pngStream)
+    using (var bitmap = new Bitmap(pngStream))
+    {
+        Console.WriteLine($"Image of {bitmap.Width}x{bitmap.Height}");
+    }
+}
+```
+
+<!-- sample: ClipboardSamples.ReadCustomFormat -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+if (clipboard.AvailableFormats().Contains("MyApp.Settings"))
+{
+    byte[] data = clipboard.GetAsBytes("MyApp.Settings");
+    Console.WriteLine($"{data.Length} bytes");
+}
+```
+
+## Writing
+
+Call `ClearContents()` first. It removes the previous content and makes the window of the token (by default the
+SharedMessageWindow) the clipboard owner; without it your formats are added to the content of another application.
+Then place one or more formats:
+
+<!-- sample: ClipboardSamples.WriteText -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+// Always clear first: this removes the previous content and makes the window of the token the clipboard owner
+clipboard.ClearContents();
+clipboard.SetAsUnicodeString("Hello, World!");
+```
+
+<!-- sample: ClipboardSamples.WriteFiles -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+clipboard.ClearContents();
+// Explorer can paste these, the paths must be fully qualified
+clipboard.SetFileNames(new[] { @"C:\Temp\report.pdf", @"C:\Temp\image.png" });
+```
+
+<!-- sample: ClipboardSamples.WriteStream -->
+```csharp
+using var pngStream = new MemoryStream();
+bitmap.Save(pngStream, System.Drawing.Imaging.ImageFormat.Png);
+pngStream.Position = 0;
+
+using var clipboard = ClipboardNative.Access();
+clipboard.ClearContents();
+clipboard.SetAsStream("PNG", pngStream);
+```
+
+Offer the same content in several formats, the application which pastes picks the best one it understands:
+
+<!-- sample: ClipboardSamples.WriteMultipleFormats -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+clipboard.ClearContents();
+// Place several formats of the same content, the application which pastes picks the best one
+clipboard.SetAsUnicodeString("Hello, World!");
+clipboard.SetAsBytes(Encoding.ASCII.GetBytes(@"{\rtf1\ansi Hello, {\b World}!}"), "Rich Text Format");
+// Your own format, it's registered on first use
+clipboard.SetAsBytes(Encoding.UTF8.GetBytes("{\"greeting\":\"Hello\"}"), "MyApp.Settings");
+```
+
+"HTML Format" is not plain HTML: it needs a header with byte offsets, see
+[HTML Clipboard Format](https://learn.microsoft.com/en-us/windows/win32/dataxchg/html-clipboard-format).
+
+To empty the clipboard:
+
+<!-- sample: ClipboardSamples.Clear -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+clipboard.ClearContents();
+```
+
+## Delayed rendering
+
+With delayed rendering you announce a format and create the data only when an application pastes it. Register a
+renderer for the format first, then announce the format with `SetDelayedRenderedContent`.
+
+<!-- sample: ClipboardSamples.DelayedRendering -->
+```csharp
+// 1. Register the renderer, keep the registration as long as the content can be requested
+IDisposable registration = ClipboardNative.RegisterDelayedRenderer("MyApp.LargeData", request =>
+{
+    // Called on the SharedMessageWindow thread when an application pastes the format.
+    // Render right here, with the token of the request: don't open the clipboard, await or switch threads.
+    byte[] data = CreateLargeData();
+    request.AccessToken.SetAsBytes(data, request.RequestedFormatId);
+});
+
+// 2. Announce the format, the data is created only when somebody pastes it
+using (var clipboard = ClipboardNative.Access())
+{
+    // ClearContents makes the SharedMessageWindow the owner, which gets the render requests
+    clipboard.ClearContents();
+    clipboard.SetDelayedRenderedContent("MyApp.LargeData");
+}
+
+// 3. Later, when the data can't be provided anymore
+registration.Dispose();
+```
+
+- The renderer is called synchronously on the SharedMessageWindow thread when a format is requested (WM_RENDERFORMAT),
+  and for all formats when the owner window is destroyed (WM_RENDERALLFORMATS, `request.RenderAllFormats` is `true`).
+- The SharedMessageWindow is not destroyed when the process exits, so it gets no WM_RENDERALLFORMATS then: formats
+  which nobody requested are gone from the clipboard when your process ends. Place content that must survive your
+  application directly.
+- Use `request.AccessToken`; it's only valid while the renderer runs. Don't call `Access()`, don't `await`, don't
+  switch threads.
+- Only one renderer per format can be registered at a time. `SetDelayedRenderedContent` throws an
+  `InvalidOperationException` when no renderer is registered or when the token's window doesn't own the clipboard
+  (call `ClearContents()` first).
+- Exceptions in a renderer are written to `System.Diagnostics.Trace`.
+
+## Clipboard history and cloud clipboard
+
+Windows 10 1809 and later keep a clipboard history (Win+V) and can sync the clipboard to other devices. Applications
+control this per content with special formats:
+
+| Format | Effect |
+|---|---|
+| `ExcludeClipboardContentFromMonitorProcessing` | not in the history, not synced, and clipboard monitors should ignore it |
+| `CanIncludeInClipboardHistory` (DWORD 0 / 1) | 0 keeps it out of the history, 1 allows it |
+| `CanUploadToCloudClipboard` (DWORD 0 / 1) | 0 keeps it from being synced, 1 allows it |
+
+Place them after the content, with the same token. For passwords and other secrets use `ExcludeFromMonitorProcessing()`:
+
+<!-- sample: ClipboardSamples.CloudOptionsSensitive -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+clipboard.ClearContents();
+clipboard.SetAsUnicodeString("MyPassword123!");
+// Not in the clipboard history (Win+V), not synced to other devices, ignored by clipboard monitors
+clipboard.ExcludeFromMonitorProcessing();
+```
+
+`SetCloudClipboardOptions` places only the options you pass; without arguments it places nothing and the user's
+settings apply:
+
+<!-- sample: ClipboardSamples.CloudOptions -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+clipboard.ClearContents();
+clipboard.SetAsUnicodeString("Temporary value");
+// Keep it out of the history and the cloud, but let clipboard managers see it.
+// Options which are not passed (null) are not placed, then the user's settings apply.
+clipboard.SetCloudClipboardOptions(canIncludeInHistory: false, canUploadToCloud: false);
+```
+
+<!-- sample: ClipboardSamples.CloudOptionsSingle -->
+```csharp
+using var clipboard = ClipboardNative.Access();
+clipboard.ClearContents();
+clipboard.SetAsUnicodeString("Shared snippet");
+clipboard.SetCanIncludeInClipboardHistory(true);
+clipboard.SetCanUploadToCloudClipboard(false);
+```
+
+If you write a clipboard monitor yourself, respect `ExcludeClipboardContentFromMonitorProcessing`
+(the constant is `ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat`).
+
+## Errors
+
+<!-- sample: ClipboardSamples.AccessDenied -->
+```csharp
 try
 {
-    using var clipboard = ClipboardNative.Access();
+    // Wait up to 1 second for another thread of this process, and try to open the clipboard 10 times, 50ms apart
+    using var clipboard = ClipboardNative.Access(retries: 10, retryInterval: TimeSpan.FromMilliseconds(50), timeout: TimeSpan.FromSeconds(1));
+    // The Get / Set extension methods throw a ClipboardAccessDeniedException when the token has no access
     var text = clipboard.GetAsUnicodeString();
 }
 catch (ClipboardAccessDeniedException ex)
 {
-    Console.WriteLine($"Clipboard access denied: {ex.Message}");
-    // Another application is currently using the clipboard
+    Console.WriteLine($"The clipboard is in use: {ex.Message}");
 }
 ```
 
-### Retry Logic
+## Formats
 
-```csharp
-using Dapplo.Windows.Clipboard;
-using System;
-using System.Threading;
-
-int maxRetries = 3;
-int retryDelay = 100; // milliseconds
-
-for (int i = 0; i < maxRetries; i++)
-{
-    try
-    {
-        using var clipboard = ClipboardNative.Access();
-        clipboard.SetAsUnicodeString("Hello, World!");
-        break; // Success
-    }
-    catch (ClipboardAccessDeniedException)
-    {
-        if (i == maxRetries - 1)
-        {
-            throw; // Give up after max retries
-        }
-        Thread.Sleep(retryDelay);
-    }
-}
-```
-
-## Cloud Clipboard and Clipboard History
-
-Windows 10 and later versions support cloud clipboard synchronization and clipboard history. You can control how your clipboard content interacts with these features using the cloud clipboard extensions.
-
-### What are Cloud Clipboard Options?
-
-The cloud clipboard formats allow you to control three aspects of clipboard behavior:
-
-1. **CanIncludeInClipboardHistory** - Controls whether the content appears in Windows clipboard history (Win+V)
-2. **CanUploadToCloudClipboard** - Controls whether the content syncs across devices via cloud
-3. **ExcludeClipboardContentFromMonitorProcessing** - When present (whatever the value), the content is excluded from history, cloud sync and clipboard monitoring apps
-
-`SetCloudClipboardOptions` only places the formats for the options which are specified: `canIncludeInHistory` and `canUploadToCloud` are `bool?` (null = don't place the format, true = DWORD 1, false = DWORD 0),
-and the exclusion format is only placed for `excludeFromMonitoring: true`. Without options nothing is placed and the Windows defaults apply.
-
-### Setting Cloud Clipboard Options
-
-The simplest way to control cloud clipboard behavior is using the `SetCloudClipboardOptions` method:
-
-```csharp
-using Dapplo.Windows.Clipboard;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    // Set your clipboard content
-    clipboard.ClearContents();
-    clipboard.SetAsUnicodeString("Sensitive information");
-    
-    // Prevent from being stored in history or synced to cloud
-    clipboard.SetCloudClipboardOptions(
-        canIncludeInHistory: false,
-        canUploadToCloud: false,
-        excludeFromMonitoring: true
-    );
-}
-```
-
-### Use Cases
-
-#### Private/Sensitive Content
-
-Prevent sensitive data from being stored in history or synced:
-
-```csharp
-using Dapplo.Windows.Clipboard;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    clipboard.ClearContents();
-    clipboard.SetAsUnicodeString("MyPassword123!");
-    
-    // Disable history and cloud sync for sensitive data
-    clipboard.SetCloudClipboardOptions(
-        canIncludeInHistory: false,
-        canUploadToCloud: false
-    );
-}
-```
-
-#### Temporary Content
-
-For temporary clipboard content that shouldn't clutter history:
-
-```csharp
-using Dapplo.Windows.Clipboard;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    clipboard.ClearContents();
-    clipboard.SetAsUnicodeString("Temporary data");
-    
-    // Don't include in history, but allow cloud sync
-    clipboard.SetCloudClipboardOptions(
-        canIncludeInHistory: false,
-        canUploadToCloud: true
-    );
-}
-```
-
-#### Normal Content (Default)
-
-For normal content nothing needs to be placed, the Windows defaults (history and cloud sync as configured by the user) apply.
-To explicitly allow both:
-
-```csharp
-using Dapplo.Windows.Clipboard;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    clipboard.ClearContents();
-    clipboard.SetAsUnicodeString("Normal clipboard content");
-
-    // Explicitly allow history and cloud sync, this doesn't place the exclusion format
-    clipboard.SetCloudClipboardOptions(canIncludeInHistory: true, canUploadToCloud: true);
-}
-```
-
-### Individual Option Methods
-
-You can also set each option individually:
-
-```csharp
-using Dapplo.Windows.Clipboard;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    clipboard.ClearContents();
-    clipboard.SetAsUnicodeString("My content");
-
-    // Set options individually
-    clipboard.SetCanIncludeInClipboardHistory(false);
-    clipboard.SetCanUploadToCloudClipboard(true);
-    // Or exclude the content from history, cloud sync and monitoring applications completely
-    clipboard.ExcludeFromMonitorProcessing();
-}
-```
-
-### Checking Cloud Clipboard Formats
-
-You can check if cloud clipboard formats are present:
-
-```csharp
-using Dapplo.Windows.Clipboard;
-using System.Linq;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    var formats = clipboard.AvailableFormats().ToList();
-    
-    bool hasHistoryFormat = formats.Contains(
-        ClipboardCloudExtensions.CanIncludeInClipboardHistoryFormat);
-    bool hasCloudFormat = formats.Contains(
-        ClipboardCloudExtensions.CanUploadToCloudClipboardFormat);
-    bool hasMonitorFormat = formats.Contains(
-        ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat);
-}
-```
-
-### Best Practices for Cloud Clipboard
-
-1. **Always set cloud options after setting content** - The cloud formats should be set in the same clipboard access session as your content
-2. **Default to the Windows defaults** - Unless you have a specific reason, don't place any of these formats
-3. **Be consistent** - If you disable history, you probably want to disable cloud sync too
-4. **Consider user privacy** - For passwords and sensitive data, always disable history and cloud sync
-
-## Common Clipboard Formats
-
-Standard Windows clipboard formats. Use the `StandardClipboardFormats` enum with format-specific methods:
-
-| Enum value | String name | Description |
+| `StandardClipboardFormats` | Name | Content |
 |---|---|---|
-| `StandardClipboardFormats.Text` | `CF_TEXT` | ANSI text |
-| `StandardClipboardFormats.UnicodeText` | `CF_UNICODETEXT` | Unicode text |
-| `StandardClipboardFormats.Bitmap` | `CF_BITMAP` | Bitmap image |
-| `StandardClipboardFormats.Drop` | `CF_HDROP` | List of file paths |
-| *(registered by apps)* | `PNG` | PNG image format |
-| *(registered by apps)* | `HTML Format` | HTML content |
-| *(registered by apps)* | `Rich Text Format` | RTF content |
+| `Text` | `CF_TEXT` | ANSI text |
+| `UnicodeText` | `CF_UNICODETEXT` | UTF-16 text |
+| `Bitmap` | `CF_BITMAP` | GDI bitmap handle |
+| `DeviceIndependentBitmap` | `CF_DIB` | BITMAPINFO followed by the pixels |
+| `DeviceIndependentBitmapV5` | `CF_DIBV5` | BITMAPV5HEADER followed by the pixels |
+| `Drop` | `CF_HDROP` | list of files |
+| `Locale` | `CF_LOCALE` | the locale of CF_TEXT |
+| registered | `PNG` | PNG file |
+| registered | `HTML Format` | HTML with a header |
+| registered | `Rich Text Format` | RTF |
 
-You can also check available formats:
+## See also
 
-```csharp
-using Dapplo.Windows.Clipboard;
-
-using (var clipboard = ClipboardNative.Access())
-{
-    var formats = clipboard.AvailableFormats();
-    foreach (var format in formats)
-    {
-        Console.WriteLine($"Format: {format}");
-    }
-}
-```
-
-## Best Practices
-
-### 1. Always Use `using` Statements, Short and on One Thread
-
-This ensures the clipboard is properly released. Don't `await` or switch threads while holding the token, and keep the block short: no other application can use the clipboard meanwhile.
-
-```csharp
-using (var clipboard = ClipboardNative.Access())
-{
-    // Use clipboard
-} // Automatically released
-```
-
-### 2. Dispose Subscriptions
-
-Clean up event subscriptions when done:
-
-```csharp
-var subscription = ClipboardNative.OnUpdate.Subscribe(...);
-
-// Later
-subscription.Dispose();
-```
-
-### 3. Handle Concurrency
-
-The clipboard is a shared resource. Use appropriate error handling:
-
-```csharp
-try
-{
-    using var clipboard = ClipboardNative.Access();
-    // Use clipboard
-}
-catch (ClipboardAccessDeniedException)
-{
-    // Handle gracefully
-}
-```
-
-### 4. Use Reactive Operators
-
-Leverage Rx operators for better control:
-
-```csharp
-var subscription = ClipboardNative.OnUpdate
-    .Throttle(TimeSpan.FromMilliseconds(500))  // Debounce rapid changes
-    .DistinctUntilChanged(info => info.Id)      // Skip duplicates
-    .ObserveOn(SynchronizationContext.Current)  // UI thread
-    .Subscribe(info => { /* Handle */ });
-```
-
-## See Also
-
-- [API Reference](../api/index.md)
-- [Getting Started](intro.md)
-- [Common Scenarios](common-scenarios.md)
-- [Reactive Extensions Documentation](http://reactivex.io/)
+- [Window messages and the SharedMessageWindow](window-messages.md)
+- [Common scenarios](common-scenarios.md): clipboard history, saving copied images, inserting text with a hotkey

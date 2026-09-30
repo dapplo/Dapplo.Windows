@@ -43,6 +43,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - **Breaking:** all assemblies are strong-named for every target framework and configuration (F-26).
 - **Breaking:** removed `ApplicationRestartManager.MaxCommandLineLength` (use `RestartMaxCmdLine`), `PowerBroadcastEvent` values that can't arrive, and undocumented DWM ordinals (`DwmpStartOrStopFlip3D`, `GetSharedSurface`, `UpdateWindowShared`) (E-31, E-35, E-36).
 - Debug builds no longer enable checked arithmetic, so Debug and Release behave the same (F-25, F-37).
+- The documentation, README and wiki use the real API, list every package with its dependencies, and every code sample is compiled in `Dapplo.Windows.Example.DocSamples`; the package project URL points to the documentation site (F-03, F-17, B-29, D-42, F-33).
 - Every package contains a README; builds are deterministic and use `ContinuousIntegrationBuild` on CI; unnecessary dependencies (Dapplo.Log in Advapi32, Microsoft.SourceLink.GitHub) are gone and no empty `.dll.config` is shipped (F-27, F-29, F-30).
 - `DpiHandler.HandleWindowMessages`, `HandleContextMenuMessages` and `MessageHandler` are public, so other UI frameworks can feed messages to a `DpiHandler`.
 - `User32Api.GetCursorLocation()` falls back to `GetCursorPos` instead of WinForms `Cursor.Position`.

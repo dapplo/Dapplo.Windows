@@ -47,19 +47,12 @@
         ]
       }
     ],
-    "overwrite": [
-      {
-        "files": [
-          "apidoc/**.md"
-        ]
-      }
-    ],
     "dest": "_site",
 	"globalMetadata": {
 		"_appTitle": "Dapplo.Windows",
 		"_appLogoPath": "images/d.svg",
 		"_appFaviconPath": "images/favicon.ico",
-		"_appFooter": "Copyright © 2017 Dapplo",
+		"_appFooter": "Copyright © 2016-2026 Dapplo",
 		"_enableSearch": true
 	},
     "globalMetadataFiles": [],

@@ -1,17 +1,18 @@
-# Dapplo.Windows.Dialogs
+# File and folder dialogs
 
-The Windows file open, file save and folder picker dialogs (the Common Item Dialog) for .NET, through COM: no Windows
-Forms or WPF needed. Targets `net480` and `net10.0-windows`.
+**Dapplo.Windows.Dialogs** shows the Windows file open, file save and folder picker dialogs (the Common Item Dialog,
+`IFileOpenDialog` / `IFileSaveDialog`) through COM. It needs neither Windows Forms nor WPF, so it also works in console
+applications and other UI frameworks.
 
-This package is part of [Dapplo.Windows](https://github.com/dapplo/Dapplo.Windows). Full documentation:
-[File and folder dialogs](https://www.dapplo.net/Dapplo.Windows/articles/dialogs.html), changes:
-[changelog](https://github.com/dapplo/Dapplo.Windows/blob/master/CHANGELOG.md).
+```powershell
+dotnet add package Dapplo.Windows.Dialogs
+```
 
 Namespace: `Dapplo.Windows.Dialogs`.
 
-## Simple API
+## The simple API
 
-`FileDialog` returns `null` when the user cancels.
+`FileDialog` has one method per dialog. Each returns `null` when the user cancels and throws on real errors.
 
 <!-- sample: DialogSamples.SimpleApi -->
 ```csharp
@@ -36,10 +37,11 @@ IReadOnlyList<string> files = FileDialog.PickFilesToOpen(filters: new[] { ("Imag
 string folder = FileDialog.PickFolder(title: "Select Output Folder");
 ```
 
-## Builders
+## The builders
 
-`FileOpenDialogBuilder`, `FileSaveDialogBuilder` and `FolderPickerBuilder` return a `FileDialogResult` with
-`WasCancelled`, `SelectedPath` and `SelectedPaths`.
+For more options use `FileOpenDialogBuilder`, `FileSaveDialogBuilder` and `FolderPickerBuilder`. `FileDialog` uses
+them too. `ShowDialog` returns a `FileDialogResult`: `WasCancelled`, `SelectedPath` and, for multiple selection,
+`SelectedPaths`. Pass the handle of your window to `ShowDialog` to make the dialog modal for it.
 
 <!-- sample: DialogSamples.OpenFile -->
 ```csharp
@@ -104,6 +106,8 @@ if (!result.WasCancelled)
 }
 ```
 
+`AddPlace` adds a folder to the navigation pane of this dialog:
+
 <!-- sample: DialogSamples.AddPlace -->
 ```csharp
 string projects = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Projects");
@@ -116,10 +120,44 @@ FileDialogResult result = new FileOpenDialogBuilder()
     .ShowDialog();
 ```
 
+| Option | How |
+|---|---|
+| File types | `AddFilter("Images", "*.png;*.jpg")`, the first filter is selected |
+| Default extension | `WithDefaultExtension("png")`, without the dot |
+| Start folder | `WithInitialDirectory(path)`; without it Windows uses the folder the user used last |
+| File name | `FileSaveDialogBuilder.WithSuggestedFileName("report.pdf")` |
+| Several files | `FileOpenDialogBuilder.AllowMultipleSelection()` |
+| Owner window | `ShowDialog(ownerHandle)` |
+
 ## Errors and threading
 
-Cancel is not an error. Real failures throw a `COMException`. The dialogs need an STA thread: the UI thread of
-Windows Forms or WPF, `[STAThread]` on `Main` of a console application, or a dedicated STA thread.
+A cancel is not an error: `WasCancelled` is `true` (or the `FileDialog` method returns `null`). Real failures throw a
+`COMException`.
+
+<!-- sample: DialogSamples.Errors -->
+```csharp
+FileDialogResult result;
+try
+{
+    result = new FileOpenDialogBuilder().AddFilter("All files", "*.*").ShowDialog();
+}
+catch (COMException ex)
+{
+    // Not a cancel: something went wrong, e.g. a shell extension failed or the thread is not STA
+    Console.WriteLine($"The dialog failed: 0x{ex.ErrorCode:X8}");
+    return;
+}
+
+if (result.WasCancelled)
+{
+    // Not an error, the user pressed Cancel or Escape
+    return;
+}
+Console.WriteLine(result.SelectedPath);
+```
+
+The dialog must be shown on an STA thread. The UI threads of Windows Forms and WPF are STA. A console application
+needs `[STAThread]` on `Main`, other threads need a dedicated STA thread:
 
 <!-- sample: DialogSamples.StaThread -->
 ```csharp
@@ -131,3 +169,10 @@ thread.SetApartmentState(ApartmentState.STA);
 thread.Start();
 thread.Join();
 ```
+
+The library doesn't check the apartment; on an MTA thread the dialog can fail with a `COMException` or misbehave.
+
+## Not covered
+
+The builders don't expose dialog events (`IFileDialog.Advise`), client GUIDs for separate "last folder" memory, custom
+button labels, or save-dialog property stores. For those, use the COM interfaces directly.

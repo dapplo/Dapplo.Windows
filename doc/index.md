@@ -1,115 +1,45 @@
 # Dapplo.Windows
 
-A comprehensive library providing Windows-specific functionality for .NET Framework and .NET Core applications.
+Dapplo.Windows gives .NET applications on Windows access to the parts of the operating system which .NET doesn't
+cover: windows and their events, keyboard and mouse hooks, the clipboard, DPI awareness, power management, the Restart
+Manager, file dialogs and more. It was built for [Greenshot](https://getgreenshot.org/) and is split into small NuGet
+packages for .NET Framework 4.8 and .NET 10.
 
-## Overview
+- [Getting started](articles/intro.md): requirements, the packages and how the library works
+- [API reference](api/index.md)
+- [Migrating to 3.0](articles/migration-3.0.md) and the
+  [changelog](https://github.com/dapplo/Dapplo.Windows/blob/master/CHANGELOG.md)
+- [Source code and issues on GitHub](https://github.com/dapplo/Dapplo.Windows)
 
-Dapplo.Windows is a collection of packages that provide P/Invoke wrappers and higher-level abstractions for Windows API functionality. Originally developed for [Greenshot](https://getgreenshot.org/), this library makes it easy to interact with Windows features from managed code.
+## What you can do
 
-## Key Features
+| Topic | Package |
+|---|---|
+| [Find, inspect, move and capture windows, react to window events](articles/window-management.md) | Dapplo.Windows |
+| [Receive window messages without a window of your own](articles/window-messages.md) | Dapplo.Windows.Messages |
+| [Global keyboard and mouse hooks, hotkeys, send input](articles/input-handling.md) | Dapplo.Windows.Input |
+| [Monitor, read and write the clipboard](articles/clipboard-usage.md) | Dapplo.Windows.Clipboard |
+| [Follow the DPI of each monitor](articles/dpi-awareness.md) | Dapplo.Windows.Dpi, .Forms, .Wpf |
+| [Keep the PC awake, sleep, shut down, wake timers, power events](articles/system-state.md) | Dapplo.Windows.SystemState |
+| [Survive updates: restart registration and installer support](articles/restart-manager.md) | Dapplo.Windows.AppRestartManager, .InstallerManager |
+| [Extract icons, write ICO / CUR files, capture the cursor](articles/icons.md) | Dapplo.Windows.Icons |
+| [File and folder dialogs without WinForms or WPF](articles/dialogs.md) | Dapplo.Windows.Dialogs |
+| [Windows Forms and WPF integration](articles/forms-and-wpf.md) | Dapplo.Windows.Forms, .Wpf |
+| [Citrix, DWM, devices, registry, sounds and more](articles/more-packages.md) | several |
+| [Recipes](articles/common-scenarios.md) | several |
 
-- **Window Management**: Query and manipulate windows, monitor window events
-- **Input Handling**: Hook keyboard and mouse events, generate input events
-- **Clipboard Access**: Monitor and manipulate clipboard content with a reactive API
-- **DPI Awareness**: Build DPI-aware applications with automatic scaling
-- **GDI/User32 Interop**: Access to native Windows API functions and structures
-- **Citrix Support**: Detect and interact with Citrix environments
-- **Desktop Window Manager**: Access DWM (Aero) functionality
+## A first example
 
-## Package Structure
-
-The library is split into focused packages for better modularity:
-
-| Package | Description |
-|---------|-------------|
-| **Dapplo.Windows** | Main package with window management and event hooking |
-| **Dapplo.Windows.Clipboard** | Clipboard monitoring and manipulation |
-| **Dapplo.Windows.Dpi** | DPI awareness and scaling support |
-| **Dapplo.Windows.Input** | Keyboard and mouse input handling |
-| **Dapplo.Windows.User32** | User32.dll API wrappers |
-| **Dapplo.Windows.Gdi32** | GDI32.dll API wrappers |
-| **Dapplo.Windows.Kernel32** | Kernel32.dll API wrappers |
-| **Dapplo.Windows.Messages** | Windows message definitions |
-| **Dapplo.Windows.Citrix** | Citrix environment detection |
-| **Dapplo.Windows.DesktopWindowsManager** | DWM API access |
-| **Dapplo.Windows.EmbeddedBrowser** | Enhanced WebBrowser control |
-| **Dapplo.Windows.Com** | COM interop helpers |
-| **Dapplo.Windows.Common** | Shared types and utilities |
-
-## Getting Started
-
-Install the packages you need via NuGet:
-
-```powershell
-# For window management and event hooking
-Install-Package Dapplo.Windows
-
-# For clipboard functionality
-Install-Package Dapplo.Windows.Clipboard
-
-# For DPI awareness
-Install-Package Dapplo.Windows.Dpi
-
-# For input handling
-Install-Package Dapplo.Windows.Input
-```
-
-## Quick Examples
-
-### Monitor Window Events
+<!-- sample: GettingStartedSamples.FirstKeyboardHook -->
 ```csharp
-using Dapplo.Windows.Desktop;
-
-// Subscribe to window title changes
-var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_NAMECHANGE)
-    .Subscribe(winEvent =>
-    {
-        var window = InteropWindow.FromHandle(winEvent.Handle);
-        Console.WriteLine($"Window title changed: {window.GetCaption()}");
-    });
+// using Dapplo.Windows.Input.Enums; using Dapplo.Windows.Input.Keyboard; using System.Reactive.Linq;
+// Ctrl+Shift+S anywhere in Windows. The handler runs on the hook thread, ObserveOn moves the work to the UI thread.
+IDisposable subscription = KeyboardHook.KeyboardEvents
+    .Where(new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyS))
+    .ObserveOn(SynchronizationContext.Current)
+    .Subscribe(_ => Console.WriteLine("Ctrl+Shift+S pressed"));
 ```
-
-### Monitor Clipboard
-```csharp
-using Dapplo.Windows.Clipboard;
-
-// Subscribe to clipboard updates
-var subscription = ClipboardNative.OnUpdate
-    .Where(info => info.Formats.Contains("Text"))
-    .Subscribe(info =>
-    {
-        using var clipboard = ClipboardNative.Access();
-        var text = clipboard.GetAsString();
-        Console.WriteLine($"Clipboard text: {text}");
-    });
-```
-
-### Handle DPI Changes
-```csharp
-using Dapplo.Windows.Dpi.Forms;
-
-// Extend DpiAwareForm for automatic DPI scaling
-public class MyForm : DpiAwareForm
-{
-    public MyForm()
-    {
-        InitializeComponent();
-    }
-}
-```
-
-## Documentation
-
-- [Getting Started Guide](articles/intro.md)
-- [API Reference](api/index.md)
-- [GitHub Repository](https://github.com/dapplo/Dapplo.Windows)
-
-## Build Status
-
-[![Build Status](https://dev.azure.com/Dapplo/Dapplo%20framework/_apis/build/status/dapplo.Dapplo.Windows?branchName=master)](https://dev.azure.com/Dapplo/Dapplo%20framework/_build/latest?definitionId=10&branchName=master)
-[![Coverage Status](https://coveralls.io/repos/github/dapplo/Dapplo.Windows/badge.svg?branch=master)](https://coveralls.io/github/dapplo/Dapplo.Windows?branch=master)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/dapplo/Dapplo.Windows/blob/master/LICENSE) file for details.
-
+MIT, see [LICENSE](https://github.com/dapplo/Dapplo.Windows/blob/master/LICENSE).

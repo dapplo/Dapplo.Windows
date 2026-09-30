@@ -1,163 +1,90 @@
-# Icon Creation
+# Icons and cursors
 
-The `Dapplo.Windows.Icons` package provides utilities for extracting system icons and for creating ICO and CUR files programmatically.
+Package **Dapplo.Windows.Icons**. Full version: [Icons and cursors](https://www.dapplo.net/Dapplo.Windows/articles/icons.html).
 
-## Installation
+The generic methods return `Icon` or `Bitmap`; for WPF convert with `ToBitmapSource()` (Dapplo.Windows.Wpf).
 
-```powershell
-Install-Package Dapplo.Windows.Icons
+## Extracting icons
+
+<!-- sample: IconSamples.ExtractIcons -->
+```csharp
+// The first icon of an executable or DLL, TIcon is Icon or Bitmap
+using var notepadIcon = IconHelper.ExtractAssociatedIcon<Icon>(@"C:\Windows\notepad.exe");
+
+// How many icons a file has, and one of them in the small size
+int count = IconHelper.CountAssociatedIcons(@"C:\Windows\System32\shell32.dll");
+using var smallIcon = IconHelper.ExtractAssociatedIcon<Bitmap>(@"C:\Windows\System32\shell32.dll", index: 3, useLargeIcon: false);
+
+// The icon Explorer shows for a file type, the file doesn't need to exist
+using var pdfIcon = IconHelper.GetFileExtensionIcon<Bitmap>("document.pdf", IconSize.Large, linkOverlay: false);
+
+// The folder icon
+using var folderIcon = IconHelper.GetFolderIcon<Icon>(IconSize.Small, FolderIconType.Closed);
 ```
 
-## Extracting Icons
+The icon of a window is in the Dapplo.Windows package:
 
-### From a File or Executable
-
+<!-- sample: WindowSamples.WindowIcon -->
 ```csharp
-using Dapplo.Windows.Icons;
-
-// Extract the large icon associated with a file
-Icon icon = IconHelper.ExtractLargeIcon(@"C:\Windows\notepad.exe");
-
-// Extract the small icon
-Icon smallIcon = IconHelper.ExtractSmallIcon(@"C:\Windows\notepad.exe");
+// The icon of a window, as Bitmap or Icon
+using var smallIcon = window.GetIcon<Bitmap>();
+using var largeIcon = window.GetIcon<Icon>(useLargeIcons: true);
 ```
 
-### From a Window
+## Writing ICO and CUR files
 
+<!-- sample: IconSamples.WriteIconFile -->
 ```csharp
-using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Icons;
-
-var window = InteropWindow.FromHandle(handle);
-Icon icon = window.GetIcon();
-```
-
-## Creating ICO Files
-
-`IconFileWriter` creates `.ico` files that comply with the [ICO file format specification](https://en.wikipedia.org/wiki/ICO_(file_format)).
-
-### Multi-Resolution Icon
-
-```csharp
-using Dapplo.Windows.Icons;
-using System.Collections.Generic;
-using System.Drawing;
-
-// Build one Bitmap per resolution
-var images = new List<Bitmap>
+// One image per size. Every image is stored as PNG (Windows Vista and later), larger than 256x256 is scaled down.
+var images = new List<Image>();
+foreach (var size in new[] { 16, 32, 48, 256 })
 {
-    CreateIconBitmap(16),
-    CreateIconBitmap(32),
-    CreateIconBitmap(48),
-    CreateIconBitmap(256)
-};
+    var bitmap = new Bitmap(size, size);
+    using (var graphics = Graphics.FromImage(bitmap))
+    {
+        graphics.Clear(Color.Transparent);
+        graphics.FillEllipse(Brushes.SteelBlue, 0, 0, size - 1, size - 1);
+    }
+    images.Add(bitmap);
+}
 
-// Write to a file
-IconFileWriter.WriteIconFile("myapp.ico", images);
+IconFileWriter.WriteIconFile("app.ico", images);
 
-// — or — write to a stream
-using (var stream = File.Create("myapp.ico"))
-    IconFileWriter.WriteIconFile(stream, images);
-
-foreach (var img in images) img.Dispose();
-```
-
-### Using `IconHelper.WriteIcon` (Legacy)
-
-The original helper method is still fully supported:
-
-```csharp
-using Dapplo.Windows.Icons;
-using System.Collections.Generic;
-using System.Drawing;
-
-var images = new List<Image> { /* your bitmaps */ };
-
+// Or into a stream
 using (var stream = new MemoryStream())
 {
-    IconHelper.WriteIcon(stream, images);
-    File.WriteAllBytes("myapp.ico", stream.ToArray());
+    IconFileWriter.WriteIconFile(stream, images);
+}
+
+images.ForEach(image => image.Dispose());
+```
+
+<!-- sample: IconSamples.WriteCursorFile -->
+```csharp
+using var cursorImage = new Bitmap(32, 32);
+using (var graphics = Graphics.FromImage(cursorImage))
+{
+    graphics.DrawLine(Pens.Black, 16, 0, 16, 31);
+    graphics.DrawLine(Pens.Black, 0, 16, 31, 16);
+}
+
+// The hot spot is the pixel which "clicks", here the center of the cross
+IconFileWriter.WriteCursorFile("cross.cur", new[] { ((Image)cursorImage, new Point(16, 16)) });
+```
+
+## Capturing the cursor
+
+<!-- sample: IconSamples.CaptureCursor -->
+```csharp
+// Capture the current mouse cursor (also high DPI and animated system cursors, the current frame)
+if (CursorHelper.TryGetCurrentCursor(out var cursor))
+{
+    using (cursor)
+    {
+        // Draw it into a screenshot: the position is the top-left of the cursor image, so subtract the hot spot
+        var mouse = User32Api.GetCursorLocation();
+        var position = new NativePoint(mouse.X - cursor.HotSpot.X - screenshotLocation.X, mouse.Y - cursor.HotSpot.Y - screenshotLocation.Y);
+        CursorHelper.DrawCursorOnBitmap(screenshot, cursor, position);
+    }
 }
 ```
-
-## Creating Cursor (CUR) Files
-
-```csharp
-using Dapplo.Windows.Icons;
-using System.Collections.Generic;
-using System.Drawing;
-
-var cursorBitmap = new Bitmap(32, 32);
-// … draw cursor graphics …
-
-var cursorData = new List<(Image image, Point hotspot)>
-{
-    (cursorBitmap, new Point(16, 16))   // hotspot at centre
-};
-
-IconFileWriter.WriteCursorFile("custom.cur", cursorData);
-cursorBitmap.Dispose();
-```
-
-## Working with the Structures Directly
-
-For advanced scenarios (e.g., embedding icons in PE resource sections) you can use the underlying structs:
-
-```csharp
-using Dapplo.Windows.Icons.Structs;
-
-// ICONDIR header
-var iconDir = IconDir.CreateIcon(count: 2);
-
-// ICONDIRENTRY for each resolution
-var entry16 = IconDirEntry.CreateForIcon(
-    width: 16, height: 16, bitCount: 32,
-    imageSize: 1024, imageOffset: 22);
-
-var entry32 = IconDirEntry.CreateForIcon(
-    width: 32, height: 32, bitCount: 32,
-    imageSize: 4096, imageOffset: 1046);
-
-// GRPICONDIR / GRPICONDIRENTRY for resource files
-var grpDir = GrpIconDir.CreateIcon(count: 2);
-var grpEntry = GrpIconDirEntry.CreateForIcon(
-    width: 32, height: 32, bitCount: 32,
-    imageSize: 4096, resourceId: 1);
-```
-
-## ICO File Format Reference
-
-An ICO file has three sections:
-
-1. **ICONDIR** (6 bytes) — file header  
-   - `Reserved` (2 bytes) — always 0  
-   - `Type` (2 bytes) — `1` for icons, `2` for cursors  
-   - `Count` (2 bytes) — number of images
-
-2. **ICONDIRENTRY** (16 bytes × `Count`) — per-image metadata  
-   - `Width`, `Height` (1 byte each) — `0` means 256  
-   - `ColorCount`, `Reserved` (1 byte each)  
-   - `Planes`, `BitCount` (2 bytes each)  
-   - `BytesInRes` (4 bytes) — size of image data  
-   - `ImageOffset` (4 bytes) — byte offset to image data
-
-3. **Image data** — PNG or BMP data for each image
-
-> **Tip:** Windows Vista+ supports PNG-compressed images inside ICO files, enabling compact 256×256 images.
-
-## Best Practices
-
-- Include at minimum 16×16, 32×32, and 48×48 resolutions in every ICO file.
-- Add a 256×256 PNG-compressed image for modern Windows high-DPI scenarios.
-- For application icons, also include 64×64 and 128×128 resolutions.
-- Always `Dispose()` `Bitmap` and `Image` objects after passing them to `IconFileWriter`.
-
-## References
-
-- [The format of icon resources — Raymond Chen](https://devblogs.microsoft.com/oldnewthing/20101018-00/?p=12513)
-- [ICO file format — Wikipedia](https://en.wikipedia.org/wiki/ICO_(file_format))
-
-## See Also
-
-- [[Getting-Started]]
-- [[Window-Management]] — extracting icons from windows

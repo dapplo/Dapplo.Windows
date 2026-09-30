@@ -1,461 +1,279 @@
-# DPI Awareness Guide
+# DPI awareness
 
-This guide covers building DPI-aware applications using the `Dapplo.Windows.Dpi` package.
-
-## Overview
-
-The DPI package helps you create applications that properly scale on high-DPI displays. It provides support for both Windows Forms and WPF applications.
-
-## Installation
+Windows runs monitors at different scale factors (100 %, 125 %, 150 %, ...), and a window can move between them.
+**Dapplo.Windows.Dpi** helps an application to follow the DPI of its windows: DPI calculations, a `DpiHandler` which
+reports DPI changes, bitmap scaling and the DPI awareness APIs of Windows. The Windows Forms and WPF parts are in
+**Dapplo.Windows.Forms** and **Dapplo.Windows.Wpf**.
 
 ```powershell
-Install-Package Dapplo.Windows.Dpi
+dotnet add package Dapplo.Windows.Dpi
+dotnet add package Dapplo.Windows.Forms   # DpiAwareForm, AttachDpiHandler for forms and context menus
+dotnet add package Dapplo.Windows.Wpf     # AttachDpiHandler for WPF windows
 ```
 
-## Windows Forms DPI Support
+Namespaces used on this page: `Dapplo.Windows.Dpi`, `Dapplo.Windows.Dpi.Enums`, `Dapplo.Windows.Forms.Dpi`,
+`Dapplo.Windows.Wpf.Dpi`, `Dapplo.Windows.Common.Structs`, `Dapplo.Windows.User32`.
 
-### Option 1: DPI-Aware Form (Recommended)
+## First: make the process DPI aware
 
-The easiest way to add DPI awareness is to extend `DpiAwareForm`:
-
-```csharp
-using Dapplo.Windows.Dpi.Forms;
-
-public class MyForm : DpiAwareForm
-{
-    public MyForm()
-    {
-        InitializeComponent();
-        // Form automatically scales with DPI changes
-    }
-}
-```
-
-This provides:
-- Automatic scaling when DPI changes
-- Bitmap scaling support
-- Font scaling
-- Control repositioning
-
-### Option 2: DPI-Unaware Form
-
-If you want the system to handle scaling (bitmap stretching):
-
-```csharp
-using Dapplo.Windows.Dpi.Forms;
-
-public class MyForm : DpiUnawareForm
-{
-    public MyForm()
-    {
-        InitializeComponent();
-        // System handles scaling via bitmap stretching
-    }
-}
-```
-
-### Option 3: Manual DPI Handling
-
-For more control, use a `DpiHandler`:
-
-```csharp
-using Dapplo.Windows.Dpi;
-using Dapplo.Windows.Dpi.Forms;
-using System.Windows.Forms;
-
-public class MyForm : Form
-{
-    private DpiHandler _dpiHandler;
-
-    public MyForm()
-    {
-        InitializeComponent();
-        
-        // Create DPI handler for this form
-        _dpiHandler = DpiHandler.Create(this);
-        
-        // Subscribe to DPI change events
-        _dpiHandler.OnDpiChanged.Subscribe(dpiChangeInfo =>
-        {
-            HandleDpiChange(dpiChangeInfo);
-        });
-    }
-
-    private void HandleDpiChange(DpiChangeInfo dpiChangeInfo)
-    {
-        Console.WriteLine($"DPI changed from {dpiChangeInfo.OldDpi} to {dpiChangeInfo.NewDpi}");
-        
-        // Scale custom elements
-        ScaleCustomControls(dpiChangeInfo);
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _dpiHandler?.Dispose();
-        }
-        base.Dispose(disposing);
-    }
-}
-```
-
-## WPF DPI Support
-
-### Window DPI Extensions
-
-WPF has built-in DPI support, but you can enhance it:
-
-```csharp
-using Dapplo.Windows.Dpi.Wpf;
-using System.Windows;
-
-public partial class MainWindow : Window
-{
-    public MainWindow()
-    {
-        InitializeComponent();
-        
-        // Get current DPI
-        var dpi = this.GetDpi();
-        Console.WriteLine($"Current DPI: {dpi}");
-        
-        // Subscribe to DPI changes
-        var dpiHandler = this.AttachDpiHandler();
-        dpiHandler.OnDpiChanged.Subscribe(dpiInfo =>
-        {
-            Console.WriteLine($"DPI changed to {dpiInfo.NewDpi}");
-        });
-    }
-}
-```
-
-## DPI Calculations
-
-### Scale Values
-
-```csharp
-using Dapplo.Windows.Dpi;
-
-// Scale a value from 96 DPI to current DPI
-int size96 = 16; // Original size at 96 DPI
-int currentDpi = 120;
-
-int scaledSize = DpiCalculator.ScaleWithDpi(size96, currentDpi);
-Console.WriteLine($"Scaled size: {scaledSize}"); // Output: 20
-```
-
-### Unscale Values
-
-```csharp
-using Dapplo.Windows.Dpi;
-
-// Convert a scaled value back to 96 DPI
-int scaledSize = 20;
-int currentDpi = 120;
-
-int originalSize = DpiCalculator.UnscaleWithDpi(scaledSize, currentDpi);
-Console.WriteLine($"Original size: {originalSize}"); // Output: 16
-```
-
-### Scale Structures
-
-```csharp
-using Dapplo.Windows.Dpi;
-using Dapplo.Windows.Common.Structs;
-
-int currentDpi = 144;
-
-// Scale NativeSize
-var size = new NativeSize(16, 16);
-var scaledSize = DpiCalculator.ScaleWithDpi(size, currentDpi);
-Console.WriteLine($"Scaled: {scaledSize.Width}x{scaledSize.Height}"); // 24x24
-
-// Scale NativeRect
-var rect = new NativeRect(0, 0, 100, 100);
-var scaledRect = DpiCalculator.ScaleWithDpi(rect, currentDpi);
-```
-
-### Calculate DPI from Scale Factor
-
-```csharp
-using Dapplo.Windows.Dpi;
-
-// 150% scaling = 144 DPI
-int dpi = DpiCalculator.DpiFromScaleFactor(1.5);
-Console.WriteLine($"DPI: {dpi}"); // Output: 144
-
-// Reverse: Get scale factor from DPI
-double scaleFactor = DpiCalculator.ScaleFactorFromDpi(144);
-Console.WriteLine($"Scale factor: {scaleFactor}"); // Output: 1.5
-```
-
-## Bitmap Scaling
-
-### Scale Bitmaps with Quality
-
-```csharp
-using Dapplo.Windows.Dpi;
-using System.Drawing;
-
-// Create bitmap scale handler
-var scaleHandler = BitmapScaleHandler.Create<Bitmap>(
-    source => (Bitmap)source.Clone(),
-    (source, size, interpolationMode) => 
-    {
-        var scaled = new Bitmap(size.Width, size.Height);
-        using (var graphics = Graphics.FromImage(scaled))
-        {
-            graphics.InterpolationMode = interpolationMode;
-            graphics.DrawImage(source, 0, 0, size.Width, size.Height);
-        }
-        return scaled;
-    },
-    bitmap => bitmap.Dispose()
-);
-
-// Original bitmap at 96 DPI
-var originalBitmap = new Bitmap("icon_16x16.png");
-
-// Scale for 144 DPI
-var scaledBitmap = scaleHandler.ScaleWithDpi(originalBitmap, 144);
-```
-
-### Automatic Bitmap Scaling in Forms
-
-When using `DpiAwareForm`, bitmaps in ImageLists are automatically scaled:
-
-```csharp
-using Dapplo.Windows.Dpi.Forms;
-using System.Windows.Forms;
-
-public class MyForm : DpiAwareForm
-{
-    private ImageList _imageList;
-
-    public MyForm()
-    {
-        InitializeComponent();
-        
-        // Add images at 96 DPI
-        _imageList = new ImageList { ImageSize = new Size(16, 16) };
-        _imageList.Images.Add(Image.FromFile("icon_16x16.png"));
-        
-        // Images will automatically scale when DPI changes
-    }
-}
-```
-
-## Working with Different DPI Contexts
-
-### Set Process DPI Awareness
-
-```csharp
-using Dapplo.Windows.Dpi;
-using Dapplo.Windows.Dpi.Enums;
-
-// Set DPI awareness for the entire process (call early in Main)
-DpiHandler.SetProcessDpiAwareness(DpiAwareness.PerMonitorAwareV2);
-```
-
-### DPI Awareness Levels
-
-- **Unaware**: Application is scaled by the system (bitmap stretching)
-- **SystemAware**: Single DPI for all monitors
-- **PerMonitorAware**: Different DPI per monitor (Windows 8.1+)
-- **PerMonitorAwareV2**: Enhanced per-monitor DPI (Windows 10 1703+)
-
-### Check Current DPI
-
-```csharp
-using Dapplo.Windows.Dpi;
-using Dapplo.Windows.User32;
-
-// Get DPI for specific monitor
-var monitor = User32Api.MonitorFromWindow(windowHandle, MonitorFrom.DefaultToNearest);
-uint dpiX, dpiY;
-DpiHandler.GetDpiForMonitor(monitor, MonitorDpiType.EffectiveDpi, out dpiX, out dpiY);
-
-Console.WriteLine($"Monitor DPI: {dpiX}x{dpiY}");
-```
-
-## DPI Change Events
-
-### Subscribe to Changes
-
-```csharp
-using Dapplo.Windows.Dpi;
-
-var dpiHandler = DpiHandler.Create(control);
-
-var subscription = dpiHandler.OnDpiChanged.Subscribe(dpiChangeInfo =>
-{
-    Console.WriteLine($"Old DPI: {dpiChangeInfo.OldDpi}");
-    Console.WriteLine($"New DPI: {dpiChangeInfo.NewDpi}");
-    Console.WriteLine($"Scale Factor: {dpiChangeInfo.ScaleFactor}");
-    
-    // Update UI elements
-    UpdateFonts(dpiChangeInfo);
-    UpdateImages(dpiChangeInfo);
-});
-
-// Don't forget to dispose
-subscription.Dispose();
-```
-
-### Handling DPI Changes in Custom Controls
-
-```csharp
-using Dapplo.Windows.Dpi;
-using System.Windows.Forms;
-
-public class DpiAwareButton : Button
-{
-    private DpiHandler _dpiHandler;
-    private int _baseFontSize = 9;
-
-    protected override void OnHandleCreated(EventArgs e)
-    {
-        base.OnHandleCreated(e);
-        
-        _dpiHandler = DpiHandler.Create(this);
-        _dpiHandler.OnDpiChanged.Subscribe(dpiInfo =>
-        {
-            // Scale font
-            float newSize = DpiCalculator.ScaleWithDpi(_baseFontSize, dpiInfo.NewDpi);
-            Font = new Font(Font.FontFamily, newSize);
-        });
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _dpiHandler?.Dispose();
-        }
-        base.Dispose(disposing);
-    }
-}
-```
-
-## Common DPI Values
-
-| DPI  | Scale Factor | Common Name |
-|------|--------------|-------------|
-| 96   | 100%         | Standard    |
-| 120  | 125%         | Medium      |
-| 144  | 150%         | Large       |
-| 192  | 200%         | Extra Large |
-
-## Best Practices
-
-### 1. Set DPI Awareness Early
-
-Call `SetProcessDpiAwareness` as early as possible in your application:
-
-```csharp
-using Dapplo.Windows.Dpi;
-using Dapplo.Windows.Dpi.Enums;
-
-static class Program
-{
-    [STAThread]
-    static void Main()
-    {
-        // Set DPI awareness before any UI is created
-        DpiHandler.SetProcessDpiAwareness(DpiAwareness.PerMonitorAwareV2);
-        
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new MainForm());
-    }
-}
-```
-
-### 2. Use Vector Graphics When Possible
-
-Vector graphics scale better than bitmaps:
-
-```csharp
-// Prefer fonts/text over bitmap icons
-// Use SVG or drawing APIs instead of fixed-size images
-```
-
-### 3. Provide Multiple Bitmap Sizes
-
-For best quality, provide bitmaps at multiple DPI levels:
-
-```csharp
-// icon_16x16.png  (96 DPI)
-// icon_20x20.png  (120 DPI)
-// icon_24x24.png  (144 DPI)
-// icon_32x32.png  (192 DPI)
-```
-
-### 4. Test at Different DPI Settings
-
-Test your application at various DPI settings:
-- 100% (96 DPI)
-- 125% (120 DPI)
-- 150% (144 DPI)
-- 200% (192 DPI)
-
-### 5. Handle DPI Changes Gracefully
-
-Users can change DPI without restarting:
-
-```csharp
-_dpiHandler.OnDpiChanged.Subscribe(dpiInfo =>
-{
-    // Reload images at new DPI
-    // Recalculate layouts
-    // Update font sizes
-    // Refresh UI
-});
-```
-
-## Application Manifest
-
-Add DPI awareness to your app.manifest:
+A process which is not DPI aware is scaled by Windows as a bitmap and looks blurry; nothing on this page changes that.
+Declare the awareness in the application manifest (`<ApplicationManifest>app.manifest</ApplicationManifest>` in the
+project file):
 
 ```xml
-<?xml version="1.0" encoding="utf-8"?>
-<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-  <application xmlns="urn:schemas-microsoft-com:asm.v3">
-    <windowsSettings>
-      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
-      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2, PerMonitor</dpiAwareness>
-    </windowsSettings>
-  </application>
-</assembly>
+<application xmlns="urn:schemas-microsoft-com:asm.v3">
+  <windowsSettings>
+    <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
+    <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2, PerMonitor</dpiAwareness>
+  </windowsSettings>
+</application>
 ```
 
-## Troubleshooting
+- .NET (Core) Windows Forms: also call `Application.SetHighDpiMode(HighDpiMode.PerMonitorV2)` or set
+  `<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>` in the project, so WinForms scales on DPI changes.
+- .NET Framework 4.8 Windows Forms: add `<add key="DpiAwareness" value="PerMonitorV2" />` to the
+  `System.Windows.Forms.ApplicationConfigurationSection` in app.config, otherwise WinForms doesn't scale on DPI changes.
+- WPF scales by itself when the process is Per Monitor aware.
 
-### Blurry Text or Controls
+If you can't use a manifest, call `NativeDpiMethods.EnableDpiAware()` before the first window is created:
 
-If controls appear blurry, ensure:
-1. DPI awareness is set correctly
-2. You're inheriting from `DpiAwareForm`
-3. The application manifest is configured
+<!-- sample: DpiSamples.EnableDpiAware -->
+```csharp
+// Prefer the manifest. If that's not possible, call this before any window is created:
+// it tries Per Monitor V2, then Per Monitor, and returns if the process is DPI aware afterwards.
+if (!NativeDpiMethods.EnableDpiAware())
+{
+    Console.WriteLine("The process is not DPI aware, Windows scales it as a bitmap");
+}
+```
 
-### Incorrect Scaling
+## Windows Forms
 
-If scaling is incorrect:
-1. Check the base DPI (should be 96)
-2. Verify DPI calculations
-3. Ensure events are properly subscribed
+### DpiAwareForm
 
-### Performance Issues
+Derive from `DpiAwareForm` (Dapplo.Windows.Forms). What it does:
 
-If DPI changes are slow:
-1. Cache scaled resources
-2. Use async loading for images
-3. Optimize layout calculations
+- It creates its window handle with the Per Monitor V2 awareness context (Per Monitor as fallback), even when the
+  thread or process uses another awareness. The awareness of the thread is restored right after.
+- On Per Monitor (v1) it enables the scaling of the non-client area (title bar, menus).
+- WM_DPICHANGED is always passed to WinForms. When WinForms handles the DPI change (it raises `Form.DpiChanged`), it
+  scales fonts and controls and applies the window bounds Windows suggests. That is the case on .NET 10 with a Per
+  Monitor V2 high DPI mode, and on .NET Framework 4.8 with the app.config setting above.
+- When WinForms doesn't handle it, only the window bounds are set to the rectangle Windows suggests. **The content is
+  not scaled**; do that yourself in `FormDpiHandler.OnDpiChanged`.
+- A cancelled `Form.DpiChanged` (`e.Cancel = true`) is respected, the bounds are not changed.
+- `FormDpiHandler` reports the DPI: the first time when the handle is created, then for every change. It survives
+  handle re-creation and is disposed with the form.
 
-## See Also
+<!-- sample: DpiSamples.DpiAwareForm -->
+```csharp
+public class MainForm : DpiAwareForm
+{
+    private readonly IDisposable _dpiSubscription;
 
-- [API Reference](../api/index.md)
-- [Getting Started](intro.md)
-- [Windows Forms Examples](https://github.com/dapplo/Dapplo.Windows/tree/master/src/Dapplo.Windows.Example.FormsExample)
-- [Microsoft DPI Documentation](https://docs.microsoft.com/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows)
+    public MainForm()
+    {
+        // FormDpiHandler is created by DpiAwareForm, OnDpiChanged fires with the first DPI when the handle is created,
+        // and for every change. WinForms scales the fonts and controls itself (Per Monitor V2), this is for everything else.
+        _dpiSubscription = FormDpiHandler.OnDpiChanged.Subscribe(info =>
+            Console.WriteLine($"DPI {info.PreviousDpi} -> {info.NewDpi}, scale factor {DpiCalculator.DpiScaleFactor(info.NewDpi)}"));
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _dpiSubscription.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+}
+```
+
+### A form that stays DPI unaware
+
+For a form which can't handle high DPI, derive from `DpiUnawareForm`. Windows then scales it as a bitmap: blurry, but
+the right size.
+
+<!-- sample: DpiSamples.DpiUnawareForm -->
+```csharp
+// Windows scales this form as a bitmap (blurry, but always the right size), even when the process is DPI aware
+public class LegacyForm : DpiUnawareForm
+{
+}
+```
+
+### AttachDpiHandler
+
+When you can't change the base class, attach a `DpiHandler` to a form. It moves and resizes the form to the rectangle
+Windows suggests on a DPI change and reports the DPI. It does not enable the non-client scaling of Per Monitor v1, for
+that you need `DpiAwareForm` (or call `DpiHandler.TryEnableNonClientDpiScaling(hWnd)` in WM_NCCREATE yourself).
+
+<!-- sample: DpiSamples.AttachDpiHandler -->
+```csharp
+public class SettingsForm : Form
+{
+    private readonly DpiHandler _dpiHandler;
+
+    public SettingsForm()
+    {
+        // Moves / resizes the form to the rectangle Windows suggests on a DPI change,
+        // and publishes the DPI. It's disposed together with the form.
+        _dpiHandler = this.AttachDpiHandler();
+        _dpiHandler.OnDpiChanged.Subscribe(info => Console.WriteLine($"Now at {info.NewDpi} DPI"));
+    }
+}
+```
+
+A `ContextMenuStrip` is a window of its own and can open on another monitor than its form:
+
+<!-- sample: DpiSamples.ContextMenu -->
+```csharp
+// A ContextMenuStrip is its own window, it can show up on another monitor than the form
+DpiHandler menuDpiHandler = contextMenuStrip.AttachDpiHandler();
+menuDpiHandler.OnDpiChanged.Subscribe(info => contextMenuStrip.ImageScalingSize = DpiCalculator.ScaleWithDpi(new Size(16, 16), info.NewDpi));
+```
+
+### Images
+
+`BitmapScaleHandler` provides a bitmap for the current DPI and applies it again on every DPI change. It owns the
+bitmaps: they are cached per DPI and disposed when the DPI changes or the handler is disposed, so the provider must
+return a new instance for every call. Dispose the handler on the UI thread.
+
+<!-- sample: DpiSamples.BitmapScaling -->
+```csharp
+public class ToolbarForm : DpiAwareForm
+{
+    private readonly ToolStripButton _saveButton = new ToolStripButton();
+    private readonly BitmapScaleHandler<string, Bitmap> _scaleHandler;
+
+    public ToolbarForm()
+    {
+        // Load the image from the form's resources, scale it for the current DPI, and apply it again on every DPI change.
+        // The handler owns and disposes the bitmaps.
+        _scaleHandler = BitmapScaleHandler.WithComponentResourceManager<Bitmap>(FormDpiHandler, GetType(), BitmapScaleHandler.SimpleBitmapScaler)
+            .AddTarget(_saveButton, "saveButton.Image", bitmap => bitmap);
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        // Dispose on the UI thread
+        _scaleHandler.Dispose();
+        base.OnClosing(e);
+    }
+}
+```
+
+`BitmapScaleHandler.SimpleBitmapScaler` scales with nearest neighbor: sharp pixels for icons, but blocky at
+uneven factors. For better results provide images for several sizes and pick the right one:
+
+<!-- sample: DpiSamples.CustomBitmapProvider -->
+```csharp
+// Pick the best source image for the DPI yourself, return a new Bitmap for every call: the handler disposes them
+var scaleHandler = BitmapScaleHandler.Create<string, Bitmap>(dpiHandler,
+    (name, dpi) => new Bitmap(dpi > 120 ? $"Images\\{name}@2x.png" : $"Images\\{name}.png"));
+
+scaleHandler.AddTargetAction(pictureBox, "logo", bitmap => pictureBox.Image = bitmap, execute: true);
+```
+
+## WPF
+
+WPF already renders in device independent units. With a Per Monitor manifest WPF follows the monitor DPI itself, and
+`AttachDpiHandler()` only reports the DPI. Only when the monitor DPI differs from the DPI WPF renders with (the process
+isn't Per Monitor aware, or WPF's per-monitor support is disabled), it applies a `LayoutTransform` to the content and
+moves the window to the rectangle Windows suggests. The handler is disposed with the window.
+
+<!-- sample: DpiSamples.Wpf -->
+```csharp
+// With a Per Monitor (V2) manifest WPF scales the window itself, the handler only reports the DPI.
+// Without it, a LayoutTransform is applied to the content when the monitor DPI differs from the DPI WPF renders with.
+DpiHandler dpiHandler = window.AttachDpiHandler();
+dpiHandler.OnDpiChanged.Subscribe(info => Console.WriteLine($"{window.Title} is now at {info.NewDpi} DPI"));
+```
+
+## Calculations
+
+96 DPI is 100 %. `DpiCalculator` scales and unscales numbers and the native structs; results are rounded, not
+truncated.
+
+<!-- sample: DpiSamples.Calculations -->
+```csharp
+// 96 DPI is 100%, 144 DPI is 150%
+int scaled = DpiCalculator.ScaleWithDpi(16, 144);      // 24
+int unscaled = DpiCalculator.UnscaleWithDpi(24, 144);  // 16
+float factor = DpiCalculator.DpiScaleFactor(120);     // 1.25
+
+// Structs are scaled too, values are rounded
+NativeSize iconSize = DpiCalculator.ScaleWithDpi(new NativeSize(32, 32), 120); // 40x40
+
+// From one DPI to another: 144 -> 96 is 0.667
+float factor144To96 = DpiCalculator.DpiScaleFactor(144, 96);
+```
+
+A `DpiHandler` knows the DPI of its window. `Dpi` is 96 until the DPI is known (`IsDpiKnown`).
+
+<!-- sample: DpiSamples.HandlerScaling -->
+```csharp
+// A DpiHandler knows the DPI of its window: Dpi is 96 until the first DPI is known (IsDpiKnown)
+int margin = dpiHandler.ScaleWithCurrentDpi(8);
+NativeSize buttonSize = dpiHandler.ScaleWithCurrentDpi(new NativeSize(75, 23));
+```
+
+| DPI | Scale |
+|---|---|
+| 96 | 100 % |
+| 120 | 125 % |
+| 144 | 150 % |
+| 168 | 175 % |
+| 192 | 200 % |
+
+## DPI of windows and monitors
+
+<!-- sample: DpiSamples.GetDpi -->
+```csharp
+// The DPI of a window, and of the monitor at a location
+int windowDpi = NativeDpiMethods.GetDpi(hWnd);
+int cursorDpi = NativeDpiMethods.GetDpi(User32Api.GetCursorLocation());
+
+// The DPI of every display
+foreach (var display in DisplayInfo.AllDisplayInfos)
+{
+    Console.WriteLine($"{display.DeviceName} {display.Bounds}: {NativeDpiMethods.GetDpi(display.Bounds.Location)} DPI");
+}
+```
+
+## Awareness contexts
+
+`DpiAwarenessContext` values are handles, and the handles Windows returns are not the same values as the constants.
+Compare them with `NativeDpiMethods.AreDpiAwarenessContextsEqual`. `ScopedThreadDpiAwarenessContext` creates windows
+with another awareness and restores the thread's awareness afterwards.
+
+<!-- sample: DpiSamples.AwarenessContext -->
+```csharp
+// Awareness contexts are handles: compare them with AreDpiAwarenessContextsEqual, not with ==
+var threadContext = NativeDpiMethods.GetThreadDpiAwarenessContext();
+bool isPerMonitorV2 = NativeDpiMethods.AreDpiAwarenessContextsEqual(threadContext, DpiAwarenessContext.PerMonitorAwareV2);
+
+// Create a window with another awareness, the previous context of the thread is restored when the scope is disposed
+using (NativeDpiMethods.ScopedThreadDpiAwarenessContext(DpiAwarenessContext.SystemAware))
+{
+    var toolWindow = new Form();
+    toolWindow.CreateControl();
+}
+```
+
+`NativeDpiMethods` also wraps `GetDpiForWindow`, `GetDpiForMonitor`, `GetSystemMetricsForDpi`,
+`AdjustWindowRectExForDpi`, `SetDialogDpiChangeBehavior` and more; `DpiApi` has convenience methods for system metrics
+and `SystemParametersInfo` for a DPI.
+
+## Testing
+
+Test with at least two monitors at different scale factors, and move the windows between them. Change the scale factor
+while the application runs, and start it on the secondary monitor. The example project
+[Dapplo.Windows.Example.FormsExample](https://github.com/dapplo/Dapplo.Windows/tree/master/src/Dapplo.Windows.Example.FormsExample)
+has forms for each approach.
+
+## See also
+
+- [Windows Forms and WPF](forms-and-wpf.md)
+- [High DPI desktop application development on Windows](https://learn.microsoft.com/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows)
