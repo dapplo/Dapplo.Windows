@@ -162,6 +162,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 - Raw-input monitors register when you subscribe and unregister when you dispose, and no longer overwrite each other's registrations (B-02, B-13); `RawInputDeviceMonitor` no longer throws for unknown devices (B-12).
 - F10 and the Alt key-up no longer report a phantom Alt (B-14); lock-key state is not flipped by auto-repeat (B-23).
 - `KeyHelper` display names are correct for extended keys and no longer throw for numpad * and / (B-19).
+- A `KeySequenceHandler` resets after a wrong combination regardless of the order in which its keys are released; before, releasing the modifier last left the sequence stuck on the failed stage.
 - Key combinations no longer stay blocked after a missed key-up (B-20); after a `KeySequenceHandler` timeout the first press restarts the sequence (B-21).
 - The clipboard is no longer left with partial data or leaked memory after a failed write (D-16); format-name caches are thread-safe and case-insensitive (D-17); `GetAsUnicodeString` has no trailing garbage (D-18); `GetFileNames` supports long paths (D-19); read errors are reported correctly (D-27); `SetAsStream` honours `size` (D-35).
 - `WindowsSessionListener` no longer crashes when `WTSRegisterSessionNotification` fails early at logon; it retries (B-11).

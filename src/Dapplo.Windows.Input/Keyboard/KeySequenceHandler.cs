@@ -15,6 +15,8 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
     private bool[] _isHandled;
     private int _offset;
     private DateTimeOffset? _expireAfter;
+    // True when a non-modifier key went down during the current (not first) stage without completing it
+    private bool _currentStageFailed;
 
     /// <summary>
     /// This sets the timeout time between key presses.
@@ -57,6 +59,7 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
     {
         _expireAfter = null;
         _offset = 0;
+        _currentStageFailed = false;
         for (var i = 0; i < _isHandled.Length; i++)
         {
             _isHandled[i] = false;
@@ -83,6 +86,7 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
         {
             _expireAfter = DateTimeOffset.Now.Add(Timeout.Value);
         }
+        _currentStageFailed = false;
         return ++_offset < _keyboardHookEventHandlers.Length;
     }
 
@@ -104,9 +108,20 @@ public class KeySequenceHandler : IKeyboardHookEventHandler
         {
             _isHandled[_offset] = true;
         }
-        else if (!keyboardHookEventArgs.IsKeyDown && _offset > 0 && currentNotPressed && !keyboardHookEventArgs.IsModifier)
+        else
         {
-            Reset();
+            if (keyboardHookEventArgs.IsKeyDown && _offset > 0 && !keyboardHookEventArgs.IsModifier && !_isHandled[_offset])
+            {
+                // A wrong key was pressed in this stage
+                _currentStageFailed = true;
+            }
+            // Reset when all keys of a failed stage are released. The key-up of a modifier alone doesn't reset the sequence,
+            // because a modifier of the previous stage can be released after the sequence advanced. The order in which the keys
+            // are released must not matter, so a failed stage also resets on the key-up of a modifier.
+            if (!keyboardHookEventArgs.IsKeyDown && _offset > 0 && currentNotPressed && (!keyboardHookEventArgs.IsModifier || _currentStageFailed))
+            {
+                Reset();
+            }
         }
 
         // Check if timeout passed, to reset the sequence

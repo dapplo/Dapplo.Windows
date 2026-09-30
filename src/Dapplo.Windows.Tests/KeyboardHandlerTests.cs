@@ -54,6 +54,28 @@ public class KeyboardHandlerTests
     }
 
     [Fact]
+    public void TestKeyHandler_KeySequenceHandler_Wrong_Right_ModifierReleasedLast()
+    {
+        var sequenceHandler = new KeySequenceHandler(
+            new KeyCombinationHandler(VirtualKeyCode.Print),
+            new KeyCombinationHandler(VirtualKeyCode.Shift, VirtualKeyCode.KeyA));
+
+        // First stage
+        Assert.False(sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print)));
+        Assert.False(sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Print)));
+        // Wrong second stage, released in reverse order so the modifier comes up last (like KeyboardInputGenerator.KeyCombinationPress)
+        Assert.False(sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Shift)));
+        Assert.False(sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyB)));
+        Assert.False(sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.KeyB)));
+        Assert.False(sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Shift)));
+        // The sequence must have been reset, so the full sequence triggers
+        Assert.False(sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Print)));
+        Assert.False(sequenceHandler.Handle(KeyboardHookEventArgs.KeyUp(VirtualKeyCode.Print)));
+        Assert.False(sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.Shift)));
+        Assert.True(sequenceHandler.Handle(KeyboardHookEventArgs.KeyDown(VirtualKeyCode.KeyA)));
+    }
+
+    [Fact]
     public void TestKeyHandler_KeySequenceHandler_Right()
     {
         var sequenceHandler = new KeySequenceHandler(

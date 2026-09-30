@@ -57,10 +57,11 @@ public class InteropWindowTests
     {
         var systray = InteropWindowQuery.GetTopWindows().FirstOrDefault(window => window.GetClassname() == "Shell_TrayWnd");
         Assert.NotNull(systray);
-        var clock = systray.GetDescendants().FirstOrDefault(window => window.GetClassname() == "TrayClockWClass");
-        Assert.NotNull(clock);
+        // The notification area exists on Windows 10 and 11 (the Windows 10 TrayClockWClass is XAML content on Windows 11)
+        var notificationArea = systray.GetDescendants().FirstOrDefault(window => window.GetClassname() == "TrayNotifyWnd");
+        Assert.NotNull(notificationArea);
 
-        var info = clock.GetInfo();
+        var info = notificationArea.GetInfo();
         Assert.True(info.ClientBounds.Width * info.ClientBounds.Height > 0);
     }
 
