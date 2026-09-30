@@ -200,10 +200,14 @@ jobs:
         if ($wrong.Count -gt 0) { throw "Packages with a different version: $($wrong.Name -join ', ')" }
         # Never re-use a version for different code: stop when its tag already exists on another commit
         git fetch --quiet --tags origin
+        if ($LASTEXITCODE -ne 0) { throw "Fetching the tags failed" }
+        # rev-parse exits with 1 when the tag doesn't exist, which is the normal case
         $tagCommit = git rev-parse --verify --quiet "refs/tags/v$version^{commit}"
         if ($tagCommit -and $tagCommit -ne $env:GITHUB_SHA) {
           throw "Version $version was already released from commit $tagCommit. Raise the version in src/version.json."
         }
+        # The step's exit code is the last native command's exit code, reset it
+        $global:LASTEXITCODE = 0
         Write-Host "Releasing version $version"
         "version=$version" >> $env:GITHUB_OUTPUT
 
