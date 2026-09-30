@@ -7,6 +7,14 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [Unreleased]
+
+### Fixed
+- Enlarged colour cursors with an alpha channel ("Make mouse pointer bigger") are rendered by `DrawIconEx` at the requested size instead of scaling up the 32x32 pixels, which looked blurry.
+
+### Changed
+- Every merge to `master` is released after approval of the `NuGet` environment; no tags need to be created by hand.
+
 ## [3.0.0] - 2026-09-30
 
 ### Changed
