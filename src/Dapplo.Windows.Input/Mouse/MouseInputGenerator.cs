@@ -93,7 +93,11 @@ public static class MouseInputGenerator
     ///     location, which is where the system delivers the wheel input. With <paramref name="restoreCursor"/> the cursor is moved
     ///     back to where it was afterwards, in the same SendInput call, so the wheel input is still processed at the location.
     /// </summary>
-    /// <param name="wheelDelta">int with the delta, one notch is 120 (WHEEL_DELTA); negative scrolls down (or left)</param>
+    /// <remarks>
+    ///     The location and the restored cursor position are physical screen coordinates; call this from a (per-monitor) DPI aware
+    ///     process, otherwise the system scales the coordinates and the cursor doesn't return to exactly the same place.
+    /// </remarks>
+    /// <param name="wheelDelta">int with the delta, one notch is 120 (WHEEL_DELTA); negative scrolls down, for the horizontal wheel negative scrolls left</param>
     /// <param name="location">NativePoint, in screen coordinates, where the mouse wheel takes place</param>
     /// <param name="restoreCursor">true to move the cursor back to its current location after the wheel input</param>
     /// <param name="horizontal">true for a horizontal wheel movement (MOUSEEVENTF_HWHEEL)</param>

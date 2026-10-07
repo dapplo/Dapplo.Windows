@@ -79,6 +79,24 @@ jobs:
           TestResults/**/*.trx
           TestResults/coverage/*.info
 
+    # Failed tests as annotations, so they are visible in the pull request (and via the checks API) without the logs
+    - name: Report failed tests
+      if: always()
+      run: |
+        function Escape-Data([string]$value) { $value -replace '%', '%25' -replace "`r", '%0D' -replace "`n", '%0A' }
+        function Escape-Property([string]$value) { (Escape-Data $value) -replace ':', '%3A' -replace ',', '%2C' }
+        $namespace = @{ t = 'http://microsoft.com/schemas/VisualStudio/TeamTest/2010' }
+        foreach ($trx in Get-ChildItem -Path TestResults -Recurse -Filter *.trx -File -ErrorAction SilentlyContinue) {
+          [xml]$xml = Get-Content -Path $trx.FullName -Raw
+          foreach ($result in (Select-Xml -Xml $xml -XPath '//t:UnitTestResult[@outcome="Failed"]' -Namespace $namespace)) {
+            $node = $result.Node
+            $errorInfo = $node.Output.ErrorInfo
+            $text = "$($errorInfo.Message)`n$((($errorInfo.StackTrace -split "`n") | Select-Object -First 4) -join "`n")"
+            if ($text.Length -gt 3000) { $text = $text.Substring(0, 3000) }
+            Write-Host "::error title=$(Escape-Property "$($trx.BaseName): $($node.testName)")::$(Escape-Data $text)"
+          }
+        }
+
     - name: Find coverage files
       id: coverage
       if: always()

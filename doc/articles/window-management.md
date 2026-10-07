@@ -330,8 +330,8 @@ default 1.0 = a page) to scroll part of a page per `Next()` / `Previous()`.
 | `ScrollMode` | A step of `StepFraction` |
 |---|---|
 | `AbsoluteWindowMessage` | The position moves by `max(1, PageSize * StepFraction)`, clamped to the range |
-| `WindowsMessage` | Below 1.0, `SB_LINEDOWN` / `SB_LINEUP` as often as approximates the fraction of `PageSize` (at least once); 1.0 sends `SB_PAGEDOWN` / `SB_PAGEUP` |
-| `MouseWheel` | `WheelDelta` (a page) times the fraction, rounded to whole notches (at least one); set `UseFractionalWheelDelta` for applications which handle high-resolution wheel deltas |
+| `WindowsMessage` | Below 1.0, `SB_LINEDOWN` / `SB_LINEUP` until the position moved by `max(1, PageSize * StepFraction)` scroll units (checked after every message, so windows which scroll in pixels work too); 1.0 sends `SB_PAGEDOWN` / `SB_PAGEUP` |
+| `MouseWheel` | `WheelDelta` (a page) times the fraction, rounded to whole notches (at least one); set `UseFractionalWheelDelta` for applications which handle high-resolution wheel deltas. A horizontal scroll bar gets horizontal wheel input |
 | `KeyboardPageUpDown` | The fraction is ignored, a key press scrolls a page |
 
 In `MouseWheel` mode the wheel input goes to the middle of `ScrollingWindow`. For an area inside a window (the page of a
@@ -356,14 +356,16 @@ dotnet add package Dapplo.Windows.Automation
   with a `ScrollPattern` which can scroll in that direction; `FromWindow(window, horizontal)` uses the window, the element in
   its middle or the first scrollable descendant.
 - `ViewportBounds` is the bounding rectangle of that element, `ScrollPercent` the position (0 to 100), `VisibleFraction` the
-  visible part of the content; `IsAtStart` / `IsAtEnd` allow `PercentTolerance` (0.5 percentage points).
+  visible part of the content; `IsAtStart` / `IsAtEnd` allow `PercentTolerance` (0.01 percentage points).
 - `Start()` / `End()` / `Next()` / `Previous()` / `Reset()` use `SetScrollPercent`, or `Scroll` with small or large increments
   when setting the percentage is not supported. A step of `StepFraction` moves the content by that part of the viewport.
 - `ScrollMode = UiAutomationScrollModes.MouseWheel` wheels at the viewport centre (or `WheelLocation`) one notch at a time
   until the position moved far enough, for controls which report the pattern but ignore it.
 - Use it on a background thread, never on the UI thread which owns the target window; an STA thread is not needed. When the
   element is gone (navigation, closed window) `IsAvailable` is false, `IsAtEnd` is true so loops end, and `Refresh()` finds
-  it again. Dispose it to release the COM objects.
+  it again. `Next()` returns false when the position didn't change, so a loop can't run forever. Chromium builds its
+  accessibility tree on the first request, so retry a `null` from `FromPoint` once after a short delay. Dispose it to release
+  the COM objects.
 
 Both scrollers implement `IScroller`, so one piece of code handles both:
 

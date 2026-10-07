@@ -149,8 +149,9 @@ public class WindowScrollerTests
 
         Assert.True(windowScroller.Next());
 
+        // An EDIT control pages by the visible lines, or one less, so the last line stays visible
         Assert.True(windowScroller.GetPosition(out var after));
-        Assert.Equal(before.Position + (int)before.PageSize, after.Position);
+        Assert.InRange(after.Position, before.Position + (int)before.PageSize - 1, before.Position + (int)before.PageSize);
     }
 
     [Fact]

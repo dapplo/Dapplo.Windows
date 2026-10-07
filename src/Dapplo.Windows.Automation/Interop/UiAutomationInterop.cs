@@ -38,6 +38,16 @@ internal static class UiaConstants
     public const int ElementNotAvailable = unchecked((int)0x80040201);
 
     public const int S_OK = 0;
+
+    /// <summary>
+    ///     True for the HRESULTs which mean that the element or its application is gone: UIA_E_ELEMENTNOTAVAILABLE,
+    ///     RPC_E_DISCONNECTED, RPC_S_SERVER_UNAVAILABLE, and COR_E_INVALIDOPERATION (e.g. a WPF dispatcher which has shut down)
+    /// </summary>
+    public static bool IsGone(int hResult) =>
+        hResult == ElementNotAvailable
+        || hResult == unchecked((int)0x80010108)
+        || hResult == unchecked((int)0x800706BA)
+        || hResult == unchecked((int)0x80131509);
 }
 
 /// <summary>

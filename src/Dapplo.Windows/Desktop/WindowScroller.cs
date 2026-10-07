@@ -166,8 +166,9 @@ public class WindowScroller : IScroller
     ///     The default 1.0 scrolls a full page as before; a scrolling capture uses e.g. 0.5 so consecutive frames overlap.
     ///     <list type="bullet">
     ///         <item><see cref="ScrollModes.AbsoluteWindowMessage"/>: the position moves by <c>max(1, PageSize * StepFraction)</c>, clamped to the range.</item>
-    ///         <item><see cref="ScrollModes.WindowsMessage"/>: below 1.0, <c>SB_LINEDOWN</c> / <c>SB_LINEUP</c> is sent <see cref="CalculateLineSteps"/> times
-    ///         (scroll units, which for most windows are lines, so this approximates the fraction); 1.0 sends <c>SB_PAGEDOWN</c> / <c>SB_PAGEUP</c>.</item>
+    ///         <item><see cref="ScrollModes.WindowsMessage"/>: below 1.0, <c>SB_LINEDOWN</c> / <c>SB_LINEUP</c> is sent until the position moved by
+    ///         <c>max(1, PageSize * StepFraction)</c> scroll units (checked after every message, at most <see cref="CalculateLineSteps"/> messages);
+    ///         1.0 sends <c>SB_PAGEDOWN</c> / <c>SB_PAGEUP</c>.</item>
     ///         <item><see cref="ScrollModes.MouseWheel"/>: the wheel moves by <see cref="WheelDelta"/> (a page) times the fraction, see <see cref="ScaleWheelDelta"/>.</item>
     ///         <item><see cref="ScrollModes.KeyboardPageUpDown"/>: the fraction is ignored, a key press always scrolls a page.</item>
     ///     </list>
@@ -217,9 +218,25 @@ public class WindowScroller : IScroller
     public bool UseFractionalWheelDelta { get; set; }
 
     /// <summary>
-    ///     The visible, scrolling area: the client area of the <see cref="ScrollingWindow"/> in screen coordinates, retrieved fresh on every call
+    ///     The visible, scrolling area: the client area of the <see cref="ScrollingWindow"/> (of its parent when that is a scroll bar control,
+    ///     <see cref="ScrollBarTypes.Control"/>) in screen coordinates, retrieved fresh on every call
     /// </summary>
-    public NativeRect ViewportBounds => ScrollingWindow.GetInfo(true).ClientBounds;
+    public NativeRect ViewportBounds
+    {
+        get
+        {
+            // When the scrolling window is a scroll bar control itself (ScrollBarTypes.Control), the scrolled area is its parent
+            if (ScrollBarType == ScrollBarTypes.Control && ScrollBarWindow is not null && ScrollBarWindow.Handle == ScrollingWindow.Handle)
+            {
+                var parentHandle = User32Api.GetParent(ScrollingWindow.Handle);
+                if (parentHandle != IntPtr.Zero)
+                {
+                    return InteropWindowFactory.CreateFor(parentHandle).GetInfo(true).ClientBounds;
+                }
+            }
+            return ScrollingWindow.GetInfo(true).ClientBounds;
+        }
+    }
 
     /// <summary>
     ///     The mouse wheel delta for a step of <paramref name="stepFraction"/> of a page.
@@ -242,8 +259,9 @@ public class WindowScroller : IScroller
     }
 
     /// <summary>
-    ///     The number of SB_LINEDOWN / SB_LINEUP messages for a step of <paramref name="stepFraction"/> of a page:
-    ///     <c>round(pageSize * stepFraction)</c>, at least 1 and at most <see cref="MaxLineSteps"/>.
+    ///     The maximum number of SB_LINEDOWN / SB_LINEUP messages for a step of <paramref name="stepFraction"/> of a page:
+    ///     <c>round(pageSize * stepFraction)</c>, at least 1 and at most <see cref="MaxLineSteps"/>. For windows whose scroll units are
+    ///     lines this is the exact number; for others the step stops earlier, as soon as the position moved far enough.
     /// </summary>
     /// <param name="pageSize">uint with the page size from the ScrollInfo, in scroll units</param>
     /// <param name="stepFraction">double, greater than 0 and at most 1</param>
@@ -262,7 +280,8 @@ public class WindowScroller : IScroller
 
     /// <summary>
     ///     The position after a step of <paramref name="stepFraction"/> of a page in <see cref="ScrollModes.AbsoluteWindowMessage"/>:
-    ///     the position moves by <c>max(1, round(pageSize * stepFraction))</c> and is clamped to the range (minimum to maximum, as before).
+    ///     the position moves by <c>max(1, round(pageSize * stepFraction))</c> (by exactly <paramref name="pageSize"/> for 1.0, as before)
+    ///     and is clamped to the range (minimum to maximum, as before).
     /// </summary>
     /// <param name="position">int with the current position</param>
     /// <param name="minimum">int with the minimum of the range</param>
@@ -274,7 +293,8 @@ public class WindowScroller : IScroller
     public static int CalculateStepPosition(int position, int minimum, int maximum, uint pageSize, double stepFraction, bool forward)
     {
         ValidateStepFraction(stepFraction);
-        var step = (long)Math.Max(1, Math.Round(pageSize * stepFraction));
+        // A full page moves by exactly the page size, as before (also when the page size is 0)
+        var step = stepFraction >= 1 ? pageSize : (long)Math.Max(1, Math.Round(pageSize * stepFraction));
         return forward
             ? (int)Math.Min(maximum, position + step)
             : (int)Math.Max(minimum, position - step);
@@ -474,13 +494,7 @@ public class WindowScroller : IScroller
                     result = SendScrollMessage(forward ? ScrollBarCommands.SB_PAGEDOWN : ScrollBarCommands.SB_PAGEUP);
                     break;
                 }
-                // Without scroll information one line is the best approximation
-                var lines = hasScrollInfo ? CalculateLineSteps(scrollInfoBefore.PageSize, stepFraction) : 1;
-                result = true;
-                for (var line = 0; line < lines && result; line++)
-                {
-                    result = SendScrollMessage(forward ? ScrollBarCommands.SB_LINEDOWN : ScrollBarCommands.SB_LINEUP);
-                }
+                result = SendLineMessages(forward, hasScrollInfo, scrollInfoBefore, stepFraction);
                 break;
             case ScrollModes.AbsoluteWindowMessage:
                 if (!hasScrollInfo)
@@ -494,11 +508,53 @@ public class WindowScroller : IScroller
                 break;
             case ScrollModes.MouseWheel:
                 var wheelDelta = fullPage ? EffectiveWheelDelta : ScaleWheelDelta(EffectiveWheelDelta, stepFraction, UseFractionalWheelDelta);
+                if (ScrollBarType == ScrollBarTypes.Horizontal)
+                {
+                    // The horizontal wheel: positive is right
+                    result = MouseInputGenerator.MoveMouseWheelAt(forward ? wheelDelta : -wheelDelta, GetWheelLocation(), RestoreCursorAfterWheel, true);
+                    break;
+                }
                 // Negative is down (towards the user)
                 result = MouseInputGenerator.MoveMouseWheelAt(forward ? -wheelDelta : wheelDelta, GetWheelLocation(), RestoreCursorAfterWheel);
                 break;
         }
         return result;
+    }
+
+    /// <summary>
+    ///     Send line messages until the position moved by the fraction of a page. The scroll units of most windows are lines, but some
+    ///     (e.g. RichEdit, WinForms AutoScroll panels) use pixels, where a line message scrolls many units: so the position is checked
+    ///     after every message (SendMessage is synchronous), and <see cref="CalculateLineSteps"/> is only the upper bound.
+    /// </summary>
+    private bool SendLineMessages(bool forward, bool hasScrollInfo, ScrollInfo scrollInfoBefore, double stepFraction)
+    {
+        var command = forward ? ScrollBarCommands.SB_LINEDOWN : ScrollBarCommands.SB_LINEUP;
+        if (!hasScrollInfo)
+        {
+            // Without scroll information one line is the best approximation
+            return SendScrollMessage(command);
+        }
+        var target = (long)Math.Max(1, Math.Round(scrollInfoBefore.PageSize * stepFraction));
+        var maxMessages = CalculateLineSteps(scrollInfoBefore.PageSize, stepFraction);
+        var previousPosition = scrollInfoBefore.Position;
+        for (var message = 0; message < maxMessages; message++)
+        {
+            if (!SendScrollMessage(command))
+            {
+                return false;
+            }
+            if (!GetPosition(out var scrollInfo) || scrollInfo.Position == previousPosition)
+            {
+                // No scroll information anymore, or the position doesn't change (the start or end is reached)
+                return true;
+            }
+            previousPosition = scrollInfo.Position;
+            if (Math.Abs((long)scrollInfo.Position - scrollInfoBefore.Position) >= target)
+            {
+                return true;
+            }
+        }
+        return true;
     }
 
     /// <summary>

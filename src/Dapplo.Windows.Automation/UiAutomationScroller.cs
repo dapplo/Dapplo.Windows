@@ -25,10 +25,14 @@ namespace Dapplo.Windows.Automation;
 ///     An STA thread is not needed.
 ///     </para>
 ///     <para>
-///     Every property and method calls into the target process, so they always reflect the current state; a step needs about three
-///     calls. When the element is gone (the page navigated, the window closed), <see cref="IsAvailable"/> becomes false,
+///     Every property and method calls into the target process, so they always reflect the current state; a step needs about four
+///     calls (position, view size, set, and one or more to see the new position). When the element is gone (the page navigated, the window closed), <see cref="IsAvailable"/> becomes false,
 ///     <see cref="IsAtEnd"/> and <see cref="IsAtStart"/> return true so loops end, and the methods return false;
 ///     <see cref="Refresh"/> finds the element again at the original location.
+///     </para>
+///     <para>
+///     Chromium based applications (Chrome, Edge, Electron) build their accessibility tree when the first UI Automation client asks,
+///     so the very first <see cref="FromPoint"/> can return null: try again after a short delay.
 ///     </para>
 ///     <para>
 ///     Dispose it to release the COM objects right away instead of waiting for the garbage collector.
@@ -39,9 +43,10 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     private static readonly LogSource Log = new LogSource();
 
     /// <summary>
-    ///     How often, and with which interval in milliseconds, the position is checked after a mouse wheel movement
+    ///     How often, and with which interval in milliseconds, the position is checked after scrolling (at most half a second, only
+    ///     spent when the position doesn't change or an application applies it late, like WPF at its next layout pass)
     /// </summary>
-    private const int PositionChangeChecks = 15;
+    private const int PositionChangeChecks = 50;
     private const int PositionChangeCheckInterval = 10;
 
     private readonly IUIAutomation _automation;
@@ -142,10 +147,11 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     public double InitialScrollPercent { get; private set; }
 
     /// <summary>
-    ///     The tolerance in percentage points for <see cref="IsAtStart"/> and <see cref="IsAtEnd"/>, some applications never report exactly 0 or 100.
-    ///     Default is 0.5.
+    ///     The tolerance in percentage points for <see cref="IsAtStart"/> and <see cref="IsAtEnd"/>, for applications which don't report
+    ///     exactly 0 or 100 because of rounding. Default is 0.01: the percentage is relative to the whole scrollable range, so on a page
+    ///     of 50 screens even 0.5 would already be a quarter of a screen.
     /// </summary>
-    public double PercentTolerance { get; set; } = 0.5;
+    public double PercentTolerance { get; set; } = 0.01;
 
     /// <summary>
     ///     The part of a page that <see cref="Next"/> and <see cref="Previous"/> scroll, greater than 0 and at most 1.
@@ -256,12 +262,11 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         {
             return false;
         }
-        if (!SetScrollPercent(InitialScrollPercent))
+        if (Math.Abs(before - InitialScrollPercent) <= PercentTolerance)
         {
-            return false;
+            return true;
         }
-        WaitForPercentChange(before, out _);
-        return true;
+        return SetScrollPercent(InitialScrollPercent) && WaitForPercentChange(before, out _);
     }
 
     /// <summary>
@@ -319,10 +324,17 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             }
             return false;
         }
-        if (TryGetScrollPercent(out var before) && SetScrollPercent(percent))
+        if (!TryGetScrollPercent(out var before) || before < 0)
         {
-            WaitForPercentChange(before, out _);
+            return false;
+        }
+        if (Math.Abs(before - percent) <= PercentTolerance)
+        {
             return true;
+        }
+        if (SetScrollPercent(percent))
+        {
+            return WaitForPercentChange(before, out var after) || Math.Abs(after - percent) <= PercentTolerance;
         }
         // SetScrollPercent not supported: large increments until the end
         for (var step = 0; step < MaxIncrementsPerStep; step++)
@@ -366,10 +378,10 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
 
         if (target >= 0 && SetScrollPercent(target))
         {
-            // Some frameworks (e.g. WPF) apply the position at their next layout pass: wait a little, so a capture right after
-            // this call sees the new position and IsAtEnd is up to date
-            WaitForPercentChange(percent, out _);
-            return true;
+            // Some frameworks (e.g. WPF) apply the position at their next layout pass: wait for it, so a capture right after this call
+            // sees the new position and IsAtEnd is up to date. A control which accepts the call but doesn't move returns false, so a
+            // "while (!IsAtEnd && Next())" loop ends; use UiAutomationScrollModes.MouseWheel for such a control.
+            return WaitForPercentChange(percent, out _);
         }
         if (!IsAvailable)
         {
@@ -404,7 +416,20 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     /// </summary>
     private bool WheelUntil(bool forward, double startPercent, double target)
     {
-        var location = WheelLocation ?? CenterOf(ViewportBounds);
+        NativePoint location;
+        if (WheelLocation.HasValue)
+        {
+            location = WheelLocation.Value;
+        }
+        else
+        {
+            var viewport = ViewportBounds;
+            if (viewport.IsEmpty)
+            {
+                return false;
+            }
+            location = CenterOf(viewport);
+        }
         var moved = false;
         var before = startPercent;
         for (var notch = 0; notch < MaxIncrementsPerStep; notch++)
@@ -510,7 +535,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         {
             return true;
         }
-        if (hResult == UiaConstants.ElementNotAvailable)
+        if (UiaConstants.IsGone(hResult))
         {
             IsAvailable = false;
         }

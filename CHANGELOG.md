@@ -12,12 +12,16 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 Everything Greenshot needs for a scrolling capture: scroll part of a page, wheel at the right spot, and scroll windows which draw their own scroll bars.
 
 ### Added
-- `WindowScroller.StepFraction` (greater than 0, at most 1, default 1.0 = a page as before): `Next()` / `Previous()` scroll part of a page, so the frames of a scrolling capture overlap. `AbsoluteWindowMessage` moves by `max(1, PageSize * fraction)` (clamped), `WindowsMessage` sends `SB_LINEDOWN` / `SB_LINEUP` as often as approximates the fraction (1.0 still sends `SB_PAGEDOWN`), `MouseWheel` scales `WheelDelta` by the fraction rounded to whole notches (`UseFractionalWheelDelta` for exact deltas), `KeyboardPageUpDown` ignores it. Helpers: `ScaleWheelDelta`, `CalculateLineSteps`, `CalculateStepPosition`. `End()` / `Start()` in `MouseWheel` mode still use full pages.
+- `WindowScroller.StepFraction` (greater than 0, at most 1, default 1.0 = a page as before): `Next()` / `Previous()` scroll part of a page, so the frames of a scrolling capture overlap. `AbsoluteWindowMessage` moves by `max(1, PageSize * fraction)` (clamped), `WindowsMessage` sends `SB_LINEDOWN` / `SB_LINEUP` until the position moved by that many scroll units, checked after every message so windows which scroll in pixels work too (1.0 still sends `SB_PAGEDOWN`), `MouseWheel` scales `WheelDelta` by the fraction rounded to whole notches (`UseFractionalWheelDelta` for exact deltas), `KeyboardPageUpDown` ignores it. Helpers: `ScaleWheelDelta`, `CalculateLineSteps`, `CalculateStepPosition`. `End()` / `Start()` in `MouseWheel` mode still use full pages.
 - `WindowScroller.WheelLocation` (default: the middle of `ScrollingWindow` as before) and `RestoreCursorAfterWheel` (default off): the cursor, which the system needs at the wheel location, is moved back in the same `SendInput` call.
 - `WindowScroller.ViewportBounds`: the client area of the scrolling window in screen coordinates.
 - `IScroller` (`IsAtStart`, `IsAtEnd`, `StepFraction`, `ViewportBounds`, `Start`, `End`, `Next`, `Previous`, `Reset`), implemented by `WindowScroller` and `UiAutomationScroller`, so a caller tries `GetWindowScroller()` first and falls back to UI Automation with one code path.
 - New package **Dapplo.Windows.Automation** with `UiAutomationScroller`: scrolls Chromium / Electron, Firefox, WPF, WinUI, Office and the Explorer file list via the UI Automation `ScrollPattern`, using the native UI Automation COM API (no WPF dependency on `net10.0-windows`). `FromPoint(point, horizontal)` walks up from the element under the point to the first scrollable one, `FromWindow(window, horizontal)`; `ViewportBounds`, `ScrollPercent`, `VisibleFraction`, `IsAtStart` / `IsAtEnd` with `PercentTolerance`; `SetScrollPercent` with a fallback to `Scroll` increments; a `MouseWheel` mode for controls which report the pattern but ignore it; `IsAvailable` / `Refresh()` when the element is gone. Use it from a background thread, not from the UI thread which owns the target window.
 - `MouseInputGenerator.MoveMouseHorizontalWheel`, `MouseInput.MoveMouseHorizontalWheel` and `MouseInputGenerator.MoveMouseWheelAt(delta, location, restoreCursor, horizontal)`.
+- CI reports failed tests as annotations, so they are visible in the pull request.
+
+### Fixed
+- `WindowScroller` in `MouseWheel` mode sends horizontal wheel input (`MOUSEEVENTF_HWHEEL`) for a horizontal scroll bar; it sent vertical wheel input.
 
 ## [3.2.0]
 
