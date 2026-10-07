@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>UI Automation helpers for Dapplo.Windows, e.g. scrolling windows which draw their own scroll bars (browsers, Electron, WPF, WinUI, Office) for a scrolling capture. Uses the native UI Automation COM API, no WPF needed.</Description>
+    <PackageTags>windows native ui-automation uia scrolling</PackageTags>
+    <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows\Dapplo.Windows.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Input\Dapplo.Windows.Input.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.User32\Dapplo.Windows.User32.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapplo.Log" Version="3.0.22" />
+  </ItemGroup>
+</Project>

@@ -10,6 +10,7 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Dapplo.Windows.App;
+using Dapplo.Windows.Automation;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
@@ -275,6 +276,40 @@ public static class WindowSamples
             }
         }
         scroller.Reset();                 // back to the original position
+        #endregion
+    }
+
+    public static void ScrollingCapture(IInteropWindow window, NativePoint clickedPoint, Action<NativeRect> captureFrame)
+    {
+        #region ScrollingCapture
+        // Windows with a Win32 scroll bar: WindowScroller; browsers, Electron, WPF, WinUI, Office: UI Automation.
+        // Both implement IScroller. Run this on a background thread, not on the UI thread of the window.
+        IScroller scroller = window.GetWindowScroller();
+        scroller ??= UiAutomationScroller.FromPoint(clickedPoint);   // or UiAutomationScroller.FromWindow(window)
+        if (scroller == null)
+        {
+            return;                       // nothing to scroll here
+        }
+        try
+        {
+            scroller.StepFraction = 0.5;  // half a page per step, so consecutive frames overlap for stitching
+            scroller.Start();
+            captureFrame(scroller.ViewportBounds);
+            while (!scroller.IsAtEnd)
+            {
+                if (!scroller.Next())
+                {
+                    break;
+                }
+                // Give the application time to paint, then capture the visible part
+                captureFrame(scroller.ViewportBounds);
+            }
+            scroller.Reset();             // back to where the user was
+        }
+        finally
+        {
+            (scroller as IDisposable)?.Dispose();   // releases the UI Automation COM objects
+        }
         #endregion
     }
 
