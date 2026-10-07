@@ -41,7 +41,7 @@ internal abstract class ScrollTestWindow : IDisposable
         };
         _thread.SetApartmentState(ApartmentState.STA);
         _thread.Start();
-        if (!_ready.Task.Wait(TimeSpan.FromSeconds(10)))
+        if (!_ready.Task.Wait(TimeSpan.FromSeconds(30)))
         {
             throw new TimeoutException($"The test window {name} didn't start");
         }
@@ -186,12 +186,14 @@ internal sealed class WpfScrollTestWindow : ScrollTestWindow
             ShowInTaskbar = false,
             Content = _scrollViewer
         };
-        _window.ContentRendered += (_, _) =>
+        // Ready after the layout pass, at ContextIdle priority (after layout and input, before idle), without depending on the render
+        // thread: ContentRendered sometimes didn't come within the timeout on a busy CI runner (.NET Framework)
+        _window.Loaded += (_, _) => _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
         {
             WindowHandle = new WpfWindows.Interop.WindowInteropHelper(_window).Handle;
             ScrollingHandle = WindowHandle;
             SignalReady();
-        };
+        }));
         _window.Closed += (_, _) => _dispatcher.InvokeShutdown();
         _window.Show();
         Dispatcher.Run();
