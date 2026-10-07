@@ -132,6 +132,20 @@ public struct MouseInput
     }
 
     /// <summary>
+    ///     Create a MouseInput struct for a horizontal wheel move (MOUSEEVENTF_HWHEEL), a positive value scrolls to the right
+    /// </summary>
+    /// <param name="wheelDelta">How much does the wheel move, one notch is 120 (WHEEL_DELTA)</param>
+    /// <param name="location">Location of the event</param>
+    /// <param name="timestamp">The time stamp for the event, null or 0 lets the system provide the time stamp</param>
+    /// <returns>MouseInput</returns>
+    public static MouseInput MoveMouseHorizontalWheel(int wheelDelta, NativePoint? location = null, uint? timestamp = null)
+    {
+        var mouseInput = MoveMouseWheel(wheelDelta, location, timestamp);
+        mouseInput.MouseEventFlags = (mouseInput.MouseEventFlags & ~MouseEventFlags.Wheel) | MouseEventFlags.HorizontalWheel;
+        return mouseInput;
+    }
+
+    /// <summary>
     ///     Create a MouseInput struct for a mouse move
     /// </summary>
     /// <param name="location">Where is the click located</param>

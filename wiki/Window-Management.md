@@ -136,6 +136,46 @@ using Bitmap bitmap = window.PrintWindow();
 bitmap?.Save("window.png", ImageFormat.Png);
 ```
 
+## Scrolling
+
+`window.GetWindowScroller()` scrolls windows with a Win32 scroll bar; for windows which draw their own scroll bars (browsers,
+Electron, WPF, WinUI, Office) the **Dapplo.Windows.Automation** package has `UiAutomationScroller`, which uses the UI
+Automation `ScrollPattern`. Both implement `IScroller`. `StepFraction` scrolls part of a page per step, so the frames of a
+scrolling capture overlap; `ViewportBounds` is the area to capture. See
+[Window management](https://www.dapplo.net/Dapplo.Windows/articles/window-management.html#scrolling) for the details.
+
+<!-- sample: WindowSamples.ScrollingCapture -->
+```csharp
+// Windows with a Win32 scroll bar: WindowScroller; browsers, Electron, WPF, WinUI, Office: UI Automation.
+// Both implement IScroller. Run this on a background thread, not on the UI thread of the window.
+IScroller scroller = window.GetWindowScroller();
+scroller ??= UiAutomationScroller.FromPoint(clickedPoint);   // or UiAutomationScroller.FromWindow(window)
+if (scroller == null)
+{
+    return;                       // nothing to scroll here
+}
+try
+{
+    scroller.StepFraction = 0.5;  // half a page per step, so consecutive frames overlap for stitching
+    scroller.Start();
+    captureFrame(scroller.ViewportBounds);
+    while (!scroller.IsAtEnd)
+    {
+        if (!scroller.Next())
+        {
+            break;
+        }
+        // Give the application time to paint, then capture the visible part
+        captureFrame(scroller.ViewportBounds);
+    }
+    scroller.Reset();             // back to where the user was
+}
+finally
+{
+    (scroller as IDisposable)?.Dispose();   // releases the UI Automation COM objects
+}
+```
+
 ## Window events
 
 `WinEventHook` events arrive on the thread of the [[SharedMessageWindow]]. Filter on

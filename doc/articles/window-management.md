@@ -11,7 +11,7 @@ dotnet add package Dapplo.Windows
 Namespaces used on this page: `Dapplo.Windows.Desktop`, `Dapplo.Windows.Enums`, `Dapplo.Windows.User32`,
 `Dapplo.Windows.User32.Enums`, `Dapplo.Windows.User32.Structs`, `Dapplo.Windows.Common.Structs`, `Dapplo.Windows.App`,
 `Dapplo.Windows.Icons`, `Dapplo.Windows.Software`, `Dapplo.Windows.Messages`, `Dapplo.Windows.Messages.Enums`,
-`System.Reactive.Linq`.
+`System.Reactive.Linq`, `Dapplo.Windows.Input.Mouse` and, for UI Automation, `Dapplo.Windows.Automation`.
 
 ## Window information
 
@@ -297,8 +297,10 @@ using var smallIcon = window.GetIcon<Bitmap>();
 using var largeIcon = window.GetIcon<Icon>(useLargeIcons: true);
 ```
 
-`GetWindowScroller()` returns a `WindowScroller` for a window with a scroll bar, for example to capture a long page in
-parts. It returns `null` when the window can't be scrolled.
+## Scrolling
+
+`GetWindowScroller()` returns a `WindowScroller` for a window with a Win32 scroll bar, for example to capture a long page in
+parts. It returns `null` when the window can't be scrolled that way.
 
 <!-- sample: WindowSamples.Scroll -->
 ```csharp
@@ -318,6 +320,83 @@ while (!scroller.IsAtEnd)
     }
 }
 scroller.Reset();                 // back to the original position
+```
+
+### Scrolling capture
+
+A scrolling capture stitches frames, so consecutive frames must overlap: set `StepFraction` (greater than 0, at most 1,
+default 1.0 = a page) to scroll part of a page per `Next()` / `Previous()`.
+
+| `ScrollMode` | A step of `StepFraction` |
+|---|---|
+| `AbsoluteWindowMessage` | The position moves by `max(1, PageSize * StepFraction)`, clamped to the range |
+| `WindowsMessage` | Below 1.0, `SB_LINEDOWN` / `SB_LINEUP` as often as approximates the fraction of `PageSize` (at least once); 1.0 sends `SB_PAGEDOWN` / `SB_PAGEUP` |
+| `MouseWheel` | `WheelDelta` (a page) times the fraction, rounded to whole notches (at least one); set `UseFractionalWheelDelta` for applications which handle high-resolution wheel deltas |
+| `KeyboardPageUpDown` | The fraction is ignored, a key press scrolls a page |
+
+In `MouseWheel` mode the wheel input goes to the middle of `ScrollingWindow`. For an area inside a window (the page of a
+browser, a list in a dialog) set `WheelLocation` (screen coordinates). The system delivers wheel input to the window under
+the cursor, so the cursor moves there; `RestoreCursorAfterWheel = true` moves it back after every wheel movement (in the
+same `SendInput` call). `MouseInputGenerator.MoveMouseWheelAt(delta, location, restoreCursor, horizontal)` does the same
+for your own wheel input.
+
+`ViewportBounds` is the scrolling area in screen coordinates, to crop the frames.
+
+### Windows without a Win32 scroll bar: UI Automation
+
+Chromium / Electron, Firefox, WPF, WinUI, Office and the Explorer file list draw their own scroll bars, so
+`GetWindowScroller()` returns `null` for them. The **Dapplo.Windows.Automation** package scrolls them with the UI Automation
+`ScrollPattern`, using the native UI Automation COM API (no WPF needed):
+
+```powershell
+dotnet add package Dapplo.Windows.Automation
+```
+
+- `UiAutomationScroller.FromPoint(screenPoint, horizontal)` takes the element under the point and walks up to the first one
+  with a `ScrollPattern` which can scroll in that direction; `FromWindow(window, horizontal)` uses the window, the element in
+  its middle or the first scrollable descendant.
+- `ViewportBounds` is the bounding rectangle of that element, `ScrollPercent` the position (0 to 100), `VisibleFraction` the
+  visible part of the content; `IsAtStart` / `IsAtEnd` allow `PercentTolerance` (0.5 percentage points).
+- `Start()` / `End()` / `Next()` / `Previous()` / `Reset()` use `SetScrollPercent`, or `Scroll` with small or large increments
+  when setting the percentage is not supported. A step of `StepFraction` moves the content by that part of the viewport.
+- `ScrollMode = UiAutomationScrollModes.MouseWheel` wheels at the viewport centre (or `WheelLocation`) one notch at a time
+  until the position moved far enough, for controls which report the pattern but ignore it.
+- Use it on a background thread, never on the UI thread which owns the target window; an STA thread is not needed. When the
+  element is gone (navigation, closed window) `IsAvailable` is false, `IsAtEnd` is true so loops end, and `Refresh()` finds
+  it again. Dispose it to release the COM objects.
+
+Both scrollers implement `IScroller`, so one piece of code handles both:
+
+<!-- sample: WindowSamples.ScrollingCapture -->
+```csharp
+// Windows with a Win32 scroll bar: WindowScroller; browsers, Electron, WPF, WinUI, Office: UI Automation.
+// Both implement IScroller. Run this on a background thread, not on the UI thread of the window.
+IScroller scroller = window.GetWindowScroller();
+scroller ??= UiAutomationScroller.FromPoint(clickedPoint);   // or UiAutomationScroller.FromWindow(window)
+if (scroller == null)
+{
+    return;                       // nothing to scroll here
+}
+try
+{
+    scroller.StepFraction = 0.5;  // half a page per step, so consecutive frames overlap for stitching
+    scroller.Start();
+    captureFrame(scroller.ViewportBounds);
+    while (!scroller.IsAtEnd)
+    {
+        if (!scroller.Next())
+        {
+            break;
+        }
+        // Give the application time to paint, then capture the visible part
+        captureFrame(scroller.ViewportBounds);
+    }
+    scroller.Reset();             // back to where the user was
+}
+finally
+{
+    (scroller as IDisposable)?.Dispose();   // releases the UI Automation COM objects
+}
 ```
 
 ## Window events

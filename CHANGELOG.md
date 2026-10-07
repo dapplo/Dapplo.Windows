@@ -7,6 +7,18 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.3.0]
+
+Everything Greenshot needs for a scrolling capture: scroll part of a page, wheel at the right spot, and scroll windows which draw their own scroll bars.
+
+### Added
+- `WindowScroller.StepFraction` (greater than 0, at most 1, default 1.0 = a page as before): `Next()` / `Previous()` scroll part of a page, so the frames of a scrolling capture overlap. `AbsoluteWindowMessage` moves by `max(1, PageSize * fraction)` (clamped), `WindowsMessage` sends `SB_LINEDOWN` / `SB_LINEUP` as often as approximates the fraction (1.0 still sends `SB_PAGEDOWN`), `MouseWheel` scales `WheelDelta` by the fraction rounded to whole notches (`UseFractionalWheelDelta` for exact deltas), `KeyboardPageUpDown` ignores it. Helpers: `ScaleWheelDelta`, `CalculateLineSteps`, `CalculateStepPosition`. `End()` / `Start()` in `MouseWheel` mode still use full pages.
+- `WindowScroller.WheelLocation` (default: the middle of `ScrollingWindow` as before) and `RestoreCursorAfterWheel` (default off): the cursor, which the system needs at the wheel location, is moved back in the same `SendInput` call.
+- `WindowScroller.ViewportBounds`: the client area of the scrolling window in screen coordinates.
+- `IScroller` (`IsAtStart`, `IsAtEnd`, `StepFraction`, `ViewportBounds`, `Start`, `End`, `Next`, `Previous`, `Reset`), implemented by `WindowScroller` and `UiAutomationScroller`, so a caller tries `GetWindowScroller()` first and falls back to UI Automation with one code path.
+- New package **Dapplo.Windows.Automation** with `UiAutomationScroller`: scrolls Chromium / Electron, Firefox, WPF, WinUI, Office and the Explorer file list via the UI Automation `ScrollPattern`, using the native UI Automation COM API (no WPF dependency on `net10.0-windows`). `FromPoint(point, horizontal)` walks up from the element under the point to the first scrollable one, `FromWindow(window, horizontal)`; `ViewportBounds`, `ScrollPercent`, `VisibleFraction`, `IsAtStart` / `IsAtEnd` with `PercentTolerance`; `SetScrollPercent` with a fallback to `Scroll` increments; a `MouseWheel` mode for controls which report the pattern but ignore it; `IsAvailable` / `Refresh()` when the element is gone. Use it from a background thread, not from the UI thread which owns the target window.
+- `MouseInputGenerator.MoveMouseHorizontalWheel`, `MouseInput.MoveMouseHorizontalWheel` and `MouseInputGenerator.MoveMouseWheelAt(delta, location, restoreCursor, horizontal)`.
+
 ## [3.2.0]
 
 What Greenshot still had to do itself around the clipboard moves into Dapplo.Windows.Clipboard, so every application gets it right.
