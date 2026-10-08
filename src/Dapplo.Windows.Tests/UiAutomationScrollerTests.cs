@@ -509,11 +509,15 @@ public class UiAutomationScrollerTests
 
         Assert.True(scroller.IsAtStart);
         Assert.Equal(0, testWindow.Offset, 1);
-        // A step from the start moves the content and the position as expected
-        Assert.True(scroller.Next());
-        Assert.InRange(testWindow.Offset, halfPage * 0.25, halfPage * 2);
-        Assert.True(scroller.Start());
-        Assert.Equal(0, testWindow.Offset, 1);
+        if (exposure == ScrollBarExposure.RangeValue)
+        {
+            // After Start the position read is the content's: a step moves both as expected. (With only a thumb a notch on this
+            // long content moves less than a thumb pixel, a step can't see that.)
+            Assert.True(scroller.Next());
+            Assert.InRange(testWindow.Offset, halfPage * 0.25, halfPage * 2);
+            Assert.True(scroller.Start());
+            Assert.Equal(0, testWindow.Offset, 1);
+        }
 
         Assert.True(scroller.End());
 

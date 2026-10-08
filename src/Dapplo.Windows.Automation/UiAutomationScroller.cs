@@ -498,7 +498,8 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     ///     The position is read from the scroll bar: its RangeValue pattern (Value, Minimum, Maximum, LargeChange), else the position of
     ///     its thumb between its line buttons, see <see cref="IsPositionKnown"/>. A thumb tells the position to a pixel: on long content
     ///     <see cref="IsAtStart"/> / <see cref="IsAtEnd"/> can be true while up to a thumb pixel's worth of content is left (compare the
-    ///     captured frames when that matters), and a step whose notch didn't move the thumb ends after that notch and returns true; <see cref="Start"/>, <see cref="End"/> and <see cref="Reset"/> to the start or end wheel a
+    ///     captured frames when that matters), and when one wheel notch moves the content less than a thumb pixel a step can't see it
+    ///     move and returns false; <see cref="Start"/>, <see cref="End"/> and <see cref="Reset"/> to the start or end wheel a
     ///     little further to make up for it.
     /// </summary>
     public bool IsScrollBarFallback { get; private set; }
@@ -1011,14 +1012,6 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             }
             if (!WaitForPercentChange(before, out var after))
             {
-                // A thumb moves in whole pixels: on long content (a thumb pixel is a large part of the step) a notch moves the content
-                // less than that, so the step ends here (smaller than asked); at the start or end of the thumb's track nothing could move.
-                // With a finer thumb a notch which didn't move it means that nothing moved.
-                if (_thumbPixelPercent > 0 && target >= 0 && _thumbPixelPercent * 4 > Math.Abs(target - startPercent)
-                    && IsAvailable && (forward ? before < 100 - PercentTolerance : before > PercentTolerance))
-                {
-                    return true;
-                }
                 Log.Verbose().WriteLine("Scroll position didn't change after a mouse wheel notch, stopping.");
                 return moved;
             }
