@@ -7,6 +7,16 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.6.0]
+
+Fixes for the scroll bar fallback of `UiAutomationScroller`, found with Greenshot's scrolling capture of the Visual Studio Output pane.
+
+### Changed
+- The area of a control without a `ScrollPattern` leaves out its scroll bar: `ViewportBounds` of a `IsScrollBarFallback` scroller and the scroll bar areas of `FindScrollableAreas` are the parent's bounds minus the scroll bar when it lies at an edge (right / left for a vertical one, bottom / top for a horizontal one), and minus a scroll bar of the other orientation at an edge (in `FindScrollableAreas` from the same search, for the scroller one more search when it is created). A scroll bar elsewhere leaves the bounds as they are; `ScrollPattern` elements are unchanged.
+
+### Fixed
+- `Start()` / `End()` in `MouseWheel` mode stopped after 100 pages and could return true far from the start or end. With a known position they now wheel several pages per input (independent of `StepFraction`; more notches when one input didn't move a thumb) until the start / end is reached or the position stops moving, limited by the remaining percentage, and return false when it wasn't reached. `Reset()` does the same for the initial position. A writable scroll bar RangeValue is still set first, and only trusted when the position read back got there. The large increments of a `ScrollPattern` without `SetScrollPercent` have a limit from the remaining percentage as well. Without a known position the behaviour is unchanged (true only when `IsAtStart` / `IsAtEnd` already is).
+
 ## [3.5.0]
 
 Scroll controls which have no UI Automation `ScrollPattern` but expose their scroll bar, like the Visual Studio editor.

@@ -338,7 +338,10 @@ public class UiAutomationScrollerTests
     public void FindScrollableAreas_IncludesTheParentOfAScrollBar(ScrollBarExposure exposure)
     {
         using var testWindow = new ScrollBarOnlyTestWindow(exposure);
-        var expected = testWindow.ControlBounds;
+        // The control without its scroll bar: a capture of the area doesn't show it
+        var expected = testWindow.ContentBounds;
+        var control = testWindow.ControlBounds;
+        Assert.True(expected.Width < control.Width);
         var windowBounds = InteropWindowFactory.CreateFor(testWindow.WindowHandle).GetInfo(true).Bounds;
 
         var areas = UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle);
@@ -346,6 +349,7 @@ public class UiAutomationScrollerTests
         Assert.True(areas.Any(a => IsNear(a, expected)), $"The control {expected} is missing: {Describe(areas)}");
         AssertInside(windowBounds, areas);
         // Only ScrollPattern elements: nothing here; and the scroll bar is vertical
+        Assert.DoesNotContain(areas, a => IsNear(a, control));
         Assert.DoesNotContain(UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle, false, null, false), a => IsNear(a, expected));
         Assert.DoesNotContain(UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle, horizontal: true), a => IsNear(a, expected));
     }
@@ -367,7 +371,7 @@ public class UiAutomationScrollerTests
     public void FromPoint_ScrollBarOnly_ReturnsAWheelScroller(ScrollBarExposure exposure)
     {
         using var testWindow = new ScrollBarOnlyTestWindow(exposure);
-        var bounds = testWindow.ControlBounds;
+        var bounds = testWindow.ContentBounds;
         var center = ScrollTestWindow.CenterOf(bounds);
         testWindow.SkipWhenNotVisibleAt(center);
 
@@ -431,6 +435,83 @@ public class UiAutomationScrollerTests
         Assert.True(scroller.Reset());   // created at the start
         Assert.True(scroller.IsAtStart);
         Assert.Equal(0, testWindow.Offset, 1);
+    }
+
+    /// <summary>
+    ///     A horizontal scroll bar at the bottom of a vertically scrolled area is cut off too
+    /// </summary>
+    [Fact]
+    public void ScrollBarOnly_AreaExcludesBothScrollBars()
+    {
+        using var testWindow = new ScrollBarOnlyTestWindow(withHorizontalScrollBar: true);
+        var expected = testWindow.ContentBounds;
+        var control = testWindow.ControlBounds;
+        Assert.True(expected.Height < control.Height && expected.Width < control.Width);
+
+        var areas = UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle);
+        Assert.True(areas.Any(a => IsNear(a, expected)), $"The content {expected} is missing: {Describe(areas)}");
+        // The horizontal scroll bar gives an area too, without both scroll bars as well
+        Assert.True(UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle, horizontal: true).Any(a => IsNear(a, expected)));
+
+        var center = ScrollTestWindow.CenterOf(expected);
+        testWindow.SkipWhenNotVisibleAt(center);
+        using var scroller = UiAutomationScroller.FromPoint(center);
+        Assert.NotNull(scroller);
+        Assert.True(IsNear(scroller.ViewportBounds, expected), $"{scroller.ViewportBounds} is not {expected}");
+    }
+
+    private static NativeRect CutScrollBar(NativeRect area, NativeRect scrollBar, bool scrollBarIsHorizontal)
+    {
+        var method = typeof(UiAutomationScroller).GetMethod("CutScrollBar", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        Assert.NotNull(method);
+        return (NativeRect)method.Invoke(null, [area, scrollBar, scrollBarIsHorizontal]);
+    }
+
+    [Fact]
+    public void CutScrollBar_OnlyAtAnEdge()
+    {
+        var area = new NativeRect(100, 100, 400, 300);
+        // Vertical at the right, at the left, in the middle
+        Assert.Equal(new NativeRect(100, 100, 383, 300), CutScrollBar(area, new NativeRect(483, 100, 17, 300), false));
+        Assert.Equal(new NativeRect(117, 100, 383, 300), CutScrollBar(area, new NativeRect(100, 100, 17, 300), false));
+        Assert.Equal(area, CutScrollBar(area, new NativeRect(300, 100, 17, 300), false));
+        // Horizontal at the bottom, outside the area, too short
+        Assert.Equal(new NativeRect(100, 100, 400, 283), CutScrollBar(area, new NativeRect(100, 383, 383, 17), true));
+        Assert.Equal(area, CutScrollBar(area, new NativeRect(100, 400, 400, 17), true));
+        Assert.Equal(area, CutScrollBar(area, new NativeRect(100, 383, 100, 17), true));
+    }
+
+    /// <summary>
+    ///     Start from far down: many more than 100 steps of half a page; with the RangeValue it is set, with only a thumb it wheels
+    ///     several pages at a time
+    /// </summary>
+    [Theory]
+    [InlineData(ScrollBarExposure.RangeValue)]
+    [InlineData(ScrollBarExposure.ThumbOnly)]
+    public void ScrollBarOnly_StartAndEnd_ReachTheLimitsOfLongContent(ScrollBarExposure exposure)
+    {
+        using var testWindow = new ScrollBarOnlyTestWindow(exposure, lineCount: 3000);
+        var center = ScrollTestWindow.CenterOf(testWindow.ContentBounds);
+        testWindow.SkipWhenNotVisibleAt(center);
+        testWindow.ScrollTo(double.MaxValue);
+        var halfPage = testWindow.ContentBounds.Height / 2.0;
+        using var scroller = UiAutomationScroller.FromPoint(center);
+        Assert.NotNull(scroller);
+        Assert.True(scroller.IsAtEnd);
+        scroller.StepFraction = 0.5;
+        scroller.RestoreCursorAfterWheel = true;
+        // In device independent pixels against physical ones, at 100% or more scaling this is at least the number of half pages
+        Assert.True(testWindow.Offset / halfPage > 100, $"Only {testWindow.Offset / halfPage} half pages");
+
+        Assert.True(scroller.Start());
+
+        Assert.True(scroller.IsAtStart);
+        Assert.Equal(0, testWindow.Offset, 1);
+
+        Assert.True(scroller.End());
+
+        Assert.True(scroller.IsAtEnd);
+        Assert.Equal(testWindow.MaxOffset, testWindow.Offset, 1);
     }
 
     /// <summary>
