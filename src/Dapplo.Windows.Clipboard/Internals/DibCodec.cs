@@ -257,6 +257,22 @@ internal static class DibCodec
 
     public static byte[] Encode(ReadOnlySpan<byte> bgra32, int width, int height, int stride, bool premultipliedAlpha, bool isV5)
     {
+        var result = new byte[GetEncodedSize(bgra32.Length, width, height, stride, isV5)];
+        Encode(bgra32, width, height, stride, premultipliedAlpha, isV5, result);
+        return result;
+    }
+
+    /// <summary>
+    /// Validate the arguments and calculate the size of the encoded DIB (header and pixels)
+    /// </summary>
+    /// <param name="bgra32Length">int with the length of the pixel data</param>
+    /// <param name="width">int with the width</param>
+    /// <param name="height">int with the height</param>
+    /// <param name="stride">int with the bytes per row of the pixel data</param>
+    /// <param name="isV5">true for a BITMAPV5HEADER, false for a BITMAPINFOHEADER</param>
+    /// <returns>int with the number of bytes</returns>
+    public static int GetEncodedSize(int bgra32Length, int width, int height, int stride, bool isV5)
+    {
         if (width <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(width), width, "The width must be positive.");
@@ -265,40 +281,59 @@ internal static class DibCodec
         {
             throw new ArgumentOutOfRangeException(nameof(height), height, "The height must be positive.");
         }
-        if (stride < width * 4)
+        if (stride < (long)width * 4)
         {
             throw new ArgumentOutOfRangeException(nameof(stride), stride, "The stride must be at least width * 4.");
         }
-        if (bgra32.Length < (long)stride * (height - 1) + width * 4)
+        if (bgra32Length < (long)stride * (height - 1) + (long)width * 4)
         {
-            throw new ArgumentException("The pixel data is smaller than stride * height.", nameof(bgra32));
+            throw new ArgumentException("The pixel data is smaller than stride * height.", "bgra32");
+        }
+        var size = (isV5 ? V5HeaderSize : InfoHeaderSize) + (long)width * 4 * height;
+        if (size > int.MaxValue)
+        {
+            throw new ArgumentException("The bitmap is too large for a DIB.", "bgra32");
+        }
+        return (int)size;
+    }
+
+    /// <summary>
+    /// Encode BGRA32 pixels as a DIB into the destination, which must have at least <see cref="GetEncodedSize"/> bytes
+    /// </summary>
+    public static void Encode(ReadOnlySpan<byte> bgra32, int width, int height, int stride, bool premultipliedAlpha, bool isV5, Span<byte> destination)
+    {
+        var size = GetEncodedSize(bgra32.Length, width, height, stride, isV5);
+        if (destination.Length < size)
+        {
+            throw new ArgumentException($"The destination has {destination.Length} bytes, the DIB needs {size}.", nameof(destination));
         }
         var headerSize = isV5 ? V5HeaderSize : InfoHeaderSize;
         var imageSize = width * 4 * height;
-        var result = new byte[headerSize + imageSize];
+        // The destination may not be zeroed (e.g. pooled memory), the unused header fields must be 0
+        destination.Slice(0, headerSize).Clear();
 
-        WriteUInt32(result, 0, (uint)headerSize);
-        WriteInt32(result, 4, width);
+        WriteUInt32(destination, 0, (uint)headerSize);
+        WriteInt32(destination, 4, width);
         // Positive height: bottom-up, which every reader supports
-        WriteInt32(result, 8, height);
-        WriteUInt16(result, 12, 1);
-        WriteUInt16(result, 14, 32);
-        WriteUInt32(result, 16, isV5 ? BiBitfields : BiRgb);
-        WriteUInt32(result, 20, (uint)imageSize);
+        WriteInt32(destination, 8, height);
+        WriteUInt16(destination, 12, 1);
+        WriteUInt16(destination, 14, 32);
+        WriteUInt32(destination, 16, isV5 ? BiBitfields : BiRgb);
+        WriteUInt32(destination, 20, (uint)imageSize);
         if (isV5)
         {
-            WriteUInt32(result, 40, 0x00FF0000);
-            WriteUInt32(result, 44, 0x0000FF00);
-            WriteUInt32(result, 48, 0x000000FF);
-            WriteUInt32(result, 52, 0xFF000000);
-            WriteUInt32(result, 56, LcsSrgb);
-            WriteUInt32(result, 108, LcsGmImages);
+            WriteUInt32(destination, 40, 0x00FF0000);
+            WriteUInt32(destination, 44, 0x0000FF00);
+            WriteUInt32(destination, 48, 0x000000FF);
+            WriteUInt32(destination, 52, 0xFF000000);
+            WriteUInt32(destination, 56, LcsSrgb);
+            WriteUInt32(destination, 108, LcsGmImages);
         }
 
         for (var y = 0; y < height; y++)
         {
             var source = bgra32.Slice(y * stride, width * 4);
-            var targetRow = headerSize + (height - 1 - y) * width * 4;
+            var target = destination.Slice(headerSize + (height - 1 - y) * width * 4, width * 4);
             for (var x = 0; x < width * 4; x += 4)
             {
                 var b = source[x];
@@ -311,13 +346,12 @@ internal static class DibCodec
                     g = Unpremultiply(g, a);
                     r = Unpremultiply(r, a);
                 }
-                result[targetRow + x] = b;
-                result[targetRow + x + 1] = g;
-                result[targetRow + x + 2] = r;
-                result[targetRow + x + 3] = a;
+                target[x] = b;
+                target[x + 1] = g;
+                target[x + 2] = r;
+                target[x + 3] = a;
             }
         }
-        return result;
     }
 
     private static byte Unpremultiply(byte value, byte alpha)
@@ -407,7 +441,7 @@ internal static class DibCodec
     private static uint ReadUInt32(byte[] data, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset, 4));
     private static int ReadInt32(byte[] data, int offset) => BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(offset, 4));
     private static ushort ReadUInt16(byte[] data, int offset) => BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(offset, 2));
-    private static void WriteUInt32(byte[] data, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(data.AsSpan(offset, 4), value);
-    private static void WriteInt32(byte[] data, int offset, int value) => BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(offset, 4), value);
-    private static void WriteUInt16(byte[] data, int offset, ushort value) => BinaryPrimitives.WriteUInt16LittleEndian(data.AsSpan(offset, 2), value);
+    private static void WriteUInt32(Span<byte> data, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(data.Slice(offset, 4), value);
+    private static void WriteInt32(Span<byte> data, int offset, int value) => BinaryPrimitives.WriteInt32LittleEndian(data.Slice(offset, 4), value);
+    private static void WriteUInt16(Span<byte> data, int offset, ushort value) => BinaryPrimitives.WriteUInt16LittleEndian(data.Slice(offset, 2), value);
 }

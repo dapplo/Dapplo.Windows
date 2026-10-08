@@ -208,7 +208,7 @@ public sealed class ClipboardContents
         }
     }
 
-    private ClipboardContents Add(uint formatId, Action<IClipboardAccessToken> place)
+    internal ClipboardContents Add(uint formatId, Action<IClipboardAccessToken> place)
     {
         if (formatId == 0)
         {
