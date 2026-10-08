@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -113,16 +114,26 @@ public static class InteropWindowQuery
     }
 
     /// <summary>
-    ///     Get the windows the user sees as application windows (see <see cref="IsVisibleApplicationWindow"/>), from top to bottom:
-    ///     visible, not minimized, with a title and a size, no tool window and no child window.
+    ///     Get the windows the user sees as application windows (see <see cref="IsVisibleApplicationWindow(IInteropWindow, bool, bool)"/>), from top to bottom:
+    ///     visible (and not cloaked), not minimized unless <paramref name="includeMinimized"/>, with a title and a size, no tool window and no child window.
     ///     The windows are a snapshot taken by <see cref="GetTopWindows"/> when this method is called, the filter is applied lazily while enumerating the result.
     /// </summary>
     /// <param name="ignoreKnownClasses">true (default) to ignore windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <param name="includeMinimized">true to include minimized windows, e.g. for a "capture this window" menu which restores the window first</param>
     /// <returns>IEnumerable with the visible application windows</returns>
-    public static IEnumerable<IInteropWindow> GetVisibleApplicationWindows(bool ignoreKnownClasses = true)
+    public static IEnumerable<IInteropWindow> GetVisibleApplicationWindows(bool ignoreKnownClasses = true, bool includeMinimized = false)
     {
-        return GetTopWindows().Where(window => window.IsVisibleApplicationWindow(ignoreKnownClasses));
+        return GetTopWindows().Where(window => window.IsVisibleApplicationWindow(ignoreKnownClasses, includeMinimized));
     }
+
+    /// <summary>
+    ///     Get the windows the user sees as application windows, see <see cref="GetVisibleApplicationWindows(bool, bool)"/>.
+    ///     Kept for binary compatibility.
+    /// </summary>
+    /// <param name="ignoreKnownClasses">true to ignore windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <returns>IEnumerable with the visible application windows</returns>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static IEnumerable<IInteropWindow> GetVisibleApplicationWindows(bool ignoreKnownClasses) => GetVisibleApplicationWindows(ignoreKnownClasses, false);
 
     /// <summary>
     ///     Get the windows in Z-order, from top (front) to bottom (back), without any filter.
@@ -170,7 +181,8 @@ public static class InteropWindowQuery
 
     /// <summary>
     /// Is the specified window a visible popup: a top-level window (it can be owned, it has no parent) with the WS_POPUP style,
-    /// which has a size, is rendered normally, is visible (WS_VISIBLE) and is not minimized. Unlike <see cref="IsVisibleApplicationWindow"/> tool windows and windows without a title are included.
+    /// which is visible (WS_VISIBLE and not cloaked), has a size and is not minimized. Unlike <see cref="IsVisibleApplicationWindow(IInteropWindow, bool, bool)"/>
+    /// tool windows and windows without a title are included.
     /// </summary>
     /// <param name="interopWindow">IInteropWindow</param>
     /// <param name="ignoreKnownClasses">true (default) to ignore windows with a class from <see cref="IgnoreClasses"/></param>
@@ -182,8 +194,17 @@ public static class InteropWindowQuery
             return false;
         }
 
+        // Most windows are invisible, reject them before the more expensive checks. IsWindowVisible (WS_VISIBLE, e.g. not the hidden preview
+        // windows of Firefox) and not cloaked (on another virtual desktop, or a suspended UWP app)
+        if (!interopWindow.IsVisible())
+        {
+            return false;
+        }
+
+        // Get the info for the size, the style & extended style
+        var windowInfo = interopWindow.GetInfo();
         // Windows without size
-        if (interopWindow.GetInfo().Bounds.IsEmpty)
+        if (windowInfo.Bounds.IsEmpty)
         {
             return false;
         }
@@ -194,16 +215,7 @@ public static class InteropWindowQuery
             return false;
         }
 
-        // Get the info for the style & extended style
-        var windowInfo = interopWindow.GetInfo();
-        var windowStyle = windowInfo.Style;
-        if ((windowStyle & WindowStyleFlags.WS_POPUP) == 0)
-        {
-            return false;
-        }
-        var exWindowStyle = windowInfo.ExtendedStyle;
-        // Skip everything which is not rendered "normally"
-        if (!interopWindow.IsWin8App() && (exWindowStyle & ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP) != 0)
+        if ((windowInfo.Style & WindowStyleFlags.WS_POPUP) == 0)
         {
             return false;
         }
@@ -212,26 +224,41 @@ public static class InteropWindowQuery
         {
             return false;
         }
-        // Skip preview windows, like the one from Firefox
-        if ((windowStyle & WindowStyleFlags.WS_VISIBLE) == 0)
-        {
-            return false;
-        }
         return !interopWindow.IsMinimized();
     }
 
     /// <summary>
+    ///     Check if the window is what the user sees as an application window (e.g. what Alt+Tab shows), see <see cref="IsVisibleApplicationWindow(IInteropWindow, bool, bool)"/>.
+    ///     Kept for binary compatibility.
+    /// </summary>
+    /// <param name="interopWindow">InteropWindow</param>
+    /// <param name="ignoreKnownClasses">true to ignore windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <returns>true if the window is a visible application window</returns>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static bool IsVisibleApplicationWindow(this IInteropWindow interopWindow, bool ignoreKnownClasses) => interopWindow.IsVisibleApplicationWindow(ignoreKnownClasses, false);
+
+    /// <summary>
     ///     Check if the window is what the user sees as an application window (e.g. what Alt+Tab shows):
-    ///     a top-level window (it can be owned, it has no parent) with a size, which is not a tool window (WS_EX_TOOLWINDOW), is rendered normally,
-    ///     is not a background Windows 10 app, is visible (WS_VISIBLE), has a title and is not minimized.
+    ///     a top-level window (it can be owned, it has no parent) which is visible (WS_VISIBLE and not cloaked, so not on another virtual desktop
+    ///     and no suspended UWP app), has a size, is not a tool window (WS_EX_TOOLWINDOW), is not a background Windows 10 app, has a title and
+    ///     is not minimized (unless <paramref name="includeMinimized"/>).
+    ///     Windows which render with DirectComposition (WS_EX_NOREDIRECTIONBITMAP, e.g. Chromium based browsers) are included.
     ///     This method will retrieve all information, and fill it to the interopWindow, it needs to make the decision.
     /// </summary>
     /// <param name="interopWindow">InteropWindow</param>
     /// <param name="ignoreKnownClasses">true (default) to ignore windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <param name="includeMinimized">true to accept minimized windows (their bounds are the small off-screen rectangle, which is not empty)</param>
     /// <returns>true if the window is a visible application window</returns>
-    public static bool IsVisibleApplicationWindow(this IInteropWindow interopWindow, bool ignoreKnownClasses = true)
+    public static bool IsVisibleApplicationWindow(this IInteropWindow interopWindow, bool ignoreKnownClasses = true, bool includeMinimized = false)
     {
         if (ignoreKnownClasses && interopWindow.CanIgnoreClass())
+        {
+            return false;
+        }
+
+        // Most windows are invisible, reject them before the more expensive checks. IsWindowVisible (WS_VISIBLE, e.g. not the hidden preview
+        // windows of Firefox) and not cloaked (on another virtual desktop, or a suspended UWP app)
+        if (!interopWindow.IsVisible())
         {
             return false;
         }
@@ -249,14 +276,7 @@ public static class InteropWindowQuery
             return false;
         }
 
-        var exWindowStyle = info.ExtendedStyle;
-        if ((exWindowStyle & ExtendedWindowStyleFlags.WS_EX_TOOLWINDOW) != 0)
-        {
-            return false;
-        }
-
-        // Skip everything which is not rendered "normally"
-        if (!interopWindow.IsWin8App() && (exWindowStyle & ExtendedWindowStyleFlags.WS_EX_NOREDIRECTIONBITMAP) != 0)
+        if ((info.ExtendedStyle & ExtendedWindowStyleFlags.WS_EX_TOOLWINDOW) != 0)
         {
             return false;
         }
@@ -267,17 +287,11 @@ public static class InteropWindowQuery
             return false;
         }
 
-        // Skip preview windows, windows without WS_VISIBLE, like the one from Firefox
-        if ((info.Style & WindowStyleFlags.WS_VISIBLE) == 0)
-        {
-            return false;
-        }
-
         // Ignore windows without title
         if (interopWindow.GetCaption().Length == 0)
         {
             return false;
         }
-        return !interopWindow.IsMinimized();
+        return includeMinimized || !interopWindow.IsMinimized();
     }
 }

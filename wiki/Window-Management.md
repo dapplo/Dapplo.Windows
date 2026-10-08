@@ -22,9 +22,11 @@ Console.WriteLine($"Visible: {window.IsVisible()}, minimized: {window.IsMinimize
 
 ## Finding windows
 
-`GetVisibleApplicationWindows()` returns the application windows a user sees: visible, not minimized, with a title, no tool
-windows. `GetTopWindows()` returns all top-level windows without a filter, `GetTopWindows(parent)` and
-`window.GetChildren()` the direct children. All of them are in Z-order (top-most first) and are a snapshot taken at
+`GetVisibleApplicationWindows()` returns the application windows a user sees: visible and not cloaked (not on another
+virtual desktop), not minimized (unless `includeMinimized: true`), with a title, no tool windows; Chromium based browsers
+are included. `GetTopWindows()` returns all top-level windows without a filter, `GetTopWindows(parent)` and
+`window.GetChildren()` the direct children (`GetChildren(allLevels: true)` the whole tree from one enumeration,
+`window.FindChildAt(point)` the deepest visible child at a point). All of them are in Z-order (top-most first) and are a snapshot taken at
 once with `EnumWindows` / `EnumChildWindows` when you call them, so they can't loop or skip windows while the Z-order
 changes.
 
