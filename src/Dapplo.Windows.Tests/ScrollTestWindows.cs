@@ -395,6 +395,7 @@ internal sealed class ScrollBarOnlyTestWindow : ScrollTestWindow
     private readonly ScrollBarExposure _exposure;
     private readonly int _lineCount;
     private readonly bool _withHorizontalScrollBar;
+    private readonly bool _followsValueChanges;
     private WpfWindows.Window _window;
     private ScrollBarOnlyControl _control;
     private Dispatcher _dispatcher;
@@ -402,19 +403,23 @@ internal sealed class ScrollBarOnlyTestWindow : ScrollTestWindow
     /// <param name="exposure">ScrollBarExposure, what the vertical scroll bar tells UI Automation</param>
     /// <param name="lineCount">int with the number of lines of 20 pixels</param>
     /// <param name="withHorizontalScrollBar">true for a horizontal scroll bar at the bottom of the content too</param>
-    public ScrollBarOnlyTestWindow(ScrollBarExposure exposure = ScrollBarExposure.RangeValue, int lineCount = ScrollBarOnlyControl.DefaultLineCount, bool withHorizontalScrollBar = false)
+    /// <param name="followsValueChanges">false: the content only follows the Scroll events of the scroll bar and the wheel, like the
+    ///     Visual Studio editor, so setting the scroll bar's value via UI Automation moves only the scroll bar</param>
+    public ScrollBarOnlyTestWindow(ScrollBarExposure exposure = ScrollBarExposure.RangeValue, int lineCount = ScrollBarOnlyControl.DefaultLineCount, bool withHorizontalScrollBar = false,
+        bool followsValueChanges = true)
         : base(nameof(ScrollBarOnlyTestWindow), start: false)
     {
         _exposure = exposure;
         _lineCount = lineCount;
         _withHorizontalScrollBar = withHorizontalScrollBar;
+        _followsValueChanges = followsValueChanges;
         Start();
     }
 
     protected override void Run()
     {
         _dispatcher = Dispatcher.CurrentDispatcher;
-        _control = new ScrollBarOnlyControl(_exposure, _lineCount, _withHorizontalScrollBar);
+        _control = new ScrollBarOnlyControl(_exposure, _lineCount, _withHorizontalScrollBar, _followsValueChanges);
         _window = new WpfWindows.Window
         {
             Title = "Dapplo.Windows scroll bar only test",
@@ -453,10 +458,14 @@ internal sealed class ScrollBarOnlyTestWindow : ScrollTestWindow
     }
 
     /// <summary>Scroll the content, in device independent pixels</summary>
-    public void ScrollTo(double offset) => Invoke(() => _control.ScrollBar.Value = Math.Max(0, Math.Min(_control.ScrollBar.Maximum, offset)));
+    public void ScrollTo(double offset) => Invoke(() =>
+    {
+        _control.MoveContent(Math.Max(0, Math.Min(_control.ScrollBar.Maximum, offset)));
+        return true;
+    });
 
-    /// <summary>How far the content is scrolled, in device independent pixels</summary>
-    public double Offset => Invoke(() => _control.ScrollBar.Value);
+    /// <summary>How far the content is scrolled, in device independent pixels (not the scroll bar's value, which may differ)</summary>
+    public double Offset => Invoke(() => _control.ContentOffset);
 
     /// <summary>The offset at the end</summary>
     public double MaxOffset => Invoke(() => _control.ScrollBar.Maximum);
@@ -477,7 +486,7 @@ internal sealed class ScrollBarOnlyControl : UserControl
     public const int LinesPerNotch = 3;
     private readonly TranslateTransform _transform = new();
 
-    public ScrollBarOnlyControl(ScrollBarExposure exposure, int lineCount = DefaultLineCount, bool withHorizontalScrollBar = false)
+    public ScrollBarOnlyControl(ScrollBarExposure exposure, int lineCount = DefaultLineCount, bool withHorizontalScrollBar = false, bool followsValueChanges = true)
     {
         var lines = new StackPanel { RenderTransform = _transform };
         for (var i = 0; i < lineCount; i++)
@@ -507,7 +516,15 @@ internal sealed class ScrollBarOnlyControl : UserControl
         Content = grid;
         Background = Brushes.White;
 
-        ScrollBar.ValueChanged += (_, e) => _transform.Y = -e.NewValue;
+        if (followsValueChanges)
+        {
+            ScrollBar.ValueChanged += (_, e) => _transform.Y = -e.NewValue;
+        }
+        else
+        {
+            // Like the Visual Studio editor: only what the user does with the scroll bar (buttons, thumb) moves the content
+            ScrollBar.Scroll += (_, e) => _transform.Y = -e.NewValue;
+        }
         viewport.SizeChanged += (_, _) =>
         {
             var height = viewport.ActualHeight;
@@ -516,15 +533,26 @@ internal sealed class ScrollBarOnlyControl : UserControl
             ScrollBar.LargeChange = height;
         };
         // Like an editor: the wheel moves a few lines per notch
+        // The wheel moves the content from where the content is, and the scroll bar follows it
         PreviewMouseWheel += (_, e) =>
         {
-            var value = ScrollBar.Value - e.Delta / 120.0 * LinesPerNotch * LineHeight;
-            ScrollBar.Value = Math.Max(ScrollBar.Minimum, Math.Min(ScrollBar.Maximum, value));
+            var offset = ContentOffset - e.Delta / 120.0 * LinesPerNotch * LineHeight;
+            MoveContent(Math.Max(ScrollBar.Minimum, Math.Min(ScrollBar.Maximum, offset)));
             e.Handled = true;
         };
     }
 
     public ScrollBar ScrollBar { get; }
+
+    /// <summary>How far the content is scrolled</summary>
+    public double ContentOffset => -_transform.Y;
+
+    /// <summary>Scroll the content and put the scroll bar there</summary>
+    public void MoveContent(double offset)
+    {
+        _transform.Y = -offset;
+        ScrollBar.Value = offset;
+    }
 
     /// <summary>The content area, without the scroll bars</summary>
     public WpfWindows.FrameworkElement Viewport { get; }
