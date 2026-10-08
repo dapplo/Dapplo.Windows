@@ -70,9 +70,12 @@ NativeRect? bounds = window.Info?.Bounds;
 ## Finding windows
 
 `InteropWindowQuery.GetVisibleApplicationWindows()` returns the windows a user sees as application windows, from top to
-bottom (Z-order): top-level windows (no parent, owned windows are included) which are visible, not minimized, have a
-title and a size, and are not a tool window, a background store app or one of a few known system windows (the desktop
-`Progman`, `Button`, `Dwm`). The same test is available as `window.IsVisibleApplicationWindow()`;
+bottom (Z-order): top-level windows (no parent, owned windows are included) which are visible (`IsWindowVisible` and not
+cloaked, so no windows on another virtual desktop and no suspended store apps), not minimized, have a title and a size,
+and are not a tool window, a background store app or one of a few known system windows (the desktop `Progman`, `Button`,
+`Dwm`). Windows which render with DirectComposition (`WS_EX_NOREDIRECTIONBITMAP`, e.g. Chrome, Edge and other Chromium
+based browsers) are included. Pass `includeMinimized: true` to include minimized windows too, e.g. for a "capture this
+window" menu which restores the window first. The same test is available as `window.IsVisibleApplicationWindow()`;
 `window.IsVisiblePopup()` is the similar test for visible `WS_POPUP` windows, which also accepts tool windows and
 windows without a title. Change the list of ignored classes with `InteropWindowQuery.AddIgnoreClass` /
 `RemoveIgnoreClass`, or pass `false` to include them.
@@ -154,8 +157,15 @@ var linked = window.GetLinkedWindows();
 ```
 
 `GetChildren()` returns the direct children in Z-order (a snapshot, see above) and stores them in `Children`; pass
-`forceUpdate: true` to read them again. `GetDescendants()` returns all levels, depth-first (a child is followed by its
-own descendants), and doesn't store them.
+`forceUpdate: true` to read them again. `GetChildren(allLevels: true)` fills the whole tree below the window from one
+enumeration: every descendant gets its `Children` (empty for a window without children), `Parent` and `ParentWindow`, so
+`GetInfo()` clips to the parents without more lookups. `GetDescendants()` returns all levels as a flat list, depth-first
+(a child is followed by its own descendants), and doesn't store them.
+
+`window.FindChildAt(point)` returns the deepest visible child window at a screen point (the window itself when no child
+contains the point, null when the window doesn't): it walks the stored tree (filling it with `allLevels` when needed) and
+uses the cached `GetInfo()` values, so it also works on a snapshot of a screen which has changed since, e.g. under a
+full-screen overlay.
 
 ## Changing windows
 

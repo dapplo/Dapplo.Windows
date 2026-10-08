@@ -25,27 +25,25 @@ namespace Dapplo.Windows.Icons
             var iconBig = new IntPtr(1);
             var iconSmall2 = new IntPtr(2);
 
-            IntPtr iconHandle;
-            if (useLargeIcons)
+            // The icon set with WM_SETICON, else the class icon: many windows never get WM_SETICON and answer WM_GETICON with 0
+            IntPtr GetIcon(IntPtr iconType, ClassLongIndex classIcon)
             {
-                if (!User32Api.TrySendMessage(hWnd, WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero, out iconHandle))
+                if (User32Api.TrySendMessage(hWnd, WindowsMessages.WM_GETICON, iconType, IntPtr.Zero, out var handle) && handle != IntPtr.Zero)
                 {
-                    iconHandle = User32Api.GetClassLongWrapper(hWnd, ClassLongIndex.IconHandle);
+                    return handle;
                 }
-            }
-            else if (!User32Api.TrySendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall2, IntPtr.Zero, out iconHandle))
-            {
-                iconHandle = User32Api.GetClassLongWrapper(hWnd, ClassLongIndex.SmallIconHandle);
+                return User32Api.GetClassLongWrapper(hWnd, classIcon);
             }
 
-            if (iconHandle == IntPtr.Zero && !User32Api.TrySendMessage(hWnd, WindowsMessages.WM_GETICON, iconSmall, IntPtr.Zero, out iconHandle))
+            // The preferred size first, then the other size
+            var iconHandle = useLargeIcons ? GetIcon(iconBig, ClassLongIndex.IconHandle) : GetIcon(iconSmall2, ClassLongIndex.SmallIconHandle);
+            if (iconHandle == IntPtr.Zero)
             {
-                iconHandle = User32Api.GetClassLongWrapper(hWnd, ClassLongIndex.SmallIconHandle);
+                iconHandle = GetIcon(iconSmall, ClassLongIndex.SmallIconHandle);
             }
-
-            if (iconHandle == IntPtr.Zero && !User32Api.TrySendMessage(hWnd, WindowsMessages.WM_GETICON, iconBig, IntPtr.Zero, out iconHandle))
+            if (iconHandle == IntPtr.Zero && !useLargeIcons)
             {
-                iconHandle = User32Api.GetClassLongWrapper(hWnd, ClassLongIndex.IconHandle);
+                iconHandle = GetIcon(iconBig, ClassLongIndex.IconHandle);
             }
             return IconHelper.IconHandleTo<TIcon>(iconHandle);
         }

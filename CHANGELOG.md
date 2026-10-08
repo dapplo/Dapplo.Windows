@@ -7,6 +7,22 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.8.0]
+
+Found while replacing Greenshot's `WindowDetails` with `IInteropWindow`, `InteropWindowQuery` and `WindowsEnumerator`.
+
+### Changed
+- **`GetVisibleApplicationWindows`, `IsVisibleApplicationWindow` and `IsVisiblePopup` now include Chromium based browsers** (Chrome, Edge, Brave and other windows which render with DirectComposition): windows with `WS_EX_NOREDIRECTIONBITMAP` were rejected, so they were also missing from `GetLinkedWindows`.
+- **`GetVisibleApplicationWindows`, `IsVisibleApplicationWindow` and `IsVisiblePopup` now exclude cloaked windows** (on another virtual desktop, suspended UWP apps): they use `IsVisible()` (`IsWindowVisible` and not cloaked) instead of only the `WS_VISIBLE` style.
+- `IsVisibleApplicationWindow` and `IsVisiblePopup` check `IsVisible()` right after the ignored classes, before `GetInfo()`: most top-level windows are invisible and are rejected without the DWM, `IsZoomed` and `FindWindowEx` calls.
+- `GetInfo()` skips the DWM extended frame bounds and the `IsApp()` / `IsMaximized()` checks for child windows (`WS_CHILD`), DWM only answers for top-level windows; child windows are still clipped to their parents.
+- `IconExtensions.GetIconForWindowHandle` (and so `GetIcon`) reads the class icon when `WM_GETICON` returns no icon, not only when the message fails: windows which never got `WM_SETICON` got the icon of the executable instead of their class icon. The order is unchanged, the preferred size first.
+
+### Added
+- `includeMinimized` for `IsVisibleApplicationWindow` and `GetVisibleApplicationWindows`, e.g. for a "capture this window" menu which restores the window first. The overloads without it are kept for binary compatibility.
+- `GetChildren(forceUpdate, allLevels)`: with `allLevels` the whole tree below the window is filled from one `EnumChildWindows`, with `Children` (empty for leaf windows), `Parent` and `ParentWindow` of every window, instead of one enumeration per level.
+- `FindChildAt(point)`: the deepest visible child window at a screen point, on the cached tree and `GetInfo()` values (works on a snapshot, e.g. under a full-screen overlay).
+
 ## [3.7.0]
 
 ### Added

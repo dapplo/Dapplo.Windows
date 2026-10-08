@@ -146,13 +146,14 @@ public static class InteropWindowExtensions
     /// <summary>
     ///     Get the direct children of the specified interopWindow in Z-order, from top (front) to bottom (back), this is not lazy!
     ///     The children are a snapshot taken with <see cref="InteropWindowQuery.GetTopWindows"/>, the result is stored in <see cref="IInteropWindow.Children"/>
-    ///     and returned from there until forceUpdate is true. Use <see cref="GetDescendants"/> to get the children of the children too.
+    ///     and returned from there until forceUpdate is true. Use <see cref="GetChildren(IInteropWindow, bool, bool)"/> with allLevels to fill the
+    ///     children of the children too (one enumeration for the whole tree), or <see cref="GetDescendants"/> for a flat list.
     ///     The children of the desktop window are the top-level windows, these have no parent (<see cref="IInteropWindow.Parent"/> is IntPtr.Zero).
     /// </summary>
     /// <param name="interopWindow">InteropWindow</param>
     /// <param name="forceUpdate">True to force updating</param>
     /// <returns>IEnumerable with InteropWindow</returns>
-    public static IEnumerable<IInteropWindow> GetChildren(this IInteropWindow interopWindow, bool forceUpdate = false)
+    public static IEnumerable<IInteropWindow> GetChildren(this IInteropWindow interopWindow, bool forceUpdate)
     {
         if (interopWindow.Children != null && !forceUpdate)
         {
@@ -170,6 +171,139 @@ public static class InteropWindowExtensions
         // Store it in the Children property
         interopWindow.Children = children;
         return children;
+    }
+
+    /// <summary>
+    ///     Get the direct children of the specified interopWindow in Z-order, see <see cref="GetChildren(IInteropWindow, bool)"/>.
+    ///     With <paramref name="allLevels"/> the whole tree below the window is filled from one enumeration (EnumChildWindows) instead of one
+    ///     enumeration per window: every descendant gets its <see cref="IInteropWindow.Children"/> (empty for a window without children, so it
+    ///     isn't enumerated again), <see cref="IInteropWindow.Parent"/> and <see cref="IInteropWindow.ParentWindow"/>, so <see cref="GetInfo"/>
+    ///     can clip to the parents without more lookups. For the desktop window the tree of every top-level window is filled, one enumeration each.
+    ///     Without forceUpdate a tree which is already filled is used as it is.
+    /// </summary>
+    /// <param name="interopWindow">InteropWindow</param>
+    /// <param name="forceUpdate">True to force updating</param>
+    /// <param name="allLevels">True to fill the children of the children too, from one enumeration</param>
+    /// <returns>IEnumerable with InteropWindow, the direct children</returns>
+    public static IEnumerable<IInteropWindow> GetChildren(this IInteropWindow interopWindow, bool forceUpdate = false, bool allLevels = false)
+    {
+        if (!allLevels)
+        {
+            return interopWindow.GetChildren(forceUpdate);
+        }
+        if (!forceUpdate && IsTreeFilled(interopWindow))
+        {
+            return interopWindow.Children;
+        }
+        if (interopWindow.Handle == User32Api.GetDesktopWindow())
+        {
+            // The top-level windows, then the tree of each of them
+            var topLevelWindows = interopWindow.GetChildren(true);
+            foreach (var topLevelWindow in topLevelWindows)
+            {
+                FillChildTree(topLevelWindow);
+            }
+            return topLevelWindows;
+        }
+        FillChildTree(interopWindow);
+        return interopWindow.Children;
+    }
+
+    /// <summary>
+    ///     True when the window and all windows below it have their Children
+    /// </summary>
+    private static bool IsTreeFilled(IInteropWindow interopWindow)
+    {
+        var pending = new Stack<IInteropWindow>();
+        pending.Push(interopWindow);
+        while (pending.Count > 0)
+        {
+            var children = pending.Pop().Children;
+            if (children == null)
+            {
+                return false;
+            }
+            foreach (var child in children)
+            {
+                pending.Push(child);
+            }
+        }
+        return true;
+    }
+
+    /// <summary>
+    ///     Fill the tree below the window from one EnumChildWindows: it enumerates depth-first in Z-order, so a parent comes before its
+    ///     children and the children of each window keep their Z-order
+    /// </summary>
+    private static void FillChildTree(IInteropWindow root)
+    {
+        var windows = new Dictionary<IntPtr, IInteropWindow> { [root.Handle] = root };
+        var children = new Dictionary<IntPtr, List<IInteropWindow>> { [root.Handle] = new List<IInteropWindow>() };
+        WindowsEnumerator.EnumerateHandles(root.Handle, hWnd =>
+        {
+            var parent = User32Api.GetAncestor(hWnd, GetAncestorFlags.GA_PARENT);
+            // A window which was re-parented during the enumeration (its parent isn't known) is left out
+            if (windows.ContainsKey(hWnd) || !windows.TryGetValue(parent, out var parentWindow))
+            {
+                return true;
+            }
+            var window = InteropWindowFactory.CreateFor(hWnd);
+            window.Parent = parent;
+            window.ParentWindow = parentWindow;
+            windows[hWnd] = window;
+            children[hWnd] = new List<IInteropWindow>();
+            children[parent].Add(window);
+            return true;
+        });
+        foreach (var pair in children)
+        {
+            windows[pair.Key].Children = pair.Value;
+        }
+    }
+
+    /// <summary>
+    ///     Find the deepest visible child window at a point: starting with the window, take the first child (in Z-order) which is visible
+    ///     (WS_VISIBLE in its WindowInfo) and whose <see cref="GetInfo"/> bounds contain the point, and continue with that child.
+    ///     The children are filled with <see cref="GetChildren(IInteropWindow, bool, bool)"/> (all levels, one enumeration) when they weren't yet.
+    ///     This works on the cached values, so it can be used on a snapshot of a screen which has changed since, e.g. under a full-screen overlay.
+    /// </summary>
+    /// <param name="interopWindow">IInteropWindow to start with</param>
+    /// <param name="point">NativePoint in screen coordinates</param>
+    /// <returns>IInteropWindow, the deepest window containing the point, the window itself when no child contains it, null when the window doesn't contain it</returns>
+    public static IInteropWindow FindChildAt(this IInteropWindow interopWindow, NativePoint point)
+    {
+        if (interopWindow == null)
+        {
+            throw new ArgumentNullException(nameof(interopWindow));
+        }
+        if (!interopWindow.GetInfo().Bounds.Contains(point))
+        {
+            return null;
+        }
+        if (interopWindow.Children == null)
+        {
+            interopWindow.GetChildren(false, true);
+        }
+        var current = interopWindow;
+        // The depth is limited, a window tree which changed into a loop can't make this run forever
+        for (var depth = 0; depth < 1000; depth++)
+        {
+            var next = current.Children?.FirstOrDefault(child =>
+            {
+                var info = child.GetInfo();
+                return (info.Style & WindowStyleFlags.WS_VISIBLE) != 0 && info.Bounds.Contains(point);
+            });
+            if (next == null)
+            {
+                return current;
+            }
+            if (next.Children == null)
+            {
+                next.GetChildren(false, true);
+            }
+            current = next;
+        }
+        return current;
     }
 
     /// <summary>
@@ -227,10 +361,10 @@ public static class InteropWindowExtensions
         // Test if we need to correct some values
         if (autoCorrect)
         {
-            // Correct the bounds, for Windows 8+
-            if (DwmApi.IsDwmEnabled)
+            // Correct the bounds, for Windows 8+. DWM only answers for top-level windows, so child windows (WS_CHILD) skip this and the
+            // IsApp / IsMaximized checks, they are only clipped to their parents. This matters for windows with many descendants.
+            if (DwmApi.IsDwmEnabled && (windowInfo.Style & WindowStyleFlags.WS_CHILD) == 0)
             {
-                // This only works for top level windows, otherwise a access denied is returned
                 bool gotFrameBounds = DwmApi.GetExtendedFrameBounds(interopWindow.Handle, out var extendedFrameBounds);
                 if (gotFrameBounds && (interopWindow.IsApp() || WindowsVersion.IsWindows10OrLater && !interopWindow.IsMaximized()))
                 {

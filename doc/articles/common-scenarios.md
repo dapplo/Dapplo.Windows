@@ -150,7 +150,7 @@ clipboard and send Ctrl+V; read the old clipboard content first and put it back 
 ```csharp
 // Place the visible windows of the primary display next to each other
 var primary = DisplayInfo.AllDisplayInfos.First(display => display.IsPrimary);
-// GetVisibleApplicationWindows skips hidden, minimized and untitled windows and tool windows
+// GetVisibleApplicationWindows skips hidden, cloaked, minimized and untitled windows and tool windows
 var windows = InteropWindowQuery.GetVisibleApplicationWindows()
     .Where(window => primary.Bounds.Contains(window.GetInfo().Bounds.Location))
     .ToList();
