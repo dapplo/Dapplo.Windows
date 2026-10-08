@@ -69,6 +69,9 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     private IUIAutomationScrollPattern _scrollPattern;
     private ScrollBarParts _scrollBar;
     private UiAutomationScrollModes _scrollMode = UiAutomationScrollModes.ScrollPattern;
+
+    /// <summary>When the last position came from a thumb: the percentage one pixel of the thumb stands for, else 0</summary>
+    private double _thumbPixelPercent;
     private double _stepFraction = 1.0;
     private bool _isDisposed;
 
@@ -493,7 +496,10 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     ///     (<see cref="ScrollMode"/> is <see cref="UiAutomationScrollModes.MouseWheel"/>), the cursor moves to <see cref="WheelLocation"/>
     ///     (or the middle of <see cref="ViewportBounds"/>), so the area must be visible on the screen.
     ///     The position is read from the scroll bar: its RangeValue pattern (Value, Minimum, Maximum, LargeChange), else the position of
-    ///     its thumb between its line buttons, see <see cref="IsPositionKnown"/>.
+    ///     its thumb between its line buttons, see <see cref="IsPositionKnown"/>. A thumb tells the position to a pixel: on long content
+    ///     <see cref="IsAtStart"/> / <see cref="IsAtEnd"/> can be true while up to a thumb pixel's worth of content is left (compare the
+    ///     captured frames when that matters); <see cref="Start"/>, <see cref="End"/> and <see cref="Reset"/> to the start or end wheel a
+    ///     little further to make up for it.
     /// </summary>
     public bool IsScrollBarFallback { get; private set; }
 
@@ -719,7 +725,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         {
             return false;
         }
-        if (IsAtTarget(before, percent, toEnd))
+        if (IsAtTarget(before, percent, toEnd) && !(ScrollMode == UiAutomationScrollModes.MouseWheel && _thumbPixelPercent > 0))
         {
             return true;
         }
@@ -825,6 +831,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         {
             if (IsAtTarget(percent, target, forward))
             {
+                WheelPastThumbPrecision(target, forward, location, percentPerNotch);
                 return true;
             }
             var notches = 1;
@@ -871,6 +878,27 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             percentPerNotch = moved / notches;
             minimumNotches = 1;
             percent = after;
+        }
+    }
+
+    /// <summary>
+    ///     A thumb tells the position to a pixel, on long content that is a lot: when the thumb says the start or end is reached, wheel
+    ///     about two thumb pixels further, which stops at the start or end
+    /// </summary>
+    private void WheelPastThumbPrecision(double target, bool forward, NativePoint location, double percentPerNotch)
+    {
+        var pixelPercent = _thumbPixelPercent;
+        if (pixelPercent <= 0 || (forward ? target < 100 : target > 0))
+        {
+            return;
+        }
+        var notches = percentPerNotch > 0
+            ? (int)Math.Max(1, Math.Min(MaxNotchesPerWheelInput, Math.Ceiling(2 * pixelPercent / percentPerNotch)))
+            : MaxNotchesPerWheelInput;
+        if (WheelNotches(forward, location, notches))
+        {
+            // Let it arrive, the position can't be checked to less than a thumb pixel
+            WaitForPercentChange(target, out _);
         }
     }
 
@@ -1095,6 +1123,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     {
         percent = UiaConstants.NoScroll;
         viewSize = 0;
+        _thumbPixelPercent = 0;
         var scrollBar = _scrollBar;
         if (scrollBar is null)
         {
@@ -1137,6 +1166,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             : trackEnd - thumbEnd <= 1 ? 100
             : Math.Max(0, Math.Min(100, (thumbStart - trackStart) * 100.0 / (trackLength - thumbLength)));
         viewSize = thumbLength * 100.0 / trackLength;
+        _thumbPixelPercent = 100.0 / (trackLength - thumbLength);
         return true;
     }
 

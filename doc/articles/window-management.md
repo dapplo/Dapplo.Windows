@@ -381,7 +381,9 @@ orientation at an edge, e.g. a horizontal one at the bottom), so the frames of a
 The position comes from the scroll bar:
 - its RangeValue pattern: the position from `Value` between `Minimum` and `Maximum`, the visible part from `LargeChange`;
   `Start()`, `End()` and `Reset()` set the value when it's writable;
-- else the position of its thumb between the line buttons (to a pixel);
+- else the position of its thumb between the line buttons. That is to a pixel of the thumb, which on long content stands for
+  a lot of content: `IsAtEnd` can be true a little early (compare the captured frames when that matters), `Start()` and
+  `End()` wheel a bit further when the thumb says they got there;
 - else it is unknown: `IsPositionKnown` is false, `ScrollPercent` is -1, `IsAtStart` / `IsAtEnd` are only true when the line
   button in that direction is disabled and the other one enabled (WPF disables both while the mouse isn't over the scroll
   bar), `Next()` / `Previous()` move one wheel notch per step and return true, and `Start()`,
