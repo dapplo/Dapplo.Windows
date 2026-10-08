@@ -81,6 +81,37 @@ public sealed class DibImage
     public static bool TryDecode(byte[] dib, long maxPixelCount, out DibImage image) => DibCodec.TryDecode(dib, maxPixelCount, out image);
 
     /// <summary>
+    /// Read the size of a device independent bitmap and whether it has alpha, without decoding (or allocating) the pixels, e.g. to choose
+    /// the pixel format of the memory for <see cref="TryDecode(ReadOnlySpan{byte}, long, Span{byte}, int)"/>. The header is validated exactly
+    /// like <see cref="TryDecode(byte[], long, out DibImage)"/> does, and <paramref name="hasAlpha"/> is what <see cref="HasAlpha"/> of the
+    /// decoded image would be (for 32 bpp this reads the alpha values of the pixels).
+    /// </summary>
+    /// <param name="dib">the CF_DIB or CF_DIBV5 data, e.g. the buffer of a snapshot stream (<see cref="System.IO.MemoryStream.TryGetBuffer"/>)</param>
+    /// <param name="maxPixelCount">long with the maximum number of pixels, e.g. <see cref="DefaultMaxPixelCount"/></param>
+    /// <param name="width">int with the width</param>
+    /// <param name="height">int with the height (always positive)</param>
+    /// <param name="hasAlpha">true when the bitmap has an alpha channel with at least one pixel which isn't fully opaque</param>
+    /// <returns>true when the bitmap can be decoded</returns>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="maxPixelCount"/> isn't positive</exception>
+    public static bool TryReadInfo(ReadOnlySpan<byte> dib, long maxPixelCount, out int width, out int height, out bool hasAlpha) =>
+        DibCodec.TryReadInfo(dib, maxPixelCount, out width, out height, out hasAlpha);
+
+    /// <summary>
+    /// Decode a device independent bitmap into memory of the caller (e.g. the locked bits of a 32 bpp bitmap), without allocating the pixels:
+    /// top-down rows of B, G, R, A bytes with straight alpha (A = 255 when the image has no alpha), exactly the pixels
+    /// <see cref="TryDecode(byte[], long, out DibImage)"/> puts in <see cref="Pixels"/>. Use <see cref="TryReadInfo"/> first for the size.
+    /// Bytes after width * 4 in each row (the padding of a larger stride) are not written.
+    /// </summary>
+    /// <param name="dib">the CF_DIB or CF_DIBV5 data</param>
+    /// <param name="maxPixelCount">long with the maximum number of pixels, e.g. <see cref="DefaultMaxPixelCount"/></param>
+    /// <param name="destination">the memory for the pixels, at least destinationStride * (height - 1) + width * 4 bytes</param>
+    /// <param name="destinationStride">int with the bytes per row of <paramref name="destination"/>, at least width * 4</param>
+    /// <returns>true when the bitmap was decoded, false for invalid or unsupported data or when the destination is too small</returns>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="maxPixelCount"/> isn't positive</exception>
+    public static bool TryDecode(ReadOnlySpan<byte> dib, long maxPixelCount, Span<byte> destination, int destinationStride) =>
+        DibCodec.TryDecode(dib, maxPixelCount, destination, destinationStride);
+
+    /// <summary>
     /// Create CF_DIBV5 data: BITMAPV5HEADER, 32 bpp BI_BITFIELDS (BGRA masks), sRGB, straight alpha, bottom-up rows.
     /// </summary>
     /// <param name="bgra32">the pixels, top-down rows of B, G, R, A bytes</param>

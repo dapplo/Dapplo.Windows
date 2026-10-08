@@ -447,6 +447,11 @@ Also place a `"PNG"` format when you can.
 pixels can be reused right away); `AddDib` with a `ReadOnlyMemory<byte>` encodes directly into the clipboard memory when the
 contents are placed, without two intermediate arrays (about 33 MB each for a 4K screenshot): keep the memory valid and
 unchanged until then, as with `AddStream`.
+To read a large bitmap without extra copies, decode straight into your own memory (e.g. the locked bits of a bitmap):
+the stream of a snapshot exposes the snapshot's array with `MemoryStream.TryGetBuffer` (don't change it),
+`DibImage.TryReadInfo(dib, maxPixelCount, out width, out height, out hasAlpha)` gives the size and whether the image has
+alpha (to choose the pixel format), and `DibImage.TryDecode(dib, maxPixelCount, destination, destinationStride)` writes
+the same top-down BGRA32 pixels as `DibImage.Pixels` into the destination.
 
 <!-- sample: ClipboardSamples.Dib -->
 ```csharp

@@ -23,14 +23,90 @@ internal static class DibCodec
     // The largest byte array the runtime allows (Array.MaxLength), the decoded pixels must fit in one
     private const long MaxArrayLength = 0x7FFFFFC7;
 
+    /// <summary>
+    /// What the header says about the pixels, validated against the length of the data
+    /// </summary>
+    private struct Header
+    {
+        public int Width;
+        public int Height;
+        public bool IsTopDown;
+        public int BitCount;
+        public bool UsesMasks;
+        public bool AlphaIsGuess;
+        public uint RedMask;
+        public uint GreenMask;
+        public uint BlueMask;
+        public uint AlphaMask;
+        public int PaletteOffset;
+        public int PaletteColors;
+        public int PaletteEntrySize;
+        public int PixelOffset;
+        public int Stride;
+    }
+
     public static bool TryDecode(byte[] data, long maxPixelCount, out DibImage image)
+    {
+        ThrowWhenNotPositive(maxPixelCount);
+        image = null;
+        if (data == null || !TryParseHeader(data, maxPixelCount, out var header))
+        {
+            return false;
+        }
+        var pixels = new byte[(long)header.Width * header.Height * 4];
+        DecodePixels(data, header, pixels, header.Width * 4, out var hasAlpha);
+        image = new DibImage(header.Width, header.Height, pixels, hasAlpha);
+        return true;
+    }
+
+    /// <summary>
+    /// Validate the header and tell the size and whether the decoded image has alpha, without decoding (or allocating) the pixels
+    /// </summary>
+    public static bool TryReadInfo(ReadOnlySpan<byte> data, long maxPixelCount, out int width, out int height, out bool hasAlpha)
+    {
+        ThrowWhenNotPositive(maxPixelCount);
+        width = height = 0;
+        hasAlpha = false;
+        if (!TryParseHeader(data, maxPixelCount, out var header))
+        {
+            return false;
+        }
+        width = header.Width;
+        height = header.Height;
+        hasAlpha = HasAlpha(data, header);
+        return true;
+    }
+
+    /// <summary>
+    /// Decode into caller-provided memory: top-down rows of BGRA32 with straight alpha, <paramref name="destinationStride"/> bytes apart
+    /// </summary>
+    public static bool TryDecode(ReadOnlySpan<byte> data, long maxPixelCount, Span<byte> destination, int destinationStride)
+    {
+        ThrowWhenNotPositive(maxPixelCount);
+        if (!TryParseHeader(data, maxPixelCount, out var header))
+        {
+            return false;
+        }
+        if (destinationStride < (long)header.Width * 4 || destination.Length < (long)destinationStride * (header.Height - 1) + (long)header.Width * 4)
+        {
+            return false;
+        }
+        DecodePixels(data, header, destination, destinationStride, out _);
+        return true;
+    }
+
+    private static void ThrowWhenNotPositive(long maxPixelCount)
     {
         if (maxPixelCount <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(maxPixelCount), maxPixelCount, "The maximum pixel count must be positive.");
         }
-        image = null;
-        if (data == null || data.Length < CoreHeaderSize)
+    }
+
+    private static bool TryParseHeader(ReadOnlySpan<byte> data, long maxPixelCount, out Header header)
+    {
+        header = default;
+        if (data.Length < CoreHeaderSize)
         {
             return false;
         }
@@ -162,23 +238,17 @@ internal static class DibCodec
                 return false;
         }
 
-        uint[] palette = null;
+        var paletteOffset = offset;
+        var paletteColors = 0;
         if (bitCount <= 8)
         {
             var maxColors = 1 << bitCount;
-            var colors = colorsUsed == 0 || colorsUsed > maxColors ? maxColors : (int)colorsUsed;
-            if (data.Length < offset + colors * paletteEntrySize)
+            paletteColors = colorsUsed == 0 || colorsUsed > maxColors ? maxColors : (int)colorsUsed;
+            if (data.Length < offset + paletteColors * paletteEntrySize)
             {
                 return false;
             }
-            palette = new uint[maxColors];
-            for (var i = 0; i < colors; i++)
-            {
-                var entry = offset + i * paletteEntrySize;
-                // RGBQUAD: blue, green, red, reserved; RGBTRIPLE: blue, green, red
-                palette[i] = data[entry] | ((uint)data[entry + 1] << 8) | ((uint)data[entry + 2] << 16) | 0xFF000000;
-            }
-            offset += colors * paletteEntrySize;
+            offset += paletteColors * paletteEntrySize;
         }
 
         // Rows are padded to 4 bytes. Compared by division, so the check can't overflow whatever the header says.
@@ -188,25 +258,98 @@ internal static class DibCodec
         {
             return false;
         }
-        var stride = (int)sourceStride;
 
-        var pixels = new byte[pixelCount * 4];
-        var redChannel = new Channel(redMask);
-        var greenChannel = new Channel(greenMask);
-        var blueChannel = new Channel(blueMask);
-        var alphaChannel = new Channel(alphaMask);
+        header = new Header
+        {
+            Width = width,
+            Height = height,
+            IsTopDown = isTopDown,
+            BitCount = bitCount,
+            UsesMasks = usesMasks,
+            AlphaIsGuess = alphaIsGuess,
+            RedMask = redMask,
+            GreenMask = greenMask,
+            BlueMask = blueMask,
+            AlphaMask = alphaMask,
+            PaletteOffset = paletteOffset,
+            PaletteColors = paletteColors,
+            PaletteEntrySize = paletteEntrySize,
+            PixelOffset = offset,
+            Stride = (int)sourceStride
+        };
+        return true;
+    }
+
+    /// <summary>
+    /// Whether the decoded image has alpha, the same answer as DecodePixels gives: an alpha mask and a pixel which isn't opaque;
+    /// for 32 bpp BI_RGB (alpha is a guess) also a pixel with a non-zero fourth byte
+    /// </summary>
+    private static bool HasAlpha(ReadOnlySpan<byte> data, in Header header)
+    {
+        if (header.AlphaMask == 0)
+        {
+            return false;
+        }
+        var alphaChannel = new Channel(header.AlphaMask);
+        var anyAlphaValue = false;
+        var anyTransparent = false;
+        for (var y = 0; y < header.Height; y++)
+        {
+            var sourceRow = header.PixelOffset + y * header.Stride;
+            for (var x = 0; x < header.Width; x++)
+            {
+                var value = header.BitCount == 32 ? ReadUInt32(data, sourceRow + x * 4) : ReadUInt16(data, sourceRow + x * 2);
+                var a = alphaChannel.Extract(value);
+                anyAlphaValue |= a != 0;
+                anyTransparent |= a != 255;
+                if (anyTransparent && (anyAlphaValue || !header.AlphaIsGuess))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Decode the pixels into top-down BGRA32 rows with straight alpha, the destination was checked by the caller
+    /// </summary>
+    private static void DecodePixels(ReadOnlySpan<byte> data, in Header header, Span<byte> destination, int destinationStride, out bool hasAlpha)
+    {
+        var width = header.Width;
+        var height = header.Height;
+        var bitCount = header.BitCount;
+        var stride = header.Stride;
+
+        // At most 256 entries; entries after the colors of the palette are black, as before
+        Span<uint> palette = bitCount <= 8 ? stackalloc uint[256] : Span<uint>.Empty;
+        if (bitCount <= 8)
+        {
+            palette.Clear();
+            for (var i = 0; i < header.PaletteColors; i++)
+            {
+                var entry = header.PaletteOffset + i * header.PaletteEntrySize;
+                // RGBQUAD: blue, green, red, reserved; RGBTRIPLE: blue, green, red
+                palette[i] = data[entry] | ((uint)data[entry + 1] << 8) | ((uint)data[entry + 2] << 16) | 0xFF000000;
+            }
+        }
+
+        var redChannel = new Channel(header.RedMask);
+        var greenChannel = new Channel(header.GreenMask);
+        var blueChannel = new Channel(header.BlueMask);
+        var alphaChannel = new Channel(header.AlphaMask);
+        var alphaMask = header.AlphaMask;
         var anyAlphaValue = false;
         var anyTransparent = false;
 
         for (var y = 0; y < height; y++)
         {
-            var sourceRow = offset + (isTopDown ? y : height - 1 - y) * stride;
-            var targetRow = y * width * 4;
+            var sourceRow = header.PixelOffset + (header.IsTopDown ? y : height - 1 - y) * stride;
+            var target = destination.Slice(y * destinationStride, width * 4);
             for (var x = 0; x < width; x++)
             {
-                var target = targetRow + x * 4;
                 byte b, g, r, a = 255;
-                if (usesMasks)
+                if (header.UsesMasks)
                 {
                     var value = bitCount == 32 ? ReadUInt32(data, sourceRow + x * 4) : ReadUInt16(data, sourceRow + x * 2);
                     b = blueChannel.Extract(value);
@@ -228,31 +371,32 @@ internal static class DibCodec
                 }
                 else
                 {
-                    var index = ReadIndex(data, sourceRow, x, bitCount);
-                    var color = palette[index];
+                    var color = palette[ReadIndex(data, sourceRow, x, bitCount)];
                     b = (byte)color;
                     g = (byte)(color >> 8);
                     r = (byte)(color >> 16);
                 }
-                pixels[target] = b;
-                pixels[target + 1] = g;
-                pixels[target + 2] = r;
-                pixels[target + 3] = a;
+                target[x * 4] = b;
+                target[x * 4 + 1] = g;
+                target[x * 4 + 2] = r;
+                target[x * 4 + 3] = a;
             }
         }
 
-        var hasAlpha = alphaMask != 0 && anyTransparent;
-        if (alphaIsGuess && !anyAlphaValue)
+        hasAlpha = alphaMask != 0 && anyTransparent;
+        if (header.AlphaIsGuess && !anyAlphaValue)
         {
             // 32 bpp BI_RGB with an unused (zero) fourth byte: opaque
-            for (var i = 3; i < pixels.Length; i += 4)
+            for (var y = 0; y < height; y++)
             {
-                pixels[i] = 255;
+                var target = destination.Slice(y * destinationStride, width * 4);
+                for (var i = 3; i < target.Length; i += 4)
+                {
+                    target[i] = 255;
+                }
             }
             hasAlpha = false;
         }
-        image = new DibImage(width, height, pixels, hasAlpha);
-        return true;
     }
 
     public static byte[] Encode(ReadOnlySpan<byte> bgra32, int width, int height, int stride, bool premultipliedAlpha, bool isV5)
@@ -367,7 +511,7 @@ internal static class DibCodec
     /// <summary>
     /// Some writers repeat the masks after a BITMAPV4HEADER / BITMAPV5HEADER, Greenshot writes them with all 12 bytes reversed
     /// </summary>
-    private static bool HasRepeatedMasks(byte[] data, int offset, uint red, uint green, uint blue)
+    private static bool HasRepeatedMasks(ReadOnlySpan<byte> data, int offset, uint red, uint green, uint blue)
     {
         if (data.Length < offset + 12 || (red | green | blue) == 0)
         {
@@ -377,7 +521,7 @@ internal static class DibCodec
         {
             return true;
         }
-        var reversed = new byte[12];
+        Span<byte> reversed = stackalloc byte[12];
         for (var i = 0; i < 12; i++)
         {
             reversed[i] = data[offset + 11 - i];
@@ -385,7 +529,7 @@ internal static class DibCodec
         return ReadUInt32(reversed, 0) == red && ReadUInt32(reversed, 4) == green && ReadUInt32(reversed, 8) == blue;
     }
 
-    private static int ReadIndex(byte[] data, int rowOffset, int x, int bitCount)
+    private static int ReadIndex(ReadOnlySpan<byte> data, int rowOffset, int x, int bitCount)
     {
         switch (bitCount)
         {
@@ -438,9 +582,9 @@ internal static class DibCodec
         }
     }
 
-    private static uint ReadUInt32(byte[] data, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset, 4));
-    private static int ReadInt32(byte[] data, int offset) => BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(offset, 4));
-    private static ushort ReadUInt16(byte[] data, int offset) => BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(offset, 2));
+    private static uint ReadUInt32(ReadOnlySpan<byte> data, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(data.Slice(offset, 4));
+    private static int ReadInt32(ReadOnlySpan<byte> data, int offset) => BinaryPrimitives.ReadInt32LittleEndian(data.Slice(offset, 4));
+    private static ushort ReadUInt16(ReadOnlySpan<byte> data, int offset) => BinaryPrimitives.ReadUInt16LittleEndian(data.Slice(offset, 2));
     private static void WriteUInt32(Span<byte> data, int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(data.Slice(offset, 4), value);
     private static void WriteInt32(Span<byte> data, int offset, int value) => BinaryPrimitives.WriteInt32LittleEndian(data.Slice(offset, 4), value);
     private static void WriteUInt16(Span<byte> data, int offset, ushort value) => BinaryPrimitives.WriteUInt16LittleEndian(data.Slice(offset, 2), value);

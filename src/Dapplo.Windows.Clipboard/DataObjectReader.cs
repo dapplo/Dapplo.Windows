@@ -161,7 +161,8 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
 
     /// <summary>
     /// Get the data of a format with an index (lindex), e.g. FileContents of the virtual file with that index.
-    /// The data is copied into a read-only MemoryStream, which stays valid after the data object is gone.
+    /// The data is copied into a read-only MemoryStream, which stays valid after the data object is gone. Its buffer can be read without
+    /// another copy with <see cref="MemoryStream.TryGetBuffer"/>; don't change it.
     /// </summary>
     /// <param name="format">string with the format name</param>
     /// <param name="index">int with the lindex, -1 for "all"</param>
@@ -174,7 +175,8 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
         {
             return false;
         }
-        stream = new MemoryStream(bytes, false);
+        // Read-only, publicly visible so TryGetBuffer works without a copy (the buffer must not be changed)
+        stream = new MemoryStream(bytes, 0, bytes.Length, false, true);
         return true;
     }
 
@@ -203,7 +205,8 @@ public sealed class DataObjectReader : IClipboardDataSource, IDisposable
         }
         // HGLOBAL allocations can be larger than the file
         var length = size.HasValue && size.Value >= 0 && size.Value < bytes.Length ? (int)size.Value : bytes.Length;
-        return new MemoryStream(bytes, 0, length, false, false);
+        // Read-only, publicly visible so TryGetBuffer works without a copy (the buffer must not be changed)
+        return new MemoryStream(bytes, 0, length, false, true);
     }
 
     private bool TryGetBytes(string format, int index, out byte[] bytes)

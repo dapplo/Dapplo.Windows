@@ -108,6 +108,26 @@ public class DataObjectReaderTests
         AssertVirtualFiles(reader);
     }
 
+    /// <summary>
+    /// The read-only streams expose their buffer, so a caller can use it without another copy
+    /// </summary>
+    [Fact]
+    public void Reader_Streams_ExposeTheirBuffer()
+    {
+        using var reader = new DataObjectReader(CreateVirtualFiles());
+        Assert.True(reader.TryGetStream(DataObjectReader.FileContentsFormat, 1, out var stream));
+        var memoryStream = Assert.IsType<MemoryStream>(stream);
+        Assert.False(memoryStream.CanWrite);
+        Assert.True(memoryStream.TryGetBuffer(out var buffer));
+        Assert.Equal(SecondContent, buffer.ToArray());
+
+        // HGLOBAL content: the stream has the file size, the buffer can be larger
+        using var first = Assert.IsType<MemoryStream>(reader.GetVirtualFiles()[0].OpenContent());
+        Assert.False(first.CanWrite);
+        Assert.True(first.TryGetBuffer(out var firstBuffer));
+        Assert.Equal(FirstContent, firstBuffer.ToArray());
+    }
+
     [Fact]
     public void Reader_Disposed_Throws()
     {
