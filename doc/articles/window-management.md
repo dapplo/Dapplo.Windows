@@ -374,18 +374,25 @@ control type ScrollBar (e.g. the Visual Studio editor and Output pane). When no 
 `ScrollPattern`, `FromPoint` takes the first one which has a visible child scroll bar in the direction; `FromWindow` does the
 same after its `ScrollPattern` lookups found nothing. Such a scroller has `IsScrollBarFallback` true and always scrolls with
 the mouse wheel (`ScrollMode` is `MouseWheel`, setting `ScrollPattern` throws), so the area has to be visible on the screen;
-`ViewportBounds` is the control (including its scroll bar), `WheelLocation` and `RestoreCursorAfterWheel` work as usual.
+`ViewportBounds` is the control without its scroll bar when the scroll bar is at an edge (and without a scroll bar of the other
+orientation at an edge, e.g. a horizontal one at the bottom), so the frames of a capture don't show it; `WheelLocation` and
+`RestoreCursorAfterWheel` work as usual.
 
 The position comes from the scroll bar:
 - its RangeValue pattern: the position from `Value` between `Minimum` and `Maximum`, the visible part from `LargeChange`;
   `Start()`, `End()` and `Reset()` set the value when it's writable;
-- else the position of its thumb between the line buttons (to a pixel);
+- else the position of its thumb between the line buttons. That is to a pixel of the thumb, which on long content stands for
+  a lot of content: `IsAtEnd` can be true a little early (compare the captured frames when that matters), `Start()` and
+  `End()` wheel a bit further when the thumb says they got there;
 - else it is unknown: `IsPositionKnown` is false, `ScrollPercent` is -1, `IsAtStart` / `IsAtEnd` are only true when the line
   button in that direction is disabled and the other one enabled (WPF disables both while the mouse isn't over the scroll
   bar), `Next()` / `Previous()` move one wheel notch per step and return true, and `Start()`,
   `End()` and `Reset()` return false. The caller detects the end itself, e.g. when the captured content stops changing.
 
-With a known position a step wheels one notch at a time until about `StepFraction` of a page moved.
+With a known position a step wheels one notch at a time until about `StepFraction` of a page moved. `Start()` and `End()` set
+a writable RangeValue and check the position read back; otherwise, like `Reset()`, they wheel several pages per input
+(independent of `StepFraction`, more notches when one input didn't move the thumb) until the start or end is reached or the
+position stops moving, with a limit from the remaining percentage. They return false when the start or end wasn't reached.
 
 Both scrollers implement `IScroller`, so one piece of code handles both:
 
@@ -429,7 +436,7 @@ finally
 One window can hold several scrollable areas: in Visual Studio the editor, the Output pane and the Solution Explorer are
 all in one WPF window. `UiAutomationScroller.FindScrollableAreas(window, horizontal)` lists the screen bounds (pixels) of the
 window element and every descendant which can scroll in that direction, and the parent of every scroll bar element in that
-direction (the controls without a `ScrollPattern` above; its rectangle includes the scroll bar), in tree order, without hit testing on the screen,
+direction (the controls without a `ScrollPattern` above; without the scroll bars at its edges, like `ViewportBounds`), in tree order, without hit testing on the screen,
 so it works while another window (a selection window) covers it. It is one `FindAll` with a cache request for the bounding
 rectangle, plus one call per scroll bar for its parent; empty and offscreen elements are left out, duplicates (a
 `ScrollPattern` element and the parent of its own scroll bar) are returned once, an outer area comes before the areas

@@ -288,7 +288,9 @@ internal interface IUIAutomationElement
 
     [PreserveSig]
     int get_CachedIsOffscreen(out int isOffscreen);
-    void get_CachedOrientation();
+    [PreserveSig]
+    int get_CachedOrientation(out int orientation);
+
     void get_CachedFrameworkId();
     void get_CachedIsRequiredForForm();
     void get_CachedItemStatus();

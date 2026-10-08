@@ -393,20 +393,28 @@ public enum ScrollBarExposure
 internal sealed class ScrollBarOnlyTestWindow : ScrollTestWindow
 {
     private readonly ScrollBarExposure _exposure;
+    private readonly int _lineCount;
+    private readonly bool _withHorizontalScrollBar;
     private WpfWindows.Window _window;
     private ScrollBarOnlyControl _control;
     private Dispatcher _dispatcher;
 
-    public ScrollBarOnlyTestWindow(ScrollBarExposure exposure = ScrollBarExposure.RangeValue) : base(nameof(ScrollBarOnlyTestWindow), start: false)
+    /// <param name="exposure">ScrollBarExposure, what the vertical scroll bar tells UI Automation</param>
+    /// <param name="lineCount">int with the number of lines of 20 pixels</param>
+    /// <param name="withHorizontalScrollBar">true for a horizontal scroll bar at the bottom of the content too</param>
+    public ScrollBarOnlyTestWindow(ScrollBarExposure exposure = ScrollBarExposure.RangeValue, int lineCount = ScrollBarOnlyControl.DefaultLineCount, bool withHorizontalScrollBar = false)
+        : base(nameof(ScrollBarOnlyTestWindow), start: false)
     {
         _exposure = exposure;
+        _lineCount = lineCount;
+        _withHorizontalScrollBar = withHorizontalScrollBar;
         Start();
     }
 
     protected override void Run()
     {
         _dispatcher = Dispatcher.CurrentDispatcher;
-        _control = new ScrollBarOnlyControl(_exposure);
+        _control = new ScrollBarOnlyControl(_exposure, _lineCount, _withHorizontalScrollBar);
         _window = new WpfWindows.Window
         {
             Title = "Dapplo.Windows scroll bar only test",
@@ -429,15 +437,23 @@ internal sealed class ScrollBarOnlyTestWindow : ScrollTestWindow
         Dispatcher.Run();
     }
 
-    /// <summary>The control (content and scroll bar) in screen coordinates</summary>
-    public NativeRect ControlBounds => Invoke(() =>
-    {
-        var topLeft = _control.PointToScreen(new WpfWindows.Point(0, 0));
-        var bottomRight = _control.PointToScreen(new WpfWindows.Point(_control.ActualWidth, _control.ActualHeight));
-        return new NativeRect((int)Math.Round(topLeft.X), (int)Math.Round(topLeft.Y), (int)Math.Round(bottomRight.X - topLeft.X), (int)Math.Round(bottomRight.Y - topLeft.Y));
-    });
+    /// <summary>The control (content and scroll bars) in screen coordinates</summary>
+    public NativeRect ControlBounds => Invoke(() => BoundsOf(_control));
 
-    public override NativeRect ScrollingBounds => ControlBounds;
+    /// <summary>The content without the scroll bars in screen coordinates</summary>
+    public NativeRect ContentBounds => Invoke(() => BoundsOf(_control.Viewport));
+
+    public override NativeRect ScrollingBounds => ContentBounds;
+
+    private static NativeRect BoundsOf(WpfWindows.FrameworkElement element)
+    {
+        var topLeft = element.PointToScreen(new WpfWindows.Point(0, 0));
+        var bottomRight = element.PointToScreen(new WpfWindows.Point(element.ActualWidth, element.ActualHeight));
+        return new NativeRect((int)Math.Round(topLeft.X), (int)Math.Round(topLeft.Y), (int)Math.Round(bottomRight.X - topLeft.X), (int)Math.Round(bottomRight.Y - topLeft.Y));
+    }
+
+    /// <summary>Scroll the content, in device independent pixels</summary>
+    public void ScrollTo(double offset) => Invoke(() => _control.ScrollBar.Value = Math.Max(0, Math.Min(_control.ScrollBar.Maximum, offset)));
 
     /// <summary>How far the content is scrolled, in device independent pixels</summary>
     public double Offset => Invoke(() => _control.ScrollBar.Value);
@@ -456,28 +472,38 @@ internal sealed class ScrollBarOnlyTestWindow : ScrollTestWindow
 /// </summary>
 internal sealed class ScrollBarOnlyControl : UserControl
 {
-    public const int LineCount = 100;
+    public const int DefaultLineCount = 100;
     public const double LineHeight = 20;
     public const int LinesPerNotch = 3;
     private readonly TranslateTransform _transform = new();
 
-    public ScrollBarOnlyControl(ScrollBarExposure exposure)
+    public ScrollBarOnlyControl(ScrollBarExposure exposure, int lineCount = DefaultLineCount, bool withHorizontalScrollBar = false)
     {
         var lines = new StackPanel { RenderTransform = _transform };
-        for (var i = 0; i < LineCount; i++)
+        for (var i = 0; i < lineCount; i++)
         {
             lines.Children.Add(new TextBlock { Text = $"Line {i}", Height = LineHeight });
         }
         var viewport = new Canvas { ClipToBounds = true, Background = Brushes.White };
+        Viewport = viewport;
         viewport.Children.Add(lines);
         ScrollBar = new ExposingScrollBar(exposure) { Orientation = Orientation.Vertical, SmallChange = LineHeight };
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition());
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = WpfWindows.GridLength.Auto });
+        grid.RowDefinitions.Add(new RowDefinition());
+        grid.RowDefinitions.Add(new RowDefinition { Height = WpfWindows.GridLength.Auto });
         Grid.SetColumn(viewport, 0);
         Grid.SetColumn(ScrollBar, 1);
         grid.Children.Add(viewport);
         grid.Children.Add(ScrollBar);
+        if (withHorizontalScrollBar)
+        {
+            // Only there to be cut off the area, like the horizontal scroll bar of an editor
+            var horizontalScrollBar = new ScrollBar { Orientation = Orientation.Horizontal, Maximum = 100, ViewportSize = 50, LargeChange = 50 };
+            Grid.SetRow(horizontalScrollBar, 1);
+            grid.Children.Add(horizontalScrollBar);
+        }
         Content = grid;
         Background = Brushes.White;
 
@@ -485,7 +511,7 @@ internal sealed class ScrollBarOnlyControl : UserControl
         viewport.SizeChanged += (_, _) =>
         {
             var height = viewport.ActualHeight;
-            ScrollBar.Maximum = Math.Max(0, LineCount * LineHeight - height);
+            ScrollBar.Maximum = Math.Max(0, lineCount * LineHeight - height);
             ScrollBar.ViewportSize = height;
             ScrollBar.LargeChange = height;
         };
@@ -499,6 +525,9 @@ internal sealed class ScrollBarOnlyControl : UserControl
     }
 
     public ScrollBar ScrollBar { get; }
+
+    /// <summary>The content area, without the scroll bars</summary>
+    public WpfWindows.FrameworkElement Viewport { get; }
 }
 
 /// <summary>

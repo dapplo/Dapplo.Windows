@@ -52,6 +52,16 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     private const int PositionChangeChecks = 50;
     private const int PositionChangeCheckInterval = 10;
 
+    /// <summary>
+    ///     Start, End and Reset with the mouse wheel: at most this many notches in one wheel input (12000, well below the 16 bit limit of
+    ///     the wheel delta in WM_MOUSEWHEEL), aiming for this many pages per input
+    /// </summary>
+    private const int MaxNotchesPerWheelInput = 100;
+    private const int PagesPerWheelInput = 5;
+
+    /// <summary>A scroll bar at the edge of its parent: how far (in pixels) it may be from that edge</summary>
+    private const int EdgeTolerance = 2;
+
     private readonly IUIAutomation _automation;
     private readonly NativePoint? _point;
     private readonly IntPtr _windowHandle;
@@ -59,6 +69,9 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     private IUIAutomationScrollPattern _scrollPattern;
     private ScrollBarParts _scrollBar;
     private UiAutomationScrollModes _scrollMode = UiAutomationScrollModes.ScrollPattern;
+
+    /// <summary>When the last position came from a thumb: the percentage one pixel of the thumb stands for, else 0</summary>
+    private double _thumbPixelPercent;
     private double _stepFraction = 1.0;
     private bool _isDisposed;
 
@@ -158,7 +171,9 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     ///     test with the smallest rectangle containing the point). Offscreen elements and empty rectangles are left out, duplicates (e.g. a
     ///     list and its scroll viewer, or a control and the parent of its own scroll bar, with the same bounds) are returned once. A
     ///     rectangle can extend beyond the window when the element is partly scrolled out of view. The rectangle of a scroll bar's parent
-    ///     includes the scroll bar.
+    ///     leaves out the scroll bar when it is at an edge of the parent (and a scroll bar of the other orientation at an edge, e.g. a
+    ///     horizontal one at the bottom of a vertically scrolled area), so a capture of the area doesn't show it; else it is the
+    ///     parent's rectangle. Elements with a ScrollPattern are returned as they are.
     ///     </para>
     ///     <para>
     ///     This blocks: it is one UI Automation search (FindAll with a cache request for the bounds, the offscreen state and the control
@@ -218,15 +233,18 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
                 || automation.CreateCacheRequest(out cacheRequest) != UiaConstants.S_OK || cacheRequest is null
                 || cacheRequest.AddProperty(UiaConstants.BoundingRectanglePropertyId) != UiaConstants.S_OK
                 || cacheRequest.AddProperty(UiaConstants.IsOffscreenPropertyId) != UiaConstants.S_OK
-                || cacheRequest.AddProperty(UiaConstants.ControlTypePropertyId) != UiaConstants.S_OK)
+                || cacheRequest.AddProperty(UiaConstants.ControlTypePropertyId) != UiaConstants.S_OK
+                || cacheRequest.AddProperty(UiaConstants.OrientationPropertyId) != UiaConstants.S_OK)
             {
                 return areas;
             }
             condition = scrollableCondition;
             if (includeScrollBarAreas)
             {
-                // The parent of a scroll bar is fetched from the found element, that needs a reference to the live element
-                if (!CreateScrollBarCondition(automation, horizontal, false, out scrollBarCondition)
+                // All scroll bars: the ones in the direction give the areas, the others are cut off those areas when at their edge.
+                // The parent of a scroll bar is fetched from the found element, that needs a reference to the live element.
+                if (automation.CreatePropertyCondition(UiaConstants.ControlTypePropertyId, UiaConstants.ScrollBarControlTypeId, out scrollBarCondition) != UiaConstants.S_OK
+                    || scrollBarCondition is null
                     || automation.CreateOrCondition(scrollableCondition, scrollBarCondition, out condition) != UiaConstants.S_OK || condition is null
                     || automation.get_ControlViewWalker(out walker) != UiaConstants.S_OK || walker is null)
                 {
@@ -253,6 +271,11 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
                 }
                 return areas;
             }
+            // In tree order: the ScrollPattern elements, and the parents of the scroll bars in the direction with their scroll bar
+            var candidates = new List<(NativeRect Bounds, NativeRect ScrollBar)>();
+            var patternBounds = new HashSet<NativeRect>();
+            var otherScrollBars = new List<NativeRect>();
+            var wantedOrientation = horizontal ? UiaConstants.OrientationHorizontal : UiaConstants.OrientationVertical;
             for (var index = 0; index < length; index++)
             {
                 if (found.GetElement(index, out var element) != UiaConstants.S_OK || element is null)
@@ -266,21 +289,40 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
                     {
                         continue;
                     }
-                    if (includeScrollBarAreas && element.get_CachedControlType(out var controlType) == UiaConstants.S_OK && controlType == UiaConstants.ScrollBarControlTypeId)
+                    if (!includeScrollBarAreas || element.get_CachedControlType(out var controlType) != UiaConstants.S_OK || controlType != UiaConstants.ScrollBarControlTypeId)
                     {
-                        // The control which scrolls is the parent of the scroll bar
-                        if (walker.GetParentElementBuildCache(element, cacheRequest, out parent) != UiaConstants.S_OK || parent is null
-                            || !TryGetCachedVisibleBounds(parent, out bounds))
-                        {
-                            continue;
-                        }
+                        candidates.Add((bounds, NativeRect.Empty));
+                        patternBounds.Add(bounds);
+                        continue;
                     }
-                    AddArea(areas, bounds);
+                    if (element.get_CachedOrientation(out var orientation) != UiaConstants.S_OK || orientation != wantedOrientation)
+                    {
+                        otherScrollBars.Add(bounds);
+                        continue;
+                    }
+                    // The control which scrolls is the parent of the scroll bar
+                    if (walker.GetParentElementBuildCache(element, cacheRequest, out parent) == UiaConstants.S_OK && parent is not null
+                        && TryGetCachedVisibleBounds(parent, out var parentBounds))
+                    {
+                        candidates.Add((parentBounds, bounds));
+                    }
                 }
                 finally
                 {
                     Release(parent);
                     Release(element);
+                }
+            }
+            foreach (var (bounds, scrollBar) in candidates)
+            {
+                if (scrollBar.IsEmpty)
+                {
+                    AddArea(areas, bounds);
+                }
+                // A ScrollPattern element and the parent of its own scroll bar: the element as it is
+                else if (!patternBounds.Contains(bounds))
+                {
+                    AddArea(areas, WithoutScrollBars(bounds, scrollBar, horizontal, otherScrollBars));
                 }
             }
             return areas;
@@ -309,6 +351,78 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             return false;
         }
         return element.get_CachedBoundingRectangle(out bounds) == UiaConstants.S_OK && !bounds.IsEmpty;
+    }
+
+    /// <summary>
+    ///     The bounds of a scroll bar's parent without the scroll bar when it is at an edge (right or left for a vertical one, bottom or
+    ///     top for a horizontal one), and without a scroll bar of the other orientation at an edge of what is left
+    /// </summary>
+    private static NativeRect WithoutScrollBars(NativeRect parentBounds, NativeRect scrollBar, bool horizontal, IEnumerable<NativeRect> otherScrollBars)
+    {
+        var area = CutScrollBar(parentBounds, scrollBar, horizontal);
+        foreach (var otherScrollBar in otherScrollBars)
+        {
+            var cut = CutScrollBar(area, otherScrollBar, !horizontal);
+            if (cut != area)
+            {
+                return cut;
+            }
+        }
+        return area;
+    }
+
+    /// <summary>
+    ///     The area without the scroll bar when the scroll bar lies inside the area, along one of its edges and covers at least half of
+    ///     that edge; else the area as it is
+    /// </summary>
+    private static NativeRect CutScrollBar(NativeRect area, NativeRect scrollBar, bool scrollBarIsHorizontal)
+    {
+        if (area.IsEmpty || scrollBar.IsEmpty
+            || scrollBar.X < area.X - EdgeTolerance || scrollBar.Y < area.Y - EdgeTolerance
+            || scrollBar.Right > area.Right + EdgeTolerance || scrollBar.Bottom > area.Bottom + EdgeTolerance)
+        {
+            return area;
+        }
+        NativeRect cut;
+        if (scrollBarIsHorizontal)
+        {
+            if (scrollBar.Width * 2 < area.Width || scrollBar.Height * 2 >= area.Height)
+            {
+                return area;
+            }
+            if (area.Bottom - scrollBar.Bottom <= EdgeTolerance)
+            {
+                cut = new NativeRect(area.X, area.Y, area.Width, scrollBar.Y - area.Y);
+            }
+            else if (scrollBar.Y - area.Y <= EdgeTolerance)
+            {
+                cut = new NativeRect(area.X, scrollBar.Bottom, area.Width, area.Bottom - scrollBar.Bottom);
+            }
+            else
+            {
+                return area;
+            }
+        }
+        else
+        {
+            if (scrollBar.Height * 2 < area.Height || scrollBar.Width * 2 >= area.Width)
+            {
+                return area;
+            }
+            if (area.Right - scrollBar.Right <= EdgeTolerance)
+            {
+                cut = new NativeRect(area.X, area.Y, scrollBar.X - area.X, area.Height);
+            }
+            else if (scrollBar.X - area.X <= EdgeTolerance)
+            {
+                cut = new NativeRect(scrollBar.Right, area.Y, area.Right - scrollBar.Right, area.Height);
+            }
+            else
+            {
+                return area;
+            }
+        }
+        return cut.IsEmpty ? area : cut;
     }
 
     /// <summary>
@@ -382,7 +496,10 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     ///     (<see cref="ScrollMode"/> is <see cref="UiAutomationScrollModes.MouseWheel"/>), the cursor moves to <see cref="WheelLocation"/>
     ///     (or the middle of <see cref="ViewportBounds"/>), so the area must be visible on the screen.
     ///     The position is read from the scroll bar: its RangeValue pattern (Value, Minimum, Maximum, LargeChange), else the position of
-    ///     its thumb between its line buttons, see <see cref="IsPositionKnown"/>.
+    ///     its thumb between its line buttons, see <see cref="IsPositionKnown"/>. A thumb tells the position to a pixel: on long content
+    ///     <see cref="IsAtStart"/> / <see cref="IsAtEnd"/> can be true while up to a thumb pixel's worth of content is left (compare the
+    ///     captured frames when that matters); <see cref="Start"/>, <see cref="End"/> and <see cref="Reset"/> to the start or end wheel a
+    ///     little further to make up for it.
     /// </summary>
     public bool IsScrollBarFallback { get; private set; }
 
@@ -433,9 +550,9 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     }
 
     /// <summary>
-    ///     The maximum number of SmallIncrement scroll calls (when SetScrollPercent is not supported) or mouse wheel notches for one step,
-    ///     and the maximum number of steps <see cref="Start"/> and <see cref="End"/> take in <see cref="UiAutomationScrollModes.MouseWheel"/>.
-    ///     Default is 100.
+    ///     The maximum number of SmallIncrement scroll calls (when SetScrollPercent is not supported) or mouse wheel notches for one step.
+    ///     <see cref="Start"/>, <see cref="End"/> and <see cref="Reset"/> are not limited by it: they continue as long as the position
+    ///     moves, limited by the remaining percentage (twice what it needs at the speed of the first movement). Default is 100.
     /// </summary>
     public int MaxIncrementsPerStep { get; set; } = 100;
 
@@ -454,6 +571,8 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     /// <summary>
     ///     The visible, scrolling area: the bounding rectangle of the element in screen coordinates (physical pixels for a per-monitor
     ///     DPI aware process), e.g. to crop the frames of a scrolling capture. Empty when the element is not available.
+    ///     For a <see cref="IsScrollBarFallback"/> scroller the element's scroll bar (and one of the other orientation) is left out when
+    ///     it is at an edge of the element, measured when the scroller was created or refreshed.
     /// </summary>
     public NativeRect ViewportBounds
     {
@@ -464,7 +583,14 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             {
                 return NativeRect.Empty;
             }
-            return bounds;
+            var scrollBar = _scrollBar;
+            if (scrollBar is null || bounds.IsEmpty)
+            {
+                return bounds;
+            }
+            var withoutScrollBars = new NativeRect(bounds.X + scrollBar.LeftInset, bounds.Y + scrollBar.TopInset,
+                bounds.Width - scrollBar.LeftInset - scrollBar.RightInset, bounds.Height - scrollBar.TopInset - scrollBar.BottomInset);
+            return withoutScrollBars.IsEmpty ? bounds : withoutScrollBars;
         }
     }
 
@@ -492,15 +618,18 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     public bool IsAtEnd => IsAtLimit(true);
 
     /// <summary>
-    ///     Scroll to the start (0 percent)
+    ///     Scroll to the start (0 percent). Uses SetScrollPercent, or a scroll bar's writable RangeValue (checking that the position read
+    ///     back got there), else large increments or, in <see cref="UiAutomationScrollModes.MouseWheel"/>, wheel input of several pages
+    ///     at a time (independent of <see cref="StepFraction"/>) until the start is reached or the position stops moving. Without a known
+    ///     position (<see cref="IsPositionKnown"/> false) this only returns true when <see cref="IsAtStart"/> already is.
     /// </summary>
-    /// <returns>bool if this worked</returns>
+    /// <returns>bool, true when the start was reached</returns>
     public bool Start() => ScrollTo(0, false);
 
     /// <summary>
-    ///     Scroll to the end (100 percent)
+    ///     Scroll to the end (100 percent), see <see cref="Start"/>
     /// </summary>
-    /// <returns>bool if this worked</returns>
+    /// <returns>bool, true when the end was reached</returns>
     public bool End() => ScrollTo(100, true);
 
     /// <summary>
@@ -534,7 +663,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             return WaitForPercentChange(before, out _);
         }
         // A scroll bar without a writable RangeValue: wheel back
-        return ScrollMode == UiAutomationScrollModes.MouseWheel && IsAvailable && WheelUntil(InitialScrollPercent > before, before, InitialScrollPercent);
+        return ScrollMode == UiAutomationScrollModes.MouseWheel && IsAvailable && WheelTo(InitialScrollPercent, before);
     }
 
     /// <summary>
@@ -587,66 +716,190 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     private bool ScrollTo(double percent, bool toEnd)
     {
         ThrowIfDisposed();
+        if (!TryGetScrollPercent(out var before))
+        {
+            // A scroll bar without a position: there is no way to know where the start or end is
+            return IsScrollBarFallback && IsAvailable && (toEnd ? IsAtEnd : IsAtStart);
+        }
+        if (before < 0)
+        {
+            return false;
+        }
+        if (IsAtTarget(before, percent, toEnd) && !(ScrollMode == UiAutomationScrollModes.MouseWheel && _thumbPixelPercent > 0))
+        {
+            return true;
+        }
         if (ScrollMode == UiAutomationScrollModes.MouseWheel)
         {
-            if (_scrollPattern is null)
+            // A scroll bar with a writable RangeValue: set it, and use it when the position read back got there
+            if (_scrollPattern is null && SetScrollPercent(percent))
             {
-                // A scroll bar: set its RangeValue when it's writable, without a position there is no way to know where the start or end is
-                if (!TryGetScrollPercent(out var current))
-                {
-                    return toEnd ? IsAtEnd && IsAvailable : IsAtStart && IsAvailable;
-                }
-                if (current < 0)
-                {
-                    return false;
-                }
-                if (Math.Abs(current - percent) <= PercentTolerance)
+                if (WaitForPercent(percent, toEnd, out var after))
                 {
                     return true;
                 }
-                if (SetScrollPercent(percent))
-                {
-                    return WaitForPercentChange(current, out var after) || Math.Abs(after - percent) <= PercentTolerance;
-                }
+                Log.Verbose().WriteLine("Setting the scroll bar to {0} percent stopped at {1}, using the mouse wheel.", percent, after);
+                before = after;
             }
-            for (var step = 0; step < MaxIncrementsPerStep; step++)
-            {
-                if (toEnd ? IsAtEnd : IsAtStart)
-                {
-                    return IsAvailable;
-                }
-                if (!Step(toEnd, 1.0))
-                {
-                    return false;
-                }
-            }
-            return false;
-        }
-        if (!TryGetScrollPercent(out var before) || before < 0)
-        {
-            return false;
-        }
-        if (Math.Abs(before - percent) <= PercentTolerance)
-        {
-            return true;
+            return WheelTo(percent, before);
         }
         if (SetScrollPercent(percent))
         {
             return WaitForPercentChange(before, out var after) || Math.Abs(after - percent) <= PercentTolerance;
         }
-        // SetScrollPercent not supported: large increments until the end
-        for (var step = 0; step < MaxIncrementsPerStep; step++)
+        // SetScrollPercent not supported: large increments until the start / end, as long as the position moves. The limit comes
+        // from the first increment: twice the increments the remaining percentage needs, plus some.
+        var limit = MaxIncrementsPerStep;
+        for (var step = 0; step < limit; step++)
         {
-            if (toEnd ? IsAtEnd : IsAtStart)
+            if (!ScrollAmountAndWait(toEnd ? ScrollAmount.LargeIncrement : ScrollAmount.LargeDecrement) || !TryGetScrollPercent(out var current))
             {
-                return IsAvailable;
+                return IsAvailable && TryGetScrollPercent(out var last) && IsAtTarget(last, percent, toEnd);
             }
-            if (!ScrollAmountAndWait(toEnd ? ScrollAmount.LargeIncrement : ScrollAmount.LargeDecrement))
+            if (IsAtTarget(current, percent, toEnd))
             {
-                return false;
+                return true;
+            }
+            if (step == 0)
+            {
+                limit = IncrementLimit(Math.Abs(before - percent), Math.Abs(current - before), 1);
             }
         }
         return false;
+    }
+
+    /// <summary>
+    ///     Within the tolerance of the target, or past it (the start or end can't be passed)
+    /// </summary>
+    private bool IsAtTarget(double current, double target, bool forward) =>
+        Math.Abs(current - target) <= PercentTolerance || (forward ? current >= target : current <= target);
+
+    /// <summary>
+    ///     Twice the increments the remaining percentage needs at the measured speed, plus some, at least <see cref="MaxIncrementsPerStep"/>
+    /// </summary>
+    private int IncrementLimit(double remaining, double moved, int increments)
+    {
+        if (moved <= 0)
+        {
+            return MaxIncrementsPerStep;
+        }
+        var needed = remaining / (moved / increments);
+        return (int)Math.Max(MaxIncrementsPerStep, Math.Min(int.MaxValue / 2.0, Math.Ceiling(needed * 2) + 10));
+    }
+
+    /// <summary>
+    ///     Poll until the position reached the target (it may arrive late)
+    /// </summary>
+    private bool WaitForPercent(double target, bool forward, out double after)
+    {
+        after = UiaConstants.NoScroll;
+        for (var check = 0; check < PositionChangeChecks; check++)
+        {
+            if (!TryGetScrollPercent(out after))
+            {
+                return false;
+            }
+            if (IsAtTarget(after, target, forward))
+            {
+                return true;
+            }
+            Thread.Sleep(PositionChangeCheckInterval);
+        }
+        return false;
+    }
+
+    /// <summary>
+    ///     Wheel to a position far away (Start, End, Reset), independent of <see cref="StepFraction"/>: several pages per wheel input once
+    ///     the movement per notch is measured, until the target is reached or the position stops moving. The number of notches is limited
+    ///     by the remaining percentage (twice what it needs at the measured speed).
+    /// </summary>
+    /// <returns>true when the target was reached</returns>
+    private bool WheelTo(double target, double percent)
+    {
+        if (!TryGetWheelLocation(out var location))
+        {
+            return false;
+        }
+        var forward = target > percent;
+        var pagePercent = TryGetViewSize(out var viewSize) && viewSize > 0 && viewSize < 100 ? viewSize / (100 - viewSize) * 100 : 0;
+        double percentPerNotch = 0;
+        // After an input which didn't move anything the next one has more notches
+        var minimumNotches = 1;
+        var sentNotches = 0;
+        var notchLimit = int.MaxValue;
+        while (true)
+        {
+            if (IsAtTarget(percent, target, forward))
+            {
+                WheelPastThumbPrecision(target, forward, location, percentPerNotch);
+                return true;
+            }
+            var notches = 1;
+            if (percentPerNotch > 0)
+            {
+                // Several pages, but not (much) more than what is left
+                var remaining = Math.Abs(target - percent);
+                var wanted = pagePercent > 0 ? Math.Min(remaining, pagePercent * PagesPerWheelInput) : remaining;
+                notches = (int)Math.Max(1, Math.Min(MaxNotchesPerWheelInput, Math.Ceiling(wanted / percentPerNotch)));
+            }
+            notches = Math.Max(notches, minimumNotches);
+            if (sentNotches + notches > notchLimit)
+            {
+                Log.Verbose().WriteLine("The target {0} percent was not reached after {1} wheel notches, at {2} percent.", target, sentNotches, percent);
+                return false;
+            }
+            if (!WheelNotches(forward, location, notches))
+            {
+                return false;
+            }
+            sentNotches += notches;
+            if (!WaitForPercentChange(percent, out var after) || (forward ? after <= percent : after >= percent))
+            {
+                if (!IsAvailable)
+                {
+                    return false;
+                }
+                // Nothing moved: e.g. a thumb moves in whole pixels, so on long content a notch may not move it. Try more notches, at most
+                // one input with the maximum, before deciding that the position doesn't change anymore.
+                if (notches >= MaxNotchesPerWheelInput)
+                {
+                    Log.Verbose().WriteLine("The scroll position doesn't change anymore at {0} percent, the target was {1}.", percent, target);
+                    return TryGetScrollPercent(out var last) && IsAtTarget(last, target, forward);
+                }
+                minimumNotches = Math.Min(MaxNotchesPerWheelInput, notches * 4);
+                continue;
+            }
+            var moved = Math.Abs(after - percent);
+            if (percentPerNotch <= 0)
+            {
+                notchLimit = sentNotches + IncrementLimit(Math.Abs(target - after), moved, notches);
+            }
+            // The latest measurement: some applications scroll smoothly and were still moving when the position was read
+            percentPerNotch = moved / notches;
+            minimumNotches = 1;
+            percent = after;
+        }
+    }
+
+    /// <summary>
+    ///     A thumb tells the position to a pixel, on long content that is a lot: when the thumb says the start or end is reached, wheel
+    ///     about two thumb pixels further, which stops at the start or end
+    /// </summary>
+    private void WheelPastThumbPrecision(double target, bool forward, NativePoint location, double percentPerNotch)
+    {
+        var pixelPercent = _thumbPixelPercent;
+        if (pixelPercent <= 0 || (forward ? target < 100 : target > 0))
+        {
+            return;
+        }
+        var notches = percentPerNotch > 0
+            ? (int)Math.Max(1, Math.Min(MaxNotchesPerWheelInput, Math.Ceiling(2 * pixelPercent / percentPerNotch)))
+            : MaxNotchesPerWheelInput;
+        if (WheelNotches(forward, location, notches))
+        {
+            // Let it arrive, the position can't be checked to less than a thumb pixel
+            WaitForPercentChange(target, out _);
+        }
     }
 
     private bool Step(bool forward, double stepFraction)
@@ -775,10 +1028,12 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         return !viewport.IsEmpty;
     }
 
-    private bool WheelNotch(bool forward, NativePoint location)
+    private bool WheelNotch(bool forward, NativePoint location) => WheelNotches(forward, location, 1);
+
+    private bool WheelNotches(bool forward, NativePoint location, int notches)
     {
         // Negative is down (towards the user) for the vertical wheel, positive is right for the horizontal wheel
-        var delta = Horizontal == forward ? WindowScroller.WheelDeltaPerNotch : -WindowScroller.WheelDeltaPerNotch;
+        var delta = notches * (Horizontal == forward ? WindowScroller.WheelDeltaPerNotch : -WindowScroller.WheelDeltaPerNotch);
         return MouseInputGenerator.MoveMouseWheelAt(delta, location, RestoreCursorAfterWheel, Horizontal);
     }
 
@@ -868,6 +1123,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     {
         percent = UiaConstants.NoScroll;
         viewSize = 0;
+        _thumbPixelPercent = 0;
         var scrollBar = _scrollBar;
         if (scrollBar is null)
         {
@@ -910,6 +1166,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             : trackEnd - thumbEnd <= 1 ? 100
             : Math.Max(0, Math.Min(100, (thumbStart - trackStart) * 100.0 / (trackLength - thumbLength)));
         viewSize = thumbLength * 100.0 / trackLength;
+        _thumbPixelPercent = 100.0 / (trackLength - thumbLength);
         return true;
     }
 
@@ -1261,7 +1518,45 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             }
         }
         FindScrollBarChildren(automation, parts, horizontal);
+        MeasureScrollBarInsets(automation, element, parts, horizontal);
         return new UiAutomationScroller(automation, element, null, horizontal, rememberPoint, rememberWindow, parts);
+    }
+
+    /// <summary>
+    ///     How much the scroll bar, and a visible scroll bar of the other orientation among the element's children, take at the edges of
+    ///     the element: the bounds of both and one search
+    /// </summary>
+    private static void MeasureScrollBarInsets(IUIAutomation automation, IUIAutomationElement element, ScrollBarParts parts, bool horizontal)
+    {
+        if (element.get_CurrentBoundingRectangle(out var bounds) != UiaConstants.S_OK || bounds.IsEmpty
+            || parts.ScrollBar.get_CurrentBoundingRectangle(out var scrollBarBounds) != UiaConstants.S_OK)
+        {
+            return;
+        }
+        var otherScrollBars = new List<NativeRect>();
+        if (CreateScrollBarCondition(automation, !horizontal, true, out var condition))
+        {
+            try
+            {
+                if (element.FindFirst(UiaConstants.TreeScopeChildren, condition, out var other) == UiaConstants.S_OK && other is not null)
+                {
+                    if (other.get_CurrentBoundingRectangle(out var otherBounds) == UiaConstants.S_OK && !otherBounds.IsEmpty)
+                    {
+                        otherScrollBars.Add(otherBounds);
+                    }
+                    Release(other);
+                }
+            }
+            finally
+            {
+                Release(condition);
+            }
+        }
+        var area = WithoutScrollBars(bounds, scrollBarBounds, horizontal, otherScrollBars);
+        parts.LeftInset = area.X - bounds.X;
+        parts.TopInset = area.Y - bounds.Y;
+        parts.RightInset = bounds.Right - area.Right;
+        parts.BottomInset = bounds.Bottom - area.Bottom;
     }
 
     /// <summary>
@@ -1427,6 +1722,12 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         /// <summary>The length of the line buttons in the scroll direction when they are at the ends of the scroll bar, else 0</summary>
         public int DecreaseLength;
         public int IncreaseLength;
+
+        /// <summary>How much the scroll bars at the edges of the element take, see ViewportBounds</summary>
+        public int LeftInset;
+        public int TopInset;
+        public int RightInset;
+        public int BottomInset;
 
         public void Release()
         {
