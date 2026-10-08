@@ -1011,9 +1011,11 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             }
             if (!WaitForPercentChange(before, out var after))
             {
-                // A thumb moves in whole pixels: on long content a notch moves the content less than that, so the step ends here
-                // (smaller than asked); at the start or end of the thumb's track nothing could move
-                if (_thumbPixelPercent > 0 && IsAvailable && (forward ? before < 100 - PercentTolerance : before > PercentTolerance))
+                // A thumb moves in whole pixels: on long content (a thumb pixel is a large part of the step) a notch moves the content
+                // less than that, so the step ends here (smaller than asked); at the start or end of the thumb's track nothing could move.
+                // With a finer thumb a notch which didn't move it means that nothing moved.
+                if (_thumbPixelPercent > 0 && target >= 0 && _thumbPixelPercent * 4 > Math.Abs(target - startPercent)
+                    && IsAvailable && (forward ? before < 100 - PercentTolerance : before > PercentTolerance))
                 {
                     return true;
                 }
