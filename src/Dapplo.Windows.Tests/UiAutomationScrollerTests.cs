@@ -468,7 +468,8 @@ public class UiAutomationScrollerTests
         Assert.False(scroller.IsPositionKnown);
         Assert.Equal(-1, scroller.ScrollPercent);
         Assert.Equal(-1, scroller.InitialScrollPercent);
-        // The WPF line buttons stay enabled, so they don't tell the ends
+        // WPF (Aero2) disables both line buttons while the mouse isn't over the scroll bar: that tells nothing
+        Assert.False(scroller.IsAtStart);
         Assert.False(scroller.IsAtEnd);
         Assert.False(scroller.Start());
         scroller.RestoreCursorAfterWheel = true;

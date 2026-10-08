@@ -381,7 +381,8 @@ The position comes from the scroll bar:
   `Start()`, `End()` and `Reset()` set the value when it's writable;
 - else the position of its thumb between the line buttons (to a pixel);
 - else it is unknown: `IsPositionKnown` is false, `ScrollPercent` is -1, `IsAtStart` / `IsAtEnd` are only true when the line
-  button in that direction is disabled, `Next()` / `Previous()` move one wheel notch per step and return true, and `Start()`,
+  button in that direction is disabled and the other one enabled (WPF disables both while the mouse isn't over the scroll
+  bar), `Next()` / `Previous()` move one wheel notch per step and return true, and `Start()`,
   `End()` and `Reset()` return false. The caller detects the end itself, e.g. when the captured content stops changing.
 
 With a known position a step wheels one notch at a time until about `StepFraction` of a page moved.

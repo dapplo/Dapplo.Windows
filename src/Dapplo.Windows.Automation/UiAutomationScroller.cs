@@ -390,7 +390,8 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     ///     True when the scroll position can be read (always for a <c>ScrollPattern</c> element while it is available). False for a
     ///     <see cref="IsScrollBarFallback"/> scroller whose scroll bar reports neither a RangeValue nor a thumb: then
     ///     <see cref="ScrollPercent"/> is -1, <see cref="IsAtStart"/> / <see cref="IsAtEnd"/> are true only when the scroll bar's line
-    ///     button in that direction is disabled (or the element is gone), <see cref="Next"/> / <see cref="Previous"/> move one mouse
+    ///     button in that direction is disabled and the other one is enabled (both disabled says nothing, e.g. WPF disables both while
+    ///     the mouse isn't over the scroll bar), or when the element is gone, <see cref="Next"/> / <see cref="Previous"/> move one mouse
     ///     wheel notch and return true without knowing whether the content moved, and <see cref="Start"/>, <see cref="End"/> and
     ///     <see cref="Reset"/> return false. The caller has to detect the end itself, e.g. when the captured content stops changing.
     /// </summary>
@@ -930,13 +931,17 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             // Can't scroll, or the element is gone: loops end
             return true;
         }
-        // No position: a disabled line button means the content is at that end, an enabled one (or none) says nothing
-        var button = end ? _scrollBar?.IncreaseButton : _scrollBar?.DecreaseButton;
-        if (button is not null && Check(button.get_CurrentIsEnabled(out var isEnabled)))
+        // No position: the line button of this end disabled while the other one is enabled means the content is at this end.
+        // Both disabled says nothing: e.g. WPF's Aero2 theme disables both while the mouse isn't over the scroll bar.
+        var scrollBar = _scrollBar;
+        var button = end ? scrollBar?.IncreaseButton : scrollBar?.DecreaseButton;
+        var otherButton = end ? scrollBar?.DecreaseButton : scrollBar?.IncreaseButton;
+        if (button is null || otherButton is null
+            || !Check(button.get_CurrentIsEnabled(out var isEnabled)) || !Check(otherButton.get_CurrentIsEnabled(out var otherIsEnabled)))
         {
-            return isEnabled == 0;
+            return !IsAvailable;
         }
-        return !IsAvailable;
+        return isEnabled == 0 && otherIsEnabled != 0;
     }
 
     /// <summary>
