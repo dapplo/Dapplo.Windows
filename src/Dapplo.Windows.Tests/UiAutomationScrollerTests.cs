@@ -486,11 +486,13 @@ public class UiAutomationScrollerTests
     ///     several pages at a time
     /// </summary>
     [Theory]
-    [InlineData(ScrollBarExposure.RangeValue)]
-    [InlineData(ScrollBarExposure.ThumbOnly)]
-    public void ScrollBarOnly_StartAndEnd_ReachTheLimitsOfLongContent(ScrollBarExposure exposure)
+    [InlineData(ScrollBarExposure.RangeValue, true)]
+    [InlineData(ScrollBarExposure.ThumbOnly, true)]
+    // Like the Visual Studio editor: setting the scroll bar's value moves only the scroll bar
+    [InlineData(ScrollBarExposure.RangeValue, false)]
+    public void ScrollBarOnly_StartAndEnd_ReachTheLimitsOfLongContent(ScrollBarExposure exposure, bool followsValueChanges)
     {
-        using var testWindow = new ScrollBarOnlyTestWindow(exposure, lineCount: 3000);
+        using var testWindow = new ScrollBarOnlyTestWindow(exposure, lineCount: 3000, followsValueChanges: followsValueChanges);
         var center = ScrollTestWindow.CenterOf(testWindow.ContentBounds);
         testWindow.SkipWhenNotVisibleAt(center);
         testWindow.ScrollTo(double.MaxValue);
@@ -507,6 +509,11 @@ public class UiAutomationScrollerTests
 
         Assert.True(scroller.IsAtStart);
         Assert.Equal(0, testWindow.Offset, 1);
+        // A step from the start moves the content and the position as expected
+        Assert.True(scroller.Next());
+        Assert.InRange(testWindow.Offset, halfPage * 0.25, halfPage * 2);
+        Assert.True(scroller.Start());
+        Assert.Equal(0, testWindow.Offset, 1);
 
         Assert.True(scroller.End());
 
@@ -515,14 +522,16 @@ public class UiAutomationScrollerTests
     }
 
     /// <summary>
-    ///     With a writable RangeValue Start and End set the value, no input is needed
+    ///     With a writable RangeValue Start and End set the value, one wheel notch confirms that the content followed
     /// </summary>
     [Fact]
     public void FromWindow_ScrollBarOnly_StartEndUseTheRangeValue()
     {
         using var testWindow = new ScrollBarOnlyTestWindow();
+        testWindow.SkipWhenNotVisibleAt(ScrollTestWindow.CenterOf(testWindow.ContentBounds));
         using var scroller = UiAutomationScroller.FromWindow(testWindow.WindowHandle);
         Assert.NotNull(scroller);
+        scroller.RestoreCursorAfterWheel = true;
         Assert.True(scroller.IsScrollBarFallback);
 
         Assert.True(scroller.End());

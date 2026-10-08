@@ -619,7 +619,8 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
 
     /// <summary>
     ///     Scroll to the start (0 percent). Uses SetScrollPercent, or a scroll bar's writable RangeValue (checking that the position read
-    ///     back got there), else large increments or, in <see cref="UiAutomationScrollModes.MouseWheel"/>, wheel input of several pages
+    ///     back got there, and with one wheel notch towards the start that the content followed: some controls, like the Visual Studio
+    ///     editor, only follow the Scroll events of their scroll bar), else large increments or, in <see cref="UiAutomationScrollModes.MouseWheel"/>, wheel input of several pages
     ///     at a time (independent of <see cref="StepFraction"/>) until the start is reached or the position stops moving. Without a known
     ///     position (<see cref="IsPositionKnown"/> false) this only returns true when <see cref="IsAtStart"/> already is.
     /// </summary>
@@ -658,11 +659,12 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         {
             return true;
         }
-        if (SetScrollPercent(InitialScrollPercent))
+        // Not for a scroll bar: setting its value may move only the scroll bar, not the content (see Start)
+        if (_scrollPattern is not null && SetScrollPercent(InitialScrollPercent))
         {
             return WaitForPercentChange(before, out _);
         }
-        // A scroll bar without a writable RangeValue: wheel back
+        // A scroll bar: wheel back
         return ScrollMode == UiAutomationScrollModes.MouseWheel && IsAvailable && WheelTo(InitialScrollPercent, before);
     }
 
@@ -734,11 +736,14 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             // A scroll bar with a writable RangeValue: set it, and use it when the position read back got there
             if (_scrollPattern is null && SetScrollPercent(percent))
             {
-                if (WaitForPercent(percent, toEnd, out var after))
+                // The value read back is the scroll bar's own, some controls only follow its Scroll events (e.g. the Visual Studio
+                // editor): then the scroll bar moved, the content didn't. A wheel notch towards the target makes the control put its
+                // real position on the scroll bar again: at the target nothing moves.
+                if (WaitForPercent(percent, toEnd, out var after) && ConfirmWithWheelNotch(percent, toEnd, out after))
                 {
                     return true;
                 }
-                Log.Verbose().WriteLine("Setting the scroll bar to {0} percent stopped at {1}, using the mouse wheel.", percent, after);
+                Log.Verbose().WriteLine("Setting the scroll bar to {0} percent didn't move the content (at {1} percent), using the mouse wheel.", percent, after);
                 before = after;
             }
             return WheelTo(percent, before);
@@ -785,6 +790,27 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         }
         var needed = remaining / (moved / increments);
         return (int)Math.Max(MaxIncrementsPerStep, Math.Min(int.MaxValue / 2.0, Math.Ceiling(needed * 2) + 10));
+    }
+
+    /// <summary>
+    ///     After setting a scroll bar's value: one wheel notch towards the target (start or end). When the content is there nothing
+    ///     moves; when only the scroll bar moved, the control scrolls a notch and its scroll bar shows the real position again.
+    /// </summary>
+    /// <returns>true when the position is still at the target after the notch</returns>
+    private bool ConfirmWithWheelNotch(double target, bool forward, out double after)
+    {
+        after = target;
+        if (!TryGetScrollPercent(out var current) || !TryGetWheelLocation(out var location) || !WheelNotch(forward, location))
+        {
+            return false;
+        }
+        if (!WaitForPercentChange(current, out after))
+        {
+            // Nothing moved: at the target
+            after = current;
+            return IsAvailable;
+        }
+        return IsAtTarget(after, target, forward);
     }
 
     /// <summary>

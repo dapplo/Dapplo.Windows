@@ -7,6 +7,11 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.6.x]
+
+### Fixed
+- `UiAutomationScroller.Start()` / `End()` of a scroll bar fallback didn't scroll the Visual Studio editor at all and returned true: setting the scroll bar's RangeValue moves only the scroll bar there (the editor follows the scroll bar's Scroll events, not its value), and the value read back is the scroll bar's own. After setting the value, one wheel notch towards the target now confirms it: at the start / end nothing moves, else the control puts its real position on the scroll bar and the rest is done with the wheel. `Reset()` of a scroll bar fallback uses the wheel only.
+
 ## [3.6.0]
 
 Fixes for the scroll bar fallback of `UiAutomationScroller`, found with Greenshot's scrolling capture of the Visual Studio Output pane.

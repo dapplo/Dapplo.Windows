@@ -380,7 +380,9 @@ orientation at an edge, e.g. a horizontal one at the bottom), so the frames of a
 
 The position comes from the scroll bar:
 - its RangeValue pattern: the position from `Value` between `Minimum` and `Maximum`, the visible part from `LargeChange`;
-  `Start()`, `End()` and `Reset()` set the value when it's writable;
+  `Start()` and `End()` set the value when it's writable and confirm with one wheel notch towards the target that the content
+  followed (the Visual Studio editor only follows the scroll bar's Scroll events, setting the value moves just the scroll
+  bar), else they continue with the wheel; `Reset()` uses the wheel;
 - else the position of its thumb between the line buttons. That is to a pixel of the thumb, which on long content stands for
   a lot of content: `IsAtEnd` can be true a little early (compare the captured frames when that matters), `Start()` and
   `End()` wheel a bit further when the thumb says they got there;
