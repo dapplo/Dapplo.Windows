@@ -367,6 +367,26 @@ dotnet add package Dapplo.Windows.Automation
   accessibility tree on the first request, so retry a `null` from `FromPoint` once after a short delay. Dispose it to release
   the COM objects.
 
+#### Controls without a ScrollPattern
+
+Some controls scroll by themselves and expose no `ScrollPattern` anywhere, but do expose their scroll bar as an element with
+control type ScrollBar (e.g. the Visual Studio editor and Output pane). When no element on the way up from the point has a
+`ScrollPattern`, `FromPoint` takes the first one which has a visible child scroll bar in the direction; `FromWindow` does the
+same after its `ScrollPattern` lookups found nothing. Such a scroller has `IsScrollBarFallback` true and always scrolls with
+the mouse wheel (`ScrollMode` is `MouseWheel`, setting `ScrollPattern` throws), so the area has to be visible on the screen;
+`ViewportBounds` is the control (including its scroll bar), `WheelLocation` and `RestoreCursorAfterWheel` work as usual.
+
+The position comes from the scroll bar:
+- its RangeValue pattern: the position from `Value` between `Minimum` and `Maximum`, the visible part from `LargeChange`;
+  `Start()`, `End()` and `Reset()` set the value when it's writable;
+- else the position of its thumb between the line buttons (to a pixel);
+- else it is unknown: `IsPositionKnown` is false, `ScrollPercent` is -1, `IsAtStart` / `IsAtEnd` are only true when the line
+  button in that direction is disabled and the other one enabled (WPF disables both while the mouse isn't over the scroll
+  bar), `Next()` / `Previous()` move one wheel notch per step and return true, and `Start()`,
+  `End()` and `Reset()` return false. The caller detects the end itself, e.g. when the captured content stops changing.
+
+With a known position a step wheels one notch at a time until about `StepFraction` of a page moved.
+
 Both scrollers implement `IScroller`, so one piece of code handles both:
 
 <!-- sample: WindowSamples.ScrollingCapture -->
@@ -375,6 +395,8 @@ Both scrollers implement `IScroller`, so one piece of code handles both:
 // Both implement IScroller. Run this on a background thread, not on the UI thread of the window.
 IScroller scroller = window.GetWindowScroller();
 scroller ??= UiAutomationScroller.FromPoint(clickedPoint);   // or UiAutomationScroller.FromWindow(window)
+// FromPoint also finds controls without a ScrollPattern which expose a scroll bar (e.g. the Visual Studio editor):
+// IsScrollBarFallback is true, they are scrolled with the mouse wheel, so the area must be visible on the screen.
 if (scroller == null)
 {
     return;                       // nothing to scroll here
@@ -390,7 +412,8 @@ try
         {
             break;
         }
-        // Give the application time to paint, then capture the visible part
+        // Give the application time to paint, then capture the visible part.
+        // When UiAutomationScroller.IsPositionKnown is false, IsAtEnd can't tell the end: stop when the frame didn't change.
         captureFrame(scroller.ViewportBounds);
     }
     scroller.Reset();             // back to where the user was
@@ -405,10 +428,14 @@ finally
 
 One window can hold several scrollable areas: in Visual Studio the editor, the Output pane and the Solution Explorer are
 all in one WPF window. `UiAutomationScroller.FindScrollableAreas(window, horizontal)` lists the screen bounds (pixels) of the
-window element and every descendant which can scroll in that direction, in tree order, without hit testing on the screen,
+window element and every descendant which can scroll in that direction, and the parent of every scroll bar element in that
+direction (the controls without a `ScrollPattern` above; its rectangle includes the scroll bar), in tree order, without hit testing on the screen,
 so it works while another window (a selection window) covers it. It is one `FindAll` with a cache request for the bounding
-rectangle, empty and offscreen elements are left out, and the result is an empty list (never `null`) when nothing scrolls
-or UI Automation isn't available. The areas can stick out of the window (e.g. a ScrollViewer larger than its pane), clip
+rectangle, plus one call per scroll bar for its parent; empty and offscreen elements are left out, duplicates (a
+`ScrollPattern` element and the parent of its own scroll bar) are returned once, an outer area comes before the areas
+inside it, and the result is an empty list (never `null`) when nothing scrolls
+or UI Automation isn't available. `FindScrollableAreas(window, horizontal, timeout, includeScrollBarAreas: false)`
+returns the `ScrollPattern` elements only. The areas can stick out of the window (e.g. a ScrollViewer larger than its pane), clip
 them yourself when needed.
 
 The call blocks: large trees (Visual Studio, Office, browsers) take a while. Run it on a background thread and cache the

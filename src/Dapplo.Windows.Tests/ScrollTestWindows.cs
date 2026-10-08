@@ -4,7 +4,11 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Dapplo.Windows.Common.Structs;
 using Xunit;
@@ -365,6 +369,167 @@ internal sealed class CoverTestWindow : ScrollTestWindow
     public override T Invoke<T>(Func<T> func) => (T)_form.Invoke(func);
 
     public override void Close() => _form.Invoke(new Action(_form.Close));
+}
+
+/// <summary>
+///     What the scroll bar of a <see cref="ScrollBarOnlyTestWindow"/> tells UI Automation about its position
+/// </summary>
+public enum ScrollBarExposure
+{
+    /// <summary>The RangeValue pattern (Value, Minimum, Maximum, LargeChange) and the thumb</summary>
+    RangeValue,
+
+    /// <summary>No RangeValue, only the thumb between the line buttons</summary>
+    ThumbOnly,
+
+    /// <summary>Neither: only the line and page buttons</summary>
+    Nothing
+}
+
+/// <summary>
+///     A WPF window with a control which scrolls by itself, like the Visual Studio editor: no ScrollPattern anywhere, a separate
+///     ScrollBar next to the content moves it, and the mouse wheel over the control moves the ScrollBar
+/// </summary>
+internal sealed class ScrollBarOnlyTestWindow : ScrollTestWindow
+{
+    private readonly ScrollBarExposure _exposure;
+    private WpfWindows.Window _window;
+    private ScrollBarOnlyControl _control;
+    private Dispatcher _dispatcher;
+
+    public ScrollBarOnlyTestWindow(ScrollBarExposure exposure = ScrollBarExposure.RangeValue) : base(nameof(ScrollBarOnlyTestWindow), start: false)
+    {
+        _exposure = exposure;
+        Start();
+    }
+
+    protected override void Run()
+    {
+        _dispatcher = Dispatcher.CurrentDispatcher;
+        _control = new ScrollBarOnlyControl(_exposure);
+        _window = new WpfWindows.Window
+        {
+            Title = "Dapplo.Windows scroll bar only test",
+            Left = 140,
+            Top = 140,
+            Width = 400,
+            Height = 300,
+            Topmost = true,
+            ShowInTaskbar = false,
+            Content = _control
+        };
+        _window.Loaded += (_, _) => _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
+        {
+            WindowHandle = new WpfWindows.Interop.WindowInteropHelper(_window).Handle;
+            ScrollingHandle = WindowHandle;
+            SignalReady();
+        }));
+        _window.Closed += (_, _) => _dispatcher.InvokeShutdown();
+        _window.Show();
+        Dispatcher.Run();
+    }
+
+    /// <summary>The control (content and scroll bar) in screen coordinates</summary>
+    public NativeRect ControlBounds => Invoke(() =>
+    {
+        var topLeft = _control.PointToScreen(new WpfWindows.Point(0, 0));
+        var bottomRight = _control.PointToScreen(new WpfWindows.Point(_control.ActualWidth, _control.ActualHeight));
+        return new NativeRect((int)Math.Round(topLeft.X), (int)Math.Round(topLeft.Y), (int)Math.Round(bottomRight.X - topLeft.X), (int)Math.Round(bottomRight.Y - topLeft.Y));
+    });
+
+    public override NativeRect ScrollingBounds => ControlBounds;
+
+    /// <summary>How far the content is scrolled, in device independent pixels</summary>
+    public double Offset => Invoke(() => _control.ScrollBar.Value);
+
+    /// <summary>The offset at the end</summary>
+    public double MaxOffset => Invoke(() => _control.ScrollBar.Maximum);
+
+    public override T Invoke<T>(Func<T> func) => _dispatcher.Invoke(func);
+
+    public override void Close() => _dispatcher.Invoke(_window.Close);
+}
+
+/// <summary>
+///     Content in a clipping canvas, moved by a ScrollBar beside it; the UserControl has no ScrollPattern, the ScrollBar is its child
+///     in the UI Automation tree
+/// </summary>
+internal sealed class ScrollBarOnlyControl : UserControl
+{
+    public const int LineCount = 100;
+    public const double LineHeight = 20;
+    public const int LinesPerNotch = 3;
+    private readonly TranslateTransform _transform = new();
+
+    public ScrollBarOnlyControl(ScrollBarExposure exposure)
+    {
+        var lines = new StackPanel { RenderTransform = _transform };
+        for (var i = 0; i < LineCount; i++)
+        {
+            lines.Children.Add(new TextBlock { Text = $"Line {i}", Height = LineHeight });
+        }
+        var viewport = new Canvas { ClipToBounds = true, Background = Brushes.White };
+        viewport.Children.Add(lines);
+        ScrollBar = new ExposingScrollBar(exposure) { Orientation = Orientation.Vertical, SmallChange = LineHeight };
+        var grid = new Grid();
+        grid.ColumnDefinitions.Add(new ColumnDefinition());
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = WpfWindows.GridLength.Auto });
+        Grid.SetColumn(viewport, 0);
+        Grid.SetColumn(ScrollBar, 1);
+        grid.Children.Add(viewport);
+        grid.Children.Add(ScrollBar);
+        Content = grid;
+        Background = Brushes.White;
+
+        ScrollBar.ValueChanged += (_, e) => _transform.Y = -e.NewValue;
+        viewport.SizeChanged += (_, _) =>
+        {
+            var height = viewport.ActualHeight;
+            ScrollBar.Maximum = Math.Max(0, LineCount * LineHeight - height);
+            ScrollBar.ViewportSize = height;
+            ScrollBar.LargeChange = height;
+        };
+        // Like an editor: the wheel moves a few lines per notch
+        PreviewMouseWheel += (_, e) =>
+        {
+            var value = ScrollBar.Value - e.Delta / 120.0 * LinesPerNotch * LineHeight;
+            ScrollBar.Value = Math.Max(ScrollBar.Minimum, Math.Min(ScrollBar.Maximum, value));
+            e.Handled = true;
+        };
+    }
+
+    public ScrollBar ScrollBar { get; }
+}
+
+/// <summary>
+///     A ScrollBar which exposes the RangeValue pattern and its thumb to UI Automation, or not
+/// </summary>
+internal sealed class ExposingScrollBar(ScrollBarExposure exposure) : ScrollBar
+{
+    protected override AutomationPeer OnCreateAutomationPeer() => new ExposingScrollBarAutomationPeer(this, exposure);
+
+    private sealed class ExposingScrollBarAutomationPeer(ScrollBar owner, ScrollBarExposure exposure) : ScrollBarAutomationPeer(owner)
+    {
+        public override object GetPattern(PatternInterface patternInterface)
+        {
+            if (patternInterface == PatternInterface.RangeValue)
+            {
+                // RangeBaseAutomationPeer implements IRangeValueProvider itself
+                return exposure == ScrollBarExposure.RangeValue ? this : null;
+            }
+            return base.GetPattern(patternInterface);
+        }
+
+        protected override List<AutomationPeer> GetChildrenCore()
+        {
+            var children = base.GetChildrenCore();
+            if (exposure != ScrollBarExposure.Nothing || children is null)
+            {
+                return children;
+            }
+            return children.Where(child => child is not ThumbAutomationPeer).ToList();
+        }
+    }
 }
 
 internal static class NativeTestMethods

@@ -288,6 +288,8 @@ public static class WindowSamples
         // Both implement IScroller. Run this on a background thread, not on the UI thread of the window.
         IScroller scroller = window.GetWindowScroller();
         scroller ??= UiAutomationScroller.FromPoint(clickedPoint);   // or UiAutomationScroller.FromWindow(window)
+        // FromPoint also finds controls without a ScrollPattern which expose a scroll bar (e.g. the Visual Studio editor):
+        // IsScrollBarFallback is true, they are scrolled with the mouse wheel, so the area must be visible on the screen.
         if (scroller == null)
         {
             return;                       // nothing to scroll here
@@ -303,7 +305,8 @@ public static class WindowSamples
                 {
                     break;
                 }
-                // Give the application time to paint, then capture the visible part
+                // Give the application time to paint, then capture the visible part.
+                // When UiAutomationScroller.IsPositionKnown is false, IsAtEnd can't tell the end: stop when the frame didn't change.
                 captureFrame(scroller.ViewportBounds);
             }
             scroller.Reset();             // back to where the user was

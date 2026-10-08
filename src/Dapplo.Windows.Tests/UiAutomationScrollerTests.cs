@@ -331,6 +331,156 @@ public class UiAutomationScrollerTests
         AssertInside(InteropWindowFactory.CreateFor(testWindow.WindowHandle).GetInfo(true).Bounds, areas);
     }
 
+    [Theory]
+    [InlineData(ScrollBarExposure.RangeValue)]
+    [InlineData(ScrollBarExposure.ThumbOnly)]
+    [InlineData(ScrollBarExposure.Nothing)]
+    public void FindScrollableAreas_IncludesTheParentOfAScrollBar(ScrollBarExposure exposure)
+    {
+        using var testWindow = new ScrollBarOnlyTestWindow(exposure);
+        var expected = testWindow.ControlBounds;
+        var windowBounds = InteropWindowFactory.CreateFor(testWindow.WindowHandle).GetInfo(true).Bounds;
+
+        var areas = UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle);
+
+        Assert.True(areas.Any(a => IsNear(a, expected)), $"The control {expected} is missing: {Describe(areas)}");
+        AssertInside(windowBounds, areas);
+        // Only ScrollPattern elements: nothing here; and the scroll bar is vertical
+        Assert.DoesNotContain(UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle, false, null, false), a => IsNear(a, expected));
+        Assert.DoesNotContain(UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle, horizontal: true), a => IsNear(a, expected));
+    }
+
+    [Fact]
+    public void FindScrollableAreas_ScrollViewerAndItsScrollBars_AreReturnedOnce()
+    {
+        using var testWindow = new TwoAreasScrollTestWindow();
+        var left = testWindow.LeftBounds;
+
+        var areas = UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle);
+
+        Assert.Single(areas, a => IsNear(a, left));
+    }
+
+    [Theory]
+    [InlineData(ScrollBarExposure.RangeValue)]
+    [InlineData(ScrollBarExposure.ThumbOnly)]
+    public void FromPoint_ScrollBarOnly_ReturnsAWheelScroller(ScrollBarExposure exposure)
+    {
+        using var testWindow = new ScrollBarOnlyTestWindow(exposure);
+        var bounds = testWindow.ControlBounds;
+        var center = ScrollTestWindow.CenterOf(bounds);
+        testWindow.SkipWhenNotVisibleAt(center);
+
+        using var scroller = UiAutomationScroller.FromPoint(center);
+
+        Assert.NotNull(scroller);
+        Assert.True(scroller.IsScrollBarFallback);
+        Assert.Equal(UiAutomationScrollModes.MouseWheel, scroller.ScrollMode);
+        Assert.Throws<InvalidOperationException>(() => scroller.ScrollMode = UiAutomationScrollModes.ScrollPattern);
+        Assert.True(scroller.IsPositionKnown);
+        Assert.True(scroller.IsAtStart);
+        Assert.False(scroller.IsAtEnd);
+        Assert.Equal(0, scroller.InitialScrollPercent, 3);
+        // About 260 of 2000 pixels are visible
+        Assert.InRange(scroller.VisibleFraction, 0.05, 0.3);
+        Assert.True(IsNear(scroller.ViewportBounds, bounds), $"{scroller.ViewportBounds} is not {bounds}");
+    }
+
+    [Fact]
+    public void FromPoint_ScrollBarOnly_HorizontalFindsNothing()
+    {
+        using var testWindow = new ScrollBarOnlyTestWindow();
+        var center = ScrollTestWindow.CenterOf(testWindow.ControlBounds);
+        testWindow.SkipWhenNotVisibleAt(center);
+
+        Assert.Null(UiAutomationScroller.FromPoint(center, horizontal: true));
+    }
+
+    /// <summary>
+    ///     The wheel moves the content, the position comes from the RangeValue or the thumb, the loop ends at the end
+    /// </summary>
+    [Theory]
+    [InlineData(ScrollBarExposure.RangeValue)]
+    [InlineData(ScrollBarExposure.ThumbOnly)]
+    public void ScrollBarOnly_HalfPageSteps_ReachTheEnd(ScrollBarExposure exposure)
+    {
+        using var testWindow = new ScrollBarOnlyTestWindow(exposure);
+        var center = ScrollTestWindow.CenterOf(testWindow.ControlBounds);
+        testWindow.SkipWhenNotVisibleAt(center);
+        using var scroller = UiAutomationScroller.FromPoint(center);
+        Assert.NotNull(scroller);
+        scroller.StepFraction = 0.5;
+        scroller.RestoreCursorAfterWheel = true;
+
+        var steps = 0;
+        var previousOffset = testWindow.Offset;
+        while (!scroller.IsAtEnd && steps < 100)
+        {
+            Assert.True(scroller.Next(), $"Step {steps} at {scroller.ScrollPercent} percent");
+            var offset = testWindow.Offset;
+            Assert.True(offset > previousOffset, $"Step {steps}: {offset} after {previousOffset}");
+            previousOffset = offset;
+            steps++;
+        }
+
+        Assert.True(scroller.IsAtEnd);
+        Assert.Equal(testWindow.MaxOffset, testWindow.Offset, 1);
+        Assert.InRange(steps, 5, 30);
+        Assert.False(scroller.Next());
+
+        Assert.True(scroller.Reset());   // created at the start
+        Assert.True(scroller.IsAtStart);
+        Assert.Equal(0, testWindow.Offset, 1);
+    }
+
+    /// <summary>
+    ///     With a writable RangeValue Start and End set the value, no input is needed
+    /// </summary>
+    [Fact]
+    public void FromWindow_ScrollBarOnly_StartEndUseTheRangeValue()
+    {
+        using var testWindow = new ScrollBarOnlyTestWindow();
+        using var scroller = UiAutomationScroller.FromWindow(testWindow.WindowHandle);
+        Assert.NotNull(scroller);
+        Assert.True(scroller.IsScrollBarFallback);
+
+        Assert.True(scroller.End());
+        Assert.True(scroller.IsAtEnd);
+        Assert.Equal(testWindow.MaxOffset, testWindow.Offset, 1);
+
+        Assert.True(scroller.Start());
+        Assert.True(scroller.IsAtStart);
+        Assert.Equal(0, testWindow.Offset, 1);
+    }
+
+    /// <summary>
+    ///     Without RangeValue and thumb the position is unknown: one notch per step, the caller detects the end
+    /// </summary>
+    [Fact]
+    public async Task ScrollBarOnly_UnknownPosition_StepsOneNotch()
+    {
+        using var testWindow = new ScrollBarOnlyTestWindow(ScrollBarExposure.Nothing);
+        var center = ScrollTestWindow.CenterOf(testWindow.ControlBounds);
+        testWindow.SkipWhenNotVisibleAt(center);
+        using var scroller = UiAutomationScroller.FromPoint(center);
+        Assert.NotNull(scroller);
+        Assert.True(scroller.IsScrollBarFallback);
+        Assert.False(scroller.IsPositionKnown);
+        Assert.Equal(-1, scroller.ScrollPercent);
+        Assert.Equal(-1, scroller.InitialScrollPercent);
+        // WPF (Aero2) disables both line buttons while the mouse isn't over the scroll bar: that tells nothing
+        Assert.False(scroller.IsAtStart);
+        Assert.False(scroller.IsAtEnd);
+        Assert.False(scroller.Start());
+        scroller.RestoreCursorAfterWheel = true;
+
+        Assert.True(scroller.Next());
+
+        var expected = ScrollBarOnlyControl.LinesPerNotch * ScrollBarOnlyControl.LineHeight;
+        await TestWait.UntilAsync(() => Math.Abs(testWindow.Offset - expected) < 0.5, $"The offset is not {expected}");
+        Assert.False(scroller.Reset());
+    }
+
     /// <summary>
     ///     Mouse wheel mode: wheel at the viewport centre until half a page moved, the cursor is put back
     /// </summary>
