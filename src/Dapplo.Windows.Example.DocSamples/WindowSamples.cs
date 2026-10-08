@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -11,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Automation;
+using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Enums;
@@ -309,6 +311,27 @@ public static class WindowSamples
         finally
         {
             (scroller as IDisposable)?.Dispose();   // releases the UI Automation COM objects
+        }
+        #endregion
+    }
+
+    public static async Task ScrollableAreas(IInteropWindow window, NativePoint mouseLocation)
+    {
+        #region ScrollableAreas
+        // Greenshot-style: list the scrollable areas of the window under the mouse once (it blocks, so not on the UI thread;
+        // works while your own window covers the screen), hit test them on every mouse move, scroll the chosen one later.
+        IReadOnlyList<NativeRect> areas = await Task.Run(() => UiAutomationScroller.FindScrollableAreas(window));
+        // The smallest area containing the cursor wins: in Visual Studio the editor, not the whole window
+        NativeRect? chosen = areas
+            .Where(area => area.Contains(mouseLocation))
+            .OrderBy(area => area.Width * area.Height)
+            .Select(area => (NativeRect?)area)
+            .FirstOrDefault();
+        if (chosen is { } area)
+        {
+            // After your own window is gone, FromPoint finds the same element under the middle of the area
+            using var scroller = UiAutomationScroller.FromPoint(new NativePoint(area.X + area.Width / 2, area.Y + area.Height / 2));
+            // ... the scrolling capture loop from the sample above
         }
         #endregion
     }

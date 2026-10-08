@@ -176,6 +176,28 @@ finally
 }
 ```
 
+`UiAutomationScroller.FindScrollableAreas(window)` lists the screen bounds of all scrollable areas inside one window (it
+blocks, run it on a background thread), e.g. to show which area under the mouse can scroll:
+
+<!-- sample: WindowSamples.ScrollableAreas -->
+```csharp
+// Greenshot-style: list the scrollable areas of the window under the mouse once (it blocks, so not on the UI thread;
+// works while your own window covers the screen), hit test them on every mouse move, scroll the chosen one later.
+IReadOnlyList<NativeRect> areas = await Task.Run(() => UiAutomationScroller.FindScrollableAreas(window));
+// The smallest area containing the cursor wins: in Visual Studio the editor, not the whole window
+NativeRect? chosen = areas
+    .Where(area => area.Contains(mouseLocation))
+    .OrderBy(area => area.Width * area.Height)
+    .Select(area => (NativeRect?)area)
+    .FirstOrDefault();
+if (chosen is { } area)
+{
+    // After your own window is gone, FromPoint finds the same element under the middle of the area
+    using var scroller = UiAutomationScroller.FromPoint(new NativePoint(area.X + area.Width / 2, area.Y + area.Height / 2));
+    // ... the scrolling capture loop from the sample above
+}
+```
+
 ## Window events
 
 `WinEventHook` events arrive on the thread of the [[SharedMessageWindow]]. Filter on

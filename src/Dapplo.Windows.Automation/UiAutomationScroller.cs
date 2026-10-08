@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Dapplo.Log;
@@ -124,6 +125,125 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     /// <param name="horizontal">false (default) for vertical scrolling, true for horizontal scrolling</param>
     /// <returns>UiAutomationScroller, or null when the window has nothing which can scroll in that direction</returns>
     public static UiAutomationScroller FromWindow(IInteropWindow window, bool horizontal = false) => window is null ? null : FromWindow(window.Handle, horizontal);
+
+    /// <summary>
+    ///     The default for the timeout of <see cref="FindScrollableAreas(IntPtr, bool, TimeSpan?)"/>: 2 seconds
+    /// </summary>
+    public static readonly TimeSpan DefaultFindTimeout = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    ///     List the areas of a window which can scroll in the direction, without hit testing on the screen: the window element itself
+    ///     and every descendant which is vertically (or horizontally) scrollable, as their bounding rectangles in screen coordinates
+    ///     (physical pixels for a per-monitor DPI aware process). Works while another window (e.g. a full-screen selection window)
+    ///     covers the window, where <see cref="FromPoint"/> would find the covering window.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     The result is in tree order, outer areas before the areas inside them; areas inside each other are all returned (hit test with
+    ///     the smallest rectangle containing the point). Offscreen elements and empty rectangles are left out, duplicates (e.g. a list and
+    ///     its scroll viewer with the same bounds) are returned once. A rectangle can extend beyond the window when the element is partly
+    ///     scrolled out of view.
+    ///     </para>
+    ///     <para>
+    ///     This blocks: it is one UI Automation search (FindAll with a cache request for the bounds and the offscreen state, so no extra call
+    ///     per element), but UI Automation walks the whole tree of the window, which takes a while for Visual Studio, Office or browsers.
+    ///     Call it on a background thread, never on the UI thread which owns the window, and cache the result. Where IUIAutomation2 is
+    ///     available (Windows 8+) the connection and transaction timeouts of the UI Automation object used for this call are set to
+    ///     <paramref name="timeout"/>, so a hanging application can't block the caller for the default 20 seconds.
+    ///     </para>
+    ///     <para>
+    ///     To scroll an area later, e.g. after the covering window closed, use <see cref="FromPoint"/> with the middle of its rectangle.
+    ///     </para>
+    /// </remarks>
+    /// <param name="windowHandle">IntPtr with the handle of the window</param>
+    /// <param name="horizontal">false (default) for vertically scrollable areas, true for horizontally scrollable areas</param>
+    /// <param name="timeout">TimeSpan for the UI Automation timeouts, default <see cref="DefaultFindTimeout"/></param>
+    /// <returns>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</returns>
+    public static IReadOnlyList<NativeRect> FindScrollableAreas(IntPtr windowHandle, bool horizontal = false, TimeSpan? timeout = null)
+    {
+        var areas = new List<NativeRect>();
+        if (windowHandle == IntPtr.Zero)
+        {
+            return areas;
+        }
+        var automation = CreateAutomation(timeout ?? DefaultFindTimeout);
+        if (automation is null)
+        {
+            return areas;
+        }
+        IUIAutomationElement windowElement = null;
+        IUIAutomationCondition condition = null;
+        IUIAutomationCacheRequest cacheRequest = null;
+        IUIAutomationElementArray found = null;
+        try
+        {
+            if (automation.ElementFromHandle(windowHandle, out windowElement) != UiaConstants.S_OK || windowElement is null)
+            {
+                return areas;
+            }
+            var propertyId = horizontal ? UiaConstants.HorizontallyScrollablePropertyId : UiaConstants.VerticallyScrollablePropertyId;
+            if (automation.CreatePropertyCondition(propertyId, true, out condition) != UiaConstants.S_OK || condition is null
+                || automation.CreateCacheRequest(out cacheRequest) != UiaConstants.S_OK || cacheRequest is null
+                || cacheRequest.AddProperty(UiaConstants.BoundingRectanglePropertyId) != UiaConstants.S_OK
+                || cacheRequest.AddProperty(UiaConstants.IsOffscreenPropertyId) != UiaConstants.S_OK
+                // Only the cached properties are needed, not references to the live elements
+                || cacheRequest.put_AutomationElementMode(UiaConstants.AutomationElementModeNone) != UiaConstants.S_OK)
+            {
+                return areas;
+            }
+            var hResult = windowElement.FindAllBuildCache(UiaConstants.TreeScopeElement | UiaConstants.TreeScopeDescendants, condition, cacheRequest, out found);
+            if (hResult != UiaConstants.S_OK || found is null || found.get_Length(out var length) != UiaConstants.S_OK)
+            {
+                if (hResult != UiaConstants.S_OK)
+                {
+                    Log.Verbose().WriteLine("Searching the scrollable areas of 0x{0:X} failed with 0x{1:X8}", windowHandle.ToInt64(), hResult);
+                }
+                return areas;
+            }
+            for (var index = 0; index < length; index++)
+            {
+                if (found.GetElement(index, out var element) != UiaConstants.S_OK || element is null)
+                {
+                    continue;
+                }
+                try
+                {
+                    if (element.get_CachedIsOffscreen(out var isOffscreen) == UiaConstants.S_OK && isOffscreen != 0)
+                    {
+                        continue;
+                    }
+                    if (element.get_CachedBoundingRectangle(out var bounds) != UiaConstants.S_OK || bounds.IsEmpty || areas.Contains(bounds))
+                    {
+                        continue;
+                    }
+                    areas.Add(bounds);
+                }
+                finally
+                {
+                    Release(element);
+                }
+            }
+            return areas;
+        }
+        finally
+        {
+            Release(found);
+            Release(cacheRequest);
+            Release(condition);
+            Release(windowElement);
+            Release(automation);
+        }
+    }
+
+    /// <summary>
+    ///     List the scrollable areas of a window, see <see cref="FindScrollableAreas(IntPtr, bool, TimeSpan?)"/>
+    /// </summary>
+    /// <param name="window">IInteropWindow</param>
+    /// <param name="horizontal">false (default) for vertically scrollable areas, true for horizontally scrollable areas</param>
+    /// <param name="timeout">TimeSpan for the UI Automation timeouts, default <see cref="DefaultFindTimeout"/></param>
+    /// <returns>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</returns>
+    public static IReadOnlyList<NativeRect> FindScrollableAreas(IInteropWindow window, bool horizontal = false, TimeSpan? timeout = null)
+        => window is null ? Array.Empty<NativeRect>() : FindScrollableAreas(window.Handle, horizontal, timeout);
 
     /// <summary>
     ///     True when this scrolls horizontally, false for vertical scrolling
@@ -544,6 +664,33 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             Log.Verbose().WriteLine("UI Automation call failed with 0x{0:X8}", hResult);
         }
         return false;
+    }
+
+    /// <summary>
+    ///     Create a UI Automation object with short timeouts (Windows 8+: CUIAutomation8 and IUIAutomation2), else the default one
+    /// </summary>
+    private static IUIAutomation CreateAutomation(TimeSpan timeout)
+    {
+        try
+        {
+            var type = Type.GetTypeFromCLSID(UiaConstants.CUIAutomation8Clsid, false);
+            if (type is not null && Activator.CreateInstance(type) is IUIAutomation automation)
+            {
+                if (automation is IUIAutomation2 automation2)
+                {
+                    var milliseconds = (uint)Math.Max(1, Math.Min(uint.MaxValue, timeout.TotalMilliseconds));
+                    automation2.put_ConnectionTimeout(milliseconds);
+                    automation2.put_TransactionTimeout(milliseconds);
+                }
+                return automation;
+            }
+        }
+        catch (Exception ex) when (ex is COMException or InvalidCastException or TypeLoadException)
+        {
+            // Before Windows 8: no CUIAutomation8, use the default object without timeouts
+            Log.Verbose().WriteLine("CUIAutomation8 is not available: {0}", ex.Message);
+        }
+        return CreateAutomation();
     }
 
     private static IUIAutomation CreateAutomation()

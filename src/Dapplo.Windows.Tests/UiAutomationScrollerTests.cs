@@ -1,10 +1,13 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Automation;
+using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
 using Dapplo.Windows.User32;
 using Xunit;
@@ -243,6 +246,89 @@ public class UiAutomationScrollerTests
         var titleBar = new Dapplo.Windows.Common.Structs.NativePoint(bounds.X + bounds.Width / 2, bounds.Y + 8);
         testWindow.SkipWhenNotVisibleAt(titleBar);
         Assert.Null(UiAutomationScroller.FromPoint(titleBar));
+    }
+
+    private static bool IsNear(NativeRect actual, NativeRect expected, int tolerance = 2) =>
+        Math.Abs(actual.X - expected.X) <= tolerance && Math.Abs(actual.Y - expected.Y) <= tolerance &&
+        Math.Abs(actual.Width - expected.Width) <= tolerance && Math.Abs(actual.Height - expected.Height) <= tolerance;
+
+    private static string Describe(IEnumerable<NativeRect> areas) => string.Join(", ", areas.Select(a => a.ToString()));
+
+    private static void AssertInside(NativeRect outer, IEnumerable<NativeRect> areas)
+    {
+        foreach (var area in areas)
+        {
+            Assert.True(area.X >= outer.X - 1 && area.Y >= outer.Y - 1 && area.Right <= outer.Right + 1 && area.Bottom <= outer.Bottom + 1,
+                $"{area} is not inside the window {outer}");
+        }
+    }
+
+    [Fact]
+    public void FindScrollableAreas_ReturnsBothAreasInsideTheWindow()
+    {
+        using var testWindow = new TwoAreasScrollTestWindow();
+        var left = testWindow.LeftBounds;
+        var right = testWindow.RightBounds;
+        var windowBounds = InteropWindowFactory.CreateFor(testWindow.WindowHandle).GetInfo(true).Bounds;
+
+        var areas = UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle);
+
+        Assert.NotNull(areas);
+        Assert.True(areas.Any(a => IsNear(a, left)), $"The left area {left} is missing: {Describe(areas)}");
+        Assert.True(areas.Any(a => IsNear(a, right)), $"The right area {right} is missing: {Describe(areas)}");
+        Assert.All(areas, a => Assert.False(a.IsEmpty));
+        AssertInside(windowBounds, areas);
+    }
+
+    [Fact]
+    public void FindScrollableAreas_Horizontal_ReturnsOnlyTheWideArea()
+    {
+        using var testWindow = new TwoAreasScrollTestWindow();
+        var left = testWindow.LeftBounds;
+        var right = testWindow.RightBounds;
+
+        var areas = UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle, horizontal: true);
+
+        Assert.True(areas.Any(a => IsNear(a, left)), $"The left area {left} is missing: {Describe(areas)}");
+        Assert.DoesNotContain(areas, a => IsNear(a, right));
+    }
+
+    /// <summary>
+    ///     Greenshot's use case: another window covers the whole window (its selection window), no hit testing on the screen is needed
+    /// </summary>
+    [Fact]
+    public void FindScrollableAreas_WorksWhileTheWindowIsCovered()
+    {
+        using var testWindow = new TwoAreasScrollTestWindow();
+        var windowInfo = InteropWindowFactory.CreateFor(testWindow.WindowHandle).GetInfo(true);
+        using var cover = new CoverTestWindow(windowInfo.Bounds);
+
+        var areas = UiAutomationScroller.FindScrollableAreas(InteropWindowFactory.CreateFor(testWindow.WindowHandle));
+
+        Assert.True(areas.Any(a => IsNear(a, testWindow.LeftBounds)), Describe(areas));
+        Assert.True(areas.Any(a => IsNear(a, testWindow.RightBounds)), Describe(areas));
+    }
+
+    [Fact]
+    public void FindScrollableAreas_NothingScrollable_ReturnsAnEmptyList()
+    {
+        using var cover = new CoverTestWindow(new NativeRect(50, 50, 200, 100));
+
+        Assert.Empty(UiAutomationScroller.FindScrollableAreas(cover.WindowHandle));
+        Assert.Empty(UiAutomationScroller.FindScrollableAreas(IntPtr.Zero));
+        Assert.Empty(UiAutomationScroller.FindScrollableAreas((IInteropWindow)null));
+    }
+
+    [Fact]
+    public void FindScrollableAreas_EdgeControl_IsFoundInTheForm()
+    {
+        using var testWindow = new TextBoxScrollTestWindow();
+        var areas = UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle);
+        Assert.SkipWhen(areas.Count == 0, "UI Automation exposes no ScrollPattern for the EDIT control on this system");
+        // The client area of the EDIT control, without its border and scroll bar, lies inside the found area
+        var client = testWindow.ScrollingBounds;
+        Assert.Contains(areas, a => a.X <= client.X && a.Y <= client.Y && a.Right >= client.Right && a.Bottom >= client.Bottom);
+        AssertInside(InteropWindowFactory.CreateFor(testWindow.WindowHandle).GetInfo(true).Bounds, areas);
     }
 
     /// <summary>
