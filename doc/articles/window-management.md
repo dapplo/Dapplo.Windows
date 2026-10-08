@@ -401,6 +401,40 @@ finally
 }
 ```
 
+### Finding the scrollable areas of a window
+
+One window can hold several scrollable areas: in Visual Studio the editor, the Output pane and the Solution Explorer are
+all in one WPF window. `UiAutomationScroller.FindScrollableAreas(window, horizontal)` lists the screen bounds (pixels) of the
+window element and every descendant which can scroll in that direction, in tree order, without hit testing on the screen,
+so it works while another window (a selection window) covers it. It is one `FindAll` with a cache request for the bounding
+rectangle, empty and offscreen elements are left out, and the result is an empty list (never `null`) when nothing scrolls
+or UI Automation isn't available. The areas can stick out of the window (e.g. a ScrollViewer larger than its pane), clip
+them yourself when needed.
+
+The call blocks: large trees (Visual Studio, Office, browsers) take a while. Run it on a background thread and cache the
+result per window. The UI Automation connection and transaction timeouts are set to `timeout` (default
+`UiAutomationScroller.DefaultFindTimeout`, 2 seconds; Windows 8 and later), so a hanging provider can't block for the
+default 20 seconds.
+
+<!-- sample: WindowSamples.ScrollableAreas -->
+```csharp
+// Greenshot-style: list the scrollable areas of the window under the mouse once (it blocks, so not on the UI thread;
+// works while your own window covers the screen), hit test them on every mouse move, scroll the chosen one later.
+IReadOnlyList<NativeRect> areas = await Task.Run(() => UiAutomationScroller.FindScrollableAreas(window));
+// The smallest area containing the cursor wins: in Visual Studio the editor, not the whole window
+NativeRect? chosen = areas
+    .Where(area => area.Contains(mouseLocation))
+    .OrderBy(area => area.Width * area.Height)
+    .Select(area => (NativeRect?)area)
+    .FirstOrDefault();
+if (chosen is { } area)
+{
+    // After your own window is gone, FromPoint finds the same element under the middle of the area
+    using var scroller = UiAutomationScroller.FromPoint(new NativePoint(area.X + area.Width / 2, area.Y + area.Height / 2));
+    // ... the scrolling capture loop from the sample above
+}
+```
+
 ## Window events
 
 `WinEventHook` turns [WinEvents](https://learn.microsoft.com/en-us/windows/win32/winauto/winevents) into observables.

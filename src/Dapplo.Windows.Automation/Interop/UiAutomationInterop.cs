@@ -19,6 +19,21 @@ internal static class UiaConstants
     /// <summary>CLSID of the CUIAutomation coclass</summary>
     public static readonly Guid CUIAutomationClsid = new Guid("ff48dba4-60ef-4201-aa87-54103eef594e");
 
+    /// <summary>CLSID of the CUIAutomation8 coclass (Windows 8+), which implements IUIAutomation2</summary>
+    public static readonly Guid CUIAutomation8Clsid = new Guid("e22ad333-b25f-460c-83d0-0581107395c9");
+
+    /// <summary>UIA_BoundingRectanglePropertyId</summary>
+    public const int BoundingRectanglePropertyId = 30001;
+
+    /// <summary>UIA_IsOffscreenPropertyId</summary>
+    public const int IsOffscreenPropertyId = 30022;
+
+    /// <summary>TreeScope_Element</summary>
+    public const int TreeScopeElement = 0x01;
+
+    /// <summary>AutomationElementMode_None: the found elements only carry the cached properties, no reference to the live element</summary>
+    public const int AutomationElementModeNone = 0;
+
     /// <summary>UIA_ScrollPatternId</summary>
     public const int ScrollPatternId = 10004;
 
@@ -95,7 +110,8 @@ internal interface IUIAutomation
     void get_RawViewCondition();
     void get_ControlViewCondition();
     void get_ContentViewCondition();
-    void CreateCacheRequest();
+    [PreserveSig]
+    int CreateCacheRequest(out IUIAutomationCacheRequest cacheRequest);
     void CreateTrueCondition();
     void CreateFalseCondition();
 
@@ -141,7 +157,8 @@ internal interface IUIAutomationElement
 
     void FindAll();
     void FindFirstBuildCache();
-    void FindAllBuildCache();
+    [PreserveSig]
+    int FindAllBuildCache(int scope, IUIAutomationCondition condition, IUIAutomationCacheRequest cacheRequest, out IUIAutomationElementArray found);
     void BuildUpdatedCache();
     void GetCurrentPropertyValue();
     void GetCurrentPropertyValueEx();
@@ -185,6 +202,43 @@ internal interface IUIAutomationElement
 
     [PreserveSig]
     int get_CurrentBoundingRectangle(out NativeRect boundingRectangle);
+
+    void get_CurrentLabeledBy();
+    void get_CurrentAriaRole();
+    void get_CurrentAriaProperties();
+    void get_CurrentIsDataValidForForm();
+    void get_CurrentControllerFor();
+    void get_CurrentDescribedBy();
+    void get_CurrentFlowsTo();
+    void get_CurrentProviderDescription();
+    void get_CachedProcessId();
+    void get_CachedControlType();
+    void get_CachedLocalizedControlType();
+    void get_CachedName();
+    void get_CachedAcceleratorKey();
+    void get_CachedAccessKey();
+    void get_CachedHasKeyboardFocus();
+    void get_CachedIsKeyboardFocusable();
+    void get_CachedIsEnabled();
+    void get_CachedAutomationId();
+    void get_CachedClassName();
+    void get_CachedHelpText();
+    void get_CachedCulture();
+    void get_CachedIsControlElement();
+    void get_CachedIsContentElement();
+    void get_CachedIsPassword();
+    void get_CachedNativeWindowHandle();
+    void get_CachedItemType();
+
+    [PreserveSig]
+    int get_CachedIsOffscreen(out int isOffscreen);
+    void get_CachedOrientation();
+    void get_CachedFrameworkId();
+    void get_CachedIsRequiredForForm();
+    void get_CachedItemStatus();
+
+    [PreserveSig]
+    int get_CachedBoundingRectangle(out NativeRect boundingRectangle);
 }
 
 /// <summary>
@@ -218,4 +272,120 @@ internal interface IUIAutomationScrollPattern
 
     [PreserveSig]
     int get_CurrentVerticallyScrollable(out int scrollable);
+}
+
+/// <summary>
+///     IUIAutomationCacheRequest: which properties are fetched together with the elements of a search
+/// </summary>
+[ComImport]
+[Guid("b32a92b5-bc25-4078-9c08-d7ee95c48e03")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IUIAutomationCacheRequest
+{
+    [PreserveSig]
+    int AddProperty(int propertyId);
+
+    void AddPattern();
+    void Clone();
+    void get_TreeScope();
+    void put_TreeScope();
+    void get_TreeFilter();
+    void put_TreeFilter();
+    void get_AutomationElementMode();
+
+    [PreserveSig]
+    int put_AutomationElementMode(int mode);
+}
+
+/// <summary>
+///     IUIAutomationElementArray
+/// </summary>
+[ComImport]
+[Guid("14314595-b4bc-4055-95f2-58f2e42c9855")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IUIAutomationElementArray
+{
+    [PreserveSig]
+    int get_Length(out int length);
+
+    [PreserveSig]
+    int GetElement(int index, out IUIAutomationElement element);
+}
+
+/// <summary>
+///     IUIAutomation2 (Windows 8+, CUIAutomation8): adds the timeouts. COM interop can't inherit an interface layout, so the
+///     55 methods of IUIAutomation are declared as placeholders first.
+/// </summary>
+[ComImport]
+[Guid("34723aff-0c9d-49d0-9896-7ab52df8cd8a")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IUIAutomation2
+{
+    void CompareElements();
+    void CompareRuntimeIds();
+    void GetRootElement();
+    void ElementFromHandle();
+    void ElementFromPoint();
+    void GetFocusedElement();
+    void GetRootElementBuildCache();
+    void ElementFromHandleBuildCache();
+    void ElementFromPointBuildCache();
+    void GetFocusedElementBuildCache();
+    void CreateTreeWalker();
+    void get_ControlViewWalker();
+    void get_ContentViewWalker();
+    void get_RawViewWalker();
+    void get_RawViewCondition();
+    void get_ControlViewCondition();
+    void get_ContentViewCondition();
+    void CreateCacheRequest();
+    void CreateTrueCondition();
+    void CreateFalseCondition();
+    void CreatePropertyCondition();
+    void CreatePropertyConditionEx();
+    void CreateAndCondition();
+    void CreateAndConditionFromArray();
+    void CreateAndConditionFromNativeArray();
+    void CreateOrCondition();
+    void CreateOrConditionFromArray();
+    void CreateOrConditionFromNativeArray();
+    void CreateNotCondition();
+    void AddAutomationEventHandler();
+    void RemoveAutomationEventHandler();
+    void AddPropertyChangedEventHandlerNativeArray();
+    void AddPropertyChangedEventHandler();
+    void RemovePropertyChangedEventHandler();
+    void AddStructureChangedEventHandler();
+    void RemoveStructureChangedEventHandler();
+    void AddFocusChangedEventHandler();
+    void RemoveFocusChangedEventHandler();
+    void RemoveAllEventHandlers();
+    void IntNativeArrayToSafeArray();
+    void IntSafeArrayToNativeArray();
+    void RectToVariant();
+    void VariantToRect();
+    void SafeArrayToRectNativeArray();
+    void CreateProxyFactoryEntry();
+    void get_ProxyFactoryMapping();
+    void GetPropertyProgrammaticName();
+    void GetPatternProgrammaticName();
+    void PollForPotentialSupportedPatterns();
+    void PollForPotentialSupportedProperties();
+    void CheckNotSupported();
+    void get_ReservedNotSupportedValue();
+    void get_ReservedMixedAttributeValue();
+    void ElementFromIAccessible();
+    void ElementFromIAccessibleBuildCache();
+
+    void get_AutoSetFocus();
+    void put_AutoSetFocus();
+    void get_ConnectionTimeout();
+
+    [PreserveSig]
+    int put_ConnectionTimeout(uint timeoutMilliseconds);
+
+    void get_TransactionTimeout();
+
+    [PreserveSig]
+    int put_TransactionTimeout(uint timeoutMilliseconds);
 }

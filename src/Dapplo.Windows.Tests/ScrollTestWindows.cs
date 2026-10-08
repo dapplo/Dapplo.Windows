@@ -19,10 +19,27 @@ namespace Dapplo.Windows.Tests;
 /// </summary>
 internal abstract class ScrollTestWindow : IDisposable
 {
-    private readonly Thread _thread;
+    private readonly string _name;
+    private Thread _thread;
     private readonly TaskCompletionSource<bool> _ready = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-    protected ScrollTestWindow(string name)
+    /// <summary>Starts the window right away</summary>
+    protected ScrollTestWindow(string name) : this(name, start: true)
+    {
+    }
+
+    /// <summary>With start false a derived class sets its fields first, then calls Start</summary>
+    protected ScrollTestWindow(string name, bool start)
+    {
+        _name = name;
+        if (start)
+        {
+            Start();
+        }
+    }
+
+    /// <summary>Start the UI thread and wait until the window is shown</summary>
+    protected void Start()
     {
         _thread = new Thread(() =>
         {
@@ -37,13 +54,13 @@ internal abstract class ScrollTestWindow : IDisposable
         })
         {
             IsBackground = true,
-            Name = name
+            Name = _name
         };
         _thread.SetApartmentState(ApartmentState.STA);
         _thread.Start();
         if (!_ready.Task.Wait(TimeSpan.FromSeconds(30)))
         {
-            throw new TimeoutException($"The test window {name} didn't start");
+            throw new TimeoutException($"The test window {_name} didn't start");
         }
     }
 
@@ -76,7 +93,7 @@ internal abstract class ScrollTestWindow : IDisposable
         {
             // already closed
         }
-        _thread.Join(TimeSpan.FromSeconds(5));
+        _thread?.Join(TimeSpan.FromSeconds(5));
     }
 
     /// <summary>
@@ -215,6 +232,139 @@ internal sealed class WpfScrollTestWindow : ScrollTestWindow
     public override T Invoke<T>(Func<T> func) => _dispatcher.Invoke(func);
 
     public override void Close() => _dispatcher.Invoke(_window.Close);
+}
+
+/// <summary>
+///     A WPF window with two ScrollViewers side by side in one HWND, like the panes of Visual Studio: the left one scrolls in both
+///     directions, the right one only vertically
+/// </summary>
+internal sealed class TwoAreasScrollTestWindow : ScrollTestWindow
+{
+    private WpfWindows.Window _window;
+    private ScrollViewer _left;
+    private ScrollViewer _right;
+    private Dispatcher _dispatcher;
+    private readonly int _left0;
+    private readonly int _top0;
+
+    public TwoAreasScrollTestWindow() : this(120, 120)
+    {
+    }
+
+    public TwoAreasScrollTestWindow(int left, int top) : base(nameof(TwoAreasScrollTestWindow), start: false)
+    {
+        _left0 = left;
+        _top0 = top;
+        Start();
+    }
+
+    private static ScrollViewer CreateScrollViewer(double itemWidth)
+    {
+        var panel = new StackPanel();
+        for (var i = 0; i < 100; i++)
+        {
+            panel.Children.Add(new TextBlock { Text = $"Item {i}", Height = 20, Width = itemWidth });
+        }
+        return new ScrollViewer
+        {
+            Content = panel,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
+        };
+    }
+
+    protected override void Run()
+    {
+        _dispatcher = Dispatcher.CurrentDispatcher;
+        _left = CreateScrollViewer(2000);
+        _right = CreateScrollViewer(50);
+        var grid = new Grid();
+        grid.ColumnDefinitions.Add(new ColumnDefinition());
+        grid.ColumnDefinitions.Add(new ColumnDefinition());
+        Grid.SetColumn(_left, 0);
+        Grid.SetColumn(_right, 1);
+        grid.Children.Add(_left);
+        grid.Children.Add(_right);
+        _window = new WpfWindows.Window
+        {
+            Title = "Dapplo.Windows scrollable areas test",
+            Left = _left0,
+            Top = _top0,
+            Width = 500,
+            Height = 300,
+            Topmost = true,
+            ShowInTaskbar = false,
+            Content = grid
+        };
+        _window.Loaded += (_, _) => _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
+        {
+            WindowHandle = new WpfWindows.Interop.WindowInteropHelper(_window).Handle;
+            ScrollingHandle = WindowHandle;
+            SignalReady();
+        }));
+        _window.Closed += (_, _) => _dispatcher.InvokeShutdown();
+        _window.Show();
+        Dispatcher.Run();
+    }
+
+    private NativeRect BoundsOf(ScrollViewer scrollViewer) => Invoke(() =>
+    {
+        var topLeft = scrollViewer.PointToScreen(new WpfWindows.Point(0, 0));
+        var bottomRight = scrollViewer.PointToScreen(new WpfWindows.Point(scrollViewer.ActualWidth, scrollViewer.ActualHeight));
+        return new NativeRect((int)Math.Round(topLeft.X), (int)Math.Round(topLeft.Y), (int)Math.Round(bottomRight.X - topLeft.X), (int)Math.Round(bottomRight.Y - topLeft.Y));
+    });
+
+    /// <summary>The left ScrollViewer in screen coordinates</summary>
+    public NativeRect LeftBounds => BoundsOf(_left);
+
+    /// <summary>The right ScrollViewer in screen coordinates</summary>
+    public NativeRect RightBounds => BoundsOf(_right);
+
+    public override NativeRect ScrollingBounds => LeftBounds;
+
+    public override T Invoke<T>(Func<T> func) => _dispatcher.Invoke(func);
+
+    public override void Close() => _dispatcher.Invoke(_window.Close);
+}
+
+/// <summary>
+///     An empty, topmost WinForms window, e.g. to cover another window like Greenshot's selection window does
+/// </summary>
+internal sealed class CoverTestWindow : ScrollTestWindow
+{
+    private WinForms.Form _form;
+    private readonly System.Drawing.Rectangle _bounds;
+
+    public CoverTestWindow(NativeRect bounds) : base(nameof(CoverTestWindow), start: false)
+    {
+        _bounds = new System.Drawing.Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+        Start();
+    }
+
+    protected override void Run()
+    {
+        _form = new WinForms.Form
+        {
+            FormBorderStyle = WinForms.FormBorderStyle.None,
+            StartPosition = WinForms.FormStartPosition.Manual,
+            Bounds = _bounds,
+            TopMost = true,
+            ShowInTaskbar = false
+        };
+        _form.Shown += (_, _) =>
+        {
+            WindowHandle = _form.Handle;
+            ScrollingHandle = WindowHandle;
+            SignalReady();
+        };
+        WinForms.Application.Run(_form);
+    }
+
+    public override NativeRect ScrollingBounds => new(_bounds.X, _bounds.Y, _bounds.Width, _bounds.Height);
+
+    public override T Invoke<T>(Func<T> func) => (T)_form.Invoke(func);
+
+    public override void Close() => _form.Invoke(new Action(_form.Close));
 }
 
 internal static class NativeTestMethods

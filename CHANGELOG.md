@@ -7,6 +7,14 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.4.0]
+
+Find the scrollable areas inside a window, for a scrolling capture which lets the user pick one.
+
+### Added
+- `UiAutomationScroller.FindScrollableAreas(windowHandle or IInteropWindow, horizontal, timeout)`: the screen bounds of the window element and every descendant which can scroll in that direction, in tree order, without hit testing on the screen (works while another window covers it). One `FindAll` with a cache request for `BoundingRectangle` and `IsOffscreen`; empty, offscreen and duplicate rectangles are left out; an empty list, never `null`. The call blocks, run it on a background thread; the UI Automation connection and transaction timeouts are set to `timeout` (default `UiAutomationScroller.DefaultFindTimeout`, 2 seconds, Windows 8 and later).
+- Interop: `IUIAutomation.CreateCacheRequest`, `IUIAutomationCacheRequest`, `IUIAutomationElement.FindAllBuildCache` and the cached `BoundingRectangle` / `IsOffscreen`, `IUIAutomationElementArray`, `IUIAutomation2` timeouts.
+
 ## [3.3.0]
 
 Everything Greenshot needs for a scrolling capture: scroll part of a page, wheel at the right spot, and scroll windows which draw their own scroll bars.
