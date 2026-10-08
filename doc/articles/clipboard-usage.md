@@ -443,6 +443,10 @@ BITMAPCOREHEADER.
 CF_DIBV5 from CF_BITMAP, so this reads GDI bitmaps too. `AddDib` / `SetAsDib` write CF_DIBV5 (32 bpp BI_BITFIELDS, sRGB,
 straight alpha; premultiplied input is converted) and CF_DIB (32 bpp BI_RGB, many applications ignore its alpha).
 Also place a `"PNG"` format when you can.
+`SetAsDib` encodes directly into the clipboard memory. `AddDib` with a span or byte array encodes when it is called (the
+pixels can be reused right away); `AddDib` with a `ReadOnlyMemory<byte>` encodes directly into the clipboard memory when the
+contents are placed, without two intermediate arrays (about 33 MB each for a 4K screenshot): keep the memory valid and
+unchanged until then, as with `AddStream`.
 
 <!-- sample: ClipboardSamples.Dib -->
 ```csharp

@@ -7,6 +7,14 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.7.0]
+
+### Added
+- `ClipboardContents.AddDib(ReadOnlyMemory<byte> bgra32, width, height, stride, premultipliedAlpha, formats)`: CF_DIBV5 / CF_DIB are encoded directly into the clipboard memory when the contents are placed, without the two intermediate arrays (about 33 MB each for a 4K screenshot). Keep the memory valid and unchanged until the contents are placed, as with `AddStream`; the arguments are checked when it is called. An `AddDib(byte[] ...)` overload keeps existing calls with a byte array unambiguous and eager.
+
+### Changed
+- `IClipboardAccessToken.SetAsDib` encodes directly into the clipboard memory instead of building the DIBs as byte arrays first. The output is unchanged.
+
 ## [3.6.x]
 
 ### Fixed

@@ -5,6 +5,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -94,6 +95,52 @@ public class ClipboardFormatHelperTests
 
         Assert.True(DibImage.TryDecode(snapshot.GetAsBytes("CF_DIB"), out var dib));
         Assert.Equal(pixels, dib.Pixels);
+    }
+
+    /// <summary>
+    /// The DIBs encoded directly into the clipboard memory (AddDib with ReadOnlyMemory, SetAsDib) are byte-identical to CreateDib / CreateDibV5,
+    /// for straight and premultiplied alpha and a stride larger than width * 4
+    /// </summary>
+    [WpfFact]
+    public async Task Dib_DirectEncode_ByteIdenticalOnTheClipboard()
+    {
+        const int width = 7, height = 5;
+        foreach (var premultipliedAlpha in new[] { false, true })
+        {
+            foreach (var stride in new[] { width * 4, width * 4 + 12 })
+            {
+                var pixels = DibEncodeTests.CreatePixels(stride, premultipliedAlpha);
+                var expectedV5 = DibImage.CreateDibV5(pixels, width, height, stride, premultipliedAlpha);
+                var expectedDib = DibImage.CreateDib(pixels, width, height, stride, premultipliedAlpha);
+                var label = $"premultiplied {premultipliedAlpha}, stride {stride}";
+
+                // Deferred: encoded when the contents are placed
+                var contents = new ClipboardContents().AddDib(new ReadOnlyMemory<byte>(pixels), width, height, stride, premultipliedAlpha);
+                await ClipboardNative.UseAsync(clipboard => clipboard.ReplaceContents(contents));
+                await AssertDibsAsync(expectedV5, expectedDib, label + ", AddDib");
+
+                // Directly
+                await ClipboardNative.UseAsync(clipboard =>
+                {
+                    clipboard.ClearContents();
+                    clipboard.SetAsDib(pixels, width, height, stride, premultipliedAlpha);
+                });
+                await AssertDibsAsync(expectedV5, expectedDib, label + ", SetAsDib");
+            }
+        }
+    }
+
+    private static async Task AssertDibsAsync(byte[] expectedV5, byte[] expectedDib, string label)
+    {
+        var snapshot = await ClipboardNative.ReadSnapshotAsync(new[] { "CF_DIBV5", "CF_DIB" });
+        foreach (var (format, expected) in new[] { ("CF_DIBV5", expectedV5), ("CF_DIB", expectedDib) })
+        {
+            var actual = snapshot.GetAsBytes(format);
+            Assert.NotNull(actual);
+            // The clipboard memory can be larger than what was written (GlobalSize)
+            Assert.True(actual.Length >= expected.Length, $"{format}, {label}: {actual.Length} bytes");
+            Assert.True(expected.SequenceEqual(actual.Take(expected.Length)), $"{format}, {label}: the bytes differ");
+        }
     }
 
     [WpfFact]
