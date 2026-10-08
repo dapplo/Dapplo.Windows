@@ -7,6 +7,18 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.9.0]
+
+Read large bitmaps from the clipboard with fewer full-size copies.
+
+### Added
+- `DibImage.TryReadInfo(ReadOnlySpan<byte> dib, long maxPixelCount, out int width, out int height, out bool hasAlpha)`: validates the header exactly like `TryDecode` and tells the size and whether the decoded image would have alpha (for 32 bpp from the alpha values of the pixels), without decoding or allocating the pixels.
+- `DibImage.TryDecode(ReadOnlySpan<byte> dib, long maxPixelCount, Span<byte> destination, int destinationStride)`: decodes into memory of the caller (e.g. a locked bitmap), the same top-down BGRA32 pixels with straight alpha as `DibImage.Pixels`; false for invalid data or a destination which is too small. The padding of a larger stride is not written.
+
+### Changed
+- The read-only `MemoryStream`s of `ClipboardSnapshot.TryGetStream` and of `DataObjectReader` are publicly visible, so `MemoryStream.TryGetBuffer` returns their array without a copy (still not writable; don't change the buffer, it is the snapshot's data).
+- The DIB decoder is split into header parsing and decoding into a span; `DibImage.TryDecode(byte[] ...)` uses it, its results are unchanged. The palette and the check for repeated masks no longer allocate.
+
 ## [3.8.0]
 
 Found while replacing Greenshot's `WindowDetails` with `IInteropWindow`, `InteropWindowQuery` and `WindowsEnumerator`.

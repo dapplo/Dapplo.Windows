@@ -117,7 +117,7 @@ public class ClipboardFormatParsingTests
     [InlineData("dib-8bpp-palette.bin", false)]
     public void Dib_DecodeSamples(string file, bool withAlpha)
     {
-        Assert.True(DibImage.TryDecode(Sample(file), out var image));
+        Assert.True(TryDecodeChecked(Sample(file), out var image));
         AssertReference(image, withAlpha);
     }
 
@@ -142,7 +142,7 @@ public class ClipboardFormatParsingTests
         Assert.Equal(v5 ? 124 : 40, BitConverter.ToInt32(dib, 0));
         Assert.Equal(2, BitConverter.ToInt32(dib, 8));
         Assert.Equal(v5 ? 3 : 0, BitConverter.ToInt32(dib, 16));
-        Assert.True(DibImage.TryDecode(dib, out var image));
+        Assert.True(TryDecodeChecked(dib, out var image));
         AssertReference(image, true);
     }
 
@@ -151,7 +151,7 @@ public class ClipboardFormatParsingTests
     {
         // 50% transparent red, premultiplied: R = 128
         var pixels = new byte[] { 0, 0, 128, 128, 0, 0, 0, 0 };
-        Assert.True(DibImage.TryDecode(DibImage.CreateDibV5(pixels, 2, 1, 8, true), out var image));
+        Assert.True(TryDecodeChecked(DibImage.CreateDibV5(pixels, 2, 1, 8, true), out var image));
         Assert.Equal(new byte[] { 0, 0, 255, 128, 0, 0, 0, 0 }, image.Pixels);
     }
 
@@ -169,14 +169,14 @@ public class ClipboardFormatParsingTests
     [InlineData(new byte[] { 12, 0, 0, 0 })]
     public void Dib_Invalid_ReturnsFalse(byte[] data)
     {
-        Assert.False(DibImage.TryDecode(data, out _));
+        Assert.False(TryDecodeChecked(data, out _));
     }
 
     [Fact]
     public void Dib_Truncated_ReturnsFalse()
     {
         var sample = Sample("dibv5-bitfields-alpha.bin");
-        Assert.False(DibImage.TryDecode(sample.Take(sample.Length - 1).ToArray(), out _));
+        Assert.False(TryDecodeChecked(sample.Take(sample.Length - 1).ToArray(), out _));
     }
 
     /// <summary>
@@ -197,7 +197,7 @@ public class ClipboardFormatParsingTests
     {
         var sample = Sample("dibv5-greenshot.bin");
         BitConverter.GetBytes(value).CopyTo(sample, offset);
-        Assert.Equal(decodes, DibImage.TryDecode(sample, out var image));
+        Assert.Equal(decodes, TryDecodeChecked(sample, out var image));
         if (decodes)
         {
             AssertReference(image, true);
@@ -210,7 +210,7 @@ public class ClipboardFormatParsingTests
         var sample = Sample("dib-8bpp-palette.bin");
         // biClrUsed 0xFFFFFFFF: the palette would reach far beyond the data
         BitConverter.GetBytes(0xFFFFFFFFu).CopyTo(sample, 32);
-        Assert.False(DibImage.TryDecode(sample, out _));
+        Assert.False(TryDecodeChecked(sample, out _));
     }
 
     [Fact]
@@ -226,7 +226,7 @@ public class ClipboardFormatParsingTests
         BitConverter.GetBytes(3).CopyTo(dib, 16);
         BitConverter.GetBytes(0xFFFFFFFFu).CopyTo(dib, 40);
         BitConverter.GetBytes(0xFFFFFFFFu).CopyTo(dib, 52);
-        Assert.True(DibImage.TryDecode(dib, out var image));
+        Assert.True(TryDecodeChecked(dib, out var image));
         Assert.Equal(255, image.Pixels[2]);
     }
 
@@ -236,7 +236,80 @@ public class ClipboardFormatParsingTests
         var sample = Sample("dib-24bpp-bottomup.bin");
         // BI_PNG
         BitConverter.GetBytes(5).CopyTo(sample, 16);
-        Assert.False(DibImage.TryDecode(sample, out _));
+        Assert.False(TryDecodeChecked(sample, out _));
+    }
+
+    // ── Span decode (3.9): every decode in these tests also checks TryReadInfo and the decode into caller memory ──
+
+    private static bool TryDecodeChecked(byte[] dib, out DibImage image) => TryDecodeChecked(dib, DibImage.DefaultMaxPixelCount, out image);
+
+    /// <summary>
+    /// DibImage.TryDecode, and the same answer from TryReadInfo and from the decode into caller memory: the same pixels with a tight
+    /// and with a larger stride (the padding untouched), false for a destination which is too small
+    /// </summary>
+    private static bool TryDecodeChecked(byte[] dib, long maxPixelCount, out DibImage image)
+    {
+        var decoded = DibImage.TryDecode(dib, maxPixelCount, out image);
+        Assert.Equal(decoded, DibImage.TryReadInfo(dib, maxPixelCount, out var width, out var height, out var hasAlpha));
+        if (!decoded)
+        {
+            Assert.False(DibImage.TryDecode(dib, maxPixelCount, new byte[1024], 64));
+            return false;
+        }
+        Assert.Equal(image.Width, width);
+        Assert.Equal(image.Height, height);
+        Assert.Equal(image.HasAlpha, hasAlpha);
+
+        var tight = Enumerable.Repeat((byte)0xCD, width * height * 4).ToArray();
+        Assert.True(DibImage.TryDecode(dib, maxPixelCount, tight, width * 4));
+        Assert.Equal(image.Pixels, tight);
+
+        var stride = width * 4 + 12;
+        var padded = Enumerable.Repeat((byte)0xCD, stride * height).ToArray();
+        Assert.True(DibImage.TryDecode(dib, maxPixelCount, padded, stride));
+        for (var y = 0; y < height; y++)
+        {
+            Assert.True(image.Pixels.Skip(y * width * 4).Take(width * 4).SequenceEqual(padded.Skip(y * stride).Take(width * 4)), $"Row {y} differs");
+            Assert.All(padded.Skip(y * stride + width * 4).Take(12), b => Assert.Equal(0xCD, b));
+        }
+
+        Assert.False(DibImage.TryDecode(dib, maxPixelCount, new byte[tight.Length - 1], width * 4));
+        Assert.False(DibImage.TryDecode(dib, maxPixelCount, tight, width * 4 - 1));
+        return true;
+    }
+
+    [Theory]
+    [InlineData(0L)]
+    [InlineData(-1L)]
+    public void Dib_SpanApi_MaxPixelCount_MustBePositive(long maxPixelCount)
+    {
+        var sample = Sample("dib-24bpp-bottomup.bin");
+        Assert.Throws<ArgumentOutOfRangeException>(() => DibImage.TryReadInfo(sample, maxPixelCount, out _, out _, out _));
+        Assert.Throws<ArgumentOutOfRangeException>(() => DibImage.TryDecode(sample, maxPixelCount, new byte[24], 12));
+    }
+
+    [Fact]
+    public void Dib_SpanApi_DecodesFromASnapshotBuffer()
+    {
+        var dib = Sample("dibv5-bitfields-alpha.bin");
+        var snapshot = (ClipboardSnapshot)Activator.CreateInstance(typeof(ClipboardSnapshot), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance, null,
+            new object[] { 1u, IntPtr.Zero, new[] { "CF_DIBV5" }, new System.Collections.Generic.Dictionary<string, byte[]> { ["CF_DIBV5"] = dib }, new string[0] }, null);
+
+        Assert.True(snapshot.TryGetStream("CF_DIBV5", out var stream));
+        var memoryStream = Assert.IsType<MemoryStream>(stream);
+        Assert.False(memoryStream.CanWrite);
+        // The snapshot's own array, no copy
+        Assert.True(memoryStream.TryGetBuffer(out var buffer));
+        Assert.Same(dib, buffer.Array);
+        Assert.Equal(dib.Length, buffer.Count);
+
+        var data = new ReadOnlySpan<byte>(buffer.Array, buffer.Offset, buffer.Count);
+        Assert.True(DibImage.TryReadInfo(data, DibImage.DefaultMaxPixelCount, out var width, out var height, out var hasAlpha));
+        Assert.True(hasAlpha);
+        var pixels = new byte[width * height * 4];
+        Assert.True(DibImage.TryDecode(data, DibImage.DefaultMaxPixelCount, pixels, width * 4));
+        Assert.True(DibImage.TryDecode(dib, out var image));
+        Assert.Equal(image.Pixels, pixels);
     }
 
     // ── DIB size limit (3.2) ─────────────────────────────────────────────────
@@ -305,9 +378,9 @@ public class ClipboardFormatParsingTests
     {
         // 3 x 2 pixels, the top-down sample has a negative height
         var sample = Sample(file);
-        Assert.True(DibImage.TryDecode(sample, 6, out var image));
+        Assert.True(TryDecodeChecked(sample, 6, out var image));
         Assert.Equal(6, image.Width * image.Height);
-        Assert.False(DibImage.TryDecode(sample, 5, out image));
+        Assert.False(TryDecodeChecked(sample, 5, out image));
         Assert.Null(image);
 
         var source = new BytesSource(StandardClipboardFormats.DeviceIndependentBitmap.AsString(), sample);
@@ -322,7 +395,7 @@ public class ClipboardFormatParsingTests
     public void Dib_MaxPixelCount_MustBePositive(long maxPixelCount)
     {
         var sample = Sample("dib-24bpp-bottomup.bin");
-        Assert.Throws<ArgumentOutOfRangeException>(() => DibImage.TryDecode(sample, maxPixelCount, out _));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TryDecodeChecked(sample, maxPixelCount, out _));
         var source = new BytesSource(StandardClipboardFormats.DeviceIndependentBitmap.AsString(), sample);
         Assert.Throws<ArgumentOutOfRangeException>(() => source.TryGetAsDib(maxPixelCount, out _));
     }
@@ -347,9 +420,9 @@ public class ClipboardFormatParsingTests
 #if NET
         var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
 #endif
-        Assert.False(DibImage.TryDecode(dib, out var image));
+        Assert.False(TryDecodeChecked(dib, out var image));
         Assert.Null(image);
-        Assert.False(DibImage.TryDecode(dib, long.MaxValue, out image));
+        Assert.False(TryDecodeChecked(dib, long.MaxValue, out image));
         Assert.Null(image);
 #if NET
         // Nothing was allocated for the pixels
@@ -364,12 +437,12 @@ public class ClipboardFormatParsingTests
         const int width = 8193;
         const int stride = (width + 31) / 32 * 4;
         var tooLarge = CreateInfoHeader(width, 8192, 1, 8 + (long)stride * 8192);
-        Assert.False(DibImage.TryDecode(tooLarge, out _));
-        Assert.False(DibImage.TryDecode(tooLarge, 8193L * 8192 - 1, out _));
+        Assert.False(TryDecodeChecked(tooLarge, out _));
+        Assert.False(TryDecodeChecked(tooLarge, 8193L * 8192 - 1, out _));
 
         // The same bitmap with fewer rows is decoded
         var small = CreateInfoHeader(width, 2, 1, 8 + stride * 2);
-        Assert.True(DibImage.TryDecode(small, out var image));
+        Assert.True(TryDecodeChecked(small, out var image));
         Assert.Equal(width, image.Width);
         Assert.Equal(2, image.Height);
     }
@@ -384,7 +457,7 @@ public class ClipboardFormatParsingTests
             var row = 1 - i / 3;
             Array.Copy(Reference[i], 0, dib, 12 + row * 12 + (i % 3) * 3, 3);
         }
-        Assert.True(DibImage.TryDecode(dib, out var image));
+        Assert.True(TryDecodeChecked(dib, out var image));
         AssertReference(image, false);
     }
 
@@ -397,7 +470,7 @@ public class ClipboardFormatParsingTests
         new byte[] { 40, 50, 60 }.CopyTo(dib, 12 + 2 * 3);
         dib[12 + 256 * 3] = 1;
         dib[12 + 256 * 3 + 1] = 2;
-        Assert.True(DibImage.TryDecode(dib, out var image));
+        Assert.True(TryDecodeChecked(dib, out var image));
         Assert.Equal(new byte[] { 10, 20, 30, 255, 40, 50, 60, 255 }, image.Pixels);
         Assert.False(image.HasAlpha);
     }
@@ -408,10 +481,10 @@ public class ClipboardFormatParsingTests
         // 65535 x 2 at 1 bpp: a signed 16-bit width would be -1
         const int stride = (65535 + 31) / 32 * 4;
         var dib = CreateCoreHeader(0xFFFF, 2, 1, 2 * 3 + 2 * stride);
-        Assert.True(DibImage.TryDecode(dib, 65535L * 2, out var image));
+        Assert.True(TryDecodeChecked(dib, 65535L * 2, out var image));
         Assert.Equal(65535, image.Width);
         Assert.Equal(2, image.Height);
-        Assert.False(DibImage.TryDecode(dib, 65535L * 2 - 1, out _));
+        Assert.False(TryDecodeChecked(dib, 65535L * 2 - 1, out _));
     }
 
     [Theory]
@@ -421,8 +494,8 @@ public class ClipboardFormatParsingTests
     public void Dib_CoreHeader_HugeDimensions_AreRejected(int width, int height, int bitCount)
     {
         var dib = CreateCoreHeader((ushort)width, (ushort)height, (ushort)bitCount, 64);
-        Assert.False(DibImage.TryDecode(dib, out _));
-        Assert.False(DibImage.TryDecode(dib, long.MaxValue, out _));
+        Assert.False(TryDecodeChecked(dib, out _));
+        Assert.False(TryDecodeChecked(dib, long.MaxValue, out _));
     }
 
     [Theory]
@@ -432,15 +505,15 @@ public class ClipboardFormatParsingTests
     public void Dib_CoreHeader_UnsupportedBitCount_ReturnsFalse(int bitCount)
     {
         var dib = CreateCoreHeader(1, 1, (ushort)bitCount, 64);
-        Assert.False(DibImage.TryDecode(dib, out _));
+        Assert.False(TryDecodeChecked(dib, out _));
     }
 
     [Fact]
     public void Dib_CoreHeader_Truncated_ReturnsFalse()
     {
         // The palette is missing
-        Assert.False(DibImage.TryDecode(CreateCoreHeader(1, 1, 8, 10), out _));
+        Assert.False(TryDecodeChecked(CreateCoreHeader(1, 1, 8, 10), out _));
         // Only the header
-        Assert.False(DibImage.TryDecode(CreateCoreHeader(1, 1, 24), out _));
+        Assert.False(TryDecodeChecked(CreateCoreHeader(1, 1, 24), out _));
     }
 }

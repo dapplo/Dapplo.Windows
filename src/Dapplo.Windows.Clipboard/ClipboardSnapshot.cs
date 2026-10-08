@@ -64,7 +64,14 @@ public sealed class ClipboardSnapshot : IClipboardDataSource
     /// <returns>long</returns>
     public long GetSize(string format) => format != null && _data.TryGetValue(format, out var bytes) ? bytes.LongLength : -1;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// A read-only MemoryStream on the data of the format, no copy. The stream exposes the snapshot's own array:
+    /// use <see cref="MemoryStream.TryGetBuffer"/> to read it without copying (e.g. to decode a large bitmap with
+    /// <see cref="DibImage.TryDecode(ReadOnlySpan{byte}, long, Span{byte}, int)"/>), but don't change the buffer, it is the snapshot's data.
+    /// </summary>
+    /// <param name="format">string with the format name</param>
+    /// <param name="stream">Stream, a read-only MemoryStream</param>
+    /// <returns>true when the snapshot has the format</returns>
     public bool TryGetStream(string format, out Stream stream)
     {
         if (format == null || !_data.TryGetValue(format, out var bytes))
@@ -72,8 +79,8 @@ public sealed class ClipboardSnapshot : IClipboardDataSource
             stream = null;
             return false;
         }
-        // Read-only view on the data, no copy
-        stream = new MemoryStream(bytes, 0, bytes.Length, false, false);
+        // Read-only view on the data, no copy; publicly visible so TryGetBuffer works (the buffer must not be changed)
+        stream = new MemoryStream(bytes, 0, bytes.Length, false, true);
         return true;
     }
 
