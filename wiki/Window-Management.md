@@ -140,7 +140,8 @@ bitmap?.Save("window.png", ImageFormat.Png);
 
 `window.GetWindowScroller()` scrolls windows with a Win32 scroll bar; for windows which draw their own scroll bars (browsers,
 Electron, WPF, WinUI, Office) the **Dapplo.Windows.Automation** package has `UiAutomationScroller`, which uses the UI
-Automation `ScrollPattern`. Both implement `IScroller`. `StepFraction` scrolls part of a page per step, so the frames of a
+Automation `ScrollPattern`; controls without one which expose a scroll bar element (e.g. the Visual Studio editor) are
+scrolled with the mouse wheel (`IsScrollBarFallback`, `IsPositionKnown`). Both implement `IScroller`. `StepFraction` scrolls part of a page per step, so the frames of a
 scrolling capture overlap; `ViewportBounds` is the area to capture. See
 [Window management](https://www.dapplo.net/Dapplo.Windows/articles/window-management.html#scrolling) for the details.
 
@@ -150,6 +151,8 @@ scrolling capture overlap; `ViewportBounds` is the area to capture. See
 // Both implement IScroller. Run this on a background thread, not on the UI thread of the window.
 IScroller scroller = window.GetWindowScroller();
 scroller ??= UiAutomationScroller.FromPoint(clickedPoint);   // or UiAutomationScroller.FromWindow(window)
+// FromPoint also finds controls without a ScrollPattern which expose a scroll bar (e.g. the Visual Studio editor):
+// IsScrollBarFallback is true, they are scrolled with the mouse wheel, so the area must be visible on the screen.
 if (scroller == null)
 {
     return;                       // nothing to scroll here
@@ -165,7 +168,8 @@ try
         {
             break;
         }
-        // Give the application time to paint, then capture the visible part
+        // Give the application time to paint, then capture the visible part.
+        // When UiAutomationScroller.IsPositionKnown is false, IsAtEnd can't tell the end: stop when the frame didn't change.
         captureFrame(scroller.ViewportBounds);
     }
     scroller.Reset();             // back to where the user was

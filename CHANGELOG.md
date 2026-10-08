@@ -7,6 +7,18 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.5.0]
+
+Scroll controls which have no UI Automation `ScrollPattern` but expose their scroll bar, like the Visual Studio editor.
+
+### Added
+- `UiAutomationScroller.FromPoint` / `FromWindow` fall back to the first element with a visible child scroll bar element in the direction when no element has a `ScrollPattern`. Such a scroller has `IsScrollBarFallback` true and scrolls with the mouse wheel (`ScrollMode` is `MouseWheel`, setting `ScrollPattern` throws `InvalidOperationException`); its `ViewportBounds` is the control including the scroll bar. The position comes from the scroll bar's RangeValue (`Value` / `Minimum` / `Maximum`, `LargeChange` for the visible part; `Start()`, `End()` and `Reset()` set the value when writable), else from its thumb between the line buttons. Without either, `IsPositionKnown` is false: `IsAtStart` / `IsAtEnd` come from disabled line buttons only, a step is one wheel notch, `Start()` / `End()` / `Reset()` return false, and the caller detects the end itself.
+- `UiAutomationScroller.FindScrollableAreas` also returns the parent of every visible scroll bar element in the direction (in the same search, one extra call per scroll bar); duplicates are returned once and an outer area comes before the areas inside it. `FindScrollableAreas(handle, horizontal, timeout, includeScrollBarAreas: false)` returns the `ScrollPattern` elements only.
+- `UiAutomationScroller.IsScrollBarFallback` and `IsPositionKnown`.
+
+### Changed
+- `UiAutomationScroller.FromPoint` and `FindScrollableAreas` can now return areas they didn't find before (controls with a scroll bar but no `ScrollPattern`); an element with a `ScrollPattern` still wins in `FromPoint` and `FromWindow`.
+
 ## [3.4.0]
 
 Find the scrollable areas inside a window, for a scrolling capture which lets the user pick one.

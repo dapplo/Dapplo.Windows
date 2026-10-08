@@ -28,6 +28,36 @@ internal static class UiaConstants
     /// <summary>UIA_IsOffscreenPropertyId</summary>
     public const int IsOffscreenPropertyId = 30022;
 
+    /// <summary>UIA_ControlTypePropertyId</summary>
+    public const int ControlTypePropertyId = 30003;
+
+    /// <summary>UIA_OrientationPropertyId</summary>
+    public const int OrientationPropertyId = 30023;
+
+    /// <summary>UIA_ScrollBarControlTypeId</summary>
+    public const int ScrollBarControlTypeId = 50014;
+
+    /// <summary>UIA_ButtonControlTypeId</summary>
+    public const int ButtonControlTypeId = 50000;
+
+    /// <summary>UIA_ThumbControlTypeId</summary>
+    public const int ThumbControlTypeId = 50027;
+
+    /// <summary>OrientationType_Horizontal</summary>
+    public const int OrientationHorizontal = 1;
+
+    /// <summary>OrientationType_Vertical</summary>
+    public const int OrientationVertical = 2;
+
+    /// <summary>UIA_RangeValuePatternId</summary>
+    public const int RangeValuePatternId = 10003;
+
+    /// <summary>TreeScope_Children</summary>
+    public const int TreeScopeChildren = 0x02;
+
+    /// <summary>AutomationElementMode_Full: the found elements are references to the live elements, needed to navigate from them</summary>
+    public const int AutomationElementModeFull = 1;
+
     /// <summary>TreeScope_Element</summary>
     public const int TreeScopeElement = 0x01;
 
@@ -101,7 +131,9 @@ internal interface IUIAutomation
     void ElementFromPointBuildCache();
     void GetFocusedElementBuildCache();
     void CreateTreeWalker();
-    void get_ControlViewWalker();
+    [PreserveSig]
+    int get_ControlViewWalker(out IUIAutomationTreeWalker walker);
+
     void get_ContentViewWalker();
 
     [PreserveSig]
@@ -117,6 +149,17 @@ internal interface IUIAutomation
 
     [PreserveSig]
     int CreatePropertyCondition(int propertyId, [MarshalAs(UnmanagedType.Struct)] object value, out IUIAutomationCondition condition);
+
+    void CreatePropertyConditionEx();
+
+    [PreserveSig]
+    int CreateAndCondition(IUIAutomationCondition condition1, IUIAutomationCondition condition2, out IUIAutomationCondition condition);
+
+    void CreateAndConditionFromArray();
+    void CreateAndConditionFromNativeArray();
+
+    [PreserveSig]
+    int CreateOrCondition(IUIAutomationCondition condition1, IUIAutomationCondition condition2, out IUIAutomationCondition condition);
 }
 
 /// <summary>
@@ -139,6 +182,15 @@ internal interface IUIAutomationTreeWalker
 {
     [PreserveSig]
     int GetParentElement(IUIAutomationElement element, out IUIAutomationElement parent);
+
+    void GetFirstChildElement();
+    void GetLastChildElement();
+    void GetNextSiblingElement();
+    void GetPreviousSiblingElement();
+    void NormalizeElement();
+
+    [PreserveSig]
+    int GetParentElementBuildCache(IUIAutomationElement element, IUIAutomationCacheRequest cacheRequest, out IUIAutomationElement parent);
 }
 
 /// <summary>
@@ -184,7 +236,9 @@ internal interface IUIAutomationElement
     void get_CurrentAccessKey();
     void get_CurrentHasKeyboardFocus();
     void get_CurrentIsKeyboardFocusable();
-    void get_CurrentIsEnabled();
+    [PreserveSig]
+    int get_CurrentIsEnabled(out int isEnabled);
+
     void get_CurrentAutomationId();
     void get_CurrentClassName();
     void get_CurrentHelpText();
@@ -212,7 +266,9 @@ internal interface IUIAutomationElement
     void get_CurrentFlowsTo();
     void get_CurrentProviderDescription();
     void get_CachedProcessId();
-    void get_CachedControlType();
+    [PreserveSig]
+    int get_CachedControlType(out int controlType);
+
     void get_CachedLocalizedControlType();
     void get_CachedName();
     void get_CachedAcceleratorKey();
@@ -272,6 +328,33 @@ internal interface IUIAutomationScrollPattern
 
     [PreserveSig]
     int get_CurrentVerticallyScrollable(out int scrollable);
+}
+
+/// <summary>
+///     IUIAutomationRangeValuePattern, e.g. the position of a scroll bar
+/// </summary>
+[ComImport]
+[Guid("59213f4f-7346-49e5-b120-80555987a148")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IUIAutomationRangeValuePattern
+{
+    [PreserveSig]
+    int SetValue(double value);
+
+    [PreserveSig]
+    int get_CurrentValue(out double value);
+
+    [PreserveSig]
+    int get_CurrentIsReadOnly(out int isReadOnly);
+
+    [PreserveSig]
+    int get_CurrentMaximum(out double maximum);
+
+    [PreserveSig]
+    int get_CurrentMinimum(out double minimum);
+
+    [PreserveSig]
+    int get_CurrentLargeChange(out double largeChange);
 }
 
 /// <summary>
