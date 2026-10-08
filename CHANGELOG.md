@@ -11,6 +11,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
 ### Fixed
 - `UiAutomationScroller.Start()` / `End()` of a scroll bar fallback didn't scroll the Visual Studio editor at all and returned true: setting the scroll bar's RangeValue moves only the scroll bar there (the editor follows the scroll bar's Scroll events, not its value), and the value read back is the scroll bar's own. After setting the value, one wheel notch towards the target now confirms it: at the start / end nothing moves, else the control puts its real position on the scroll bar and the rest is done with the wheel. `Reset()` of a scroll bar fallback uses the wheel only.
+- A scroll bar fallback whose position comes from the thumb: on long content a wheel notch moves the content less than a thumb pixel, and `Next()` / `Previous()` returned false in the middle of the content. A notch which didn't move the thumb now ends the step with true (a smaller step) unless the thumb is at the start / end.
 
 ## [3.6.0]
 

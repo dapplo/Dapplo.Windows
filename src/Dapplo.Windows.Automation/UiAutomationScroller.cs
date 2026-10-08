@@ -498,7 +498,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     ///     The position is read from the scroll bar: its RangeValue pattern (Value, Minimum, Maximum, LargeChange), else the position of
     ///     its thumb between its line buttons, see <see cref="IsPositionKnown"/>. A thumb tells the position to a pixel: on long content
     ///     <see cref="IsAtStart"/> / <see cref="IsAtEnd"/> can be true while up to a thumb pixel's worth of content is left (compare the
-    ///     captured frames when that matters); <see cref="Start"/>, <see cref="End"/> and <see cref="Reset"/> to the start or end wheel a
+    ///     captured frames when that matters), and a step whose notch didn't move the thumb ends after that notch and returns true; <see cref="Start"/>, <see cref="End"/> and <see cref="Reset"/> to the start or end wheel a
     ///     little further to make up for it.
     /// </summary>
     public bool IsScrollBarFallback { get; private set; }
@@ -1011,6 +1011,12 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             }
             if (!WaitForPercentChange(before, out var after))
             {
+                // A thumb moves in whole pixels: on long content a notch moves the content less than that, so the step ends here
+                // (smaller than asked); at the start or end of the thumb's track nothing could move
+                if (_thumbPixelPercent > 0 && IsAvailable && (forward ? before < 100 - PercentTolerance : before > PercentTolerance))
+                {
+                    return true;
+                }
                 Log.Verbose().WriteLine("Scroll position didn't change after a mouse wheel notch, stopping.");
                 return moved;
             }
