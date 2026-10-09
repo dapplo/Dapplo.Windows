@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -104,7 +106,7 @@ public class UiAutomationAreasTests
 
     // Internal (the test assembly can't see the internals of the signed library), no spans: reflection works
     private static bool HasLargeEmptyArea(UiAutomationArea root) =>
-        (bool)typeof(UiAutomationAreas).GetMethod("HasLargeEmptyArea", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(null, new object[] { root });
+        (bool)typeof(UiAutomationAreas).GetMethod("HasLargeEmptyArea", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static, null, new[] { typeof(UiAutomationArea) }, null).Invoke(null, new object[] { root });
 
     private static IEnumerable<UiAutomationArea> Flatten(UiAutomationArea area) => new[] { area }.Concat(area.Children.SelectMany(Flatten));
 
@@ -114,11 +116,11 @@ public class UiAutomationAreasTests
         inner.Left >= outer.Left && inner.Top >= outer.Top && inner.Right <= outer.Right && inner.Bottom <= outer.Bottom;
 
     [Fact]
-    public void FindAreas_HasThePanelsAndButtons_InsideTheWindow()
+    public async Task FindAreas_HasThePanelsAndButtons_InsideTheWindow()
     {
         using var testWindow = new AreasTestWindow();
 
-        var root = UiAutomationAreas.FindAreas(testWindow.WindowHandle);
+        var root = await UiAutomationAreas.FindAreasAsync(testWindow.WindowHandle, maxDepth: 10, cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.NotNull(root);
         Assert.False(root.Bounds.IsEmpty);
@@ -154,23 +156,23 @@ public class UiAutomationAreasTests
     }
 
     [Fact]
-    public void FindAreas_MinimumSize_DropsSmallAreas()
+    public async Task FindAreas_MinimumSize_DropsSmallAreas()
     {
         using var testWindow = new AreasTestWindow();
 
-        Assert.NotNull(Find(UiAutomationAreas.FindAreas(testWindow.WindowHandle), "Tiny"));
-        var root = UiAutomationAreas.FindAreas(testWindow.WindowHandle, minimumSize: 20);
+        Assert.NotNull(Find(await UiAutomationAreas.FindAreasAsync(testWindow.WindowHandle, maxDepth: 10, cancellationToken: TestContext.Current.CancellationToken), "Tiny"));
+        var root = await UiAutomationAreas.FindAreasAsync(testWindow.WindowHandle, maxDepth: 10, minimumSize: 20, cancellationToken: TestContext.Current.CancellationToken);
         Assert.Null(Find(root, "Tiny"));
         Assert.NotNull(Find(root, "Deep"));
         Assert.All(Flatten(root), area => Assert.True(area.Bounds.Width >= 20 && area.Bounds.Height >= 20, area.ToString()));
     }
 
     [Fact]
-    public void FindAreas_AreaWithTheBoundsOfItsParent_IsReplacedByItsChildren()
+    public async Task FindAreas_AreaWithTheBoundsOfItsParent_IsReplacedByItsChildren()
     {
         using var testWindow = new AreasTestWindow();
 
-        var root = UiAutomationAreas.FindAreas(testWindow.WindowHandle);
+        var root = await UiAutomationAreas.FindAreasAsync(testWindow.WindowHandle, maxDepth: 10, cancellationToken: TestContext.Current.CancellationToken);
 
         var wrapper = Find(root, "Wrapper");
         Assert.NotNull(wrapper);
@@ -183,11 +185,47 @@ public class UiAutomationAreasTests
         }
     }
 
+    /// <summary>
+    ///     maxDepth counts the levels of the result, after merging: the wrapper with the same bounds as its parent doesn't count
+    /// </summary>
     [Fact]
-    public void FindAreas_NoWindow_ReturnsNull()
+    public async Task FindAreas_MaxDepth_CountsAfterMerging()
     {
-        Assert.Null(UiAutomationAreas.FindAreas(IntPtr.Zero));
-        Assert.Null(UiAutomationAreas.FindAreas((Dapplo.Windows.Desktop.IInteropWindow)null));
+        using var testWindow = new AreasTestWindow();
+        var token = TestContext.Current.CancellationToken;
+
+        var levelOne = await UiAutomationAreas.FindAreasAsync(testWindow.WindowHandle, maxDepth: 1, cancellationToken: token);
+        Assert.NotNull(Find(levelOne, "Outer"));
+        Assert.NotNull(Find(levelOne, "Wrapper"));
+        Assert.Null(Find(levelOne, "Inner"));
+        Assert.Null(Find(levelOne, "Wrapped"));
+        Assert.All(levelOne.Children, child => Assert.Empty(child.Children));
+        // Only the window
+        Assert.Empty((await UiAutomationAreas.FindAreasAsync(testWindow.WindowHandle, maxDepth: 0, cancellationToken: token)).Children);
+
+        // Wrapper (1) > SameBounds (merged) > Wrapped (2)
+        var levelTwo = await UiAutomationAreas.FindAreasAsync(testWindow.WindowHandle, maxDepth: 2, cancellationToken: token);
+        Assert.Contains(Find(levelTwo, "Wrapper").Children, child => child.Name == "Wrapped");
+        Assert.NotNull(Find(levelTwo, "Inner"));
+        Assert.Null(Find(levelTwo, "Deep"));
+    }
+
+    [Fact]
+    public async Task FindAreas_Canceled_Throws()
+    {
+        using var testWindow = new AreasTestWindow();
+        using var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => UiAutomationAreas.FindAreasAsync(testWindow.WindowHandle, cancellationToken: cancellationTokenSource.Token));
+    }
+
+    [Fact]
+    public async Task FindAreas_NoWindow_ReturnsNull()
+    {
+        var token = TestContext.Current.CancellationToken;
+        Assert.Null(await UiAutomationAreas.FindAreasAsync(IntPtr.Zero, cancellationToken: token));
+        Assert.Null(await UiAutomationAreas.FindAreasAsync((Dapplo.Windows.Desktop.IInteropWindow)null, cancellationToken: token));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => UiAutomationAreas.FindAreasAsync(new IntPtr(1), maxDepth: -1, cancellationToken: token));
     }
 
     // ── GetAreasAt, on hand-built trees ───────────────────────────────────────

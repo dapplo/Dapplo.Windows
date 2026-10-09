@@ -8,7 +8,7 @@ namespace Dapplo.Windows.Automation;
 
 /// <summary>
 ///     An area of a window as UI Automation reports it: an element of the control view with its bounds, control type, name and the areas
-///     inside it. Immutable, a snapshot from <see cref="UiAutomationAreas.FindAreas(IntPtr, int, TimeSpan?)"/>.
+///     inside it. Immutable, a snapshot from <see cref="UiAutomationAreas.FindAreasAsync(IntPtr, int, int, TimeSpan?, System.Threading.CancellationToken)"/>.
 /// </summary>
 public sealed class UiAutomationArea
 {

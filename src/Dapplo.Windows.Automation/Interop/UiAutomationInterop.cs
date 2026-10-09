@@ -55,9 +55,6 @@ internal static class UiaConstants
     /// <summary>UIA_NamePropertyId</summary>
     public const int NamePropertyId = 30005;
 
-    /// <summary>TreeScope_Subtree: the element and all its descendants</summary>
-    public const int TreeScopeSubtree = 0x07;
-
     /// <summary>TreeScope_Children</summary>
     public const int TreeScopeChildren = 0x02;
 
@@ -234,9 +231,7 @@ internal interface IUIAutomationElement
 
     void GetCachedPattern();
     void GetCachedParent();
-    [PreserveSig]
-    int GetCachedChildren(out IUIAutomationElementArray children);
-
+    void GetCachedChildren();
 
     [PreserveSig]
     int get_CurrentProcessId(out int processId);
@@ -387,9 +382,7 @@ internal interface IUIAutomationCacheRequest
     void AddPattern();
     void Clone();
     void get_TreeScope();
-    [PreserveSig]
-    int put_TreeScope(int scope);
-
+    void put_TreeScope();
     void get_TreeFilter();
 
     [PreserveSig]
