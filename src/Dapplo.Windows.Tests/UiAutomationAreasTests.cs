@@ -404,4 +404,100 @@ public class UiAutomationAreasTests
         Assert.NotNull(area.Children);
         Assert.Empty(area.Children);
     }
+
+    private static UiAutomationArea ReadUntilComplete(Func<(UiAutomationArea Root, bool ReadAgain)> read, TimeSpan contentWait, TimeSpan pause, CancellationToken cancellationToken)
+    {
+        var method = typeof(UiAutomationAreas).GetMethod("ReadUntilComplete", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        try
+        {
+            return (UiAutomationArea)method.Invoke(null, new object[] { read, contentWait, pause, IntPtr.Zero, cancellationToken });
+        }
+        catch (System.Reflection.TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            throw;
+        }
+    }
+
+    private static UiAutomationArea TreeNumber(int number) => new UiAutomationArea(new NativeRect(0, 0, 100, 100), 50032, $"Read {number}");
+
+    [Fact]
+    public void ReadUntilComplete_ReadsAgainUntilTheTreeIsComplete()
+    {
+        var reads = 0;
+        var result = ReadUntilComplete(() =>
+        {
+            reads++;
+            return (TreeNumber(reads), reads < 3);
+        }, TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(10), TestContext.Current.CancellationToken);
+
+        Assert.Equal(3, reads);
+        Assert.Equal("Read 3", result.Name);
+    }
+
+    [Fact]
+    public void ReadUntilComplete_CompleteTree_ReadsOnce()
+    {
+        var reads = 0;
+        var result = ReadUntilComplete(() => { reads++; return (TreeNumber(reads), false); }, TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(10), TestContext.Current.CancellationToken);
+        Assert.Equal(1, reads);
+        Assert.Equal("Read 1", result.Name);
+    }
+
+    [Fact]
+    public void ReadUntilComplete_ZeroWait_ReadsOnce()
+    {
+        var reads = 0;
+        var result = ReadUntilComplete(() => { reads++; return (TreeNumber(reads), true); }, TimeSpan.Zero, TimeSpan.FromMilliseconds(10), TestContext.Current.CancellationToken);
+        Assert.Equal(1, reads);
+        Assert.Equal("Read 1", result.Name);
+    }
+
+    [Fact]
+    public void ReadUntilComplete_StaysEmpty_StopsAfterTheWaitWithTheLastResult()
+    {
+        var reads = 0;
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        var result = ReadUntilComplete(() => { reads++; return (TreeNumber(reads), true); }, TimeSpan.FromMilliseconds(300), TimeSpan.FromMilliseconds(50), TestContext.Current.CancellationToken);
+        stopwatch.Stop();
+
+        // About 300 ms / 50 ms pauses plus the first read; generous bounds for a busy build agent
+        Assert.InRange(reads, 2, 8);
+        Assert.Equal($"Read {reads}", result.Name);
+        Assert.InRange(stopwatch.ElapsedMilliseconds, 250, 2000);
+    }
+
+    [Fact]
+    public void ReadUntilComplete_NullResult_StopsAtOnce()
+    {
+        var reads = 0;
+        var result = ReadUntilComplete(() => { reads++; return (null, true); }, TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(10), TestContext.Current.CancellationToken);
+        Assert.Equal(1, reads);
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void ReadUntilComplete_CancelDuringPause_Throws()
+    {
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var reads = 0;
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        Assert.Throws<OperationCanceledException>(() => ReadUntilComplete(() =>
+        {
+            reads++;
+            // Cancel while the loop is about to pause for a long time
+            cancellationTokenSource.CancelAfter(100);
+            return (TreeNumber(reads), true);
+        }, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(10), cancellationTokenSource.Token));
+        stopwatch.Stop();
+
+        Assert.Equal(1, reads);
+        Assert.True(stopwatch.ElapsedMilliseconds < 5000, $"Cancellation took {stopwatch.ElapsedMilliseconds} ms");
+    }
+
+    [Fact]
+    public async Task FindAreasAsync_NegativeContentWait_Throws()
+    {
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => UiAutomationAreas.FindAreasAsync(IntPtr.Zero, contentWait: TimeSpan.FromSeconds(-1), cancellationToken: TestContext.Current.CancellationToken));
+    }
 }
