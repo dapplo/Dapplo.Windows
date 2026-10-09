@@ -7,6 +7,11 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.11.0]
+
+### Added
+- `UiAutomationAreas.FindAreasAsync(…, contentWait, cancellationToken)`: while the tree still has a large area without content, it is read again with a pause of a quarter of a second between the attempts, until the tree is complete or `contentWait` has passed (null uses the new `UiAutomationAreas.DefaultContentWait`, 3 seconds; `TimeSpan.Zero` reads only once); the last result is returned. Before, the tree was read a second time only once, after half a second, which wasn't enough for Edge with Gmail right after Edge started. The condition is unchanged since 3.10.5, a complete tree never waits. The cancellation token is checked during every pause and before every request; each attempt is logged at verbose level. The overloads without `contentWait` remain for binary compatibility.
+
 ## [3.10.x]
 
 ### Fixed

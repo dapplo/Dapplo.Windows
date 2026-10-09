@@ -485,7 +485,7 @@ if (chosen is { } area)
 
 Windows which draw their own content (a browser page, Electron, WPF or UWP apps, an Office ribbon) have no child windows
 to snap a selection to, but UI Automation knows their parts.
-`UiAutomationAreas.FindAreasAsync(window, maxDepth = 3, minimumSize = 0, timeout, cancellationToken)` reads the element
+`UiAutomationAreas.FindAreasAsync(window, maxDepth = 3, minimumSize = 0, timeout, contentWait, cancellationToken)` reads the element
 tree of the control view of a window and returns it as immutable `UiAutomationArea`s (`Bounds`, `ControlType`, `Name`,
 `Children`), the window's own element is the root; null when UI Automation isn't available or the window is gone. It works
 on a window handle, so also while your own window covers the screen. For snapping the tree is cleaned up: offscreen and
@@ -501,9 +501,13 @@ request, a single request can't be interrupted. The UI Automation timeouts are s
 Chromium based browsers build their accessibility tree when a UI Automation client first asks, the first answer has only
 the frame of the window: when an element whose children were read has no content (no children which aren't offscreen,
 only children with an empty rectangle, or children with its own rectangle and no content) and its area covers at least a
-quarter of the window, `FindAreasAsync` reads the tree once more after half a second. An area whose
+quarter of the window, `FindAreasAsync` reads the tree again, with a pause of a quarter of a second between the attempts,
+until the tree is complete or `contentWait` has passed (default `UiAutomationAreas.DefaultContentWait`, 3 seconds), and
+returns the last result. `TimeSpan.Zero` reads only once. A complete tree never waits; the cancellation token is checked
+during every pause, so a caller which moved on stops the attempts at once. An area whose
 children were all left out (smaller than `minimumSize`, clipped away) has content and doesn't count, neither does an empty
-overlay next to a sibling with the same bounds and content.
+overlay next to a sibling with the same bounds and content. A large element which really is empty (an empty pane) makes
+every call wait the whole `contentWait`, pass a shorter one when that matters.
 
 Measured on a CI runner with Edge and a page of 3000 paragraphs, 300 links and a 300-row table: the page document is on
 level 3 and its first content (heading, links, table) on level 4, so a browser page needs `maxDepth: 4` or more.
@@ -515,7 +519,8 @@ level 3 and its first content (heading, links, table) on level 4, so a browser p
 | 5 | ~0.6 s | 637 | most of the visible page |
 | 7 | ~0.75 s | 669 | everything |
 
-The first request to a new Edge (with the second read) took about 1 to 1.2 seconds with `maxDepth: 4`.
+The first request to a new Edge (with the reads again) took about 1 to 1.2 seconds with `maxDepth: 4`; right after Edge
+started, with Gmail still loading, it can take longer, up to `contentWait`.
 
 <!-- sample: WindowSamples.UiAutomationAreaSnapping -->
 ```csharp

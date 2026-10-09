@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Log;
@@ -22,14 +24,20 @@ public static class UiAutomationAreas
     private static readonly LogSource Log = new LogSource();
 
     /// <summary>
-    ///     The default for the timeout of <see cref="FindAreasAsync(IntPtr, int, int, TimeSpan?, CancellationToken)"/>: 2 seconds
+    ///     The default for the timeout of <see cref="FindAreasAsync(IntPtr, int, int, TimeSpan?, TimeSpan?, CancellationToken)"/>: 2 seconds
     /// </summary>
     public static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(2);
 
     /// <summary>
-    ///     How long to wait before the second attempt when the tree looks incomplete
+    ///     The default for the content wait of <see cref="FindAreasAsync(IntPtr, int, int, TimeSpan?, TimeSpan?, CancellationToken)"/>:
+    ///     how long the tree is read again while it looks incomplete, 3 seconds
     /// </summary>
-    private static readonly TimeSpan SecondAttemptDelay = TimeSpan.FromMilliseconds(500);
+    public static readonly TimeSpan DefaultContentWait = TimeSpan.FromSeconds(3);
+
+    /// <summary>
+    ///     The pause between two reads while the tree looks incomplete
+    /// </summary>
+    private static readonly TimeSpan ContentPause = TimeSpan.FromMilliseconds(250);
 
     /// <summary>
     ///     A guard against a provider which reports a (nearly) endless chain of elements with the same rectangle
@@ -59,10 +67,12 @@ public static class UiAutomationAreas
     ///     Some applications (e.g. Chromium based browsers) build their accessibility tree only when a UI Automation client asks for it, the
     ///     first answer then has only the frame of the window. When an element whose children were read has no content (it reports no children
     ///     which aren't offscreen, only children with an empty rectangle, or children with its own rectangle which have no content themselves)
-    ///     and its area covers at least a quarter of the window, this waits half a second and reads the tree once more, the second
-    ///     result is returned. An area whose children were all left out (smaller than <paramref name="minimumSize"/>, clipped away) has content
-    ///     and doesn't count, neither does an empty overlay with a sibling of the same bounds which has content. A window with an element which
-    ///     really is large and empty pays this half second on every call.
+    ///     and its area covers at least a quarter of the window, the tree looks incomplete: it is read again, with a short pause (a quarter of
+    ///     a second) between the reads, until it is complete or <paramref name="contentWait"/> has passed (right after Edge started, Gmail took
+    ///     longer than half a second); the last result is returned. An area whose children were all left out (smaller than
+    ///     <paramref name="minimumSize"/>, clipped away) has content and doesn't count, neither does an empty overlay with a sibling of the same
+    ///     bounds which has content, so a complete tree never waits. A window with an element which really is large and empty waits the whole
+    ///     <paramref name="contentWait"/> on every call: pass a shorter one (or <see cref="TimeSpan.Zero"/>) for such windows.
     ///     </para>
     ///     <para>
     ///     Where IUIAutomation2 is available (Windows 8+) the connection and transaction timeouts of every request are set to
@@ -73,38 +83,60 @@ public static class UiAutomationAreas
     /// <param name="maxDepth">int with the number of levels below the window, after merging elements with the same rectangle as their parent; 0 for the window only</param>
     /// <param name="minimumSize">int with the minimum width and height of an area in pixels, 0 (default) for all</param>
     /// <param name="timeout">TimeSpan for the UI Automation timeouts, default <see cref="DefaultTimeout"/></param>
-    /// <param name="cancellationToken">CancellationToken, checked before every request to the application</param>
+    /// <param name="contentWait">TimeSpan, how long the tree is read again while it looks incomplete, default <see cref="DefaultContentWait"/>;
+    ///     <see cref="TimeSpan.Zero"/> reads it only once</param>
+    /// <param name="cancellationToken">CancellationToken, checked before every request to the application and during every pause</param>
     /// <returns>Task with the UiAutomationArea for the window, null when UI Automation isn't available or the window is gone</returns>
     /// <exception cref="OperationCanceledException">When <paramref name="cancellationToken"/> was canceled</exception>
     public static Task<UiAutomationArea> FindAreasAsync(IntPtr windowHandle, int maxDepth = 3, int minimumSize = 0, TimeSpan? timeout = null,
-        CancellationToken cancellationToken = default)
+        TimeSpan? contentWait = null, CancellationToken cancellationToken = default)
     {
         if (maxDepth < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(maxDepth), maxDepth, "The maximum depth can't be negative.");
+        }
+        if (contentWait < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(contentWait), contentWait, "The content wait can't be negative.");
         }
         if (windowHandle == IntPtr.Zero)
         {
             return Task.FromResult<UiAutomationArea>(null);
         }
         // The thread pool threads are MTA, UI Automation must not run on the UI thread which owns the window
-        return Task.Run(() => FindAreas(windowHandle, maxDepth, minimumSize, timeout ?? DefaultTimeout, cancellationToken), cancellationToken);
+        return Task.Run(() => FindAreas(windowHandle, maxDepth, minimumSize, timeout ?? DefaultTimeout, contentWait ?? DefaultContentWait, cancellationToken),
+            cancellationToken);
     }
 
     /// <summary>
-    ///     Read the element tree of a window, see <see cref="FindAreasAsync(IntPtr, int, int, TimeSpan?, CancellationToken)"/>
+    ///     Read the element tree of a window, see <see cref="FindAreasAsync(IntPtr, int, int, TimeSpan?, TimeSpan?, CancellationToken)"/>
     /// </summary>
     /// <param name="window">IInteropWindow</param>
     /// <param name="maxDepth">int with the number of levels below the window, after merging elements with the same rectangle as their parent</param>
     /// <param name="minimumSize">int with the minimum width and height of an area in pixels, 0 (default) for all</param>
     /// <param name="timeout">TimeSpan for the UI Automation timeouts, default <see cref="DefaultTimeout"/></param>
-    /// <param name="cancellationToken">CancellationToken, checked before every request to the application</param>
+    /// <param name="contentWait">TimeSpan, how long the tree is read again while it looks incomplete, default <see cref="DefaultContentWait"/></param>
+    /// <param name="cancellationToken">CancellationToken, checked before every request to the application and during every pause</param>
     /// <returns>Task with the UiAutomationArea for the window, null when UI Automation isn't available or the window is gone</returns>
     public static Task<UiAutomationArea> FindAreasAsync(IInteropWindow window, int maxDepth = 3, int minimumSize = 0, TimeSpan? timeout = null,
-        CancellationToken cancellationToken = default)
-        => window is null ? Task.FromResult<UiAutomationArea>(null) : FindAreasAsync(window.Handle, maxDepth, minimumSize, timeout, cancellationToken);
+        TimeSpan? contentWait = null, CancellationToken cancellationToken = default)
+        => window is null ? Task.FromResult<UiAutomationArea>(null) : FindAreasAsync(window.Handle, maxDepth, minimumSize, timeout, contentWait, cancellationToken);
 
-    private static UiAutomationArea FindAreas(IntPtr windowHandle, int maxDepth, int minimumSize, TimeSpan timeout, CancellationToken cancellationToken)
+    /// <summary>
+    ///     Kept for binary compatibility, see <see cref="FindAreasAsync(IntPtr, int, int, TimeSpan?, TimeSpan?, CancellationToken)"/>
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static Task<UiAutomationArea> FindAreasAsync(IntPtr windowHandle, int maxDepth, int minimumSize, TimeSpan? timeout, CancellationToken cancellationToken)
+        => FindAreasAsync(windowHandle, maxDepth, minimumSize, timeout, null, cancellationToken);
+
+    /// <summary>
+    ///     Kept for binary compatibility, see <see cref="FindAreasAsync(IInteropWindow, int, int, TimeSpan?, TimeSpan?, CancellationToken)"/>
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static Task<UiAutomationArea> FindAreasAsync(IInteropWindow window, int maxDepth, int minimumSize, TimeSpan? timeout, CancellationToken cancellationToken)
+        => FindAreasAsync(window, maxDepth, minimumSize, timeout, null, cancellationToken);
+
+    private static UiAutomationArea FindAreas(IntPtr windowHandle, int maxDepth, int minimumSize, TimeSpan timeout, TimeSpan contentWait, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var automation = UiAutomationScroller.CreateAutomation(timeout);
@@ -114,23 +146,59 @@ public static class UiAutomationAreas
         }
         try
         {
-            var root = ReadOnce(automation, windowHandle, maxDepth, minimumSize, cancellationToken, out var readAgain);
-            if (readAgain)
+            return ReadUntilComplete(() =>
             {
-                // The accessibility tree may just have been built because of this request, read it again
-                Log.Verbose().WriteLine("The tree of window 0x{0:X} has a large area without content, reading it again.", windowHandle.ToInt64());
-                if (cancellationToken.WaitHandle.WaitOne(SecondAttemptDelay))
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-                root = new TreeReader(automation, maxDepth, minimumSize, cancellationToken).Read(windowHandle) ?? root;
-            }
-            return root;
+                var root = ReadOnce(automation, windowHandle, maxDepth, minimumSize, cancellationToken, out var readAgain);
+                return (root, readAgain);
+            }, contentWait, ContentPause, windowHandle, cancellationToken);
         }
         finally
         {
             UiAutomationScroller.Release(automation);
         }
+    }
+
+    /// <summary>
+    ///     Read, and read again with a pause between the reads while the tree looks incomplete (the accessibility tree may just be built because
+    ///     of the request), until it is complete or the content wait has passed. Returns the last result; a read which returns null (the window
+    ///     is gone) ends the attempts with the previous result.
+    /// </summary>
+    /// <param name="read">reads the tree once, with whether it looks incomplete</param>
+    /// <param name="contentWait">TimeSpan with the total time for the attempts, TimeSpan.Zero reads once</param>
+    /// <param name="pause">TimeSpan between two reads</param>
+    /// <param name="windowHandle">IntPtr for the log</param>
+    /// <param name="cancellationToken">CancellationToken, checked during every pause and before every read</param>
+    internal static UiAutomationArea ReadUntilComplete(Func<(UiAutomationArea Root, bool ReadAgain)> read, TimeSpan contentWait, TimeSpan pause, IntPtr windowHandle,
+        CancellationToken cancellationToken)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        var (root, readAgain) = read();
+        var attempt = 1;
+        while (root != null && readAgain)
+        {
+            var remaining = contentWait - stopwatch.Elapsed;
+            if (remaining <= TimeSpan.Zero)
+            {
+                Log.Verbose().WriteLine("The tree of window 0x{0:X} still has a large area without content after {1} attempts in {2} ms, using it.",
+                    windowHandle.ToInt64(), attempt, (long)stopwatch.Elapsed.TotalMilliseconds);
+                break;
+            }
+            attempt++;
+            Log.Verbose().WriteLine("The tree of window 0x{0:X} has a large area without content, reading it again (attempt {1}).", windowHandle.ToInt64(), attempt);
+            if (cancellationToken.WaitHandle.WaitOne(remaining < pause ? remaining : pause))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            var (next, nextReadAgain) = read();
+            if (next == null)
+            {
+                break;
+            }
+            root = next;
+            readAgain = nextReadAgain;
+        }
+        return root;
     }
 
     /// <summary>
