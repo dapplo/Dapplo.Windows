@@ -7,6 +7,11 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.10.x]
+
+### Fixed
+- `UiAutomationAreas.FindAreasAsync` read the tree a second time (after half a second) on every call for windows with a large area whose children were all left out (smaller than `minimumSize`, or clipped away), e.g. Gmail in Edge. Only an element without content now counts as content which isn't there yet: no children which aren't offscreen, only children with an empty rectangle, or children with its own rectangle (merged) which have no content themselves. Children which were left out because they are too small or clipped away are content.
+
 ## [3.10.0]
 
 ### Added

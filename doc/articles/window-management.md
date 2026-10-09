@@ -499,9 +499,11 @@ of the result, after merging elements with their parent's rectangle. The cancell
 request, a single request can't be interrupted. The UI Automation timeouts are set to `timeout` (default 2 seconds).
 
 Chromium based browsers build their accessibility tree when a UI Automation client first asks, the first answer has only
-the frame of the window: when an area whose children were read has nothing visible inside and covers at least a quarter
-of the window (an empty overlay next to a sibling with the same bounds and content doesn't count), `FindAreasAsync` reads
-the tree once more after half a second.
+the frame of the window: when an element whose children were read has no content (no children which aren't offscreen,
+only children with an empty rectangle, or children with its own rectangle and no content) and its area covers at least a
+quarter of the window, `FindAreasAsync` reads the tree once more after half a second. An area whose
+children were all left out (smaller than `minimumSize`, clipped away) has content and doesn't count, neither does an empty
+overlay next to a sibling with the same bounds and content.
 
 Measured on a CI runner with Edge and a page of 3000 paragraphs, 300 links and a 300-row table: the page document is on
 level 3 and its first content (heading, links, table) on level 4, so a browser page needs `maxDepth: 4` or more.
