@@ -204,6 +204,23 @@ if (chosen is { } area)
 }
 ```
 
+`UiAutomationAreas.FindAreas(window)` reads the UI Automation element tree of a window (the parts of a web page, a WPF
+app, a ribbon) as `UiAutomationArea`s in one request; `root.GetAreasAt(point)` gives the areas at a point, deepest first,
+e.g. to snap a region selection to them:
+
+<!-- sample: WindowSamples.UiAutomationAreaSnapping -->
+```csharp
+// Snap a region selection to the parts of a window which has no child windows there (a web page, a WPF app, a ribbon):
+// read the UI Automation tree of the window under the mouse once (it blocks, so not on the UI thread), then hit test the snapshot
+UiAutomationArea root = await Task.Run(() => UiAutomationAreas.FindAreas(window, minimumSize: 8));
+if (root != null)
+{
+    // Deepest area first, the window last: snap to the first, let the user step up the chain with the keys
+    IReadOnlyList<UiAutomationArea> chain = root.GetAreasAt(mouseLocation);
+    NativeRect? snapTo = chain.Count > 0 ? chain[0].Bounds : null;
+}
+```
+
 ## Window events
 
 `WinEventHook` events arrive on the thread of the [[SharedMessageWindow]]. Filter on

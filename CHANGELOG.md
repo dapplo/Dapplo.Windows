@@ -7,6 +7,15 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.10.0]
+
+### Added
+- New in Dapplo.Windows.Automation: `UiAutomationAreas.FindAreas(windowHandle or IInteropWindow, minimumSize, timeout)` reads the UI Automation element tree (control view) of a window as immutable `UiAutomationArea`s (`Bounds`, `ControlType`, `Name`, `Children`), with one request to the application (`ElementFromHandleBuildCache` with `TreeScope_Subtree`). For snapping a region selection to the parts of windows without child windows (web pages, Electron, WPF and UWP apps, ribbons): offscreen and empty elements are left out, elements below `minimumSize` with their children, rectangles are clipped to their parent, and an element with its parent's rectangle is replaced by its children. When the result has an empty area which covers a quarter of the window (Chromium builds its accessibility tree on the first request, the first answer has only the frame), the tree is read once more after half a second. The UI Automation timeouts are set to `timeout` (default 2 seconds). It blocks: call it on a background thread.
+- `UiAutomationArea.GetAreasAt(point)`: the areas containing a point, deepest first, the top-most sibling wins on overlap; pure geometry on the snapshot.
+
+### Fixed
+- `ToForegroundAsync` returned early when the window was already the foreground window, before restoring it: a minimized window which is the foreground window stayed minimized. A minimized window is now restored first.
+
 ## [3.9.0]
 
 Read large bitmaps from the clipboard with fewer full-size copies.

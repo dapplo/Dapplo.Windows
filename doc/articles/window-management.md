@@ -481,6 +481,40 @@ if (chosen is { } area)
 }
 ```
 
+### The parts of a window: UI Automation areas
+
+Windows which draw their own content (a browser page, Electron, WPF or UWP apps, an Office ribbon) have no child windows
+to snap a selection to, but UI Automation knows their parts. `UiAutomationAreas.FindAreas(window, minimumSize, timeout)`
+reads the element tree of the control view of a window with one request (`ElementFromHandleBuildCache` with
+`TreeScope_Subtree` and a cache for the bounds, control type, name and offscreen state) and returns it as immutable
+`UiAutomationArea`s (`Bounds`, `ControlType`, `Name`, `Children`), the window's own element is the root; null when UI
+Automation isn't available or the window is gone. It works on a window handle, so also while your own window covers the
+screen. For snapping the tree is cleaned up: offscreen and empty elements are left out, elements smaller than
+`minimumSize` with their children, every rectangle is clipped to its parent's, and an element with the same rectangle
+as its parent is replaced by its children. `root.GetAreasAt(point)` returns the areas containing a point, deepest first
+(the top-most sibling wins on overlap), as pure geometry on the snapshot.
+
+The call blocks and large trees take a while: run it on a background (MTA) thread and keep the result. The UI Automation
+timeouts are set to `timeout` (default 2 seconds). Chromium based browsers build their accessibility tree when a UI
+Automation client first asks, the first answer has only the frame of the window: when the result has an area without
+children which covers at least a quarter of the window (an empty overlay next to a sibling with the same bounds and content
+doesn't count), `FindAreas` reads the tree once more after half a second. Measured on a CI runner with Edge and a page of
+3000 paragraphs, 300 links and a 300-row table: about 0.7 seconds and 669 areas (370 with `minimumSize: 8`), the very
+first request to a new Edge about 1.25 seconds (with the second read); Notepad with 2000 lines: about 20 ms.
+
+<!-- sample: WindowSamples.UiAutomationAreaSnapping -->
+```csharp
+// Snap a region selection to the parts of a window which has no child windows there (a web page, a WPF app, a ribbon):
+// read the UI Automation tree of the window under the mouse once (it blocks, so not on the UI thread), then hit test the snapshot
+UiAutomationArea root = await Task.Run(() => UiAutomationAreas.FindAreas(window, minimumSize: 8));
+if (root != null)
+{
+    // Deepest area first, the window last: snap to the first, let the user step up the chain with the keys
+    IReadOnlyList<UiAutomationArea> chain = root.GetAreasAt(mouseLocation);
+    NativeRect? snapTo = chain.Count > 0 ? chain[0].Bounds : null;
+}
+```
+
 ## Window events
 
 `WinEventHook` turns [WinEvents](https://learn.microsoft.com/en-us/windows/win32/winauto/winevents) into observables.
