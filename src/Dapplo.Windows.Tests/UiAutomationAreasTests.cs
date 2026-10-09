@@ -94,6 +94,87 @@ internal sealed class AreasTestWindow : ScrollTestWindow
     public override void Close() => _dispatcher.Invoke(_window.Close);
 }
 
+/// <summary>
+///     What the large panel of a <see cref="LargePanelTestWindow"/> holds
+/// </summary>
+public enum LargePanelContent
+{
+    /// <summary>Only buttons of 6 x 6 pixels</summary>
+    SmallControls,
+
+    /// <summary>Nothing</summary>
+    Nothing,
+
+    /// <summary>Only an empty panel with the same bounds (merged away)</summary>
+    EmptyPanelWithTheSameBounds
+}
+
+/// <summary>
+///     A WPF window with one large panel, see <see cref="LargePanelContent"/>
+/// </summary>
+internal sealed class LargePanelTestWindow : ScrollTestWindow
+{
+    private readonly LargePanelContent _content;
+    private WpfWindows.Window _window;
+    private Dispatcher _dispatcher;
+
+    public LargePanelTestWindow(LargePanelContent content) : base(nameof(LargePanelTestWindow), start: false)
+    {
+        _content = content;
+        Start();
+    }
+
+    protected override void Run()
+    {
+        _dispatcher = Dispatcher.CurrentDispatcher;
+        var large = new UserControl { Margin = new WpfWindows.Thickness(10) };
+        AutomationProperties.SetName(large, "Large");
+        if (_content == LargePanelContent.EmptyPanelWithTheSameBounds)
+        {
+            var inner = new UserControl();
+            AutomationProperties.SetName(inner, "SameBounds");
+            large.Content = inner;
+        }
+        if (_content == LargePanelContent.SmallControls)
+        {
+            var panel = new WrapPanel();
+            for (var i = 0; i < 10; i++)
+            {
+                var button = new Button { Width = 6, Height = 6, Margin = new WpfWindows.Thickness(4) };
+                AutomationProperties.SetName(button, $"Small {i}");
+                panel.Children.Add(button);
+            }
+            large.Content = panel;
+        }
+        _window = new WpfWindows.Window
+        {
+            Title = "Dapplo.Windows large panel test",
+            Left = 180,
+            Top = 180,
+            Width = 400,
+            Height = 300,
+            Topmost = true,
+            ShowInTaskbar = false,
+            Content = large
+        };
+        _window.Loaded += (_, _) => _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
+        {
+            WindowHandle = new WpfWindows.Interop.WindowInteropHelper(_window).Handle;
+            ScrollingHandle = WindowHandle;
+            SignalReady();
+        }));
+        _window.Closed += (_, _) => _dispatcher.InvokeShutdown();
+        _window.Show();
+        Dispatcher.Run();
+    }
+
+    public override NativeRect ScrollingBounds => NativeRect.Empty;
+
+    public override T Invoke<T>(Func<T> func) => _dispatcher.Invoke(func);
+
+    public override void Close() => _dispatcher.Invoke(_window.Close);
+}
+
 public class UiAutomationAreasTests
 {
     private const int ButtonControlType = 50000;
@@ -256,6 +337,45 @@ public class UiAutomationAreasTests
     {
         Assert.Empty(Root.GetAreasAt(new NativePoint(100, 50)));
         Assert.Empty(Root.GetAreasAt(new NativePoint(-1, 50)));
+    }
+
+    // Internal, no spans: reflection works
+    private static bool NeedsSecondRead(IntPtr windowHandle, int maxDepth, int minimumSize) =>
+        (bool)typeof(UiAutomationAreas).GetMethod("NeedsSecondRead", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            .Invoke(null, new object[] { windowHandle, maxDepth, minimumSize });
+
+    /// <summary>
+    ///     A large area whose children are all smaller than minimumSize has content: no second read (Gmail in Edge read twice on every call)
+    /// </summary>
+    [Fact]
+    public async Task FindAreas_LargeAreaWithOnlySmallChildren_IsNotReadAgain()
+    {
+        using var testWindow = new LargePanelTestWindow(LargePanelContent.SmallControls);
+
+        Assert.False(NeedsSecondRead(testWindow.WindowHandle, 3, 20));
+        Assert.False(NeedsSecondRead(testWindow.WindowHandle, 3, 0));
+
+        var root = await UiAutomationAreas.FindAreasAsync(testWindow.WindowHandle, minimumSize: 20, cancellationToken: TestContext.Current.CancellationToken);
+        var large = Find(root, "Large");
+        Assert.NotNull(large);
+        // The small buttons were left out
+        Assert.Empty(large.Children);
+        Assert.NotNull(Find(await UiAutomationAreas.FindAreasAsync(testWindow.WindowHandle, cancellationToken: TestContext.Current.CancellationToken), "Small 0"));
+    }
+
+    /// <summary>
+    ///     A large element which reports no children still is content which may not be there yet, unless it wasn't read because of maxDepth
+    /// </summary>
+    [Theory]
+    [InlineData(LargePanelContent.Nothing)]
+    [InlineData(LargePanelContent.EmptyPanelWithTheSameBounds)]
+    public void FindAreas_LargeAreaWithoutContent_IsReadAgain(LargePanelContent content)
+    {
+        using var testWindow = new LargePanelTestWindow(content);
+
+        Assert.True(NeedsSecondRead(testWindow.WindowHandle, 3, 0));
+        // At maxDepth 1 the panel's children aren't read
+        Assert.False(NeedsSecondRead(testWindow.WindowHandle, 1, 0));
     }
 
     [Fact]

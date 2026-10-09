@@ -57,9 +57,12 @@ public static class UiAutomationAreas
     ///     </para>
     ///     <para>
     ///     Some applications (e.g. Chromium based browsers) build their accessibility tree only when a UI Automation client asks for it, the
-    ///     first answer then has only the frame of the window. When an area whose children were read has none visible and covers at least a quarter of
-    ///     the window (an empty overlay with a sibling of the same bounds which has content doesn't count), this waits half a second and reads
-    ///     the tree once more, the second result is returned. A window with a large empty area pays this half second on every call.
+    ///     first answer then has only the frame of the window. When an element whose children were read has no content (it reports no children
+    ///     which aren't offscreen, only children with an empty rectangle, or children with its own rectangle which have no content themselves)
+    ///     and its area covers at least a quarter of the window, this waits half a second and reads the tree once more, the second
+    ///     result is returned. An area whose children were all left out (smaller than <paramref name="minimumSize"/>, clipped away) has content
+    ///     and doesn't count, neither does an empty overlay with a sibling of the same bounds which has content. A window with an element which
+    ///     really is large and empty pays this half second on every call.
     ///     </para>
     ///     <para>
     ///     Where IUIAutomation2 is available (Windows 8+) the connection and transaction timeouts of every request are set to
@@ -111,9 +114,8 @@ public static class UiAutomationAreas
         }
         try
         {
-            var reader = new TreeReader(automation, maxDepth, minimumSize, cancellationToken);
-            var root = reader.Read(windowHandle);
-            if (root != null && HasLargeEmptyArea(root, reader.EmptyAreas.Contains))
+            var root = ReadOnce(automation, windowHandle, maxDepth, minimumSize, cancellationToken, out var readAgain);
+            if (readAgain)
             {
                 // The accessibility tree may just have been built because of this request, read it again
                 Log.Verbose().WriteLine("The tree of window 0x{0:X} has a large area without content, reading it again.", windowHandle.ToInt64());
@@ -124,6 +126,38 @@ public static class UiAutomationAreas
                 root = new TreeReader(automation, maxDepth, minimumSize, cancellationToken).Read(windowHandle) ?? root;
             }
             return root;
+        }
+        finally
+        {
+            UiAutomationScroller.Release(automation);
+        }
+    }
+
+    /// <summary>
+    ///     Read the tree once, readAgain tells if it looks incomplete (see FindAreasAsync)
+    /// </summary>
+    private static UiAutomationArea ReadOnce(IUIAutomation automation, IntPtr windowHandle, int maxDepth, int minimumSize, CancellationToken cancellationToken, out bool readAgain)
+    {
+        var reader = new TreeReader(automation, maxDepth, minimumSize, cancellationToken);
+        var root = reader.Read(windowHandle);
+        readAgain = root != null && HasLargeEmptyArea(root, reader.EmptyAreas.Contains);
+        return root;
+    }
+
+    /// <summary>
+    ///     Read the tree of the window once and tell if FindAreasAsync would read it again, for the tests
+    /// </summary>
+    internal static bool NeedsSecondRead(IntPtr windowHandle, int maxDepth, int minimumSize)
+    {
+        var automation = UiAutomationScroller.CreateAutomation(DefaultTimeout);
+        if (automation is null)
+        {
+            return false;
+        }
+        try
+        {
+            ReadOnce(automation, windowHandle, maxDepth, minimumSize, CancellationToken.None, out var readAgain);
+            return readAgain;
         }
         finally
         {
@@ -267,12 +301,15 @@ public static class UiAutomationAreas
         /// <param name="childDepth">int with the level the children get in the result</param>
         /// <param name="areas">List to add the areas to</param>
         /// <param name="nesting">int with the number of merged elements above, a guard</param>
-        /// <returns>true when the element has children (whether or not they were kept)</returns>
+        /// <returns>true when the element has content: a child which was kept, or left out only because it is too small or clipped away
+        ///     (also when the children weren't read because of a limit); false when it has no children, only children with an empty
+        ///     rectangle (or merged children without content), or reading them failed</returns>
         private bool AddChildren(IUIAutomationElement element, NativeRect parentBounds, int childDepth, List<UiAutomationArea> areas, int nesting)
         {
             if (childDepth > _maxDepth || nesting > MaxNesting)
             {
-                return false;
+                // Not read: unknown, which must not look like content which isn't there yet
+                return true;
             }
             _cancellationToken.ThrowIfCancellationRequested();
             if (element.FindAllBuildCache(UiaConstants.TreeScopeChildren, _visibleChildren, _cacheRequest, out var children) != UiaConstants.S_OK || children is null)
@@ -285,6 +322,7 @@ public static class UiAutomationAreas
                 {
                     return false;
                 }
+                var hasContent = false;
                 for (var index = 0; index < length; index++)
                 {
                     if (children.GetElement(index, out var child) != UiaConstants.S_OK || child is null)
@@ -293,14 +331,14 @@ public static class UiAutomationAreas
                     }
                     try
                     {
-                        AddArea(child, parentBounds, childDepth, areas, nesting);
+                        hasContent |= AddArea(child, parentBounds, childDepth, areas, nesting);
                     }
                     finally
                     {
                         UiAutomationScroller.Release(child);
                     }
                 }
-                return length > 0;
+                return hasContent;
             }
             finally
             {
@@ -308,38 +346,45 @@ public static class UiAutomationAreas
             }
         }
 
-        private void AddArea(IUIAutomationElement element, NativeRect parentBounds, int depth, List<UiAutomationArea> areas, int nesting)
+        /// <summary>
+        ///     Add the area of the element (or, when it has the parent's rectangle, the areas of its children)
+        /// </summary>
+        /// <returns>true when the element is content, see AddChildren</returns>
+        private bool AddArea(IUIAutomationElement element, NativeRect parentBounds, int depth, List<UiAutomationArea> areas, int nesting)
         {
             if (element.get_CachedIsOffscreen(out var isOffscreen) == UiaConstants.S_OK && isOffscreen != 0)
             {
-                return;
+                return false;
             }
             if (element.get_CachedBoundingRectangle(out var bounds) != UiaConstants.S_OK || bounds.IsEmpty)
             {
-                return;
+                return false;
             }
             // Web pages report elements outside the visible part
             bounds = bounds.Intersect(parentBounds);
             if (bounds.IsEmpty || bounds.Width < _minimumSize || bounds.Height < _minimumSize)
             {
-                return;
+                // Content, which is left out here
+                return true;
             }
             if (bounds == parentBounds)
             {
-                // Adds nothing: its children belong to the parent, on the same level
-                AddChildren(element, parentBounds, depth, areas, nesting + 1);
-                return;
+                // Adds nothing: its children belong to the parent, on the same level; it is content when they are
+                return AddChildren(element, parentBounds, depth, areas, nesting + 1);
             }
             var children = new List<UiAutomationArea>();
-            var expanded = depth < _maxDepth;
-            AddChildren(element, bounds, depth + 1, children, nesting);
+            var belowMaxDepth = depth < _maxDepth;
+            var hasChildren = AddChildren(element, bounds, depth + 1, children, nesting);
             var area = new UiAutomationArea(bounds, GetControlType(element), GetName(element), children);
-            // Read, and nothing visible inside (no children, or only offscreen / empty ones)
-            if (expanded && children.Count == 0)
+            // Content which isn't there yet: the element reports no children which aren't offscreen, only children with an empty rectangle,
+            // or merged children (with its rectangle) without content; or reading them failed, the safe side. Children which were all left
+            // out here (too small, clipped away) are content, the area doesn't count as empty.
+            if (belowMaxDepth && !hasChildren)
             {
                 EmptyAreas.Add(area);
             }
             areas.Add(area);
+            return true;
         }
     }
 
