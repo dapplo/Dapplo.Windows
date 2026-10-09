@@ -793,7 +793,8 @@ public static class InteropWindowExtensions
     }
 
     /// <summary>
-    ///     Set the window as foreground window
+    ///     Set the window as foreground window, a minimized window is restored first (also when it already is the foreground window,
+    ///     which a minimized window can be)
     /// </summary>
     /// <param name="interopWindow">The window to bring to the foreground</param>
     public static async ValueTask ToForegroundAsync(this IInteropWindow interopWindow)
@@ -804,12 +805,6 @@ public static class InteropWindowExtensions
             return;
         }
 
-        var foregroundWindow = User32Api.GetForegroundWindow();
-        // Window is already the foreground window
-        if (foregroundWindow == interopWindow.Handle)
-        {
-            return;
-        }
         if (interopWindow.IsMinimized(true))
         {
             interopWindow.Restore();
@@ -819,6 +814,13 @@ public static class InteropWindowExtensions
             {
                 await Task.Delay(50).ConfigureAwait(false);
             }
+        }
+
+        var foregroundWindow = User32Api.GetForegroundWindow();
+        // Window is already the foreground window
+        if (foregroundWindow == interopWindow.Handle)
+        {
+            return;
         }
 
         // See https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setforegroundwindow

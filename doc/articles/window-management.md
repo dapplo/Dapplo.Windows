@@ -481,6 +481,54 @@ if (chosen is { } area)
 }
 ```
 
+### The parts of a window: UI Automation areas
+
+Windows which draw their own content (a browser page, Electron, WPF or UWP apps, an Office ribbon) have no child windows
+to snap a selection to, but UI Automation knows their parts.
+`UiAutomationAreas.FindAreasAsync(window, maxDepth = 3, minimumSize = 0, timeout, cancellationToken)` reads the element
+tree of the control view of a window and returns it as immutable `UiAutomationArea`s (`Bounds`, `ControlType`, `Name`,
+`Children`), the window's own element is the root; null when UI Automation isn't available or the window is gone. It works
+on a window handle, so also while your own window covers the screen. For snapping the tree is cleaned up: offscreen and
+empty elements are left out, elements smaller than `minimumSize` with their children, every rectangle is clipped to its
+parent's, and an element with the same rectangle as its parent is replaced by its children. `root.GetAreasAt(point)`
+returns the areas containing a point, deepest first (the top-most sibling wins on overlap), as pure geometry on the snapshot.
+
+The calls run on a background (MTA) thread. The tree is read level by level, one request to the application per area
+whose children are read (only the children which aren't offscreen), so `maxDepth` limits the work; it counts the levels
+of the result, after merging elements with their parent's rectangle. The cancellation token is checked before every
+request, a single request can't be interrupted. The UI Automation timeouts are set to `timeout` (default 2 seconds).
+
+Chromium based browsers build their accessibility tree when a UI Automation client first asks, the first answer has only
+the frame of the window: when an area whose children were read has nothing visible inside and covers at least a quarter
+of the window (an empty overlay next to a sibling with the same bounds and content doesn't count), `FindAreasAsync` reads
+the tree once more after half a second.
+
+Measured on a CI runner with Edge and a page of 3000 paragraphs, 300 links and a 300-row table: the page document is on
+level 3 and its first content (heading, links, table) on level 4, so a browser page needs `maxDepth: 4` or more.
+
+| maxDepth | Time | Areas | Content |
+|---|---|---|---|
+| 3 | ~35 ms | 18 | browser frame, the document without its content |
+| 4 | ~0.35 s | 29 | the first level of the page |
+| 5 | ~0.6 s | 637 | most of the visible page |
+| 7 | ~0.75 s | 669 | everything |
+
+The first request to a new Edge (with the second read) took about 1 to 1.2 seconds with `maxDepth: 4`.
+
+<!-- sample: WindowSamples.UiAutomationAreaSnapping -->
+```csharp
+// Snap a region selection to the parts of a window which has no child windows there (a web page, a WPF app, a ribbon):
+// read the UI Automation tree of the window under the mouse once (on a background thread, cancel it when the mouse moves on),
+// then hit test the snapshot
+UiAutomationArea root = await UiAutomationAreas.FindAreasAsync(window, maxDepth: 4, minimumSize: 8, cancellationToken: cancellationToken);
+if (root != null)
+{
+    // Deepest area first, the window last: snap to the first, let the user step up the chain with the keys
+    IReadOnlyList<UiAutomationArea> chain = root.GetAreasAt(mouseLocation);
+    NativeRect? snapTo = chain.Count > 0 ? chain[0].Bounds : null;
+}
+```
+
 ## Window events
 
 `WinEventHook` turns [WinEvents](https://learn.microsoft.com/en-us/windows/win32/winauto/winevents) into observables.

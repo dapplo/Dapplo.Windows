@@ -1251,7 +1251,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     /// <summary>
     ///     Create a UI Automation object with short timeouts (Windows 8+: CUIAutomation8 and IUIAutomation2), else the default one
     /// </summary>
-    private static IUIAutomation CreateAutomation(TimeSpan timeout)
+    internal static IUIAutomation CreateAutomation(TimeSpan timeout)
     {
         try
         {
@@ -1768,7 +1768,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         }
     }
 
-    private static void Release(object comObject)
+    internal static void Release(object comObject)
     {
         if (comObject is not null && Marshal.IsComObject(comObject))
         {

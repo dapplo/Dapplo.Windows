@@ -5,6 +5,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Windows.Common.Extensions;
@@ -13,6 +14,8 @@ using Dapplo.Windows.Desktop;
 using Dapplo.Windows.DesktopWindowsManager;
 using Dapplo.Windows.DesktopWindowsManager.Enums;
 using Dapplo.Windows.Icons;
+using Dapplo.Windows.User32;
+using Dapplo.Windows.User32.Enums;
 using Xunit;
 using WinForms = System.Windows.Forms;
 
@@ -263,6 +266,31 @@ public class WindowQueryTests
         testWindow.MoveBy(300);
         Assert.Equal(testWindow.ButtonHandle, root.FindChildAt(buttonCenter)?.Handle);
         Assert.NotEqual(testWindow.ButtonHandle, Fresh(testWindow.WindowHandle).FindChildAt(buttonCenter)?.Handle);
+    }
+
+    /// <summary>
+    ///     A minimized window can still be the foreground window, ToForegroundAsync must restore it then too
+    /// </summary>
+    [Fact]
+    public async Task ToForegroundAsync_RestoresAMinimizedForegroundWindow()
+    {
+        using var testWindow = new QueryTestWindow("Dapplo minimized foreground");
+        var handle = testWindow.WindowHandle;
+        await Fresh(handle).ToForegroundAsync();
+        for (var wait = 0; wait < 40 && User32Api.GetForegroundWindow() != handle; wait++)
+        {
+            await Task.Delay(50, TestContext.Current.CancellationToken);
+        }
+        Assert.SkipWhen(User32Api.GetForegroundWindow() != handle, "The test window can't become the foreground window here");
+
+        User32Api.ShowWindow(handle, ShowWindowCommands.ShowMinNoActivation);
+        await TestWait.UntilAsync(() => User32Api.IsIconic(handle), "The window wasn't minimized");
+        Assert.SkipWhen(User32Api.GetForegroundWindow() != handle, "Minimizing without activation changed the foreground window here");
+
+        await Fresh(handle).ToForegroundAsync();
+
+        Assert.False(User32Api.IsIconic(handle));
+        Assert.False(Fresh(handle).IsMinimized());
     }
 
     // ── Class icon ───────────────────────────────────────────────────────────

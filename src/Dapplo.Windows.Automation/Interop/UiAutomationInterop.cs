@@ -52,6 +52,9 @@ internal static class UiaConstants
     /// <summary>UIA_RangeValuePatternId</summary>
     public const int RangeValuePatternId = 10003;
 
+    /// <summary>UIA_NamePropertyId</summary>
+    public const int NamePropertyId = 30005;
+
     /// <summary>TreeScope_Children</summary>
     public const int TreeScopeChildren = 0x02;
 
@@ -127,7 +130,9 @@ internal interface IUIAutomation
 
     void GetFocusedElement();
     void GetRootElementBuildCache();
-    void ElementFromHandleBuildCache();
+    [PreserveSig]
+    int ElementFromHandleBuildCache(IntPtr hwnd, IUIAutomationCacheRequest cacheRequest, out IUIAutomationElement element);
+
     void ElementFromPointBuildCache();
     void GetFocusedElementBuildCache();
     void CreateTreeWalker();
@@ -140,7 +145,9 @@ internal interface IUIAutomation
     int get_RawViewWalker(out IUIAutomationTreeWalker walker);
 
     void get_RawViewCondition();
-    void get_ControlViewCondition();
+    [PreserveSig]
+    int get_ControlViewCondition(out IUIAutomationCondition condition);
+
     void get_ContentViewCondition();
     [PreserveSig]
     int CreateCacheRequest(out IUIAutomationCacheRequest cacheRequest);
@@ -270,7 +277,9 @@ internal interface IUIAutomationElement
     int get_CachedControlType(out int controlType);
 
     void get_CachedLocalizedControlType();
-    void get_CachedName();
+    [PreserveSig]
+    int get_CachedName([MarshalAs(UnmanagedType.BStr)] out string name);
+
     void get_CachedAcceleratorKey();
     void get_CachedAccessKey();
     void get_CachedHasKeyboardFocus();
@@ -375,7 +384,10 @@ internal interface IUIAutomationCacheRequest
     void get_TreeScope();
     void put_TreeScope();
     void get_TreeFilter();
-    void put_TreeFilter();
+
+    [PreserveSig]
+    int put_TreeFilter(IUIAutomationCondition filter);
+
     void get_AutomationElementMode();
 
     [PreserveSig]

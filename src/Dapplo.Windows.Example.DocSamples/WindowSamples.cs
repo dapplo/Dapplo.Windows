@@ -9,6 +9,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Windows.App;
 using Dapplo.Windows.Automation;
@@ -335,6 +336,22 @@ public static class WindowSamples
             // After your own window is gone, FromPoint finds the same element under the middle of the area
             using var scroller = UiAutomationScroller.FromPoint(new NativePoint(area.X + area.Width / 2, area.Y + area.Height / 2));
             // ... the scrolling capture loop from the sample above
+        }
+        #endregion
+    }
+
+    public static async Task UiAutomationAreaSnapping(IInteropWindow window, NativePoint mouseLocation, CancellationToken cancellationToken)
+    {
+        #region UiAutomationAreaSnapping
+        // Snap a region selection to the parts of a window which has no child windows there (a web page, a WPF app, a ribbon):
+        // read the UI Automation tree of the window under the mouse once (on a background thread, cancel it when the mouse moves on),
+// then hit test the snapshot
+        UiAutomationArea root = await UiAutomationAreas.FindAreasAsync(window, maxDepth: 4, minimumSize: 8, cancellationToken: cancellationToken);
+        if (root != null)
+        {
+            // Deepest area first, the window last: snap to the first, let the user step up the chain with the keys
+            IReadOnlyList<UiAutomationArea> chain = root.GetAreasAt(mouseLocation);
+            NativeRect? snapTo = chain.Count > 0 ? chain[0].Bounds : null;
         }
         #endregion
     }
