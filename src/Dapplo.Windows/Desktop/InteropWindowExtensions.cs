@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Threading;
 using System.Drawing;
 using System.Threading.Tasks;
 using Dapplo.Windows.App;
@@ -402,7 +404,10 @@ public static class InteropWindowExtensions
         // Like the Win32 GetParent, only a window with WS_CHILD has a parent. Other windows are top-level (also message-only windows),
         // for these GetParent would return the owner and GetAncestor(GA_PARENT) the desktop (or message-only root) window.
         var parent = IntPtr.Zero;
-        var style = unchecked((WindowStyleFlags)(int)User32Api.GetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE).ToInt64());
+        // The style of the cached WindowInfo saves a call (e.g. IsVisibleApplicationWindow reads the info right before), forceUpdate reads it fresh
+        var style = interopWindow.Info.HasValue && !forceUpdate
+            ? interopWindow.Info.Value.Style
+            : unchecked((WindowStyleFlags)(int)User32Api.GetWindowLongWrapper(interopWindow.Handle, WindowLongIndex.GWL_STYLE).ToInt64());
         if ((style & WindowStyleFlags.WS_CHILD) != 0)
         {
             parent = User32Api.GetAncestor(interopWindow.Handle, GetAncestorFlags.GA_PARENT);
@@ -794,11 +799,33 @@ public static class InteropWindowExtensions
 
     /// <summary>
     ///     Set the window as foreground window, a minimized window is restored first (also when it already is the foreground window,
-    ///     which a minimized window can be)
+    ///     which a minimized window can be). See <see cref="ToForegroundAsync(IInteropWindow, CancellationToken)"/>.
     /// </summary>
     /// <param name="interopWindow">The window to bring to the foreground</param>
-    public static async ValueTask ToForegroundAsync(this IInteropWindow interopWindow)
+    public static ValueTask ToForegroundAsync(this IInteropWindow interopWindow) => interopWindow.ToForegroundAsync(CancellationToken.None);
+
+    /// <summary>
+    ///     Set the window as foreground window, a minimized window is restored first (also when it already is the foreground window,
+    ///     which a minimized window can be).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     Most calls complete synchronously, without allocating: only for a minimized window which isn't restored at once the call waits,
+    ///     checking every 50 ms, at most 2 seconds. The <paramref name="cancellationToken"/> is checked at the start and during that wait.
+    ///     </para>
+    ///     <para>
+    ///     After that wait the rest (the foreground switch) runs on a thread-pool thread, the continuation doesn't return to the context of the
+    ///     caller (ConfigureAwait(false)). The switch attaches the input of the current thread to the thread of the foreground window
+    ///     (AttachThreadInput), which works from any thread with a message queue: the thread gets one with its first User32 call, which
+    ///     happens before the attach (GetForegroundWindow).
+    ///     </para>
+    /// </remarks>
+    /// <param name="interopWindow">The window to bring to the foreground</param>
+    /// <param name="cancellationToken">CancellationToken, stops waiting for a minimized window to restore</param>
+    /// <exception cref="OperationCanceledException">the token was cancelled before the call or while waiting for the window to restore</exception>
+    public static async ValueTask ToForegroundAsync(this IInteropWindow interopWindow, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         // Nothing we can do if it's not visible!
         if (!interopWindow.IsVisible())
         {
@@ -809,10 +836,10 @@ public static class InteropWindowExtensions
         {
             interopWindow.Restore();
             // Wait until the window is restored, but not forever
-            var waitUntil = DateTime.UtcNow + RestoreTimeout;
-            while (interopWindow.IsMinimized(true) && DateTime.UtcNow < waitUntil)
+            var stopwatch = Stopwatch.StartNew();
+            while (interopWindow.IsMinimized(true) && stopwatch.Elapsed < RestoreTimeout)
             {
-                await Task.Delay(50).ConfigureAwait(false);
+                await Task.Delay(50, cancellationToken).ConfigureAwait(false);
             }
         }
 
