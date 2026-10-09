@@ -197,6 +197,65 @@ public class WindowQueryTests
         Assert.False(Fresh(testWindow.WindowHandle).IsVisibleApplicationWindow());
     }
 
+    /// <summary>
+    ///     Most top-level windows are invisible: IsWindowVisible rejects them before the class name and the cloak check are asked.
+    ///     The cached IsVisible keeps its meaning (visible and not cloaked).
+    /// </summary>
+    [Fact]
+    public void Hidden_IsRejectedBeforeTheClassName()
+    {
+        using var testWindow = new QueryTestWindow("Dapplo hidden order");
+        var handle = testWindow.WindowHandle;
+
+        var visible = Fresh(handle);
+        Assert.True(visible.IsVisibleApplicationWindow());
+        Assert.True(visible.IsVisible);
+        Assert.NotNull(visible.Classname);
+
+        testWindow.Hide();
+        var hidden = Fresh(handle);
+        Assert.False(hidden.IsVisibleApplicationWindow());
+        Assert.False(hidden.IsVisible);
+        Assert.Null(hidden.Classname);
+        Assert.Null(hidden.Info);
+
+        var hiddenPopup = Fresh(handle);
+        Assert.False(hiddenPopup.IsVisiblePopup());
+        Assert.False(hiddenPopup.IsVisible);
+        Assert.Null(hiddenPopup.Classname);
+
+        // A cached value is used as before
+        var cached = Fresh(handle);
+        cached.IsVisible = false;
+        Assert.False(cached.IsVisibleApplicationWindow());
+        Assert.Null(cached.Classname);
+        // Without ignoring known classes the class name is never needed
+        var notIgnoring = Fresh(handle);
+        Assert.False(notIgnoring.IsVisibleApplicationWindow(ignoreKnownClasses: false));
+        Assert.Null(notIgnoring.Classname);
+    }
+
+    /// <summary>
+    ///     GetParent uses the style of a cached WindowInfo, the result is the same as without it
+    /// </summary>
+    [Fact]
+    public void GetParent_WithCachedInfo_IsTheSame()
+    {
+        using var testWindow = new QueryTestWindow("Dapplo parent info");
+        foreach (var handle in new[] { testWindow.WindowHandle, testWindow.OuterHandle, testWindow.InnerHandle, testWindow.ButtonHandle })
+        {
+            var expected = Fresh(handle).GetParent();
+            var withInfo = Fresh(handle);
+            withInfo.GetInfo();
+            Assert.NotNull(withInfo.Info);
+            Assert.Equal(expected, withInfo.GetParent());
+            Assert.Equal(expected, withInfo.GetParent(forceUpdate: true));
+        }
+        Assert.Equal(IntPtr.Zero, Fresh(testWindow.WindowHandle).GetParent());
+        Assert.Equal(testWindow.WindowHandle, Fresh(testWindow.OuterHandle).GetParent());
+        Assert.Equal(testWindow.OuterHandle, Fresh(testWindow.InnerHandle).GetParent());
+    }
+
     [Fact]
     public void Minimized_OnlyWithIncludeMinimized()
     {
@@ -276,7 +335,7 @@ public class WindowQueryTests
     {
         using var testWindow = new QueryTestWindow("Dapplo minimized foreground");
         var handle = testWindow.WindowHandle;
-        await Fresh(handle).ToForegroundAsync();
+        await Fresh(handle).ToForegroundAsync(TestContext.Current.CancellationToken);
         for (var wait = 0; wait < 40 && User32Api.GetForegroundWindow() != handle; wait++)
         {
             await Task.Delay(50, TestContext.Current.CancellationToken);
@@ -287,10 +346,31 @@ public class WindowQueryTests
         await TestWait.UntilAsync(() => User32Api.IsIconic(handle), "The window wasn't minimized");
         Assert.SkipWhen(User32Api.GetForegroundWindow() != handle, "Minimizing without activation changed the foreground window here");
 
-        await Fresh(handle).ToForegroundAsync();
+        await Fresh(handle).ToForegroundAsync(TestContext.Current.CancellationToken);
 
         Assert.False(User32Api.IsIconic(handle));
         Assert.False(Fresh(handle).IsMinimized());
+    }
+
+    /// <summary>
+    ///     A cancelled token throws before anything is changed, a minimized window stays minimized
+    /// </summary>
+    [Fact]
+    public async Task ToForegroundAsync_CancelledToken_Throws()
+    {
+        using var testWindow = new QueryTestWindow("Dapplo foreground cancelled");
+        var handle = testWindow.WindowHandle;
+        testWindow.Minimize();
+        await TestWait.UntilAsync(() => User32Api.IsIconic(handle), "The window wasn't minimized");
+
+        using var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+        cancellationTokenSource.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => Fresh(handle).ToForegroundAsync(cancellationTokenSource.Token).AsTask());
+        Assert.True(User32Api.IsIconic(handle));
+
+        // Not cancelled: the window is restored, the token is checked while waiting for it
+        await Fresh(handle).ToForegroundAsync(TestContext.Current.CancellationToken);
+        Assert.False(User32Api.IsIconic(handle));
     }
 
     // ── Class icon ───────────────────────────────────────────────────────────

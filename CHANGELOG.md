@@ -7,6 +7,18 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.12.0]
+
+Small efficiency and API fixes, found while reviewing 3.11.2 for Greenshot.
+
+### Added
+- `ToForegroundAsync(cancellationToken)`: the token is checked at the start and while waiting for a minimized window to restore (`OperationCanceledException`). It still returns a `ValueTask`, most calls complete without waiting or allocating. The wait is measured with a `Stopwatch` instead of `DateTime.UtcNow`. After a wait the foreground switch runs on a thread-pool thread (as before), `AttachThreadInput` works from there.
+
+### Changed
+- `IsVisibleApplicationWindow` and `IsVisiblePopup` check cheapest first: `IsWindowVisible`, then the class name of the ignored classes (`GetClassName`), then the cloak check (`DwmGetWindowAttribute`). Most top-level windows are invisible, so an enumeration no longer asks the class name of every top-level window, only of the visible ones. The cloak check was already only made for windows with `WS_VISIBLE`, it is now also skipped for visible windows with an ignored class (e.g. `Progman`). The cached `IsVisible` keeps its meaning (visible and not cloaked).
+- `GetParent` uses the style of a cached `WindowInfo` instead of reading `GWL_STYLE` again (unless `forceUpdate`); `IsVisibleApplicationWindow` and `IsVisiblePopup` read the info right before.
+- `User32Api.GetText` and `GetInternalText` read captions up to 255 characters into a buffer on the stack, only longer captions allocate a buffer. The full length is still supported.
+
 ## [3.11.0]
 
 ### Added

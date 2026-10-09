@@ -209,7 +209,9 @@ if (!window.GetVisibleLocation(out var visibleLocation) || visibleLocation != wi
 
 `ToForegroundAsync()` restores a minimized window, waits (up to 2 seconds) until it's restored and makes it the
 foreground window. Windows has rules about which process may change the foreground window; when it refuses, the
-taskbar button flashes instead.
+taskbar button flashes instead. `ToForegroundAsync(cancellationToken)` stops waiting for the restore when the token is
+cancelled. Most calls complete without waiting; after a wait the foreground switch continues on a thread-pool thread,
+not on the context of the caller.
 
 <!-- sample: WindowSamples.ToForeground -->
 ```csharp

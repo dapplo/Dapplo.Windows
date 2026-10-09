@@ -151,6 +151,39 @@ public class S1SweepTests
     }
 
     /// <summary>
+    ///     Captions around the size of the buffer on the stack (256 characters including the terminating 0) and of the doubled buffer
+    /// </summary>
+    [Fact]
+    public void GetText_CaptionsAroundTheStackBuffer_AreComplete()
+    {
+        var lengths = new[] { 1, 253, 254, 255, 256, 257, 510, 511, 512, 513 };
+        var results = new System.Collections.Generic.List<(string Caption, string Text, string InternalText)>();
+        SharedMessageWindow.Invoke(hWnd =>
+        {
+            var previousCaption = User32Api.GetText(hWnd);
+            try
+            {
+                foreach (var length in lengths)
+                {
+                    var caption = new string('x', length - 1) + "!";
+                    User32Api.SetWindowText(hWnd, caption);
+                    results.Add((caption, User32Api.GetText(hWnd), User32Api.GetInternalText(hWnd)));
+                }
+            }
+            finally
+            {
+                User32Api.SetWindowText(hWnd, previousCaption);
+            }
+        });
+        Assert.Equal(lengths.Length, results.Count);
+        foreach (var (caption, text, internalText) in results)
+        {
+            Assert.Equal(caption, text);
+            Assert.Equal(caption, internalText);
+        }
+    }
+
+    /// <summary>
     ///     A-47: an exception in a predicate doesn't unwind through the native callback, but is rethrown after the enumeration
     /// </summary>
     [Fact]

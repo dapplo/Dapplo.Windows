@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Dapplo.Windows.App;
+using Dapplo.Windows.DesktopWindowsManager;
 using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 
@@ -180,6 +181,39 @@ public static class InteropWindowQuery
     }
 
     /// <summary>
+    /// The first checks of <see cref="IsVisibleApplicationWindow(IInteropWindow, bool, bool)"/> and <see cref="IsVisiblePopup"/>, cheapest first:
+    /// most top-level windows are invisible, so IsWindowVisible (WS_VISIBLE, e.g. not the hidden preview windows of Firefox) rejects them before
+    /// the class name (GetClassName) and the cloak check (DwmGetWindowAttribute: on another virtual desktop, or a suspended UWP app).
+    /// The cached <see cref="IInteropWindow.IsVisible"/> keeps its meaning: visible and not cloaked.
+    /// </summary>
+    /// <param name="interopWindow">IInteropWindow</param>
+    /// <param name="ignoreKnownClasses">true to reject windows with a class from <see cref="IgnoreClasses"/></param>
+    /// <returns>true if the window is visible, not cloaked and its class is not ignored</returns>
+    private static bool IsVisibleAndNotIgnored(this IInteropWindow interopWindow, bool ignoreKnownClasses)
+    {
+        if (interopWindow.IsVisible.HasValue)
+        {
+            return interopWindow.IsVisible.Value && !(ignoreKnownClasses && interopWindow.CanIgnoreClass());
+        }
+
+        if (!User32Api.IsWindowVisible(interopWindow.Handle))
+        {
+            // Not visible, so also not "visible and not cloaked"
+            interopWindow.IsVisible = false;
+            return false;
+        }
+
+        if (ignoreKnownClasses && interopWindow.CanIgnoreClass())
+        {
+            return false;
+        }
+
+        var isVisible = !DwmApi.IsWindowCloaked(interopWindow.Handle);
+        interopWindow.IsVisible = isVisible;
+        return isVisible;
+    }
+
+    /// <summary>
     /// Is the specified window a visible popup: a top-level window (it can be owned, it has no parent) with the WS_POPUP style,
     /// which is visible (WS_VISIBLE and not cloaked), has a size and is not minimized. Unlike <see cref="IsVisibleApplicationWindow(IInteropWindow, bool, bool)"/>
     /// tool windows and windows without a title are included.
@@ -189,14 +223,7 @@ public static class InteropWindowQuery
     /// <returns>true if the IInteropWindow is a visible popup</returns>
     public static bool IsVisiblePopup(this IInteropWindow interopWindow, bool ignoreKnownClasses = true)
     {
-        if (ignoreKnownClasses && interopWindow.CanIgnoreClass())
-        {
-            return false;
-        }
-
-        // Most windows are invisible, reject them before the more expensive checks. IsWindowVisible (WS_VISIBLE, e.g. not the hidden preview
-        // windows of Firefox) and not cloaked (on another virtual desktop, or a suspended UWP app)
-        if (!interopWindow.IsVisible())
+        if (!interopWindow.IsVisibleAndNotIgnored(ignoreKnownClasses))
         {
             return false;
         }
@@ -251,14 +278,7 @@ public static class InteropWindowQuery
     /// <returns>true if the window is a visible application window</returns>
     public static bool IsVisibleApplicationWindow(this IInteropWindow interopWindow, bool ignoreKnownClasses = true, bool includeMinimized = false)
     {
-        if (ignoreKnownClasses && interopWindow.CanIgnoreClass())
-        {
-            return false;
-        }
-
-        // Most windows are invisible, reject them before the more expensive checks. IsWindowVisible (WS_VISIBLE, e.g. not the hidden preview
-        // windows of Firefox) and not cloaked (on another virtual desktop, or a suspended UWP app)
-        if (!interopWindow.IsVisible())
+        if (!interopWindow.IsVisibleAndNotIgnored(ignoreKnownClasses))
         {
             return false;
         }

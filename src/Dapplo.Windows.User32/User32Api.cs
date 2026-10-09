@@ -231,26 +231,62 @@ public static class User32Api
     /// <returns>string</returns>
     private static unsafe string ReadCaption(IntPtr hWnd, int capacity, bool useInternalGetWindowText)
     {
+        // Most captions are short: the first attempt uses a buffer on the stack, only a longer caption needs one on the heap
+        if (capacity <= StackAllocCaptionThreshold)
+        {
+            var stackBuffer = stackalloc char[capacity];
+            if (TryReadCaption(hWnd, stackBuffer, capacity, useInternalGetWindowText, out var caption))
+            {
+                return caption;
+            }
+            capacity = (int)Math.Min(capacity * 2L, MaxWindowTextLength);
+        }
+
         while (true)
         {
-            var buffer = new char[capacity];
-            int copied;
-            fixed (char* caption = buffer)
+            var heapBuffer = new char[capacity];
+            fixed (char* buffer = heapBuffer)
             {
-                copied = useInternalGetWindowText ? InternalGetWindowText(hWnd, caption, capacity) : GetWindowText(hWnd, caption, capacity);
-            }
-            if (copied <= 0)
-            {
-                return string.Empty;
-            }
-            // A completely filled buffer means the caption might be truncated, retry with a bigger buffer
-            if (copied < capacity - 1 || capacity >= MaxWindowTextLength)
-            {
-                return new string(buffer, 0, Math.Min(copied, capacity - 1));
+                if (TryReadCaption(hWnd, buffer, capacity, useInternalGetWindowText, out var caption))
+                {
+                    return caption;
+                }
             }
             capacity = (int)Math.Min(capacity * 2L, MaxWindowTextLength);
         }
     }
+
+    /// <summary>
+    ///     Read the caption into the buffer
+    /// </summary>
+    /// <param name="hWnd">IntPtr for the window</param>
+    /// <param name="buffer">char pointer to the buffer</param>
+    /// <param name="capacity">int with the capacity of the buffer, including the terminating 0</param>
+    /// <param name="useInternalGetWindowText">true to use InternalGetWindowText, false for GetWindowText</param>
+    /// <param name="caption">string with the caption, when the result is true</param>
+    /// <returns>false when the buffer was completely filled (the caption might be truncated) and a bigger buffer is possible</returns>
+    private static unsafe bool TryReadCaption(IntPtr hWnd, char* buffer, int capacity, bool useInternalGetWindowText, out string caption)
+    {
+        var copied = useInternalGetWindowText ? InternalGetWindowText(hWnd, buffer, capacity) : GetWindowText(hWnd, buffer, capacity);
+        if (copied <= 0)
+        {
+            caption = string.Empty;
+            return true;
+        }
+        // A completely filled buffer means the caption might be truncated, retry with a bigger buffer
+        if (copied < capacity - 1 || capacity >= MaxWindowTextLength)
+        {
+            caption = new string(buffer, 0, Math.Min(copied, capacity - 1));
+            return true;
+        }
+        caption = null;
+        return false;
+    }
+
+    /// <summary>
+    ///     Captions up to this number of characters (including the terminating 0) are first read into a buffer on the stack
+    /// </summary>
+    private const int StackAllocCaptionThreshold = 256;
 
     /// <summary>
     ///     The maximum number of characters which <see cref="GetTextFromWindow"/>, <see cref="GetText"/> and <see cref="GetInternalText"/> retrieve, longer texts are truncated.
