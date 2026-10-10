@@ -43,9 +43,10 @@ public static class UiAutomationAreas
 
     /// <summary>
     ///     The depth of the read which tells if the tree of a window looks incomplete for <see cref="UiAutomationScroller"/>.FindScrollableAreas:
-    ///     the document of a Chromium page is on level 3, its children are read with 4
+    ///     the document of a plain Chromium page is on level 3 of the top-level window, pages in browsers with more panes are deeper. The read
+    ///     stays cheap, elements smaller than a quarter of the window are left out with their children.
     /// </summary>
-    private const int ContentCheckDepth = 4;
+    private const int ContentCheckDepth = 8;
 
     /// <summary>
     ///     A guard against a provider which reports a (nearly) endless chain of elements with the same rectangle
@@ -269,8 +270,40 @@ public static class UiAutomationAreas
         var minimumSize = User32Api.GetWindowInfo(windowHandle, ref windowInfo)
             ? Math.Max(0, Math.Min(windowInfo.Bounds.Width, windowInfo.Bounds.Height) / 4)
             : 0;
-        ReadOnce(automation, windowHandle, ContentCheckDepth, minimumSize, cancellationToken, out var readAgain);
-        return readAgain;
+        var reader = new TreeReader(automation, ContentCheckDepth, minimumSize, cancellationToken);
+        var root = reader.Read(windowHandle);
+        // The window's own element without content only counts for windows which build their tree on demand: a child window without
+        // children (a button, a custom drawn control) is complete, it must not wait the content wait before the caller asks its parent
+        var rootHasContent = reader.RootHasContent || !BuildsTreeOnDemand(windowHandle);
+        return LooksIncomplete(root, rootHasContent, reader.EmptyAreas.Contains);
+    }
+
+    /// <summary>
+    ///     The window class of the page in Chromium based browsers, Electron apps and WebView2
+    /// </summary>
+    private const string ChromiumRenderWidgetClass = "Chrome_RenderWidgetHostHWND";
+
+    /// <summary>
+    ///     True for a window whose element is filled only when a UI Automation client asks for it (Chromium's render widget window)
+    /// </summary>
+    private static bool BuildsTreeOnDemand(IntPtr windowHandle) => User32Api.GetClassname(windowHandle) == ChromiumRenderWidgetClass;
+
+    /// <summary>
+    ///     The decision of <see cref="LooksIncomplete(IUIAutomation, IntPtr, CancellationToken)"/>: a large element without content, or the window's
+    ///     own element without content (Chromium's render widget window before its tree is built: the document has the window's bounds and is
+    ///     merged into the root, so the root is the element without children; only for windows which build their tree on demand).
+    /// </summary>
+    /// <param name="root">UiAutomationArea of the window, null when it couldn't be read</param>
+    /// <param name="rootHasContent">false when the window's element has no children, only children with an empty rectangle, or merged children
+    ///     without content</param>
+    /// <param name="isEmpty">tells if an area really has no children (not just because they weren't read)</param>
+    internal static bool LooksIncomplete(UiAutomationArea root, bool rootHasContent, Func<UiAutomationArea, bool> isEmpty)
+    {
+        if (root is null || root.Bounds.IsEmpty)
+        {
+            return false;
+        }
+        return !rootHasContent || HasLargeEmptyArea(root, isEmpty);
     }
 
     /// <summary>
@@ -349,6 +382,11 @@ public static class UiAutomationAreas
         /// </summary>
         public HashSet<UiAutomationArea> EmptyAreas { get; } = new HashSet<UiAutomationArea>();
 
+        /// <summary>
+        ///     Whether the root element has content (see AddChildren), true when its children weren't read
+        /// </summary>
+        public bool RootHasContent { get; private set; } = true;
+
         private IUIAutomationCacheRequest _cacheRequest;
         private IUIAutomationCondition _controlView;
         private IUIAutomationCondition _notOffscreen;
@@ -383,7 +421,7 @@ public static class UiAutomationAreas
                 var children = new List<UiAutomationArea>();
                 if (!rootBounds.IsEmpty)
                 {
-                    AddChildren(rootElement, rootBounds, 1, children, 0);
+                    RootHasContent = AddChildren(rootElement, rootBounds, 1, children, 0);
                 }
                 return new UiAutomationArea(rootBounds, GetControlType(rootElement), GetName(rootElement), children);
             }
