@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class WinMm | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class WinMm | Dapplo.Windows ">
+      
+      <meta name="description" content="Windows Multi-Media API">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Multimedia_WinMm.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Multimedia.WinMm%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Multimedia.WinMm">
+
+
+
+  <h1 id="Dapplo_Windows_Multimedia_WinMm" data-uid="Dapplo.Windows.Multimedia.WinMm" class="text-break">
+Class WinMm  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Multimedia/WinMm.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Multimedia.html">Multimedia</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Multimedia.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Windows Multi-Media API</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class WinMm</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">WinMm</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Multimedia_WinMm_PlayFile_" data-uid="Dapplo.Windows.Multimedia.WinMm.PlayFile*"></a>
+
+  <h3 id="Dapplo_Windows_Multimedia_WinMm_PlayFile_System_String_" data-uid="Dapplo.Windows.Multimedia.WinMm.PlayFile(System.String)">
+  PlayFile(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Multimedia/WinMm.cs/#L61"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Play a WAV file asynchronously, winmm reads the file itself.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool PlayFile(string path)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>path</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Path of the WAV file, PlaySound supports at most 255 characters</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the sound was started, false if the file doesn't exist or playing failed. A file which exists but isn't a valid WAV file
+can't be detected up front (PlaySound opens it asynchronously), it simply doesn't play: no default sound is played instead.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Multimedia_WinMm_PlayResource_" data-uid="Dapplo.Windows.Multimedia.WinMm.PlayResource*"></a>
+
+  <h3 id="Dapplo_Windows_Multimedia_WinMm_PlayResource_System_String_System_IntPtr_" data-uid="Dapplo.Windows.Multimedia.WinMm.PlayResource(System.String,System.IntPtr)">
+  PlayResource(string, nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Multimedia/WinMm.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Play a native (Win32) WAVE resource asynchronously.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool PlayResource(string resourceName, nint moduleHandle = 0)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>resourceName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Name of the WAVE resource to play</p>
+</dd>
+    <dt><code>moduleHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>Handle (HMODULE) of the executable or DLL which contains the resource,
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr.zero">Zero</a> (default) uses the executable of the current process.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the sound started playing, false if the resource wasn't found or can't be played</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Multimedia_WinMm_PlaySystemSound_" data-uid="Dapplo.Windows.Multimedia.WinMm.PlaySystemSound*"></a>
+
+  <h3 id="Dapplo_Windows_Multimedia_WinMm_PlaySystemSound_Dapplo_Windows_Multimedia_Enums_SystemSounds_" data-uid="Dapplo.Windows.Multimedia.WinMm.PlaySystemSound(Dapplo.Windows.Multimedia.Enums.SystemSounds)">
+  PlaySystemSound(SystemSounds)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Multimedia/WinMm.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Play a sound of the Windows sound scheme asynchronously.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool PlaySystemSound(SystemSounds systemSound)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>systemSound</code> <a class="xref" href="Dapplo.Windows.Multimedia.Enums.SystemSounds.html">SystemSounds</a></dt>
+    <dd><p>Value from the SystemSounds enum</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the sound started playing</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Multimedia_WinMm_PlayWave_" data-uid="Dapplo.Windows.Multimedia.WinMm.PlayWave*"></a>
+
+  <h3 id="Dapplo_Windows_Multimedia_WinMm_PlayWave_System_Byte___" data-uid="Dapplo.Windows.Multimedia.WinMm.PlayWave(System.Byte[])">
+  PlayWave(byte[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Multimedia/WinMm.cs/#L97"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Play WAVE data (a complete .wav file) asynchronously.
+The wave data is copied into unmanaged memory which is kept alive until the next call to <a class="xref" href="Dapplo.Windows.Multimedia.WinMm.html#Dapplo_Windows_Multimedia_WinMm_PlayWave_System_Byte___">PlayWave(byte[])</a> or <a class="xref" href="Dapplo.Windows.Multimedia.WinMm.html#Dapplo_Windows_Multimedia_WinMm_StopPlaying">StopPlaying()</a>,
+so the passed byte[] can be reused or collected directly after this call.
+Any sound which is currently playing is stopped first.
+See <a href="https://blogs.msdn.microsoft.com/larryosterman/2009/02/19/playsoundxxx-snd_memory-snd_async-is-almost-always-a-bad-idea/">PlaySound(xxx, SND_MEMORY | SND_ASYNC) is almost always a bad idea.</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool PlayWave(byte[] soundBytes)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>soundBytes</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd><p>Wave data to play</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the sound started playing</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Multimedia_WinMm_PlayWave_" data-uid="Dapplo.Windows.Multimedia.WinMm.PlayWave*"></a>
+
+  <h3 id="Dapplo_Windows_Multimedia_WinMm_PlayWave_System_IntPtr_Dapplo_Windows_Multimedia_Enums_SoundSettings_" data-uid="Dapplo.Windows.Multimedia.WinMm.PlayWave(System.IntPtr,Dapplo.Windows.Multimedia.Enums.SoundSettings)">
+  PlayWave(nint, SoundSettings)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Multimedia/WinMm.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Play WAVE data from unmanaged memory, <a class="xref" href="Dapplo.Windows.Multimedia.Enums.SoundSettings.html#Dapplo_Windows_Multimedia_Enums_SoundSettings_Memory">Memory</a> is always added to the settings.
+Note: the caller owns the memory, when <a class="xref" href="Dapplo.Windows.Multimedia.Enums.SoundSettings.html#Dapplo_Windows_Multimedia_Enums_SoundSettings_Async">Async</a> is used it must stay valid until the sound has finished or was stopped with <a class="xref" href="Dapplo.Windows.Multimedia.WinMm.html#Dapplo_Windows_Multimedia_WinMm_StopPlaying">StopPlaying()</a>.
+Prefer <a class="xref" href="Dapplo.Windows.Multimedia.WinMm.html#Dapplo_Windows_Multimedia_WinMm_PlayWave_System_Byte___">PlayWave(byte[])</a>, which takes care of this.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool PlayWave(nint memoryPtr, SoundSettings settings)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>memoryPtr</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>Pointer to the WAVE data (a complete .wav file in memory)</p>
+</dd>
+    <dt><code>settings</code> <a class="xref" href="Dapplo.Windows.Multimedia.Enums.SoundSettings.html">SoundSettings</a></dt>
+    <dd><p>SoundSettings, e.g. <a class="xref" href="Dapplo.Windows.Multimedia.Enums.SoundSettings.html#Dapplo_Windows_Multimedia_Enums_SoundSettings_None">None</a> to play synchronously</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the sound was played (synchronous) or started playing (asynchronous)</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Multimedia_WinMm_StopPlaying_" data-uid="Dapplo.Windows.Multimedia.WinMm.StopPlaying*"></a>
+
+  <h3 id="Dapplo_Windows_Multimedia_WinMm_StopPlaying" data-uid="Dapplo.Windows.Multimedia.WinMm.StopPlaying">
+  StopPlaying()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Multimedia/WinMm.cs/#L124"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Stop playing, this also frees the memory of a sound started with <a class="xref" href="Dapplo.Windows.Multimedia.WinMm.html#Dapplo_Windows_Multimedia_WinMm_PlayWave_System_Byte___">PlayWave(byte[])</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void StopPlaying()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Multimedia/WinMm.cs/#L14" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

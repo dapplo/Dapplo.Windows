@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class NativeRectFloatExtensions | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class NativeRectFloatExtensions | Dapplo.Windows ">
+      
+      <meta name="description" content="Helper methods for the NativeRectFloat struct">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions">
+
+
+
+  <h1 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions" class="text-break">
+Class NativeRectFloatExtensions  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L13"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Common.html">Common</a>.<a class="xref" href="Dapplo.Windows.Common.Extensions.html">Extensions</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Common.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Helper methods for the NativeRectFloat struct</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class NativeRectFloatExtensions</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">NativeRectFloatExtensions</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_ChangeHeight_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.ChangeHeight*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_ChangeHeight_Dapplo_Windows_Common_Structs_NativeRectFloat_System_Single_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.ChangeHeight(Dapplo.Windows.Common.Structs.NativeRectFloat,System.Single)">
+  ChangeHeight(NativeRectFloat, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRectFloat, from the supplied one, using the specified height</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat ChangeHeight(this NativeRectFloat rect, float height)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>height</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>float</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_ChangeWidth_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.ChangeWidth*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_ChangeWidth_Dapplo_Windows_Common_Structs_NativeRectFloat_System_Single_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.ChangeWidth(Dapplo.Windows.Common.Structs.NativeRectFloat,System.Single)">
+  ChangeWidth(NativeRectFloat, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L45"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRectFloat, from the supplied one, using the specified width</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat ChangeWidth(this NativeRectFloat rect, float width)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>float</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_ChangeX_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.ChangeX*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_ChangeX_Dapplo_Windows_Common_Structs_NativeRectFloat_System_Single_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.ChangeX(Dapplo.Windows.Common.Structs.NativeRectFloat,System.Single)">
+  ChangeX(NativeRectFloat, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L21"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRectFloat, from the supplied one, using the specified X coordinate</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat ChangeX(this NativeRectFloat rect, float x)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>x</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>float</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_ChangeY_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.ChangeY*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_ChangeY_Dapplo_Windows_Common_Structs_NativeRectFloat_System_Single_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.ChangeY(Dapplo.Windows.Common.Structs.NativeRectFloat,System.Single)">
+  ChangeY(NativeRectFloat, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L33"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRectFloat, from the supplied one, using the specified Y coordinate</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat ChangeY(this NativeRectFloat rect, float y)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>y</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>float</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Contains_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Contains*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Contains_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativePointFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Contains(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativePointFloat)">
+  Contains(NativeRectFloat, NativePointFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if this NativeRectFloat contains the specified NativePointFloat</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool Contains(this NativeRectFloat rect, NativePointFloat point)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>point</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePointFloat.html">NativePointFloat</a></dt>
+    <dd><p>NativePointFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if it contains</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Contains_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Contains*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Contains_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeRectFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Contains(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativeRectFloat)">
+  Contains(NativeRectFloat, NativeRectFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if small NativeRectFloat is entirely contained within the larger NativeRectFloat</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool Contains(this NativeRectFloat largerRectangle, NativeRectFloat smallerRectangle)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>largerRectangle</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat, the larger rectangle</p>
+</dd>
+    <dt><code>smallerRectangle</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat, the smaller rectangle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True if small rectangle is entirely contained within the larger rectangle, false otherwise</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Contains_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Contains*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Contains_Dapplo_Windows_Common_Structs_NativeRectFloat_System_Single_System_Single_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Contains(Dapplo.Windows.Common.Structs.NativeRectFloat,System.Single,System.Single)">
+  Contains(NativeRectFloat, float, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if this NativeRectFloat contains the specified coordinates</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool Contains(this NativeRectFloat rect, float x, float y)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>x</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>float</p>
+</dd>
+    <dt><code>y</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>float</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if it contains</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_HasOverlap_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.HasOverlap*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_HasOverlap_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeRectFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.HasOverlap(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativeRectFloat)">
+  HasOverlap(NativeRectFloat, NativeRectFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L113"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check that two rectangles overlap with each other, this means they share a non-empty area.
+Right and Bottom are exclusive, so adjacent rectangles (e.g. rect1.Right == rect2.Left) do not overlap,
+a rectangle which contains the other (or is contained) does overlap.
+This is the same as <a class="xref" href="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.html#Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_IntersectsWith_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeRectFloat_">IntersectsWith(NativeRectFloat, NativeRectFloat)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool HasOverlap(this NativeRectFloat rect1, NativeRectFloat rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>The first rectangle</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>The second rectangle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>The rectangles overlap</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Inflate_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Inflate*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Inflate_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeSizeFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Inflate(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativeSizeFloat)">
+  Inflate(NativeRectFloat, NativeSizeFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L277"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a new NativeRect which is rect but inflated with the specified size</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat Inflate(this NativeRectFloat rect, NativeSizeFloat size)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>size</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeSizeFloat.html">NativeSizeFloat</a></dt>
+    <dd><p>NativeSizeFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Inflate_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Inflate*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Inflate_Dapplo_Windows_Common_Structs_NativeRectFloat_System_Int32_System_Int32_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Inflate(Dapplo.Windows.Common.Structs.NativeRectFloat,System.Int32,System.Int32)">
+  Inflate(NativeRectFloat, int, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L252"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a new NativeRectFloat which is rect but inflated with the specified width and height</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat Inflate(this NativeRectFloat rect, int width, int height)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>height</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Inflate_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Inflate*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Inflate_Dapplo_Windows_Common_Structs_NativeRectFloat_System_Single_System_Single_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Inflate(Dapplo.Windows.Common.Structs.NativeRectFloat,System.Single,System.Single)">
+  Inflate(NativeRectFloat, float, float)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L265"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a new NativeRectFloat which is rect but inflated with the specified width and height</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat Inflate(this NativeRectFloat rect, float width, float height)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>float</p>
+</dd>
+    <dt><code>height</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd><p>float</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Intersect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Intersect*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Intersect_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeRectFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Intersect(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativeRectFloat)">
+  Intersect(NativeRectFloat, NativeRectFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L226"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a new NativeRectFloat which is the intersection of rect1 and rect2</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat Intersect(this NativeRectFloat rect1, NativeRectFloat rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat which is the intersection of rect1 and rect2</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_IntersectsWith_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.IntersectsWith*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_IntersectsWith_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeRectFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.IntersectsWith(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativeRectFloat)">
+  IntersectsWith(NativeRectFloat, NativeRectFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L289"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current NativeRectFloat intersects with the specified.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool IntersectsWith(this NativeRectFloat rect1, NativeRectFloat rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_IsAdjacent_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.IsAdjacent*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_IsAdjacent_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeRectFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.IsAdjacent(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativeRectFloat)">
+  IsAdjacent(NativeRectFloat, NativeRectFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L122"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if either rectangle is adjacent to the other rectangle</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static AdjacentTo IsAdjacent(this NativeRectFloat rect1, NativeRectFloat rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>The first rectangle</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>The second rectangle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Enums.AdjacentTo.html">AdjacentTo</a></dt>
+    <dd><p>At least one rectangle is adjacent to the other rectangle</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_IsDockedToLeftOf_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.IsDockedToLeftOf*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_IsDockedToLeftOf_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeRectFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.IsDockedToLeftOf(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativeRectFloat)">
+  IsDockedToLeftOf(NativeRectFloat, NativeRectFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L163"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if a NativeRectFloat is docked to the left of another NativeRectFloat</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool IsDockedToLeftOf(this NativeRectFloat rect1, NativeRectFloat rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat to test if it's docked</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat rect to be docked to</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool with true if they are docked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_IsDockedToRightOf_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.IsDockedToRightOf*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_IsDockedToRightOf_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeRectFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.IsDockedToRightOf(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativeRectFloat)">
+  IsDockedToRightOf(NativeRectFloat, NativeRectFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L176"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if a NativeRectFloat is docked to the right of another NativeRectFloat</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool IsDockedToRightOf(this NativeRectFloat rect1, NativeRectFloat rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat to test if it's docked</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat rect to be docked to</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool with true if they are docked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_MoveTo_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.MoveTo*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_MoveTo_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativePointFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.MoveTo(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativePointFloat)">
+  MoveTo(NativeRectFloat, NativePointFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L329"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRectFloat from the specified one, but on a different location</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat MoveTo(this NativeRectFloat rect, NativePointFloat location)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>location</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePointFloat.html">NativePointFloat</a></dt>
+    <dd><p>NativePointFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_MoveTo_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.MoveTo*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_MoveTo_Dapplo_Windows_Common_Structs_NativeRectFloat_System_Nullable_System_Single__System_Nullable_System_Single__" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.MoveTo(Dapplo.Windows.Common.Structs.NativeRectFloat,System.Nullable{System.Single},System.Nullable{System.Single})">
+  MoveTo(NativeRectFloat, float?, float?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L342"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRectFloat from the specified one, but on a different location</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat MoveTo(this NativeRectFloat rect, float? x = null, float? y = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>x</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>?</dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>y</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>?</dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Normalize_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Normalize*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Normalize_Dapplo_Windows_Common_Structs_NativeRectFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Normalize(Dapplo.Windows.Common.Structs.NativeRectFloat)">
+  Normalize(NativeRectFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L389"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Normalize the NativeRectFloat by making a negative width and or height absolute</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat Normalize(this NativeRectFloat rect)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Offset_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Offset*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Offset_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativePointFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Offset(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativePointFloat)">
+  Offset(NativeRectFloat, NativePointFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L304"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect by offsetting the specified one</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat Offset(this NativeRectFloat rect, NativePointFloat offset)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>offset</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePointFloat.html">NativePointFloat</a></dt>
+    <dd><p>NativePointFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Offset_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Offset*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Offset_Dapplo_Windows_Common_Structs_NativeRectFloat_System_Nullable_System_Single__System_Nullable_System_Single__" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Offset(Dapplo.Windows.Common.Structs.NativeRectFloat,System.Nullable{System.Single},System.Nullable{System.Single})">
+  Offset(NativeRectFloat, float?, float?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L317"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRectFloat by offsetting the specified one</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat Offset(this NativeRectFloat rect, float? offsetX = null, float? offsetY = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>offsetX</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>?</dt>
+    <dd><p>float</p>
+</dd>
+    <dt><code>offsetY</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>?</dt>
+    <dd><p>float</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Resize_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Resize*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Resize_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeSizeFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Resize(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativeSizeFloat)">
+  Resize(NativeRectFloat, NativeSizeFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L354"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRectFloat from the specified one, but with a different size</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat Resize(this NativeRectFloat rect, NativeSizeFloat size)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>size</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeSizeFloat.html">NativeSizeFloat</a></dt>
+    <dd><p>NativeSizeFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Resize_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Resize*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Resize_Dapplo_Windows_Common_Structs_NativeRectFloat_System_Nullable_System_Single__System_Nullable_System_Single__" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Resize(Dapplo.Windows.Common.Structs.NativeRectFloat,System.Nullable{System.Single},System.Nullable{System.Single})">
+  Resize(NativeRectFloat, float?, float?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L367"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRectFloat from the specified one, but with a different size</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat Resize(this NativeRectFloat rect, float? width = null, float? height = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>?</dt>
+    <dd><p>float</p>
+</dd>
+    <dt><code>height</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>?</dt>
+    <dd><p>float</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Round_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Round*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Round_Dapplo_Windows_Common_Structs_NativeRectFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Round(Dapplo.Windows.Common.Structs.NativeRectFloat)">
+  Round(NativeRectFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L378"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a NativeRect, using rounded values, from the specified NativeRectFloat</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect Round(this NativeRectFloat rect)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Union_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Union*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectFloatExtensions_Union_Dapplo_Windows_Common_Structs_NativeRectFloat_Dapplo_Windows_Common_Structs_NativeRectFloat_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectFloatExtensions.Union(Dapplo.Windows.Common.Structs.NativeRectFloat,Dapplo.Windows.Common.Structs.NativeRectFloat)">
+  Union(NativeRectFloat, NativeRectFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L190"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a new NativeRectFloat which is the union of rect1 and rect2.
+Like the Win32 UnionRect, empty rectangles (see <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html#Dapplo_Windows_Common_Structs_NativeRectFloat_IsEmpty">IsEmpty</a>) are ignored, so accumulating from NativeRectFloat.Empty works.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRectFloat Union(this NativeRectFloat rect1, NativeRectFloat rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRectFloat.html">NativeRectFloat</a></dt>
+    <dd><p>NativeRectFloat which is the union of rect1 and rect2, or NativeRectFloat.Empty if both are empty</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectFloatExtensions.cs/#L13" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

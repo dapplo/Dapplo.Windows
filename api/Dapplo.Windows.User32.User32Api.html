@@ -1,0 +1,4143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class User32Api | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class User32Api | Dapplo.Windows ">
+      
+      <meta name="description" content="Native wrappers for the User32 DLL">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_User32_User32Api.md&amp;value=---%0Auid%3A%20Dapplo.Windows.User32.User32Api%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.User32.User32Api">
+
+
+
+  <h1 id="Dapplo_Windows_User32_User32Api" data-uid="Dapplo.Windows.User32.User32Api" class="text-break">
+Class User32Api  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.User32.html">User32</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.User32.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Native wrappers for the User32 DLL</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class User32Api</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">User32Api</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Dapplo_Windows_User32_User32Api_MaxWindowTextLength" data-uid="Dapplo.Windows.User32.User32Api.MaxWindowTextLength">
+  MaxWindowTextLength
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L294"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The maximum number of characters which <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_GetTextFromWindow_System_IntPtr_">GetTextFromWindow(nint)</a>, <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_GetText_System_IntPtr_">GetText(nint)</a> and <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_GetInternalText_System_IntPtr_">GetInternalText(nint)</a> retrieve, longer texts are truncated.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const int MaxWindowTextLength = 1048576</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Dapplo_Windows_User32_User32Api_User32" data-uid="Dapplo.Windows.User32.User32Api.User32">
+  User32
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L511"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The DLL Name for the User32 library</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string User32 = &quot;user32&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_User32_User32Api_AttachThreadInput_" data-uid="Dapplo.Windows.User32.User32Api.AttachThreadInput*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_AttachThreadInput_System_Int32_System_Int32_System_Boolean_" data-uid="Dapplo.Windows.User32.User32Api.AttachThreadInput(System.Int32,System.Int32,System.Boolean)">
+  AttachThreadInput(int, int, bool)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-attachthreadinput">AttachThreadInput function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool AttachThreadInput(int idAttach, int idAttachTo, bool fAttach)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>idAttach</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the identifier of the thread to be attached to another thread</p>
+</dd>
+    <dt><code>idAttachTo</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the identifier of the thread to which idAttach will be attached</p>
+</dd>
+    <dt><code>fAttach</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to attach, false to detach</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the function succeeds</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_BringWindowToTop_" data-uid="Dapplo.Windows.User32.User32Api.BringWindowToTop*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_BringWindowToTop_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.BringWindowToTop(System.IntPtr)">
+  BringWindowToTop(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Bring the specified window to the front</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool BringWindowToTop(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr specifying the hWnd</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the call was successfull</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_CreateWin32Exception_" data-uid="Dapplo.Windows.User32.User32Api.CreateWin32Exception*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_CreateWin32Exception_System_String_" data-uid="Dapplo.Windows.User32.User32Api.CreateWin32Exception(System.String)">
+  CreateWin32Exception(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L136"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Helper method to create a Win32 exception with the windows message in it</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Exception CreateWin32Exception(string method)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>method</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with current method</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Exception</a></dt>
+    <dd><p>Exception</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_EnumChildWindows_" data-uid="Dapplo.Windows.User32.User32Api.EnumChildWindows*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_EnumChildWindows_System_IntPtr_Dapplo_Windows_User32_User32Api_EnumWindowsProc_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.EnumChildWindows(System.IntPtr,Dapplo.Windows.User32.User32Api.EnumWindowsProc,System.IntPtr)">
+  EnumChildWindows(nint, EnumWindowsProc, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool EnumChildWindows(nint hWndParent, User32Api.EnumWindowsProc enumFunc, nint param)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWndParent</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with hWnd of parent window, if this is IntPtr.Zero this function behaves as EnumWindows</p>
+</dd>
+    <dt><code>enumFunc</code> <a class="xref" href="Dapplo.Windows.User32.User32Api.html">User32Api</a>.<a class="xref" href="Dapplo.Windows.User32.User32Api.EnumWindowsProc.html">EnumWindowsProc</a></dt>
+    <dd><p>EnumWindowsProc</p>
+</dd>
+    <dt><code>param</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>An application-defined value to be passed to the callback function.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if success</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_EnumDisplays_" data-uid="Dapplo.Windows.User32.User32Api.EnumDisplays*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_EnumDisplays" data-uid="Dapplo.Windows.User32.User32Api.EnumDisplays">
+  EnumDisplays()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L95"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieve all available display infos</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;DisplayInfo&gt; EnumDisplays()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Dapplo.Windows.User32.DisplayInfo.html">DisplayInfo</a>&gt;</dt>
+    <dd><p>IReadOnlyList of DisplayInfo</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_EnumThreadWindows_" data-uid="Dapplo.Windows.User32.User32Api.EnumThreadWindows*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_EnumThreadWindows_System_Int32_" data-uid="Dapplo.Windows.User32.User32Api.EnumThreadWindows(System.Int32)">
+  EnumThreadWindows(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This returns the list of window handles for the specified thread</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;nint&gt; EnumThreadWindows(int threadId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>threadId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a>&gt;</dt>
+    <dd><p>List of IntPtr</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_EnumThreadWindows_" data-uid="Dapplo.Windows.User32.User32Api.EnumThreadWindows*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_EnumThreadWindows_System_Int32_Dapplo_Windows_User32_User32Api_EnumWindowsProc_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.EnumThreadWindows(System.Int32,Dapplo.Windows.User32.User32Api.EnumWindowsProc,System.IntPtr)">
+  EnumThreadWindows(int, EnumWindowsProc, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633495(v=vs.85).aspx">
+EnumThreadWindows
+function
+</a>
+Enumerates all non child windows associated with a thread by passing the handle to each window, in turn, to an
+application-defined callback function.
+EnumThreadWindows continues until the last window is enumerated or the callback function returns FALSE.
+To enumerate child windows of a particular window, use the EnumChildWindows function.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool EnumThreadWindows(int threadId, User32Api.EnumWindowsProc enumFunc, nint param)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>threadId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The identifier of the thread whose windows are to be enumerated.</p>
+</dd>
+    <dt><code>enumFunc</code> <a class="xref" href="Dapplo.Windows.User32.User32Api.html">User32Api</a>.<a class="xref" href="Dapplo.Windows.User32.User32Api.EnumWindowsProc.html">EnumWindowsProc</a></dt>
+    <dd><p>EnumWindowsProc</p>
+</dd>
+    <dt><code>param</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>An application-defined value to be passed to the callback function.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_EnumWindows_" data-uid="Dapplo.Windows.User32.User32Api.EnumWindows*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_EnumWindows_Dapplo_Windows_User32_User32Api_EnumWindowsProc_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.EnumWindows(Dapplo.Windows.User32.User32Api.EnumWindowsProc,System.IntPtr)">
+  EnumWindows(EnumWindowsProc, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx">here</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool EnumWindows(User32Api.EnumWindowsProc enumFunc, nint param)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>enumFunc</code> <a class="xref" href="Dapplo.Windows.User32.User32Api.html">User32Api</a>.<a class="xref" href="Dapplo.Windows.User32.User32Api.EnumWindowsProc.html">EnumWindowsProc</a></dt>
+    <dd><p>EnumWindowsProc</p>
+</dd>
+    <dt><code>param</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>An application-defined value to be passed to the callback function.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if success</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_FillRect_" data-uid="Dapplo.Windows.User32.User32Api.FillRect*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_FillRect_System_IntPtr_Dapplo_Windows_Common_Structs_NativeRect__System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.FillRect(System.IntPtr,Dapplo.Windows.Common.Structs.NativeRect@,System.IntPtr)">
+  FillRect(nint, ref NativeRect, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Fills a rectangle by using the specified brush and logical device context.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool FillRect(nint hDC, ref NativeRect lprc, nint hbr)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hDC</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the device context in which the rectangle is to be filled.</p>
+</dd>
+    <dt><code>lprc</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>A reference to a NativeRect structure that specifies the logical coordinates of the rectangle to be filled.</p>
+</dd>
+    <dt><code>hbr</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the brush used to fill the rectangle.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the function succeeds</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_FindWindow_" data-uid="Dapplo.Windows.User32.User32Api.FindWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_FindWindow_System_String_System_String_" data-uid="Dapplo.Windows.User32.User32Api.FindWindow(System.String,System.String)">
+  FindWindow(string, string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves a handle to the top-level window whose class name and window name match the specified strings. This function does not search child windows. This function does not perform a case-sensitive search.
+To search child windows, beginning with a specified child window, use the FindWindowEx function.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint FindWindow(string lpClassName, string lpWindowName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>lpClassName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string</p>
+</dd>
+    <dt><code>lpWindowName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>If the function succeeds, the return value is a handle to the window that has the specified class name and window name.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_FindWindowEx_" data-uid="Dapplo.Windows.User32.User32Api.FindWindowEx*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_FindWindowEx_System_IntPtr_System_IntPtr_System_String_System_String_" data-uid="Dapplo.Windows.User32.User32Api.FindWindowEx(System.IntPtr,System.IntPtr,System.String,System.String)">
+  FindWindowEx(nint, nint, string, string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves a handle to a window whose class name and window name match the specified strings. The function searches child windows, beginning with the one following the specified child window. This function does not perform a case-sensitive search.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint FindWindowEx(nint hWndParent, nint hWndChildAfter, string lpszClass, string lpszWindow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWndParent</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, A handle to the parent window whose child windows are to be searched.
+If hWndParent is NULL, the function uses the desktop window as the parent window. The function searches among windows that are child windows of the desktop.
+If hWndParent is <a class="xref" href="Dapplo.Windows.User32.WindowHandles.html#Dapplo_Windows_User32_WindowHandles_HWND_MESSAGE">HWND_MESSAGE</a>, the function searches all message-only windows.</p>
+</dd>
+    <dt><code>hWndChildAfter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, a handle to a child window. The search begins with the next child window in the Z order. The child window must be a direct child window of hWndParent, not just a descendant window.
+If hWndChildAfter is NULL, the search begins with the first child window of hWndParent.
+Note that if both hWndParent and hWndChildAfter are NULL, the function searches all top-level and message-only windows.</p>
+</dd>
+    <dt><code>lpszClass</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The class name or a class atom created by a previous call to the RegisterClass or RegisterClassEx function. The atom must be placed in the low-order word of lpszClass; the high-order word must be zero.
+If lpszClass is a string, it specifies the window class name. The class name can be any name registered with RegisterClass or RegisterClassEx, or any of the predefined control-class names, or it can be MAKEINTATOM(0x8000). In this latter case, 0x8000 is the atom for a menu class. For more information, see the Remarks section of this topic.</p>
+</dd>
+    <dt><code>lpszWindow</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The window name (the window's title). If this parameter is NULL, all window names match.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>If the function succeeds, the return value is a handle to the window that has the specified class and window names.
+If the function fails, the return value is NULL. To get extended error information, call GetLastError.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_User32_User32Api_FindWindowEx_System_IntPtr_System_IntPtr_System_String_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>If the lpszWindow parameter is not NULL, FindWindowEx calls the GetWindowText function to retrieve the window name for comparison. For a description of a potential problem that can arise, see the Remarks section of GetWindowText.
+An application can call this function in the following way.
+FindWindowEx( NULL, NULL, MAKEINTATOM(0x8000), NULL );
+Note that 0x8000 is the atom for a menu class. When an application calls this function, the function checks whether a context menu is being displayed that the application created.</p>
+</div>
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetAncestor_" data-uid="Dapplo.Windows.User32.User32Api.GetAncestor*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetAncestor_System_IntPtr_Dapplo_Windows_User32_Enums_GetAncestorFlags_" data-uid="Dapplo.Windows.User32.User32Api.GetAncestor(System.IntPtr,Dapplo.Windows.User32.Enums.GetAncestorFlags)">
+  GetAncestor(nint, GetAncestorFlags)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the handle to the ancestor of the specified window, see
+<a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getancestor">GetAncestor function</a>.
+Unlike <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_GetParent_System_IntPtr_">GetParent(nint)</a>, GA_PARENT never returns the owner. For a top-level window GA_PARENT returns the desktop window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GetAncestor(nint hWnd, GetAncestorFlags getAncestorFlags)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle, if this is the desktop window the function returns IntPtr.Zero</p>
+</dd>
+    <dt><code>getAncestorFlags</code> <a class="xref" href="Dapplo.Windows.User32.Enums.GetAncestorFlags.html">GetAncestorFlags</a></dt>
+    <dd><p>GetAncestorFlags</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the handle of the ancestor</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetClassLongWrapper_" data-uid="Dapplo.Windows.User32.User32Api.GetClassLongWrapper*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetClassLongWrapper_System_IntPtr_Dapplo_Windows_User32_Enums_ClassLongIndex_" data-uid="Dapplo.Windows.User32.User32Api.GetClassLongWrapper(System.IntPtr,Dapplo.Windows.User32.Enums.ClassLongIndex)">
+  GetClassLongWrapper(nint, ClassLongIndex)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L149"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Wrapper for the GetClassLong which decides if the system is 64-bit or not and calls the right one.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static nint GetClassLongWrapper(nint hWnd, ClassLongIndex index)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>index</code> <a class="xref" href="Dapplo.Windows.User32.Enums.ClassLongIndex.html">ClassLongIndex</a></dt>
+    <dd><p>ClassLongIndex</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetClassname_" data-uid="Dapplo.Windows.User32.User32Api.GetClassname*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetClassname_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetClassname(System.IntPtr)">
+  GetClassname(nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L163"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieve the windows classname</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string GetClassname(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr for the window</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetCursorInfo_" data-uid="Dapplo.Windows.User32.User32Api.GetCursorInfo*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetCursorInfo_Dapplo_Windows_User32_Structs_CursorInfo__" data-uid="Dapplo.Windows.User32.User32Api.GetCursorInfo(Dapplo.Windows.User32.Structs.CursorInfo@)">
+  GetCursorInfo(ref CursorInfo)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648389(v=vs.85).aspx">GetCursorInfo function</a>
+Retrieves information about the global cursor.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetCursorInfo(ref CursorInfo cursorInfo)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>cursorInfo</code> <a class="xref" href="Dapplo.Windows.User32.Structs.CursorInfo.html">CursorInfo</a></dt>
+    <dd><p>CursorInfo structure to fill</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetCursorLocation_" data-uid="Dapplo.Windows.User32.User32Api.GetCursorLocation*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetCursorLocation" data-uid="Dapplo.Windows.User32.User32Api.GetCursorLocation">
+  GetCursorLocation()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the cursor location safely, accounting for DPI settings in Vista/Windows 7.
+This uses GetPhysicalCursorPos, and falls back to GetCursorPos if that fails.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static NativePoint GetCursorLocation()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint with cursor location, relative to the origin of the monitor setup
+(i.e. negative coordinates are possible in multi screen setups)</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetDC_" data-uid="Dapplo.Windows.User32.User32Api.GetDC*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetDC_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetDC(System.IntPtr)">
+  GetDC(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>The GetDC function retrieves a handle to a device context (DC) for the client area of a specified window or for the entire screen. You can use the returned handle in subsequent GDI functions to draw in the DC. The device context is an opaque data structure, whose values are used internally by GDI.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd144871(v=vs.85).aspx">GetDC function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GetDC(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window whose DC is to be retrieved. If this value is NULL, GetDC retrieves the DC for the entire screen.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>If the function succeeds, the return value is a handle to the DC for the specified window's client area.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetDesktopWindow_" data-uid="Dapplo.Windows.User32.User32Api.GetDesktopWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetDesktopWindow" data-uid="Dapplo.Windows.User32.User32Api.GetDesktopWindow">
+  GetDesktopWindow()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the hWnd of the Desktop window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GetDesktopWindow()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetDisplayInfo_" data-uid="Dapplo.Windows.User32.User32Api.GetDisplayInfo*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetDisplayInfo_System_IntPtr_System_Int32_" data-uid="Dapplo.Windows.User32.User32Api.GetDisplayInfo(System.IntPtr,System.Int32)">
+  GetDisplayInfo(nint, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the display info for the specified monitor handle</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DisplayInfo GetDisplayInfo(nint monitorHandle, int index)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>monitorHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>index</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.User32.DisplayInfo.html">DisplayInfo</a></dt>
+    <dd><p>DisplayInfo</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetForegroundWindow_" data-uid="Dapplo.Windows.User32.User32Api.GetForegroundWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetForegroundWindow" data-uid="Dapplo.Windows.User32.User32Api.GetForegroundWindow">
+  GetForegroundWindow()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the hWnd for the window which is currently the foreground window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GetForegroundWindow()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetGuiResources_" data-uid="Dapplo.Windows.User32.User32Api.GetGuiResources*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetGuiResources_System_IntPtr_System_UInt32_" data-uid="Dapplo.Windows.User32.User32Api.GetGuiResources(System.IntPtr,System.UInt32)">
+  GetGuiResources(nint, uint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern uint GetGuiResources(nint hProcess, uint uiFlags)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hProcess</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+    <dt><code>uiFlags</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetGuiResourcesGdiCount_" data-uid="Dapplo.Windows.User32.User32Api.GetGuiResourcesGdiCount*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetGuiResourcesGdiCount" data-uid="Dapplo.Windows.User32.User32Api.GetGuiResourcesGdiCount">
+  GetGuiResourcesGdiCount()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L178"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return the count of GDI objects.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static uint GetGuiResourcesGdiCount()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>Return the count of GDI objects.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetGuiResourcesUserCount_" data-uid="Dapplo.Windows.User32.User32Api.GetGuiResourcesUserCount*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetGuiResourcesUserCount" data-uid="Dapplo.Windows.User32.User32Api.GetGuiResourcesUserCount">
+  GetGuiResourcesUserCount()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L188"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return the count of USER objects.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static uint GetGuiResourcesUserCount()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>Return the count of USER objects.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetInternalText_" data-uid="Dapplo.Windows.User32.User32Api.GetInternalText*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetInternalText_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetInternalText(System.IntPtr)">
+  GetInternalText(nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L220"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieve the caption (title) which Windows stored for the window, with InternalGetWindowText.
+This never sends a message to the window, so it cannot hang or deadlock, even for windows of other threads of the current process.
+A text which the window procedure only supplies via WM_GETTEXT is not returned.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string GetInternalText(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr for the window</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the caption, empty if there is none</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetParent_" data-uid="Dapplo.Windows.User32.User32Api.GetParent*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetParent_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetParent(System.IntPtr)">
+  GetParent(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves a handle to the specified window's parent or owner.
+To retrieve a handle to a specified ancestor, use the GetAncestor function.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GetParent(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window whose parent window handle is to be retrieved.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr handle to the parent window or IntPtr.Zero if none
+If the window is a child window, the return value is a handle to the parent window. If the window is a top-level
+window with the WS_POPUP style, the return value is a handle to the <b>owner</b> window.
+Use <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_GetAncestor_System_IntPtr_Dapplo_Windows_User32_Enums_GetAncestorFlags_">GetAncestor(nint, GetAncestorFlags)</a> with <a class="xref" href="Dapplo.Windows.User32.Enums.GetAncestorFlags.html#Dapplo_Windows_User32_Enums_GetAncestorFlags_GA_PARENT">GA_PARENT</a> for the real parent, and <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_GetWindow_System_IntPtr_Dapplo_Windows_User32_Enums_GetWindowCommands_">GetWindow(nint, GetWindowCommands)</a> with <a class="xref" href="Dapplo.Windows.User32.Enums.GetWindowCommands.html#Dapplo_Windows_User32_Enums_GetWindowCommands_GW_OWNER">GW_OWNER</a> for the owner.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetScrollBarInfo_" data-uid="Dapplo.Windows.User32.User32Api.GetScrollBarInfo*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetScrollBarInfo_System_IntPtr_Dapplo_Windows_User32_Enums_ObjectIdentifiers_Dapplo_Windows_User32_Structs_ScrollBarInfo__" data-uid="Dapplo.Windows.User32.User32Api.GetScrollBarInfo(System.IntPtr,Dapplo.Windows.User32.Enums.ObjectIdentifiers,Dapplo.Windows.User32.Structs.ScrollBarInfo@)">
+  GetScrollBarInfo(nint, ObjectIdentifiers, ref ScrollBarInfo)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787581(v=vs.85).aspx">GetScrollBarInfo function</a>
+for more information.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetScrollBarInfo(nint hWnd, ObjectIdentifiers idObject, ref ScrollBarInfo scrollBarInfo)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>Handle to a window associated with the scroll bar whose information is to be retrieved. If the
+idObject parameter is OBJID_CLIENT, hWnd is a handle to a scroll bar control. Otherwise, hWnd is a handle to a
+window created with WS_VSCROLL and/or WS_HSCROLL style.</p>
+</dd>
+    <dt><code>idObject</code> <a class="xref" href="Dapplo.Windows.User32.Enums.ObjectIdentifiers.html">ObjectIdentifiers</a></dt>
+    <dd><p>Specifies the scroll bar object. Can be ObjectIdentifiers.Client,
+ObjectIdentifiers.HorizontalScrollbar, ObjectIdentifiers.VerticalScrollbar</p>
+</dd>
+    <dt><code>scrollBarInfo</code> <a class="xref" href="Dapplo.Windows.User32.Structs.ScrollBarInfo.html">ScrollBarInfo</a></dt>
+    <dd><p>ScrollBarInfo ref</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetScrollInfo_" data-uid="Dapplo.Windows.User32.User32Api.GetScrollInfo*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetScrollInfo_System_IntPtr_Dapplo_Windows_User32_Enums_ScrollBarTypes_Dapplo_Windows_User32_Structs_ScrollInfo__" data-uid="Dapplo.Windows.User32.User32Api.GetScrollInfo(System.IntPtr,Dapplo.Windows.User32.Enums.ScrollBarTypes,Dapplo.Windows.User32.Structs.ScrollInfo@)">
+  GetScrollInfo(nint, ScrollBarTypes, ref ScrollInfo)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787583(v=vs.85).aspx">GetScrollInfo</a> for
+more information.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetScrollInfo(nint hWnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle</p>
+</dd>
+    <dt><code>scrollBar</code> <a class="xref" href="Dapplo.Windows.User32.Enums.ScrollBarTypes.html">ScrollBarTypes</a></dt>
+    <dd><p>ScrollBarTypes</p>
+</dd>
+    <dt><code>scrollInfo</code> <a class="xref" href="Dapplo.Windows.User32.Structs.ScrollInfo.html">ScrollInfo</a></dt>
+    <dd><p>ScrollInfo ref</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool if it worked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetSysColor_" data-uid="Dapplo.Windows.User32.User32Api.GetSysColor*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetSysColor_Dapplo_Windows_User32_Enums_SysColorIndexes_" data-uid="Dapplo.Windows.User32.User32Api.GetSysColor(Dapplo.Windows.User32.Enums.SysColorIndexes)">
+  GetSysColor(SysColorIndexes)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the current color of the specified display element.
+Display elements are the parts of a window and the display that appear on the system display screen.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern uint GetSysColor(SysColorIndexes nIndex)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>nIndex</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SysColorIndexes.html">SysColorIndexes</a></dt>
+    <dd><p>SysColorIndexes with the display element whose color is to be retrieved.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>The function returns the red, green, blue (RGB) color value of the given element.
+If the nIndex parameter is out of range, the return value is zero.
+Because zero is also a valid RGB value, you cannot use GetSysColor to determine whether a system color is supported by the current platform.Instead, use the GetSysColorBrush function, which returns NULL if the color is not supported.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetSystemMetrics_" data-uid="Dapplo.Windows.User32.User32Api.GetSystemMetrics*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetSystemMetrics_Dapplo_Windows_User32_Enums_SystemMetric_" data-uid="Dapplo.Windows.User32.User32Api.GetSystemMetrics(Dapplo.Windows.User32.Enums.SystemMetric)">
+  GetSystemMetrics(SystemMetric)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724385(v=vs.85).aspx">GetSystemMetrics function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int GetSystemMetrics(SystemMetric index)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>index</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SystemMetric.html">SystemMetric</a></dt>
+    <dd><p>SystemMetric</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetText_" data-uid="Dapplo.Windows.User32.User32Api.GetText*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetText_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetText(System.IntPtr)">
+  GetText(nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L202"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieve the windows caption (title), with GetWindowText, the length of the caption is not limited.
+Note: for a window of the current process GetWindowText sends WM_GETTEXT. For a window of the calling thread this is a direct call,
+but for a window which belongs to another thread of the current process this can deadlock when that thread is waiting for the caller.
+Use <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_GetInternalText_System_IntPtr_">GetInternalText(nint)</a> for such windows.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string GetText(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr for the window</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the caption, empty if there is none</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetTextFromWindow_" data-uid="Dapplo.Windows.User32.User32Api.GetTextFromWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetTextFromWindow_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetTextFromWindow(System.IntPtr)">
+  GetTextFromWindow(nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L313"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the text of a control, this is not the caption.
+The messages are sent with SendMessageTimeout and SMTO_ABORTIFHUNG, so a hung window cannot block the caller.
+Texts longer than <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_MaxWindowTextLength">MaxWindowTextLength</a> characters are truncated.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string GetTextFromWindow(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the text, or null if there is no text or the window didn't respond in time</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetTitleBarInfoEx_" data-uid="Dapplo.Windows.User32.User32Api.GetTitleBarInfoEx*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetTitleBarInfoEx_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetTitleBarInfoEx(System.IntPtr)">
+  GetTitleBarInfoEx(nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L370"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the titlebar info ex for the specified window.
+The message is sent with SendMessageTimeout and SMTO_ABORTIFHUNG, so a hung window cannot block the caller.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TitleBarInfoEx GetTitleBarInfoEx(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.User32.Structs.TitleBarInfoEx.html">TitleBarInfoEx</a></dt>
+    <dd><p>TitleBarInfoEx, this is empty (only the size is set) if the window didn't respond in time</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetTopWindow_" data-uid="Dapplo.Windows.User32.User32Api.GetTopWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetTopWindow_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetTopWindow(System.IntPtr)">
+  GetTopWindow(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Examines the Z order of the child windows associated with the specified parent window and retrieves a handle to the child window at the top of the Z order.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633514(v=vs.85).aspx">GetTopWindow</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GetTopWindow(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the parent window whose child windows are to be examined. If this parameter is NULL, the function returns a handle to the window at the top of the Z order.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>If the function succeeds, the return value is a handle to the child window at the top of the Z order. If the specified window has no child windows, the return value is NULL. To get extended error information, use the GetLastError function.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWheelScrollLines_" data-uid="Dapplo.Windows.User32.User32Api.GetWheelScrollLines*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWheelScrollLines" data-uid="Dapplo.Windows.User32.User32Api.GetWheelScrollLines">
+  GetWheelScrollLines()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L384"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the number of lines to scroll when the vertical mouse wheel is moved, see SPI_GETWHEELSCROLLLINES.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static uint GetWheelScrollLines()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with the number of lines, 0 means no scrolling, uint.MaxValue (WHEEL_PAGESCROLL) means scroll a page. If the value cannot be retrieved, the Windows default of 3 is returned.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWindow_" data-uid="Dapplo.Windows.User32.User32Api.GetWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWindow_System_IntPtr_Dapplo_Windows_User32_Enums_GetWindowCommands_" data-uid="Dapplo.Windows.User32.User32Api.GetWindow(System.IntPtr,Dapplo.Windows.User32.Enums.GetWindowCommands)">
+  GetWindow(nint, GetWindowCommands)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves a handle to a window that has the specified relationship (Z-Order or owner) to the specified window.
+See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633515(v=vs.85).aspx">GetWindow function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GetWindow(nint hWnd, GetWindowCommands getWindowCommand)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr A handle to a window. The window handle retrieved is relative to this window, based on the
+value of the uCmd parameter.</p>
+</dd>
+    <dt><code>getWindowCommand</code> <a class="xref" href="Dapplo.Windows.User32.Enums.GetWindowCommands.html">GetWindowCommands</a></dt>
+    <dd><p>GetWindowCommands The relationship between the specified window and the window whose
+handle is to be retrieved. See GetWindowCommands</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWindowDC_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowDC*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWindowDC_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowDC(System.IntPtr)">
+  GetWindowDC(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>The GetWindowDC function retrieves the device context (DC) for the entire window, including title bar, menus, and scroll bars. A window device context permits painting anywhere in a window, because the origin of the device context is the upper-left corner of the window instead of the client area.
+GetWindowDC assigns default attributes to the window device context each time it retrieves the device context.Previous attributes are lost.
+See <a href="https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getwindowdc">GetWindowDC function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint GetWindowDC(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window whose DC is to be retrieved. If this value is NULL, GetWindowDC retrieves the DC for the entire screen.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>If the function succeeds, the return value is a handle to a device context for the specified window.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWindowDisplayAffinity_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowDisplayAffinity*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWindowDisplayAffinity_System_IntPtr_Dapplo_Windows_User32_Enums_WindowDisplayAffinity__" data-uid="Dapplo.Windows.User32.User32Api.GetWindowDisplayAffinity(System.IntPtr,Dapplo.Windows.User32.Enums.WindowDisplayAffinity@)">
+  GetWindowDisplayAffinity(nint, out WindowDisplayAffinity)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowdisplayaffinity">&gt;SetWindowDisplayAffinity function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetWindowDisplayAffinity(nint hWnd, out WindowDisplayAffinity windowDisplayAffinity)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>windowDisplayAffinity</code> <a class="xref" href="Dapplo.Windows.User32.Enums.WindowDisplayAffinity.html">WindowDisplayAffinity</a></dt>
+    <dd><p>WindowDisplayAffinity out</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if it worked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWindowInfo_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowInfo*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWindowInfo_System_IntPtr_Dapplo_Windows_User32_Structs_WindowInfo__" data-uid="Dapplo.Windows.User32.User32Api.GetWindowInfo(System.IntPtr,Dapplo.Windows.User32.Structs.WindowInfo@)">
+  GetWindowInfo(nint, ref WindowInfo)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633516(v=vs.85).aspx">GetWindowInfo</a>
+Retrieves information about the specified window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetWindowInfo(nint hWnd, ref WindowInfo windowInfo)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>windowInfo</code> <a class="xref" href="Dapplo.Windows.User32.Structs.WindowInfo.html">WindowInfo</a></dt>
+    <dd><p>WindowInfo (use WindowInfo.Create)</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool if false than get the last error</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWindowLongWrapper_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowLongWrapper*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWindowLongWrapper_System_IntPtr_Dapplo_Windows_User32_Enums_WindowLongIndex_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowLongWrapper(System.IntPtr,Dapplo.Windows.User32.Enums.WindowLongIndex)">
+  GetWindowLongWrapper(nint, WindowLongIndex)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L395"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Wrapper for the GetWindowLong which decides if the system is 64-bit or not and calls the right one.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static nint GetWindowLongWrapper(nint hWnd, WindowLongIndex index)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>index</code> <a class="xref" href="Dapplo.Windows.User32.Enums.WindowLongIndex.html">WindowLongIndex</a></dt>
+    <dd><p>WindowLongIndex</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWindowPlacement_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowPlacement*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWindowPlacement_System_IntPtr_Dapplo_Windows_User32_Structs_WindowPlacement__" data-uid="Dapplo.Windows.User32.User32Api.GetWindowPlacement(System.IntPtr,Dapplo.Windows.User32.Structs.WindowPlacement@)">
+  GetWindowPlacement(nint, ref WindowPlacement)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the WindowPlacement for the specified window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetWindowPlacement(nint hWnd, ref WindowPlacement windowPlacement)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>windowPlacement</code> <a class="xref" href="Dapplo.Windows.User32.Structs.WindowPlacement.html">WindowPlacement</a></dt>
+    <dd><p>WindowPlacement</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if success</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWindowRgn_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowRgn*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWindowRgn_System_IntPtr_System_Runtime_InteropServices_SafeHandle_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowRgn(System.IntPtr,System.Runtime.InteropServices.SafeHandle)">
+  GetWindowRgn(nint, SafeHandle)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd144950(v=vs.85).aspx">GetWindowRgn function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern RegionResults GetWindowRgn(nint hWnd, SafeHandle hRgn)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>hRgn</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.safehandle">SafeHandle</a></dt>
+    <dd><p>SafeHandle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.User32.Enums.RegionResults.html">RegionResults</a></dt>
+    <dd><p>RegionResults</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWindowTextLength_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowTextLength*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWindowTextLength_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowTextLength(System.IntPtr)">
+  GetWindowTextLength(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633521.aspx">GetWindowTextLength  function</a>
+Retrieves the length, in characters, of the specified window's title bar text (if the window has a title bar). If the specified window is a control, the function retrieves the length of the text within the control. However, GetWindowTextLength cannot retrieve the length of the text of an edit control in another application.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int GetWindowTextLength(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window or control.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>If the function succeeds, the return value is the length, in characters, of the text. Under certain conditions, this value may actually be greater than the length of the text. For more information, see the following Remarks section.
+If the window has no text, the return value is zero. To get extended error information, call GetLastError.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWindowThreadProcessId_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowThreadProcessId*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWindowThreadProcessId_System_IntPtr_System_Int32__" data-uid="Dapplo.Windows.User32.User32Api.GetWindowThreadProcessId(System.IntPtr,System.Int32@)">
+  GetWindowThreadProcessId(nint, out int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633522(v=vs.85).aspx">GetWindowThreadProcessId function</a>
+Retrieves the identifier of the thread that created the specified window and, optionally, the identifier of the process that created the window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int GetWindowThreadProcessId(nint hWnd, out int processId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window.</p>
+</dd>
+    <dt><code>processId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>A pointer to a variable that receives the process identifier. If this parameter is not NULL, GetWindowThreadProcessId copies the identifier of the process to the variable; otherwise, it does not.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The return value is the identifier of the thread that created the window.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_GetWindowThreadProcessId_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowThreadProcessId*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_GetWindowThreadProcessId_System_IntPtr_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.GetWindowThreadProcessId(System.IntPtr,System.IntPtr)">
+  GetWindowThreadProcessId(nint, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633522(v=vs.85).aspx">GetWindowThreadProcessId function</a>
+Retrieves the identifier of the thread that created the specified window and, optionally, the identifier of the process that created the window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int GetWindowThreadProcessId(nint hWnd, nint processId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window.</p>
+</dd>
+    <dt><code>processId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A pointer to a variable that receives the process identifier. If this parameter is not NULL, GetWindowThreadProcessId copies the identifier of the process to the variable; otherwise, it does not.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The return value is the identifier of the thread that created the window.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_IsIconic_" data-uid="Dapplo.Windows.User32.User32Api.IsIconic*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_IsIconic_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.IsIconic(System.IntPtr)">
+  IsIconic(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return true if the specified window is minimized</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool IsIconic(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr for the hWnd</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if minimized</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_IsWindow_" data-uid="Dapplo.Windows.User32.User32Api.IsWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_IsWindow_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.IsWindow(System.IntPtr)">
+  IsWindow(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Determines whether the specified window handle identifies an existing window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool IsWindow(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window to be tested.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If the window handle identifies an existing window, the return value is true.
+If the window handle does not identify an existing window, the return value is false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_IsWindowVisible_" data-uid="Dapplo.Windows.User32.User32Api.IsWindowVisible*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_IsWindowVisible_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.IsWindowVisible(System.IntPtr)">
+  IsWindowVisible(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Determines the visibility state of the specified window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool IsWindowVisible(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window to be tested.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If the specified window, its parent window, its parent's parent window, and so forth, have the WS_VISIBLE style, the return value is nonzero. Otherwise, the return value is zero.
+Because the return value specifies whether the window has the WS_VISIBLE style, it may be nonzero even if the window is totally obscured by other windows.</p>
+<p>Remarks:
+The visibility state of a window is indicated by the WS_VISIBLE style bit. When WS_VISIBLE is set, the window is displayed and subsequent drawing into it is displayed as long as the window has the WS_VISIBLE style.
+Any drawing to a window with the WS_VISIBLE style will not be displayed if the window is obscured by other windows or is clipped by its parent window.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_IsZoomed_" data-uid="Dapplo.Windows.User32.User32Api.IsZoomed*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_IsZoomed_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.IsZoomed(System.IntPtr)">
+  IsZoomed(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return true if the specified window is maximized</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool IsZoomed(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr for the hWnd</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if maximized</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_LockWorkStation_" data-uid="Dapplo.Windows.User32.User32Api.LockWorkStation*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_LockWorkStation" data-uid="Dapplo.Windows.User32.User32Api.LockWorkStation">
+  LockWorkStation()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Locks the workstation's display. Locking a workstation protects it from unauthorized use.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool LockWorkStation()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Because the function executes asynchronously, true indicates that the operation has been initiated. If false, call GetLastError</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_MapWindowPoints_" data-uid="Dapplo.Windows.User32.User32Api.MapWindowPoints*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_MapWindowPoints_System_IntPtr_System_IntPtr_Dapplo_Windows_Common_Structs_NativePoint__" data-uid="Dapplo.Windows.User32.User32Api.MapWindowPoints(System.IntPtr,System.IntPtr,Dapplo.Windows.Common.Structs.NativePoint@)">
+  MapWindowPoints(nint, nint, ref NativePoint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L1318"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The MapWindowPoints function converts (maps) a point from a coordinate space relative to one window to a coordinate space relative to another window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int MapWindowPoints(nint hWndFrom, nint hWndTo, ref NativePoint point)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWndFrom</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr window handle for the from window, IntPtr.Zero for screen coordinates</p>
+</dd>
+    <dt><code>hWndTo</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr window handle for the to window, IntPtr.Zero for screen coordinates</p>
+</dd>
+    <dt><code>point</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint to convert, in device units</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>See <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_MapWindowPoints_System_IntPtr_System_IntPtr_Dapplo_Windows_Common_Structs_NativePoint___">MapWindowPoints(nint, nint, NativePoint[])</a></p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_MapWindowPoints_" data-uid="Dapplo.Windows.User32.User32Api.MapWindowPoints*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_MapWindowPoints_System_IntPtr_System_IntPtr_Dapplo_Windows_Common_Structs_NativePoint___" data-uid="Dapplo.Windows.User32.User32Api.MapWindowPoints(System.IntPtr,System.IntPtr,Dapplo.Windows.Common.Structs.NativePoint[])">
+  MapWindowPoints(nint, nint, NativePoint[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L1344"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The MapWindowPoints function converts (maps) a set of points from a coordinate space relative to one window to a coordinate space relative to another window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int MapWindowPoints(nint hWndFrom, nint hWndTo, NativePoint[] points)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWndFrom</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr window handle for the from window, IntPtr.Zero for screen coordinates</p>
+</dd>
+    <dt><code>hWndTo</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr window handle for the to window, IntPtr.Zero for screen coordinates</p>
+</dd>
+    <dt><code>points</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a>[]</dt>
+    <dd><p>NativePoint array with the points to convert, in device units, these are converted in place</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>If the function succeeds, the low-order word of the return value is the number of pixels added to the horizontal coordinate of each source point in order to compute the horizontal coordinate of each destination point. (In addition to that, if precisely one of hWndFrom and hWndTo is mirrored, then each resulting horizontal coordinate is multiplied by -1.) The high-order word is the number of pixels added to the vertical coordinate of each source point in order to compute the vertical coordinate of each destination point.
+If the function fails, the return value is zero. Call SetLastError prior to calling this method to differentiate an error return value from a legitimate &quot;0&quot; return value.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_MapWindowPoints_" data-uid="Dapplo.Windows.User32.User32Api.MapWindowPoints*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_MapWindowPoints_System_IntPtr_System_IntPtr_Dapplo_Windows_Common_Structs_NativeRect__" data-uid="Dapplo.Windows.User32.User32Api.MapWindowPoints(System.IntPtr,System.IntPtr,Dapplo.Windows.Common.Structs.NativeRect@)">
+  MapWindowPoints(nint, nint, ref NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L1331"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The MapWindowPoints function converts (maps) a rectangle from a coordinate space relative to one window to a coordinate space relative to another window.
+If exactly one of the windows is mirrored, the left and right coordinates are swapped so the result is a normalized rectangle.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int MapWindowPoints(nint hWndFrom, nint hWndTo, ref NativeRect rect)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWndFrom</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr window handle for the from window, IntPtr.Zero for screen coordinates</p>
+</dd>
+    <dt><code>hWndTo</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr window handle for the to window, IntPtr.Zero for screen coordinates</p>
+</dd>
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect to convert, in device units</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>See <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_MapWindowPoints_System_IntPtr_System_IntPtr_Dapplo_Windows_Common_Structs_NativePoint___">MapWindowPoints(nint, nint, NativePoint[])</a></p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_MonitorFromRect_" data-uid="Dapplo.Windows.User32.User32Api.MonitorFromRect*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_MonitorFromRect_Dapplo_Windows_Common_Structs_NativeRect__Dapplo_Windows_User32_Enums_MonitorFrom_" data-uid="Dapplo.Windows.User32.User32Api.MonitorFromRect(Dapplo.Windows.Common.Structs.NativeRect@,Dapplo.Windows.User32.Enums.MonitorFrom)">
+  MonitorFromRect(ref NativeRect, MonitorFrom)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>The MonitorFromRect function retrieves a handle to the display monitor that has the largest area of intersection
+with a specified rectangle.
+see
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145063(v=vs.85).aspx">MonitorFromRect function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint MonitorFromRect(ref NativeRect rect, MonitorFrom monitorFrom)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>A RECT structure that specifies the rectangle of interest in virtual-screen coordinates.</p>
+</dd>
+    <dt><code>monitorFrom</code> <a class="xref" href="Dapplo.Windows.User32.Enums.MonitorFrom.html">MonitorFrom</a></dt>
+    <dd><p>MonitorFromRectFlags</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>HMONITOR handle</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_MonitorFromWindow_" data-uid="Dapplo.Windows.User32.User32Api.MonitorFromWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_MonitorFromWindow_System_IntPtr_Dapplo_Windows_User32_Enums_MonitorFrom_" data-uid="Dapplo.Windows.User32.User32Api.MonitorFromWindow(System.IntPtr,Dapplo.Windows.User32.Enums.MonitorFrom)">
+  MonitorFromWindow(nint, MonitorFrom)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145064(v=vs.85).aspx">
+MonitorFromWindow
+function
+</a>
+The MonitorFromWindow function retrieves a handle to the display monitor that has the largest area of intersection
+with the bounding rectangle of a specified window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint MonitorFromWindow(nint hWnd, MonitorFrom monitorFrom)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+    <dt><code>monitorFrom</code> <a class="xref" href="Dapplo.Windows.User32.Enums.MonitorFrom.html">MonitorFrom</a></dt>
+    <dd><p>MonitorFromFlags</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr for the monitor</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_PostMessage_" data-uid="Dapplo.Windows.User32.User32Api.PostMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_PostMessage_System_IntPtr_Dapplo_Windows_Messages_Enums_WindowsMessages_System_IntPtr_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.PostMessage(System.IntPtr,Dapplo.Windows.Messages.Enums.WindowsMessages,System.IntPtr,System.IntPtr)">
+  PostMessage(nint, WindowsMessages, nint, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Places (posts) a message in the message queue of the thread that created the window and returns without waiting for it to be processed.
+See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-postmessagew">PostMessageW</a>.
+Don't post messages with pointers to memory (e.g. WM_SETTEXT), the memory might be gone before the message is processed; use SendMessage for those.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool PostMessage(nint hWnd, WindowsMessages windowsMessage, nint wParam, nint lParam)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, the window whose window procedure receives the message. <a class="xref" href="Dapplo.Windows.User32.WindowHandles.html#Dapplo_Windows_User32_WindowHandles_HWND_BROADCAST">HWND_BROADCAST</a> posts it to all top-level windows,
+IntPtr.Zero posts a thread message to the calling thread (like <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_PostThreadMessage_System_Int32_System_UInt32_System_IntPtr_System_IntPtr_">PostThreadMessage(int, uint, nint, nint)</a> with the current thread).</p>
+</dd>
+    <dt><code>windowsMessage</code> <a class="xref" href="Dapplo.Windows.Messages.Enums.WindowsMessages.html">WindowsMessages</a></dt>
+    <dd><p>WindowsMessages</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, pointer-sized message-specific information</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, pointer-sized message-specific information</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the message was posted, false if not: use <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.marshal.getlastwin32error">GetLastWin32Error()</a> for the reason, e.g. ERROR_NOT_ENOUGH_QUOTA when the queue is full or ERROR_ACCESS_DENIED when UIPI blocks it</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_PostMessage_" data-uid="Dapplo.Windows.User32.User32Api.PostMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_PostMessage_System_IntPtr_System_UInt32_System_IntPtr_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.PostMessage(System.IntPtr,System.UInt32,System.IntPtr,System.IntPtr)">
+  PostMessage(nint, uint, nint, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Places (posts) a message, e.g. one registered with RegisterWindowMessage, in the message queue of the thread that created the window and returns without waiting for it to be processed.
+See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-postmessagew">PostMessageW</a>.
+Don't post messages with pointers to memory, the memory might be gone before the message is processed; use SendMessage for those.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool PostMessage(nint hWnd, uint message, nint wParam, nint lParam)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, the window whose window procedure receives the message. <a class="xref" href="Dapplo.Windows.User32.WindowHandles.html#Dapplo_Windows_User32_WindowHandles_HWND_BROADCAST">HWND_BROADCAST</a> posts it to all top-level windows,
+IntPtr.Zero posts a thread message to the calling thread.</p>
+</dd>
+    <dt><code>message</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with the message id</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, pointer-sized message-specific information</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, pointer-sized message-specific information</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the message was posted, false if not: use <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.marshal.getlastwin32error">GetLastWin32Error()</a> for the reason</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_PostThreadMessage_" data-uid="Dapplo.Windows.User32.User32Api.PostThreadMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_PostThreadMessage_System_Int32_Dapplo_Windows_Messages_Enums_WindowsMessages_System_IntPtr_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.PostThreadMessage(System.Int32,Dapplo.Windows.Messages.Enums.WindowsMessages,System.IntPtr,System.IntPtr)">
+  PostThreadMessage(int, WindowsMessages, nint, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Posts a message to the message queue of the specified thread, it returns without waiting for the thread to process the message.
+The message has no window (hWnd is IntPtr.Zero), so it is not dispatched to a window procedure: the message loop of that thread must handle it, e.g. WM_QUIT to end it.
+See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-postthreadmessagew">PostThreadMessageW</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool PostThreadMessage(int threadId, WindowsMessages windowsMessage, nint wParam, nint lParam)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>threadId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the id of the thread, as returned by <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_GetWindowThreadProcessId_System_IntPtr_System_IntPtr_">GetWindowThreadProcessId(nint, nint)</a> or GetCurrentThreadId (not the managed thread id)</p>
+</dd>
+    <dt><code>windowsMessage</code> <a class="xref" href="Dapplo.Windows.Messages.Enums.WindowsMessages.html">WindowsMessages</a></dt>
+    <dd><p>WindowsMessages</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, pointer-sized message-specific information</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, pointer-sized message-specific information</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the message was posted, false if not: use <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.marshal.getlastwin32error">GetLastWin32Error()</a> for the reason, e.g. ERROR_INVALID_THREAD_ID when the thread has no message queue (yet)</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_PostThreadMessage_" data-uid="Dapplo.Windows.User32.User32Api.PostThreadMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_PostThreadMessage_System_Int32_System_UInt32_System_IntPtr_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.PostThreadMessage(System.Int32,System.UInt32,System.IntPtr,System.IntPtr)">
+  PostThreadMessage(int, uint, nint, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Posts a message, e.g. one registered with RegisterWindowMessage, to the message queue of the specified thread, it returns without waiting for the thread to process the message.
+See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-postthreadmessagew">PostThreadMessageW</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool PostThreadMessage(int threadId, uint message, nint wParam, nint lParam)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>threadId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the id of the thread, as returned by <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_GetWindowThreadProcessId_System_IntPtr_System_IntPtr_">GetWindowThreadProcessId(nint, nint)</a> or GetCurrentThreadId (not the managed thread id)</p>
+</dd>
+    <dt><code>message</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with the message id</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, pointer-sized message-specific information</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, pointer-sized message-specific information</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the message was posted, false if not: use <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.marshal.getlastwin32error">GetLastWin32Error()</a> for the reason</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_PrintWindow_" data-uid="Dapplo.Windows.User32.User32Api.PrintWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_PrintWindow_System_IntPtr_System_IntPtr_Dapplo_Windows_User32_Enums_PrintWindowFlags_" data-uid="Dapplo.Windows.User32.User32Api.PrintWindow(System.IntPtr,System.IntPtr,Dapplo.Windows.User32.Enums.PrintWindowFlags)">
+  PrintWindow(nint, nint, PrintWindowFlags)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd162869(v=vs.85).aspx">PrintWindow function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool PrintWindow(nint hWnd, nint hDc, PrintWindowFlags printWindowFlags)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>hDc</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>printWindowFlags</code> <a class="xref" href="Dapplo.Windows.User32.Enums.PrintWindowFlags.html">PrintWindowFlags</a></dt>
+    <dd><p>PrintWindowFlags</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_ReleaseCapture_" data-uid="Dapplo.Windows.User32.User32Api.ReleaseCapture*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_ReleaseCapture" data-uid="Dapplo.Windows.User32.User32Api.ReleaseCapture">
+  ReleaseCapture()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Releases the mouse capture from a window in the current thread and restores normal mouse input processing. A window that has captured the mouse receives all mouse input, regardless of the position of the cursor, except when a mouse button is clicked while the cursor hot spot is in the window of another thread.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646261(v=vs.85).aspx">ReleaseCapture function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool ReleaseCapture()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool if it worked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_ReleaseDC_" data-uid="Dapplo.Windows.User32.User32Api.ReleaseDC*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_ReleaseDC_System_IntPtr_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.ReleaseDC(System.IntPtr,System.IntPtr)">
+  ReleaseDC(nint, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>The ReleaseDC function releases a device context (DC), freeing it for use by other applications. The effect of the ReleaseDC function depends on the type of DC. It frees only common and window DCs. It has no effect on class or private DCs.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool ReleaseDC(nint hWnd, nint hDc)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr A handle to the window whose DC is to be released.</p>
+</dd>
+    <dt><code>hDc</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr A handle to the DC to be released.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>The return value indicates whether the DC was released.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SendMessage_" data-uid="Dapplo.Windows.User32.User32Api.SendMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SendMessage_System_IntPtr_Dapplo_Windows_Messages_Enums_WindowsMessages_Dapplo_Windows_User32_Enums_ScrollBarCommands_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.SendMessage(System.IntPtr,Dapplo.Windows.Messages.Enums.WindowsMessages,Dapplo.Windows.User32.Enums.ScrollBarCommands,System.IntPtr)">
+  SendMessage(nint, WindowsMessages, ScrollBarCommands, nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L853"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Used for the WM_VSCROLL and WM_HSCROLL windows messages</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static nint SendMessage(nint hWnd, WindowsMessages windowsMessage, ScrollBarCommands scrollBarCommand, nint lParam)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>windowsMessage</code> <a class="xref" href="Dapplo.Windows.Messages.Enums.WindowsMessages.html">WindowsMessages</a></dt>
+    <dd><p>WindowsMessages</p>
+</dd>
+    <dt><code>scrollBarCommand</code> <a class="xref" href="Dapplo.Windows.User32.Enums.ScrollBarCommands.html">ScrollBarCommands</a></dt>
+    <dd><p>ScrollBarCommands</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, IntPtr.Zero for a standard scroll bar or the handle of the scroll bar control</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, 0 if the message was processed</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SendMessage_" data-uid="Dapplo.Windows.User32.User32Api.SendMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SendMessage_System_IntPtr_Dapplo_Windows_Messages_Enums_WindowsMessages_Dapplo_Windows_User32_Enums_SysCommands_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.SendMessage(System.IntPtr,Dapplo.Windows.Messages.Enums.WindowsMessages,Dapplo.Windows.User32.Enums.SysCommands,System.IntPtr)">
+  SendMessage(nint, WindowsMessages, SysCommands, nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L840"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Used for the WM_VSCROLL and WM_HSCROLL windows messages</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static nint SendMessage(nint hWnd, WindowsMessages windowsMessage, SysCommands sysCommand, nint lParam)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>windowsMessage</code> <a class="xref" href="Dapplo.Windows.Messages.Enums.WindowsMessages.html">WindowsMessages</a></dt>
+    <dd><p>WindowsMessages</p>
+</dd>
+    <dt><code>sysCommand</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SysCommands.html">SysCommands</a></dt>
+    <dd><p>SysCommands</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SendMessage_" data-uid="Dapplo.Windows.User32.User32Api.SendMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SendMessage_System_IntPtr_Dapplo_Windows_Messages_Enums_WindowsMessages_System_IntPtr_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.SendMessage(System.IntPtr,Dapplo.Windows.Messages.Enums.WindowsMessages,System.IntPtr,System.IntPtr)">
+  SendMessage(nint, WindowsMessages, nint, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Used for calls where the arguments are IntPtr</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint SendMessage(nint hWnd, WindowsMessages windowsMessage, nint wParam, nint lParam)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>windowsMessage</code> <a class="xref" href="Dapplo.Windows.Messages.Enums.WindowsMessages.html">WindowsMessages</a></dt>
+    <dd><p>WindowsMessages</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SendMessage_" data-uid="Dapplo.Windows.User32.User32Api.SendMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SendMessage_System_IntPtr_Dapplo_Windows_Messages_Enums_WindowsMessages_System_IntPtr_System_String_" data-uid="Dapplo.Windows.User32.User32Api.SendMessage(System.IntPtr,Dapplo.Windows.Messages.Enums.WindowsMessages,System.IntPtr,System.String)">
+  SendMessage(nint, WindowsMessages, nint, string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Used for WM_SETTEXT or another message where a string needs to be send</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint SendMessage(nint hWnd, WindowsMessages windowsMessage, nint wParam, string lParam)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>windowsMessage</code> <a class="xref" href="Dapplo.Windows.Messages.Enums.WindowsMessages.html">WindowsMessages</a></dt>
+    <dd><p>WindowsMessages</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, The return value specifies the result of the message processing; it depends on the message sent.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SendMessageTimeout_" data-uid="Dapplo.Windows.User32.User32Api.SendMessageTimeout*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SendMessageTimeout_System_IntPtr_Dapplo_Windows_Messages_Enums_WindowsMessages_System_IntPtr_System_IntPtr_Dapplo_Windows_User32_Enums_SendMessageTimeoutFlags_System_UInt32_System_IntPtr__" data-uid="Dapplo.Windows.User32.User32Api.SendMessageTimeout(System.IntPtr,Dapplo.Windows.Messages.Enums.WindowsMessages,System.IntPtr,System.IntPtr,Dapplo.Windows.User32.Enums.SendMessageTimeoutFlags,System.UInt32,System.IntPtr@)">
+  SendMessageTimeout(nint, WindowsMessages, nint, nint, SendMessageTimeoutFlags, uint, out nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sends the specified message to one or more windows, depending on the specified fuFlags this can handle issues with hanging message loops.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644952(v=vs.85).aspx">SendMessageTimeout function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SendMessageTimeout(nint hWnd, WindowsMessages msg, nint wParam, nint lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out nint lpdwResult)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>msg</code> <a class="xref" href="Dapplo.Windows.Messages.Enums.WindowsMessages.html">WindowsMessages</a></dt>
+    <dd><p>WindowsMessages</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>fuFlags</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SendMessageTimeoutFlags.html">SendMessageTimeoutFlags</a></dt>
+    <dd><p>SendMessageTimeoutFlags</p>
+</dd>
+    <dt><code>uTimeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint The duration of the time-out period, in milliseconds. If the message is a broadcast message, each window can use the full time-out period. For example, if you specify a five second time-out period and there are three top-level windows that fail to process the message, you could have up to a 15 second delay.</p>
+</dd>
+    <dt><code>lpdwResult</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>UIntPtr The result of the message processing. The value of this parameter depends on the message that is specified.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool false if timeout true if the sendmessage returned</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SendMessageTimeout_" data-uid="Dapplo.Windows.User32.User32Api.SendMessageTimeout*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SendMessageTimeout_System_IntPtr_System_UInt32_System_IntPtr_System_IntPtr_Dapplo_Windows_User32_Enums_SendMessageTimeoutFlags_System_UInt32_System_IntPtr__" data-uid="Dapplo.Windows.User32.User32Api.SendMessageTimeout(System.IntPtr,System.UInt32,System.IntPtr,System.IntPtr,Dapplo.Windows.User32.Enums.SendMessageTimeoutFlags,System.UInt32,System.IntPtr@)">
+  SendMessageTimeout(nint, uint, nint, nint, SendMessageTimeoutFlags, uint, out nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sends the specified message to one or more windows, depending on the specified fuFlags this can handle issues with hanging message loops.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644952(v=vs.85).aspx">SendMessageTimeout function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SendMessageTimeout(nint hWnd, uint msg, nint wParam, nint lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out nint lpdwResult)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>msg</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>fuFlags</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SendMessageTimeoutFlags.html">SendMessageTimeoutFlags</a></dt>
+    <dd><p>SendMessageTimeoutFlags</p>
+</dd>
+    <dt><code>uTimeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint The duration of the time-out period, in milliseconds. If the message is a broadcast message, each window can use the full time-out period. For example, if you specify a five second time-out period and there are three top-level windows that fail to process the message, you could have up to a 15 second delay.</p>
+</dd>
+    <dt><code>lpdwResult</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr The result of the message processing. The value of this parameter depends on the message that is specified.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool false if timeout true if the sendmessage returned</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SendMessageTimeout_" data-uid="Dapplo.Windows.User32.User32Api.SendMessageTimeout*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SendMessageTimeout_System_IntPtr_System_UInt32_System_IntPtr_System_IntPtr_Dapplo_Windows_User32_Enums_SendMessageTimeoutFlags_System_UInt32_System_UIntPtr__" data-uid="Dapplo.Windows.User32.User32Api.SendMessageTimeout(System.IntPtr,System.UInt32,System.IntPtr,System.IntPtr,Dapplo.Windows.User32.Enums.SendMessageTimeoutFlags,System.UInt32,System.UIntPtr@)">
+  SendMessageTimeout(nint, uint, nint, nint, SendMessageTimeoutFlags, uint, out nuint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sends the specified message to one or more windows, depending on the specified fuFlags this can handle issues with hanging message loops.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644952(v=vs.85).aspx">SendMessageTimeout function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SendMessageTimeout(nint hWnd, uint msg, nint wParam, nint lParam, SendMessageTimeoutFlags fuFlags, uint uTimeout, out nuint lpdwResult)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>msg</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>fuFlags</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SendMessageTimeoutFlags.html">SendMessageTimeoutFlags</a></dt>
+    <dd><p>SendMessageTimeoutFlags</p>
+</dd>
+    <dt><code>uTimeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint The duration of the time-out period, in milliseconds. If the message is a broadcast message, each window can use the full time-out period. For example, if you specify a five second time-out period and there are three top-level windows that fail to process the message, you could have up to a 15 second delay.</p>
+</dd>
+    <dt><code>lpdwResult</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uintptr">nuint</a></dt>
+    <dd><p>UIntPtr The result of the message processing. The value of this parameter depends on the message that is specified.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool false if timeout true if the sendmessage returned</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetCapture_" data-uid="Dapplo.Windows.User32.User32Api.SetCapture*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetCapture_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.SetCapture(System.IntPtr)">
+  SetCapture(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the mouse capture to the specified window belonging to the current thread.SetCapture captures mouse input either when the mouse is over the capturing window, or when the mouse button was pressed while the mouse was over the capturing window and the button is still down. Only one window at a time can capture the mouse.
+If the mouse cursor is over a window created by another thread, the system will direct mouse input to the specified window only if a mouse button is down.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646262(v=vs.85).aspx">SetCapture function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint SetCapture(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window in the current thread that is to capture the mouse.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>The return value is a handle to the window that had previously captured the mouse. If there is no such window, the return value is NULL.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_User32_User32Api_SetCapture_System_IntPtr__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Only the foreground window can capture the mouse. When a background window attempts to do so, the window receives messages only for mouse events that occur when the cursor hot spot is within the visible portion of the window. Also, even if the foreground window has captured the mouse, the user can still click another window, bringing it to the foreground.
+When the window no longer requires all mouse input, the thread that created the window should call the ReleaseCapture function to release the mouse.
+This function cannot be used to capture mouse input meant for another process.
+When the mouse is captured, menu hotkeys and other keyboard accelerators do not work.</p>
+</div>
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetExtendedWindowStyle_" data-uid="Dapplo.Windows.User32.User32Api.SetExtendedWindowStyle*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetExtendedWindowStyle_System_IntPtr_Dapplo_Windows_User32_Enums_ExtendedWindowStyleFlags_" data-uid="Dapplo.Windows.User32.User32Api.SetExtendedWindowStyle(System.IntPtr,Dapplo.Windows.User32.Enums.ExtendedWindowStyleFlags)">
+  SetExtendedWindowStyle(nint, ExtendedWindowStyleFlags)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L430"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Set the Extended WindowStyle</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static nint SetExtendedWindowStyle(nint hWnd, ExtendedWindowStyleFlags extendedWindowStyleFlags)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>extendedWindowStyleFlags</code> <a class="xref" href="Dapplo.Windows.User32.Enums.ExtendedWindowStyleFlags.html">ExtendedWindowStyleFlags</a></dt>
+    <dd><p>ExtendedWindowStyleFlags</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the previous value, see <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_SetWindowLongWrapper_System_IntPtr_Dapplo_Windows_User32_Enums_WindowLongIndex_System_IntPtr_">SetWindowLongWrapper(nint, WindowLongIndex, nint)</a> on how to detect a failure</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetFocus_" data-uid="Dapplo.Windows.User32.User32Api.SetFocus*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetFocus_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.SetFocus(System.IntPtr)">
+  SetFocus(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the keyboard focus to the specified window. The window must be attached to the calling thread's message queue.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint SetFocus(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window that will receive the keyboard input. If this parameter is NULL, keystrokes
+are ignored.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr
+If the function succeeds, the return value is the handle to the window that previously had the keyboard focus.
+If the hWnd parameter is invalid or the window is not attached to the calling thread's message queue, the return
+value is NULL.
+To get extended error information, call GetLastError.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetForegroundWindow_" data-uid="Dapplo.Windows.User32.User32Api.SetForegroundWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetForegroundWindow_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.SetForegroundWindow(System.IntPtr)">
+  SetForegroundWindow(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Set the current foreground window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SetForegroundWindow(nint hWnd)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the handle to the window</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetParent_" data-uid="Dapplo.Windows.User32.User32Api.SetParent*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetParent_System_IntPtr_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.SetParent(System.IntPtr,System.IntPtr)">
+  SetParent(nint, nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633541(v=vs.85).aspx">SetParent function</a>
+Changes the parent window of the specified child window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint SetParent(nint hWndChild, nint hWndNewParent)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWndChild</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>hWndNewParent</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>If the function succeeds, the return value is a handle to the previous parent window.
+If the function fails, the return value is NULL. To get extended error information, call GetLastError.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetScrollInfo_" data-uid="Dapplo.Windows.User32.User32Api.SetScrollInfo*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetScrollInfo_System_IntPtr_Dapplo_Windows_User32_Enums_ScrollBarTypes_Dapplo_Windows_User32_Structs_ScrollInfo__System_Boolean_" data-uid="Dapplo.Windows.User32.User32Api.SetScrollInfo(System.IntPtr,Dapplo.Windows.User32.Enums.ScrollBarTypes,Dapplo.Windows.User32.Structs.ScrollInfo@,System.Boolean)">
+  SetScrollInfo(nint, ScrollBarTypes, ref ScrollInfo, bool)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787595(v=vs.85).aspx">SetScrollInfo</a> for
+more information.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int SetScrollInfo(nint hWnd, ScrollBarTypes scrollBar, ref ScrollInfo scrollInfo, bool redraw)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle</p>
+</dd>
+    <dt><code>scrollBar</code> <a class="xref" href="Dapplo.Windows.User32.Enums.ScrollBarTypes.html">ScrollBarTypes</a></dt>
+    <dd><p>ScrollBarTypes</p>
+</dd>
+    <dt><code>scrollInfo</code> <a class="xref" href="Dapplo.Windows.User32.Structs.ScrollInfo.html">ScrollInfo</a></dt>
+    <dd><p>ScrollInfo ref</p>
+</dd>
+    <dt><code>redraw</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool to specify if a redraw should be made</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the current position of the scroll box</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetWindowDisplayAffinity_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowDisplayAffinity*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetWindowDisplayAffinity_System_IntPtr_Dapplo_Windows_User32_Enums_WindowDisplayAffinity_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowDisplayAffinity(System.IntPtr,Dapplo.Windows.User32.Enums.WindowDisplayAffinity)">
+  SetWindowDisplayAffinity(nint, WindowDisplayAffinity)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowdisplayaffinity">&gt;SetWindowDisplayAffinity function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SetWindowDisplayAffinity(nint hWnd, WindowDisplayAffinity windowDisplayAffinity)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>windowDisplayAffinity</code> <a class="xref" href="Dapplo.Windows.User32.Enums.WindowDisplayAffinity.html">WindowDisplayAffinity</a></dt>
+    <dd><p>WindowDisplayAffinity</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if it worked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetWindowLongWrapper_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowLongWrapper*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetWindowLongWrapper_System_IntPtr_Dapplo_Windows_User32_Enums_WindowLongIndex_System_IntPtr_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowLongWrapper(System.IntPtr,Dapplo.Windows.User32.Enums.WindowLongIndex,System.IntPtr)">
+  SetWindowLongWrapper(nint, WindowLongIndex, nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L413"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Wrapper for the SetWindowLong which decides if the system is 64-bit or not and calls the right one.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static nint SetWindowLongWrapper(nint hWnd, WindowLongIndex index, nint replacementValue)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>index</code> <a class="xref" href="Dapplo.Windows.User32.Enums.WindowLongIndex.html">WindowLongIndex</a></dt>
+    <dd><p>WindowLongIndex</p>
+</dd>
+    <dt><code>replacementValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the previous value.
+As 0 is also a valid previous value, a failure is only signalled by 0 together with a non-zero <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.marshal.getlastwin32error">GetLastWin32Error()</a>,
+the last error is cleared before the call so it's reliable.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetWindowPlacement_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowPlacement*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetWindowPlacement_System_IntPtr_Dapplo_Windows_User32_Structs_WindowPlacement__" data-uid="Dapplo.Windows.User32.User32Api.SetWindowPlacement(System.IntPtr,Dapplo.Windows.User32.Structs.WindowPlacement@)">
+  SetWindowPlacement(nint, ref WindowPlacement)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Set the WindowPlacement for the specified window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SetWindowPlacement(nint hWnd, ref WindowPlacement windowPlacement)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>windowPlacement</code> <a class="xref" href="Dapplo.Windows.User32.Structs.WindowPlacement.html">WindowPlacement</a></dt>
+    <dd><p>WindowPlacement</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the call was sucessfull</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetWindowPos_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowPos*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetWindowPos_System_IntPtr_System_IntPtr_System_Int32_System_Int32_System_Int32_System_Int32_Dapplo_Windows_User32_Enums_WindowPos_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowPos(System.IntPtr,System.IntPtr,System.Int32,System.Int32,System.Int32,System.Int32,Dapplo.Windows.User32.Enums.WindowPos)">
+  SetWindowPos(nint, nint, int, int, int, int, WindowPos)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Changes the size, position, and Z order of a child, pop-up, or top-level window. These windows are ordered according to their appearance on the screen. The topmost window receives the highest rank and is the first window in the Z order.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633545(v=vs.85).aspx">SetWindowPos</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, WindowPos uFlags)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, a handle to the window.</p>
+</dd>
+    <dt><code>hWndInsertAfter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, a handle to the window to precede the positioned window in the Z order. This parameter must be a window handle or one of
+<a class="xref" href="Dapplo.Windows.User32.WindowHandles.html#Dapplo_Windows_User32_WindowHandles_HWND_TOP">HWND_TOP</a>, <a class="xref" href="Dapplo.Windows.User32.WindowHandles.html#Dapplo_Windows_User32_WindowHandles_HWND_BOTTOM">HWND_BOTTOM</a>, <a class="xref" href="Dapplo.Windows.User32.WindowHandles.html#Dapplo_Windows_User32_WindowHandles_HWND_TOPMOST">HWND_TOPMOST</a> or <a class="xref" href="Dapplo.Windows.User32.WindowHandles.html#Dapplo_Windows_User32_WindowHandles_HWND_NOTOPMOST">HWND_NOTOPMOST</a>.
+It is ignored when uFlags contains SWP_NOZORDER.</p>
+</dd>
+    <dt><code>x</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>y</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>cx</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>cy</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>uFlags</code> <a class="xref" href="Dapplo.Windows.User32.Enums.WindowPos.html">WindowPos</a></dt>
+    <dd><p>WindowPos</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetWindowStyle_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowStyle*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetWindowStyle_System_IntPtr_Dapplo_Windows_User32_Enums_WindowStyleFlags_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowStyle(System.IntPtr,Dapplo.Windows.User32.Enums.WindowStyleFlags)">
+  SetWindowStyle(nint, WindowStyleFlags)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L442"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Set the WindowStyleFlags</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static nint SetWindowStyle(nint hWnd, WindowStyleFlags windowStyleFlags)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>windowStyleFlags</code> <a class="xref" href="Dapplo.Windows.User32.Enums.WindowStyleFlags.html">WindowStyleFlags</a></dt>
+    <dd><p>WindowStyleFlags</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the previous value, see <a class="xref" href="Dapplo.Windows.User32.User32Api.html#Dapplo_Windows_User32_User32Api_SetWindowLongWrapper_System_IntPtr_Dapplo_Windows_User32_Enums_WindowLongIndex_System_IntPtr_">SetWindowLongWrapper(nint, WindowLongIndex, nint)</a> on how to detect a failure</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SetWindowText_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowText*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SetWindowText_System_IntPtr_System_String_" data-uid="Dapplo.Windows.User32.User32Api.SetWindowText(System.IntPtr,System.String)">
+  SetWindowText(nint, string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><pre><code>Get the caption of the window
+</code></pre>
+<p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633546.aspx">SetWindowText function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int SetWindowText(nint hWnd, string caption)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle</p>
+</dd>
+    <dt><code>caption</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the new caption</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the size of the caption</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_ShowScrollBar_" data-uid="Dapplo.Windows.User32.User32Api.ShowScrollBar*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_ShowScrollBar_System_IntPtr_Dapplo_Windows_User32_Enums_ScrollBarTypes_System_Boolean_" data-uid="Dapplo.Windows.User32.User32Api.ShowScrollBar(System.IntPtr,Dapplo.Windows.User32.Enums.ScrollBarTypes,System.Boolean)">
+  ShowScrollBar(nint, ScrollBarTypes, bool)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb787601(v=vs.85).aspx">ShowScrollBar function</a>
+for more information.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool ShowScrollBar(nint hWnd, ScrollBarTypes scrollBar, bool show)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>scrollBar</code> <a class="xref" href="Dapplo.Windows.User32.Enums.ScrollBarTypes.html">ScrollBarTypes</a></dt>
+    <dd><p>ScrollBarTypes</p>
+</dd>
+    <dt><code>show</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to show, false to hide</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If the function succeeds, the return value is nonzero.
+If the function fails, the return value is zero. To get extended error information, call GetLastError.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_ShowWindow_" data-uid="Dapplo.Windows.User32.User32Api.ShowWindow*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_ShowWindow_System_IntPtr_Dapplo_Windows_User32_Enums_ShowWindowCommands_" data-uid="Dapplo.Windows.User32.User32Api.ShowWindow(System.IntPtr,Dapplo.Windows.User32.Enums.ShowWindowCommands)">
+  ShowWindow(nint, ShowWindowCommands)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx">ShowWindow function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool ShowWindow(nint hWnd, ShowWindowCommands nCmdShow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the window.</p>
+</dd>
+    <dt><code>nCmdShow</code> <a class="xref" href="Dapplo.Windows.User32.Enums.ShowWindowCommands.html">ShowWindowCommands</a></dt>
+    <dd><p>ShowWindowCommands
+Controls how the window is to be shown.
+This parameter is ignored the first time an application calls ShowWindow, if the program that launched the
+application provides a STARTUPINFO structure.
+Otherwise, the first time ShowWindow is called, the value should be the value obtained by the WinMain function in
+its nCmdShow parameter.
+In subsequent calls, this parameter can be one of the following values.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SystemParametersInfo_" data-uid="Dapplo.Windows.User32.User32Api.SystemParametersInfo*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SystemParametersInfo_Dapplo_Windows_User32_Enums_SystemParametersInfoActions_System_UInt32_Dapplo_Windows_User32_Structs_AnimationInfo__Dapplo_Windows_User32_Enums_SystemParametersInfoBehaviors_" data-uid="Dapplo.Windows.User32.User32Api.SystemParametersInfo(Dapplo.Windows.User32.Enums.SystemParametersInfoActions,System.UInt32,Dapplo.Windows.User32.Structs.AnimationInfo@,Dapplo.Windows.User32.Enums.SystemParametersInfoBehaviors)">
+  SystemParametersInfo(SystemParametersInfoActions, uint, ref AnimationInfo, SystemParametersInfoBehaviors)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947(v=vs.85).aspx">
+SystemParametersInfo
+function
+</a>
+For setting AnimationInfo</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, ref AnimationInfo animationInfo, SystemParametersInfoBehaviors fWinIni)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>uiAction</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SystemParametersInfoActions.html">SystemParametersInfoActions</a></dt>
+    <dd><p>SystemParametersInfoActions</p>
+</dd>
+    <dt><code>uiParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>A parameter whose usage and format depends on the system parameter being queried or set. For more
+information about system-wide parameters, see the uiAction parameter. If not otherwise indicated, you must specify
+zero for this parameter.</p>
+</dd>
+    <dt><code>animationInfo</code> <a class="xref" href="Dapplo.Windows.User32.Structs.AnimationInfo.html">AnimationInfo</a></dt>
+    <dd><p>AnimationInfo</p>
+</dd>
+    <dt><code>fWinIni</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SystemParametersInfoBehaviors.html">SystemParametersInfoBehaviors</a></dt>
+    <dd><p>SystemParametersInfoBehaviors</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SystemParametersInfo_" data-uid="Dapplo.Windows.User32.User32Api.SystemParametersInfo*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SystemParametersInfo_Dapplo_Windows_User32_Enums_SystemParametersInfoActions_System_UInt32_System_String_Dapplo_Windows_User32_Enums_SystemParametersInfoBehaviors_" data-uid="Dapplo.Windows.User32.User32Api.SystemParametersInfo(Dapplo.Windows.User32.Enums.SystemParametersInfoActions,System.UInt32,System.String,Dapplo.Windows.User32.Enums.SystemParametersInfoBehaviors)">
+  SystemParametersInfo(SystemParametersInfoActions, uint, string, SystemParametersInfoBehaviors)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947(v=vs.85).aspx">
+SystemParametersInfo
+function
+</a>
+For setting a string parameter</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, string pvParam, SystemParametersInfoBehaviors fWinIni)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>uiAction</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SystemParametersInfoActions.html">SystemParametersInfoActions</a></dt>
+    <dd><p>SystemParametersInfoActions</p>
+</dd>
+    <dt><code>uiParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>A parameter whose usage and format depends on the system parameter being queried or set. For more
+information about system-wide parameters, see the uiAction parameter. If not otherwise indicated, you must specify
+zero for this parameter.</p>
+</dd>
+    <dt><code>pvParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string</p>
+</dd>
+    <dt><code>fWinIni</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SystemParametersInfoBehaviors.html">SystemParametersInfoBehaviors</a></dt>
+    <dd><p>SystemParametersInfoBehaviors</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_SystemParametersInfo_" data-uid="Dapplo.Windows.User32.User32Api.SystemParametersInfo*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_SystemParametersInfo_Dapplo_Windows_User32_Enums_SystemParametersInfoActions_System_UInt32_System_Text_StringBuilder_Dapplo_Windows_User32_Enums_SystemParametersInfoBehaviors_" data-uid="Dapplo.Windows.User32.User32Api.SystemParametersInfo(Dapplo.Windows.User32.Enums.SystemParametersInfoActions,System.UInt32,System.Text.StringBuilder,Dapplo.Windows.User32.Enums.SystemParametersInfoBehaviors)">
+  SystemParametersInfo(SystemParametersInfoActions, uint, StringBuilder, SystemParametersInfoBehaviors)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947(v=vs.85).aspx">
+SystemParametersInfo
+function
+</a>
+For reading a string parameter</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, StringBuilder pvParam, SystemParametersInfoBehaviors fWinIni)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>uiAction</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SystemParametersInfoActions.html">SystemParametersInfoActions</a></dt>
+    <dd><p>SystemParametersInfoActions</p>
+</dd>
+    <dt><code>uiParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>A parameter whose usage and format depends on the system parameter being queried or set. For more
+information about system-wide parameters, see the uiAction parameter. If not otherwise indicated, you must specify
+zero for this parameter.</p>
+</dd>
+    <dt><code>pvParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.stringbuilder">StringBuilder</a></dt>
+    <dd><p>string</p>
+</dd>
+    <dt><code>fWinIni</code> <a class="xref" href="Dapplo.Windows.User32.Enums.SystemParametersInfoBehaviors.html">SystemParametersInfoBehaviors</a></dt>
+    <dd><p>SystemParametersInfoBehaviors</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_TrySendMessage_" data-uid="Dapplo.Windows.User32.User32Api.TrySendMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_TrySendMessage_System_IntPtr_Dapplo_Windows_Messages_Enums_WindowsMessages_System_IntPtr_System_IntPtr_System_IntPtr__System_UInt32_" data-uid="Dapplo.Windows.User32.User32Api.TrySendMessage(System.IntPtr,Dapplo.Windows.Messages.Enums.WindowsMessages,System.IntPtr,System.IntPtr,System.IntPtr@,System.UInt32)">
+  TrySendMessage(nint, WindowsMessages, nint, nint, out nint, uint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L458"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Try to send a WindowsMessage, this will return if the target didn't respond in the specified timeout (300ms by default)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TrySendMessage(nint hWnd, WindowsMessages message, nint wParam, nint lParam, out nint result, uint timeout = 300)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr window handle</p>
+</dd>
+    <dt><code>message</code> <a class="xref" href="Dapplo.Windows.Messages.Enums.WindowsMessages.html">WindowsMessages</a></dt>
+    <dd><p>WindowsMessages</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>result</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>out IntPtr</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with optional number of milliseconds, default is 300</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the SendMessage worked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_TrySendMessage_" data-uid="Dapplo.Windows.User32.User32Api.TrySendMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_TrySendMessage_System_IntPtr_System_UInt32_System_IntPtr_System_IntPtr_System_IntPtr__System_UInt32_" data-uid="Dapplo.Windows.User32.User32Api.TrySendMessage(System.IntPtr,System.UInt32,System.IntPtr,System.IntPtr,System.IntPtr@,System.UInt32)">
+  TrySendMessage(nint, uint, nint, nint, out nint, uint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L478"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Try to send a WindowsMessage, this will return if the target didn't respond in the specified timeout (300ms by default)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TrySendMessage(nint hWnd, uint message, nint wParam, nint lParam, out nint result, uint timeout = 300)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr window handle</p>
+</dd>
+    <dt><code>message</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>result</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>out IntPtr</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with optional number of milliseconds, default is 300</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the SendMessage worked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_User32_User32Api_TrySendMessage_" data-uid="Dapplo.Windows.User32.User32Api.TrySendMessage*"></a>
+
+  <h3 id="Dapplo_Windows_User32_User32Api_TrySendMessage_System_IntPtr_System_UInt32_System_IntPtr_System_IntPtr_System_UIntPtr__System_UInt32_" data-uid="Dapplo.Windows.User32.User32Api.TrySendMessage(System.IntPtr,System.UInt32,System.IntPtr,System.IntPtr,System.UIntPtr@,System.UInt32)">
+  TrySendMessage(nint, uint, nint, nint, out nuint, uint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L498"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Try to send a WindowsMessage, this will return if the target didn't respond in the specified timeout (300ms by default)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TrySendMessage(nint hWnd, uint message, nint wParam, nint lParam, out nuint result, uint timeout = 300)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr window handle</p>
+</dd>
+    <dt><code>message</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint</p>
+</dd>
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>result</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uintptr">nuint</a></dt>
+    <dd><p>out UIntPtr</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with optional number of milliseconds, default is 300</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the SendMessage worked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.User32/User32Api.cs/#L23" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class RawInputApi | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class RawInputApi | Dapplo.Windows ">
+      
+      <meta name="description" content="Functionality to use the RawInput API">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Input_RawInputApi.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Input.RawInputApi%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Input.RawInputApi">
+
+
+
+  <h1 id="Dapplo_Windows_Input_RawInputApi" data-uid="Dapplo.Windows.Input.RawInputApi" class="text-break">
+Class RawInputApi  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L18"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Input.html">Input</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Input.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Functionality to use the RawInput API</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class RawInputApi</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">RawInputApi</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Input_RawInputApi_CreateRawInputDevice_" data-uid="Dapplo.Windows.Input.RawInputApi.CreateRawInputDevice*"></a>
+
+  <h3 id="Dapplo_Windows_Input_RawInputApi_CreateRawInputDevice_System_IntPtr_Dapplo_Windows_Input_Enums_HidUsagesConsumer_Dapplo_Windows_Input_Enums_RawInputDeviceFlags_" data-uid="Dapplo.Windows.Input.RawInputApi.CreateRawInputDevice(System.IntPtr,Dapplo.Windows.Input.Enums.HidUsagesConsumer,Dapplo.Windows.Input.Enums.RawInputDeviceFlags)">
+  CreateRawInputDevice(nint, HidUsagesConsumer, RawInputDeviceFlags)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L79"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create RawInputDevice, to use with RegisterRawInput</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static RawInputDevice CreateRawInputDevice(nint hWnd, HidUsagesConsumer usage, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle which handles the messages</p>
+</dd>
+    <dt><code>usage</code> <a class="xref" href="Dapplo.Windows.Input.Enums.HidUsagesConsumer.html">HidUsagesConsumer</a></dt>
+    <dd><p>Consumer Usage for the raw input device.</p>
+</dd>
+    <dt><code>flags</code> <a class="xref" href="Dapplo.Windows.Input.Enums.RawInputDeviceFlags.html">RawInputDeviceFlags</a></dt>
+    <dd><p>RawInputDeviceFlags</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Structs.RawInputDevice.html">RawInputDevice</a></dt>
+    <dd><p>RawInputDevice filled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_RawInputApi_CreateRawInputDevice_" data-uid="Dapplo.Windows.Input.RawInputApi.CreateRawInputDevice*"></a>
+
+  <h3 id="Dapplo_Windows_Input_RawInputApi_CreateRawInputDevice_System_IntPtr_Dapplo_Windows_Input_Enums_HidUsagesGeneric_Dapplo_Windows_Input_Enums_RawInputDeviceFlags_" data-uid="Dapplo.Windows.Input.RawInputApi.CreateRawInputDevice(System.IntPtr,Dapplo.Windows.Input.Enums.HidUsagesGeneric,Dapplo.Windows.Input.Enums.RawInputDeviceFlags)">
+  CreateRawInputDevice(nint, HidUsagesGeneric, RawInputDeviceFlags)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L61"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create RawInputDevice, to use with RegisterRawInput</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static RawInputDevice CreateRawInputDevice(nint hWnd, HidUsagesGeneric usage, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle which handles the messages</p>
+</dd>
+    <dt><code>usage</code> <a class="xref" href="Dapplo.Windows.Input.Enums.HidUsagesGeneric.html">HidUsagesGeneric</a></dt>
+    <dd><p>Generic Usage for the raw input device.</p>
+</dd>
+    <dt><code>flags</code> <a class="xref" href="Dapplo.Windows.Input.Enums.RawInputDeviceFlags.html">RawInputDeviceFlags</a></dt>
+    <dd><p>RawInputDeviceFlags</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Structs.RawInputDevice.html">RawInputDevice</a></dt>
+    <dd><p>RawInputDevice filled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_RawInputApi_CreateRawInputDevice_" data-uid="Dapplo.Windows.Input.RawInputApi.CreateRawInputDevice*"></a>
+
+  <h3 id="Dapplo_Windows_Input_RawInputApi_CreateRawInputDevice_System_IntPtr_Dapplo_Windows_Input_Enums_RawInputDevices_Dapplo_Windows_Input_Enums_RawInputDeviceFlags_" data-uid="Dapplo.Windows.Input.RawInputApi.CreateRawInputDevice(System.IntPtr,Dapplo.Windows.Input.Enums.RawInputDevices,Dapplo.Windows.Input.Enums.RawInputDeviceFlags)">
+  CreateRawInputDevice(nint, RawInputDevices, RawInputDeviceFlags)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create RawInputDevice</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static RawInputDevice CreateRawInputDevice(nint hWnd, RawInputDevices device, RawInputDeviceFlags flags = RawInputDeviceFlags.InputSink)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the window handle which handles the messages</p>
+</dd>
+    <dt><code>device</code> <a class="xref" href="Dapplo.Windows.Input.Enums.RawInputDevices.html">RawInputDevices</a></dt>
+    <dd><p>RawInputDevices</p>
+</dd>
+    <dt><code>flags</code> <a class="xref" href="Dapplo.Windows.Input.Enums.RawInputDeviceFlags.html">RawInputDeviceFlags</a></dt>
+    <dd><p>RawInputDeviceFlags</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Structs.RawInputDevice.html">RawInputDevice</a></dt>
+    <dd><p>RawInputDevice filled</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_RawInputApi_GetAllDevices_" data-uid="Dapplo.Windows.Input.RawInputApi.GetAllDevices*"></a>
+
+  <h3 id="Dapplo_Windows_Input_RawInputApi_GetAllDevices" data-uid="Dapplo.Windows.Input.RawInputApi.GetAllDevices">
+  GetAllDevices()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L342"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A convenient function for getting all raw input devices.
+This method will get all devices, including virtual devices-
+For remote desktop and any other device driver that's registered as such a device.
+Devices which are removed while they are queried are skipped.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IEnumerable&lt;RawInputDeviceInformation&gt; GetAllDevices()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Dapplo.Windows.Input.RawInputDeviceInformation.html">RawInputDeviceInformation</a>&gt;</dt>
+    <dd><p>IEnumerable with RawInputDeviceInformation</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_RawInputApi_GetDeviceInformation_" data-uid="Dapplo.Windows.Input.RawInputApi.GetDeviceInformation*"></a>
+
+  <h3 id="Dapplo_Windows_Input_RawInputApi_GetDeviceInformation_System_IntPtr_" data-uid="Dapplo.Windows.Input.RawInputApi.GetDeviceInformation(System.IntPtr)">
+  GetDeviceInformation(nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L257"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieve RawInputDeviceInformation on the by the handle specified RawInput device
+This is used when calling GetAllDevices, but can also be called when getting a WM_INPUT_DEVICE_CHANGE message</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static RawInputDeviceInformation GetDeviceInformation(nint handle)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>handle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr handle to the raw input device</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.RawInputDeviceInformation.html">RawInputDeviceInformation</a></dt>
+    <dd><p>RawInputDeviceInformation</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_RawInputApi_GetRegisteredDevices_" data-uid="Dapplo.Windows.Input.RawInputApi.GetRegisteredDevices*"></a>
+
+  <h3 id="Dapplo_Windows_Input_RawInputApi_GetRegisteredDevices" data-uid="Dapplo.Windows.Input.RawInputApi.GetRegisteredDevices">
+  GetRegisteredDevices()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L113"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the raw input devices which are registered for the current process, see <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getregisteredrawinputdevices">GetRegisteredRawInputDevices</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static RawInputDevice[] GetRegisteredDevices()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Input.Structs.RawInputDevice.html">RawInputDevice</a>[]</dt>
+    <dd><p>RawInputDevice array</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.win32exception">Win32Exception</a></dt>
+    <dd><p>Win32Exception when the call failed</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Input_RawInputApi_RegisterRawInput_" data-uid="Dapplo.Windows.Input.RawInputApi.RegisterRawInput*"></a>
+
+  <h3 id="Dapplo_Windows_Input_RawInputApi_RegisterRawInput_Dapplo_Windows_Input_Structs_RawInputDevice___" data-uid="Dapplo.Windows.Input.RawInputApi.RegisterRawInput(Dapplo.Windows.Input.Structs.RawInputDevice[])">
+  RegisterRawInput(params RawInputDevice[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Register to handle RawInput events
+Note:
+To receive WM_INPUT messages, an application must first register the raw input devices using RegisterRawInputDevices. By default, an application does not receive raw input.
+To receive WM_INPUT_DEVICE_CHANGE messages, an application must specify the RIDEV_DEVNOTIFY flag for each device class that is specified by the usUsagePage and usUsage fields of the RAWINPUTDEVICE structure . By default, an application does not receive WM_INPUT_DEVICE_CHANGE notifications for raw input device arrival and removal.
+If a RAWINPUTDEVICE structure has the RIDEV_REMOVE flag set and the hWndTarget parameter is not set to NULL, then parameter validation will fail.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void RegisterRawInput(params RawInputDevice[] rawInputDevices)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rawInputDevices</code> <a class="xref" href="Dapplo.Windows.Input.Structs.RawInputDevice.html">RawInputDevice</a>[]</dt>
+    <dd><p>RawInputDevice(s) specifying what to register</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.win32exception">Win32Exception</a></dt>
+    <dd><p>Win32Exception when the registration failed</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Input_RawInputApi_RegisterRawInput_" data-uid="Dapplo.Windows.Input.RawInputApi.RegisterRawInput*"></a>
+
+  <h3 id="Dapplo_Windows_Input_RawInputApi_RegisterRawInput_System_IntPtr_Dapplo_Windows_Input_Enums_RawInputDeviceFlags_Dapplo_Windows_Input_Enums_RawInputDevices___" data-uid="Dapplo.Windows.Input.RawInputApi.RegisterRawInput(System.IntPtr,Dapplo.Windows.Input.Enums.RawInputDeviceFlags,Dapplo.Windows.Input.Enums.RawInputDevices[])">
+  RegisterRawInput(nint, RawInputDeviceFlags, params RawInputDevices[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L28"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Register the specified window to receive raw input, coming from the specified device</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void RegisterRawInput(nint hWnd, RawInputDeviceFlags flags, params RawInputDevices[] devices)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr for the window to receive the events</p>
+</dd>
+    <dt><code>flags</code> <a class="xref" href="Dapplo.Windows.Input.Enums.RawInputDeviceFlags.html">RawInputDeviceFlags</a></dt>
+    <dd><p>RawInputDeviceFlags</p>
+</dd>
+    <dt><code>devices</code> <a class="xref" href="Dapplo.Windows.Input.Enums.RawInputDevices.html">RawInputDevices</a>[]</dt>
+    <dd><p>one or more RawInputDevices</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_RawInputApi_TryGetRawInputData_" data-uid="Dapplo.Windows.Input.RawInputApi.TryGetRawInputData*"></a>
+
+  <h3 id="Dapplo_Windows_Input_RawInputApi_TryGetRawInputData_System_IntPtr_Dapplo_Windows_Input_Structs_RawInput__System_Byte____" data-uid="Dapplo.Windows.Input.RawInputApi.TryGetRawInputData(System.IntPtr,Dapplo.Windows.Input.Structs.RawInput@,System.Byte[]@)">
+  TryGetRawInputData(nint, out RawInput, out byte[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L154"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Read the raw input of a WM_INPUT message, including the variable length data of a HID device.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryGetRawInputData(nint hRawInput, out RawInput rawInput, out byte[] hidData)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hRawInput</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr, the lParam of the WM_INPUT message</p>
+</dd>
+    <dt><code>rawInput</code> <a class="xref" href="Dapplo.Windows.Input.Structs.RawInput.html">RawInput</a></dt>
+    <dd><p>RawInput with the header and the mouse, keyboard or fixed HID information</p>
+</dd>
+    <dt><code>hidData</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd><p>byte array with the HID input reports, null for a mouse or keyboard</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the raw input could be read</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Input_RawInputApi_TryParseRawInput_" data-uid="Dapplo.Windows.Input.RawInputApi.TryParseRawInput*"></a>
+
+  <h3 id="Dapplo_Windows_Input_RawInputApi_TryParseRawInput_System_Byte___Dapplo_Windows_Input_Structs_RawInput__System_Byte____" data-uid="Dapplo.Windows.Input.RawInputApi.TryParseRawInput(System.Byte[],Dapplo.Windows.Input.Structs.RawInput@,System.Byte[]@)">
+  TryParseRawInput(byte[], out RawInput, out byte[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L188"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Parse the RAWINPUT data, as returned by GetRawInputData with RID_INPUT, including the variable length data of a HID device.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryParseRawInput(byte[] data, out RawInput rawInput, out byte[] hidData)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>data</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd><p>byte array with the RAWINPUT, as the current process (32 or 64 bit) gets it</p>
+</dd>
+    <dt><code>rawInput</code> <a class="xref" href="Dapplo.Windows.Input.Structs.RawInput.html">RawInput</a></dt>
+    <dd><p>RawInput with the header and the mouse, keyboard or fixed HID information</p>
+</dd>
+    <dt><code>hidData</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd><p>byte array with the HID input reports (Count * SizeHid bytes), null for a mouse or keyboard</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the data could be parsed</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/RawInputApi.cs/#L18" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

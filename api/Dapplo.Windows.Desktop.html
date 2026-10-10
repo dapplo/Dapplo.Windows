@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Namespace Dapplo.Windows.Desktop | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Namespace Dapplo.Windows.Desktop | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Desktop">
+
+  <h1 id="Dapplo_Windows_Desktop" data-uid="Dapplo.Windows.Desktop" class="text-break">Namespace Dapplo.Windows.Desktop</h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+
+    <h3 id="classes">
+Classes
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.EnvironmentChangedEventArgs.html">EnvironmentChangedEventArgs</a></dt>
+      <dd><p>Event arguments for the WM_SETTINGCHANGE message</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.EnvironmentMonitor.html">EnvironmentMonitor</a></dt>
+      <dd><p>A monitor for environment changes</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.InteropWindow.html">InteropWindow</a></dt>
+      <dd><p>Information about a native window
+Note: This is a dumb container, and doesn't retrieve anything about the window itself</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html">InteropWindowExtensions</a></dt>
+      <dd><p>Extensions for the interopWindow, all get or set commands update the value in the InteropWindow that is used.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.InteropWindowFactory.html">InteropWindowFactory</a></dt>
+      <dd><p>Factory for InteropWindows</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html">InteropWindowQuery</a></dt>
+      <dd><p>Query for native windows</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.WinEventHook.html">WinEventHook</a></dt>
+      <dd><p>The WinEventHook can register handlers to become important windows events
+This makes it possible to know a.o. when a window is created, moved, updated and closed.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.WindowScroller.html">WindowScroller</a></dt>
+      <dd><p>Scrolls a window with a Win32 scroll bar, see <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetWindowScroller_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_User32_Enums_ScrollBarTypes_System_Boolean_">GetWindowScroller(IInteropWindow, ScrollBarTypes, bool)</a>.
+For windows which draw their own scroll bars (browsers, WPF, WinUI, Office) use the UI Automation based scroller of the
+Dapplo.Windows.Automation package, both implement <a class="xref" href="Dapplo.Windows.Desktop.IScroller.html">IScroller</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.WindowsEnumerator.html">WindowsEnumerator</a></dt>
+      <dd><p>A managed EnumWindows / EnumChildWindows wrapper, offering both as IObservable as an IEnumerable.
+Without a parent EnumWindows enumerates the top-level windows, in Z-order from top to bottom.
+With a parent EnumChildWindows enumerates all the descendants of the parent (children, their children etc.), depth-first in Z-order:
+a child is followed by its own descendants before its next sibling. Use <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_GetTopWindows_Dapplo_Windows_Desktop_IInteropWindow_">GetTopWindows(IInteropWindow)</a> for the direct children only.
+Windows builds the list of handles when the enumeration starts, so the enumeration is a consistent snapshot: it can't loop or skip windows when the Z-order changes,
+windows created during the enumeration are not included and windows destroyed during the enumeration may still be reported.</p>
+</dd>
+    </dl>
+    <h3 id="interfaces">
+Interfaces
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+      <dd><p>This is the interface of all classes which represent a native window</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Desktop.IScroller.html">IScroller</a></dt>
+      <dd><p>Scrolls a window or an area inside a window step by step, e.g. for a scrolling capture.
+Implemented by <a class="xref" href="Dapplo.Windows.Desktop.WindowScroller.html">WindowScroller</a> (Win32 scroll bars, see <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetWindowScroller_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_User32_Enums_ScrollBarTypes_System_Boolean_">GetWindowScroller(IInteropWindow, ScrollBarTypes, bool)</a>)
+and by the UI Automation based scroller of the Dapplo.Windows.Automation package, so a caller can try one and fall back
+to the other with the same code.</p>
+</dd>
+    </dl>
+
+
+</article>
+
+        <div class="contribution d-print-none">
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

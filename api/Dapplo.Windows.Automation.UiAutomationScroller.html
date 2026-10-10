@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class UiAutomationScroller | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class UiAutomationScroller | Dapplo.Windows ">
+      
+      <meta name="description" content="Scrolls an element which supports the UI Automation ScrollPattern. This works for nearly every application which draws its own scroll bars, where  returns null: Chromium / Electron, Firefox, WPF, WinUI, Office and the Explorer file list. Controls which have no ScrollPattern but expose their scroll bar as a UI Automation element (e.g. the Visual Studio editor) are scrolled with the mouse wheel, see . Create it with  or ; it has the same shape as , both implement .">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Automation_UiAutomationScroller.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Automation.UiAutomationScroller%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Automation.UiAutomationScroller">
+
+
+
+  <h1 id="Dapplo_Windows_Automation_UiAutomationScroller" data-uid="Dapplo.Windows.Automation.UiAutomationScroller" class="text-break">
+Class UiAutomationScroller  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Automation.html">Automation</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Automation.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Scrolls an element which supports the UI Automation <code>ScrollPattern</code>. This works for nearly every application which draws
+its own scroll bars, where <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_GetWindowScroller_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_User32_Enums_ScrollBarTypes_System_Boolean_">GetWindowScroller(IInteropWindow, ScrollBarTypes, bool)</a> returns null: Chromium / Electron, Firefox,
+WPF, WinUI, Office and the Explorer file list.
+Controls which have no <code>ScrollPattern</code> but expose their scroll bar as a UI Automation element (e.g. the Visual Studio
+editor) are scrolled with the mouse wheel, see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsScrollBarFallback">IsScrollBarFallback</a>.
+Create it with <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FromPoint_Dapplo_Windows_Common_Structs_NativePoint_System_Boolean_">FromPoint(NativePoint, bool)</a> or <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FromWindow_System_IntPtr_System_Boolean_">FromWindow(nint, bool)</a>; it has the same shape as
+<a class="xref" href="Dapplo.Windows.Desktop.WindowScroller.html">WindowScroller</a>, both implement <a class="xref" href="Dapplo.Windows.Desktop.IScroller.html">IScroller</a>.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class UiAutomationScroller : IScroller, IDisposable</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">UiAutomationScroller</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="Dapplo.Windows.Desktop.IScroller.html">IScroller</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="Dapplo_Windows_Automation_UiAutomationScroller_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>
+Threading: use it from a background thread (MTA, e.g. the thread pool); calls block while the target application answers.
+Never use it on the UI thread which owns the target window (e.g. your own window), UI Automation would wait for that thread.
+An STA thread is not needed.
+</p>
+<p>
+Every property and method calls into the target process, so they always reflect the current state; a step needs about four
+calls (position, view size, set, and one or more to see the new position). When the element is gone (the page navigated, the window closed), <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAvailable">IsAvailable</a> becomes false,
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAtEnd">IsAtEnd</a> and <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAtStart">IsAtStart</a> return true so loops end, and the methods return false;
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Refresh">Refresh()</a> finds the element again at the original location.
+</p>
+<p>
+Chromium based applications (Chrome, Edge, Electron) build their accessibility tree when the first UI Automation client asks,
+so the very first <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FromPoint_Dapplo_Windows_Common_Structs_NativePoint_System_Boolean_">FromPoint(NativePoint, bool)</a> can return null: try again after a short delay.
+</p>
+<p>
+Dispose it to release the COM objects right away instead of waiting for the garbage collector.
+</p>
+</div>
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_DefaultFindTimeout" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.DefaultFindTimeout">
+  DefaultFindTimeout
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L159"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The default for the timeout of <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__">FindScrollableAreas(nint, bool, TimeSpan?)</a>: 2 seconds</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly TimeSpan DefaultFindTimeout</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_Horizontal_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Horizontal*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_Horizontal" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Horizontal">
+  Horizontal
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L581"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True when this scrolls horizontally, false for vertical scrolling</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Horizontal { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_InitialScrollPercent_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.InitialScrollPercent*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_InitialScrollPercent" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.InitialScrollPercent">
+  InitialScrollPercent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L634"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The scroll percentage when this scroller was created (or refreshed), used by <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Reset">Reset()</a>; -1 when it was unknown</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double InitialScrollPercent { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_IsAtEnd_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.IsAtEnd*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_IsAtEnd" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.IsAtEnd">
+  IsAtEnd
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L727"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True when the content is at the end (100 percent, within <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_PercentTolerance">PercentTolerance</a>), when it can't scroll, or when the element is not available.
+Without a known position see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsPositionKnown">IsPositionKnown</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsAtEnd { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_IsAtStart_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.IsAtStart*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_IsAtStart" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.IsAtStart">
+  IsAtStart
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L721"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True when the content is at the start (0 percent, within <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_PercentTolerance">PercentTolerance</a>), when it can't scroll, or when the element is not available.
+Without a known position see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsPositionKnown">IsPositionKnown</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsAtStart { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_IsAvailable_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.IsAvailable*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_IsAvailable" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.IsAvailable">
+  IsAvailable
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L629"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>False when the element is not available anymore (e.g. the page navigated or the window closed), see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Refresh">Refresh()</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsAvailable { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_IsPositionKnown_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.IsPositionKnown*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_IsPositionKnown" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.IsPositionKnown">
+  IsPositionKnown
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L624"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True when the scroll position can be read (always for a <code>ScrollPattern</code> element while it is available). False for a
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsScrollBarFallback">IsScrollBarFallback</a> scroller whose scroll bar reports neither a RangeValue nor a thumb: then
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_ScrollPercent">ScrollPercent</a> is -1, <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAtStart">IsAtStart</a> / <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAtEnd">IsAtEnd</a> are true only when the scroll bar's line
+button in that direction is disabled and the other one is enabled (both disabled says nothing, e.g. WPF disables both while
+the mouse isn't over the scroll bar), or when the element is gone, <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Next">Next()</a> / <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Previous">Previous()</a> move one mouse
+wheel notch and return true without knowing whether the content moved, and <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Start">Start()</a>, <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_End">End()</a> and
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Reset">Reset()</a> return false. The caller has to detect the end itself, e.g. when the captured content stops changing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsPositionKnown { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_IsScrollBarFallback_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.IsScrollBarFallback*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_IsScrollBarFallback" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.IsScrollBarFallback">
+  IsScrollBarFallback
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L613"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True when the element has no <code>ScrollPattern</code> but a child scroll bar element: it is scrolled with the mouse wheel
+(<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_ScrollMode">ScrollMode</a> is <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScrollModes.html#Dapplo_Windows_Automation_UiAutomationScrollModes_MouseWheel">MouseWheel</a>), the cursor moves to <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_WheelLocation">WheelLocation</a>
+(or the middle of <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_ViewportBounds">ViewportBounds</a>), so the area must be visible on the screen.
+The position is read from the scroll bar: its RangeValue pattern (Value, Minimum, Maximum, LargeChange), else the position of
+its thumb between its line buttons, see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsPositionKnown">IsPositionKnown</a>. A thumb tells the position to a pixel: on long content
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAtStart">IsAtStart</a> / <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAtEnd">IsAtEnd</a> can be true while up to a thumb pixel's worth of content is left (compare the
+captured frames when that matters), and when one wheel notch moves the content less than a thumb pixel a step can't see it
+move and returns false; <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Start">Start()</a>, <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_End">End()</a> and <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Reset">Reset()</a> to the start or end wheel a
+little further to make up for it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsScrollBarFallback { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_MaxIncrementsPerStep_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.MaxIncrementsPerStep*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_MaxIncrementsPerStep" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.MaxIncrementsPerStep">
+  MaxIncrementsPerStep
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L666"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The maximum number of SmallIncrement scroll calls (when SetScrollPercent is not supported) or mouse wheel notches for one step.
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Start">Start()</a>, <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_End">End()</a> and <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Reset">Reset()</a> are not limited by it: they continue as long as the position
+moves, limited by the remaining percentage (twice what it needs at the speed of the first movement). Default is 100.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int MaxIncrementsPerStep { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_PercentTolerance_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.PercentTolerance*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_PercentTolerance" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.PercentTolerance">
+  PercentTolerance
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L641"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The tolerance in percentage points for <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAtStart">IsAtStart</a> and <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAtEnd">IsAtEnd</a>, for applications which don't report
+exactly 0 or 100 because of rounding. Default is 0.01: the percentage is relative to the whole scrollable range, so on a page
+of 50 screens even 0.5 would already be a quarter of a screen.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double PercentTolerance { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_RestoreCursorAfterWheel_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.RestoreCursorAfterWheel*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_RestoreCursorAfterWheel" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.RestoreCursorAfterWheel">
+  RestoreCursorAfterWheel
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L678"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>In <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScrollModes.html#Dapplo_Windows_Automation_UiAutomationScrollModes_MouseWheel">MouseWheel</a> the cursor moves to the wheel location. When this is true the cursor is moved
+back to where it was after every wheel movement. Default is false.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool RestoreCursorAfterWheel { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_ScrollMode_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.ScrollMode*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_ScrollMode" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.ScrollMode">
+  ScrollMode
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L589"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>How <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Next">Next()</a>, <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Previous">Previous()</a>, <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Start">Start()</a> and <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_End">End()</a> scroll, default is
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScrollModes.html#Dapplo_Windows_Automation_UiAutomationScrollModes_ScrollPattern">ScrollPattern</a>; always <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScrollModes.html#Dapplo_Windows_Automation_UiAutomationScrollModes_MouseWheel">MouseWheel</a> when
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsScrollBarFallback">IsScrollBarFallback</a> is true.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public UiAutomationScrollModes ScrollMode { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Automation.UiAutomationScrollModes.html">UiAutomationScrollModes</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>ScrollPattern was set while <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsScrollBarFallback">IsScrollBarFallback</a> is true</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_ScrollPercent_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.ScrollPercent*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_ScrollPercent" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.ScrollPercent">
+  ScrollPercent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L709"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The current scroll position in percent (0 to 100) in the scroll direction, -1 when it can't scroll or the element is not available</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double ScrollPercent { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_StepFraction_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.StepFraction*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_StepFraction" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.StepFraction">
+  StepFraction
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L648"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The part of a page that <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Next">Next()</a> and <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Previous">Previous()</a> scroll, greater than 0 and at most 1.
+The default 1.0 scrolls a full page; a scrolling capture uses e.g. 0.5 so consecutive frames overlap.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double StepFraction { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>The value is not greater than 0 and at most 1.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_ViewportBounds_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.ViewportBounds*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_ViewportBounds" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.ViewportBounds">
+  ViewportBounds
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L686"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The visible, scrolling area: the bounding rectangle of the element in screen coordinates (physical pixels for a per-monitor
+DPI aware process), e.g. to crop the frames of a scrolling capture. Empty when the element is not available.
+For a <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsScrollBarFallback">IsScrollBarFallback</a> scroller the element's scroll bar (and one of the other orientation) is left out when
+it is at an edge of the element, measured when the scroller was created or refreshed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeRect ViewportBounds { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_VisibleFraction_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.VisibleFraction*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_VisibleFraction" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.VisibleFraction">
+  VisibleFraction
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L715"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The visible part of the content in the scroll direction, between 0 and 1 (VerticalViewSize / 100), 0 when unknown.
+E.g. 0.25 means a page shows a quarter of the content.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double VisibleFraction { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_WheelLocation_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.WheelLocation*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_WheelLocation" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.WheelLocation">
+  WheelLocation
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L672"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Where the mouse wheel input goes in <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScrollModes.html#Dapplo_Windows_Automation_UiAutomationScrollModes_MouseWheel">MouseWheel</a>, in screen coordinates.
+Null (the default) uses the middle of <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_ViewportBounds">ViewportBounds</a>. The cursor moves there, see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_RestoreCursorAfterWheel">RestoreCursorAfterWheel</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativePoint? WheelLocation { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_Dispose_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Dispose*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_Dispose" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L814"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_End_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.End*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_End" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.End">
+  End()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L743"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scroll to the end (100 percent), see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_Start">Start()</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool End()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool, true when the end was reached</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_System_Nullable_System_TimeSpan__" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas(Dapplo.Windows.Desktop.IInteropWindow,System.Boolean,System.Nullable{System.TimeSpan})">
+  FindScrollableAreas(IInteropWindow, bool, TimeSpan?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L548"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>List the scrollable areas of a window, see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__">FindScrollableAreas(nint, bool, TimeSpan?)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;NativeRect&gt; FindScrollableAreas(IInteropWindow window, bool horizontal = false, TimeSpan? timeout = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>window</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+    <dt><code>horizontal</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>false (default) for vertically scrollable areas, true for horizontally scrollable areas</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation timeouts, default <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_DefaultFindTimeout">DefaultFindTimeout</a></p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a>&gt;</dt>
+    <dd><p>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_System_Nullable_System_TimeSpan__System_Boolean_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas(Dapplo.Windows.Desktop.IInteropWindow,System.Boolean,System.Nullable{System.TimeSpan},System.Boolean)">
+  FindScrollableAreas(IInteropWindow, bool, TimeSpan?, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L559"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>List the scrollable areas of a window, see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__System_Boolean_">FindScrollableAreas(nint, bool, TimeSpan?, bool)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;NativeRect&gt; FindScrollableAreas(IInteropWindow window, bool horizontal, TimeSpan? timeout, bool includeScrollBarAreas)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>window</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+    <dt><code>horizontal</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>false for vertically scrollable areas, true for horizontally scrollable areas</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation timeouts, null for <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_DefaultFindTimeout">DefaultFindTimeout</a></p>
+</dd>
+    <dt><code>includeScrollBarAreas</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to include the parents of scroll bar elements, false for the elements with a ScrollPattern only</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a>&gt;</dt>
+    <dd><p>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_System_Nullable_System_TimeSpan__System_Boolean_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas(Dapplo.Windows.Desktop.IInteropWindow,System.Boolean,System.Nullable{System.TimeSpan},System.Boolean,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)">
+  FindScrollableAreas(IInteropWindow, bool, TimeSpan?, bool, TimeSpan?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L574"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>List the scrollable areas of a window and wait for content which isn't there yet, see
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__System_Boolean_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">FindScrollableAreas(nint, bool, TimeSpan?, bool, TimeSpan?, CancellationToken)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;NativeRect&gt; FindScrollableAreas(IInteropWindow window, bool horizontal, TimeSpan? timeout, bool includeScrollBarAreas, TimeSpan? contentWait, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>window</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+    <dt><code>horizontal</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>false for vertically scrollable areas, true for horizontally scrollable areas</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation timeouts, null for <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_DefaultFindTimeout">DefaultFindTimeout</a></p>
+</dd>
+    <dt><code>includeScrollBarAreas</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to include the parents of scroll bar elements, false for the elements with a ScrollPattern only</p>
+</dd>
+    <dt><code>contentWait</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan, how long the search is done again while it finds nothing and the tree looks incomplete,
+null for <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_DefaultContentWait">DefaultContentWait</a>; <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan.zero">Zero</a> searches once</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken, checked during every pause and before every search</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a>&gt;</dt>
+    <dd><p>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas(System.IntPtr,System.Boolean,System.Nullable{System.TimeSpan})">
+  FindScrollableAreas(nint, bool, TimeSpan?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L200"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>List the areas of a window which can scroll in the direction, without hit testing on the screen: the window element itself
+and every descendant which is vertically (or horizontally) scrollable, and the parent of every scroll bar element with that
+orientation (a control which scrolls by itself but has no <code>ScrollPattern</code>, like the Visual Studio editor), as their
+bounding rectangles in screen coordinates (physical pixels for a per-monitor DPI aware process). Works while another window
+(e.g. a full-screen selection window) covers the window, where <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FromPoint_Dapplo_Windows_Common_Structs_NativePoint_System_Boolean_">FromPoint(NativePoint, bool)</a> would find the covering window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;NativeRect&gt; FindScrollableAreas(nint windowHandle, bool horizontal = false, TimeSpan? timeout = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>windowHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the handle of the window</p>
+</dd>
+    <dt><code>horizontal</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>false (default) for vertically scrollable areas, true for horizontally scrollable areas</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation timeouts, default <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_DefaultFindTimeout">DefaultFindTimeout</a></p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a>&gt;</dt>
+    <dd><p>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>
+The result is in tree order, an outer area always before the areas inside it; areas inside each other are all returned (hit
+test with the smallest rectangle containing the point). Offscreen elements and empty rectangles are left out, duplicates (e.g. a
+list and its scroll viewer, or a control and the parent of its own scroll bar, with the same bounds) are returned once. A
+rectangle can extend beyond the window when the element is partly scrolled out of view. The rectangle of a scroll bar's parent
+leaves out the scroll bar when it is at an edge of the parent (and a scroll bar of the other orientation at an edge, e.g. a
+horizontal one at the bottom of a vertically scrolled area), so a capture of the area doesn't show it; else it is the
+parent's rectangle. Elements with a ScrollPattern are returned as they are.
+</p>
+<p>
+This blocks: it is one UI Automation search (FindAll with a cache request for the bounds, the offscreen state and the control
+type, so no extra call per element; one more call per scroll bar for its parent), but UI Automation walks the whole tree of
+the window, which takes a while for Visual Studio, Office or browsers.
+Call it on a background thread, never on the UI thread which owns the window, and cache the result. Where IUIAutomation2 is
+available (Windows 8+) the connection and transaction timeouts of the UI Automation object used for this call are set to
+<code class="paramref">timeout</code>, so a hanging application can't block the caller for the default 20 seconds.
+</p>
+<p>
+This overload searches once. Chromium based browsers and Electron apps build their accessibility tree only when a UI Automation
+client asks for it, so the first search after the browser started or a page loaded can miss the page; the overload with a
+<code>contentWait</code> (<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__System_Boolean_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">FindScrollableAreas(nint, bool, TimeSpan?, bool, TimeSpan?, CancellationToken)</a>) searches again
+while nothing is found and the tree looks incomplete.
+</p>
+<p>
+To scroll an area later, e.g. after the covering window closed, use <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FromPoint_Dapplo_Windows_Common_Structs_NativePoint_System_Boolean_">FromPoint(NativePoint, bool)</a> with the middle of its rectangle.
+</p>
+</div>
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__System_Boolean_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas(System.IntPtr,System.Boolean,System.Nullable{System.TimeSpan},System.Boolean)">
+  FindScrollableAreas(nint, bool, TimeSpan?, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L212"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>List the areas of a window which can scroll in the direction, see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__">FindScrollableAreas(nint, bool, TimeSpan?)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;NativeRect&gt; FindScrollableAreas(nint windowHandle, bool horizontal, TimeSpan? timeout, bool includeScrollBarAreas)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>windowHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the handle of the window</p>
+</dd>
+    <dt><code>horizontal</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>false for vertically scrollable areas, true for horizontally scrollable areas</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation timeouts, null for <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_DefaultFindTimeout">DefaultFindTimeout</a></p>
+</dd>
+    <dt><code>includeScrollBarAreas</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to include the parents of scroll bar elements (areas without a ScrollPattern),
+false for the elements with a ScrollPattern only</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a>&gt;</dt>
+    <dd><p>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__System_Boolean_System_Nullable_System_TimeSpan__System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FindScrollableAreas(System.IntPtr,System.Boolean,System.Nullable{System.TimeSpan},System.Boolean,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)">
+  FindScrollableAreas(nint, bool, TimeSpan?, bool, TimeSpan?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L247"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>List the areas of a window which can scroll in the direction, and wait for content which isn't there yet, see
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__">FindScrollableAreas(nint, bool, TimeSpan?)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;NativeRect&gt; FindScrollableAreas(nint windowHandle, bool horizontal, TimeSpan? timeout, bool includeScrollBarAreas, TimeSpan? contentWait, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>windowHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the handle of the window</p>
+</dd>
+    <dt><code>horizontal</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>false for vertically scrollable areas, true for horizontally scrollable areas</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation timeouts, null for <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_DefaultFindTimeout">DefaultFindTimeout</a></p>
+</dd>
+    <dt><code>includeScrollBarAreas</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to include the parents of scroll bar elements (areas without a ScrollPattern),
+false for the elements with a ScrollPattern only</p>
+</dd>
+    <dt><code>contentWait</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan, how long the search is done again while it finds nothing and the tree looks incomplete,
+null for <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_DefaultContentWait">DefaultContentWait</a>; <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan.zero">Zero</a> searches once</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken, checked during every pause and before every search</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a>&gt;</dt>
+    <dd><p>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Automation_UiAutomationScroller_FindScrollableAreas_System_IntPtr_System_Boolean_System_Nullable_System_TimeSpan__System_Boolean_System_Nullable_System_TimeSpan__System_Threading_CancellationToken__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>
+Some applications (e.g. Chromium based browsers and Electron apps) build their accessibility tree only when a UI Automation client
+asks for it, the first answer then has only the frame of the window, so the page has no scrollable area yet. When the search finds no
+area, a shallow read of the control view (as <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_FindAreasAsync_System_IntPtr_System_Int32_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">FindAreasAsync(nint, int, int, TimeSpan?, TimeSpan?, CancellationToken)</a>
+does) tells if the tree looks incomplete: an element without content (it reports no children which aren't offscreen, only children with
+an empty rectangle, or children with its own rectangle which have no content themselves) covers at least a quarter of the window. Then
+the search is done again, with a short pause (a quarter of a second) between the attempts, until an area is found, the tree is complete
+or <code class="paramref">contentWait</code> has passed; the last result is returned. A window which has nothing to scroll and a complete tree
+never waits, an empty overlay with a sibling of the same bounds which has content doesn't count. A window with an element which really
+is large and empty (and nothing to scroll) waits the whole <code class="paramref">contentWait</code> on every call: cache the result, or pass a
+shorter one (or <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan.zero">Zero</a>) for such windows.
+</p>
+<p>
+All attempts use one UI Automation object. <code class="paramref">cancellationToken</code> is checked during every pause and before every search,
+a single search can't be interrupted.
+</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.operationcanceledexception">OperationCanceledException</a></dt>
+    <dd><p>When <code class="paramref">cancellationToken</code> was canceled</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_FromPoint_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FromPoint*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_FromPoint_Dapplo_Windows_Common_Structs_NativePoint_System_Boolean_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FromPoint(Dapplo.Windows.Common.Structs.NativePoint,System.Boolean)">
+  FromPoint(NativePoint, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L105"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Find the scrollable element under a screen point: the element at the point, or the first of its ancestors with a
+<code>ScrollPattern</code> which can scroll in the requested direction. When there is none, the first of them (the element at the
+point included) with a child scroll bar element in that direction, scrolled with the mouse wheel (<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsScrollBarFallback">IsScrollBarFallback</a>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static UiAutomationScroller FromPoint(NativePoint screenPoint, bool horizontal = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>screenPoint</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint in screen coordinates, e.g. where the user clicked</p>
+</dd>
+    <dt><code>horizontal</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>false (default) for vertical scrolling, true for horizontal scrolling</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html">UiAutomationScroller</a></dt>
+    <dd><p>UiAutomationScroller, or null when nothing at that point can scroll in that direction</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_FromWindow_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FromWindow*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_FromWindow_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FromWindow(Dapplo.Windows.Desktop.IInteropWindow,System.Boolean)">
+  FromWindow(IInteropWindow, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L154"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Find the scrollable element of a window, see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_FromWindow_System_IntPtr_System_Boolean_">FromWindow(nint, bool)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static UiAutomationScroller FromWindow(IInteropWindow window, bool horizontal = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>window</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+    <dt><code>horizontal</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>false (default) for vertical scrolling, true for horizontal scrolling</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html">UiAutomationScroller</a></dt>
+    <dd><p>UiAutomationScroller, or null when the window has nothing which can scroll in that direction</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_FromWindow_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FromWindow*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_FromWindow_System_IntPtr_System_Boolean_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.FromWindow(System.IntPtr,System.Boolean)">
+  FromWindow(nint, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L129"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Find the scrollable element of a window: the window element itself when it can scroll, else the element under the middle of
+the window (walking up to a scrollable ancestor), else the first scrollable descendant of the window. When none of them has
+a <code>ScrollPattern</code>, the same lookups for an element with a child scroll bar element, scrolled with the mouse wheel
+(<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsScrollBarFallback">IsScrollBarFallback</a>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static UiAutomationScroller FromWindow(nint windowHandle, bool horizontal = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>windowHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the handle of the window</p>
+</dd>
+    <dt><code>horizontal</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>false (default) for vertical scrolling, true for horizontal scrolling</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html">UiAutomationScroller</a></dt>
+    <dd><p>UiAutomationScroller, or null when the window has nothing which can scroll in that direction</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_Next_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Next*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_Next" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Next">
+  Next()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L749"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scroll forward (down or right) by <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_StepFraction">StepFraction</a> of a page</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Next()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool if this worked, false at the end, when the element is gone or when the position didn't change</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_Previous_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Previous*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_Previous" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Previous">
+  Previous()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L755"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scroll back (up or left) by <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_StepFraction">StepFraction</a> of a page</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Previous()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool if this worked, false at the start, when the element is gone or when the position didn't change</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_Refresh_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Refresh*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_Refresh" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Refresh">
+  Refresh()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L785"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Find the element again at the original point (or in the original window), e.g. after <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAvailable">IsAvailable</a> became false
+because the page navigated. <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_InitialScrollPercent">InitialScrollPercent</a> and <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsScrollBarFallback">IsScrollBarFallback</a> are taken from the new element.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Refresh()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true when a scrollable element was found</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_Reset_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Reset*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_Reset" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Reset">
+  Reset()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L761"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scroll back to <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_InitialScrollPercent">InitialScrollPercent</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Reset()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool if this worked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_Start_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Start*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_Start" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.Start">
+  Start()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L737"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Scroll to the start (0 percent). Uses SetScrollPercent, or a scroll bar's writable RangeValue (checking that the position read
+back got there, and with one wheel notch towards the start that the content followed: some controls, like the Visual Studio
+editor, only follow the Scroll events of their scroll bar), else large increments or, in <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScrollModes.html#Dapplo_Windows_Automation_UiAutomationScrollModes_MouseWheel">MouseWheel</a>, wheel input of several pages
+at a time (independent of <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_StepFraction">StepFraction</a>) until the start is reached or the position stops moving. Without a known
+position (<a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsPositionKnown">IsPositionKnown</a> false) this only returns true when <a class="xref" href="Dapplo.Windows.Automation.UiAutomationScroller.html#Dapplo_Windows_Automation_UiAutomationScroller_IsAtStart">IsAtStart</a> already is.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Start()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool, true when the start was reached</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationScroller_ToString_" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.ToString*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationScroller_ToString" data-uid="Dapplo.Windows.Automation.UiAutomationScroller.ToString">
+  ToString()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L1916"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns a string that represents the current object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A string that represents the current object.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationScroller.cs/#L44" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

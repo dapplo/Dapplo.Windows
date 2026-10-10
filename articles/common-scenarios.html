@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Common scenarios | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Common scenarios | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/common-scenarios.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="common-scenarios">Common scenarios</h1>
+
+<p>Recipes which combine several packages. They are short on purpose: add error handling and disposal as your
+application needs it.</p>
+<p>Namespaces used on this page: <code>Dapplo.Windows.Clipboard</code>, <code>Dapplo.Windows.Desktop</code>, <code>Dapplo.Windows.Enums</code>,
+<code>Dapplo.Windows.Input.Enums</code>, <code>Dapplo.Windows.Input.Keyboard</code>, <code>Dapplo.Windows.Messages</code>,
+<code>Dapplo.Windows.Messages.Enums</code>, <code>Dapplo.Windows.User32</code>, <code>Dapplo.Windows.User32.Enums</code>,
+<code>Dapplo.Windows.Common.Extensions</code>, <code>System.Reactive.Linq</code>, <code>System.Reactive.Concurrency</code>.</p>
+<h2 id="screenshot-of-the-active-window-with-a-hotkey">Screenshot of the active window with a hotkey</h2>
+<p>Alt+PrintScreen, but as PNG with transparency on the clipboard. The work is moved off the hook thread with <code>ObserveOn</code>.</p>
+<!-- sample: CommonScenariosSamples.ScreenshotHotkey -->
+<pre><code class="lang-csharp">// Alt+PrintScreen replacement: capture the active window as PNG onto the clipboard
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(new KeyCombinationHandler(VirtualKeyCode.Menu, VirtualKeyCode.PrintScreen))
+    // Leave the hook thread before doing the work
+    .ObserveOn(TaskPoolScheduler.Default)
+    .Subscribe(_ =&gt;
+    {
+        var window = InteropWindowQuery.GetForegroundWindow();
+        using var bitmap = window.PrintWindow();
+        if (bitmap == null)
+        {
+            return;
+        }
+        using var png = new MemoryStream();
+        bitmap.Save(png, ImageFormat.Png);
+        png.Position = 0;
+
+        using var clipboard = ClipboardNative.Access();
+        clipboard.ClearContents();
+        clipboard.SetAsStream(&quot;PNG&quot;, png);
+    });
+</code></pre>
+<h2 id="time-tracking-which-application-is-active">Time tracking: which application is active</h2>
+<!-- sample: CommonScenariosSamples.ActiveWindowTracking -->
+<pre><code class="lang-csharp">// How long is each application in the foreground?
+var usage = new Dictionary&lt;string, TimeSpan&gt;();
+string currentProcess = null;
+var since = DateTimeOffset.Now;
+
+var subscription = WinEventHook.Create(WinEvents.EVENT_SYSTEM_FOREGROUND)
+    // Don't query the process on the SharedMessageWindow thread
+    .ObserveOn(TaskPoolScheduler.Default)
+    .Subscribe(info =&gt;
+    {
+        var now = DateTimeOffset.Now;
+        if (currentProcess != null)
+        {
+            usage[currentProcess] = (usage.TryGetValue(currentProcess, out var total) ? total : TimeSpan.Zero) + (now - since);
+        }
+        using var process = Process.GetProcessById(InteropWindowFactory.CreateFor(info.Handle).GetProcessId());
+        currentProcess = process.ProcessName;
+        since = now;
+    });
+</code></pre>
+<h2 id="notice-when-an-application-starts">Notice when an application starts</h2>
+<!-- sample: CommonScenariosSamples.ApplicationStarts -->
+<pre><code class="lang-csharp">// Get told when Notepad opens a window
+var subscription = WinEventHook.WindowCreateDestroyObservable()
+    .Where(info =&gt; info.WinEvent == WinEvents.EVENT_OBJECT_CREATE)
+    .Select(info =&gt; InteropWindowFactory.CreateFor(info.Handle))
+    .Where(window =&gt; window.IsVisibleApplicationWindow() &amp;&amp; window.GetClassname() == &quot;Notepad&quot;)
+    .Subscribe(window =&gt; Console.WriteLine($&quot;Notepad opened a window: {window.Handle}&quot;));
+</code></pre>
+<p>For the lock screen and logon / logoff see <code>WindowsSessionListener</code> in
+<a href="window-messages.html#session-changes-lock-unlock-logon-logoff">Window messages</a>.</p>
+<h2 id="clipboard-history">Clipboard history</h2>
+<p>A simple history of copied text. It skips content which asked to be excluded from monitoring (passwords).</p>
+<!-- sample: CommonScenariosSamples.ClipboardHistory -->
+<pre><code class="lang-csharp">var history = new List&lt;string&gt;();
+var subscription = ClipboardNative.OnUpdate
+    // Skip the current content, only log changes
+    .Skip(1)
+    .Where(info =&gt; info.FormatIds.Contains((uint)StandardClipboardFormats.UnicodeText))
+    // Respect passwords and other excluded content
+    .Where(info =&gt; !info.Formats.Contains(ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat))
+    .ObserveOn(TaskPoolScheduler.Default)
+    .Subscribe(info =&gt;
+    {
+        using var clipboard = ClipboardNative.Access();
+        if (clipboard.CanAccess)
+        {
+            history.Add(clipboard.GetAsUnicodeString());
+        }
+    });
+</code></pre>
+<h2 id="save-copied-images">Save copied images</h2>
+<!-- sample: CommonScenariosSamples.SaveClipboardImages -->
+<pre><code class="lang-csharp">var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+var subscription = ClipboardNative.OnUpdate
+    .Skip(1)
+    .Where(info =&gt; info.Formats.Contains(&quot;PNG&quot;))
+    .ObserveOn(TaskPoolScheduler.Default)
+    .Subscribe(info =&gt;
+    {
+        using var clipboard = ClipboardNative.Access();
+        if (clipboard.CanAccess &amp;&amp; clipboard.TryGetAsStream(&quot;PNG&quot;, out var png))
+        {
+            using (png)
+            using (var file = File.Create(Path.Combine(folder, $&quot;clipboard-{info.Timestamp:yyyyMMdd-HHmmss}.png&quot;)))
+            {
+                png.CopyTo(file);
+            }
+        }
+    });
+</code></pre>
+<h2 id="insert-text-with-a-hotkey">Insert text with a hotkey</h2>
+<p><code>KeyboardInputGenerator.TypeText</code> types the text as Unicode characters, independent of the keyboard layout.
+<code>TriggerMode.AllKeysUp</code> fires when the user released the hotkey, so the text isn't combined with Ctrl and Alt, and it
+passes the keys on, so none gets stuck.</p>
+<!-- sample: CommonScenariosSamples.InsertTimestamp -->
+<pre><code class="lang-csharp">// Ctrl+Alt+D types the current date into the active application.
+// AllKeysUp fires when the user released all keys of the combination, so the text isn't combined with Ctrl or Alt,
+// and the keys are passed on, so no key gets stuck.
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.KeyD) { TriggerMode = TriggerMode.AllKeysUp })
+    .ObserveOn(TaskPoolScheduler.Default)
+    .Subscribe(_ =&gt; KeyboardInputGenerator.TypeText(DateTime.Now.ToString(&quot;yyyy-MM-dd&quot;)));
+</code></pre>
+<p>Some applications ignore typed Unicode characters (games, remote desktop windows). For those, put the text on the
+clipboard and send Ctrl+V; read the old clipboard content first and put it back after the paste.</p>
+<h2 id="tile-windows">Tile windows</h2>
+<!-- sample: CommonScenariosSamples.TileWindows -->
+<pre><code class="lang-csharp">// Place the visible windows of the primary display next to each other
+var primary = DisplayInfo.AllDisplayInfos.First(display =&gt; display.IsPrimary);
+// GetVisibleApplicationWindows skips hidden, cloaked, minimized and untitled windows and tool windows
+var windows = InteropWindowQuery.GetVisibleApplicationWindows()
+    .Where(window =&gt; primary.Bounds.Contains(window.GetInfo().Bounds.Location))
+    .ToList();
+if (windows.Count == 0)
+{
+    return;
+}
+var width = primary.WorkingArea.Width / windows.Count;
+for (var i = 0; i &lt; windows.Count; i++)
+{
+    windows[i].Restore();
+    User32Api.SetWindowPos(windows[i].Handle, IntPtr.Zero,
+        primary.WorkingArea.Left + i * width, primary.WorkingArea.Top, width, primary.WorkingArea.Height,
+        WindowPos.SWP_NOZORDER | WindowPos.SWP_NOACTIVATE);
+}
+</code></pre>
+<h2 id="minimize-all-other-windows">Minimize all other windows</h2>
+<!-- sample: CommonScenariosSamples.MinimizeOthers -->
+<pre><code class="lang-csharp">var active = InteropWindowQuery.GetForegroundWindow();
+foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows().Where(w =&gt; w.Handle != active.Handle))
+{
+    window.Minimize();
+}
+</code></pre>
+<h2 id="single-instance">Single instance</h2>
+<p>A second instance tells the first one to show itself, with a registered message which the SharedMessageWindow of the
+first instance receives.</p>
+<!-- sample: CommonScenariosSamples.SingleInstance -->
+<pre><code class="lang-csharp">// The first instance listens, a second instance broadcasts and exits
+uint showMessage = RegisteredWindowMessages.Register(&quot;MyApp.ShowMainWindow&quot;);
+using var mutex = new Mutex(true, &quot;MyApp.SingleInstance&quot;, out var isFirstInstance);
+if (!isFirstInstance)
+{
+    // HWND_BROADCAST: every top-level window gets it, also the SharedMessageWindow of the first instance
+    User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
+    return;
+}
+var subscription = SharedMessageWindow.Messages
+    .Where(m =&gt; (uint)m.Msg == showMessage)
+    .ObserveOn(SynchronizationContext.Current)
+    .Subscribe(_ =&gt; showMainWindow());
+</code></pre>
+<h2 id="handling-many-events">Handling many events</h2>
+<p>WinEvents, mouse moves and clipboard changes can arrive in bursts. <code>Throttle</code> waits for a quiet moment, <code>Sample</code> takes
+the latest value every interval, <code>Buffer</code> collects them.</p>
+<!-- sample: CommonScenariosSamples.Debounce -->
+<pre><code class="lang-csharp">// Location changes arrive by the hundred while a window is dragged: wait until it is quiet for 250ms
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_LOCATIONCHANGE)
+    .Where(info =&gt; info.ObjectIdentifier == ObjectIdentifiers.Window)
+    .Throttle(TimeSpan.FromMilliseconds(250))
+    .Subscribe(info =&gt; Console.WriteLine(&quot;A window stopped moving&quot;));
+
+// Or collect them and process them in batches
+var batches = ClipboardNative.OnUpdate
+    .Buffer(TimeSpan.FromSeconds(1))
+    .Where(batch =&gt; batch.Count &gt; 0)
+    .Subscribe(batch =&gt; Console.WriteLine($&quot;{batch.Count} clipboard changes in the last second&quot;));
+</code></pre>
+<h2 id="more">More</h2>
+<ul>
+<li>A DPI-aware form: <a href="dpi-awareness.html#dpiawareform">DPI awareness</a></li>
+<li>Update files that are in use: <a href="restart-manager.html#installer-side">Restart Manager</a></li>
+<li>Keep the PC awake, or wake it up: <a href="system-state.html">Power and system state</a></li>
+<li>A global hotkey with <code>RegisterHotKey</code>: <a href="window-messages.html#registrations-listen">Window messages</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/common-scenarios.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

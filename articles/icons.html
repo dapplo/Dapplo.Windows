@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Icons and cursors | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Icons and cursors | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/icons.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="icons-and-cursors">Icons and cursors</h1>
+
+<p><strong>Dapplo.Windows.Icons</strong> extracts icons from files and the shell, writes ICO and CUR files, and captures the mouse
+cursor, for example to draw it into a screenshot. The icon of a window is in the main package, see
+<a href="window-management.html#screenshots-icons-and-scrolling">Window management</a>.</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows.Icons
+</code></pre>
+<p>Namespaces used on this page: <code>Dapplo.Windows.Icons</code>, <code>Dapplo.Windows.Icons.Enums</code>, <code>Dapplo.Windows.Common.Structs</code>,
+<code>Dapplo.Windows.User32</code>.</p>
+<p>The generic methods (<code>&lt;TIcon&gt;</code>) return <code>System.Drawing.Icon</code> or <code>Bitmap</code>; other types throw a
+<code>NotSupportedException</code>. For WPF convert the result with <code>ToBitmapSource()</code> from Dapplo.Windows.Wpf. Returned icons own
+their handle, dispose them.</p>
+<h2 id="extracting-icons">Extracting icons</h2>
+<!-- sample: IconSamples.ExtractIcons -->
+<pre><code class="lang-csharp">// The first icon of an executable or DLL, TIcon is Icon or Bitmap
+using var notepadIcon = IconHelper.ExtractAssociatedIcon&lt;Icon&gt;(@&quot;C:\Windows\notepad.exe&quot;);
+
+// How many icons a file has, and one of them in the small size
+int count = IconHelper.CountAssociatedIcons(@&quot;C:\Windows\System32\shell32.dll&quot;);
+using var smallIcon = IconHelper.ExtractAssociatedIcon&lt;Bitmap&gt;(@&quot;C:\Windows\System32\shell32.dll&quot;, index: 3, useLargeIcon: false);
+
+// The icon Explorer shows for a file type, the file doesn't need to exist
+using var pdfIcon = IconHelper.GetFileExtensionIcon&lt;Bitmap&gt;(&quot;document.pdf&quot;, IconSize.Large, linkOverlay: false);
+
+// The folder icon
+using var folderIcon = IconHelper.GetFolderIcon&lt;Icon&gt;(IconSize.Small, FolderIconType.Closed);
+</code></pre>
+<p><code>IconHelper.GetAppLogo&lt;Bitmap&gt;(exePath)</code> reads the logo of a store (UWP / MSIX) app from its AppxManifest, and
+<code>IconHelper.LoadIconWithScaleDown</code> / <code>LoadIconWithSystemMetrics</code> load icon resources at a size.</p>
+<p>The sizes of the system:</p>
+<!-- sample: IconSamples.SystemIconSizes -->
+<pre><code class="lang-csharp">// The icon sizes of the system, they depend on the DPI of the process
+Size small = new Size(IconHelper.GetSmallIconWidth(), IconHelper.GetSmallIconHeight());
+Size standard = new Size(IconHelper.GetStandardIconWidth(), IconHelper.GetStandardIconHeight());
+</code></pre>
+<h2 id="writing-ico-files">Writing ICO files</h2>
+<p><code>IconFileWriter.WriteIconFile</code> writes one ICO with an image per size. Every image is stored as PNG, which Windows Vista
+and later read; images larger than 256 x 256 are scaled down to fit.</p>
+<!-- sample: IconSamples.WriteIconFile -->
+<pre><code class="lang-csharp">// One image per size. Every image is stored as PNG (Windows Vista and later), larger than 256x256 is scaled down.
+var images = new List&lt;Image&gt;();
+foreach (var size in new[] { 16, 32, 48, 256 })
+{
+    var bitmap = new Bitmap(size, size);
+    using (var graphics = Graphics.FromImage(bitmap))
+    {
+        graphics.Clear(Color.Transparent);
+        graphics.FillEllipse(Brushes.SteelBlue, 0, 0, size - 1, size - 1);
+    }
+    images.Add(bitmap);
+}
+
+IconFileWriter.WriteIconFile(&quot;app.ico&quot;, images);
+
+// Or into a stream
+using (var stream = new MemoryStream())
+{
+    IconFileWriter.WriteIconFile(stream, images);
+}
+
+images.ForEach(image =&gt; image.Dispose());
+</code></pre>
+<h2 id="writing-cur-files">Writing CUR files</h2>
+<p>A cursor also needs the hot spot, the pixel which &quot;clicks&quot;:</p>
+<!-- sample: IconSamples.WriteCursorFile -->
+<pre><code class="lang-csharp">using var cursorImage = new Bitmap(32, 32);
+using (var graphics = Graphics.FromImage(cursorImage))
+{
+    graphics.DrawLine(Pens.Black, 16, 0, 16, 31);
+    graphics.DrawLine(Pens.Black, 0, 16, 31, 16);
+}
+
+// The hot spot is the pixel which &quot;clicks&quot;, here the center of the cross
+IconFileWriter.WriteCursorFile(&quot;cross.cur&quot;, new[] { ((Image)cursorImage, new Point(16, 16)) });
+</code></pre>
+<h2 id="capturing-the-mouse-cursor">Capturing the mouse cursor</h2>
+<p><code>CursorHelper.TryGetCurrentCursor</code> captures the current cursor with its color and mask layers, its <code>Size</code> and its
+<code>HotSpot</code>, also for large pointer sizes and high DPI. <code>DrawCursorOnBitmap</code> / <code>DrawCursorOnGraphics</code> draw it; the
+position is the top-left of the cursor image, so subtract the hot spot to draw it at the mouse position.</p>
+<!-- sample: IconSamples.CaptureCursor -->
+<pre><code class="lang-csharp">// Capture the current mouse cursor (also high DPI and animated system cursors, the current frame)
+if (CursorHelper.TryGetCurrentCursor(out var cursor))
+{
+    using (cursor)
+    {
+        // Draw it into a screenshot: the position is the top-left of the cursor image, so subtract the hot spot
+        var mouse = User32Api.GetCursorLocation();
+        var position = new NativePoint(mouse.X - cursor.HotSpot.X - screenshotLocation.X, mouse.Y - cursor.HotSpot.Y - screenshotLocation.Y);
+        CursorHelper.DrawCursorOnBitmap(screenshot, cursor, position);
+    }
+}
+</code></pre>
+<h2 id="the-file-format">The file format</h2>
+<p>For your own tools the structures of the format are available in <code>Dapplo.Windows.Icons.Structs</code>:</p>
+<ul>
+<li><code>IconDir</code> / <code>IconDirEntry</code>: the ICONDIR header and the ICONDIRENTRY of each image in an .ico or .cur file
+(<code>CreateIcon</code> / <code>CreateCursor</code>, <code>CreateForIcon</code> / <code>CreateForCursor</code>).</li>
+<li><code>GrpIconDir</code> / <code>GrpIconDirEntry</code>: the same for icon resources in executables, where an entry refers to a resource id
+instead of a file offset. <code>IconFileWriter.WriteGrpIconDir</code> / <code>WriteGrpIconDirEntry</code> write them.</li>
+</ul>
+<p>An ICO file is a 6-byte ICONDIR (reserved, type 1 = icon or 2 = cursor, count), a 16-byte ICONDIRENTRY per image
+(width and height where 0 means 256, color count, planes or hot spot X, bit count or hot spot Y, size, offset) and the
+image data (PNG or BMP without the file header).</p>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="https://devblogs.microsoft.com/oldnewthing/20101018-00/?p=12513">The format of icon resources (Raymond Chen)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/ICO_(file_format)">ICO file format (Wikipedia)</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/icons.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

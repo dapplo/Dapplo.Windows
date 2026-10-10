@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Window management | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Window management | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/window-management.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="window-management">Window management</h1>
+
+<p>The <strong>Dapplo.Windows</strong> package wraps a window handle (HWND) in an <code>IInteropWindow</code>, which reads information about the
+window on demand and caches it. Static classes find windows (<code>InteropWindowQuery</code>, <code>WindowsEnumerator</code>) and report
+window events (<code>WinEventHook</code>).</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows
+</code></pre>
+<p>Namespaces used on this page: <code>Dapplo.Windows.Desktop</code>, <code>Dapplo.Windows.Enums</code>, <code>Dapplo.Windows.User32</code>,
+<code>Dapplo.Windows.User32.Enums</code>, <code>Dapplo.Windows.User32.Structs</code>, <code>Dapplo.Windows.Common.Structs</code>, <code>Dapplo.Windows.App</code>,
+<code>Dapplo.Windows.Icons</code>, <code>Dapplo.Windows.Software</code>, <code>Dapplo.Windows.Messages</code>, <code>Dapplo.Windows.Messages.Enums</code>,
+<code>System.Reactive.Linq</code>, <code>Dapplo.Windows.Input.Mouse</code> and, for UI Automation, <code>Dapplo.Windows.Automation</code>.</p>
+<h2 id="window-information">Window information</h2>
+<p><code>InteropWindowFactory.CreateFor(handle)</code> wraps a handle, nothing is read at that moment. The <code>Get...</code> extension methods
+read a value the first time and store it in the window object; later calls return the stored value unless you pass
+<code>forceUpdate: true</code>.</p>
+<!-- sample: WindowSamples.WindowInformation -->
+<pre><code class="lang-csharp">// Wrap a window handle, nothing is read yet
+IInteropWindow window = InteropWindowFactory.CreateFor(User32Api.GetForegroundWindow());
+// Or: IInteropWindow window = InteropWindowQuery.GetForegroundWindow();
+
+// The Get... methods read the value once and cache it in the window object, pass forceUpdate: true to read it again
+Console.WriteLine($&quot;Title: {window.GetCaption()}&quot;);
+Console.WriteLine($&quot;Class: {window.GetClassname()}&quot;);
+Console.WriteLine($&quot;Bounds: {window.GetInfo().Bounds}&quot;);
+Console.WriteLine($&quot;Client bounds: {window.GetInfo().ClientBounds}&quot;);
+Console.WriteLine($&quot;Process: {window.GetProcessId()}&quot;);
+Console.WriteLine($&quot;Visible: {window.IsVisible()}, minimized: {window.IsMinimized()}, maximized: {window.IsMaximized()}&quot;);
+</code></pre>
+<p><code>GetInfo()</code> returns a <code>WindowInfo</code> with <code>Bounds</code>, <code>ClientBounds</code>, <code>Style</code>, <code>ExtendedStyle</code> and more. For top-level
+windows the bounds are corrected with the DWM &quot;extended frame bounds&quot;, so they don't include the invisible resize
+border that Windows 10 and 11 add around windows.</p>
+<h3 id="reading-several-values-at-once">Reading several values at once</h3>
+<p><code>Fill()</code> reads the values you select with <code>InteropWindowRetrieveSettings</code>. It respects the cache, so add <code>ForceUpdate</code>
+when you need fresh values. The cached values are also available as properties (<code>Caption</code>, <code>Info</code>, <code>IsVisible</code>, ...),
+which are <code>null</code> when they were not read yet.</p>
+<!-- sample: WindowSamples.FillSelective -->
+<pre><code class="lang-csharp">// Read several values at once, the default is everything except the children (CacheAllAutoCorrect)
+window.Fill();
+
+// Only what you need
+window.Fill(InteropWindowRetrieveSettings.Caption | InteropWindowRetrieveSettings.Info);
+
+// ForceUpdate reads the values again, even when they were cached
+window.Fill(InteropWindowRetrieveSettings.Info | InteropWindowRetrieveSettings.ForceUpdate);
+
+// The cached values are properties, null when they were not retrieved
+string caption = window.Caption;
+NativeRect? bounds = window.Info?.Bounds;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Reads</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CacheAll</code></td>
+<td>caption, class name, info, maximized, minimized, parent, owner, placement, process id, text, visible, scroll info</td>
+</tr>
+<tr>
+<td><code>CacheAllAutoCorrect</code> (default of <code>Fill</code>)</td>
+<td>the same, with the bounds corrected (DWM frame, clipped to the parent)</td>
+</tr>
+<tr>
+<td><code>CacheAllWithChildren</code></td>
+<td><code>CacheAll</code> plus the direct children, in Z-order</td>
+</tr>
+<tr>
+<td><code>ForceUpdate</code></td>
+<td>combine with the above to read again</td>
+</tr>
+</tbody>
+</table>
+<h2 id="finding-windows">Finding windows</h2>
+<p><code>InteropWindowQuery.GetVisibleApplicationWindows()</code> returns the windows a user sees as application windows, from top to
+bottom (Z-order): top-level windows (no parent, owned windows are included) which are visible (<code>IsWindowVisible</code> and not
+cloaked, so no windows on another virtual desktop and no suspended store apps), not minimized, have a title and a size,
+and are not a tool window, a background store app or one of a few known system windows (the desktop <code>Progman</code>, <code>Button</code>,
+<code>Dwm</code>). Windows which render with DirectComposition (<code>WS_EX_NOREDIRECTIONBITMAP</code>, e.g. Chrome, Edge and other Chromium
+based browsers) are included. Pass <code>includeMinimized: true</code> to include minimized windows too, e.g. for a &quot;capture this
+window&quot; menu which restores the window first. The same test is available as <code>window.IsVisibleApplicationWindow()</code>;
+<code>window.IsVisiblePopup()</code> is the similar test for visible <code>WS_POPUP</code> windows, which also accepts tool windows and
+windows without a title. Change the list of ignored classes with <code>InteropWindowQuery.AddIgnoreClass</code> /
+<code>RemoveIgnoreClass</code>, or pass <code>false</code> to include them.</p>
+<p><code>InteropWindowQuery.GetTopWindows()</code> returns <em>all</em> top-level windows in Z-order (index 0 is the top-most window),
+without any filter. <code>GetTopWindows(parent)</code> returns the direct children of a window, also in Z-order.</p>
+<p>Both are a snapshot: the list is taken at once, with <code>EnumWindows</code> / <code>EnumChildWindows</code>, when you call the method.
+Windows builds the list before it reports the first window, so the result can't loop, skip or repeat windows when
+windows are activated, created or destroyed in the meantime (a <code>GetWindow(GW_HWNDNEXT)</code> walk can). The windows in the
+snapshot can of course still change or disappear afterwards; <code>GetVisibleApplicationWindows()</code> takes the snapshot when it is called
+and applies its filter while you enumerate the result.</p>
+<!-- sample: WindowSamples.ApplicationWindows -->
+<pre><code class="lang-csharp">// The application windows the user sees (visible, with a title, not minimized), from top to bottom
+foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows())
+{
+    Console.WriteLine($&quot;{window.GetCaption()} ({window.GetClassname()})&quot;);
+}
+</code></pre>
+<p>Filter with LINQ, or let <code>WindowsEnumerator</code> filter while it enumerates:</p>
+<!-- sample: WindowSamples.FilterWindows -->
+<pre><code class="lang-csharp">// All visible Notepad windows
+var notepads = InteropWindowQuery.GetVisibleApplicationWindows()
+    .Where(window =&gt; window.GetClassname() == &quot;Notepad&quot;)
+    .ToList();
+
+// All top-level windows of a process
+var ownWindows = InteropWindowQuery.GetWindowsForProcess(Process.GetCurrentProcess().Id);
+
+// Enumerate with a predicate and stop early: the first window with &quot;Dapplo&quot; in the title
+var firstMatch = WindowsEnumerator.EnumerateWindows(
+        wherePredicate: window =&gt; window.GetCaption().Contains(&quot;Dapplo&quot;),
+        takeWhileFunc: (window, count) =&gt; count &lt; 1)
+    .FirstOrDefault();
+</code></pre>
+<!-- sample: WindowSamples.FindByTitle -->
+<pre><code class="lang-csharp">IInteropWindow FindWindowByTitle(string title) =&gt;
+    InteropWindowQuery.GetVisibleApplicationWindows()
+        .FirstOrDefault(window =&gt; window.GetCaption().IndexOf(title, StringComparison.OrdinalIgnoreCase) &gt;= 0);
+
+var calculator = FindWindowByTitle(&quot;Calculator&quot;);
+</code></pre>
+<h3 id="children-parent-and-owner">Children, parent and owner</h3>
+<p>A <em>child</em> window lives inside its <em>parent</em> (a button in a dialog). A top-level window can have an <em>owner</em> (a dialog
+belongs to the main window of the application), but it has no parent. Dapplo.Windows keeps both apart: <code>GetParent()</code>
+never returns the owner, use <code>GetOwner()</code> for that.</p>
+<!-- sample: WindowSamples.ChildWindows -->
+<pre><code class="lang-csharp">// The direct children, from top to bottom (Z-order)
+foreach (var child in window.GetChildren())
+{
+    Console.WriteLine($&quot;Child {child.GetClassname()}&quot;);
+}
+
+// Children, grandchildren, ...
+var descendants = window.GetDescendants();
+</code></pre>
+<!-- sample: WindowSamples.ParentAndOwner -->
+<pre><code class="lang-csharp">// The parent is the window a child window lives in, top-level windows have none (IntPtr.Zero)
+IInteropWindow parent = window.GetParentWindow();
+
+// The owner is the window a dialog or tool window belongs to, e.g. the main window of the application
+IInteropWindow owner = window.GetOwnerWindow();
+
+// All other top-level windows of the same process
+var linked = window.GetLinkedWindows();
+</code></pre>
+<p><code>GetChildren()</code> returns the direct children in Z-order (a snapshot, see above) and stores them in <code>Children</code>; pass
+<code>forceUpdate: true</code> to read them again. <code>GetChildren(allLevels: true)</code> fills the whole tree below the window from one
+enumeration: every descendant gets its <code>Children</code> (empty for a window without children), <code>Parent</code> and <code>ParentWindow</code>, so
+<code>GetInfo()</code> clips to the parents without more lookups. <code>GetDescendants()</code> returns all levels as a flat list, depth-first
+(a child is followed by its own descendants), and doesn't store them.</p>
+<p><code>window.FindChildAt(point)</code> returns the deepest visible child window at a screen point (the window itself when no child
+contains the point, null when the window doesn't): it walks the stored tree (filling it with <code>allLevels</code> when needed) and
+uses the cached <code>GetInfo()</code> values, so it also works on a snapshot of a screen which has changed since, e.g. under a
+full-screen overlay.</p>
+<h2 id="changing-windows">Changing windows</h2>
+<!-- sample: WindowSamples.ShowHide -->
+<pre><code class="lang-csharp">window.Minimize();
+window.Maximize();
+window.Restore();
+
+// Anything else ShowWindow supports
+User32Api.ShowWindow(window.Handle, ShowWindowCommands.Hide);
+User32Api.ShowWindow(window.Handle, ShowWindowCommands.ShowNoActivation);
+</code></pre>
+<!-- sample: WindowSamples.MoveResize -->
+<pre><code class="lang-csharp">// Move, keeping the size
+window.MoveTo(new NativePoint(100, 100));
+
+// Move and resize
+User32Api.SetWindowPos(window.Handle, IntPtr.Zero, 100, 100, 800, 600, WindowPos.SWP_NOZORDER | WindowPos.SWP_NOACTIVATE);
+
+// Placement: the normal (restored) bounds and the show state, e.g. to save and restore a layout
+WindowPlacement placement = window.GetPlacement();
+window.SetPlacement(placement);
+</code></pre>
+<p>After a monitor was removed, windows can end up where nobody sees them. <code>GetVisibleLocation</code> finds a place on one of the
+current displays:</p>
+<!-- sample: WindowSamples.KeepVisible -->
+<pre><code class="lang-csharp">// Move a window, e.g. after a monitor was disconnected, to a place where it can be seen
+if (!window.GetVisibleLocation(out var visibleLocation) || visibleLocation != window.GetInfo().Bounds.Location)
+{
+    window.MoveTo(visibleLocation);
+}
+</code></pre>
+<h3 id="bringing-a-window-to-the-front">Bringing a window to the front</h3>
+<p><code>ToForegroundAsync()</code> restores a minimized window, waits (up to 2 seconds) until it's restored and makes it the
+foreground window. Windows has rules about which process may change the foreground window; when it refuses, the
+taskbar button flashes instead. <code>ToForegroundAsync(cancellationToken)</code> stops waiting for the restore when the token is
+cancelled. Most calls complete without waiting; after a wait the foreground switch continues on a thread-pool thread,
+not on the context of the caller.</p>
+<!-- sample: WindowSamples.ToForeground -->
+<pre><code class="lang-csharp">// Restores a minimized window and makes it the foreground window. Windows may still refuse,
+// e.g. when the user is working in another application: then the taskbar button flashes.
+await window.ToForegroundAsync();
+</code></pre>
+<h3 id="z-order-and-always-on-top">Z-order and always on top</h3>
+<p><code>SetWindowPos</code> changes the Z-order. <code>WindowHandles</code> has the special handles for its <code>hWndInsertAfter</code> argument:
+<code>HWND_TOP</code>, <code>HWND_BOTTOM</code>, <code>HWND_TOPMOST</code> and <code>HWND_NOTOPMOST</code> (and <code>HWND_MESSAGE</code> and <code>HWND_BROADCAST</code> for other APIs).</p>
+<!-- sample: WindowSamples.AlwaysOnTop -->
+<pre><code class="lang-csharp">bool isTopmost = (window.GetInfo(forceUpdate: true).ExtendedStyle &amp; ExtendedWindowStyleFlags.WS_EX_TOPMOST) != 0;
+User32Api.SetWindowPos(window.Handle, isTopmost ? WindowHandles.HWND_NOTOPMOST : WindowHandles.HWND_TOPMOST, 0, 0, 0, 0,
+    WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE | WindowPos.SWP_NOACTIVATE);
+</code></pre>
+<!-- sample: WindowSamples.ZOrder -->
+<pre><code class="lang-csharp">const WindowPos zOrderOnly = WindowPos.SWP_NOMOVE | WindowPos.SWP_NOSIZE | WindowPos.SWP_NOACTIVATE;
+
+// Send a window behind all other windows, or bring it to the top without activating it
+User32Api.SetWindowPos(window.Handle, WindowHandles.HWND_BOTTOM, 0, 0, 0, 0, zOrderOnly);
+User32Api.SetWindowPos(window.Handle, WindowHandles.HWND_TOP, 0, 0, 0, 0, zOrderOnly);
+
+// Place a window directly below another one
+User32Api.SetWindowPos(window.Handle, other.Handle, 0, 0, 0, 0, zOrderOnly);
+
+// A snapshot of the Z-order, index 0 is the top-most window
+var zOrder = InteropWindowQuery.GetTopWindows().Select(w =&gt; w.Handle).ToList();
+bool isAboveOther = zOrder.IndexOf(window.Handle) &lt; zOrder.IndexOf(other.Handle);
+</code></pre>
+<h3 id="posting-messages">Posting messages</h3>
+<p><code>window.PostMessage(...)</code> (or <code>User32Api.PostMessage</code> for a handle) puts a message in the message queue of the window's
+thread and returns immediately, <code>SendMessage</code> waits until the message was processed. It returns <code>false</code> when the
+message couldn't be posted, <code>Marshal.GetLastWin32Error()</code> tells why (e.g. the window is gone, or UIPI blocks messages
+from a process with a lower integrity level). Only post messages with values in <code>wParam</code> / <code>lParam</code>, not with pointers
+to your memory. <code>User32Api.PostThreadMessage</code> posts to a thread (its message loop) instead of a window.</p>
+<!-- sample: WindowSamples.PostMessages -->
+<pre><code class="lang-csharp">// Ask a window to close, without waiting: an application which asks &quot;Save changes?&quot; doesn't block the caller
+if (!window.PostMessage(WindowsMessages.WM_CLOSE))
+{
+    Console.WriteLine($&quot;Posting failed, error {Marshal.GetLastWin32Error()}&quot;);
+}
+
+// Post a registered message to all top-level windows, e.g. to the other instances of your application
+uint showMessage = RegisteredWindowMessages.Register(&quot;MyApp.ShowMainWindow&quot;);
+User32Api.PostMessage(WindowHandles.HWND_BROADCAST, showMessage, IntPtr.Zero, IntPtr.Zero);
+</code></pre>
+<h2 id="window-state">Window state</h2>
+<p>Window handles are reused by Windows after a window is destroyed. Check <code>Exists()</code> before you use a handle you kept
+for a while.</p>
+<!-- sample: WindowSamples.WindowState -->
+<pre><code class="lang-csharp">// Handles are recycled, check that the window still exists before working with it
+if (!window.Exists())
+{
+    return;
+}
+bool isApplicationWindow = window.IsVisibleApplicationWindow();
+bool isOwnWindow = window.IsOwnedByCurrentProcess();
+// A Windows Store (UWP) app window
+bool isApp = window.IsApp();
+</code></pre>
+<h2 id="screenshots-icons-and-scrolling">Screenshots, icons and scrolling</h2>
+<p><code>PrintWindow()</code> asks the window to render itself into a <code>Bitmap</code>, so it also works for windows which are covered by
+other windows. It uses <code>PW_RENDERFULLCONTENT</code> on Windows 8.1 and later, which captures DirectComposition content
+(browsers, UWP apps) as well. Minimized windows can't be captured. For WPF use <code>PrintWindowAsBitmapSource()</code> from
+Dapplo.Windows.Wpf.</p>
+<!-- sample: WindowSamples.Screenshot -->
+<pre><code class="lang-csharp">// Renders the window, also when it's covered by other windows (not when it's minimized).
+// The result is cropped to the visible frame, without the invisible resize borders.
+using Bitmap bitmap = window.PrintWindow();
+bitmap?.Save(&quot;window.png&quot;, ImageFormat.Png);
+</code></pre>
+<!-- sample: WindowSamples.WindowIcon -->
+<pre><code class="lang-csharp">// The icon of a window, as Bitmap or Icon
+using var smallIcon = window.GetIcon&lt;Bitmap&gt;();
+using var largeIcon = window.GetIcon&lt;Icon&gt;(useLargeIcons: true);
+</code></pre>
+<h2 id="scrolling">Scrolling</h2>
+<p><code>GetWindowScroller()</code> returns a <code>WindowScroller</code> for a window with a Win32 scroll bar, for example to capture a long page in
+parts. It returns <code>null</code> when the window can't be scrolled that way.</p>
+<!-- sample: WindowSamples.Scroll -->
+<pre><code class="lang-csharp">// null when the window has no scroll bar
+WindowScroller scroller = window.GetWindowScroller();
+if (scroller == null)
+{
+    return;
+}
+scroller.Start();                 // scroll to the top
+while (!scroller.IsAtEnd)
+{
+    // e.g. capture the visible part here
+    if (!scroller.Next())         // one page down
+    {
+        break;
+    }
+}
+scroller.Reset();                 // back to the original position
+</code></pre>
+<h3 id="scrolling-capture">Scrolling capture</h3>
+<p>A scrolling capture stitches frames, so consecutive frames must overlap: set <code>StepFraction</code> (greater than 0, at most 1,
+default 1.0 = a page) to scroll part of a page per <code>Next()</code> / <code>Previous()</code>.</p>
+<table>
+<thead>
+<tr>
+<th><code>ScrollMode</code></th>
+<th>A step of <code>StepFraction</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AbsoluteWindowMessage</code></td>
+<td>The position moves by <code>max(1, PageSize * StepFraction)</code>, clamped to the range</td>
+</tr>
+<tr>
+<td><code>WindowsMessage</code></td>
+<td>Below 1.0, <code>SB_LINEDOWN</code> / <code>SB_LINEUP</code> until the position moved by <code>max(1, PageSize * StepFraction)</code> scroll units (checked after every message, so windows which scroll in pixels work too); 1.0 sends <code>SB_PAGEDOWN</code> / <code>SB_PAGEUP</code></td>
+</tr>
+<tr>
+<td><code>MouseWheel</code></td>
+<td><code>WheelDelta</code> (a page) times the fraction, rounded to whole notches (at least one); set <code>UseFractionalWheelDelta</code> for applications which handle high-resolution wheel deltas. A horizontal scroll bar gets horizontal wheel input</td>
+</tr>
+<tr>
+<td><code>KeyboardPageUpDown</code></td>
+<td>The fraction is ignored, a key press scrolls a page</td>
+</tr>
+</tbody>
+</table>
+<p>In <code>MouseWheel</code> mode the wheel input goes to the middle of <code>ScrollingWindow</code>. For an area inside a window (the page of a
+browser, a list in a dialog) set <code>WheelLocation</code> (screen coordinates). The system delivers wheel input to the window under
+the cursor, so the cursor moves there; <code>RestoreCursorAfterWheel = true</code> moves it back after every wheel movement (in the
+same <code>SendInput</code> call). <code>MouseInputGenerator.MoveMouseWheelAt(delta, location, restoreCursor, horizontal)</code> does the same
+for your own wheel input.</p>
+<p><code>ViewportBounds</code> is the scrolling area in screen coordinates, to crop the frames.</p>
+<h3 id="windows-without-a-win32-scroll-bar-ui-automation">Windows without a Win32 scroll bar: UI Automation</h3>
+<p>Chromium / Electron, Firefox, WPF, WinUI, Office and the Explorer file list draw their own scroll bars, so
+<code>GetWindowScroller()</code> returns <code>null</code> for them. The <strong>Dapplo.Windows.Automation</strong> package scrolls them with the UI Automation
+<code>ScrollPattern</code>, using the native UI Automation COM API (no WPF needed):</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows.Automation
+</code></pre>
+<ul>
+<li><code>UiAutomationScroller.FromPoint(screenPoint, horizontal)</code> takes the element under the point and walks up to the first one
+with a <code>ScrollPattern</code> which can scroll in that direction; <code>FromWindow(window, horizontal)</code> uses the window, the element in
+its middle or the first scrollable descendant.</li>
+<li><code>ViewportBounds</code> is the bounding rectangle of that element, <code>ScrollPercent</code> the position (0 to 100), <code>VisibleFraction</code> the
+visible part of the content; <code>IsAtStart</code> / <code>IsAtEnd</code> allow <code>PercentTolerance</code> (0.01 percentage points).</li>
+<li><code>Start()</code> / <code>End()</code> / <code>Next()</code> / <code>Previous()</code> / <code>Reset()</code> use <code>SetScrollPercent</code>, or <code>Scroll</code> with small or large increments
+when setting the percentage is not supported. A step of <code>StepFraction</code> moves the content by that part of the viewport.</li>
+<li><code>ScrollMode = UiAutomationScrollModes.MouseWheel</code> wheels at the viewport centre (or <code>WheelLocation</code>) one notch at a time
+until the position moved far enough, for controls which report the pattern but ignore it.</li>
+<li>Use it on a background thread, never on the UI thread which owns the target window; an STA thread is not needed. When the
+element is gone (navigation, closed window) <code>IsAvailable</code> is false, <code>IsAtEnd</code> is true so loops end, and <code>Refresh()</code> finds
+it again. <code>Next()</code> returns false when the position didn't change, so a loop can't run forever. Chromium builds its
+accessibility tree on the first request, so retry a <code>null</code> from <code>FromPoint</code> once after a short delay. Dispose it to release
+the COM objects.</li>
+</ul>
+<h4 id="controls-without-a-scrollpattern">Controls without a ScrollPattern</h4>
+<p>Some controls scroll by themselves and expose no <code>ScrollPattern</code> anywhere, but do expose their scroll bar as an element with
+control type ScrollBar (e.g. the Visual Studio editor and Output pane). When no element on the way up from the point has a
+<code>ScrollPattern</code>, <code>FromPoint</code> takes the first one which has a visible child scroll bar in the direction; <code>FromWindow</code> does the
+same after its <code>ScrollPattern</code> lookups found nothing. Such a scroller has <code>IsScrollBarFallback</code> true and always scrolls with
+the mouse wheel (<code>ScrollMode</code> is <code>MouseWheel</code>, setting <code>ScrollPattern</code> throws), so the area has to be visible on the screen;
+<code>ViewportBounds</code> is the control without its scroll bar when the scroll bar is at an edge (and without a scroll bar of the other
+orientation at an edge, e.g. a horizontal one at the bottom), so the frames of a capture don't show it; <code>WheelLocation</code> and
+<code>RestoreCursorAfterWheel</code> work as usual.</p>
+<p>The position comes from the scroll bar:</p>
+<ul>
+<li>its RangeValue pattern: the position from <code>Value</code> between <code>Minimum</code> and <code>Maximum</code>, the visible part from <code>LargeChange</code>;
+<code>Start()</code> and <code>End()</code> set the value when it's writable and confirm with one wheel notch towards the target that the content
+followed (the Visual Studio editor only follows the scroll bar's Scroll events, setting the value moves just the scroll
+bar), else they continue with the wheel; <code>Reset()</code> uses the wheel;</li>
+<li>else the position of its thumb between the line buttons. That is to a pixel of the thumb, which on long content stands for
+a lot of content: <code>IsAtEnd</code> can be true a little early (compare the captured frames when that matters), <code>Start()</code> and
+<code>End()</code> wheel a bit further when the thumb says they got there;</li>
+<li>else it is unknown: <code>IsPositionKnown</code> is false, <code>ScrollPercent</code> is -1, <code>IsAtStart</code> / <code>IsAtEnd</code> are only true when the line
+button in that direction is disabled and the other one enabled (WPF disables both while the mouse isn't over the scroll
+bar), <code>Next()</code> / <code>Previous()</code> move one wheel notch per step and return true, and <code>Start()</code>,
+<code>End()</code> and <code>Reset()</code> return false. The caller detects the end itself, e.g. when the captured content stops changing.</li>
+</ul>
+<p>With a known position a step wheels one notch at a time until about <code>StepFraction</code> of a page moved. <code>Start()</code> and <code>End()</code> set
+a writable RangeValue and check the position read back; otherwise, like <code>Reset()</code>, they wheel several pages per input
+(independent of <code>StepFraction</code>, more notches when one input didn't move the thumb) until the start or end is reached or the
+position stops moving, with a limit from the remaining percentage. They return false when the start or end wasn't reached.</p>
+<p>Both scrollers implement <code>IScroller</code>, so one piece of code handles both:</p>
+<!-- sample: WindowSamples.ScrollingCapture -->
+<pre><code class="lang-csharp">// Windows with a Win32 scroll bar: WindowScroller; browsers, Electron, WPF, WinUI, Office: UI Automation.
+// Both implement IScroller. Run this on a background thread, not on the UI thread of the window.
+IScroller scroller = window.GetWindowScroller();
+scroller ??= UiAutomationScroller.FromPoint(clickedPoint);   // or UiAutomationScroller.FromWindow(window)
+// FromPoint also finds controls without a ScrollPattern which expose a scroll bar (e.g. the Visual Studio editor):
+// IsScrollBarFallback is true, they are scrolled with the mouse wheel, so the area must be visible on the screen.
+if (scroller == null)
+{
+    return;                       // nothing to scroll here
+}
+try
+{
+    scroller.StepFraction = 0.5;  // half a page per step, so consecutive frames overlap for stitching
+    scroller.Start();
+    captureFrame(scroller.ViewportBounds);
+    while (!scroller.IsAtEnd)
+    {
+        if (!scroller.Next())
+        {
+            break;
+        }
+        // Give the application time to paint, then capture the visible part.
+        // When UiAutomationScroller.IsPositionKnown is false, IsAtEnd can't tell the end: stop when the frame didn't change.
+        captureFrame(scroller.ViewportBounds);
+    }
+    scroller.Reset();             // back to where the user was
+}
+finally
+{
+    (scroller as IDisposable)?.Dispose();   // releases the UI Automation COM objects
+}
+</code></pre>
+<h3 id="finding-the-scrollable-areas-of-a-window">Finding the scrollable areas of a window</h3>
+<p>One window can hold several scrollable areas: in Visual Studio the editor, the Output pane and the Solution Explorer are
+all in one WPF window. <code>UiAutomationScroller.FindScrollableAreas(window, horizontal)</code> lists the screen bounds (pixels) of the
+window element and every descendant which can scroll in that direction, and the parent of every scroll bar element in that
+direction (the controls without a <code>ScrollPattern</code> above; without the scroll bars at its edges, like <code>ViewportBounds</code>), in tree order, without hit testing on the screen,
+so it works while another window (a selection window) covers it. It is one <code>FindAll</code> with a cache request for the bounding
+rectangle, plus one call per scroll bar for its parent; empty and offscreen elements are left out, duplicates (a
+<code>ScrollPattern</code> element and the parent of its own scroll bar) are returned once, an outer area comes before the areas
+inside it, and the result is an empty list (never <code>null</code>) when nothing scrolls
+or UI Automation isn't available. <code>FindScrollableAreas(window, horizontal, timeout, includeScrollBarAreas: false)</code>
+returns the <code>ScrollPattern</code> elements only. The areas can stick out of the window (e.g. a ScrollViewer larger than its pane), clip
+them yourself when needed.</p>
+<p>The call blocks: large trees (Visual Studio, Office, browsers) take a while. Run it on a background thread and cache the
+result per window. The UI Automation connection and transaction timeouts are set to <code>timeout</code> (default
+<code>UiAutomationScroller.DefaultFindTimeout</code>, 2 seconds; Windows 8 and later), so a hanging provider can't block for the
+default 20 seconds.</p>
+<p>Chromium based browsers (Edge, Chrome) and Electron apps build their accessibility tree when a UI Automation client first
+asks, so the first search after the browser started or a page loaded finds no area for the page.
+<code>FindScrollableAreas(window, horizontal, timeout, includeScrollBarAreas, contentWait, cancellationToken)</code> searches again
+in that case: when nothing is found and a shallow read of the control view shows an element without content covering at
+least a quarter of the window (the check of <code>UiAutomationAreas.FindAreasAsync</code>), it searches again with a pause of a
+quarter of a second between the attempts, until an area is found, the tree is complete or <code>contentWait</code> has passed
+(null for <code>UiAutomationAreas.DefaultContentWait</code>, 3 seconds; <code>TimeSpan.Zero</code> searches once, like the overloads without
+it), and returns the last result. A window with nothing to scroll and a complete tree never waits; one with an element
+which really is large and empty waits the whole <code>contentWait</code>, so cache the result. The token is checked during every
+pause and before every search.</p>
+<!-- sample: WindowSamples.ScrollableAreas -->
+<pre><code class="lang-csharp">// Greenshot-style: list the scrollable areas of the window under the mouse once (it blocks, so not on the UI thread;
+// works while your own window covers the screen), hit test them on every mouse move, scroll the chosen one later.
+IReadOnlyList&lt;NativeRect&gt; areas = await Task.Run(() =&gt; UiAutomationScroller.FindScrollableAreas(window));
+// The smallest area containing the cursor wins: in Visual Studio the editor, not the whole window
+NativeRect? chosen = areas
+    .Where(area =&gt; area.Contains(mouseLocation))
+    .OrderBy(area =&gt; area.Width * area.Height)
+    .Select(area =&gt; (NativeRect?)area)
+    .FirstOrDefault();
+if (chosen is { } area)
+{
+    // After your own window is gone, FromPoint finds the same element under the middle of the area
+    using var scroller = UiAutomationScroller.FromPoint(new NativePoint(area.X + area.Width / 2, area.Y + area.Height / 2));
+    // ... the scrolling capture loop from the sample above
+}
+</code></pre>
+<h3 id="the-parts-of-a-window-ui-automation-areas">The parts of a window: UI Automation areas</h3>
+<p>Windows which draw their own content (a browser page, Electron, WPF or UWP apps, an Office ribbon) have no child windows
+to snap a selection to, but UI Automation knows their parts.
+<code>UiAutomationAreas.FindAreasAsync(window, maxDepth = 3, minimumSize = 0, timeout, contentWait, cancellationToken)</code> reads the element
+tree of the control view of a window and returns it as immutable <code>UiAutomationArea</code>s (<code>Bounds</code>, <code>ControlType</code>, <code>Name</code>,
+<code>Children</code>), the window's own element is the root; null when UI Automation isn't available or the window is gone. It works
+on a window handle, so also while your own window covers the screen. For snapping the tree is cleaned up: offscreen and
+empty elements are left out, elements smaller than <code>minimumSize</code> with their children, every rectangle is clipped to its
+parent's, and an element with the same rectangle as its parent is replaced by its children. <code>root.GetAreasAt(point)</code>
+returns the areas containing a point, deepest first (the top-most sibling wins on overlap), as pure geometry on the snapshot.</p>
+<p>The calls run on a background (MTA) thread. The tree is read level by level, one request to the application per area
+whose children are read (only the children which aren't offscreen), so <code>maxDepth</code> limits the work; it counts the levels
+of the result, after merging elements with their parent's rectangle. The cancellation token is checked before every
+request, a single request can't be interrupted. The UI Automation timeouts are set to <code>timeout</code> (default 2 seconds).</p>
+<p>Chromium based browsers build their accessibility tree when a UI Automation client first asks, the first answer has only
+the frame of the window: when an element whose children were read has no content (no children which aren't offscreen,
+only children with an empty rectangle, or children with its own rectangle and no content) and its area covers at least a
+quarter of the window, <code>FindAreasAsync</code> reads the tree again, with a pause of a quarter of a second between the attempts,
+until the tree is complete or <code>contentWait</code> has passed (default <code>UiAutomationAreas.DefaultContentWait</code>, 3 seconds), and
+returns the last result. <code>TimeSpan.Zero</code> reads only once. A complete tree never waits; the cancellation token is checked
+during every pause, so a caller which moved on stops the attempts at once. An area whose
+children were all left out (smaller than <code>minimumSize</code>, clipped away) has content and doesn't count, neither does an empty
+overlay next to a sibling with the same bounds and content. A large element which really is empty (an empty pane) makes
+every call wait the whole <code>contentWait</code>, pass a shorter one when that matters.</p>
+<p>Measured on a CI runner with Edge and a page of 3000 paragraphs, 300 links and a 300-row table: the page document is on
+level 3 and its first content (heading, links, table) on level 4, so a browser page needs <code>maxDepth: 4</code> or more.</p>
+<table>
+<thead>
+<tr>
+<th>maxDepth</th>
+<th>Time</th>
+<th>Areas</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>~35 ms</td>
+<td>18</td>
+<td>browser frame, the document without its content</td>
+</tr>
+<tr>
+<td>4</td>
+<td>~0.35 s</td>
+<td>29</td>
+<td>the first level of the page</td>
+</tr>
+<tr>
+<td>5</td>
+<td>~0.6 s</td>
+<td>637</td>
+<td>most of the visible page</td>
+</tr>
+<tr>
+<td>7</td>
+<td>~0.75 s</td>
+<td>669</td>
+<td>everything</td>
+</tr>
+</tbody>
+</table>
+<p>The first request to a new Edge (with the reads again) took about 1 to 1.2 seconds with <code>maxDepth: 4</code>; right after Edge
+started, with Gmail still loading, it can take longer, up to <code>contentWait</code>.</p>
+<!-- sample: WindowSamples.UiAutomationAreaSnapping -->
+<pre><code class="lang-csharp">// Snap a region selection to the parts of a window which has no child windows there (a web page, a WPF app, a ribbon):
+// read the UI Automation tree of the window under the mouse once (on a background thread, cancel it when the mouse moves on),
+// then hit test the snapshot
+UiAutomationArea root = await UiAutomationAreas.FindAreasAsync(window, maxDepth: 4, minimumSize: 8, cancellationToken: cancellationToken);
+if (root != null)
+{
+    // Deepest area first, the window last: snap to the first, let the user step up the chain with the keys
+    IReadOnlyList&lt;UiAutomationArea&gt; chain = root.GetAreasAt(mouseLocation);
+    NativeRect? snapTo = chain.Count &gt; 0 ? chain[0].Bounds : null;
+}
+</code></pre>
+<h2 id="window-events">Window events</h2>
+<p><code>WinEventHook</code> turns <a href="https://learn.microsoft.com/en-us/windows/win32/winauto/winevents">WinEvents</a> into observables.
+The hook is installed when you subscribe and removed when the last subscription is disposed. The events are delivered
+on the thread of the <a href="window-messages.html">SharedMessageWindow</a>: keep <code>OnNext</code> short and use <code>ObserveOn</code> for slow work.</p>
+<p>The events are also raised for objects inside windows (menus, the caret, list items ...). Check
+<code>ObjectIdentifier == ObjectIdentifiers.Window</code> (and <code>IsSelf</code>) when you only want windows.</p>
+<!-- sample: WindowSamples.MonitorCreateDestroy -->
+<pre><code class="lang-csharp">// Created and destroyed top-level and child windows, events arrive on the SharedMessageWindow thread
+IDisposable subscription = WinEventHook.WindowCreateDestroyObservable()
+    .Subscribe(info =&gt;
+    {
+        if (info.WinEvent == WinEvents.EVENT_OBJECT_CREATE)
+        {
+            Console.WriteLine($&quot;Created {info.Handle}&quot;);
+        }
+        else
+        {
+            // The window is gone, only the handle is left
+            Console.WriteLine($&quot;Destroyed {info.Handle}&quot;);
+        }
+    });
+
+// Removes the hook
+subscription.Dispose();
+</code></pre>
+<!-- sample: WindowSamples.MonitorTitle -->
+<pre><code class="lang-csharp">var subscription = WinEventHook.WindowTitleChangeObservable()
+    .Select(info =&gt; InteropWindowFactory.CreateFor(info.Handle))
+    .Where(window =&gt; window.IsVisibleApplicationWindow())
+    .Subscribe(window =&gt; Console.WriteLine($&quot;New title: {window.GetCaption(forceUpdate: true)}&quot;));
+</code></pre>
+<!-- sample: WindowSamples.MonitorForeground -->
+<pre><code class="lang-csharp">// The user switched to another window
+var subscription = WinEventHook.Create(WinEvents.EVENT_SYSTEM_FOREGROUND)
+    .Subscribe(info =&gt; Console.WriteLine($&quot;Active: {InteropWindowFactory.CreateFor(info.Handle).GetCaption()}&quot;));
+</code></pre>
+<!-- sample: WindowSamples.MonitorLocation -->
+<pre><code class="lang-csharp">// Moved or resized windows, this also fires for the caret and the cursor: filter on the window itself
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_LOCATIONCHANGE)
+    .Where(info =&gt; info.ObjectIdentifier == ObjectIdentifiers.Window &amp;&amp; info.IsSelf)
+    // Many events arrive while dragging, only take the last one
+    .Throttle(TimeSpan.FromMilliseconds(100))
+    .Subscribe(info =&gt; Console.WriteLine($&quot;Moved: {InteropWindowFactory.CreateFor(info.Handle).GetInfo(forceUpdate: true).Bounds}&quot;));
+</code></pre>
+<p>Limit a hook to one process (or thread) when you can, Windows then only calls you for that process:</p>
+<!-- sample: WindowSamples.MonitorProcess -->
+<pre><code class="lang-csharp">// Only the events of one process: less work for Windows and for you
+var subscription = WinEventHook.Create(WinEvents.EVENT_OBJECT_CREATE, WinEvents.EVENT_OBJECT_DESTROY, process: process.Id)
+    .Where(info =&gt; info.ObjectIdentifier == ObjectIdentifiers.Window)
+    .Subscribe(info =&gt; Console.WriteLine($&quot;{process.ProcessName}: {info.WinEvent}&quot;));
+</code></pre>
+<h2 id="displays">Displays</h2>
+<p><code>DisplayInfo.AllDisplayInfos</code> lists the monitors; it's updated when displays, resolutions or the work area change.</p>
+<!-- sample: WindowSamples.Displays -->
+<pre><code class="lang-csharp">foreach (var display in DisplayInfo.AllDisplayInfos)
+{
+    Console.WriteLine($&quot;{display.DeviceName}: {display.Bounds}, work area {display.WorkingArea}, primary: {display.IsPrimary}&quot;);
+}
+// The bounds of all displays together
+NativeRect desktop = DisplayInfo.ScreenBounds;
+</code></pre>
+<h2 id="installed-software">Installed software</h2>
+<!-- sample: WindowSamples.InstalledSoftware -->
+<pre><code class="lang-csharp">// Reads the uninstall information of the registry (64 and 32 bit, machine and user)
+foreach (var software in InstallationInformation.InstalledSoftware().Where(s =&gt; s.Publisher == &quot;Microsoft Corporation&quot;))
+{
+    Console.WriteLine($&quot;{software.DisplayName} {software.DisplayVersion}&quot;);
+}
+</code></pre>
+<h2 id="tips">Tips</h2>
+<ul>
+<li>An <code>IInteropWindow</code> is a snapshot. Values which change (title, bounds, state) need <code>forceUpdate: true</code> when you read
+them again later.</li>
+<li><code>GetTopWindows()</code>, <code>GetVisibleApplicationWindows()</code>, <code>GetChildren()</code> and <code>WindowsEnumerator</code> return a snapshot of the windows
+at the moment of the call; call them again for the current state.</li>
+<li>Reading the text of a window which belongs to a hung application times out after 500 ms instead of blocking.</li>
+<li>Keep WinEvent subscriptions narrow (event range, process) and throttle location events, they are frequent.</li>
+</ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="window-messages.html">Window messages and the SharedMessageWindow</a></li>
+<li><a href="forms-and-wpf.html">Windows Forms and WPF</a></li>
+<li><a href="common-scenarios.html">Common scenarios</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/window-management.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

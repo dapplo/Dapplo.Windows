@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class UiAutomationAreas | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class UiAutomationAreas | Dapplo.Windows ">
+      
+      <meta name="description" content="Read the areas UI Automation knows inside a window (the parts of a browser page, an Electron, WPF or UWP app, an Office ribbon), e.g. to snap a region selection to them where the window has no child windows. Works on a window handle, not on a point, so it also works while another window (a full-screen selection window) covers the window.">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Automation_UiAutomationAreas.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Automation.UiAutomationAreas%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Automation.UiAutomationAreas">
+
+
+
+  <h1 id="Dapplo_Windows_Automation_UiAutomationAreas" data-uid="Dapplo.Windows.Automation.UiAutomationAreas" class="text-break">
+Class UiAutomationAreas  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationAreas.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Automation.html">Automation</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Automation.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Read the areas UI Automation knows inside a window (the parts of a browser page, an Electron, WPF or UWP app, an Office ribbon),
+e.g. to snap a region selection to them where the window has no child windows. Works on a window handle, not on a point, so it also
+works while another window (a full-screen selection window) covers the window.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class UiAutomationAreas</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">UiAutomationAreas</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationAreas_DefaultContentWait" data-uid="Dapplo.Windows.Automation.UiAutomationAreas.DefaultContentWait">
+  DefaultContentWait
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationAreas.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The default for the content wait of <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_FindAreasAsync_System_IntPtr_System_Int32_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">FindAreasAsync(nint, int, int, TimeSpan?, TimeSpan?, CancellationToken)</a>:
+how long the tree is read again while it looks incomplete, 3 seconds</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly TimeSpan DefaultContentWait</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationAreas_DefaultTimeout" data-uid="Dapplo.Windows.Automation.UiAutomationAreas.DefaultTimeout">
+  DefaultTimeout
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationAreas.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The default for the timeout of <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_FindAreasAsync_System_IntPtr_System_Int32_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">FindAreasAsync(nint, int, int, TimeSpan?, TimeSpan?, CancellationToken)</a>: 2 seconds</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly TimeSpan DefaultTimeout</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationAreas_FindAreasAsync_" data-uid="Dapplo.Windows.Automation.UiAutomationAreas.FindAreasAsync*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationAreas_FindAreasAsync_Dapplo_Windows_Desktop_IInteropWindow_System_Int32_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Automation.UiAutomationAreas.FindAreasAsync(Dapplo.Windows.Desktop.IInteropWindow,System.Int32,System.Int32,System.Nullable{System.TimeSpan},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)">
+  FindAreasAsync(IInteropWindow, int, int, TimeSpan?, TimeSpan?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationAreas.cs/#L129"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Read the element tree of a window, see <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_FindAreasAsync_System_IntPtr_System_Int32_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">FindAreasAsync(nint, int, int, TimeSpan?, TimeSpan?, CancellationToken)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;UiAutomationArea&gt; FindAreasAsync(IInteropWindow window, int maxDepth = 3, int minimumSize = 0, TimeSpan? timeout = null, TimeSpan? contentWait = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>window</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+    <dt><code>maxDepth</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the number of levels below the window, after merging elements with the same rectangle as their parent</p>
+</dd>
+    <dt><code>minimumSize</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the minimum width and height of an area in pixels, 0 (default) for all</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation timeouts, default <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_DefaultTimeout">DefaultTimeout</a></p>
+</dd>
+    <dt><code>contentWait</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan, how long the tree is read again while it looks incomplete, default <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_DefaultContentWait">DefaultContentWait</a></p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken, checked before every request to the application and during every pause</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="Dapplo.Windows.Automation.UiAutomationArea.html">UiAutomationArea</a>&gt;</dt>
+    <dd><p>Task with the UiAutomationArea for the window, null when UI Automation isn't available or the window is gone</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationAreas_FindAreasAsync_" data-uid="Dapplo.Windows.Automation.UiAutomationAreas.FindAreasAsync*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationAreas_FindAreasAsync_System_IntPtr_System_Int32_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Automation.UiAutomationAreas.FindAreasAsync(System.IntPtr,System.Int32,System.Int32,System.Nullable{System.TimeSpan},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)">
+  FindAreasAsync(nint, int, int, TimeSpan?, TimeSpan?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationAreas.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Read the element tree of a window (the control view) as <a class="xref" href="Dapplo.Windows.Automation.UiAutomationArea.html">UiAutomationArea</a>s, the window's own element is the root.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;UiAutomationArea&gt; FindAreasAsync(nint windowHandle, int maxDepth = 3, int minimumSize = 0, TimeSpan? timeout = null, TimeSpan? contentWait = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>windowHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the handle of the window</p>
+</dd>
+    <dt><code>maxDepth</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the number of levels below the window, after merging elements with the same rectangle as their parent; 0 for the window only</p>
+</dd>
+    <dt><code>minimumSize</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the minimum width and height of an area in pixels, 0 (default) for all</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation timeouts, default <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_DefaultTimeout">DefaultTimeout</a></p>
+</dd>
+    <dt><code>contentWait</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan, how long the tree is read again while it looks incomplete, default <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_DefaultContentWait">DefaultContentWait</a>;
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan.zero">Zero</a> reads it only once</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken, checked before every request to the application and during every pause</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="Dapplo.Windows.Automation.UiAutomationArea.html">UiAutomationArea</a>&gt;</dt>
+    <dd><p>Task with the UiAutomationArea for the window, null when UI Automation isn't available or the window is gone</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Automation_UiAutomationAreas_FindAreasAsync_System_IntPtr_System_Int32_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>
+The UI Automation calls run on a background (MTA) thread of the thread pool, the returned task completes with a snapshot.
+The tree is read level by level: one request to the application (FindAllBuildCache with TreeScope_Children for the control view
+children which aren't offscreen, and a cache for the bounds, control type, name and offscreen state) per area whose children are read,
+so <code class="paramref">maxDepth</code> limits the work. A single request can't be interrupted: on a long web page the one for the children of
+the document is by far the largest.
+<code class="paramref">cancellationToken</code> is checked before every request.
+</p>
+<p>
+The result is cleaned up for snapping: offscreen elements and elements with an empty rectangle are left out (with their children),
+an element smaller than <code class="paramref">minimumSize</code> in width or height is left out with its children, every rectangle is clipped to
+its parent's (web pages report elements outside the visible part), and an element with the same rectangle as its parent is replaced
+by its children, so there are no chains of identical rectangles. <code class="paramref">maxDepth</code> counts the levels of the result, after
+this merge: the children of a merged element are still read.
+</p>
+<p>
+Some applications (e.g. Chromium based browsers) build their accessibility tree only when a UI Automation client asks for it, the
+first answer then has only the frame of the window. When an element whose children were read has no content (it reports no children
+which aren't offscreen, only children with an empty rectangle, or children with its own rectangle which have no content themselves)
+and its area covers at least a quarter of the window, the tree looks incomplete: it is read again, with a short pause (a quarter of
+a second) between the reads, until it is complete or <code class="paramref">contentWait</code> has passed (right after Edge started, Gmail took
+longer than half a second); the last result is returned. An area whose children were all left out (smaller than
+<code class="paramref">minimumSize</code>, clipped away) has content and doesn't count, neither does an empty overlay with a sibling of the same
+bounds which has content, so a complete tree never waits. A window with an element which really is large and empty waits the whole
+<code class="paramref">contentWait</code> on every call: pass a shorter one (or <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan.zero">Zero</a>) for such windows.
+</p>
+<p>
+Where IUIAutomation2 is available (Windows 8+) the connection and transaction timeouts of every request are set to
+<code class="paramref">timeout</code>, so a hanging application can't block for the default 20 seconds.
+</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.operationcanceledexception">OperationCanceledException</a></dt>
+    <dd><p>When <code class="paramref">cancellationToken</code> was canceled</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationAreas.cs/#L24" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
