@@ -7,6 +7,11 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.13.x]
+
+### Fixed
+- `UiAutomationAreas.FindAreasAsync` with a tree which stays incomplete: at the end of `contentWait` a rest below a millisecond didn't pause (`WaitHandle.WaitOne(TimeSpan)` truncates to whole milliseconds), so the tree was read several times in a row until the wait was over. The last pause is now rounded up to a whole millisecond. The `ReadUntilComplete_StaysEmpty_StopsAfterTheWaitWithTheLastResult` test found it on the net48 CI run (11 reads instead of at most 8).
+
 ## [3.13.0]
 
 All packages at their latest versions, a build without warnings, and a fix for Start/End/Reset with the mouse wheel in WPF.
