@@ -11,6 +11,8 @@ using Dapplo.Windows.Automation.Interop;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.User32;
+using Dapplo.Windows.User32.Structs;
 
 namespace Dapplo.Windows.Automation;
 
@@ -37,7 +39,13 @@ public static class UiAutomationAreas
     /// <summary>
     ///     The pause between two reads while the tree looks incomplete
     /// </summary>
-    private static readonly TimeSpan ContentPause = TimeSpan.FromMilliseconds(250);
+    internal static readonly TimeSpan ContentPause = TimeSpan.FromMilliseconds(250);
+
+    /// <summary>
+    ///     The depth of the read which tells if the tree of a window looks incomplete for <see cref="UiAutomationScroller"/>.FindScrollableAreas:
+    ///     the document of a Chromium page is on level 3, its children are read with 4
+    /// </summary>
+    private const int ContentCheckDepth = 4;
 
     /// <summary>
     ///     A guard against a provider which reports a (nearly) endless chain of elements with the same rectangle
@@ -170,6 +178,15 @@ public static class UiAutomationAreas
     /// <param name="cancellationToken">CancellationToken, checked during every pause and before every read</param>
     internal static UiAutomationArea ReadUntilComplete(Func<(UiAutomationArea Root, bool ReadAgain)> read, TimeSpan contentWait, TimeSpan pause, IntPtr windowHandle,
         CancellationToken cancellationToken)
+        => ReadUntil(read, contentWait, pause, windowHandle, cancellationToken);
+
+    /// <summary>
+    ///     Read, and read again with a pause between the reads while the result looks incomplete (see ReadUntilComplete), shared with
+    ///     <see cref="UiAutomationScroller"/>.FindScrollableAreas
+    /// </summary>
+    /// <typeparam name="T">Type of the result, a read which returns null ends the attempts with the previous result</typeparam>
+    internal static T ReadUntil<T>(Func<(T Result, bool ReadAgain)> read, TimeSpan contentWait, TimeSpan pause, IntPtr windowHandle,
+        CancellationToken cancellationToken) where T : class
     {
         var stopwatch = Stopwatch.StartNew();
         var (root, readAgain) = read();
@@ -234,6 +251,26 @@ public static class UiAutomationAreas
         {
             UiAutomationScroller.Release(automation);
         }
+    }
+
+    /// <summary>
+    ///     A shallow read of the control view of the window (<see cref="ContentCheckDepth"/> levels) which tells if its tree looks incomplete:
+    ///     an element without content covers at least a quarter of the window, see <see cref="HasLargeEmptyArea(UiAutomationArea, Func{UiAutomationArea, bool})"/>.
+    ///     Elements smaller than a quarter of the window's width or height are left out with their children: they can't cover a quarter of it,
+    ///     and their parents have content.
+    /// </summary>
+    /// <param name="automation">IUIAutomation, the one of the caller</param>
+    /// <param name="windowHandle">IntPtr with the handle of the window</param>
+    /// <param name="cancellationToken">CancellationToken, checked before every request</param>
+    /// <returns>true when the tree looks incomplete</returns>
+    internal static bool LooksIncomplete(IUIAutomation automation, IntPtr windowHandle, CancellationToken cancellationToken)
+    {
+        var windowInfo = WindowInfo.Create();
+        var minimumSize = User32Api.GetWindowInfo(windowHandle, ref windowInfo)
+            ? Math.Max(0, Math.Min(windowInfo.Bounds.Width, windowInfo.Bounds.Height) / 4)
+            : 0;
+        ReadOnce(automation, windowHandle, ContentCheckDepth, minimumSize, cancellationToken, out var readAgain);
+        return readAgain;
     }
 
     /// <summary>
