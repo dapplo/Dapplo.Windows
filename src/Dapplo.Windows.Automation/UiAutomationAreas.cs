@@ -185,7 +185,10 @@ public static class UiAutomationAreas
             }
             attempt++;
             Log.Verbose().WriteLine("The tree of window 0x{0:X} has a large area without content, reading it again (attempt {1}).", windowHandle.ToInt64(), attempt);
-            if (cancellationToken.WaitHandle.WaitOne(remaining < pause ? remaining : pause))
+            // Whole milliseconds, rounded up: WaitOne(TimeSpan) truncates, a rest below a millisecond would not pause at all and the
+            // tree would be read several times in a row at the end of the wait
+            var wait = remaining < pause ? remaining : pause;
+            if (cancellationToken.WaitHandle.WaitOne((int)Math.Ceiling(wait.TotalMilliseconds)))
             {
                 cancellationToken.ThrowIfCancellationRequested();
             }
