@@ -155,11 +155,11 @@ public class ToolbarForm : DpiAwareForm
             .AddTarget(_saveButton, "saveButton.Image", bitmap => bitmap);
     }
 
-    protected override void OnClosing(CancelEventArgs e)
+    protected override void OnFormClosing(FormClosingEventArgs e)
     {
         // Dispose on the UI thread
         _scaleHandler.Dispose();
-        base.OnClosing(e);
+        base.OnFormClosing(e);
     }
 }
 ```

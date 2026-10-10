@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using Dapplo.Log;
@@ -50,10 +49,10 @@ public partial class FormWithAttachedDpiHandler : Form //DpiAwareForm
         });
     }
 
-    protected override void OnClosing(CancelEventArgs e)
+    protected override void OnFormClosing(FormClosingEventArgs e)
     {
         _dpiChangeSubscription.Dispose();
         _scaleHandler.Dispose();
-        base.OnClosing(e);
+        base.OnFormClosing(e);
     }
 }

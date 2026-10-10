@@ -114,7 +114,7 @@ public class ClipboardThreadingTests
                 Assert.Equal(text, clipboardAccessToken.GetAsUnicodeString());
             }
             await blocked.ConfigureAwait(false);
-        });
+        }, TestContext.Current.CancellationToken);
         Assert.True(await Task.Run(() => OpenAndCloseOnThisThread()));
     }
 
@@ -161,7 +161,7 @@ public class ClipboardThreadingTests
             await blocked.ConfigureAwait(false);
             var read = await ClipboardNative.UseAsync(clipboard => clipboard.GetAsUnicodeString()).ConfigureAwait(false);
             Assert.Equal(text, read);
-        });
+        }, TestContext.Current.CancellationToken);
         Assert.True(await Task.Run(() => OpenAndCloseOnThisThread()));
     }
 

@@ -7,6 +7,18 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.13.0]
+
+All packages at their latest versions, a build without warnings, and a fix for Start/End/Reset with the mouse wheel in WPF.
+
+### Changed
+- Dependencies: System.Reactive 7.0.0 (from 6.1.0; Dapplo.Windows uses no UI framework specific Rx APIs), System.Drawing.Common and System.Resources.Extensions 10.0.12, Nerdbank.GitVersioning 3.10.94.
+- Tests: xunit.v3 4.0.2 as `xunit.v3.mtp-off` (xunit.v3 4 includes Microsoft.Testing.Platform v2, which no longer runs through the VSTest mode of `dotnet test` on the .NET 10 SDK; the mtp-off variant keeps `dotnet test` with filters, trx and coverlet, and the Visual Studio Test Explorer via xunit.runner.visualstudio 4.0.0), xunit.analyzers 2.2.0, Xunit.StaFact 4.0.24, Microsoft.NET.Test.Sdk 18.10.1, coverlet.msbuild 10.0.1. `[assembly: Parallelization(Mode = ParallelMode.None, MaxThreads = 1)]` (namespace `Xunit.v3`) replaces the `CollectionBehavior` parallelization settings which xunit.v3 4 made obsolete, xunit.runner.json uses `"parallelMode": "none"`.
+- The build has no warnings anymore (xUnit analyzer findings in the tests, the obsolete `Form.OnClosing` in the samples, coverlet couldn't resolve System.Drawing.Common while instrumenting).
+
+### Fixed
+- `UiAutomationScroller` in `UiAutomationScrollModes.MouseWheel`: `Start()`, `End()` and `Reset()` stopped far before the target in WPF (e.g. at 14 % for `End()`). A WPF ScrollViewer scrolls one notch per wheel message whatever the delta is, so a wheel input with several notches moved only one; several notches are now sent as that many wheel messages in one input, applications which use the delta end up at the same position.
+
 ## [3.12.0]
 
 Small efficiency and API fixes, found while reviewing 3.11.2 for Greenshot.

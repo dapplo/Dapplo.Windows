@@ -11,6 +11,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- WFO0003: the test runner generates Main, so Application.SetHighDpiMode can't be used, the manifest is the only way to set the DPI awareness before any window exists -->
     <NoWarn>$(NoWarn);WFO0003</NoWarn>
+    <!-- coverlet resolves the referenced assemblies from the deps.json compile context, without it System.Drawing.Common
+         (from the WindowsDesktop framework) can't be resolved while instrumenting -->
+    <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
@@ -45,21 +48,23 @@
     <None Update="Samples\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="System.Reactive" Version="7.0.0" />
     <PackageReference Include="Dapplo.Log.Loggers" Version="3.0.22" />
     <PackageReference Include="Dapplo.Log.XUnit" Version="3.0.22" />
-    <PackageReference Include="xunit.analyzers" Version="1.27.0">
+    <PackageReference Include="xunit.analyzers" Version="2.2.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="xunit.v3" Version="3.2.2" />
-    <PackageReference Include="Xunit.StaFact" Version="3.0.13" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+    <!-- xunit.v3 4 contains Microsoft.Testing.Platform v2, which no longer runs through the VSTest mode of dotnet test on the .NET 10 SDK.
+         The mtp-off variant keeps VSTest (dotnet test with filters, trx and coverlet, Visual Studio Test Explorer via xunit.runner.visualstudio) -->
+    <PackageReference Include="xunit.v3.mtp-off" Version="4.0.2" />
+    <PackageReference Include="Xunit.StaFact" Version="4.0.24" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.msbuild" Version="8.0.0">
+    <PackageReference Include="coverlet.msbuild" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

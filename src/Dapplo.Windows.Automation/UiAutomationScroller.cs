@@ -852,6 +852,9 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         double percentPerNotch = 0;
         // After an input which didn't move anything the next one has more notches
         var minimumNotches = 1;
+        // How far one notch in its own input moved, and whether the application takes only one notch per input
+        double singleNotchPercent = 0;
+        var oneNotchPerInput = false;
         var sentNotches = 0;
         var notchLimit = int.MaxValue;
         while (true)
@@ -869,7 +872,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
                 var wanted = pagePercent > 0 ? Math.Min(remaining, pagePercent * PagesPerWheelInput) : remaining;
                 notches = (int)Math.Max(1, Math.Min(MaxNotchesPerWheelInput, Math.Ceiling(wanted / percentPerNotch)));
             }
-            notches = Math.Max(notches, minimumNotches);
+            notches = oneNotchPerInput ? 1 : Math.Max(notches, minimumNotches);
             if (sentNotches + notches > notchLimit)
             {
                 Log.Verbose().WriteLine("The target {0} percent was not reached after {1} wheel notches, at {2} percent.", target, sentNotches, percent);
@@ -888,7 +891,7 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
                 }
                 // Nothing moved: e.g. a thumb moves in whole pixels, so on long content a notch may not move it. Try more notches, at most
                 // one input with the maximum, before deciding that the position doesn't change anymore.
-                if (notches >= MaxNotchesPerWheelInput)
+                if (oneNotchPerInput || notches >= MaxNotchesPerWheelInput)
                 {
                     Log.Verbose().WriteLine("The scroll position doesn't change anymore at {0} percent, the target was {1}.", percent, target);
                     return TryGetScrollPercent(out var last) && IsAtTarget(last, target, forward);
@@ -900,6 +903,23 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             if (percentPerNotch <= 0)
             {
                 notchLimit = sentNotches + IncrementLimit(Math.Abs(target - after), moved, notches);
+            }
+            if (notches == 1 && singleNotchPercent <= 0)
+            {
+                singleNotchPercent = moved;
+            }
+            else if (notches > 1 && singleNotchPercent > 0 && moved < singleNotchPercent * notches / 4)
+            {
+                // Several notches in one input moved about as far as one: the application scrolls one notch per input whatever the delta
+                // is (a WPF ScrollViewer only looks at the sign, and applies queued wheel input over several layout passes). Continue with
+                // one notch per input, the speed per notch is the one measured with a single notch.
+                Log.Verbose().WriteLine("{0} wheel notches in one input moved {1} percent, one notch moved {2} percent: continuing with one notch per input.",
+                    notches, moved, singleNotchPercent);
+                oneNotchPerInput = true;
+                percentPerNotch = singleNotchPercent;
+                minimumNotches = 1;
+                percent = after;
+                continue;
             }
             // The latest measurement: some applications scroll smoothly and were still moving when the position was read
             percentPerNotch = moved / notches;
