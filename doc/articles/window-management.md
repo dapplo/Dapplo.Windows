@@ -468,8 +468,11 @@ Chromium based browsers (Edge, Chrome) and Electron apps build their accessibili
 asks, so the first search after the browser started or a page loaded finds no area for the page.
 `FindScrollableAreas(window, horizontal, timeout, includeScrollBarAreas, contentWait, cancellationToken)` searches again
 in that case: when nothing is found and a shallow read of the control view shows an element without content covering at
-least a quarter of the window (the check of `UiAutomationAreas.FindAreasAsync`), it searches again with a pause of a
-quarter of a second between the attempts, until an area is found, the tree is complete or `contentWait` has passed
+least a quarter of the window (the check of `UiAutomationAreas.FindAreasAsync`), or the window's own element has no content
+(only for Chromium's render widget window, `Chrome_RenderWidgetHostHWND`, before its tree is built; other windows without
+children are complete), it searches again with a pause of a quarter of a second
+between the attempts, until an area is found, the tree is complete or `contentWait` has passed. The search itself makes
+Chromium build the tree, so a tree which looks complete after a search which found nothing is searched once more
 (null for `UiAutomationAreas.DefaultContentWait`, 3 seconds; `TimeSpan.Zero` searches once, like the overloads without
 it), and returns the last result. A window with nothing to scroll and a complete tree never waits; one with an element
 which really is large and empty waits the whole `contentWait`, so cache the result. The token is checked during every
