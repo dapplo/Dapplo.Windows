@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using Dapplo.Windows.Common.Structs;
@@ -79,11 +78,11 @@ public static class DpiSamples
                 .AddTarget(_saveButton, "saveButton.Image", bitmap => bitmap);
         }
 
-        protected override void OnClosing(CancelEventArgs e)
+        protected override void OnFormClosing(FormClosingEventArgs e)
         {
             // Dispose on the UI thread
             _scaleHandler.Dispose();
-            base.OnClosing(e);
+            base.OnFormClosing(e);
         }
     }
     #endregion

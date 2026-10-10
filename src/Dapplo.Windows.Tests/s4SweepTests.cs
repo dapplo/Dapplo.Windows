@@ -162,8 +162,8 @@ public class S4SweepTests
                 return false;
             }
         });
-        waitStarted.Wait(TimeSpan.FromSeconds(5));
-        await Task.Delay(100);
+        waitStarted.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         timer.Dispose();
         // The wait keeps a reference on the handle, it is not closed under the wait, so the wait simply times out
         Assert.False(await waitTask);

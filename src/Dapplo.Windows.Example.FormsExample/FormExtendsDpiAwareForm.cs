@@ -6,7 +6,6 @@ using Dapplo.Windows.Desktop;
 using Dapplo.Windows.Dpi;
 using Dapplo.Windows.Forms.Dpi;
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -48,12 +47,12 @@ public partial class FormExtendsDpiAwareForm : DpiAwareForm
         });
     }
 
-    protected override void OnClosing(CancelEventArgs e)
+    protected override void OnFormClosing(FormClosingEventArgs e)
     {
         _contextMenuDpiHandler.Dispose();
         _dpiChangeSubscription.Dispose();
         _scaleHandler.Dispose();
-        base.OnClosing(e);
+        base.OnFormClosing(e);
     }
 
     private void Button1_Click(object sender, EventArgs e)

@@ -60,6 +60,7 @@ jobs:
         --framework net10.0-windows --no-build --filter "Category!=Interactive"
         --logger "trx;LogFilePrefix=Dapplo.Windows.Tests" --results-directory "$env:GITHUB_WORKSPACE/TestResults"
         /p:CollectCoverage=true /p:CoverletOutputFormat=lcov "/p:CoverletOutput=$env:GITHUB_WORKSPACE/TestResults/coverage/"
+        2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/test-net10.log"
 
     - name: Test (net480)
       if: success() || failure()
@@ -67,6 +68,7 @@ jobs:
         dotnet test src/Dapplo.Windows.Tests/Dapplo.Windows.Tests.csproj --configuration $env:BUILD_CONFIGURATION
         --framework net480 --no-build --filter "Category!=Interactive"
         --logger "trx;LogFilePrefix=Dapplo.Windows.Tests" --results-directory "$env:GITHUB_WORKSPACE/TestResults"
+        2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/test-net480.log"
 
     - name: Upload test results
       if: always()
@@ -94,6 +96,16 @@ jobs:
             $text = "$($errorInfo.Message)`n$((($errorInfo.StackTrace -split "`n") | Select-Object -First 4) -join "`n")"
             if ($text.Length -gt 3000) { $text = $text.Substring(0, 3000) }
             Write-Host "::error title=$(Escape-Property "$($trx.BaseName): $($node.testName)")::$(Escape-Data $text)"
+          }
+        }
+        # A test run which fails without results (e.g. the test host crashed): the end of its console output as an annotation
+        foreach ($log in Get-ChildItem -Path $env:RUNNER_TEMP -Filter 'test-*.log' -File -ErrorAction SilentlyContinue) {
+          $lines = @(Get-Content -Path $log.FullName)
+          $problems = @($lines | Where-Object { $_ -notmatch '^\s*(Passed|Skipped)\s' -and $_ -match '(?i)\berror\b|exception|aborted|crash|^\s*failed[!\s]' } | Select-Object -First 25)
+          if ($problems.Count -gt 0) {
+            $text = (($problems + '---' + ($lines | Select-Object -Last 15)) -join "`n")
+            if ($text.Length -gt 3000) { $text = $text.Substring(0, 3000) }
+            Write-Host "::warning title=$(Escape-Property "Test output $($log.BaseName)")::$(Escape-Data $text)"
           }
         }
 

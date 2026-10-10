@@ -451,7 +451,7 @@ public class UiAutomationScrollerTests
         var areas = UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle);
         Assert.True(areas.Any(a => IsNear(a, expected)), $"The content {expected} is missing: {Describe(areas)}");
         // The horizontal scroll bar gives an area too, without both scroll bars as well
-        Assert.True(UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle, horizontal: true).Any(a => IsNear(a, expected)));
+        Assert.Contains(UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle, horizontal: true), a => IsNear(a, expected));
 
         var center = ScrollTestWindow.CenterOf(expected);
         testWindow.SkipWhenNotVisibleAt(center);

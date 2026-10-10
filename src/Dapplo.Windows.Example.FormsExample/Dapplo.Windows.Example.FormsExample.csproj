@@ -17,9 +17,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dapplo.Log.Loggers" Version="3.0.22" />
-    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="System.Reactive" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <PackageReference Include="System.Resources.Extensions" Version="10.0.3" />
+    <PackageReference Include="System.Resources.Extensions" Version="10.0.12" />
   </ItemGroup>
 </Project>

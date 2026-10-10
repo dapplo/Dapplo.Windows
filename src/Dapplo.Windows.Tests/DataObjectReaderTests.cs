@@ -192,13 +192,14 @@ public class DataObjectReaderTests
     }
 
     [Fact]
-    public void HostileEnumerator_Endless_DoesNotHang()
+    public async Task HostileEnumerator_Endless_DoesNotHang()
     {
         var dataObject = new TestDataObject { Enumerator = new EndlessEnumFormatEtc() };
         using var reader = new DataObjectReader(dataObject);
-        var task = Task.Run(() => reader.Formats);
-        Assert.True(task.Wait(TimeSpan.FromSeconds(10)), "Enumerating the formats must stop");
-        Assert.Single(task.Result);
+        var task = Task.Run(() => reader.Formats, TestContext.Current.CancellationToken);
+        var completed = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken));
+        Assert.True(completed == task, "Enumerating the formats must stop");
+        Assert.Single(await task);
     }
 
     [Theory]

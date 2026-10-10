@@ -10,6 +10,6 @@
 		<ProjectReference Include="..\Dapplo.Windows.InstallerManager\Dapplo.Windows.InstallerManager.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="System.Resources.Extensions" Version="10.0.3" />
+		<PackageReference Include="System.Resources.Extensions" Version="10.0.12" />
 	</ItemGroup>
 </Project>
