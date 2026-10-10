@@ -7,6 +7,11 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.14.0]
+
+### Added
+- `UiAutomationScroller.FindScrollableAreas(windowHandle or IInteropWindow, horizontal, timeout, includeScrollBarAreas, contentWait, cancellationToken)`: Chromium based browsers and Electron apps build their accessibility tree only when a UI Automation client first asks, so the first search after the browser started or a page loaded found no area for the page (in Greenshot the scroll indication was missing on the first capture). When the search finds nothing and a shallow read of the control view shows an element without content covering at least a quarter of the window (the check of `UiAutomationAreas.FindAreasAsync`), it searches again with a pause of a quarter of a second, until an area is found, the tree is complete or `contentWait` has passed (null uses `UiAutomationAreas.DefaultContentWait`, 3 seconds; `TimeSpan.Zero` searches once); the last result is returned. All attempts use one UI Automation object, the token is checked during every pause and before every search. A window with nothing to scroll and a complete tree never waits. The existing overloads search once, as before.
+
 ## [3.13.x]
 
 ### Fixed

@@ -500,4 +500,159 @@ public class UiAutomationAreasTests
     {
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => UiAutomationAreas.FindAreasAsync(IntPtr.Zero, contentWait: TimeSpan.FromSeconds(-1), cancellationToken: TestContext.Current.CancellationToken));
     }
+    // ── FindScrollableAreas with a content wait ─────────────────────────────
+
+    private static IReadOnlyList<NativeRect> ReadScrollableAreas(Func<IReadOnlyList<NativeRect>> find, Func<bool> looksIncomplete, TimeSpan contentWait, TimeSpan pause,
+        CancellationToken cancellationToken)
+    {
+        var method = typeof(UiAutomationScroller).GetMethod("ReadScrollableAreas", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        try
+        {
+            return (IReadOnlyList<NativeRect>)method.Invoke(null, new object[] { find, looksIncomplete, contentWait, pause, IntPtr.Zero, cancellationToken });
+        }
+        catch (System.Reflection.TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            throw;
+        }
+    }
+
+    private static readonly IReadOnlyList<NativeRect> NoAreas = Array.Empty<NativeRect>();
+    private static readonly IReadOnlyList<NativeRect> OneArea = new[] { new NativeRect(10, 10, 100, 100) };
+
+    [Fact]
+    public void ScrollableAreas_ZeroWait_SearchesOnce()
+    {
+        var finds = 0;
+        var checks = 0;
+        var result = ReadScrollableAreas(() => { finds++; return NoAreas; }, () => { checks++; return true; }, TimeSpan.Zero, TimeSpan.FromMilliseconds(10),
+            TestContext.Current.CancellationToken);
+        Assert.Empty(result);
+        Assert.Equal(1, finds);
+        // Nothing to decide with a single search: no shallow read
+        Assert.Equal(0, checks);
+    }
+
+    [Fact]
+    public void ScrollableAreas_Found_DoesNotCheckTheTree()
+    {
+        var finds = 0;
+        var checks = 0;
+        var result = ReadScrollableAreas(() => { finds++; return OneArea; }, () => { checks++; return true; }, TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(10),
+            TestContext.Current.CancellationToken);
+        Assert.Same(OneArea, result);
+        Assert.Equal(1, finds);
+        Assert.Equal(0, checks);
+    }
+
+    [Fact]
+    public void ScrollableAreas_NothingAndCompleteTree_DoesNotWait()
+    {
+        var finds = 0;
+        var checks = 0;
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        var result = ReadScrollableAreas(() => { finds++; return NoAreas; }, () => { checks++; return false; }, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(1),
+            TestContext.Current.CancellationToken);
+        Assert.Empty(result);
+        Assert.Equal(1, finds);
+        Assert.Equal(1, checks);
+        Assert.True(stopwatch.ElapsedMilliseconds < 900, $"Took {stopwatch.ElapsedMilliseconds} ms");
+    }
+
+    [Fact]
+    public void ScrollableAreas_IncompleteTree_SearchesAgainUntilFound()
+    {
+        var finds = 0;
+        var result = ReadScrollableAreas(() => ++finds < 3 ? NoAreas : OneArea, () => true, TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(10),
+            TestContext.Current.CancellationToken);
+        Assert.Same(OneArea, result);
+        Assert.Equal(3, finds);
+    }
+
+    [Fact]
+    public void ScrollableAreas_CancelDuringPause_Throws()
+    {
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var finds = 0;
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        Assert.Throws<OperationCanceledException>(() => ReadScrollableAreas(() =>
+        {
+            finds++;
+            cancellationTokenSource.CancelAfter(100);
+            return NoAreas;
+        }, () => true, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(10), cancellationTokenSource.Token));
+        Assert.Equal(1, finds);
+        Assert.True(stopwatch.ElapsedMilliseconds < 5000, $"Cancellation took {stopwatch.ElapsedMilliseconds} ms");
+    }
+
+    [Fact]
+    public void FindScrollableAreas_NegativeContentWait_Throws()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => UiAutomationScroller.FindScrollableAreas(IntPtr.Zero, false, null, true, TimeSpan.FromSeconds(-1),
+            TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
+    ///     Real windows with a complete tree return without waiting: one which can scroll, one with nothing to scroll, and one whose
+    ///     large panel only holds small controls (left out by the shallow read, the panel has content)
+    /// </summary>
+    [Fact]
+    public void FindScrollableAreas_CompleteTree_ReturnsWithoutWaiting()
+    {
+        var contentWait = TimeSpan.FromSeconds(10);
+        using (var scrollWindow = new WpfScrollTestWindow())
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            var areas = UiAutomationScroller.FindScrollableAreas(scrollWindow.WindowHandle, false, null, true, contentWait, TestContext.Current.CancellationToken);
+            Assert.NotEmpty(areas);
+            Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(5), $"Took {stopwatch.ElapsedMilliseconds} ms");
+        }
+        using (var areasWindow = new AreasTestWindow())
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            var areas = UiAutomationScroller.FindScrollableAreas(areasWindow.WindowHandle, false, null, true, contentWait, TestContext.Current.CancellationToken);
+            Assert.Empty(areas);
+            Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(5), $"Took {stopwatch.ElapsedMilliseconds} ms");
+        }
+        using (var smallControlsWindow = new LargePanelTestWindow(LargePanelContent.SmallControls))
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            var areas = UiAutomationScroller.FindScrollableAreas(smallControlsWindow.WindowHandle, false, null, true, contentWait, TestContext.Current.CancellationToken);
+            Assert.Empty(areas);
+            Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(5), $"Took {stopwatch.ElapsedMilliseconds} ms");
+        }
+    }
+
+    /// <summary>
+    ///     A large element without content and nothing to scroll looks like a tree which isn't built yet: the whole content wait, once
+    /// </summary>
+    [Fact]
+    public void FindScrollableAreas_LargeEmptyElement_WaitsTheContentWait()
+    {
+        using var testWindow = new LargePanelTestWindow(LargePanelContent.Nothing);
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        var areas = UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle, false, null, true, TimeSpan.FromMilliseconds(800), TestContext.Current.CancellationToken);
+        stopwatch.Stop();
+        Assert.Empty(areas);
+        Assert.InRange(stopwatch.ElapsedMilliseconds, 700, 10000);
+
+        // The overloads without a content wait search once
+        stopwatch.Restart();
+        Assert.Empty(UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle));
+        Assert.True(stopwatch.ElapsedMilliseconds < 700, $"Took {stopwatch.ElapsedMilliseconds} ms");
+    }
+
+    /// <summary>
+    ///     Cancellation with a real window during the wait for content
+    /// </summary>
+    [Fact]
+    public void FindScrollableAreas_CancelDuringTheContentWait_Throws()
+    {
+        using var testWindow = new LargePanelTestWindow(LargePanelContent.Nothing);
+        using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        Assert.ThrowsAny<OperationCanceledException>(() =>
+            UiAutomationScroller.FindScrollableAreas(testWindow.WindowHandle, false, null, true, TimeSpan.FromSeconds(30), cancellationTokenSource.Token));
+        Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(10), $"Cancellation took {stopwatch.ElapsedMilliseconds} ms");
+    }
 }

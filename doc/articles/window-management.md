@@ -464,6 +464,17 @@ result per window. The UI Automation connection and transaction timeouts are set
 `UiAutomationScroller.DefaultFindTimeout`, 2 seconds; Windows 8 and later), so a hanging provider can't block for the
 default 20 seconds.
 
+Chromium based browsers (Edge, Chrome) and Electron apps build their accessibility tree when a UI Automation client first
+asks, so the first search after the browser started or a page loaded finds no area for the page.
+`FindScrollableAreas(window, horizontal, timeout, includeScrollBarAreas, contentWait, cancellationToken)` searches again
+in that case: when nothing is found and a shallow read of the control view shows an element without content covering at
+least a quarter of the window (the check of `UiAutomationAreas.FindAreasAsync`), it searches again with a pause of a
+quarter of a second between the attempts, until an area is found, the tree is complete or `contentWait` has passed
+(null for `UiAutomationAreas.DefaultContentWait`, 3 seconds; `TimeSpan.Zero` searches once, like the overloads without
+it), and returns the last result. A window with nothing to scroll and a complete tree never waits; one with an element
+which really is large and empty waits the whole `contentWait`, so cache the result. The token is checked during every
+pause and before every search.
+
 <!-- sample: WindowSamples.ScrollableAreas -->
 ```csharp
 // Greenshot-style: list the scrollable areas of the window under the mouse once (it blocks, so not on the UI thread;

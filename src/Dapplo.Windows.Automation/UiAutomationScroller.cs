@@ -184,6 +184,12 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     ///     <paramref name="timeout"/>, so a hanging application can't block the caller for the default 20 seconds.
     ///     </para>
     ///     <para>
+    ///     This overload searches once. Chromium based browsers and Electron apps build their accessibility tree only when a UI Automation
+    ///     client asks for it, so the first search after the browser started or a page loaded can miss the page; the overload with a
+    ///     <c>contentWait</c> (<see cref="FindScrollableAreas(IntPtr, bool, TimeSpan?, bool, TimeSpan?, CancellationToken)"/>) searches again
+    ///     while nothing is found and the tree looks incomplete.
+    ///     </para>
+    ///     <para>
     ///     To scroll an area later, e.g. after the covering window closed, use <see cref="FromPoint"/> with the middle of its rectangle.
     ///     </para>
     /// </remarks>
@@ -204,17 +210,104 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     ///     false for the elements with a ScrollPattern only</param>
     /// <returns>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</returns>
     public static IReadOnlyList<NativeRect> FindScrollableAreas(IntPtr windowHandle, bool horizontal, TimeSpan? timeout, bool includeScrollBarAreas)
+        => FindScrollableAreas(windowHandle, horizontal, timeout, includeScrollBarAreas, TimeSpan.Zero);
+
+    /// <summary>
+    ///     List the areas of a window which can scroll in the direction, and wait for content which isn't there yet, see
+    ///     <see cref="FindScrollableAreas(IntPtr, bool, TimeSpan?)"/>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     Some applications (e.g. Chromium based browsers and Electron apps) build their accessibility tree only when a UI Automation client
+    ///     asks for it, the first answer then has only the frame of the window, so the page has no scrollable area yet. When the search finds no
+    ///     area, a shallow read of the control view (as <see cref="UiAutomationAreas.FindAreasAsync(IntPtr, int, int, TimeSpan?, TimeSpan?, CancellationToken)"/>
+    ///     does) tells if the tree looks incomplete: an element without content (it reports no children which aren't offscreen, only children with
+    ///     an empty rectangle, or children with its own rectangle which have no content themselves) covers at least a quarter of the window. Then
+    ///     the search is done again, with a short pause (a quarter of a second) between the attempts, until an area is found, the tree is complete
+    ///     or <paramref name="contentWait"/> has passed; the last result is returned. A window which has nothing to scroll and a complete tree
+    ///     never waits, an empty overlay with a sibling of the same bounds which has content doesn't count. A window with an element which really
+    ///     is large and empty (and nothing to scroll) waits the whole <paramref name="contentWait"/> on every call: cache the result, or pass a
+    ///     shorter one (or <see cref="TimeSpan.Zero"/>) for such windows.
+    ///     </para>
+    ///     <para>
+    ///     All attempts use one UI Automation object. <paramref name="cancellationToken"/> is checked during every pause and before every search,
+    ///     a single search can't be interrupted.
+    ///     </para>
+    /// </remarks>
+    /// <param name="windowHandle">IntPtr with the handle of the window</param>
+    /// <param name="horizontal">false for vertically scrollable areas, true for horizontally scrollable areas</param>
+    /// <param name="timeout">TimeSpan for the UI Automation timeouts, null for <see cref="DefaultFindTimeout"/></param>
+    /// <param name="includeScrollBarAreas">true to include the parents of scroll bar elements (areas without a ScrollPattern),
+    ///     false for the elements with a ScrollPattern only</param>
+    /// <param name="contentWait">TimeSpan, how long the search is done again while it finds nothing and the tree looks incomplete,
+    ///     null for <see cref="UiAutomationAreas.DefaultContentWait"/>; <see cref="TimeSpan.Zero"/> searches once</param>
+    /// <param name="cancellationToken">CancellationToken, checked during every pause and before every search</param>
+    /// <returns>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</returns>
+    /// <exception cref="OperationCanceledException">When <paramref name="cancellationToken"/> was canceled</exception>
+    public static IReadOnlyList<NativeRect> FindScrollableAreas(IntPtr windowHandle, bool horizontal, TimeSpan? timeout, bool includeScrollBarAreas,
+        TimeSpan? contentWait, CancellationToken cancellationToken = default)
     {
-        var areas = new List<NativeRect>();
+        if (contentWait < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(contentWait), contentWait, "The content wait can't be negative.");
+        }
+        cancellationToken.ThrowIfCancellationRequested();
         if (windowHandle == IntPtr.Zero)
         {
-            return areas;
+            return new List<NativeRect>();
         }
         var automation = CreateAutomation(timeout ?? DefaultFindTimeout);
         if (automation is null)
         {
-            return areas;
+            return new List<NativeRect>();
         }
+        try
+        {
+            return ReadScrollableAreas(() => FindScrollableAreasOnce(automation, windowHandle, horizontal, includeScrollBarAreas),
+                () => UiAutomationAreas.LooksIncomplete(automation, windowHandle, cancellationToken),
+                contentWait ?? UiAutomationAreas.DefaultContentWait, UiAutomationAreas.ContentPause, windowHandle, cancellationToken);
+        }
+        finally
+        {
+            Release(automation);
+        }
+    }
+
+    /// <summary>
+    ///     Search, and search again while nothing is found and the tree looks incomplete, see
+    ///     <see cref="FindScrollableAreas(IntPtr, bool, TimeSpan?, bool, TimeSpan?, CancellationToken)"/>
+    /// </summary>
+    /// <param name="find">searches the scrollable areas once</param>
+    /// <param name="looksIncomplete">tells if the tree looks incomplete, only asked when the search found nothing</param>
+    /// <param name="contentWait">TimeSpan with the total time for the attempts, TimeSpan.Zero searches once</param>
+    /// <param name="pause">TimeSpan between two attempts</param>
+    /// <param name="windowHandle">IntPtr for the log</param>
+    /// <param name="cancellationToken">CancellationToken, checked during every pause and before every search</param>
+    internal static IReadOnlyList<NativeRect> ReadScrollableAreas(Func<IReadOnlyList<NativeRect>> find, Func<bool> looksIncomplete, TimeSpan contentWait,
+        TimeSpan pause, IntPtr windowHandle, CancellationToken cancellationToken)
+    {
+        if (contentWait <= TimeSpan.Zero)
+        {
+            return find();
+        }
+        return UiAutomationAreas.ReadUntil(() =>
+        {
+            var areas = find();
+            if (areas.Count > 0)
+            {
+                return (areas, false);
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            return (areas, looksIncomplete());
+        }, contentWait, pause, windowHandle, cancellationToken);
+    }
+
+    /// <summary>
+    ///     One search for the scrollable areas, with the UI Automation object of the caller
+    /// </summary>
+    private static List<NativeRect> FindScrollableAreasOnce(IUIAutomation automation, IntPtr windowHandle, bool horizontal, bool includeScrollBarAreas)
+    {
+        var areas = new List<NativeRect>();
         IUIAutomationElement windowElement = null;
         IUIAutomationCondition scrollableCondition = null;
         IUIAutomationCondition scrollBarCondition = null;
@@ -339,7 +432,6 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             Release(scrollBarCondition);
             Release(scrollableCondition);
             Release(windowElement);
-            Release(automation);
         }
     }
 
@@ -466,6 +558,22 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     /// <returns>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</returns>
     public static IReadOnlyList<NativeRect> FindScrollableAreas(IInteropWindow window, bool horizontal, TimeSpan? timeout, bool includeScrollBarAreas)
         => window is null ? Array.Empty<NativeRect>() : FindScrollableAreas(window.Handle, horizontal, timeout, includeScrollBarAreas);
+
+    /// <summary>
+    ///     List the scrollable areas of a window and wait for content which isn't there yet, see
+    ///     <see cref="FindScrollableAreas(IntPtr, bool, TimeSpan?, bool, TimeSpan?, CancellationToken)"/>
+    /// </summary>
+    /// <param name="window">IInteropWindow</param>
+    /// <param name="horizontal">false for vertically scrollable areas, true for horizontally scrollable areas</param>
+    /// <param name="timeout">TimeSpan for the UI Automation timeouts, null for <see cref="DefaultFindTimeout"/></param>
+    /// <param name="includeScrollBarAreas">true to include the parents of scroll bar elements, false for the elements with a ScrollPattern only</param>
+    /// <param name="contentWait">TimeSpan, how long the search is done again while it finds nothing and the tree looks incomplete,
+    ///     null for <see cref="UiAutomationAreas.DefaultContentWait"/>; <see cref="TimeSpan.Zero"/> searches once</param>
+    /// <param name="cancellationToken">CancellationToken, checked during every pause and before every search</param>
+    /// <returns>IReadOnlyList with the rectangles, empty (never null) when there are none or UI Automation is not available</returns>
+    public static IReadOnlyList<NativeRect> FindScrollableAreas(IInteropWindow window, bool horizontal, TimeSpan? timeout, bool includeScrollBarAreas,
+        TimeSpan? contentWait, CancellationToken cancellationToken = default)
+        => window is null ? Array.Empty<NativeRect>() : FindScrollableAreas(window.Handle, horizontal, timeout, includeScrollBarAreas, contentWait, cancellationToken);
 
     /// <summary>
     ///     True when this scrolls horizontally, false for vertical scrolling
