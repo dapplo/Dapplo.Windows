@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Getting started | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Getting started | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/intro.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="getting-started">Getting started</h1>
+
+<p>Dapplo.Windows gives .NET applications access to the parts of Windows that the .NET base library doesn't cover:
+window information and events, keyboard and mouse hooks, the clipboard, DPI awareness, power management, the
+Restart Manager and more. It started as the native layer of <a href="https://getgreenshot.org/">Greenshot</a> and is split into
+small packages, so you only install what you use.</p>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li>Windows. The packages call Win32 APIs and don't work on other operating systems.</li>
+<li>.NET Framework 4.8 (<code>net480</code>) or .NET 10 (<code>net10.0-windows</code>). Every package targets both.</li>
+<li>Most APIs work on Windows 7 and later. Where a feature needs a newer Windows version (for example Per Monitor V2 DPI
+awareness, Windows 10 1703), the documentation says so.</li>
+</ul>
+<h2 id="packages">Packages</h2>
+<p>Install the package for the feature you need, NuGet brings in its dependencies.</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>What it's for</th>
+<th>Depends on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dapplo.Windows</strong></td>
+<td>Window information, enumeration and manipulation, WinEvent hooks, window screenshots and icons, installed software</td>
+<td>Common, Com, DesktopWindowsManager, Gdi32, Icons, Input, Kernel32, Messages, User32</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Clipboard</strong></td>
+<td>Monitor, read and write the clipboard, delayed rendering, clipboard history and cloud options</td>
+<td>Kernel32, Messages</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Input</strong></td>
+<td>Low-level keyboard and mouse hooks, key combinations and sequences, generating input, raw input</td>
+<td>Common, Messages, User32</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Dpi</strong></td>
+<td>DPI calculations, <code>DpiHandler</code> for DPI changes, bitmap scaling, DPI awareness contexts</td>
+<td>Common, Gdi32, Messages, User32</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Forms</strong></td>
+<td>Windows Forms integration: <code>DpiAwareForm</code>, window messages of a <code>Control</code>, placement</td>
+<td>Dapplo.Windows, Dpi, Messages</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Wpf</strong></td>
+<td>WPF integration: DPI handler for a <code>Window</code>, window messages, conversions to WPF types, <code>BitmapSource</code></td>
+<td>Dapplo.Windows, Dpi, Gdi32, Messages</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Messages</strong></td>
+<td><code>SharedMessageWindow</code>, the <code>WindowsMessages</code> enum, session (lock / logon) notifications</td>
+<td>Common</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.SystemState</strong></td>
+<td>Prevent sleep, sleep / hibernate / shut down / log off, waitable (wake) timers, power events</td>
+<td>Messages</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.AppRestartManager</strong></td>
+<td>Register an application for restart, answer &quot;end session&quot; requests</td>
+<td>Messages</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.InstallerManager</strong></td>
+<td>For installers: find the processes which lock files, close and restart them (Restart Manager)</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Dialogs</strong></td>
+<td>Modern file open, file save and folder picker dialogs, without WinForms or WPF</td>
+<td>Common</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Icons</strong></td>
+<td>Extract icons, write ICO and CUR files, capture the mouse cursor</td>
+<td>Common, Dpi, Gdi32, Kernel32, Messages, Shell32, User32</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Devices</strong></td>
+<td>Device arrival and removal notifications (USB, volumes, ...)</td>
+<td>Messages</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.DesktopWindowsManager</strong></td>
+<td>DWM: extended frame bounds, cloaking, accent color, corner preference</td>
+<td>Common</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Citrix</strong></td>
+<td>Detect a Citrix session and query client information</td>
+<td>Common</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.EmbeddedBrowser</strong></td>
+<td>Make the WinForms <code>WebBrowser</code> use the installed Internet Explorer version</td>
+<td>Com</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Multimedia</strong></td>
+<td>Play system sounds and WAV data</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Advapi32</strong></td>
+<td>Registry change notifications, logon SID</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.User32</strong></td>
+<td>User32 P/Invoke: windows, displays, messages, scroll bars</td>
+<td>Common, Messages</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Gdi32</strong></td>
+<td>GDI and GDI+ P/Invoke, safe handles, bitmap helpers</td>
+<td>Common, User32</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Kernel32</strong></td>
+<td>Kernel32 P/Invoke: processes, DLL loading, package identity</td>
+<td>Common</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Shell32</strong></td>
+<td>Shell32 P/Invoke: taskbar position and state, icon extraction</td>
+<td>Common</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Com</strong></td>
+<td>COM helpers</td>
+<td>Common</td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.Common</strong></td>
+<td>Shared structs (<code>NativeRect</code>, <code>NativePoint</code>, ...), <code>HResult</code>, <code>Win32</code> errors, <code>WindowsVersion</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p>The packages don't depend on Windows Forms or WPF, except <strong>Dapplo.Windows.Forms</strong>, <strong>Dapplo.Windows.Wpf</strong> (see
+<a href="forms-and-wpf.html">Windows Forms and WPF</a>) and <strong>Dapplo.Windows.EmbeddedBrowser</strong>, which extends the Windows Forms
+<code>WebBrowser</code>.</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows
+dotnet add package Dapplo.Windows.Clipboard
+dotnet add package Dapplo.Windows.Input
+</code></pre>
+<h2 id="first-steps">First steps</h2>
+<p>List the visible top-level windows:</p>
+<!-- sample: GettingStartedSamples.FirstWindowQuery -->
+<pre><code class="lang-csharp">// using Dapplo.Windows.Desktop;
+foreach (var window in InteropWindowQuery.GetVisibleApplicationWindows())
+{
+    Console.WriteLine($&quot;{window.GetCaption()} - {window.GetClassname()} at {window.GetInfo().Bounds}&quot;);
+}
+</code></pre>
+<p>Get told when a window title changes:</p>
+<!-- sample: GettingStartedSamples.WindowTitles -->
+<pre><code class="lang-csharp">// using Dapplo.Windows.Desktop; using System.Reactive.Linq;
+IDisposable subscription = WinEventHook.WindowTitleChangeObservable()
+    .Subscribe(info =&gt;
+    {
+        var window = InteropWindowFactory.CreateFor(info.Handle);
+        Console.WriteLine($&quot;Title changed: {window.GetCaption(forceUpdate: true)}&quot;);
+    });
+</code></pre>
+<p>Log the text that is copied to the clipboard:</p>
+<!-- sample: GettingStartedSamples.FirstClipboardMonitor -->
+<pre><code class="lang-csharp">// using Dapplo.Windows.Clipboard; using System.Reactive.Linq;
+IDisposable subscription = ClipboardNative.OnUpdate
+    .Where(info =&gt; info.FormatIds.Contains((uint)StandardClipboardFormats.UnicodeText))
+    .Throttle(TimeSpan.FromMilliseconds(100))
+    .Subscribe(info =&gt;
+    {
+        using var clipboard = ClipboardNative.Access();
+        Console.WriteLine($&quot;Copied: {clipboard.GetAsUnicodeString()}&quot;);
+    });
+</code></pre>
+<p>React to a global hotkey:</p>
+<!-- sample: GettingStartedSamples.FirstKeyboardHook -->
+<pre><code class="lang-csharp">// using Dapplo.Windows.Input.Enums; using Dapplo.Windows.Input.Keyboard; using System.Reactive.Linq;
+// Ctrl+Shift+S anywhere in Windows. The handler runs on the hook thread, ObserveOn moves the work to the UI thread.
+IDisposable subscription = KeyboardHook.KeyboardEvents
+    .Where(new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyS))
+    .ObserveOn(SynchronizationContext.Current)
+    .Subscribe(_ =&gt; Console.WriteLine(&quot;Ctrl+Shift+S pressed&quot;));
+</code></pre>
+<h2 id="how-the-library-works">How the library works</h2>
+<p>Most events in Dapplo.Windows are <code>IObservable&lt;T&gt;</code> streams (<a href="https://github.com/dotnet/reactive">System.Reactive</a>).
+A few rules apply to all of them.</p>
+<p><strong>Subscribing installs, disposing removes.</strong> A hook or registration is made when you subscribe and removed when the
+last subscription is disposed. Keep the <code>IDisposable</code> and dispose it when you're done:</p>
+<!-- sample: GettingStartedSamples.Dispose -->
+<pre><code class="lang-csharp">// Hooks and registrations are made when you subscribe, and removed when you dispose the subscription
+IDisposable subscription = ClipboardNative.OnUpdate.Subscribe(info =&gt; { });
+// ...
+subscription.Dispose();
+
+// Clipboard access is a lock for all applications: hold it briefly and always dispose it
+using (var clipboard = ClipboardNative.Access())
+{
+    // ...
+}
+</code></pre>
+<p><strong>Events arrive on a background thread.</strong> Windows delivers hook and window messages to the thread which registered
+them, so the library uses its own threads:</p>
+<ul>
+<li>Window messages (clipboard updates, power, session, device, WinEvent hooks, raw input) arrive on the thread of the
+<a href="window-messages.html">SharedMessageWindow</a>, a hidden window with its own message loop that lives for the whole process.</li>
+<li>Keyboard and mouse hook events arrive on the hook thread of <code>KeyboardHook</code> / <code>MouseHook</code>.</li>
+</ul>
+<p>Your <code>OnNext</code> runs on that thread and blocks it. Keep it short. Use <code>ObserveOn(SynchronizationContext.Current)</code>
+(called on the UI thread) to continue on the UI thread, or <code>ObserveOn(TaskPoolScheduler.Default)</code> for slow work.</p>
+<p><strong>Answer synchronously.</strong> When you answer Windows, for example with <code>Handled</code> on a key event or <code>Result</code> on a window
+message, do it inside <code>OnNext</code>, before any <code>ObserveOn</code>, <code>Throttle</code> or <code>await</code>. Once the thread changes, Windows already
+has its answer.</p>
+<p><strong>A failing subscriber doesn't take the others down.</strong> An exception in your <code>OnNext</code> ends that subscription only. The
+SharedMessageWindow and the hooks publish these exceptions on their <code>SubscriberErrors</code> observables and write them to
+<code>System.Diagnostics.Trace</code>.</p>
+<h2 id="about-the-samples">About the samples</h2>
+<p>Every code sample in this documentation, in the README and in the wiki is compiled with each build. The samples live in
+the project
+<a href="https://github.com/dapplo/Dapplo.Windows/tree/master/src/Dapplo.Windows.Example.DocSamples">src/Dapplo.Windows.Example.DocSamples</a>,
+one class per page (for example <code>ClipboardSamples</code> for <a href="clipboard-usage.html">the clipboard page</a>). Each sample is a
+<code>#region</code> in that class, and the markdown has a <code>&lt;!-- sample: Class.Region --&gt;</code> comment above the copy of the code.
+When you change a sample, change the code in the project first, build, and copy the region into the markdown.</p>
+<p>The samples show the calls, they are not meant to be run as they are. The <code>using</code> directives which a page needs are
+listed at the top of the page, the example projects in the repository (<code>Dapplo.Windows.Example.*</code>) are complete
+applications.</p>
+<h2 id="upgrading-from-2x">Upgrading from 2.x</h2>
+<p>Version 3.0 changes many APIs on purpose. Read the <a href="migration-3.0.html">migration guide</a> and the
+<a href="https://github.com/dapplo/Dapplo.Windows/blob/master/CHANGELOG.md">changelog</a>.</p>
+<h2 id="where-next">Where next</h2>
+<ul>
+<li><a href="window-management.html">Window management</a></li>
+<li><a href="window-messages.html">Window messages and the SharedMessageWindow</a></li>
+<li><a href="input-handling.html">Keyboard and mouse</a></li>
+<li><a href="clipboard-usage.html">Clipboard</a></li>
+<li><a href="dpi-awareness.html">DPI awareness</a></li>
+<li><a href="system-state.html">Power and system state</a></li>
+<li><a href="restart-manager.html">Restart Manager</a></li>
+<li><a href="icons.html">Icons and cursors</a></li>
+<li><a href="dialogs.html">File and folder dialogs</a></li>
+<li><a href="forms-and-wpf.html">Windows Forms and WPF</a></li>
+<li><a href="more-packages.html">More packages</a></li>
+<li><a href="common-scenarios.html">Common scenarios</a></li>
+<li><a href="../api/index.html">API reference</a></li>
+</ul>
+<p>Questions and bugs: <a href="https://github.com/dapplo/Dapplo.Windows/issues">GitHub issues</a>.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/intro.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

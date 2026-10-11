@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Interface IDispatch | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Interface IDispatch | Dapplo.Windows ">
+      
+      <meta name="description" content="Exposes objects, methods and properties to programming tools and other applications that support Automation. COM components implement the IDispatch interface to enable access by Automation clients, such as Visual Basic. This is declared as InterfaceIsIUnknown, as the runtime adds the IUnknown methods (slot 0-2) itself, so the IDispatch methods are in the vtable slots 3-6 on all target frameworks.">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Com_IDispatch.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Com.IDispatch%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Com.IDispatch">
+
+
+
+  <h1 id="Dapplo_Windows_Com_IDispatch" data-uid="Dapplo.Windows.Com.IDispatch" class="text-break">
+Interface IDispatch  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Com/IDispatch.cs/#L15"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Com.html">Com</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Com.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Exposes objects, methods and properties to programming tools and other applications that support Automation. COM components implement the IDispatch interface to enable access by Automation clients, such as Visual Basic.
+This is declared as InterfaceIsIUnknown, as the runtime adds the IUnknown methods (slot 0-2) itself, so the IDispatch methods are in the vtable slots 3-6 on all target frameworks.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Guid(&quot;00020400-0000-0000-C000-000000000046&quot;)]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+public interface IDispatch</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Com_IDispatch_GetIDsOfNames_" data-uid="Dapplo.Windows.Com.IDispatch.GetIDsOfNames*"></a>
+
+  <h3 id="Dapplo_Windows_Com_IDispatch_GetIDsOfNames_System_Guid__System_String___System_Int32_System_Int32_System_Int32___" data-uid="Dapplo.Windows.Com.IDispatch.GetIDsOfNames(System.Guid@,System.String[],System.Int32,System.Int32,System.Int32[])">
+  GetIDsOfNames(ref Guid, string[], int, int, int[])
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Com/IDispatch.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Maps a single member and an optional set of argument names to a corresponding set of integer DISPIDs, which can be used on subsequent calls to Invoke.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int GetIDsOfNames(ref Guid riid, string[] rgsNames, int cNames, int lcid, int[] rgDispId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>riid</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a></dt>
+    <dd><p>Reserved for future use. Must be IID_NULL (Guid.Empty).</p>
+</dd>
+    <dt><code>rgsNames</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd><p>Array of names to be mapped.</p>
+</dd>
+    <dt><code>cNames</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The count of the names to be mapped.</p>
+</dd>
+    <dt><code>lcid</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The locale context in which to interpret the names.</p>
+</dd>
+    <dt><code>rgDispId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>[]</dt>
+    <dd><p>Caller-allocated array, each element of which contains an identifier (ID) corresponding to one of the names passed in the rgszNames array.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the HRESULT</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Com_IDispatch_GetTypeInfo_" data-uid="Dapplo.Windows.Com.IDispatch.GetTypeInfo*"></a>
+
+  <h3 id="Dapplo_Windows_Com_IDispatch_GetTypeInfo_System_Int32_System_Int32_System_Runtime_InteropServices_ComTypes_ITypeInfo__" data-uid="Dapplo.Windows.Com.IDispatch.GetTypeInfo(System.Int32,System.Int32,System.Runtime.InteropServices.ComTypes.ITypeInfo@)">
+  GetTypeInfo(int, int, out ITypeInfo)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Com/IDispatch.cs/#L35"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the type information for an object, which can then be used to get the type information for an interface.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int GetTypeInfo(int iTInfo, int lcid, out ITypeInfo typeInfo)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>iTInfo</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the type information to return, pass 0 to retrieve type information for the IDispatch implementation</p>
+</dd>
+    <dt><code>lcid</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the locale identifier for the type information</p>
+</dd>
+    <dt><code>typeInfo</code> <span class="xref">ITypeInfo</span></dt>
+    <dd><p>out ITypeInfo</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the HRESULT</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Com_IDispatch_GetTypeInfoCount_" data-uid="Dapplo.Windows.Com.IDispatch.GetTypeInfoCount*"></a>
+
+  <h3 id="Dapplo_Windows_Com_IDispatch_GetTypeInfoCount_System_Int32__" data-uid="Dapplo.Windows.Com.IDispatch.GetTypeInfoCount(System.Int32@)">
+  GetTypeInfoCount(out int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Com/IDispatch.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the number of type information interfaces that an object provides (either 0 or 1).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int GetTypeInfoCount(out int count)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>count</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>out int with the number of type information interfaces</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the HRESULT</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Com_IDispatch_Invoke_" data-uid="Dapplo.Windows.Com.IDispatch.Invoke*"></a>
+
+  <h3 id="Dapplo_Windows_Com_IDispatch_Invoke_System_Int32_System_Guid__System_UInt32_System_UInt16_System_Runtime_InteropServices_ComTypes_DISPPARAMS__System_Object__System_Runtime_InteropServices_ComTypes_EXCEPINFO__System_UInt32__" data-uid="Dapplo.Windows.Com.IDispatch.Invoke(System.Int32,System.Guid@,System.UInt32,System.UInt16,System.Runtime.InteropServices.ComTypes.DISPPARAMS@,System.Object@,System.Runtime.InteropServices.ComTypes.EXCEPINFO@,System.UInt32@)">
+  Invoke(int, ref Guid, uint, ushort, ref DISPPARAMS, out object, ref EXCEPINFO, out uint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Com/IDispatch.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Provides access to properties and methods exposed by an object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int Invoke(int dispIdMember, ref Guid riid, uint lcid, ushort wFlags, ref DISPPARAMS pDispParams, out object pVarResult, ref EXCEPINFO pExcepInfo, out uint pArgErr)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dispIdMember</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Identifies the member.</p>
+</dd>
+    <dt><code>riid</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a></dt>
+    <dd><p>Reserved for future use. Must be IID_NULL (Guid.Empty).</p>
+</dd>
+    <dt><code>lcid</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>The locale context in which to interpret arguments.</p>
+</dd>
+    <dt><code>wFlags</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint16">ushort</a></dt>
+    <dd><p>Flags describing the context of the Invoke call.</p>
+</dd>
+    <dt><code>pDispParams</code> <span class="xref">DISPPARAMS</span></dt>
+    <dd><p>Pointer to a DISPPARAMS structure containing an array of arguments.</p>
+</dd>
+    <dt><code>pVarResult</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The result.</p>
+</dd>
+    <dt><code>pExcepInfo</code> <span class="xref">EXCEPINFO</span></dt>
+    <dd><p>A structure that contains exception information.</p>
+</dd>
+    <dt><code>pArgErr</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>The index of the first argument that has an error.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the HRESULT</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Com/IDispatch.cs/#L15" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Window messages and the SharedMessageWindow | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Window messages and the SharedMessageWindow | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/window-messages.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="window-messages-and-the-sharedmessagewindow">Window messages and the SharedMessageWindow</h1>
+
+<p>Many Windows notifications arrive as messages for a window: clipboard changes, power events, session changes, device
+changes, hotkeys, raw input. <strong>Dapplo.Windows.Messages</strong> provides one hidden window for all of them, the
+<code>SharedMessageWindow</code>, and exposes its messages as an observable.</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows.Messages
+</code></pre>
+<p>Namespaces used on this page: <code>Dapplo.Windows.Messages</code>, <code>Dapplo.Windows.Messages.Enums</code>,
+<code>System.Reactive.Linq</code>; for the integrations <code>Dapplo.Windows.Forms.Messages</code>, <code>Dapplo.Windows.Wpf.Messages</code> and
+<code>Dapplo.Windows.Desktop</code>.</p>
+<h2 id="the-sharedmessagewindow">The SharedMessageWindow</h2>
+<ul>
+<li>It is created on first use (the first access to <code>Handle</code>, <code>Messages</code>, <code>Listen</code> or <code>Invoke</code>) on its own background
+STA thread with a message loop, and then lives until the process exits. Subscribing or disposing never creates or
+destroys it. If something destroys the window, it's created again on the next use.</li>
+<li>When the process exits (<code>AppDomain.ProcessExit</code>) it is destroyed on its own thread, see <a href="#shutdown">Shutdown</a>, so
+delayed rendered clipboard content is rendered and survives the process.</li>
+<li>It is a hidden top-level window (<code>WS_POPUP</code> with <code>WS_EX_TOOLWINDOW</code>), not a message-only window: only top-level
+windows receive broadcasts such as <code>WM_QUERYENDSESSION</code>, <code>WM_POWERBROADCAST</code>, <code>WM_DISPLAYCHANGE</code> and
+<code>WM_SETTINGCHANGE</code>. It doesn't show up in the taskbar or in Alt+Tab.</li>
+<li><code>SharedMessageWindow.Handle</code> returns the handle; it waits until the window exists and never returns 0.</li>
+<li>All of Dapplo.Windows uses this one window, so every package that needs messages shares one thread.</li>
+</ul>
+<h3 id="receiving-messages">Receiving messages</h3>
+<p><code>SharedMessageWindow.Messages</code> is a hot observable of every message the window receives. <code>OnNext</code> is called
+synchronously inside the window procedure, on the window thread. Keep it short: while your code runs, the window can't
+process other messages.</p>
+<!-- sample: MessagesSamples.SimpleFilter -->
+<pre><code class="lang-csharp">// Called on the SharedMessageWindow thread: keep it short, and never block it
+IDisposable subscription = SharedMessageWindow.Messages
+    .Where(m =&gt; m.Msg == WindowsMessages.WM_DISPLAYCHANGE)
+    .Subscribe(m =&gt; Console.WriteLine($&quot;Display changed, new resolution {(int)m.LParam &amp; 0xFFFF}x{((int)m.LParam &gt;&gt; 16) &amp; 0xFFFF}&quot;));
+
+// Stop listening, the window itself stays alive
+subscription.Dispose();
+</code></pre>
+<p>Use <code>ObserveOn</code> to continue somewhere else, for example on the UI thread:</p>
+<!-- sample: MessagesSamples.ObserveOnUi -->
+<pre><code class="lang-csharp">// Filter on the window thread, then continue on the UI thread (call this on the UI thread)
+var subscription = SharedMessageWindow.Messages
+    .Where(m =&gt; m.Msg == WindowsMessages.WM_SETTINGCHANGE)
+    .ObserveOn(SynchronizationContext.Current)
+    .Subscribe(m =&gt; statusLabel.Text = &quot;Settings changed&quot;);
+</code></pre>
+<h3 id="answering-a-message">Answering a message</h3>
+<p>Each message is a <code>WindowMessage</code> object which all subscribers share. Set <code>Handled = true</code> and a <code>Result</code> to answer
+Windows yourself; when nobody sets <code>Handled</code>, the default window procedure processes the message. This only works
+synchronously inside <code>OnNext</code>: after <code>ObserveOn</code>, <code>Throttle</code>, <code>Delay</code> or an <code>await</code> the answer was already sent.</p>
+<!-- sample: MessagesSamples.HandleMessage -->
+<pre><code class="lang-csharp">// Handled and Result must be set synchronously in OnNext, before any ObserveOn
+var subscription = SharedMessageWindow.Messages
+    .Where(m =&gt; m.Msg == WindowsMessages.WM_QUERYENDSESSION)
+    .Subscribe(m =&gt;
+    {
+        m.Result = 1;    // TRUE: the session may end
+        m.Handled = true; // don't call DefWindowProc
+    });
+</code></pre>
+<h3 id="registrations-listen">Registrations: Listen</h3>
+<p>Many APIs register a window for notifications and must be called on the thread of that window (<code>RegisterHotKey</code>,
+<code>AddClipboardFormatListener</code>, <code>WTSRegisterSessionNotification</code>, <code>RegisterRawInputDevices</code>, ...). <code>Listen(onSetup, onTeardown)</code> runs <code>onSetup</code> on the window thread when you subscribe, and <code>onTeardown</code> on the window thread when you
+dispose, exactly once per subscription. When <code>onSetup</code> throws, the exception goes to <code>OnError</code> of the subscriber and
+<code>onTeardown</code> is not called.</p>
+<!-- sample: MessagesSamples.ListenHotkeyPInvoke -->
+<pre><code class="lang-csharp">[DllImport(&quot;user32&quot;, SetLastError = true)]
+private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint modifiers, uint virtualKey);
+
+[DllImport(&quot;user32&quot;, SetLastError = true)]
+private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+</code></pre>
+<!-- sample: MessagesSamples.ListenHotkey -->
+<pre><code class="lang-csharp">const int hotkeyId = 1;
+const uint modControl = 0x0002, modShift = 0x0004, modNoRepeat = 0x4000;
+
+// RegisterHotKey must be called on the thread of the window which gets WM_HOTKEY:
+// Listen runs onSetup and onTeardown on the SharedMessageWindow thread
+var subscription = SharedMessageWindow.Listen(
+        onSetup: hwnd =&gt;
+        {
+            if (!RegisterHotKey(hwnd, hotkeyId, modControl | modShift | modNoRepeat, (uint)'P'))
+            {
+                // The exception goes to OnError of this subscription
+                throw new System.ComponentModel.Win32Exception();
+            }
+        },
+        onTeardown: hwnd =&gt; UnregisterHotKey(hwnd, hotkeyId))
+    .Where(m =&gt; m.Msg == WindowsMessages.WM_HOTKEY &amp;&amp; m.WParam == hotkeyId)
+    .Subscribe(
+        m =&gt; Console.WriteLine(&quot;Ctrl+Shift+P pressed&quot;),
+        ex =&gt; Console.WriteLine($&quot;Registering the hotkey failed: {ex.Message}&quot;));
+
+// Disposing the subscription runs onTeardown (UnregisterHotKey) on the window thread
+subscription.Dispose();
+</code></pre>
+<h3 id="running-code-on-the-window-thread-invoke">Running code on the window thread: Invoke</h3>
+<p><code>Invoke(action)</code> runs the action synchronously on the window thread and rethrows its exceptions. On the window thread
+itself it calls the action directly. Don't call it from a thread the window thread is waiting for, that would
+deadlock.</p>
+<!-- sample: MessagesSamples.Invoke -->
+<pre><code class="lang-csharp">// Run code on the window thread and wait for it, exceptions are rethrown here
+bool isWindowThread = false;
+SharedMessageWindow.Invoke(hwnd =&gt; isWindowThread = SharedMessageWindow.IsWindowThread);
+
+// The handle exists as soon as it's requested, and stays valid until the window is shut down (at process exit)
+IntPtr handle = SharedMessageWindow.Handle;
+</code></pre>
+<h3 id="shutdown">Shutdown</h3>
+<p><code>SharedMessageWindow.Shutdown(timeout)</code> destroys the window on its own thread and waits until its message loop ended.
+Destroying it makes Windows send <code>WM_RENDERALLFORMATS</code> (when the window owns the clipboard) and <code>WM_DESTROY</code>: the
+<a href="clipboard-usage.html#delayed-rendering">delayed clipboard renderers</a> run synchronously on the window thread before
+<code>Shutdown</code> returns. It returns <code>false</code> when the timeout elapsed.</p>
+<ul>
+<li>It's called automatically on <code>AppDomain.ProcessExit</code>, with <code>ProcessExitShutdownTimeout</code> (default 1.5 seconds;
+on .NET Framework all ProcessExit handlers together get about 2 seconds). ProcessExit runs on another thread, the
+window thread is a background thread which is still running then. After that <code>IsProcessExiting</code> is <code>true</code> and the
+window is not created again: using it throws an <code>ObjectDisposedException</code>.</li>
+<li>On .NET Framework, in a non-default AppDomain (e.g. a test host such as vstest or xunit), the same happens on
+<code>AppDomain.DomainUnload</code>, with the same timeout: the window thread must have ended before the CLR aborts the threads
+of the unloaded AppDomain, and <code>IsProcessExiting</code> is <code>true</code> from then on. If the shutdown times out (e.g. a delayed
+renderer is still busy), <code>WM_CLOSE</code> is posted and the thread abort is postponed until the window procedure returned,
+so it never passes the user32 callback. On .NET (Core) there is only one AppDomain, nothing changes there.</li>
+<li>Call it yourself at the end of <code>Main</code> when you want to choose the moment or need more time.</li>
+<li>After an explicit <code>Shutdown</code> (not at process exit) the next use creates a new window, but the registrations of the
+old window (<code>Listen</code>, <code>Invoke</code>: clipboard listener, hotkeys, session notifications) are gone and their <code>onTeardown</code>
+is not called. It's meant for the end of the application.</li>
+<li>Called on the window thread, it destroys the window directly and returns <code>true</code>; the loop ends right after.</li>
+</ul>
+<!-- sample: MessagesSamples.Shutdown -->
+<pre><code class="lang-csharp">// Happens automatically on AppDomain.ProcessExit, with this timeout (default 1.5 seconds)
+SharedMessageWindow.ProcessExitShutdownTimeout = TimeSpan.FromSeconds(1);
+
+// Or at the end of Main, to control the moment and the timeout yourself:
+// the window is destroyed on its own thread, delayed rendered clipboard formats are rendered (WM_RENDERALLFORMATS)
+bool isShutDown = SharedMessageWindow.Shutdown(TimeSpan.FromSeconds(5));
+if (!isShutDown)
+{
+    Console.WriteLine(&quot;The window thread didn't end in time, e.g. a delayed renderer is still busy&quot;);
+}
+</code></pre>
+<h3 id="errors-in-subscribers">Errors in subscribers</h3>
+<p>An exception in a subscriber doesn't stop the message loop or the other subscribers. The failing subscription ends,
+and the exception is published on <code>SubscriberErrors</code> and written to <code>System.Diagnostics.Trace</code>.</p>
+<!-- sample: MessagesSamples.SubscriberErrors -->
+<pre><code class="lang-csharp">// An exception in a subscriber ends only that subscription, it is published here (and written to Trace)
+var errorSubscription = SharedMessageWindow.SubscriberErrors
+    .Subscribe(ex =&gt; Console.Error.WriteLine($&quot;A message subscriber failed: {ex}&quot;));
+</code></pre>
+<h3 id="your-own-messages">Your own messages</h3>
+<p><code>RegisteredWindowMessages.Register</code> registers a message which is unique on the desktop, for example so a second
+instance of your application can talk to the first one (see
+<a href="common-scenarios.html#single-instance">Common scenarios</a>).</p>
+<!-- sample: MessagesSamples.CustomMessage -->
+<pre><code class="lang-csharp">// A message which is unique for the whole desktop, e.g. to let a second instance talk to the first
+uint showMeMessage = RegisteredWindowMessages.Register(&quot;MyApp.ShowMe&quot;);
+
+var subscription = SharedMessageWindow.Messages
+    .Where(m =&gt; (uint)m.Msg == showMeMessage)
+    .Subscribe(m =&gt; Console.WriteLine(&quot;Another instance asked me to show myself&quot;));
+</code></pre>
+<h2 id="what-uses-the-sharedmessagewindow">What uses the SharedMessageWindow</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Message</th>
+<th>Page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ClipboardNative.OnUpdate</code>, delayed rendering</td>
+<td><code>WM_CLIPBOARDUPDATE</code>, <code>WM_RENDERFORMAT</code>, <code>WM_RENDERALLFORMATS</code>, <code>WM_DESTROYCLIPBOARD</code></td>
+<td><a href="clipboard-usage.html">Clipboard</a></td>
+</tr>
+<tr>
+<td><code>WinEventHook</code></td>
+<td>WinEvent callbacks (the hooks are installed on the window thread)</td>
+<td><a href="window-management.html">Window management</a></td>
+</tr>
+<tr>
+<td><code>RawInputMonitor</code>, <code>RawInputDeviceMonitor</code></td>
+<td><code>WM_INPUT</code>, <code>WM_INPUT_DEVICE_CHANGE</code></td>
+<td><a href="input-handling.html">Keyboard and mouse</a></td>
+</tr>
+<tr>
+<td><code>WindowsSessionListener</code></td>
+<td><code>WM_WTSSESSION_CHANGE</code></td>
+<td>below</td>
+</tr>
+<tr>
+<td><code>EnvironmentMonitor</code></td>
+<td><code>WM_SETTINGCHANGE</code></td>
+<td>below</td>
+</tr>
+<tr>
+<td><code>DisplayInfo</code></td>
+<td><code>WM_DISPLAYCHANGE</code>, <code>WM_SETTINGCHANGE</code>, <code>WM_DPICHANGED</code></td>
+<td><a href="window-management.html#displays">Window management</a></td>
+</tr>
+<tr>
+<td><code>PowerBroadcastListener</code></td>
+<td><code>WM_POWERBROADCAST</code></td>
+<td><a href="system-state.html">Power and system state</a></td>
+</tr>
+<tr>
+<td><code>ApplicationRestartManager.ListenForEndSession</code></td>
+<td><code>WM_QUERYENDSESSION</code>, <code>WM_ENDSESSION</code></td>
+<td><a href="restart-manager.html">Restart Manager</a></td>
+</tr>
+<tr>
+<td><code>DeviceNotification</code></td>
+<td><code>WM_DEVICECHANGE</code></td>
+<td><a href="more-packages.html#devices">More packages</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="session-changes-lock-unlock-logon-logoff">Session changes: lock, unlock, logon, logoff</h2>
+<p><code>WindowsSessionListener</code> reports when the workstation is locked or unlocked, and logon / logoff of the session. The
+events are raised on the SharedMessageWindow thread. Early at logon the registration can fail because the Remote
+Desktop Services are not running yet; the listener retries every 2 seconds for about 2 minutes and then raises
+<code>RegistrationFailed</code>.</p>
+<!-- sample: MessagesSamples.SessionListener -->
+<pre><code class="lang-csharp">var sessionListener = new WindowsSessionListener();
+
+// The events are raised on the SharedMessageWindow thread
+sessionListener.SessionLockChange += (sender, args) =&gt;
+{
+    if (args.EventType == WtsSessionChangeEvents.WTS_SESSION_LOCK)
+    {
+        Console.WriteLine($&quot;Session {args.SessionId} locked&quot;);
+    }
+    else if (args.EventType == WtsSessionChangeEvents.WTS_SESSION_UNLOCK)
+    {
+        Console.WriteLine($&quot;Session {args.SessionId} unlocked&quot;);
+    }
+};
+
+sessionListener.SessionLogonChange += (sender, args) =&gt;
+    Console.WriteLine(args.EventType == WtsSessionChangeEvents.WTS_SESSION_LOGON ? &quot;Logged on&quot; : &quot;Logged off&quot;);
+
+// Early at logon the registration can fail, it's retried for about 2 minutes before this is raised
+sessionListener.RegistrationFailed += (sender, args) =&gt;
+    Console.WriteLine($&quot;No session notifications: {args.GetException().Message}&quot;);
+
+sessionListener.Start();
+
+// Ignore events for a while, without unregistering
+sessionListener.Pause();
+sessionListener.Resume();
+
+// Stop listening and unregister
+sessionListener.Dispose();
+</code></pre>
+<h2 id="environment-changes">Environment changes</h2>
+<p><code>EnvironmentMonitor.EnvironmentUpdateEvents</code> reports <code>WM_SETTINGCHANGE</code>: changed system parameters, and named areas
+such as <code>&quot;ImmersiveColorSet&quot;</code> (light / dark mode) or <code>&quot;Environment&quot;</code> (environment variables).</p>
+<!-- sample: MessagesSamples.EnvironmentChanges -->
+<pre><code class="lang-csharp">// WM_SETTINGCHANGE, e.g. when the user switches between light and dark mode (&quot;ImmersiveColorSet&quot;)
+var subscription = EnvironmentMonitor.EnvironmentUpdateEvents
+    .Where(e =&gt; e.Area == &quot;ImmersiveColorSet&quot;)
+    .Subscribe(e =&gt; Console.WriteLine(&quot;The color theme changed&quot;));
+</code></pre>
+<h2 id="messages-of-your-own-windows">Messages of your own windows</h2>
+<p>The SharedMessageWindow only sees its own messages. For the messages of your forms and WPF windows use the
+integration packages. Both run on the UI thread, so <code>Handled</code> and <code>Result</code> can be set in <code>OnNext</code>.</p>
+<p>Windows Forms (<strong>Dapplo.Windows.Forms</strong>): <code>WinProcMessages()</code> subclasses the control, follows handle re-creation
+and completes when the control is disposed.</p>
+<!-- sample: MessagesSamples.FormsMessages -->
+<pre><code class="lang-csharp">// Subclasses the form's window. Runs on the UI thread, you may set Handled / Result.
+// The sequence follows handle re-creation and completes when the form is disposed.
+var subscription = form.WinProcMessages()
+    .Where(m =&gt; m.Msg == WindowsMessages.WM_NCHITTEST)
+    .Subscribe(m =&gt;
+    {
+        // HTCAPTION: the whole window can be dragged like its title bar
+        m.Result = new IntPtr(2);
+        m.Handled = true;
+    });
+</code></pre>
+<p>WPF (<strong>Dapplo.Windows.Wpf</strong>): <code>WinProcMessages()</code> hooks the <code>HwndSource</code> of the window; subscribing before the window
+is shown works, the hook is added when the source is created. Disposing the subscription never closes the window.</p>
+<!-- sample: MessagesSamples.WpfMessages -->
+<pre><code class="lang-csharp">// Works before the window is shown, the hook is added when the HwndSource is created
+var subscription = window.WinProcMessages()
+    .Where(m =&gt; m.Msg == WindowsMessages.WM_DPICHANGED)
+    .Subscribe(m =&gt; Console.WriteLine(&quot;DPI changed&quot;));
+</code></pre>
+<h2 id="names-of-the-message-types">Names of the message types</h2>
+<ul>
+<li><code>WindowsMessages</code> (namespace <code>Dapplo.Windows.Messages.Enums</code>) is the enum of message identifiers (<code>WM_...</code>).</li>
+<li><code>WindowMessage</code> is one message sent to a window (<code>Hwnd</code>, <code>Msg</code>, <code>WParam</code>, <code>LParam</code>, <code>Handled</code>, <code>Result</code>), both for
+the SharedMessageWindow and for your own forms and WPF windows (<code>WinProcMessages()</code>).</li>
+<li><code>Msg</code> (namespace <code>Dapplo.Windows.Messages.Structs</code>) is the native <code>MSG</code> structure of a message loop.</li>
+<li><code>RegisteredWindowMessages</code> registers custom messages (<code>Register</code>) and gets the name of a message id (<code>GetName</code>).</li>
+</ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="intro.html#how-the-library-works">Getting started: how the library works</a></li>
+<li><a href="input-handling.html">Keyboard and mouse</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/window-messages.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
