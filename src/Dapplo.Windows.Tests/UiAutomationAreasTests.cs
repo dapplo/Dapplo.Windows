@@ -554,9 +554,50 @@ public class UiAutomationAreasTests
         var result = ReadScrollableAreas(() => { finds++; return NoAreas; }, () => { checks++; return false; }, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(1),
             TestContext.Current.CancellationToken);
         Assert.Empty(result);
-        Assert.Equal(1, finds);
+        // Once more after the check: the tree may have been completed during the first search
+        Assert.Equal(2, finds);
         Assert.Equal(1, checks);
         Assert.True(stopwatch.ElapsedMilliseconds < 900, $"Took {stopwatch.ElapsedMilliseconds} ms");
+    }
+
+    /// <summary>
+    ///     Cold Edge: the first search makes Chromium build the tree, the check right after it sees the complete tree; the search after the
+    ///     check finds the page
+    /// </summary>
+    [Fact]
+    public void ScrollableAreas_TreeCompletedDuringTheSearch_SearchesOnceMore()
+    {
+        var finds = 0;
+        var checks = 0;
+        var result = ReadScrollableAreas(() => ++finds == 1 ? NoAreas : OneArea, () => { checks++; return false; }, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(1),
+            TestContext.Current.CancellationToken);
+        Assert.Same(OneArea, result);
+        Assert.Equal(2, finds);
+        Assert.Equal(1, checks);
+    }
+
+    private static bool LooksIncomplete(UiAutomationArea root, bool rootHasContent, Func<UiAutomationArea, bool> isEmpty) =>
+        (bool)typeof(UiAutomationAreas).GetMethod("LooksIncomplete", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static, null,
+            new[] { typeof(UiAutomationArea), typeof(bool), typeof(Func<UiAutomationArea, bool>) }, null).Invoke(null, new object[] { root, rootHasContent, isEmpty });
+
+    /// <summary>
+    ///     The window's own element without content looks incomplete (Chromium's render widget window before its tree is built: the document
+    ///     has the window's bounds and is merged into the root); with content (e.g. only small children, left out) it doesn't
+    /// </summary>
+    [Fact]
+    public void LooksIncomplete_RootWithoutContent()
+    {
+        var renderWidget = new UiAutomationArea(new NativeRect(0, 0, 976, 696), 50033, "Render widget");
+        Func<UiAutomationArea, bool> isEmpty = area => area.Children.Count == 0;
+        Assert.True(LooksIncomplete(renderWidget, false, isEmpty));
+        Assert.False(LooksIncomplete(renderWidget, true, isEmpty));
+        // HasLargeEmptyArea alone only looks at the root's children
+        Assert.False(HasLargeEmptyArea(renderWidget));
+        // A large empty child still counts, a window which can't be read or has no size doesn't
+        Assert.True(LooksIncomplete(new UiAutomationArea(new NativeRect(0, 0, 100, 100), 50032, "Window",
+            new[] { new UiAutomationArea(new NativeRect(0, 20, 100, 60), 50030, "Document") }), true, isEmpty));
+        Assert.False(LooksIncomplete(null, false, isEmpty));
+        Assert.False(LooksIncomplete(new UiAutomationArea(NativeRect.Empty, 50032, "Window"), false, isEmpty));
     }
 
     [Fact]
@@ -621,6 +662,20 @@ public class UiAutomationAreasTests
             Assert.Empty(areas);
             Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(5), $"Took {stopwatch.ElapsedMilliseconds} ms");
         }
+    }
+
+    /// <summary>
+    ///     A child window whose element has no children (here a button) is complete: no content wait, the caller asks its parent at once.
+    ///     Only Chromium's render widget window counts as incomplete without content.
+    /// </summary>
+    [Fact]
+    public void FindScrollableAreas_ChildWindowWithoutChildren_ReturnsWithoutWaiting()
+    {
+        using var testWindow = new QueryTestWindow("Dapplo scrollable areas leaf");
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        var areas = UiAutomationScroller.FindScrollableAreas(testWindow.TopButtonHandle, false, null, true, TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+        Assert.Empty(areas);
+        Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(5), $"Took {stopwatch.ElapsedMilliseconds} ms");
     }
 
     /// <summary>

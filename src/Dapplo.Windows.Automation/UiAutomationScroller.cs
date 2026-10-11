@@ -222,10 +222,13 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     ///     asks for it, the first answer then has only the frame of the window, so the page has no scrollable area yet. When the search finds no
     ///     area, a shallow read of the control view (as <see cref="UiAutomationAreas.FindAreasAsync(IntPtr, int, int, TimeSpan?, TimeSpan?, CancellationToken)"/>
     ///     does) tells if the tree looks incomplete: an element without content (it reports no children which aren't offscreen, only children with
-    ///     an empty rectangle, or children with its own rectangle which have no content themselves) covers at least a quarter of the window. Then
-    ///     the search is done again, with a short pause (a quarter of a second) between the attempts, until an area is found, the tree is complete
-    ///     or <paramref name="contentWait"/> has passed; the last result is returned. A window which has nothing to scroll and a complete tree
-    ///     never waits, an empty overlay with a sibling of the same bounds which has content doesn't count. A window with an element which really
+    ///     an empty rectangle, or children with its own rectangle which have no content themselves) covers at least a quarter of the window, or
+    ///     the window's own element has no content and it is Chromium's render widget window (<c>Chrome_RenderWidgetHostHWND</c>, also in Electron
+    ///     and WebView2) before its tree is built; other windows without children, like a button or a custom drawn control, are complete. Then the search is done again,
+    ///     with a short pause (a quarter of a second) between the attempts, until an area is found, the tree is complete or
+    ///     <paramref name="contentWait"/> has passed; the last result is returned. The search itself makes Chromium build the tree, so when the
+    ///     tree looks complete after a search which found nothing, the search is done once more. A window which has nothing to scroll and a
+    ///     complete tree never waits, an empty overlay with a sibling of the same bounds which has content doesn't count. A window with an element which really
     ///     is large and empty (and nothing to scroll) waits the whole <paramref name="contentWait"/> on every call: cache the result, or pass a
     ///     shorter one (or <see cref="TimeSpan.Zero"/>) for such windows.
     ///     </para>
@@ -278,7 +281,8 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     ///     <see cref="FindScrollableAreas(IntPtr, bool, TimeSpan?, bool, TimeSpan?, CancellationToken)"/>
     /// </summary>
     /// <param name="find">searches the scrollable areas once</param>
-    /// <param name="looksIncomplete">tells if the tree looks incomplete, only asked when the search found nothing</param>
+    /// <param name="looksIncomplete">tells if the tree looks incomplete, only asked when the search found nothing; when it says complete the
+    ///     search is done once more</param>
     /// <param name="contentWait">TimeSpan with the total time for the attempts, TimeSpan.Zero searches once</param>
     /// <param name="pause">TimeSpan between two attempts</param>
     /// <param name="windowHandle">IntPtr for the log</param>
@@ -298,7 +302,14 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
                 return (areas, false);
             }
             cancellationToken.ThrowIfCancellationRequested();
-            return (areas, looksIncomplete());
+            if (looksIncomplete())
+            {
+                return (areas, true);
+            }
+            // Complete now, but the search itself makes Chromium build the tree: it may have been completed during the search, after the
+            // part with the page was searched. A search after the check is reliable.
+            cancellationToken.ThrowIfCancellationRequested();
+            return (find(), false);
         }, contentWait, pause, windowHandle, cancellationToken);
     }
 

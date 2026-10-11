@@ -7,6 +7,11 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.14.x]
+
+### Fixed
+- `UiAutomationScroller.FindScrollableAreas` with a content wait gave up too early for a freshly started Edge (Greenshot: no area for the page right after the capture started, found a moment later). Measured with a cold Edge on the CI runner: for Chromium's render widget window (`Chrome_RenderWidgetHostHWND`) the page document has the window's bounds and is merged into the window's own element, which has no children before the tree is built, and that element was never checked; for the top-level window the search itself made Chromium build the tree, so the check right after a search which found nothing already saw a complete tree. Now the window's own element without content counts as incomplete for Chromium's render widget window (other windows without children, like a button or a custom drawn control, are complete and don't wait), and a tree which looks complete after a search which found nothing is searched once more. The check reads 8 levels instead of 4 (pages in browsers with more panes are deeper; elements smaller than a quarter of the window are left out with their children, so the read stays cheap).
+
 ## [3.14.0]
 
 ### Added
