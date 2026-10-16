@@ -7,6 +7,13 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.15.0]
+
+### Added
+- Windows stock icons (the shell's own icons for error, warning, information, the UAC shield, folders, drives and more) in any size: `StockIcons.GetIcon<TIcon>(StockIconId id, int size, StockIconFlags extraFlags = 0)` in Dapplo.Windows.Icons returns a `Bitmap` or `Icon` of exactly `size` x `size` pixels with its alpha channel (a `Bitmap` is Format32bppArgb, saved as png it stays transparent), or null when Windows has no icon for the id. It gets the file and index of the icon with SHGetStockIconInfo and extracts it with SHDefExtractIcon in the requested size; every icon handle and bitmap is destroyed before it returns. `StockIconFlags.LinkOverlay` and `Selected` are applied to the extracted icon (Windows only applies them to its own sizes).
+- Dapplo.Windows.Shell32: `Shell32Api.SHGetStockIconInfo`, `StockIconInfo` (with `Create()`, which sets the size the call needs), `StockIconId` (all SHSTOCKICONID values of the Windows SDK), `StockIconFlags`, `Shell32Api.SHDefExtractIcon` and `Shell32Api.MakeIconSize(large, small)` for its size argument (large | (small << 16)).
+- Note: on .NET 8 and later System.Drawing has its own `StockIconId`; a file with `using System.Drawing;` needs an alias such as `using StockIconId = Dapplo.Windows.Shell32.Enums.StockIconId;`.
+
 ## [3.14.x]
 
 ### Fixed

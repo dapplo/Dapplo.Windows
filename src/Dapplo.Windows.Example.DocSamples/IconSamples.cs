@@ -4,11 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Icons;
 using Dapplo.Windows.Icons.Enums;
+using Dapplo.Windows.Shell32.Enums;
 using Dapplo.Windows.User32;
+// System.Drawing has its own StockIconId on .NET 8 and later
+using StockIconId = Dapplo.Windows.Shell32.Enums.StockIconId;
 
 namespace Dapplo.Windows.Example.DocSamples;
 
@@ -101,6 +105,22 @@ public static class IconSamples
         // The icon sizes of the system, they depend on the DPI of the process
         Size small = new Size(IconHelper.GetSmallIconWidth(), IconHelper.GetSmallIconHeight());
         Size standard = new Size(IconHelper.GetStandardIconWidth(), IconHelper.GetStandardIconHeight());
+        #endregion
+    }
+
+    public static void GetStockIcons(System.Windows.Forms.Button elevateButton)
+    {
+        #region StockIcons
+        // The shield for a button which needs administrator rights, in the small icon size
+        elevateButton.Image = StockIcons.GetIcon<Bitmap>(StockIconId.Shield, 16);
+        elevateButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+
+        // The error icon as the big image of a toast, with its alpha channel: saved as png it stays transparent
+        using var error = StockIcons.GetIcon<Bitmap>(StockIconId.Error, 96);
+        error?.Save("error.png", ImageFormat.Png);
+
+        // null when Windows has no icon for the id; Icon works as well, and the shortcut overlay can be added
+        using var folderLink = StockIcons.GetIcon<Icon>(StockIconId.Folder, 48, StockIconFlags.LinkOverlay);
         #endregion
     }
 }

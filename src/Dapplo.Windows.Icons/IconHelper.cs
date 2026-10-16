@@ -2,6 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Drawing;
+using Dapplo.Windows.Icons.Structs;
+using Dapplo.Windows.Gdi32.Structs;
+using Dapplo.Windows.Gdi32.SafeHandles;
+using Dapplo.Windows.Gdi32;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -266,6 +271,136 @@ public static class IconHelper
             }
         }
         return default;
+    }
+
+    /// <summary>
+    ///     Convert an icon handle to a Format32bppArgb Bitmap of the icon's own size, keeping its alpha channel.
+    ///     Icon.ToBitmap() of an icon from a handle loses the partial transparency (GDI+ only uses the mask), this reads the 32 bpp color
+    ///     bitmap of the icon, which has straight alpha; an icon without alpha gets its transparency from the AND mask.
+    ///     The caller keeps the ownership of the handle.
+    /// </summary>
+    /// <param name="iconHandle">IntPtr with the icon handle</param>
+    /// <returns>Bitmap, null when the handle is invalid</returns>
+    internal static Bitmap IconHandleToArgbBitmap(IntPtr iconHandle)
+    {
+        if (iconHandle == IntPtr.Zero)
+        {
+            return null;
+        }
+        var iconInfo = IconInfoEx.Create();
+        if (!NativeIconMethods.GetIconInfoEx(iconHandle, ref iconInfo))
+        {
+            return null;
+        }
+        // GetIconInfoEx created the bitmaps, they are deleted when the SafeHandles are disposed
+        iconInfo.TakeBitmaps(out var maskBitmap, out var colorBitmap);
+        using (maskBitmap)
+        using (colorBitmap)
+        {
+            var size = CursorHelper.GetCursorBitmapSize(maskBitmap, colorBitmap);
+            if (size.IsEmpty)
+            {
+                return null;
+            }
+            if (colorBitmap.IsInvalid)
+            {
+                // Monochrome: the mask holds the AND mask (top half) and the XOR mask (bottom half)
+                return MonochromeIconToBitmap(maskBitmap, size.Width, size.Height);
+            }
+            var bitmap = CursorHelper.ExtractRawColorBitmap(colorBitmap, size.Width, size.Height, out var hasAlpha);
+            if (bitmap != null && !hasAlpha && !ApplyAndMask(bitmap, maskBitmap))
+            {
+                bitmap.Dispose();
+                return null;
+            }
+            return bitmap;
+        }
+    }
+
+    /// <summary>
+    ///     Read a monochrome mask bitmap (1 bpp) as 32 bpp pixels, black is 0xFF000000 and white 0xFFFFFFFF
+    /// </summary>
+    private static int[] ReadMaskPixels(SafeHBitmapHandle maskBitmap, int width, int height)
+    {
+        var pixels = new int[width * height];
+        var bitmapInfoHeader = BitmapInfoHeader.Create(width, -height, 32);
+        bitmapInfoHeader.SizeImage = 0;
+        var pinned = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+        var hdc = User32Api.GetDC(IntPtr.Zero);
+        try
+        {
+            return Gdi32Api.GetDIBits(hdc, maskBitmap, 0, (uint)height, pinned.AddrOfPinnedObject(), ref bitmapInfoHeader, 0) == 0 ? null : pixels;
+        }
+        finally
+        {
+            User32Api.ReleaseDC(IntPtr.Zero, hdc);
+            pinned.Free();
+        }
+    }
+
+    /// <summary>
+    ///     Make the pixels transparent where the AND mask is white (1), for a color icon without alpha channel
+    /// </summary>
+    private static unsafe bool ApplyAndMask(Bitmap bitmap, SafeHBitmapHandle maskBitmap)
+    {
+        var mask = ReadMaskPixels(maskBitmap, bitmap.Width, bitmap.Height);
+        if (mask is null)
+        {
+            return false;
+        }
+        var data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+        try
+        {
+            for (var y = 0; y < data.Height; y++)
+            {
+                var row = (byte*)data.Scan0 + y * data.Stride;
+                for (var x = 0; x < data.Width; x++)
+                {
+                    if ((mask[y * data.Width + x] & 0x00FFFFFF) != 0)
+                    {
+                        row[x * 4 + 3] = 0;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            bitmap.UnlockBits(data);
+        }
+        return true;
+    }
+
+    /// <summary>
+    ///     A monochrome icon: AND mask white is transparent, else the XOR mask gives black or white
+    ///     (screen inverting pixels, AND and XOR both white, can't be shown in a bitmap and are drawn black)
+    /// </summary>
+    private static unsafe Bitmap MonochromeIconToBitmap(SafeHBitmapHandle maskBitmap, int width, int height)
+    {
+        var masks = ReadMaskPixels(maskBitmap, width, height * 2);
+        if (masks is null)
+        {
+            return null;
+        }
+        var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+        var data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+        try
+        {
+            for (var y = 0; y < height; y++)
+            {
+                var row = (int*)((byte*)data.Scan0 + y * data.Stride);
+                for (var x = 0; x < width; x++)
+                {
+                    var andWhite = (masks[y * width + x] & 0x00FFFFFF) != 0;
+                    var xorWhite = (masks[(y + height) * width + x] & 0x00FFFFFF) != 0;
+                    row[x] = andWhite && !xorWhite ? 0 : !andWhite && xorWhite ? unchecked((int)0xFFFFFFFF) : unchecked((int)0xFF000000);
+                }
+            }
+        }
+        finally
+        {
+            bitmap.UnlockBits(data);
+        }
+        return bitmap;
     }
 
     /// <summary>

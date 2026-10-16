@@ -45,6 +45,37 @@ Size small = new Size(IconHelper.GetSmallIconWidth(), IconHelper.GetSmallIconHei
 Size standard = new Size(IconHelper.GetStandardIconWidth(), IconHelper.GetStandardIconHeight());
 ```
 
+## Stock icons
+
+The shell's own icons, the stock icons (error, warning, information, the UAC shield, folders, drives and about 90 more,
+`Dapplo.Windows.Shell32.Enums.StockIconId`), in any size with `StockIcons.GetIcon<TIcon>(id, size)`. Windows picks the
+best image of the icon for the size, the result is exactly `size` x `size` pixels and keeps its alpha channel, so a
+`Bitmap` (Format32bppArgb) saved as png stays transparent. It returns `null` when Windows has no icon for the id.
+`StockIconFlags.LinkOverlay` adds the shortcut arrow and `StockIconFlags.Selected` blends the icon with the highlight
+color, as the shell does. All icon handles are destroyed before the method returns.
+
+On .NET 8 and later System.Drawing has its own `StockIconId` (for `SystemIcons.GetStockIcon`), so a file with
+`using System.Drawing;` needs an alias, `using StockIconId = Dapplo.Windows.Shell32.Enums.StockIconId;`.
+
+<!-- sample: IconSamples.StockIcons -->
+```csharp
+// The shield for a button which needs administrator rights, in the small icon size
+elevateButton.Image = StockIcons.GetIcon<Bitmap>(StockIconId.Shield, 16);
+elevateButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+
+// The error icon as the big image of a toast, with its alpha channel: saved as png it stays transparent
+using var error = StockIcons.GetIcon<Bitmap>(StockIconId.Error, 96);
+error?.Save("error.png", ImageFormat.Png);
+
+// null when Windows has no icon for the id; Icon works as well, and the shortcut overlay can be added
+using var folderLink = StockIcons.GetIcon<Icon>(StockIconId.Folder, 48, StockIconFlags.LinkOverlay);
+```
+
+The raw API is in Dapplo.Windows.Shell32: `Shell32Api.SHGetStockIconInfo` with a `StockIconInfo` from
+`StockIconInfo.Create()` (the structure needs its size, without it the call fails with E_INVALIDARG) gives the file and
+index of a stock icon, and `Shell32Api.SHDefExtractIcon` extracts an icon from a file in any size. Its size argument
+holds two sizes, large | (small << 16); `Shell32Api.MakeIconSize(96, 16)` builds it.
+
 ## Writing ICO files
 
 `IconFileWriter.WriteIconFile` writes one ICO with an image per size. Every image is stored as PNG, which Windows Vista
