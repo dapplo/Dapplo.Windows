@@ -69,6 +69,62 @@ public static class Shell32Api
 
 
     /// <summary>
+    ///     Retrieves information about a system-defined Shell icon, a stock icon (Windows Vista and later).
+    ///     See <a href="https://learn.microsoft.com/windows/win32/api/shellapi/nf-shellapi-shgetstockiconinfo">SHGetStockIconInfo function</a>.
+    ///     Create the <paramref name="info"/> with <see cref="StockIconInfo.Create"/>, the size of the structure must be set.
+    ///     With <see cref="StockIconFlags.Icon"/> the caller owns <see cref="StockIconInfo.IconHandle"/> and must destroy it with DestroyIcon.
+    ///     For an icon in any size use the path and index (<see cref="StockIconFlags.IconLocation"/>) with <see cref="SHDefExtractIcon"/>,
+    ///     or StockIcons.GetIcon in Dapplo.Windows.Icons, which does that.
+    /// </summary>
+    /// <param name="siid">StockIconId of the icon</param>
+    /// <param name="uFlags">StockIconFlags, what to return</param>
+    /// <param name="info">ref StockIconInfo, receives the information</param>
+    /// <returns>HRESULT, 0 (S_OK) on success, e.g. E_INVALIDARG (0x80070057) for an unknown id or a structure without its size</returns>
+    [DllImport(Shell32Dll, ExactSpelling = true)]
+    public static extern int SHGetStockIconInfo(StockIconId siid, StockIconFlags uFlags, ref StockIconInfo info);
+
+    /// <summary>
+    ///     Extracts an icon from a file in the requested size, e.g. the file and index of a stock icon.
+    ///     See <a href="https://learn.microsoft.com/windows/win32/api/shlobj_core/nf-shlobj_core-shdefextracticonw">SHDefExtractIconW function</a>.
+    ///     The caller owns the returned icon handles and must destroy both with DestroyIcon.
+    /// </summary>
+    /// <remarks>
+    ///     <paramref name="nIconSize"/> holds two sizes in pixels: the large size in the low word and the small size in the high word,
+    ///     large | (small &lt;&lt; 16). E.g. 96 px large and 16 px small is 96 | (16 &lt;&lt; 16) = 0x00100060. Passing only the large size (96)
+    ///     asks for a small icon of 0 px. Use <see cref="MakeIconSize"/> to build the value.
+    /// </remarks>
+    /// <param name="pszIconFile">Path of the file which contains the icon, e.g. <see cref="StockIconInfo.Path"/></param>
+    /// <param name="iIndex">Index of the icon in the file, a negative value is a resource ID (e.g. <see cref="StockIconInfo.IconIndex"/>)</param>
+    /// <param name="uFlags">GIL_* flags, normally 0; GIL_SIMULATEDOC (1) draws the icon as a document</param>
+    /// <param name="phiconLarge">Receives the handle of the large icon</param>
+    /// <param name="phiconSmall">Receives the handle of the small icon</param>
+    /// <param name="nIconSize">The sizes of the large (low word) and small (high word) icon in pixels, see the remarks and <see cref="MakeIconSize"/></param>
+    /// <returns>HRESULT, 0 (S_OK) on success, 1 (S_FALSE) when the file has no icon at the index, E_FAIL when the file isn't found</returns>
+    [DllImport(Shell32Dll, CharSet = CharSet.Unicode, EntryPoint = "SHDefExtractIconW", ExactSpelling = true)]
+    public static extern int SHDefExtractIcon(string pszIconFile, int iIndex, uint uFlags, out IntPtr phiconLarge, out IntPtr phiconSmall, uint nIconSize);
+
+    /// <summary>
+    ///     The nIconSize value of <see cref="SHDefExtractIcon"/>: the large size in the low word, the small size in the high word,
+    ///     largeSize | (smallSize &lt;&lt; 16)
+    /// </summary>
+    /// <param name="largeSize">int with the size of the large icon in pixels, 1 to 65535</param>
+    /// <param name="smallSize">int with the size of the small icon in pixels, 1 to 65535</param>
+    /// <returns>uint for nIconSize</returns>
+    /// <exception cref="ArgumentOutOfRangeException">a size is not between 1 and 65535</exception>
+    public static uint MakeIconSize(int largeSize, int smallSize)
+    {
+        if (largeSize < 1 || largeSize > ushort.MaxValue)
+        {
+            throw new ArgumentOutOfRangeException(nameof(largeSize), largeSize, "The size must be between 1 and 65535 pixels.");
+        }
+        if (smallSize < 1 || smallSize > ushort.MaxValue)
+        {
+            throw new ArgumentOutOfRangeException(nameof(smallSize), smallSize, "The size must be between 1 and 65535 pixels.");
+        }
+        return (uint)largeSize | ((uint)smallSize << 16);
+    }
+
+    /// <summary>
     /// Sends an appbar message to the system.
     /// See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb762108.aspx">SHAppBarMessage function</a>
     /// </summary>

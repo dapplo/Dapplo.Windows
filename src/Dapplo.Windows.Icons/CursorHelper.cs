@@ -223,7 +223,7 @@ public static class CursorHelper
     /// <param name="bitmaskBitmap">SafeHBitmapHandle for the mask</param>
     /// <param name="colorBitmap">SafeHBitmapHandle for the color bitmap, can be invalid</param>
     /// <returns>NativeSize, empty if the size can't be determined</returns>
-    private static NativeSize GetCursorBitmapSize(SafeHBitmapHandle bitmaskBitmap, SafeHBitmapHandle colorBitmap)
+    internal static NativeSize GetCursorBitmapSize(SafeHBitmapHandle bitmaskBitmap, SafeHBitmapHandle colorBitmap)
     {
         bool isMonochrome = colorBitmap == null || colorBitmap.IsInvalid;
         var hMeasure = isMonochrome ? bitmaskBitmap : colorBitmap;
@@ -296,7 +296,7 @@ public static class CursorHelper
     /// <param name="hasAlpha">When the method returns, contains a value indicating whether the extracted bitmap includes an alpha channel.</param>
     /// <returns>A 32-bit color bitmap representing the extracted image, or null if extraction fails or the parameters are
     /// invalid.</returns>
-    private static Bitmap ExtractRawColorBitmap(SafeHBitmapHandle hbmColor, int width, int height, out bool hasAlpha)
+    internal static Bitmap ExtractRawColorBitmap(SafeHBitmapHandle hbmColor, int width, int height, out bool hasAlpha)
     {
         hasAlpha = false;
         if (hbmColor == null || hbmColor.IsInvalid || width <= 0 || height <= 0) return null;
