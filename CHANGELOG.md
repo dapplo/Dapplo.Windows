@@ -7,6 +7,12 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.16.0]
+
+### Added
+- `CapturedCursor.Trim()` in Dapplo.Windows.Icons: a new CapturedCursor without the transparent border (the cursor canvas is 32x32, 48x48 at 150 % and up to 256x256 with a bigger mouse pointer, the visible arrow only fills a corner). The layers are cropped to the smallest rectangle holding every visible pixel and keep their pixel format: in an alpha cursor a pixel is visible when its alpha is above 0, in a mask cursor everything except mask white (AND = 1) with color black (XOR = 0) is visible, also the pixels which invert the screen (e.g. of the I-beam). `Size` is that rectangle, `HotSpot` moves by its top-left and can end up outside of the layers, even negative, when it sits in a transparent part: drawing at "mouse position minus HotSpot" still puts every pixel where it was. Nothing transparent at the border, or nothing visible, gives a plain `Clone()`. The pixels are read with LockBits, one pass per layer.
+- `CursorHelper.TryGetCurrentCursor(out CapturedCursor result, bool trim = false)`: with `trim` the captured cursor is trimmed. The overload without `trim` remains for binary compatibility.
+
 ## [3.15.0]
 
 ### Added

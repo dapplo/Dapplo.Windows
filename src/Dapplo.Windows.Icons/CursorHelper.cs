@@ -68,7 +68,45 @@ public static class CursorHelper
     /// <param name="result">When this method returns, contains a CapturedCursor instance populated with details about the current cursor,
     /// including its size, hotspot, and image layers. This parameter is passed uninitialized.</param>
     /// <returns>true if the current cursor information was successfully retrieved and captured; otherwise, false.</returns>
-    public static bool TryGetCurrentCursor(out CapturedCursor result)
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static bool TryGetCurrentCursor(out CapturedCursor result) => TryCaptureCurrentCursor(out result);
+
+    /// <summary>
+    /// Attempts to retrieve information about the current cursor and capture its visual and positional properties.
+    /// </summary>
+    /// <remarks>This method captures both system and custom cursors, ensuring the cursor is visible before
+    /// extracting its details. For system cursors, it attempts to load a high-DPI version to improve image quality. The
+    /// captured information includes the cursor's size, hotspot, and image layers, which can be used for further
+    /// processing or display. The layers have the size of the cursor canvas (32x32, 48x48 at 150 %, up to 256x256 with a bigger mouse pointer),
+    /// the visible cursor usually fills only a part of it: with <paramref name="trim"/> the transparent border is removed, see <see cref="CapturedCursor.Trim"/>.</remarks>
+    /// <param name="result">When this method returns, contains a CapturedCursor instance populated with details about the current cursor,
+    /// including its size, hotspot, and image layers. This parameter is passed uninitialized.</param>
+    /// <param name="trim">true to remove the transparent border of the cursor (<see cref="CapturedCursor.Trim"/>), the hot spot can then be outside of the layers;
+    /// false (default) for the layers in the size of the cursor canvas</param>
+    /// <returns>true if the current cursor information was successfully retrieved and captured; otherwise, false.</returns>
+    public static bool TryGetCurrentCursor(out CapturedCursor result, bool trim = false)
+    {
+        if (!TryCaptureCurrentCursor(out result))
+        {
+            return false;
+        }
+        if (!trim)
+        {
+            return true;
+        }
+        var captured = result;
+        try
+        {
+            result = captured.Trim();
+        }
+        finally
+        {
+            captured.Dispose();
+        }
+        return true;
+    }
+
+    private static bool TryCaptureCurrentCursor(out CapturedCursor result)
     {
         result = new CapturedCursor();
         var cursorInfo = CursorInfo.Create();

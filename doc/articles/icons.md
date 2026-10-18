@@ -145,6 +145,38 @@ if (CursorHelper.TryGetCurrentCursor(out var cursor))
 }
 ```
 
+The layers have the size of the cursor canvas: 32x32, 48x48 at 150 % and up to 256x256 with "Make mouse pointer
+bigger", while the visible arrow only fills a corner of it. `TryGetCurrentCursor(out cursor, trim: true)`, or
+`cursor.Trim()` on a cursor you already have, removes the transparent border: the layers are cropped to the smallest
+rectangle holding every visible pixel (alpha above 0; for a mask cursor everything except mask white with color black,
+so the inverting pixels of e.g. the I-beam stay), `Size` is that rectangle and `HotSpot` moves with it. The hot spot can
+then be outside of the layers, even negative, when it sits in a transparent part; drawing at "mouse position minus
+HotSpot" still puts every pixel where it was. `Trim()` returns a new instance, the caller disposes both.
+
+<!-- sample: IconSamples.TrimCursor -->
+```csharp
+// Without the transparent border: the layers only hold the visible cursor (the canvas is up to 256x256, the arrow fills a corner)
+if (CursorHelper.TryGetCurrentCursor(out var cursor, trim: true))
+{
+    using (cursor)
+    {
+        // The bounds of the cursor on the screen, e.g. to check if it is on a capture
+        var mouse = User32Api.GetCursorLocation();
+        var bounds = new NativeRect(mouse.X - cursor.HotSpot.X, mouse.Y - cursor.HotSpot.Y, cursor.Size.Width, cursor.Size.Height);
+    }
+}
+
+// Or trim a cursor you already have, the result is a new instance: dispose both
+if (CursorHelper.TryGetCurrentCursor(out var untrimmed))
+{
+    using (untrimmed)
+    using (var trimmed = untrimmed.Trim())
+    {
+        // HotSpot can be outside of the trimmed layers (even negative), drawing at "mouse position minus HotSpot" stays correct
+    }
+}
+```
+
 ## The file format
 
 For your own tools the structures of the format are available in `Dapplo.Windows.Icons.Structs`:
