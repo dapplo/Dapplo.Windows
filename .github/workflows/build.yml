@@ -54,6 +54,16 @@ jobs:
     # Tests that drive the real desktop are tagged Interactive and excluded.
     # Coverage is only collected on .NET 10: coverlet.msbuild 8 injects a tracker that references System.Runtime 8.0,
     # which doesn't exist on .NET Framework, so every instrumented call would fail there.
+    - name: TEMP install NVDA
+      run: choco install nvda -y --no-progress
+
+    - name: TEMP screen reader experiment
+      if: success() || failure()
+      run: >
+        dotnet test src/Dapplo.Windows.Tests/Dapplo.Windows.Tests.csproj --configuration $env:BUILD_CONFIGURATION
+        --framework net10.0-windows --no-build --filter "FullyQualifiedName~ScreenReader"
+        --logger "trx;LogFilePrefix=Experiment" --results-directory "$env:GITHUB_WORKSPACE/TestResults"
+
     - name: Test (net10.0-windows, with coverage)
       run: >
         dotnet test src/Dapplo.Windows.Tests/Dapplo.Windows.Tests.csproj --configuration $env:BUILD_CONFIGURATION
