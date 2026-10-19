@@ -118,4 +118,28 @@ public class User32Tests
         var text = User32Api.GetTextFromWindow(handle);
         Assert.Equal(largeText, text);
     }
+
+    /// <summary>
+    ///     The UINT overload of SystemParametersInfo is public (it was private, only its XML documentation was published)
+    /// </summary>
+    [Fact]
+    public void SystemParametersInfo_Uint_IsPublicAndReadsTheValue()
+    {
+        var method = typeof(User32Api).GetMethod(nameof(User32Api.SystemParametersInfo), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null,
+            new[] { typeof(SystemParametersInfoActions), typeof(uint), typeof(uint).MakeByRefType(), typeof(SystemParametersInfoBehaviors) }, null);
+        Assert.NotNull(method);
+
+        Assert.True(User32Api.SystemParametersInfo(SystemParametersInfoActions.SPI_GETWHEELSCROLLLINES, 0, out uint wheelScrollLines, SystemParametersInfoBehaviors.None));
+        Assert.Equal(User32Api.GetWheelScrollLines(), wheelScrollLines);
+    }
+
+    /// <summary>
+    ///     IsScreenReaderRunning is the BOOL of SPI_GETSCREENREADER
+    /// </summary>
+    [Fact]
+    public void IsScreenReaderRunning_IsTheScreenReaderFlag()
+    {
+        Assert.True(User32Api.SystemParametersInfo(SystemParametersInfoActions.SPI_GETSCREENREADER, 0, out uint screenReader, SystemParametersInfoBehaviors.None));
+        Assert.Equal(screenReader != 0, User32Api.IsScreenReaderRunning());
+    }
 }

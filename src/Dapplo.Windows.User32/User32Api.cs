@@ -387,6 +387,17 @@ public static class User32Api
     }
 
     /// <summary>
+    ///     Is a screen reader (screen review utility) running, see SPI_GETSCREENREADER.
+    ///     A screen reader sets this flag, applications should then present information in text instead of only graphically
+    ///     (e.g. announce a result instead of only showing an animation or a toast).
+    /// </summary>
+    /// <returns>bool, true when a screen reader is running; false when not, or when the value can't be read</returns>
+    public static bool IsScreenReaderRunning()
+    {
+        return SystemParametersInfo(SystemParametersInfoActions.SPI_GETSCREENREADER, 0, out uint screenReader, SystemParametersInfoBehaviors.None) && screenReader != 0;
+    }
+
+    /// <summary>
     ///     Wrapper for the GetWindowLong which decides if the system is 64-bit or not and calls the right one.
     /// </summary>
     /// <param name="hWnd">IntPtr</param>
@@ -1482,16 +1493,17 @@ public static class User32Api
     public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, ref AnimationInfo animationInfo, SystemParametersInfoBehaviors fWinIni);
 
     /// <summary>
-    ///     SystemParametersInfo for reading a UINT parameter, e.g. SPI_GETWHEELSCROLLLINES
+    ///     See <a href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-systemparametersinfow">SystemParametersInfo function</a>.
+    ///     For reading a UINT parameter, e.g. SPI_GETWHEELSCROLLLINES, or a BOOL parameter (4 bytes, 0 is FALSE), e.g. SPI_GETSCREENREADER.
     /// </summary>
     /// <param name="uiAction">SystemParametersInfoActions</param>
     /// <param name="uiParam">uint, must be 0 for most actions</param>
     /// <param name="pvParam">out uint with the value</param>
-    /// <param name="fWinIni">SystemParametersInfoBehaviors</param>
-    /// <returns>bool</returns>
+    /// <param name="fWinIni">SystemParametersInfoBehaviors, SystemParametersInfoBehaviors.None for reading</param>
+    /// <returns>bool, false when the call failed (Marshal.GetLastWin32Error has the reason)</returns>
     [DllImport(User32, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "SystemParametersInfoW", ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, out uint pvParam, SystemParametersInfoBehaviors fWinIni);
+    public static extern bool SystemParametersInfo(SystemParametersInfoActions uiAction, uint uiParam, out uint pvParam, SystemParametersInfoBehaviors fWinIni);
 
     /// <summary>
     /// Locks the workstation's display. Locking a workstation protects it from unauthorized use.
