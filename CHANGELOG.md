@@ -12,6 +12,7 @@ Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 ### Added
 - `User32Api.SystemParametersInfo(SystemParametersInfoActions, uint, out uint, SystemParametersInfoBehaviors)` is public: the overload for reading a UINT (e.g. SPI_GETWHEELSCROLLLINES) or BOOL parameter existed but was private, only its XML documentation was published.
 - `User32Api.IsScreenReaderRunning()`: SPI_GETSCREENREADER, true when a screen reader (screen review utility) is running.
+- `EnvironmentMonitor.ScreenReaderChanges`: `IObservable<bool>` with the current screen reader flag, then every change reported with WM_SETTINGCHANGE (wParam SPI_SETSCREENREADER). Windows only broadcasts it when the screen reader passes SPIF_UPDATEINIFILE and SPIF_SENDCHANGE: NVDA does when it starts and quits (verified on the CI runner), for Narrator and other screen readers it isn't verified. `EnvironmentMonitor.EnvironmentUpdateEvents` already was the generic stream of all WM_SETTINGCHANGE messages.
 
 ## [3.16.0]
 

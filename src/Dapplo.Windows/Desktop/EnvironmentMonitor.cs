@@ -4,6 +4,7 @@
 using System;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using Dapplo.Windows.User32;
 using Dapplo.Windows.User32.Enums;
 using Dapplo.Windows.Messages.Enums;
 using Dapplo.Windows.Messages;
@@ -47,5 +48,40 @@ namespace Dapplo.Windows.Desktop
         ///     The WM_SETTINGCHANGE messages of the SharedMessageWindow, produced on the thread of that window
         /// </summary>
         public static IObservable<EnvironmentChangedEventArgs> EnvironmentUpdateEvents => Singleton.Value._environmentObservable;
+
+        /// <summary>
+        ///     Whether a screen reader is running (SPI_GETSCREENREADER), starting with the current value, then every change.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///     A screen reader sets the flag with SPI_SETSCREENREADER; Windows only broadcasts WM_SETTINGCHANGE (wParam SPI_SETSCREENREADER) when it
+        ///     passes SPIF_UPDATEINIFILE and SPIF_SENDCHANGE. NVDA does so when it starts and when it quits (verified on Windows Server with NVDA's
+        ///     -q); for other screen readers, Narrator included, this is not verified. A screen reader which only sets the flag is not seen here,
+        ///     so read <see cref="User32Api.IsScreenReaderRunning"/> when the value matters at a certain moment.
+        ///     </para>
+        ///     <para>
+        ///     The current value is produced on the subscribing thread, the changes on the thread of the SharedMessageWindow; equal values in a
+        ///     row are suppressed. The subscription to the messages starts before the current value is read, so no change is missed.
+        ///     </para>
+        /// </remarks>
+        public static IObservable<bool> ScreenReaderChanges => Observable.Create<bool>(observer =>
+            {
+                var gate = new object();
+                var subscription = EnvironmentUpdateEvents
+                    .Where(e => e.SystemParametersInfoAction == SystemParametersInfoActions.SPI_SETSCREENREADER)
+                    .Subscribe(_ =>
+                    {
+                        lock (gate)
+                        {
+                            observer.OnNext(User32Api.IsScreenReaderRunning());
+                        }
+                    }, observer.OnError, observer.OnCompleted);
+                lock (gate)
+                {
+                    observer.OnNext(User32Api.IsScreenReaderRunning());
+                }
+                return subscription;
+            })
+            .DistinctUntilChanged();
     }
 }
