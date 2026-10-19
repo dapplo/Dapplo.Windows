@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Struct WinEventInfo | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Struct WinEventInfo | Dapplo.Windows ">
+      
+      <meta name="description" content="This immutable struct represents the information passed to the WinEventProc as described here">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Structs_WinEventInfo.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Structs.WinEventInfo%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Structs.WinEventInfo">
+
+
+
+  <h1 id="Dapplo_Windows_Structs_WinEventInfo" data-uid="Dapplo.Windows.Structs.WinEventInfo" class="text-break">
+Struct WinEventInfo  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Structs.html">Structs</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>This immutable struct represents the information passed to the WinEventProc as described
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd373885(v=vs.85).aspx">here</a></p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly struct WinEventInfo</code></pre>
+  </div>
+
+
+
+
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetype.equals">ValueType.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetype.gethashcode">ValueType.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetype.tostring">ValueType.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Structs_WinEventInfo_EventHook_" data-uid="Dapplo.Windows.Structs.WinEventInfo.EventHook*"></a>
+
+  <h3 id="Dapplo_Windows_Structs_WinEventInfo_EventHook" data-uid="Dapplo.Windows.Structs.WinEventInfo.EventHook">
+  EventHook
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Handle to an event hook function. This value is returned by SetWinEventHook when the hook function is installed and
+is specific to each instance of the hook function.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public nint EventHook { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Structs_WinEventInfo_EventThread_" data-uid="Dapplo.Windows.Structs.WinEventInfo.EventThread*"></a>
+
+  <h3 id="Dapplo_Windows_Structs_WinEventInfo_EventThread" data-uid="Dapplo.Windows.Structs.WinEventInfo.EventThread">
+  EventThread
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L36"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Identifies the thread that generated the event, or the thread that owns the current window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int EventThread { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Structs_WinEventInfo_EventTime_" data-uid="Dapplo.Windows.Structs.WinEventInfo.EventTime*"></a>
+
+  <h3 id="Dapplo_Windows_Structs_WinEventInfo_EventTime" data-uid="Dapplo.Windows.Structs.WinEventInfo.EventTime">
+  EventTime
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L41"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Specifies the time, in milliseconds, that the event was generated.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public uint EventTime { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Structs_WinEventInfo_Handle_" data-uid="Dapplo.Windows.Structs.WinEventInfo.Handle*"></a>
+
+  <h3 id="Dapplo_Windows_Structs_WinEventInfo_Handle" data-uid="Dapplo.Windows.Structs.WinEventInfo.Handle">
+  Handle
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Handle to the window that generates the event, or IntPtr.Zero if no window is associated with the event.
+For example, the mouse pointer is not associated with a window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public nint Handle { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Structs_WinEventInfo_IdChild_" data-uid="Dapplo.Windows.Structs.WinEventInfo.IdChild*"></a>
+
+  <h3 id="Dapplo_Windows_Structs_WinEventInfo_IdChild" data-uid="Dapplo.Windows.Structs.WinEventInfo.IdChild">
+  IdChild
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L54"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Identifies whether the event was triggered by an object or a child element of the object.
+If this value is CHILDID_SELF (0), the event was triggered by the object;
+otherwise, this value is the child ID of the element that triggered the event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int IdChild { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Structs_WinEventInfo_IsSelf_" data-uid="Dapplo.Windows.Structs.WinEventInfo.IsSelf*"></a>
+
+  <h3 id="Dapplo_Windows_Structs_WinEventInfo_IsSelf" data-uid="Dapplo.Windows.Structs.WinEventInfo.IsSelf">
+  IsSelf
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Identifies whether the event was triggered by an object</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsSelf { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Structs_WinEventInfo_ObjectIdentifier_" data-uid="Dapplo.Windows.Structs.WinEventInfo.ObjectIdentifier*"></a>
+
+  <h3 id="Dapplo_Windows_Structs_WinEventInfo_ObjectIdentifier" data-uid="Dapplo.Windows.Structs.WinEventInfo.ObjectIdentifier">
+  ObjectIdentifier
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L64"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Identifies the object associated with the event, this is one of the object identifiers or a custom object ID.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ObjectIdentifiers ObjectIdentifier { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.User32.Enums.ObjectIdentifiers.html">ObjectIdentifiers</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Structs_WinEventInfo_WinEvent_" data-uid="Dapplo.Windows.Structs.WinEventInfo.WinEvent*"></a>
+
+  <h3 id="Dapplo_Windows_Structs_WinEventInfo_WinEvent" data-uid="Dapplo.Windows.Structs.WinEventInfo.WinEvent">
+  WinEvent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Specifies the event that occurred.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public WinEvents WinEvent { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Enums.WinEvents.html">WinEvents</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Structs_WinEventInfo_Create_" data-uid="Dapplo.Windows.Structs.WinEventInfo.Create*"></a>
+
+  <h3 id="Dapplo_Windows_Structs_WinEventInfo_Create_System_IntPtr_Dapplo_Windows_Enums_WinEvents_System_IntPtr_Dapplo_Windows_User32_Enums_ObjectIdentifiers_System_Int32_System_Int32_System_UInt32_" data-uid="Dapplo.Windows.Structs.WinEventInfo.Create(System.IntPtr,Dapplo.Windows.Enums.WinEvents,System.IntPtr,Dapplo.Windows.User32.Enums.ObjectIdentifiers,System.Int32,System.Int32,System.UInt32)">
+  Create(nint, WinEvents, nint, ObjectIdentifiers, int, int, uint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L95"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a WinEventInfo instance</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WinEventInfo Create(nint winEventHook, WinEvents winEvent, nint hWnd, ObjectIdentifiers idObject, int idChild, int eventThread, uint eventTime)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>winEventHook</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>Handle to an event hook function. This value is returned by SetWinEventHook when the hook
+function is installed and is specific to each instance of the hook function.</p>
+</dd>
+    <dt><code>winEvent</code> <a class="xref" href="Dapplo.Windows.Enums.WinEvents.html">WinEvents</a></dt>
+    <dd><p>Specifies the event that occurred. This value is one of the event constants.</p>
+</dd>
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>Handle to the window that generates the event, or NULL if no window is associated with the event.
+For example, the mouse pointer is not associated with a window.</p>
+</dd>
+    <dt><code>idObject</code> <a class="xref" href="Dapplo.Windows.User32.Enums.ObjectIdentifiers.html">ObjectIdentifiers</a></dt>
+    <dd><p>Identifies the object associated with the event. This is one of the object identifiers or a
+custom object ID.</p>
+</dd>
+    <dt><code>idChild</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Identifies whether the event was triggered by an object or a child element of the object. If this
+value is CHILDID_SELF, the event was triggered by the object; otherwise, this value is the child ID of the element
+that triggered the event.</p>
+</dd>
+    <dt><code>eventThread</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Identifies the thread that generated the event, or the thread that owns the current window.</p>
+</dd>
+    <dt><code>eventTime</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>Specifies the time, in milliseconds, that the event was generated.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Structs.WinEventInfo.html">WinEventInfo</a></dt>
+    <dd><p>WinEventInfo</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Structs/WinEventInfo.cs/#L14" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

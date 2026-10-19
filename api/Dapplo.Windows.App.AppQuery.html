@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class AppQuery | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class AppQuery | Dapplo.Windows ">
+      
+      <meta name="description" content="Helper class to support with Windows Store apps">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_App_AppQuery.md&amp;value=---%0Auid%3A%20Dapplo.Windows.App.AppQuery%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.App.AppQuery">
+
+
+
+  <h1 id="Dapplo_Windows_App_AppQuery" data-uid="Dapplo.Windows.App.AppQuery" class="text-break">
+Class AppQuery  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L18"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.App.html">App</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Helper class to support with Windows Store apps</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class AppQuery</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">AppQuery</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Dapplo_Windows_App_AppQuery_AppFrameWindowClass" data-uid="Dapplo.Windows.App.AppQuery.AppFrameWindowClass">
+  AppFrameWindowClass
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Windows 10 uses ApplicationFrameWindow to host the App</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string AppFrameWindowClass = &quot;ApplicationFrameWindow&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Dapplo_Windows_App_AppQuery_AppWindowClass" data-uid="Dapplo.Windows.App.AppQuery.AppWindowClass">
+  AppWindowClass
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Used for Windows 8(.1) and Windows 10 (but as child of &quot;ApplicationFrameWindow&quot;)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string AppWindowClass = &quot;Windows.UI.Core.CoreWindow&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_App_AppQuery_AppLauncher_" data-uid="Dapplo.Windows.App.AppQuery.AppLauncher*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_AppLauncher" data-uid="Dapplo.Windows.App.AppQuery.AppLauncher">
+  AppLauncher
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L64"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the hWnd for the AppLauncer</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static nint AppLauncher { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_App_AppQuery_IsLauncherVisible_" data-uid="Dapplo.Windows.App.AppQuery.IsLauncherVisible*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_IsLauncherVisible" data-uid="Dapplo.Windows.App.AppQuery.IsLauncherVisible">
+  IsLauncherVisible
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L80"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return true if the app-launcher is visible</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsLauncherVisible { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_App_AppQuery_WindowsStoreApps_" data-uid="Dapplo.Windows.App.AppQuery.WindowsStoreApps*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_WindowsStoreApps" data-uid="Dapplo.Windows.App.AppQuery.WindowsStoreApps">
+  WindowsStoreApps
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L85"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieve handles of all Windows store apps</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IEnumerable&lt;IInteropWindow&gt; WindowsStoreApps { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_App_AppQuery_AppVisible_" data-uid="Dapplo.Windows.App.AppQuery.AppVisible*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_AppVisible_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.App.AppQuery.AppVisible(Dapplo.Windows.Common.Structs.NativeRect)">
+  AppVisible(NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L118"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check if a Windows Store App (WinRT) is visible</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool AppVisible(NativeRect windowBounds)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>windowBounds</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if an app, covering the supplied rect, is visible</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_App_AppQuery_GetAppLauncher_" data-uid="Dapplo.Windows.App.AppQuery.GetAppLauncher*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_GetAppLauncher" data-uid="Dapplo.Windows.App.AppQuery.GetAppLauncher">
+  GetAppLauncher()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L150"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the AppLauncher</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IInteropWindow GetAppLauncher()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_App_AppQuery_GetCoreWindow_" data-uid="Dapplo.Windows.App.AppQuery.GetCoreWindow*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_GetCoreWindow_Dapplo_Windows_Desktop_IInteropWindow_" data-uid="Dapplo.Windows.App.AppQuery.GetCoreWindow(Dapplo.Windows.Desktop.IInteropWindow)">
+  GetCoreWindow(IInteropWindow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L214"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the &quot;Windows.UI.Core.CoreWindow&quot; child of an &quot;ApplicationFrameWindow&quot;, this belongs to the process of the app.
+This uses FindWindowEx, as EnumChildWindows (GetChildren) doesn't return the CoreWindow, and doesn't change the Children of the interopWindow.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IInteropWindow GetCoreWindow(this IInteropWindow interopWindow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>interopWindow</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow for the CoreWindow, or null if there is none</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_App_AppQuery_IsApp_" data-uid="Dapplo.Windows.App.AppQuery.IsApp*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_IsApp_Dapplo_Windows_Desktop_IInteropWindow_" data-uid="Dapplo.Windows.App.AppQuery.IsApp(Dapplo.Windows.Desktop.IInteropWindow)">
+  IsApp(IInteropWindow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L168"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This checks if the window is an App (Win8 or Win10)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsApp(this IInteropWindow interopWindow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>interopWindow</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_App_AppQuery_IsAppLauncher_" data-uid="Dapplo.Windows.App.AppQuery.IsAppLauncher*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_IsAppLauncher_Dapplo_Windows_Desktop_IInteropWindow_" data-uid="Dapplo.Windows.App.AppQuery.IsAppLauncher(Dapplo.Windows.Desktop.IInteropWindow)">
+  IsAppLauncher(IInteropWindow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L181"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if this window is for the App-Launcher</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsAppLauncher(this IInteropWindow interopWindow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>interopWindow</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_App_AppQuery_IsBackgroundWin10App_" data-uid="Dapplo.Windows.App.AppQuery.IsBackgroundWin10App*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_IsBackgroundWin10App_Dapplo_Windows_Desktop_IInteropWindow_" data-uid="Dapplo.Windows.App.AppQuery.IsBackgroundWin10App(Dapplo.Windows.Desktop.IInteropWindow)">
+  IsBackgroundWin10App(IInteropWindow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L234"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This checks if the window is a Windows 10 App
+For Windows 10 apps are hosted inside &quot;ApplicationFrameWindow&quot;</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsBackgroundWin10App(this IInteropWindow interopWindow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>interopWindow</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_App_AppQuery_IsGutter_" data-uid="Dapplo.Windows.App.AppQuery.IsGutter*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_IsGutter_Dapplo_Windows_Desktop_IInteropWindow_" data-uid="Dapplo.Windows.App.AppQuery.IsGutter(Dapplo.Windows.Desktop.IInteropWindow)">
+  IsGutter(IInteropWindow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L189"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check if the window is the metro gutter (sizeable separator)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsGutter(this IInteropWindow interopWindow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>interopWindow</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_App_AppQuery_IsWin10App_" data-uid="Dapplo.Windows.App.AppQuery.IsWin10App*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_IsWin10App_Dapplo_Windows_Desktop_IInteropWindow_" data-uid="Dapplo.Windows.App.AppQuery.IsWin10App(Dapplo.Windows.Desktop.IInteropWindow)">
+  IsWin10App(IInteropWindow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L199"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This checks if the window is a Windows 10 App
+For Windows 10 apps are hosted inside &quot;ApplicationFrameWindow&quot;, this checks for a direct child with the class &quot;Windows.UI.Core.CoreWindow&quot;
+without changing the Children of the interopWindow.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWin10App(this IInteropWindow interopWindow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>interopWindow</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_App_AppQuery_IsWin8App_" data-uid="Dapplo.Windows.App.AppQuery.IsWin8App*"></a>
+
+  <h3 id="Dapplo_Windows_App_AppQuery_IsWin8App_Dapplo_Windows_Desktop_IInteropWindow_" data-uid="Dapplo.Windows.App.AppQuery.IsWin8App(Dapplo.Windows.Desktop.IInteropWindow)">
+  IsWin8App(IInteropWindow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L246"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This checks if the window is a Windows 8 App, not Win 10!</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWin8App(this IInteropWindow interopWindow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>interopWindow</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/App/AppQuery.cs/#L18" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

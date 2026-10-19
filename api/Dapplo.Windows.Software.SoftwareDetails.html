@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class SoftwareDetails | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class SoftwareDetails | Dapplo.Windows ">
+      
+      <meta name="description" content="This class contains all known fields which describe installed software, details can be found hee: Uninstall Registry Key">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Software_SoftwareDetails.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Software.SoftwareDetails%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Software.SoftwareDetails">
+
+
+
+  <h1 id="Dapplo_Windows_Software_SoftwareDetails" data-uid="Dapplo.Windows.Software.SoftwareDetails" class="text-break">
+Class SoftwareDetails  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L16"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Software.html">Software</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>This class contains all known fields which describe installed software, details can be found hee: <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/uninstall-registry-key">Uninstall Registry Key</a></p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class SoftwareDetails</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">SoftwareDetails</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_AuthorizedCDFPrefix_" data-uid="Dapplo.Windows.Software.SoftwareDetails.AuthorizedCDFPrefix*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_AuthorizedCDFPrefix" data-uid="Dapplo.Windows.Software.SoftwareDetails.AuthorizedCDFPrefix">
+  AuthorizedCDFPrefix
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/arpauthorizedcdfprefix">ARPAUTHORIZEDCDFPREFIX property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string AuthorizedCDFPrefix { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_Comments_" data-uid="Dapplo.Windows.Software.SoftwareDetails.Comments*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_Comments" data-uid="Dapplo.Windows.Software.SoftwareDetails.Comments">
+  Comments
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L36"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Comments provided to the Add or Remove Programs control panel.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Comments { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_Contact_" data-uid="Dapplo.Windows.Software.SoftwareDetails.Contact*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_Contact" data-uid="Dapplo.Windows.Software.SoftwareDetails.Contact">
+  Contact
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/arpcontact">ARPCONTACT property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Contact { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_DisplayName_" data-uid="Dapplo.Windows.Software.SoftwareDetails.DisplayName*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_DisplayName" data-uid="Dapplo.Windows.Software.SoftwareDetails.DisplayName">
+  DisplayName
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L41"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>ProductName property</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string DisplayName { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_DisplayVersion_" data-uid="Dapplo.Windows.Software.SoftwareDetails.DisplayVersion*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_DisplayVersion" data-uid="Dapplo.Windows.Software.SoftwareDetails.DisplayVersion">
+  DisplayVersion
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Derived from ProductVersion property
+See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/productversion">ProductVersion property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string DisplayVersion { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_EstimatedSize_" data-uid="Dapplo.Windows.Software.SoftwareDetails.EstimatedSize*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_EstimatedSize" data-uid="Dapplo.Windows.Software.SoftwareDetails.EstimatedSize">
+  EstimatedSize
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L52"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Determined and set by the Windows Installer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int EstimatedSize { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_HelpLink_" data-uid="Dapplo.Windows.Software.SoftwareDetails.HelpLink*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_HelpLink" data-uid="Dapplo.Windows.Software.SoftwareDetails.HelpLink">
+  HelpLink
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/arphelplink">ARPHELPLINK property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string HelpLink { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_HelpTelephone_" data-uid="Dapplo.Windows.Software.SoftwareDetails.HelpTelephone*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_HelpTelephone" data-uid="Dapplo.Windows.Software.SoftwareDetails.HelpTelephone">
+  HelpTelephone
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/arphelptelephone">ARPHELPTELEPHONE property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string HelpTelephone { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_Id_" data-uid="Dapplo.Windows.Software.SoftwareDetails.Id*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_Id" data-uid="Dapplo.Windows.Software.SoftwareDetails.Id">
+  Id
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L21"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Application's product code GUID</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Guid? Id { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_InstallDate_" data-uid="Dapplo.Windows.Software.SoftwareDetails.InstallDate*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_InstallDate" data-uid="Dapplo.Windows.Software.SoftwareDetails.InstallDate">
+  InstallDate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The last time this product received service.
+The value of this property is replaced each time a patch is applied or removed from the product or the /v Command-Line Option is used to repair the product.
+If the product has received no repairs or patches this property contains the time this product was installed on this computer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string InstallDate { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_InstallLocation_" data-uid="Dapplo.Windows.Software.SoftwareDetails.InstallLocation*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_InstallLocation" data-uid="Dapplo.Windows.Software.SoftwareDetails.InstallLocation">
+  InstallLocation
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/arpinstalllocation">ARPINSTALLLOCATION property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string InstallLocation { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_InstallSource_" data-uid="Dapplo.Windows.Software.SoftwareDetails.InstallSource*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_InstallSource" data-uid="Dapplo.Windows.Software.SoftwareDetails.InstallSource">
+  InstallSource
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L80"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/sourcedir">SourceDir property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string InstallSource { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_Language_" data-uid="Dapplo.Windows.Software.SoftwareDetails.Language*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_Language" data-uid="Dapplo.Windows.Software.SoftwareDetails.Language">
+  Language
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L85"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/productlanguage">ProductLanguage property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Language { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_ModifyPath_" data-uid="Dapplo.Windows.Software.SoftwareDetails.ModifyPath*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_ModifyPath" data-uid="Dapplo.Windows.Software.SoftwareDetails.ModifyPath">
+  ModifyPath
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L90"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Determined and set by the Windows Installer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string ModifyPath { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_NoModify_" data-uid="Dapplo.Windows.Software.SoftwareDetails.NoModify*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_NoModify" data-uid="Dapplo.Windows.Software.SoftwareDetails.NoModify">
+  NoModify
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L134"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool NoModify { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_NoRepair_" data-uid="Dapplo.Windows.Software.SoftwareDetails.NoRepair*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_NoRepair" data-uid="Dapplo.Windows.Software.SoftwareDetails.NoRepair">
+  NoRepair
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L136"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool NoRepair { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_Publisher_" data-uid="Dapplo.Windows.Software.SoftwareDetails.Publisher*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_Publisher" data-uid="Dapplo.Windows.Software.SoftwareDetails.Publisher">
+  Publisher
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L95"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The Manufacturer property is the name of the manufacturer for the product. It is advertised as a product property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Publisher { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_Readme_" data-uid="Dapplo.Windows.Software.SoftwareDetails.Readme*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_Readme" data-uid="Dapplo.Windows.Software.SoftwareDetails.Readme">
+  Readme
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L97"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Readme { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_Size_" data-uid="Dapplo.Windows.Software.SoftwareDetails.Size*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_Size" data-uid="Dapplo.Windows.Software.SoftwareDetails.Size">
+  Size
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long Size { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_SystemComponent_" data-uid="Dapplo.Windows.Software.SoftwareDetails.SystemComponent*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_SystemComponent" data-uid="Dapplo.Windows.Software.SoftwareDetails.SystemComponent">
+  SystemComponent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L71"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool SystemComponent { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_URLInfoAbout_" data-uid="Dapplo.Windows.Software.SoftwareDetails.URLInfoAbout*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_URLInfoAbout" data-uid="Dapplo.Windows.Software.SoftwareDetails.URLInfoAbout">
+  URLInfoAbout
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L109"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/arpurlinfoabout">ARPURLINFOABOUT property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string URLInfoAbout { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_URLUpdateInfo_" data-uid="Dapplo.Windows.Software.SoftwareDetails.URLUpdateInfo*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_URLUpdateInfo" data-uid="Dapplo.Windows.Software.SoftwareDetails.URLUpdateInfo">
+  URLUpdateInfo
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L114"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/arpurlupdateinfo">ARPURLUPDATEINFO property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string URLUpdateInfo { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_UninstallString_" data-uid="Dapplo.Windows.Software.SoftwareDetails.UninstallString*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_UninstallString" data-uid="Dapplo.Windows.Software.SoftwareDetails.UninstallString">
+  UninstallString
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L104"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Determined and set by Windows Installer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string UninstallString { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_Version_" data-uid="Dapplo.Windows.Software.SoftwareDetails.Version*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_Version" data-uid="Dapplo.Windows.Software.SoftwareDetails.Version">
+  Version
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Derived from ProductVersion property
+See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/productversion">ProductVersion property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Version { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_VersionMajor_" data-uid="Dapplo.Windows.Software.SoftwareDetails.VersionMajor*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_VersionMajor" data-uid="Dapplo.Windows.Software.SoftwareDetails.VersionMajor">
+  VersionMajor
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L125"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Derived from ProductVersion property
+See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/productversion">ProductVersion property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int VersionMajor { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_VersionMinor_" data-uid="Dapplo.Windows.Software.SoftwareDetails.VersionMinor*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_VersionMinor" data-uid="Dapplo.Windows.Software.SoftwareDetails.VersionMinor">
+  VersionMinor
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L130"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Derived from ProductVersion property
+See <a href="https://docs.microsoft.com/en-us/windows/desktop/msi/productversion">ProductVersion property</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int VersionMinor { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_WindowsInstaller_" data-uid="Dapplo.Windows.Software.SoftwareDetails.WindowsInstaller*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_WindowsInstaller" data-uid="Dapplo.Windows.Software.SoftwareDetails.WindowsInstaller">
+  WindowsInstaller
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L132"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool WindowsInstaller { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Software_SoftwareDetails_ToString_" data-uid="Dapplo.Windows.Software.SoftwareDetails.ToString*"></a>
+
+  <h3 id="Dapplo_Windows_Software_SoftwareDetails_ToString" data-uid="Dapplo.Windows.Software.SoftwareDetails.ToString">
+  ToString()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L139"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns a string that represents the current object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A string that represents the current object.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Software/SoftwareDetails.cs/#L16" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>File and folder dialogs | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="File and folder dialogs | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/dialogs.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="file-and-folder-dialogs">File and folder dialogs</h1>
+
+<p><strong>Dapplo.Windows.Dialogs</strong> shows the Windows file open, file save and folder picker dialogs (the Common Item Dialog,
+<code>IFileOpenDialog</code> / <code>IFileSaveDialog</code>) through COM. It needs neither Windows Forms nor WPF, so it also works in console
+applications and other UI frameworks.</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows.Dialogs
+</code></pre>
+<p>Namespace: <code>Dapplo.Windows.Dialogs</code>.</p>
+<h2 id="the-simple-api">The simple API</h2>
+<p><code>FileDialog</code> has one method per dialog. Each returns <code>null</code> when the user cancels and throws on real errors.</p>
+<!-- sample: DialogSamples.SimpleApi -->
+<pre><code class="lang-csharp">// Every FileDialog method returns null when the user cancels
+string path = FileDialog.PickFileToOpen(
+    title: &quot;Open Document&quot;,
+    initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+    filters: new[] { (&quot;Text files&quot;, &quot;*.txt&quot;), (&quot;All files&quot;, &quot;*.*&quot;) });
+if (path != null)
+{
+    Console.WriteLine(File.ReadAllText(path));
+}
+
+string savePath = FileDialog.PickFileToSave(
+    title: &quot;Save Screenshot&quot;,
+    suggestedFileName: &quot;screenshot.png&quot;,
+    filters: new[] { (&quot;PNG Image&quot;, &quot;*.png&quot;), (&quot;JPEG Image&quot;, &quot;*.jpg&quot;) },
+    defaultExtension: &quot;png&quot;);
+
+IReadOnlyList&lt;string&gt; files = FileDialog.PickFilesToOpen(filters: new[] { (&quot;Images&quot;, &quot;*.png;*.jpg;*.bmp&quot;) });
+
+string folder = FileDialog.PickFolder(title: &quot;Select Output Folder&quot;);
+</code></pre>
+<h2 id="the-builders">The builders</h2>
+<p>For more options use <code>FileOpenDialogBuilder</code>, <code>FileSaveDialogBuilder</code> and <code>FolderPickerBuilder</code>. <code>FileDialog</code> uses
+them too. <code>ShowDialog</code> returns a <code>FileDialogResult</code>: <code>WasCancelled</code>, <code>SelectedPath</code> and, for multiple selection,
+<code>SelectedPaths</code>. Pass the handle of your window to <code>ShowDialog</code> to make the dialog modal for it.</p>
+<!-- sample: DialogSamples.OpenFile -->
+<pre><code class="lang-csharp">FileDialogResult result = new FileOpenDialogBuilder()
+    .WithTitle(&quot;Open Configuration&quot;)
+    .WithInitialDirectory(@&quot;C:\ProgramData\MyApp&quot;)
+    .AddFilter(&quot;Config files&quot;, &quot;*.json;*.xml&quot;)
+    .AddFilter(&quot;All files&quot;, &quot;*.*&quot;)
+    .WithDefaultExtension(&quot;json&quot;)
+    // The dialog is modal for this window
+    .ShowDialog(ownerWindowHandle);
+
+if (result.WasCancelled)
+{
+    return;
+}
+string configPath = result.SelectedPath;
+</code></pre>
+<!-- sample: DialogSamples.OpenFiles -->
+<pre><code class="lang-csharp">FileDialogResult result = new FileOpenDialogBuilder()
+    .WithTitle(&quot;Import Images&quot;)
+    .AddFilter(&quot;Images&quot;, &quot;*.png;*.jpg;*.bmp;*.gif&quot;)
+    .AllowMultipleSelection()
+    .ShowDialog();
+
+if (!result.WasCancelled)
+{
+    foreach (string file in result.SelectedPaths)
+    {
+        Console.WriteLine(file);
+    }
+}
+</code></pre>
+<!-- sample: DialogSamples.SaveFile -->
+<pre><code class="lang-csharp">FileDialogResult result = new FileSaveDialogBuilder()
+    .WithTitle(&quot;Export Report&quot;)
+    .WithSuggestedFileName(&quot;report.pdf&quot;)
+    .WithDefaultExtension(&quot;pdf&quot;)
+    .AddFilter(&quot;PDF files&quot;, &quot;*.pdf&quot;)
+    .ShowDialog();
+
+if (!result.WasCancelled)
+{
+    Console.WriteLine($&quot;Export to {result.SelectedPath}&quot;);
+}
+</code></pre>
+<!-- sample: DialogSamples.PickFolder -->
+<pre><code class="lang-csharp">FileDialogResult result = new FolderPickerBuilder()
+    .WithTitle(&quot;Select Backup Location&quot;)
+    .WithInitialDirectory(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))
+    .ShowDialog();
+
+if (!result.WasCancelled)
+{
+    Console.WriteLine($&quot;Backup to {result.SelectedPath}&quot;);
+}
+</code></pre>
+<p><code>AddPlace</code> adds a folder to the navigation pane of this dialog:</p>
+<!-- sample: DialogSamples.AddPlace -->
+<pre><code class="lang-csharp">string projects = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), &quot;Projects&quot;);
+
+FileDialogResult result = new FileOpenDialogBuilder()
+    .WithTitle(&quot;Open Project&quot;)
+    .AddFilter(&quot;Project files&quot;, &quot;*.proj&quot;)
+    // Pinned at the top of the navigation pane, only for this dialog
+    .AddPlace(projects, atTop: true)
+    .ShowDialog();
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>File types</td>
+<td><code>AddFilter(&quot;Images&quot;, &quot;*.png;*.jpg&quot;)</code>, the first filter is selected</td>
+</tr>
+<tr>
+<td>Default extension</td>
+<td><code>WithDefaultExtension(&quot;png&quot;)</code>, without the dot</td>
+</tr>
+<tr>
+<td>Start folder</td>
+<td><code>WithInitialDirectory(path)</code>; without it Windows uses the folder the user used last</td>
+</tr>
+<tr>
+<td>File name</td>
+<td><code>FileSaveDialogBuilder.WithSuggestedFileName(&quot;report.pdf&quot;)</code></td>
+</tr>
+<tr>
+<td>Several files</td>
+<td><code>FileOpenDialogBuilder.AllowMultipleSelection()</code></td>
+</tr>
+<tr>
+<td>Owner window</td>
+<td><code>ShowDialog(ownerHandle)</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="errors-and-threading">Errors and threading</h2>
+<p>A cancel is not an error: <code>WasCancelled</code> is <code>true</code> (or the <code>FileDialog</code> method returns <code>null</code>). Real failures throw a
+<code>COMException</code>.</p>
+<!-- sample: DialogSamples.Errors -->
+<pre><code class="lang-csharp">FileDialogResult result;
+try
+{
+    result = new FileOpenDialogBuilder().AddFilter(&quot;All files&quot;, &quot;*.*&quot;).ShowDialog();
+}
+catch (COMException ex)
+{
+    // Not a cancel: something went wrong, e.g. a shell extension failed
+    Console.WriteLine($&quot;The dialog failed: 0x{ex.ErrorCode:X8}&quot;);
+    return;
+}
+
+if (result.WasCancelled)
+{
+    // Not an error, the user pressed Cancel or Escape
+    return;
+}
+Console.WriteLine(result.SelectedPath);
+</code></pre>
+<p>The dialog must be shown on an STA thread. The UI threads of Windows Forms and WPF are STA. A console application
+needs <code>[STAThread]</code> on <code>Main</code>, other threads need a dedicated STA thread:</p>
+<!-- sample: DialogSamples.StaThread -->
+<pre><code class="lang-csharp">// The dialog needs an STA thread. UI threads of WinForms and WPF are STA, a console application's Main needs [STAThread],
+// from other threads use a dedicated STA thread:
+string path = null;
+var thread = new Thread(() =&gt; path = FileDialog.PickFileToOpen());
+thread.SetApartmentState(ApartmentState.STA);
+thread.Start();
+thread.Join();
+</code></pre>
+<p>On any other thread <code>ShowDialog</code> (and the <code>FileDialog</code> methods) throw an <code>InvalidOperationException</code> which says so,
+before any COM object is created. Thread pool threads (<code>Task.Run</code>, <code>await</code> continuations without a UI
+<code>SynchronizationContext</code>) are always MTA:</p>
+<!-- sample: DialogSamples.StaCheck -->
+<pre><code class="lang-csharp">try
+{
+    // Task.Run uses a thread pool thread, which is MTA: the builder throws before any COM object is created
+    await Task.Run(() =&gt; new FolderPickerBuilder().ShowDialog());
+}
+catch (InvalidOperationException ex)
+{
+    // &quot;FolderPickerBuilder.ShowDialog must be called from an STA thread, but the current thread (...) is MTA. ...&quot;
+    Console.WriteLine(ex.Message);
+}
+</code></pre>
+<h2 id="not-covered">Not covered</h2>
+<p>The builders don't expose dialog events (<code>IFileDialog.Advise</code>), client GUIDs for separate &quot;last folder&quot; memory, custom
+button labels, or save-dialog property stores. For those, use the COM interfaces directly.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/dialogs.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

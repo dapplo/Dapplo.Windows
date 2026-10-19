@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Struct NativePoint | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Struct NativePoint | Dapplo.Windows ">
+      
+      <meta name="description" content="NativePoint represents the native POINT structure for calling native methods. It has conversions from and to System.Drawing.Point (the conversions from and to the WPF types are extension methods in Dapplo.Windows.Wpf)">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Common_Structs_NativePoint.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Common.Structs.NativePoint%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Common.Structs.NativePoint">
+
+
+
+  <h1 id="Dapplo_Windows_Common_Structs_NativePoint" data-uid="Dapplo.Windows.Common.Structs.NativePoint" class="text-break">
+Struct NativePoint  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Common.html">Common</a>.<a class="xref" href="Dapplo.Windows.Common.Structs.html">Structs</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Common.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>NativePoint represents the native POINT structure for calling native methods.
+It has conversions from and to System.Drawing.Point (the conversions from and to the WPF types are extension methods in Dapplo.Windows.Wpf)</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Serializable]
+[TypeConverter(typeof(NativePointTypeConverter))]
+[SuppressMessage(&quot;ReSharper&quot;, &quot;ConvertToAutoPropertyWithPrivateSetter&quot;)]
+public readonly struct NativePoint : IEquatable&lt;NativePoint&gt;</code></pre>
+  </div>
+
+
+
+
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a>&gt;</div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </dd></dl>
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Common.Extensions.NativePointExtensions.html#Dapplo_Windows_Common_Extensions_NativePointExtensions_ChangeX_Dapplo_Windows_Common_Structs_NativePoint_System_Int32_">NativePointExtensions.ChangeX(NativePoint, int)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Common.Extensions.NativePointExtensions.html#Dapplo_Windows_Common_Extensions_NativePointExtensions_ChangeY_Dapplo_Windows_Common_Structs_NativePoint_System_Int32_">NativePointExtensions.ChangeY(NativePoint, int)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Common.Extensions.NativePointExtensions.html#Dapplo_Windows_Common_Extensions_NativePointExtensions_Offset_Dapplo_Windows_Common_Structs_NativePoint_Dapplo_Windows_Common_Structs_NativePoint_">NativePointExtensions.Offset(NativePoint, NativePoint)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Common.Extensions.NativePointExtensions.html#Dapplo_Windows_Common_Extensions_NativePointExtensions_Offset_Dapplo_Windows_Common_Structs_NativePoint_System_Nullable_System_Int32__System_Nullable_System_Int32__">NativePointExtensions.Offset(NativePoint, int?, int?)</a>
+  </div>
+  </dd></dl>
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint__ctor_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.#ctor*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint__ctor_System_Int32_System_Int32_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.#ctor(System.Int32,System.Int32)">
+  NativePoint(int, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L41"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Constructor with x and y coordinates</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativePoint(int x, int y)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>x</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>y</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_Empty_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.Empty*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_Empty" data-uid="Dapplo.Windows.Common.Structs.NativePoint.Empty">
+  Empty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L149"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Empty NativePoint</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static NativePoint Empty { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_X_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.X*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_X" data-uid="Dapplo.Windows.Common.Structs.NativePoint.X">
+  X
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The X coordinate</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int X { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_Y_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.Y*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_Y" data-uid="Dapplo.Windows.Common.Structs.NativePoint.Y">
+  Y
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The Y coordinate</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Y { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_Deconstruct_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.Deconstruct*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_Deconstruct_System_Int32__System_Int32__" data-uid="Dapplo.Windows.Common.Structs.NativePoint.Deconstruct(System.Int32@,System.Int32@)">
+  Deconstruct(out int, out int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L140"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Decontructor for tuples</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Deconstruct(out int x, out int y)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>x</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>y</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_Equals_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.Equals*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_Equals_Dapplo_Windows_Common_Structs_NativePoint_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.Equals(Dapplo.Windows.Common.Structs.NativePoint)">
+  Equals(NativePoint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L132"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Indicates whether the current object is equal to another object of the same type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public bool Equals(NativePoint other)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>other</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>An object to compare with this object.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> if the current object is equal to the <code class="paramref">other</code> parameter; otherwise, <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_Equals_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.Equals*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_Equals_System_Object_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.Equals(System.Object)">
+  Equals(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L122"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Indicates whether this instance and a specified object are equal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public override bool Equals(object obj)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>obj</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The object to compare with the current instance.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> if <code class="paramref">obj</code> and this instance are the same type and represent the same value; otherwise, <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_GetHashCode_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.GetHashCode*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_GetHashCode" data-uid="Dapplo.Windows.Common.Structs.NativePoint.GetHashCode">
+  GetHashCode()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L108"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns the hash code for this instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public override int GetHashCode()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>A 32-bit signed integer that is the hash code for this instance.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_ToString_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.ToString*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_ToString" data-uid="Dapplo.Windows.Common.Structs.NativePoint.ToString">
+  ToString()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L118"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns the fully qualified type name of this instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public override string ToString()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The fully qualified type name.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="operators">Operators
+</h2>
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_op_Equality_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Equality*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_op_Equality_Dapplo_Windows_Common_Structs_NativePoint_Dapplo_Windows_Common_Structs_NativePoint_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Equality(Dapplo.Windows.Common.Structs.NativePoint,Dapplo.Windows.Common.Structs.NativePoint)">
+  operator ==(NativePoint, NativePoint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Equal</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator ==(NativePoint point1, NativePoint point2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>point1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint</p>
+</dd>
+    <dt><code>point2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>rue if equal</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_op_Explicit_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Explicit*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_op_Explicit_Dapplo_Windows_Common_Structs_NativePointFloat__Dapplo_Windows_Common_Structs_NativePoint" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Explicit(Dapplo.Windows.Common.Structs.NativePointFloat)~Dapplo.Windows.Common.Structs.NativePoint">
+  explicit operator NativePoint(NativePointFloat)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L80"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Explicit (lossy) cast from NativePointFloat to NativePoint.
+The coordinates are floored, so the result is the pixel which contains the point. Use Round() to round instead.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static explicit operator NativePoint(NativePointFloat nativePointFloat)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>nativePointFloat</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePointFloat.html">NativePointFloat</a></dt>
+    <dd><p>NativePointFloat</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_op_Explicit_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Explicit*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_op_Explicit_System_Drawing_PointF__Dapplo_Windows_Common_Structs_NativePoint" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Explicit(System.Drawing.PointF)~Dapplo.Windows.Common.Structs.NativePoint">
+  explicit operator NativePoint(PointF)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L70"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Explicit (lossy) cast from System.Drawing.PointF to NativePoint.
+The coordinates are floored, so the result is the pixel which contains the point. Use Round() on a NativePointFloat to round instead.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static explicit operator NativePoint(PointF point)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>point</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.drawing.pointf">PointF</a></dt>
+    <dd><p>System.Drawing.PointF</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_op_Implicit_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Implicit*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_op_Implicit_Dapplo_Windows_Common_Structs_NativePoint__System_Drawing_Point" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Implicit(Dapplo.Windows.Common.Structs.NativePoint)~System.Drawing.Point">
+  implicit operator Point(NativePoint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L51"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Implicit cast from NativePoint to System.Drawing.Point</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static implicit operator Point(NativePoint point)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>point</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.drawing.point">Point</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_op_Implicit_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Implicit*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_op_Implicit_System_Drawing_Point__Dapplo_Windows_Common_Structs_NativePoint" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Implicit(System.Drawing.Point)~Dapplo.Windows.Common.Structs.NativePoint">
+  implicit operator NativePoint(Point)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L60"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Implicit cast from System.Drawing.Point to NativePoint</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static implicit operator NativePoint(Point point)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>point</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.drawing.point">Point</a></dt>
+    <dd><p>System.Drawing.Point</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Structs_NativePoint_op_Inequality_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Inequality*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Structs_NativePoint_op_Inequality_Dapplo_Windows_Common_Structs_NativePoint_Dapplo_Windows_Common_Structs_NativePoint_" data-uid="Dapplo.Windows.Common.Structs.NativePoint.op_Inequality(Dapplo.Windows.Common.Structs.NativePoint,Dapplo.Windows.Common.Structs.NativePoint)">
+  operator !=(NativePoint, NativePoint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L102"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Not equal</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator !=(NativePoint point1, NativePoint point2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>point1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint</p>
+</dd>
+    <dt><code>point2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>false if the values are equal</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Structs/NativePoint.cs/#L17" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
