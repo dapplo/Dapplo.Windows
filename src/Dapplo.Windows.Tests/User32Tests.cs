@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -117,5 +118,58 @@ public class User32Tests
 
         var text = User32Api.GetTextFromWindow(handle);
         Assert.Equal(largeText, text);
+    }
+
+    /// <summary>
+    ///     The UINT overload of SystemParametersInfo is public (it was private, only its XML documentation was published)
+    /// </summary>
+    [Fact]
+    public void SystemParametersInfo_Uint_IsPublicAndReadsTheValue()
+    {
+        var method = typeof(User32Api).GetMethod(nameof(User32Api.SystemParametersInfo), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null,
+            new[] { typeof(SystemParametersInfoActions), typeof(uint), typeof(uint).MakeByRefType(), typeof(SystemParametersInfoBehaviors) }, null);
+        Assert.NotNull(method);
+
+        Assert.True(User32Api.SystemParametersInfo(SystemParametersInfoActions.SPI_GETWHEELSCROLLLINES, 0, out uint wheelScrollLines, SystemParametersInfoBehaviors.None));
+        Assert.Equal(User32Api.GetWheelScrollLines(), wheelScrollLines);
+    }
+
+    /// <summary>
+    ///     IsScreenReaderRunning is the BOOL of SPI_GETSCREENREADER
+    /// </summary>
+    [Fact]
+    public void IsScreenReaderRunning_IsTheScreenReaderFlag()
+    {
+        Assert.True(User32Api.SystemParametersInfo(SystemParametersInfoActions.SPI_GETSCREENREADER, 0, out uint screenReader, SystemParametersInfoBehaviors.None));
+        Assert.Equal(screenReader != 0, User32Api.IsScreenReaderRunning());
+    }
+
+    /// <summary>
+    ///     ScreenReaderChanges starts with the current value and reports a change which is broadcast with SPIF_UPDATEINIFILE | SPIF_SENDCHANGE,
+    ///     as NVDA does. Interactive: it changes the system wide screen reader flag (and restores it).
+    /// </summary>
+    [Fact]
+    [Trait("Category", "Interactive")]
+    public void ScreenReaderChanges_ReportsTheFlag()
+    {
+        var initial = User32Api.IsScreenReaderRunning();
+        var values = new System.Collections.Concurrent.BlockingCollection<bool>();
+        using var subscription = EnvironmentMonitor.ScreenReaderChanges.Subscribe(value => values.Add(value));
+        Assert.True(values.TryTake(out var first, 1000, TestContext.Current.CancellationToken));
+        Assert.Equal(initial, first);
+        try
+        {
+            Assert.True(User32Api.SystemParametersInfo(SystemParametersInfoActions.SPI_SETSCREENREADER, initial ? 0u : 1u, (string)null,
+                SystemParametersInfoBehaviors.UpdateIniFile | SystemParametersInfoBehaviors.SendChange));
+            Assert.True(values.TryTake(out var changed, 5000, TestContext.Current.CancellationToken), "No change was reported");
+            Assert.Equal(!initial, changed);
+        }
+        finally
+        {
+            User32Api.SystemParametersInfo(SystemParametersInfoActions.SPI_SETSCREENREADER, initial ? 1u : 0u, (string)null,
+                SystemParametersInfoBehaviors.UpdateIniFile | SystemParametersInfoBehaviors.SendChange);
+        }
+        Assert.True(values.TryTake(out var restored, 5000, TestContext.Current.CancellationToken), "The restore was not reported");
+        Assert.Equal(initial, restored);
     }
 }

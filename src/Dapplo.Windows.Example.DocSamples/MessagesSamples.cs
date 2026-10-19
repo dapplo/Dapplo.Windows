@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Threading;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.User32;
 using Dapplo.Windows.Forms.Messages;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.Messages.Enums;
@@ -185,6 +186,18 @@ public static class MessagesSamples
         var subscription = EnvironmentMonitor.EnvironmentUpdateEvents
             .Where(e => e.Area == "ImmersiveColorSet")
             .Subscribe(e => Console.WriteLine("The color theme changed"));
+        #endregion
+    }
+
+    public static void ScreenReader()
+    {
+        #region ScreenReader
+        // Is a screen reader running right now, e.g. when a capture starts: announce the result instead of only showing it
+        bool screenReader = User32Api.IsScreenReaderRunning();
+
+        // Or follow it: the current value first, then every change which the screen reader broadcasts (NVDA does)
+        var subscription = EnvironmentMonitor.ScreenReaderChanges
+            .Subscribe(running => Console.WriteLine(running ? "A screen reader is running" : "No screen reader"));
         #endregion
     }
 

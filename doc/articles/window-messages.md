@@ -262,6 +262,21 @@ var subscription = EnvironmentMonitor.EnvironmentUpdateEvents
     .Subscribe(e => Console.WriteLine("The color theme changed"));
 ```
 
+`User32Api.IsScreenReaderRunning()` reads SPI_GETSCREENREADER, the flag a screen reader sets while it runs.
+`EnvironmentMonitor.ScreenReaderChanges` starts with the current value and follows the changes. Windows only reports
+a change when the screen reader passes SPIF_UPDATEINIFILE and SPIF_SENDCHANGE; NVDA does when it starts and quits, for
+other screen readers (Narrator included) this isn't verified, so read the flag when the value matters at a certain moment.
+
+<!-- sample: MessagesSamples.ScreenReader -->
+```csharp
+// Is a screen reader running right now, e.g. when a capture starts: announce the result instead of only showing it
+bool screenReader = User32Api.IsScreenReaderRunning();
+
+// Or follow it: the current value first, then every change which the screen reader broadcasts (NVDA does)
+var subscription = EnvironmentMonitor.ScreenReaderChanges
+    .Subscribe(running => Console.WriteLine(running ? "A screen reader is running" : "No screen reader"));
+```
+
 ## Messages of your own windows
 
 The SharedMessageWindow only sees its own messages. For the messages of your forms and WPF windows use the
