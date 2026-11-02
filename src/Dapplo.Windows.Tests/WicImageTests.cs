@@ -108,6 +108,29 @@ public class WicImageTests
     private static bool HasEncoder(Guid containerFormat) => WicCodecs.GetEncoders().Any(e => e.ContainerFormat == containerFormat);
     private static bool HasDecoder(Guid containerFormat) => WicCodecs.GetDecoders().Any(e => e.ContainerFormat == containerFormat);
 
+    /// <summary>
+    /// A Store encoder can be registered but fail to initialize (WINCODEC_ERR_COMPONENTINITIALIZEFAILURE), e.g. on the CI runner or HEIF without the HEVC extension
+    /// </summary>
+    private static bool CanCreateEncoder(Guid containerFormat, out string reason)
+    {
+        reason = null;
+        if (!HasEncoder(containerFormat))
+        {
+            reason = "The encoder is not installed";
+            return false;
+        }
+        try
+        {
+            WicImage.GetEncoderOptions(containerFormat);
+            return true;
+        }
+        catch (WicCodecNotFoundException ex)
+        {
+            reason = $"The encoder can't be used: {ex.Message}";
+            return false;
+        }
+    }
+
     [Theory]
     [InlineData("png")]
     [InlineData("tiff")]
@@ -206,7 +229,8 @@ public class WicImageTests
     [Fact]
     public void JpegXl_LosslessRoundTrip()
     {
-        Assert.SkipUnless(HasEncoder(WicContainerFormats.JpegXl) && HasDecoder(WicContainerFormats.JpegXl), "The JPEG XL codec is not installed");
+        Assert.SkipUnless(HasDecoder(WicContainerFormats.JpegXl), "The JPEG XL decoder is not installed");
+        Assert.SkipUnless(CanCreateEncoder(WicContainerFormats.JpegXl, out var reason), reason ?? string.Empty);
         var encoderOptions = WicImage.GetEncoderOptions(WicContainerFormats.JpegXl);
         Log.Info().WriteLine("JPEG XL encoder options: {0}", string.Join(", ", encoderOptions));
         Assert.SkipUnless(encoderOptions.Any(o => o.Name == "Lossless"), "The JPEG XL encoder has no Lossless option");
@@ -221,7 +245,8 @@ public class WicImageTests
     [Fact]
     public void Heif_EncodeDecode()
     {
-        Assert.SkipUnless(HasEncoder(WicContainerFormats.Heif) && HasDecoder(WicContainerFormats.Heif), "The HEIF codec is not installed");
+        Assert.SkipUnless(HasDecoder(WicContainerFormats.Heif), "The HEIF decoder is not installed");
+        Assert.SkipUnless(CanCreateEncoder(WicContainerFormats.Heif, out var reason), reason ?? string.Empty);
         const int width = 64, height = 48, stride = width * 4;
         var pixels = CreatePixels(width, height, 4, stride, true);
         byte[] encoded;
