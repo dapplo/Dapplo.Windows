@@ -161,6 +161,13 @@ public static class WicImage
         {
             factory = WicNativeMethods.CreateImagingFactory();
             var source = createSource(factory);
+            var sourceIndexedBits = IndexedBitsPerPixel(source.PixelFormat);
+            var paletteColors = GetPaletteColors(options, sourceIndexedBits);
+            if (sourceIndexedBits > 0)
+            {
+                // The encoder and the converter get the colors of the indexes through IWICBitmapSource.CopyPalette
+                source.Palette = paletteColors;
+            }
             var stream = new ManagedIStream(target);
 
             var container = options.ContainerFormat;
@@ -173,6 +180,11 @@ public static class WicImage
             Wic.Check(frame.SetSize((uint)source.Width, (uint)source.Height), "IWICBitmapFrameEncode.SetSize", stream);
             Wic.Check(frame.SetResolution(options.DpiX, options.DpiY), "IWICBitmapFrameEncode.SetResolution", stream);
             var pixelFormat = source.PixelFormat;
+            if (paletteColors != null && sourceIndexedBits == 0)
+            {
+                // A palette was given for pixels which aren't indexed: ask the encoder for an indexed format
+                pixelFormat = WicPixelFormats.Format8bppIndexed;
+            }
             Wic.Check(frame.SetPixelFormat(ref pixelFormat), "IWICBitmapFrameEncode.SetPixelFormat", stream);
 
             IReadOnlyList<WicMetadataIssue> metadataIssues = Array.Empty<WicMetadataIssue>();
@@ -191,21 +203,31 @@ public static class WicImage
                 metadataIssues = metadataWriter.Issues;
             }
 
+            var targetIndexedBits = IndexedBitsPerPixel(pixelFormat);
+            if (targetIndexedBits > 0)
+            {
+                // An indexed format (e.g. GIF) needs a palette: the given one, the exact colors of the pixels when they fit, otherwise one which WIC makes
+                Wic.Check(factory.CreatePalette(out palette), "IWICImagingFactory.CreatePalette");
+                var colors = paletteColors ?? CollectColors(factory, source, 1 << targetIndexedBits);
+                if (colors != null)
+                {
+                    InitializePalette(palette, colors);
+                }
+                else
+                {
+                    Wic.Check(palette.InitializeFromBitmap(source, 1u << targetIndexedBits, HasAlpha(source.PixelFormat) ? 1 : 0), "IWICPalette.InitializeFromBitmap", source);
+                }
+                Wic.Check(frame.SetPalette(palette), "IWICBitmapFrameEncode.SetPalette", stream);
+            }
+
             IWICBitmapSource pixels = source;
             if (pixelFormat != source.PixelFormat)
             {
                 // The encoder wants another pixel format, WIC converts while it pulls the rows
                 Log.Debug().WriteLine("The encoder for {0} converts {1} to {2}", options.ContainerFormat, source.PixelFormat, pixelFormat);
-                var indexedBits = IndexedBitsPerPixel(pixelFormat);
-                if (indexedBits > 0)
-                {
-                    // An indexed format (e.g. GIF) needs a palette, made from the pixels, with a transparent color when the source has alpha
-                    Wic.Check(factory.CreatePalette(out palette), "IWICImagingFactory.CreatePalette");
-                    Wic.Check(palette.InitializeFromBitmap(source, 1u << indexedBits, HasAlpha(source.PixelFormat) ? 1 : 0), "IWICPalette.InitializeFromBitmap", source);
-                    Wic.Check(frame.SetPalette(palette), "IWICBitmapFrameEncode.SetPalette", stream);
-                }
                 Wic.Check(factory.CreateFormatConverter(out converter), "IWICImagingFactory.CreateFormatConverter");
-                Wic.Check(converter.Initialize(source, ref pixelFormat, WicBitmapDitherType.None, palette, indexedBits > 0 ? 50 : 0, WicBitmapPaletteType.Custom), "IWICFormatConverter.Initialize", source);
+                var dither = options.Dither ? WicBitmapDitherType.ErrorDiffusion : WicBitmapDitherType.None;
+                Wic.Check(converter.Initialize(source, ref pixelFormat, dither, targetIndexedBits > 0 ? palette : null, targetIndexedBits > 0 ? 50 : 0, WicBitmapPaletteType.Custom), "IWICFormatConverter.Initialize", source);
                 pixels = (IWICBitmapSource)converter;
             }
             Wic.Check(frame.WriteSource(pixels, IntPtr.Zero), "IWICBitmapFrameEncode.WriteSource", source, stream);
@@ -233,6 +255,119 @@ public static class WicImage
             {
                 target.Dispose();
             }
+        }
+    }
+
+    /// <summary>
+    /// The palette of the options as WICColor values, validated
+    /// </summary>
+    private static uint[] GetPaletteColors(WicEncodeOptions options, int sourceIndexedBits)
+    {
+        if (options.Palette == null)
+        {
+            if (sourceIndexedBits > 0)
+            {
+                throw new ArgumentException("Pixels with an indexed pixel format need WicEncodeOptions.Palette", nameof(options));
+            }
+            return null;
+        }
+        var colors = new uint[options.Palette.Count];
+        for (int i = 0; i < colors.Length; i++)
+        {
+            colors[i] = options.Palette[i];
+        }
+        if (colors.Length == 0 || colors.Length > 256)
+        {
+            throw new ArgumentException("The palette must have 1 to 256 colors", nameof(options));
+        }
+        if (sourceIndexedBits > 0 && colors.Length > 1 << sourceIndexedBits)
+        {
+            throw new ArgumentException($"The palette has {colors.Length} colors, the pixel format only {1 << sourceIndexedBits}", nameof(options));
+        }
+        return colors;
+    }
+
+    private static void InitializePalette(IWICPalette palette, uint[] colors)
+    {
+        var handle = GCHandle.Alloc(colors, GCHandleType.Pinned);
+        try
+        {
+            Wic.Check(palette.InitializeCustom(handle.AddrOfPinnedObject(), (uint)colors.Length), "IWICPalette.InitializeCustom");
+        }
+        finally
+        {
+            handle.Free();
+        }
+    }
+
+    /// <summary>
+    /// The distinct colors of the pixels, sorted, when there are at most maxColors and no pixel is partly transparent (a fully transparent pixel counts
+    /// as the color 0); otherwise null. The pixels are read once more for this, in bands.
+    /// </summary>
+    private static uint[] CollectColors(IWICImagingFactory factory, WicPixelSource source, int maxColors)
+    {
+        IWICFormatConverter converter = null;
+        try
+        {
+            IWICBitmapSource bgra = source;
+            if (source.PixelFormat != WicPixelFormats.Format32bppBgra)
+            {
+                Wic.Check(factory.CreateFormatConverter(out converter), "IWICImagingFactory.CreateFormatConverter");
+                var format = WicPixelFormats.Format32bppBgra;
+                Wic.Check(converter.Initialize(source, ref format, WicBitmapDitherType.None, null, 0, WicBitmapPaletteType.Custom), "IWICFormatConverter.Initialize", source);
+                bgra = (IWICBitmapSource)converter;
+            }
+            var rowBytes = source.Width * 4;
+            var bandRows = Math.Max(1, Math.Min(source.Height, BandBytes / rowBytes));
+            var buffer = new uint[bandRows * source.Width];
+            var colors = new HashSet<uint>();
+            var bufferHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            try
+            {
+                for (int top = 0; top < source.Height; top += bandRows)
+                {
+                    var count = Math.Min(bandRows, source.Height - top);
+                    var rect = new WicRect(0, top, source.Width, count);
+                    var rectHandle = GCHandle.Alloc(rect, GCHandleType.Pinned);
+                    try
+                    {
+                        Wic.Check(bgra.CopyPixels(rectHandle.AddrOfPinnedObject(), (uint)rowBytes, (uint)(count * rowBytes), bufferHandle.AddrOfPinnedObject()), "IWICBitmapSource.CopyPixels", source);
+                    }
+                    finally
+                    {
+                        rectHandle.Free();
+                    }
+                    for (int i = 0; i < count * source.Width; i++)
+                    {
+                        var color = buffer[i];
+                        var alpha = color >> 24;
+                        if (alpha == 0)
+                        {
+                            color = 0;
+                        }
+                        else if (alpha != 255)
+                        {
+                            return null;
+                        }
+                        if (colors.Add(color) && colors.Count > maxColors)
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                bufferHandle.Free();
+            }
+            var result = new uint[colors.Count];
+            colors.CopyTo(result);
+            Array.Sort(result);
+            return result;
+        }
+        finally
+        {
+            Wic.Release(converter);
         }
     }
 
@@ -550,6 +685,7 @@ public static class WicImage
         try
         {
             factory = WicNativeMethods.CreateImagingFactory();
+            var origin = input.Position;
             var stream = new ManagedIStream(input);
             Wic.Check(factory.CreateDecoderFromStream(stream, IntPtr.Zero, WicDecodeOptions.MetadataCacheOnDemand, out decoder), "Creating a decoder for the stream", stream);
             Wic.Check(decoder.GetContainerFormat(out var containerFormat), "IWICBitmapDecoder.GetContainerFormat", stream);
@@ -562,6 +698,7 @@ public static class WicImage
                 dpiX = dpiY = 96;
             }
             var metadata = WicMetadataReading.Read(factory, frame, containerFormat);
+            var hasResolution = HasResolution(frame, metadata, containerFormat, input, origin);
 
             IWICBitmapSource pixels = (IWICBitmapSource)frame;
             var orientationApplied = false;
@@ -578,7 +715,7 @@ public static class WicImage
                 orientationApplied = true;
             }
 
-            var info = new WicFrameInfo((int)width, (int)height, dpiX, dpiY, pixelFormat, containerFormat, (int)frameCount, metadata, orientationApplied);
+            var info = new WicFrameInfo((int)width, (int)height, dpiX, dpiY, hasResolution, pixelFormat, containerFormat, (int)frameCount, metadata, orientationApplied);
             try
             {
                 return action(factory, pixels, info);
@@ -600,6 +737,23 @@ public static class WicImage
             {
                 input.Dispose();
             }
+        }
+    }
+
+    private static bool HasResolution(IWICBitmapFrameDecode frame, WicMetadata metadata, Guid containerFormat, Stream input, long origin)
+    {
+        IWICMetadataQueryReader queryReader = null;
+        try
+        {
+            if (!frame.GetMetadataQueryReader(out queryReader).Succeeded())
+            {
+                queryReader = null;
+            }
+            return ResolutionProbe.HasResolution(queryReader, metadata, containerFormat, input, origin);
+        }
+        finally
+        {
+            Wic.Release(queryReader);
         }
     }
 

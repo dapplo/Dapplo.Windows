@@ -10,12 +10,13 @@ namespace Dapplo.Windows.Imaging;
 /// </summary>
 public sealed class WicFrameInfo
 {
-    internal WicFrameInfo(int width, int height, double dpiX, double dpiY, Guid pixelFormat, Guid containerFormat, int frameCount, WicMetadata metadata, bool orientationApplied)
+    internal WicFrameInfo(int width, int height, double dpiX, double dpiY, bool hasResolution, Guid pixelFormat, Guid containerFormat, int frameCount, WicMetadata metadata, bool orientationApplied)
     {
         Width = width;
         Height = height;
         DpiX = dpiX;
         DpiY = dpiY;
+        HasResolution = hasResolution;
         PixelFormat = pixelFormat;
         ContainerFormat = containerFormat;
         FrameCount = frameCount;
@@ -42,6 +43,14 @@ public sealed class WicFrameInfo
     /// The vertical resolution in dots per inch, after the orientation when it is applied
     /// </summary>
     public double DpiY { get; }
+
+    /// <summary>
+    /// True when the file itself stores a resolution (PNG pHYs in pixels per meter, JFIF density in inch or cm, EXIF/TIFF XResolution with a unit,
+    /// JPEG XR WIDTH_RESOLUTION, BMP pixels per meter, ...).
+    /// False when <see cref="DpiX"/> / <see cref="DpiY"/> are only the default of the decoder, because the file stores none, or only an aspect ratio.
+    /// WIC reports a resolution in both cases, e.g. 96 for a PNG without pHYs and 72 for a WebP without EXIF; use your own default when this is false.
+    /// </summary>
+    public bool HasResolution { get; }
 
     /// <summary>
     /// The pixel format of the frame as stored, see <see cref="WicPixelFormats"/>

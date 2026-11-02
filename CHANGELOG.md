@@ -7,6 +7,16 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.19.0]
+
+### Added
+- `WicFrameInfo.HasResolution` in Dapplo.Windows.Imaging: true when the file itself stores a resolution, false when `DpiX` / `DpiY` are only the default of the decoder. WIC can't say "unknown", every decoder fills in its own default (96 for a PNG without pHYs, 72 for a WebP without EXIF), so "the file says 72" (macOS screenshots, camera JPEGs) couldn't be told apart from "the file says nothing". Per container: PNG pHYs with the unit meter, JPEG JFIF density in inch or cm or EXIF XResolution, TIFF/DNG XResolution, JPEG XR WIDTH_RESOLUTION, BMP pixels per meter other than 0, GIF/ICO/DDS never, other containers an EXIF IFD with XResolution; a ResolutionUnit of 1 (none) or a pHYs/JFIF unit 0 (aspect ratio only) is no resolution. It is filled by `GetFrameInfo` and every `Decode` overload from the frame which is open anyway; only PNG (when WIC doesn't expose pHYs), JPEG XR and BMP read a few bytes of the file, the stream position is restored.
+- `WicEncodeOptions.Palette` (up to 256 colors as 0xAARRGGBB) and the indexed pixel formats `WicPixelFormats.Format1bppIndexed` .. `Format8bppIndexed`: indexed pixels are encoded with that palette (GIF, PNG, BMP, TIFF), other pixels get the nearest color of the palette and the encoder is asked for an 8 bit indexed format.
+- `WicEncodeOptions.Dither`: error diffusion when the pixels are reduced to fewer colors than they have.
+
+### Changed
+- GIF without a palette in the options: pixels with at most 256 colors and no partly transparent pixel get exactly these colors as palette, so decoding gives the same pixels. Before, WIC always chose the palette (`IWICPalette::InitializeFromBitmap`), which could change colors; it still does for more colors.
+
 ## [3.18.0]
 
 ### Added

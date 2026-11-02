@@ -48,6 +48,21 @@ public sealed class WicEncodeOptions
     /// What the encoder doesn't support is skipped and reported in <see cref="WicEncodeResult.MetadataIssues"/>, it never fails the encoding.
     /// </summary>
     public Action<WicMetadataWriter> Metadata { get; set; }
+
+    /// <summary>
+    /// The palette for an indexed image (e.g. GIF, or a PNG with a palette), at most 256 colors as 32 bit BGRA values (0xAARRGGBB, the layout of
+    /// GDI+ Color.ToArgb and of WICColor). A color with alpha 0 is the transparent color.
+    /// Required when the pixels have an indexed pixel format (<see cref="WicPixelFormats.Format8bppIndexed"/>), the indexes refer to this palette.
+    /// With other pixels the encoder is asked for an 8 bit indexed format and each pixel gets the nearest color of the palette.
+    /// When it is null and the encoder writes an indexed format (GIF), the palette is made from the pixels: with at most 256 colors (and no partial
+    /// transparency) these exact colors, otherwise WIC chooses the colors.
+    /// </summary>
+    public IReadOnlyList<uint> Palette { get; set; }
+
+    /// <summary>
+    /// Use error diffusion dithering when the pixels are reduced to a palette with fewer colors than the image has; false (default) uses the nearest color
+    /// </summary>
+    public bool Dither { get; set; }
 }
 
 /// <summary>

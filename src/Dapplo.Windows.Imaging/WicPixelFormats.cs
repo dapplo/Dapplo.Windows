@@ -55,4 +55,24 @@ public static class WicPixelFormats
     /// GUID_WICPixelFormat128bppRGBAFloat: 32 bit floating point R, G, B, A, for HDR.
     /// </summary>
     public static readonly Guid Format128bppRgbaFloat = new Guid("6FDDC324-4E03-4BFE-B185-3D77768DC919");
+    /// <summary>
+    /// GUID_WICPixelFormat1bppIndexed: 1 bit palette index, needs <see cref="WicEncodeOptions.Palette"/> when encoding
+    /// </summary>
+    public static readonly Guid Format1bppIndexed = new Guid("6FDDC324-4E03-4BFE-B185-3D77768DC901");
+
+    /// <summary>
+    /// GUID_WICPixelFormat2bppIndexed: 2 bit palette index, needs <see cref="WicEncodeOptions.Palette"/> when encoding
+    /// </summary>
+    public static readonly Guid Format2bppIndexed = new Guid("6FDDC324-4E03-4BFE-B185-3D77768DC902");
+
+    /// <summary>
+    /// GUID_WICPixelFormat4bppIndexed: 4 bit palette index, needs <see cref="WicEncodeOptions.Palette"/> when encoding
+    /// </summary>
+    public static readonly Guid Format4bppIndexed = new Guid("6FDDC324-4E03-4BFE-B185-3D77768DC903");
+
+    /// <summary>
+    /// GUID_WICPixelFormat8bppIndexed: one byte palette index per pixel, needs <see cref="WicEncodeOptions.Palette"/> when encoding.
+    /// The same layout as GDI+ Format8bppIndexed.
+    /// </summary>
+    public static readonly Guid Format8bppIndexed = new Guid("6FDDC324-4E03-4BFE-B185-3D77768DC904");
 }

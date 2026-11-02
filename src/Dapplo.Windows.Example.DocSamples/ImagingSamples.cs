@@ -70,7 +70,8 @@ public static class ImagingSamples
             WicFrameInfo info = WicImage.Decode(source, WicPixelFormats.Format32bppBgra, (WicFrameInfo frame, out int stride) =>
             {
                 bitmap = new Bitmap(frame.Width, frame.Height, PixelFormat.Format32bppArgb);
-                bitmap.SetResolution((float)frame.DpiX, (float)frame.DpiY);
+                // The resolution of the file; when it stores none, WIC reports the default of the decoder (96 or 72), use your own
+                bitmap.SetResolution(frame.HasResolution ? (float)frame.DpiX : 96, frame.HasResolution ? (float)frame.DpiY : 96);
                 bitmapData = bitmap.LockBits(new Rectangle(0, 0, frame.Width, frame.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                 stride = bitmapData.Stride;
                 return bitmapData.Scan0;

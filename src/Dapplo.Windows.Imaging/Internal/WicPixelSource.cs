@@ -56,7 +56,39 @@ internal abstract class WicPixelSource : IWICBitmapSource, IFailureSource
         return HResult.S_OK;
     }
 
-    public HResult CopyPalette(nint palette) => WicErrors.PaletteUnavailable;
+    /// <summary>
+    /// The colors of an indexed pixel format (WICColor, 0xAARRGGBB), null for the other formats
+    /// </summary>
+    public uint[] Palette { get; set; }
+
+    public HResult CopyPalette(nint palette)
+    {
+        if (Palette == null || Palette.Length == 0)
+        {
+            return WicErrors.PaletteUnavailable;
+        }
+        if (palette == IntPtr.Zero)
+        {
+            return HResult.E_INVALIDARG;
+        }
+        object paletteObject = null;
+        var handle = GCHandle.Alloc(Palette, GCHandleType.Pinned);
+        try
+        {
+            paletteObject = Marshal.GetObjectForIUnknown(palette);
+            return ((IWICPalette)paletteObject).InitializeCustom(handle.AddrOfPinnedObject(), (uint)Palette.Length);
+        }
+        catch (Exception ex)
+        {
+            LastException = ex;
+            return ex.HResult < 0 ? (HResult)ex.HResult : HResult.E_FAIL;
+        }
+        finally
+        {
+            handle.Free();
+            Wic.Release(paletteObject);
+        }
+    }
 
     public unsafe HResult CopyPixels(nint rectangle, uint stride, uint bufferSize, nint buffer)
     {
