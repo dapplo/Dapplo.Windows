@@ -274,21 +274,20 @@ jobs:
         Set-Content -Path $notesFile -Value $notes -Encoding utf8NoBOM
         if ($notes) { Get-Content $notesFile } else { Write-Host "No changelog section found, GitHub will generate the notes." }
 
-    # Trusted publishing: nuget.org trusts this workflow (policy for dapplo/Dapplo.Windows, build.yml, environment NuGet)
-    # and hands out a short-lived API key. Set the repository variable NUGET_USER to the nuget.org user name that owns
-    # the policy. Without it the NUGET_API_KEY secret is used, as before.
+    # Trusted publishing: nuget.org trusts this workflow (policy of Lakritzator for dapplo/Dapplo.Windows, build.yml,
+    # environment NuGet) and hands out a short-lived API key. If the login fails, the NUGET_API_KEY secret is used.
     - name: NuGet login (trusted publishing)
       id: nuget-login
-      if: vars.NUGET_USER != ''
+      continue-on-error: true
       uses: NuGet/login@v1
       with:
-        user: ${{ vars.NUGET_USER }}
+        user: Lakritzator
 
     - name: Push to NuGet
       env:
         NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY || secrets.NUGET_API_KEY }}
       run: |
-        if ([string]::IsNullOrEmpty($env:NUGET_API_KEY)) { throw "No NuGet API key: set the NUGET_USER variable (trusted publishing) or the NUGET_API_KEY secret." }
+        if ([string]::IsNullOrEmpty($env:NUGET_API_KEY)) { throw "No NuGet API key: the trusted publishing login failed and the NUGET_API_KEY secret is not configured." }
         # dotnet nuget push also pushes the .snupkg next to each .nupkg; --skip-duplicate makes re-runs safe
         foreach ($package in Get-ChildItem -Path artifacts -Filter *.nupkg -File) {
           dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
