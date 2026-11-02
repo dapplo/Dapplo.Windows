@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Dapplo.Windows.Imaging has supporting code for the Windows Imaging Component (WIC), e.g. to find the image formats which can be read and written.</Description>
+    <PackageTags>windows native wic imaging codecs</PackageTags>
+    <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapplo.Log" Version="3.0.22" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapplo.Windows.Com\Dapplo.Windows.Com.csproj" />
+    <ProjectReference Include="..\Dapplo.Windows.Common\Dapplo.Windows.Common.csproj" />
+  </ItemGroup>
+</Project>
