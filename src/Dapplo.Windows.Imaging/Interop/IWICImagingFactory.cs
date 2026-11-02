@@ -3,13 +3,14 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using Dapplo.Windows.Common.Enums;
 
 namespace Dapplo.Windows.Imaging.Interop;
 
 /// <summary>
-/// The WIC imaging factory, only CreateComponentEnumerator is used.
-/// Every method before it is declared, in the order of wincodec.idl, so the vtable slot of CreateComponentEnumerator is right.
+/// The WIC imaging factory.
+/// Every method up to CreateComponentEnumerator is declared, in the order of wincodec.idl, so the vtable slots are right.
 /// The methods which aren't used have untyped (nint) parameters, they must not be called.
 /// The methods after CreateComponentEnumerator (CreateFastMetadataEncoderFromDecoder etc.) are left out, which is allowed for the end of a vtable.
 /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/wincodec/nn-wincodec-iwicimagingfactory">IWICImagingFactory interface</a>
@@ -20,18 +21,18 @@ namespace Dapplo.Windows.Imaging.Interop;
 internal interface IWICImagingFactory
 {
     [PreserveSig] HResult CreateDecoderFromFilename(nint wzFilename, nint pguidVendor, uint dwDesiredAccess, int metadataOptions, out nint ppIDecoder);
-    [PreserveSig] HResult CreateDecoderFromStream(nint pIStream, nint pguidVendor, int metadataOptions, out nint ppIDecoder);
+    [PreserveSig] HResult CreateDecoderFromStream(IStream pIStream, nint pguidVendor, WicDecodeOptions metadataOptions, out IWICBitmapDecoder ppIDecoder);
     [PreserveSig] HResult CreateDecoderFromFileHandle(nint hFile, nint pguidVendor, int metadataOptions, out nint ppIDecoder);
-    [PreserveSig] HResult CreateComponentInfo(nint clsidComponent, out nint ppIInfo);
+    [PreserveSig] HResult CreateComponentInfo([In] ref Guid clsidComponent, [MarshalAs(UnmanagedType.IUnknown)] out object ppIInfo);
     [PreserveSig] HResult CreateDecoder(nint guidContainerFormat, nint pguidVendor, out nint ppIDecoder);
-    [PreserveSig] HResult CreateEncoder(nint guidContainerFormat, nint pguidVendor, out nint ppIEncoder);
+    [PreserveSig] HResult CreateEncoder([In] ref Guid guidContainerFormat, nint pguidVendor, out IWICBitmapEncoder ppIEncoder);
     [PreserveSig] HResult CreatePalette(out nint ppIPalette);
-    [PreserveSig] HResult CreateFormatConverter(out nint ppIFormatConverter);
+    [PreserveSig] HResult CreateFormatConverter(out IWICFormatConverter ppIFormatConverter);
     [PreserveSig] HResult CreateBitmapScaler(out nint ppIBitmapScaler);
     [PreserveSig] HResult CreateBitmapClipper(out nint ppIBitmapClipper);
-    [PreserveSig] HResult CreateBitmapFlipRotator(out nint ppIBitmapFlipRotator);
+    [PreserveSig] HResult CreateBitmapFlipRotator(out IWICBitmapFlipRotator ppIBitmapFlipRotator);
     [PreserveSig] HResult CreateStream(out nint ppIWICStream);
-    [PreserveSig] HResult CreateColorContext(out nint ppIWICColorContext);
+    [PreserveSig] HResult CreateColorContext(out IWICColorContext ppIWICColorContext);
     [PreserveSig] HResult CreateColorTransformer(out nint ppIWICColorTransform);
     [PreserveSig] HResult CreateBitmap(uint uiWidth, uint uiHeight, nint pixelFormat, int option, out nint ppIBitmap);
     [PreserveSig] HResult CreateBitmapFromSource(nint piBitmapSource, int option, out nint ppIBitmap);
