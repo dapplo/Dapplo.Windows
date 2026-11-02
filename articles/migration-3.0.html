@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Migrating to Dapplo.Windows 3.0 | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Migrating to Dapplo.Windows 3.0 | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/migration-3.0.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="migrating-to-dapplowindows-30">Migrating to Dapplo.Windows 3.0</h1>
+
+<p>Dapplo.Windows 3.0 fixes many interop bugs. Where an API encoded a wrong concept, it was changed instead of kept for
+compatibility. This page lists every breaking change with the code you need to update. The full list of changes is in
+the <a href="../../CHANGELOG.md">changelog</a>.</p>
+<p>Upgrading an application with an AI assistant? Give it <a href="../ai/upgrade-to-3.0.html">the upgrade prompt</a>: it covers the
+renames and, more importantly, the changes that still compile but behave differently.</p>
+<h2 id="target-frameworks-and-packages">Target frameworks and packages</h2>
+<p>3.0 targets <code>net480</code> and <code>net10.0-windows</code>. The core packages no longer pull in WinForms or WPF; add
+<strong>Dapplo.Windows.Forms</strong> or <strong>Dapplo.Windows.Wpf</strong> when you use those helpers.</p>
+<table>
+<thead>
+<tr>
+<th>2.x</th>
+<th>3.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Dapplo.Windows.Dpi.Forms.DpiAwareForm</code>, <code>DpiUnawareForm</code>, <code>FormsDpiExtensions.AttachDpiHandler(Form / ContextMenuStrip)</code></td>
+<td>Dapplo.Windows.Forms, <code>Dapplo.Windows.Forms.Dpi</code></td>
+</tr>
+<tr>
+<td><code>BitmapScaleHandler.AddTarget(Button / ToolStripItem, …)</code></td>
+<td><code>Dapplo.Windows.Forms.Dpi.BitmapScaleHandlerExtensions</code>; core: <code>AddTargetAction(target, key, apply, execute)</code></td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Messages.WinProcListener</code> (<code>AddHook(HwndSourceHook)</code>)</td>
+<td><code>Dapplo.Windows.Forms.Messages.WinProcListener</code> (<code>AddHook(WinProcHook)</code>, same signature)</td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Messages.WinProcFormsExtensions.WinProcFormsMessages()</code></td>
+<td><code>WinProcMessages()</code> in <code>Dapplo.Windows.Forms.Messages</code></td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Extensions.FormsExtensions</code></td>
+<td><code>Dapplo.Windows.Forms.FormsExtensions</code></td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Messages.WinProcHandler</code>, <code>WinProcHandlerHook</code>, <code>WinProcWindowsExtensions.WinProcMessages(Window)</code></td>
+<td>Dapplo.Windows.Wpf, <code>Dapplo.Windows.Wpf.Messages</code></td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Dpi.Wpf.WindowDpiExtensions</code></td>
+<td><code>Dapplo.Windows.Wpf.Dpi.WindowDpiExtensions</code></td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Extensions.WindowsExtensions</code> (<code>AsInteropWindow</code>, <code>GetHandle</code>, <code>ApplyPlacement</code>, <code>RetrievePlacement</code>)</td>
+<td><code>Dapplo.Windows.Wpf.WindowExtensions</code></td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Extensions.BitmapExtensions.ToBitmapSource(Bitmap / Image)</code></td>
+<td><code>Dapplo.Windows.Wpf.BitmapSourceExtensions.ToBitmapSource(Bitmap / Image / Icon)</code></td>
+</tr>
+<tr>
+<td><code>interopWindow.PrintWindow&lt;TBitmap&gt;()</code></td>
+<td><code>PrintWindow()</code> returns <code>Bitmap</code>; <code>PrintWindowAsBitmapSource()</code> in Dapplo.Windows.Wpf</td>
+</tr>
+<tr>
+<td><code>GetIcon&lt;BitmapSource&gt;()</code>, <code>IconHelper.*&lt;BitmapSource&gt;</code></td>
+<td><code>GetIcon&lt;Bitmap&gt;().ToBitmapSource()</code></td>
+</tr>
+<tr>
+<td><code>DwmApi.ColorizationColor</code> (WPF <code>Color</code>)</td>
+<td><code>DwmApi.ColorizationColor.ToMediaColor()</code> (now a <code>System.Drawing.Color</code>)</td>
+</tr>
+<tr>
+<td>Casts between <code>Native*</code> structs and <code>System.Windows.Point</code> / <code>Size</code> / <code>Rect</code> / <code>Int32Rect</code></td>
+<td><code>Dapplo.Windows.Wpf.NativeStructWpfExtensions</code>: <code>ToPoint</code>, <code>ToNativePointFloat</code>, <code>ToSize</code>, <code>ToNativeSize</code>, <code>ToNativeSizeFloat</code>, <code>ToRect</code>, <code>ToNativeRectFloat</code>, <code>ToInt32Rect</code>, <code>ToNativeRect</code></td>
+</tr>
+<tr>
+<td><code>NativeRect(Float).Transform(Matrix)</code></td>
+<td><code>Dapplo.Windows.Wpf.NativeStructWpfExtensions.Transform</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="lang-csharp">// 2.x
+System.Windows.Rect wpfRect = nativeRect;
+// 3.0
+using Dapplo.Windows.Wpf;
+var wpfRect = nativeRect.ToRect();
+</code></pre>
+<h2 id="renames-and-moved-types-sweep">Renames and moved types (sweep)</h2>
+<table>
+<thead>
+<tr>
+<th>2.x</th>
+<th>3.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>window.GetParent()</code> for an owned dialog</td>
+<td><code>window.GetOwner()</code> (<code>GetParent()</code> is only the real parent now)</td>
+</tr>
+<tr>
+<td><code>window.GetChildren()</code> meaning all descendants</td>
+<td><code>window.GetDescendants()</code></td>
+</tr>
+<tr>
+<td><code>new SafeCurrentInputDesktopHandle()</code></td>
+<td><code>ThreadDesktopScope.SwitchToInputDesktop()</code> / <code>SafeDesktopHandle.OpenInputDesktop()</code></td>
+</tr>
+<tr>
+<td><code>TrySendMessage(h, msg, wp, out r, lp, t)</code></td>
+<td><code>TrySendMessage(h, msg, wp, lp, out r, t)</code></td>
+</tr>
+<tr>
+<td><code>AttachThreadInput(a, b, 1)</code></td>
+<td><code>AttachThreadInput(a, b, true)</code></td>
+</tr>
+<tr>
+<td><code>MapWindowPoints(a, b, ref pt, 1)</code></td>
+<td><code>MapWindowPoints(a, b, ref pt)</code></td>
+</tr>
+<tr>
+<td><code>InteropWindow w = hWnd;</code> / <code>IntPtr h = w;</code></td>
+<td><code>InteropWindowFactory.CreateFor(hWnd)</code> / <code>w.Handle</code></td>
+</tr>
+<tr>
+<td><code>InteropWindowQuery.IgnoreClasses.Add(x)</code></td>
+<td><code>InteropWindowQuery.AddIgnoreClass(x)</code></td>
+</tr>
+<tr>
+<td><code>DesktopAccessRight.GENERIC_ALL</code> (0x1FF)</td>
+<td><code>DesktopAccessRight.DESKTOP_ALL_SPECIFIC</code></td>
+</tr>
+<tr>
+<td><code>IconHelper.GetAppLogo&lt;Bitmap&gt;(window)</code></td>
+<td><code>window.GetAppLogo&lt;Bitmap&gt;()</code> (package Dapplo.Windows)</td>
+</tr>
+<tr>
+<td><code>long hr = Win32.GetHResult(e)</code></td>
+<td><code>HResult hr = Win32.GetHResult(e)</code></td>
+</tr>
+<tr>
+<td><code>ColorSpace.LCS_GM_IMAGES</code></td>
+<td><code>ColorSpaceIntent.LCS_GM_IMAGES</code></td>
+</tr>
+<tr>
+<td><code>BitfieldColorMask.Create(255, 255, 255)</code></td>
+<td><code>BitfieldColorMask.Rgb888</code></td>
+</tr>
+<tr>
+<td><code>int s = Kernel32Api.GlobalSize(h)</code></td>
+<td><code>ulong s = Kernel32Api.GlobalSize(h).ToUInt64()</code></td>
+</tr>
+<tr>
+<td><code>PackageInfo.IsRunningOnUwp</code></td>
+<td><code>PackageInfo.HasPackageIdentity</code></td>
+</tr>
+<tr>
+<td><code>Ole32Api.ClassIdFromProgId(p) == Guid.Empty</code></td>
+<td><code>!Ole32Api.ClassIdFromProgId(p).HasValue</code></td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Kernel32.RestartManager</code>, <code>Kernel32.Enums.Rm*</code>, <code>Kernel32.Structs.Rm*</code></td>
+<td><code>Dapplo.Windows.InstallerManager.InstallerRestartManager</code>, <code>InstallerManager.Enums</code>, <code>InstallerManager.Structs</code></td>
+</tr>
+<tr>
+<td><code>RmProcessInfo.strAppName</code> / <code>Process.dwProcessId</code> / <code>bRestartable</code></td>
+<td><code>AppName</code> / <code>Process.ProcessId</code> / <code>IsRestartable</code></td>
+</tr>
+<tr>
+<td><code>session.Shutdown()</code> (forced)</td>
+<td><code>session.Shutdown(RmShutdownType.Force)</code>; the default is now graceful</td>
+</tr>
+<tr>
+<td><code>ExtractIconEx(f, i, out l, out s, 1)</code></td>
+<td><code>var l = new IntPtr[1]; var s = new IntPtr[1]; ExtractIconEx(f, i, l, s, 1)</code>; count: <code>CountIcons(f)</code></td>
+</tr>
+<tr>
+<td><code>Shell32Api.TaskbarPosition</code></td>
+<td><code>Shell32Api.TryGetTaskbarPosition(out var data)</code></td>
+</tr>
+<tr>
+<td><code>Advapi32Api.CurrentSessionId</code></td>
+<td><code>Advapi32Api.CurrentLogonSid</code> (the session id is <code>Process.GetCurrentProcess().SessionId</code>)</td>
+</tr>
+<tr>
+<td><code>IntPtr timer = SystemStateApi.CreateWaitableTimer(...)</code></td>
+<td><code>SafeWaitHandle timer = ...</code></td>
+</tr>
+<tr>
+<td><code>WinFrame.IsAvailabe</code>, <code>ClientLatency.Avarage</code> / <code>Derivation</code>, <code>UserInfo.Domainname</code> / <code>Username</code></td>
+<td><code>IsAvailable</code>, <code>Average</code> / <code>Deviation</code>, <code>DomainName</code> / <code>UserName</code></td>
+</tr>
+<tr>
+<td><code>AppBarStates.AllwaysOnTop</code>, <code>AppBarMessages.SetAutohideAppBar</code></td>
+<td><code>AlwaysOnTop</code>, <code>SetAutoHideAppBar</code></td>
+</tr>
+<tr>
+<td><code>DwmWindowAttributes.NcrenderingPolicy</code>, <code>TransitionsForcedisabled</code></td>
+<td><code>NcRenderingPolicy</code>, <code>TransitionsForceDisabled</code></td>
+</tr>
+<tr>
+<td><code>VirtualKeyCode.Snapshot</code>, <code>Hangul</code>, <code>Kanji</code></td>
+<td><code>PrintScreen</code>, <code>Kana</code>, <code>Hanja</code></td>
+</tr>
+<tr>
+<td><code>MouseButtonStates.Button4Up</code> / <code>Button6Up</code> / <code>Button1Down</code></td>
+<td><code>ButtonX1Up</code> / <code>ButtonX2Up</code> / <code>LeftButtonDown</code></td>
+</tr>
+<tr>
+<td><code>LowerIntegretyInjected</code>, <code>HidUsagesGeneric.Consumer</code></td>
+<td><code>LowerIntegrityInjected</code>, <code>HidUsagePages.Consumer</code></td>
+</tr>
+<tr>
+<td><code>WM_KEYFIRST</code>, <code>WM_MOUSEFIRST</code></td>
+<td><code>WM_KEYDOWN</code>, <code>WM_MOUSEMOVE</code></td>
+</tr>
+<tr>
+<td><code>ApplicationRestartManager.MaxCommandLineLength</code></td>
+<td><code>RestartMaxCmdLine</code></td>
+</tr>
+<tr>
+<td><code>new KeyCombinationHandler(...) { TriggerOnKeyUp = true }</code></td>
+<td><code>{ TriggerMode = TriggerMode.FirstKeyUp }</code>, or <code>TriggerMode.AllKeysUp</code> when the hotkey sends input</td>
+</tr>
+<tr>
+<td><code>window.GetZOrderedChildren(force)</code></td>
+<td><code>window.GetChildren(force)</code></td>
+</tr>
+<tr>
+<td><code>InteropWindowRetrieveSettings.ZOrderedChildren</code> / <code>CacheAllChildZorder</code></td>
+<td><code>Children</code> / <code>CacheAllWithChildren</code></td>
+</tr>
+<tr>
+<td><code>new IntPtr(-1)</code> / <code>new IntPtr(-2)</code> for <code>SetWindowPos</code></td>
+<td><code>WindowHandles.HWND_TOPMOST</code> / <code>WindowHandles.HWND_NOTOPMOST</code></td>
+</tr>
+<tr>
+<td><code>token.SetAsUnicodeString(x)</code> without <code>ClearContents()</code></td>
+<td><code>ClipboardNative.ReplaceContents(new ClipboardContents().AddUnicodeString(x))</code></td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Messages.Enumerations</code></td>
+<td><code>Dapplo.Windows.Messages.Enums</code></td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Messages.Structs.WindowMessage</code></td>
+<td><code>Dapplo.Windows.Messages.WindowMessage</code></td>
+</tr>
+<tr>
+<td><code>WindowMessageInfo</code> (<code>Handle</code>, <code>Message</code>, <code>WordParam</code>, <code>LongParam</code>)</td>
+<td><code>WindowMessage</code> (<code>Hwnd</code>, <code>Msg</code>, <code>WParam</code>, <code>LParam</code>)</td>
+</tr>
+<tr>
+<td><code>WindowsMessage.RegisterWindowsMessage(name)</code> / <code>GetWindowsMessage(id)</code></td>
+<td><code>RegisteredWindowMessages.Register(name)</code> / <code>GetName(id)</code></td>
+</tr>
+<tr>
+<td><code>Msg.wParam</code> / <code>Msg.lParam</code></td>
+<td><code>Msg.WParam</code> / <code>Msg.LParam</code></td>
+</tr>
+<tr>
+<td><code>control.WinProcFormsMessages()</code></td>
+<td><code>control.WinProcMessages()</code></td>
+</tr>
+<tr>
+<td><code>InteropWindowQuery.GetTopLevelWindows()</code></td>
+<td><code>InteropWindowQuery.GetVisibleApplicationWindows()</code></td>
+</tr>
+<tr>
+<td><code>window.IsTopLevel()</code> / <code>window.IsPopup()</code></td>
+<td><code>window.IsVisibleApplicationWindow()</code> / <code>window.IsVisiblePopup()</code> (for &quot;no parent&quot; use <code>GetParent() == IntPtr.Zero</code>)</td>
+</tr>
+<tr>
+<td><code>WinMm.Play(string)</code> / <code>Play(byte[])</code> / <code>Play(IntPtr, SoundSettings)</code></td>
+<td><code>WinMm.PlayResource</code> / <code>PlayWave(byte[])</code> / <code>PlayWave(IntPtr, SoundSettings)</code></td>
+</tr>
+<tr>
+<td><code>RmShutdownType.RmForceShutdown</code> / <code>RmShutdownOnlyRegistered</code></td>
+<td><code>RmShutdownType.Force</code> / <code>OnlyRegistered</code></td>
+</tr>
+<tr>
+<td><code>DwmApi.ColorizationDrawingColor</code> / <code>ColorizationSystemDrawingColor</code></td>
+<td><code>DwmApi.ColorizationColor</code></td>
+</tr>
+<tr>
+<td><code>Dapplo.Windows.Gdi32.Enums.DrawIconExFlags</code></td>
+<td><code>Dapplo.Windows.Icons.Enums.DrawIconExFlags</code></td>
+</tr>
+<tr>
+<td><code>GdiExtensions.AreRectangleCornersVisisble</code>, <code>CieXyzTripple</code></td>
+<td><code>AreRectangleCornersVisible</code>, <code>CieXyzTriple</code></td>
+</tr>
+<tr>
+<td><code>SystemStateApi.CloseHandle(h)</code></td>
+<td><code>Kernel32Api.CloseHandle(h)</code> (the timers use <code>SafeWaitHandle</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Behaviour changes to check:</p>
+<ul>
+<li><p><strong>Dialogs</strong> must be shown from an STA thread (the UI thread or a <code>[STAThread]</code> Main), not from <code>Task.Run</code>.</p>
+</li>
+<li><p><strong><code>GetTopWindows()</code></strong> returns a list taken at call time; call it again for the current state.</p>
+</li>
+<li><p><strong>Owner vs parent:</strong> <code>IsVisibleApplicationWindow</code> / <code>IsVisiblePopup</code> (formerly <code>IsTopLevel</code> / <code>IsPopup</code>) accept owned windows, and <code>GetInfo(autoCorrect)</code> no longer crops owned dialogs.</p>
+</li>
+<li><p><strong>DPI:</strong> <code>DpiAwareForm</code> lets WinForms scale on WM_DPICHANGED. Remove manual font or control scaling you did in <code>FormDpiHandler.OnDpiChanged</code>, or cancel <code>Form.DpiChanged</code>. DPI scaling now rounds (<code>ScaleWithDpi(3, 144)</code> is 5).</p>
+</li>
+<li><p><strong>Cursor drawing:</strong> <code>DrawCursorOnGraphics</code> / <code>DrawCursorOnBitmap</code> take the top-left of the cursor image; subtract <code>cursor.HotSpot</code> to draw at the mouse position.</p>
+</li>
+<li><p><strong>Empty rectangles:</strong> rectangles and sizes with a negative width or height count as empty.</p>
+</li>
+<li><p><strong>Keyboard handlers:</strong> use one handler instance per subscription, or the <code>Where(() =&gt; new KeyCombinationHandler(...))</code> factory overload.</p>
+</li>
+<li><p><strong>Strong names:</strong> the net10 assemblies are now strong-named too.</p>
+</li>
+</ul>
+<h2 id="saved-settings">Saved settings</h2>
+<p>Check everything your application stored with 2.x:</p>
+<ul>
+<li><strong><code>NativeSize</code> strings:</strong> 2.x wrote <code>Height,Width</code> and read the values back the other way round. 3.0 reads and writes
+<code>Width,Height</code>, so a size saved by 2.x comes back swapped. Swap stored values once when you upgrade (for example with
+a settings version number), or reset them.</li>
+<li><strong>Culture:</strong> the type converters now always write with the invariant culture. Values written by 2.x under a culture
+with a different minus sign (sv-SE, nb-NO) could not be read back before and may need a reset.</li>
+<li><strong>Key names:</strong> <code>KeyHelper.VirtualKeyCodeFromString</code> still accepts the removed alias names <code>Snapshot</code>, <code>Hangul</code>,
+<code>Hangeul</code> and <code>Kanji</code>. <code>VirtualKeyCode.ToString()</code> now always gives the remaining name (<code>PrintScreen</code>, <code>Kana</code>,
+<code>Hanja</code>), so re-saved settings use the new names. <code>&quot;win&quot;</code> now means either Windows key.</li>
+<li><strong>Enum numbers:</strong> if you stored <code>MonitorFrom</code>, <code>SysColorIndexes.Color3Dface</code>, <code>ProcessAccessRights</code>,
+<code>DialogDpiChangeBehaviors</code>, <code>ObjectStates.STATE_SYSTEM_VALID</code> or <code>DesktopAccessRight.GENERIC_ALL</code> as numbers, the
+values changed.</li>
+</ul>
+<h2 id="hresult">HRESULT</h2>
+<p><code>HResult</code> is now <code>enum HResult : int</code>. <code>Failed()</code> and <code>Succeeded()</code> work, and <code>ThrowOnFailure()</code> throws. Failures
+that were silently treated as success in 2.x now take the failure branch, so review code that calls COM, DWM or DPI
+functions. Casts to <code>uint</code> need <code>unchecked((uint)hr)</code>.</p>
+<h2 id="window-information-and-scrolling">Window information and scrolling</h2>
+<h3 id="monitorfrom"><code>MonitorFrom</code></h3>
+<p>The member names are unchanged but the values now match Win32, and the enum is no longer <code>[Flags]</code>. Recompiling is
+enough, unless you stored the numbers or combined members with <code>|</code>.</p>
+<h3 id="sendmessage"><code>SendMessage</code></h3>
+<p>WPARAM, LPARAM and LRESULT are pointer-sized everywhere.</p>
+<pre><code class="lang-csharp">// 2.x
+User32Api.SendMessage(hWnd, msg, 5, 0);
+int r = User32Api.SendMessage(hWnd, WindowsMessages.WM_VSCROLL, ScrollBarCommands.SB_LINEDOWN, 0);
+// 3.0
+User32Api.SendMessage(hWnd, msg, new IntPtr(5), IntPtr.Zero);
+IntPtr r = User32Api.SendMessage(hWnd, WindowsMessages.WM_VSCROLL, ScrollBarCommands.SB_LINEDOWN, IntPtr.Zero);
+</code></pre>
+<h3 id="scrollbarinfo"><code>ScrollBarInfo</code></h3>
+<p><code>ThumbTop</code> and <code>ThumbBottom</code> were swapped. <code>ThumbSize</code> is renamed to <code>LineButtonSize</code>, because it is the size of the
+arrow buttons. The thumb size is <code>ThumbBottom - ThumbTop</code>.</p>
+<h3 id="syscolorindexescolor3dface"><code>SysColorIndexes.Color3Dface</code></h3>
+<p>Now 15 (<code>COLOR_3DFACE</code>). No code change is needed.</p>
+<h3 id="fill-caches-again"><code>Fill()</code> caches again</h3>
+<p><code>InteropWindowExtensions.Fill()</code> used to ignore its settings and always refresh, auto-correct and query the
+maximized state. It now does what the flags say.</p>
+<ul>
+<li>Pass <code>InteropWindowRetrieveSettings.ForceUpdate</code> when you need fresh values.</li>
+<li><code>CacheAll</code>, <code>CacheAllWithChildren</code> and <code>CacheAllChildZorder</code> no longer auto-correct bounds. Use <code>CacheAllAutoCorrect</code>
+or add <code>AutoCorrectValues</code>.</li>
+</ul>
+<h3 id="wheel-scroll-lines">Wheel scroll lines</h3>
+<pre><code class="lang-csharp">// 2.x
+int lines = WindowScroller.ScrollWheelLinesFromRegistry;
+// 3.0: 0 means the wheel doesn't scroll, uint.MaxValue means one notch scrolls a page
+uint lines = WindowScroller.ScrollWheelLines;
+int delta = WindowScroller.CalculateWheelDelta(pageSize, lines);
+</code></pre>
+<h2 id="geometry">Geometry</h2>
+<p><code>NativeRectExtensions.Intersect2</code> is removed; it returned the union on the Y axis. Use <code>Intersect</code>, which returns
+<code>NativeRect.Empty</code> when the rectangles don't overlap.</p>
+<pre><code class="lang-csharp">// 2.x
+var overlap = rect1.Intersect2(rect2);
+// 3.0
+var overlap = rect1.Intersect(rect2);
+</code></pre>
+<h3 id="docking-and-overlap">Docking and overlap</h3>
+<p>Right and Bottom are exclusive, as in a Win32 <code>RECT</code>. Flush rectangles (<code>a.Right == b.Left</code>) are now docked; if you
+built docked rectangles with a 1-pixel gap, make them flush. <code>HasOverlap</code> is now the same as <code>IntersectsWith</code>.</p>
+<h3 id="conversions">Conversions</h3>
+<p>Lossy conversions are explicit:</p>
+<pre><code class="lang-csharp">// 2.x
+NativeRect r = rectFloat;
+NativePoint p = pointFloat;
+// 3.0: the containing integer rectangle, or round explicitly
+var r = (NativeRect)rectFloat;
+var p = pointFloat.Round();
+</code></pre>
+<p>Points floor, sizes round up and rectangles become the smallest containing integer rectangle, so values can differ
+slightly from 2.x (10.5/30.5 now becomes 10/31 where it was 10/30).</p>
+<h3 id="sorting-and-type-converters">Sorting and type converters</h3>
+<p><code>NativeSize.CompareTo</code> now sorts ascending by area. <code>NativeSizeTypeConverter</code> writes <code>Width,Height</code>; strings saved by
+2.x were <code>Height,Width</code>, so swap them once or re-save them.</p>
+<h2 id="windows-version">Windows version</h2>
+<p><code>WindowsVersion</code> reads the real version with <code>RtlGetVersion</code>. <code>IsWindowsVista</code> and <code>IsWindows10</code> now mean exactly
+that version:</p>
+<pre><code class="lang-csharp">// 2.x meaning &quot;Windows 10 or later&quot;
+if (WindowsVersion.IsWindows10) { }
+// 3.0
+if (WindowsVersion.IsWindows10OrLater) { }
+</code></pre>
+<h2 id="icons-and-cursors">Icons and cursors</h2>
+<p><code>IconInfo</code> and <code>IconInfoEx</code> no longer create a SafeHandle on every property read.</p>
+<pre><code class="lang-csharp">// 2.x
+using var color = iconInfo.ColorBitmapHandle;
+iconInfoEx.Dispose();
+// 3.0: raw, non-owning handles
+IntPtr color = iconInfo.ColorBitmap;
+// take ownership once ...
+iconInfoEx.TakeBitmaps(out var mask, out var colorBitmap);
+using (mask) using (colorBitmap) { /* ... */ }
+// ... or just free them
+iconInfoEx.DeleteBitmaps();
+</code></pre>
+<h2 id="dpi">DPI</h2>
+<p><code>DpiAwarenessContext</code> is a pointer-sized struct. Compare contexts with the Win32 function, because the handles Windows
+returns are not the pseudo values:</p>
+<pre><code class="lang-csharp">// 2.x
+if (NativeDpiMethods.GetThreadDpiAwarenessContext() == DpiAwarenessContext.PerMonitorAwareV2) { }
+// 3.0
+if (NativeDpiMethods.AreDpiAwarenessContextsEqual(NativeDpiMethods.GetThreadDpiAwarenessContext(), DpiAwarenessContext.PerMonitorAwareV2)) { }
+</code></pre>
+<p>The members are static properties, so they can't be used in <code>case</code> labels or as default parameter values.</p>
+<ul>
+<li><code>GetWindowDpiHostingBehavior()</code> → <code>GetWindowDpiHostingBehavior(hWnd)</code>.</li>
+<li><code>EnableNonClientDpiScaling(hWnd).Succeeded()</code> → <code>EnableNonClientDpiScaling(hWnd)</code> (returns <code>bool</code>).</li>
+<li><code>DialogDpiChangeBehaviors.DisableControlRelayout</code> is now 4.</li>
+</ul>
+<h2 id="com">COM</h2>
+<p><code>IUnknown</code> is removed; use <code>Marshal.QueryInterface</code>, <code>Marshal.AddRef</code> and <code>Marshal.Release</code>. <code>IDispatch.GetTypeInfo</code>
+now returns <code>System.Runtime.InteropServices.ComTypes.ITypeInfo</code> on every target, and <code>Invoke</code> reports the argument
+error as <code>out uint</code>.</p>
+<h2 id="messages-and-sharedmessagewindow">Messages and SharedMessageWindow</h2>
+<p><code>WindowMessage</code> is a sealed class. Set <code>Handled</code> and <code>Result</code> synchronously inside <code>OnNext</code>; after <code>ObserveOn</code> the
+reply has already been sent.</p>
+<pre><code class="lang-csharp">// 2.x (had no effect, the struct was a copy)
+SharedMessageWindow.Messages.Subscribe(m =&gt; { m.Result = (nuint)1; m.Handled = true; });
+// 3.0
+SharedMessageWindow.Messages.Subscribe(m =&gt; { m.Result = 1; m.Handled = true; });
+</code></pre>
+<p>The window now exists for the whole process after first use. <code>Handle</code> never returns 0, so drop any &quot;wait until the
+window exists&quot; code. Registrations that need the window go into <code>Listen(onSetup, onTeardown)</code>, which runs both on the
+window thread. Use <code>SharedMessageWindow.Invoke(hwnd =&gt; ...)</code> to run other code there.</p>
+<h2 id="end-of-session">End of session</h2>
+<pre><code class="lang-csharp">// 2.x
+ApplicationRestartManager.ListenForEndSession(onQuerySession: reason =&gt; canClose, onEndSession: reason =&gt; Save()).Subscribe();
+// 3.0: answer synchronously inside OnNext
+ApplicationRestartManager.ListenForEndSession().Subscribe(m =&gt;
+{
+    if (m.IsQuery)
+    {
+        if (!canClose) m.Veto(&quot;Unsaved captures&quot;);
+    }
+    else if (m.IsSessionEnding)
+    {
+        Save();
+    }
+});
+</code></pre>
+<p><code>EndSessionMessage</code> moved from <code>Dapplo.Windows.Messages.Structs</code> to <code>Dapplo.Windows.AppRestartManager</code>.
+<code>WasRestartRequested()</code> becomes <code>WasRestartRequested(&quot;/restore&quot;)</code> with the argument you registered.</p>
+<h2 id="keyboard-and-mouse-hooks">Keyboard and mouse hooks</h2>
+<p><code>KeyboardHook</code> and <code>MouseHook</code> run on their own thread, so subscribers are no longer called on the UI thread. Decide
+<code>Handled</code> quickly and synchronously, and move UI work to the UI thread:</p>
+<pre><code class="lang-csharp">KeyboardHook.KeyboardEvents
+    .Where(handler)                              // sets Handled synchronously
+    .ObserveOn(SynchronizationContext.Current)   // then do the slow work on the UI thread
+    .Subscribe(args =&gt; OnHotkey());
+</code></pre>
+<p>For listeners that never set <code>Handled</code>, use <code>KeyboardEventsNonBlocking</code> / <code>MouseEventsNonBlocking</code>.</p>
+<p><code>&quot;win&quot;</code> parses to the new <code>VirtualKeyCode.Win</code>, which matches either Windows key. Use <code>LeftWin</code> to require the left key.</p>
+<h2 id="raw-input">Raw input</h2>
+<p><code>args.RawInput.Device.HID.GetData()</code> becomes <code>args.HidData</code>. <code>RawInputApi.GetRawInputData(…)</code> becomes
+<code>RawInputApi.TryGetRawInputData(lParam, out var rawInput, out var hidData)</code>.</p>
+<h2 id="clipboard">Clipboard</h2>
+<ul>
+<li><p>Delayed rendering: register the renderer before <code>SetDelayedRenderedContent</code>.</p>
+<pre><code class="lang-csharp">// 2.x
+ClipboardNative.OnRenderFormat.Subscribe(r =&gt; r.AccessToken.SetAsUnicodeString(text, r.RequestedFormatId));
+// 3.0
+using var registration = ClipboardNative.RegisterDelayedRenderer(StandardClipboardFormats.UnicodeText,
+    r =&gt; r.AccessToken.SetAsUnicodeString(text, r.RequestedFormatId));
+</code></pre>
+</li>
+<li><p><code>ClipboardUpdateInformation.Create(hWnd)</code> becomes <code>Create()</code>. <code>OnUpdate</code> no longer reads content; call <code>Access()</code>
+after <code>ObserveOn</code> to read it.</p>
+</li>
+<li><p>Keep an access token on one thread and don't <code>await</code> while holding it. Cancelling <code>AccessAsync</code> throws
+<code>OperationCanceledException</code> instead of returning a token with <code>IsOpenTimeout</code>.</p>
+</li>
+<li><p><code>SetCloudClipboardOptions()</code> without arguments now places nothing. <code>SetExcludeClipboardContentFromMonitorProcessing(true)</code>
+becomes <code>ExcludeFromMonitorProcessing()</code>.</p>
+</li>
+</ul>
+<h2 id="system-state">System state</h2>
+<pre><code class="lang-csharp">// 2.x
+SystemStateApi.PreventSleep(); /* ... */ SystemStateApi.AllowSleep();
+// 3.0
+using (SystemStateApi.PreventSleep(&quot;Recording&quot;)) { /* ... */ }
+</code></pre>
+<h2 id="kernel32">Kernel32</h2>
+<p><code>ProcessAccessRights.QueryLimitedInformation</code> had the value of <code>QueryInformation</code> (0x400). It is now 0x1000, which also
+works for elevated processes. If you relied on the full query right, use <code>QueryInformation</code>. <code>All</code> is now the
+Vista-and-later value 0x1FFFFF.</p>
+<h2 id="multimedia">Multimedia</h2>
+<p><code>WinMm.Play(byte[])</code> is now <code>WinMm.PlayWave(byte[])</code>, returns <code>bool</code> and copies the data, so you no longer need to keep the array pinned. Callers must
+recompile.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/migration-3.0.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

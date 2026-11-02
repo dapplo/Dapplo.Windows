@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class ClipboardRenderFormatRequest | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ClipboardRenderFormatRequest | Dapplo.Windows ">
+      
+      <meta name="description" content="Information about a delayed rendering request, this is passed to a renderer registered with .">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest">
+
+
+
+  <h1 id="Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest" data-uid="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest" class="text-break">
+Class ClipboardRenderFormatRequest  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardRenderFormatRequest.cs/#L13"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Clipboard.html">Clipboard</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Clipboard.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Information about a delayed rendering request, this is passed to a renderer registered with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_System_UInt32_System_Action_Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest__">RegisterDelayedRenderer(uint, Action&lt;ClipboardRenderFormatRequest&gt;)</a>.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class ClipboardRenderFormatRequest</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ClipboardRenderFormatRequest</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>The request, and its <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.html#Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_AccessToken">AccessToken</a>, are only valid while the renderer runs.
+The renderer is called synchronously on the SharedMessageWindow thread, render the data directly: don't switch threads, await or open the clipboard.</p>
+</div>
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_AccessToken_" data-uid="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.AccessToken*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_AccessToken" data-uid="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.AccessToken">
+  AccessToken
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardRenderFormatRequest.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The access token to place the requested format on the clipboard with, e.g. with SetAsUnicodeString or SetAsStream and the <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.html#Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_RequestedFormatId">RequestedFormatId</a>.
+This is only valid during the call of the renderer, on the calling thread, the library takes care of opening (if needed) and closing the clipboard.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IClipboardAccessToken AccessToken { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_RenderAllFormats_" data-uid="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.RenderAllFormats*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_RenderAllFormats" data-uid="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.RenderAllFormats">
+  RenderAllFormats
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardRenderFormatRequest.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True when the format is rendered because the clipboard owner (the SharedMessageWindow) is being destroyed (WM_RENDERALLFORMATS),
+false when another application requested the format (WM_RENDERFORMAT).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool RenderAllFormats { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_RequestedFormat_" data-uid="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.RequestedFormat*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_RequestedFormat" data-uid="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.RequestedFormat">
+  RequestedFormat
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardRenderFormatRequest.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The format which was requested</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string RequestedFormat { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_RequestedFormatId_" data-uid="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.RequestedFormatId*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_RequestedFormatId" data-uid="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.RequestedFormatId">
+  RequestedFormatId
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardRenderFormatRequest.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The format ID which was requested</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public uint RequestedFormatId { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardRenderFormatRequest.cs/#L13" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

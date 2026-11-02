@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class BitmapScaleHandler&lt;TKey, TValue&gt; | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class BitmapScaleHandler&lt;TKey, TValue&gt; | Dapplo.Windows ">
+      
+      <meta name="description" content="This provides bitmaps scaled according to the current DPI. If the DPI changes, it will reapply the bitmaps and dispose the old ones. The BitmapScaleHandler owns every value which the provider and the scaler return: they are cached per DPI, and disposed when the DPI changes or the handler is disposed. When the scaler returns a new instance, the one from the provider is disposed directly. So the provider must return a new instance for every call (not a shared one). Dispose the handler on the UI thread (e.g. when the form closes), it assigns the default value to all targets.">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Dpi_BitmapScaleHandler_2.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Dpi.BitmapScaleHandler%602%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Dpi.BitmapScaleHandler`2">
+
+
+
+  <h1 id="Dapplo_Windows_Dpi_BitmapScaleHandler_2" data-uid="Dapplo.Windows.Dpi.BitmapScaleHandler`2" class="text-break">
+Class BitmapScaleHandler&lt;TKey, TValue&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/BitmapScaleHandler.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Dpi.html">Dpi</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Dpi.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>This provides bitmaps scaled according to the current DPI.
+If the DPI changes, it will reapply the bitmaps and dispose the old ones.
+The BitmapScaleHandler owns every value which the provider and the scaler return: they are cached per DPI, and disposed when the DPI changes or the handler is disposed.
+When the scaler returns a new instance, the one from the provider is disposed directly. So the provider must return a new instance for every call (not a shared one).
+Dispose the handler on the UI thread (e.g. when the form closes), it assigns the default value to all targets.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class BitmapScaleHandler&lt;TKey, TValue&gt; : IDisposable where TValue : IDisposable</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TKey</code></dt>
+    <dd></dd>
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">BitmapScaleHandler&lt;TKey, TValue&gt;</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Dpi_BitmapScaleHandler_2_AddApplyAction_" data-uid="Dapplo.Windows.Dpi.BitmapScaleHandler`2.AddApplyAction*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_BitmapScaleHandler_2_AddApplyAction_System_Action__1___0_System_Boolean_" data-uid="Dapplo.Windows.Dpi.BitmapScaleHandler`2.AddApplyAction(System.Action{`1},`0,System.Boolean)">
+  AddApplyAction(Action&lt;TValue&gt;, TKey, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/BitmapScaleHandler.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add an action which applies a bitmap</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BitmapScaleHandler&lt;TKey, TValue&gt; AddApplyAction(Action&lt;TValue&gt; apply, TKey imageKey, bool execute = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>apply</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;TValue&gt;</dt>
+    <dd><p>Action which assigns a bitmap</p>
+</dd>
+    <dt><code>imageKey</code> <span class="xref">TKey</span></dt>
+    <dd><p>key of the image</p>
+</dd>
+    <dt><code>execute</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Execute specifies if the assignment needs to be done right away</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Dpi.BitmapScaleHandler-2.html">BitmapScaleHandler</a>&lt;TKey, TValue&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_BitmapScaleHandler_2_AddTargetAction_" data-uid="Dapplo.Windows.Dpi.BitmapScaleHandler`2.AddTargetAction*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_BitmapScaleHandler_2_AddTargetAction_System_Object__0_System_Action__1__System_Boolean_" data-uid="Dapplo.Windows.Dpi.BitmapScaleHandler`2.AddTargetAction(System.Object,`0,System.Action{`1},System.Boolean)">
+  AddTargetAction(object, TKey, Action&lt;TValue&gt;, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/BitmapScaleHandler.cs/#L146"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add a target, e.g. a Button, which gets a (new) bitmap applied when the DPI changes.
+The target is also the key for <a class="xref" href="Dapplo.Windows.Dpi.BitmapScaleHandler-2.html#Dapplo_Windows_Dpi_BitmapScaleHandler_2_RemoveTarget_System_Object_">RemoveTarget(object)</a>, adding the same target again replaces the previous action.
+Dapplo.Windows.Forms has extensions to add a Windows Forms Button or ToolStripItem.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BitmapScaleHandler&lt;TKey, TValue&gt; AddTargetAction(object target, TKey imageKey, Action&lt;TValue&gt; apply, bool execute = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>target</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>object which is the target, used as key</p>
+</dd>
+    <dt><code>imageKey</code> <span class="xref">TKey</span></dt>
+    <dd><p>key of the image</p>
+</dd>
+    <dt><code>apply</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;TValue&gt;</dt>
+    <dd><p>Action which applies the bitmap to the target</p>
+</dd>
+    <dt><code>execute</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Execute specifies if the assignment needs to be done right away</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Dpi.BitmapScaleHandler-2.html">BitmapScaleHandler</a>&lt;TKey, TValue&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_BitmapScaleHandler_2_Dispose_" data-uid="Dapplo.Windows.Dpi.BitmapScaleHandler`2.Dispose*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_BitmapScaleHandler_2_Dispose" data-uid="Dapplo.Windows.Dpi.BitmapScaleHandler`2.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/BitmapScaleHandler.cs/#L180"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Stop processing DPI changes, assign the default value to all targets, and dispose all cached bitmaps.
+Call this on the UI thread.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Dpi_BitmapScaleHandler_2_RemoveTarget_" data-uid="Dapplo.Windows.Dpi.BitmapScaleHandler`2.RemoveTarget*"></a>
+
+  <h3 id="Dapplo_Windows_Dpi_BitmapScaleHandler_2_RemoveTarget_System_Object_" data-uid="Dapplo.Windows.Dpi.BitmapScaleHandler`2.RemoveTarget(System.Object)">
+  RemoveTarget(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/BitmapScaleHandler.cs/#L358"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Remove a previously added target for being updated.
+This will not update the image, or remove it right away.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BitmapScaleHandler&lt;TKey, TValue&gt; RemoveTarget(object target)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>target</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Dpi.BitmapScaleHandler-2.html">BitmapScaleHandler</a>&lt;TKey, TValue&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Dpi/BitmapScaleHandler.cs/#L78" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

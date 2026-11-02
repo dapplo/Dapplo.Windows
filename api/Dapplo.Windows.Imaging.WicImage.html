@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class WicImage | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class WicImage | Dapplo.Windows ">
+      
+      <meta name="description" content="Encode and decode images with the Windows Imaging Component (WIC), without WPF, System.Drawing or other pixel libraries: pixels are passed as memory (pointer and stride) or row by row through a callback, streams are .NET streams. Every COM object is created per call and released before the call returns, the methods work from STA and MTA threads. When WIC has no codec for the container format or the stream, a  is thrown.">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Imaging_WicImage.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Imaging.WicImage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Imaging.WicImage">
+
+
+
+  <h1 id="Dapplo_Windows_Imaging_WicImage" data-uid="Dapplo.Windows.Imaging.WicImage" class="text-break">
+Class WicImage  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Imaging/WicImage.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Imaging.html">Imaging</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Imaging.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Encode and decode images with the Windows Imaging Component (WIC), without WPF, System.Drawing or other pixel libraries:
+pixels are passed as memory (pointer and stride) or row by row through a callback, streams are .NET streams.
+Every COM object is created per call and released before the call returns, the methods work from STA and MTA threads.
+When WIC has no codec for the container format or the stream, a <a class="xref" href="Dapplo.Windows.Imaging.WicCodecNotFoundException.html">WicCodecNotFoundException</a> is thrown.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class WicImage</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">WicImage</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Imaging_WicImage_Decode_" data-uid="Dapplo.Windows.Imaging.WicImage.Decode*"></a>
+
+  <h3 id="Dapplo_Windows_Imaging_WicImage_Decode_System_IO_Stream_System_Guid_Dapplo_Windows_Imaging_WicPixelBufferProvider_System_Boolean_" data-uid="Dapplo.Windows.Imaging.WicImage.Decode(System.IO.Stream,System.Guid,Dapplo.Windows.Imaging.WicPixelBufferProvider,System.Boolean)">
+  Decode(Stream, Guid, WicPixelBufferProvider, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Imaging/WicImage.cs/#L596"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Decode the first frame into memory which is supplied once the size is known, e.g. the locked buffer of a new Bitmap. The stream is read once.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WicFrameInfo Decode(Stream source, Guid targetPixelFormat, WicPixelBufferProvider bufferProvider, bool applyOrientation = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>the stream with the image, from its current position</p>
+</dd>
+    <dt><code>targetPixelFormat</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a></dt>
+    <dd><p>the pixel format of the memory, see <a class="xref" href="Dapplo.Windows.Imaging.WicPixelFormats.html">WicPixelFormats</a></p>
+</dd>
+    <dt><code>bufferProvider</code> <a class="xref" href="Dapplo.Windows.Imaging.WicPixelBufferProvider.html">WicPixelBufferProvider</a></dt>
+    <dd><p>supplies the memory and its stride</p>
+</dd>
+    <dt><code>applyOrientation</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to apply the EXIF orientation (rotate and flip)</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicFrameInfo.html">WicFrameInfo</a></dt>
+    <dd><p>WicFrameInfo with the size and the metadata</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicCodecNotFoundException.html">WicCodecNotFoundException</a></dt>
+    <dd><p>when no decoder recognizes the stream</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Imaging_WicImage_Decode_" data-uid="Dapplo.Windows.Imaging.WicImage.Decode*"></a>
+
+  <h3 id="Dapplo_Windows_Imaging_WicImage_Decode_System_IO_Stream_System_Guid_Dapplo_Windows_Imaging_WicRowConsumer_System_Boolean_" data-uid="Dapplo.Windows.Imaging.WicImage.Decode(System.IO.Stream,System.Guid,Dapplo.Windows.Imaging.WicRowConsumer,System.Boolean)">
+  Decode(Stream, Guid, WicRowConsumer, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Imaging/WicImage.cs/#L635"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Decode the first frame and hand the rows to a consumer, in bands of rows from a pooled buffer</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WicFrameInfo Decode(Stream source, Guid targetPixelFormat, WicRowConsumer rows, bool applyOrientation = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>the stream with the image, from its current position</p>
+</dd>
+    <dt><code>targetPixelFormat</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a></dt>
+    <dd><p>the pixel format of the rows, see <a class="xref" href="Dapplo.Windows.Imaging.WicPixelFormats.html">WicPixelFormats</a></p>
+</dd>
+    <dt><code>rows</code> <a class="xref" href="Dapplo.Windows.Imaging.WicRowConsumer.html">WicRowConsumer</a></dt>
+    <dd><p>receives the rows</p>
+</dd>
+    <dt><code>applyOrientation</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to apply the EXIF orientation (rotate and flip)</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicFrameInfo.html">WicFrameInfo</a></dt>
+    <dd><p>WicFrameInfo with the size and the metadata</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicCodecNotFoundException.html">WicCodecNotFoundException</a></dt>
+    <dd><p>when no decoder recognizes the stream</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Imaging_WicImage_Decode_" data-uid="Dapplo.Windows.Imaging.WicImage.Decode*"></a>
+
+  <h3 id="Dapplo_Windows_Imaging_WicImage_Decode_System_IO_Stream_System_Guid_System_IntPtr_System_Int32_System_Boolean_" data-uid="Dapplo.Windows.Imaging.WicImage.Decode(System.IO.Stream,System.Guid,System.IntPtr,System.Int32,System.Boolean)">
+  Decode(Stream, Guid, nint, int, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Imaging/WicImage.cs/#L574"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Decode the first frame into memory the caller allocated, e.g. the locked buffer of a Bitmap of the size from <a class="xref" href="Dapplo.Windows.Imaging.WicImage.html#Dapplo_Windows_Imaging_WicImage_GetFrameInfo_System_IO_Stream_System_Boolean_">GetFrameInfo(Stream, bool)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WicFrameInfo Decode(Stream source, Guid targetPixelFormat, nint pixels, int stride, bool applyOrientation = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>the stream with the image, from its current position</p>
+</dd>
+    <dt><code>targetPixelFormat</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a></dt>
+    <dd><p>the pixel format of the memory, see <a class="xref" href="Dapplo.Windows.Imaging.WicPixelFormats.html">WicPixelFormats</a></p>
+</dd>
+    <dt><code>pixels</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>pointer to stride * height bytes</p>
+</dd>
+    <dt><code>stride</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>bytes per row of the memory</p>
+</dd>
+    <dt><code>applyOrientation</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to apply the EXIF orientation (rotate and flip), the memory then has the size of the rotated image</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicFrameInfo.html">WicFrameInfo</a></dt>
+    <dd><p>WicFrameInfo with the size and the metadata</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicCodecNotFoundException.html">WicCodecNotFoundException</a></dt>
+    <dd><p>when no decoder recognizes the stream</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Imaging_WicImage_Encode_" data-uid="Dapplo.Windows.Imaging.WicImage.Encode*"></a>
+
+  <h3 id="Dapplo_Windows_Imaging_WicImage_Encode_System_IO_Stream_Dapplo_Windows_Imaging_WicEncodeOptions_System_Int32_System_Int32_System_Guid_Dapplo_Windows_Imaging_WicRowProvider_" data-uid="Dapplo.Windows.Imaging.WicImage.Encode(System.IO.Stream,Dapplo.Windows.Imaging.WicEncodeOptions,System.Int32,System.Int32,System.Guid,Dapplo.Windows.Imaging.WicRowProvider)">
+  Encode(Stream, WicEncodeOptions, int, int, Guid, WicRowProvider)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Imaging/WicImage.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Encode pixels which are supplied row by row, e.g. from ImageSharp ProcessPixelRows when the image isn't contiguous.
+The encoder pulls the rows it needs, no copy of the image is made.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WicEncodeResult Encode(Stream destination, WicEncodeOptions options, int width, int height, Guid pixelFormat, WicRowProvider rows)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>destination</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>the stream to write to, from its current position; a stream which can't seek is written through a MemoryStream</p>
+</dd>
+    <dt><code>options</code> <a class="xref" href="Dapplo.Windows.Imaging.WicEncodeOptions.html">WicEncodeOptions</a></dt>
+    <dd><p>the container format and the encoder options</p>
+</dd>
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>width in pixels</p>
+</dd>
+    <dt><code>height</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>height in pixels</p>
+</dd>
+    <dt><code>pixelFormat</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a></dt>
+    <dd><p>the pixel format of the rows, see <a class="xref" href="Dapplo.Windows.Imaging.WicPixelFormats.html">WicPixelFormats</a></p>
+</dd>
+    <dt><code>rows</code> <a class="xref" href="Dapplo.Windows.Imaging.WicRowProvider.html">WicRowProvider</a></dt>
+    <dd><p>supplies the rows</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicEncodeResult.html">WicEncodeResult</a></dt>
+    <dd><p>WicEncodeResult with the pixel format the encoder used and the skipped metadata</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Imaging_WicImage_Encode_" data-uid="Dapplo.Windows.Imaging.WicImage.Encode*"></a>
+
+  <h3 id="Dapplo_Windows_Imaging_WicImage_Encode_System_IO_Stream_Dapplo_Windows_Imaging_WicEncodeOptions_System_IntPtr_System_Int32_System_Int32_System_Int32_System_Guid_" data-uid="Dapplo.Windows.Imaging.WicImage.Encode(System.IO.Stream,Dapplo.Windows.Imaging.WicEncodeOptions,System.IntPtr,System.Int32,System.Int32,System.Int32,System.Guid)">
+  Encode(Stream, WicEncodeOptions, nint, int, int, int, Guid)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Imaging/WicImage.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Encode pixels in memory, e.g. GDI+ BitmapData.Scan0 or a contiguous ImageSharp buffer. The pixels are read without a copy of the image.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WicEncodeResult Encode(Stream destination, WicEncodeOptions options, nint pixels, int width, int height, int stride, Guid pixelFormat)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>destination</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>the stream to write to, from its current position; a stream which can't seek is written through a MemoryStream</p>
+</dd>
+    <dt><code>options</code> <a class="xref" href="Dapplo.Windows.Imaging.WicEncodeOptions.html">WicEncodeOptions</a></dt>
+    <dd><p>the container format and the encoder options</p>
+</dd>
+    <dt><code>pixels</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>pointer to the first row</p>
+</dd>
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>width in pixels</p>
+</dd>
+    <dt><code>height</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>height in pixels</p>
+</dd>
+    <dt><code>stride</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>bytes from the start of one row to the next, at least width * bits per pixel / 8 (negative strides are not supported)</p>
+</dd>
+    <dt><code>pixelFormat</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a></dt>
+    <dd><p>the pixel format of the memory, see <a class="xref" href="Dapplo.Windows.Imaging.WicPixelFormats.html">WicPixelFormats</a></p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicEncodeResult.html">WicEncodeResult</a></dt>
+    <dd><p>WicEncodeResult with the pixel format the encoder used and the skipped metadata</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Imaging_WicImage_GetEncoderOptions_" data-uid="Dapplo.Windows.Imaging.WicImage.GetEncoderOptions*"></a>
+
+  <h3 id="Dapplo_Windows_Imaging_WicImage_GetEncoderOptions_System_Guid_" data-uid="Dapplo.Windows.Imaging.WicImage.GetEncoderOptions(System.Guid)">
+  GetEncoderOptions(Guid)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Imaging/WicImage.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The options of an encoder, e.g. &quot;ImageQuality&quot; or &quot;Lossless&quot;, for <a class="xref" href="Dapplo.Windows.Imaging.WicEncodeOptions.html#Dapplo_Windows_Imaging_WicEncodeOptions_EncoderOptions">EncoderOptions</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;WicEncoderOption&gt; GetEncoderOptions(Guid containerFormat)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>containerFormat</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a></dt>
+    <dd><p>see <a class="xref" href="Dapplo.Windows.Imaging.WicContainerFormats.html">WicContainerFormats</a></p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Dapplo.Windows.Imaging.WicEncoderOption.html">WicEncoderOption</a>&gt;</dt>
+    <dd><p>IReadOnlyList of WicEncoderOption</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicCodecNotFoundException.html">WicCodecNotFoundException</a></dt>
+    <dd><p>when there is no encoder for the container format</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Imaging_WicImage_GetFrameInfo_" data-uid="Dapplo.Windows.Imaging.WicImage.GetFrameInfo*"></a>
+
+  <h3 id="Dapplo_Windows_Imaging_WicImage_GetFrameInfo_System_IO_Stream_System_Boolean_" data-uid="Dapplo.Windows.Imaging.WicImage.GetFrameInfo(System.IO.Stream,System.Boolean)">
+  GetFrameInfo(Stream, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Imaging/WicImage.cs/#L548"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Read the size, resolution, pixel format and metadata of the first frame, without decoding the pixels.
+A seekable stream is positioned back where it was, so <a class="xref" href="Dapplo.Windows.Imaging.WicImage.html#Dapplo_Windows_Imaging_WicImage_Decode_System_IO_Stream_System_Guid_System_IntPtr_System_Int32_System_Boolean_">Decode(Stream, Guid, nint, int, bool)</a> can follow.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WicFrameInfo GetFrameInfo(Stream source, bool applyOrientation = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>the stream with the image, from its current position</p>
+</dd>
+    <dt><code>applyOrientation</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to report the size after applying the EXIF orientation</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicFrameInfo.html">WicFrameInfo</a></dt>
+    <dd><p>WicFrameInfo</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Imaging.WicCodecNotFoundException.html">WicCodecNotFoundException</a></dt>
+    <dd><p>when no decoder recognizes the stream</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Imaging/WicImage.cs/#L25" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

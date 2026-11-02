@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class Advapi32Api | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class Advapi32Api | Dapplo.Windows ">
+      
+      <meta name="description" content="Native methods to get registry or the login session information">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Advapi32_Advapi32Api.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Advapi32.Advapi32Api%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Advapi32.Advapi32Api">
+
+
+
+  <h1 id="Dapplo_Windows_Advapi32_Advapi32Api" data-uid="Dapplo.Windows.Advapi32.Advapi32Api" class="text-break">
+Class Advapi32Api  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Advapi32/Advapi32Api.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Advapi32.html">Advapi32</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Advapi32.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Native methods to get registry or the login session information</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class Advapi32Api</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">Advapi32Api</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Advapi32_Advapi32Api_CurrentLogonSid_" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.CurrentLogonSid*"></a>
+
+  <h3 id="Dapplo_Windows_Advapi32_Advapi32Api_CurrentLogonSid" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.CurrentLogonSid">
+  CurrentLogonSid
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Advapi32/Advapi32Api.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the logon SID (the SE_GROUP_LOGON_ID group, S-1-5-5-X-Y) of the current process token, as a string.
+Note: this is not the Terminal Services session id, for that use <code>Process.GetCurrentProcess().SessionId</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string CurrentLogonSid { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the logon SID, or string.Empty when it could not be determined</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Advapi32_Advapi32Api_ConvertSidToStringSid_" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.ConvertSidToStringSid*"></a>
+
+  <h3 id="Dapplo_Windows_Advapi32_Advapi32Api_ConvertSidToStringSid_System_IntPtr_System_IntPtr__" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.ConvertSidToStringSid(System.IntPtr,System.IntPtr@)">
+  ConvertSidToStringSid(nint, out nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See more about <a href="https://docs.microsoft.com/en-us/windows/desktop/api/sddl/nf-sddl-convertsidtostringsida">ConvertSidToStringSidA function</a>
+The ConvertSidToStringSid function converts a security identifier (SID) to a string format suitable for display, storage, or transmission.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool ConvertSidToStringSid(nint pSid, out nint ptrSid)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>pSid</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+    <dt><code>ptrSid</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Advapi32_Advapi32Api_GetTokenInformation_" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.GetTokenInformation*"></a>
+
+  <h3 id="Dapplo_Windows_Advapi32_Advapi32Api_GetTokenInformation_System_IntPtr_Dapplo_Windows_Advapi32_Enums_TokenInformationClasses_System_IntPtr_System_Int32_System_Int32__" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.GetTokenInformation(System.IntPtr,Dapplo.Windows.Advapi32.Enums.TokenInformationClasses,System.IntPtr,System.Int32,System.Int32@)">
+  GetTokenInformation(nint, TokenInformationClasses, nint, int, out int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>The GetTokenInformation function retrieves a specified type of information about an access token. The calling process must have appropriate access rights to obtain the information.
+See more at <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa446671(v=vs.85).aspx">GetTokenInformation function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetTokenInformation(nint tokenHandle, TokenInformationClasses tokenInformationClasses, nint tokenInformation, int tokenInformationLength, out int returnLength)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>tokenHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to an access token from which information is retrieved. If TokenInformationClass specifies TokenSource, the handle must have TOKEN_QUERY_SOURCE access. For all other TokenInformationClass values, the handle must have TOKEN_QUERY access.</p>
+</dd>
+    <dt><code>tokenInformationClasses</code> <a class="xref" href="Dapplo.Windows.Advapi32.Enums.TokenInformationClasses.html">TokenInformationClasses</a></dt>
+    <dd><p>Specifies a value from the TOKEN_INFORMATION_CLASS enumerated type to identify the type of information the function retrieves. Any callers who check the TokenIsAppContainer and have it return 0 should also verify that the caller token is not an identify level impersonation token. If the current token is not an app container but is an identity level token, you should return AccessDenied.</p>
+</dd>
+    <dt><code>tokenInformation</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A pointer to a buffer the function fills with the requested information. The structure put into this buffer depends upon the type of information specified by the TokenInformationClass parameter.</p>
+</dd>
+    <dt><code>tokenInformationLength</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Specifies the size, in bytes, of the buffer pointed to by the TokenInformation parameter. If TokenInformation is NULL, this parameter must be zero.</p>
+</dd>
+    <dt><code>returnLength</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>A pointer to a variable that receives the number of bytes needed for the buffer pointed to by the TokenInformation parameter. If this value is larger than the value specified in the TokenInformationLength parameter, the function fails and stores no data in the buffer.
+If the value of the TokenInformationClass parameter is TokenDefaultDacl and the token has no default DACL, the function sets the variable pointed to by ReturnLength to sizeof(TOKEN_DEFAULT_DACL) and sets the DefaultDacl member of the TOKEN_DEFAULT_DACL structure to NULL.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If the function succeeds, the return value is nonzero.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Advapi32_Advapi32Api_RegCloseKey_" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.RegCloseKey*"></a>
+
+  <h3 id="Dapplo_Windows_Advapi32_Advapi32Api_RegCloseKey_System_IntPtr_" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.RegCloseKey(System.IntPtr)">
+  RegCloseKey(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Closes a handle to the specified registry key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int RegCloseKey(nint hKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>UIntPtr a handle to the registry key</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Advapi32_Advapi32Api_RegNotifyChangeKeyValue_" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.RegNotifyChangeKeyValue*"></a>
+
+  <h3 id="Dapplo_Windows_Advapi32_Advapi32Api_RegNotifyChangeKeyValue_System_IntPtr_System_Boolean_Dapplo_Windows_Advapi32_Enums_RegistryNotifyFilter_System_IntPtr_System_Boolean_" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.RegNotifyChangeKeyValue(System.IntPtr,System.Boolean,Dapplo.Windows.Advapi32.Enums.RegistryNotifyFilter,System.IntPtr,System.Boolean)">
+  RegNotifyChangeKeyValue(nint, bool, RegistryNotifyFilter, nint, bool)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Notifies the caller about changes to the attributes or contents of a specified registry key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int RegNotifyChangeKeyValue(nint hKey, bool watchSubtree, RegistryNotifyFilter notifyFilter, nint hEvent, bool asynchronous)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr A handle to an open registry key.</p>
+</dd>
+    <dt><code>watchSubtree</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If this parameter is TRUE, the function reports changes in the specified key and its subkeys. If the parameter is FALSE, the function reports changes only in the specified key.</p>
+</dd>
+    <dt><code>notifyFilter</code> <a class="xref" href="Dapplo.Windows.Advapi32.Enums.RegistryNotifyFilter.html">RegistryNotifyFilter</a></dt>
+    <dd><p>RegChangeNotifyFilter A value that indicates the changes that should be reported.</p>
+</dd>
+    <dt><code>hEvent</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+    <dt><code>asynchronous</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>If this parameter is TRUE, the function returns immediately and reports changes by signaling the specified event. If this parameter is FALSE, the function does not return until a change has occurred.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Advapi32_Advapi32Api_RegOpenKeyEx_" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.RegOpenKeyEx*"></a>
+
+  <h3 id="Dapplo_Windows_Advapi32_Advapi32Api_RegOpenKeyEx_System_IntPtr_System_String_Dapplo_Windows_Advapi32_Enums_RegistryOpenOptions_Dapplo_Windows_Advapi32_Enums_RegistryKeySecurityAccessRights_System_IntPtr__" data-uid="Dapplo.Windows.Advapi32.Advapi32Api.RegOpenKeyEx(System.IntPtr,System.String,Dapplo.Windows.Advapi32.Enums.RegistryOpenOptions,Dapplo.Windows.Advapi32.Enums.RegistryKeySecurityAccessRights,System.IntPtr@)">
+  RegOpenKeyEx(nint, string, RegistryOpenOptions, RegistryKeySecurityAccessRights, out nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Opens the specified registry key. Note that key names are not case sensitive.
+To perform transacted registry operations on a key, call the RegOpenKeyTransacted function.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int RegOpenKeyEx(nint hKey, string subKey, RegistryOpenOptions ulOptions, RegistryKeySecurityAccessRights samDesired, out nint hOpenedKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr A handle to an open registry key.</p>
+</dd>
+    <dt><code>subKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The name of the registry subkey to be opened.
+Key names are not case sensitive.
+The lpSubKey parameter can be a pointer to an empty string. If lpSubKey is a pointer to an empty string and hKey is HKEY_CLASSES_ROOT, phkResult receives the same hKey handle passed into the function. Otherwise, phkResult receives a new handle to the key specified by hKey.
+The lpSubKey parameter can be NULL only if hKey is one of the predefined keys. If lpSubKey is NULL and hKey is HKEY_CLASSES_ROOT, phkResult receives a new handle to the key specified by hKey. Otherwise, phkResult receives the same hKey handle passed in to the function.</p>
+</dd>
+    <dt><code>ulOptions</code> <a class="xref" href="Dapplo.Windows.Advapi32.Enums.RegistryOpenOptions.html">RegistryOpenOptions</a></dt>
+    <dd><p>RegistryOpenOptions</p>
+</dd>
+    <dt><code>samDesired</code> <a class="xref" href="Dapplo.Windows.Advapi32.Enums.RegistryKeySecurityAccessRights.html">RegistryKeySecurityAccessRights</a></dt>
+    <dd><p>RegistryKeySecurityAccessRights</p>
+</dd>
+    <dt><code>hOpenedKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>UIntPtr a handle to the registry key</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Advapi32/Advapi32Api.cs/#L14" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

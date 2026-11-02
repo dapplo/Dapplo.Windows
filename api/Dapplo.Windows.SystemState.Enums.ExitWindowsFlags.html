@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Enum ExitWindowsFlags | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Enum ExitWindowsFlags | Dapplo.Windows ">
+      
+      <meta name="description" content="Flags for the ExitWindowsEx function, which logs off the interactive user, shuts down the system, or shuts down and restarts the system. See ExitWindowsEx function">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_SystemState_Enums_ExitWindowsFlags.md&amp;value=---%0Auid%3A%20Dapplo.Windows.SystemState.Enums.ExitWindowsFlags%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.SystemState.Enums.ExitWindowsFlags">
+
+
+
+
+  <h1 id="Dapplo_Windows_SystemState_Enums_ExitWindowsFlags" data-uid="Dapplo.Windows.SystemState.Enums.ExitWindowsFlags" class="text-break">
+Enum ExitWindowsFlags  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.SystemState/Enums/ExitWindowsFlags.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.SystemState.html">SystemState</a>.<a class="xref" href="Dapplo.Windows.SystemState.Enums.html">Enums</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.SystemState.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Flags for the ExitWindowsEx function, which logs off the interactive user, shuts down the system,
+or shuts down and restarts the system.
+See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-exitwindowsex">ExitWindowsEx function</a></p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[SuppressMessage(&quot;ReSharper&quot;, &quot;InconsistentNaming&quot;)]
+[Flags]
+public enum ExitWindowsFlags : uint</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Common.Extensions.EnumExtensions.html#Dapplo_Windows_Common_Extensions_EnumExtensions_GetAttributeOfType__1_System_Enum_">EnumExtensions.GetAttributeOfType&lt;T&gt;(Enum)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Common.Extensions.EnumExtensions.html#Dapplo_Windows_Common_Extensions_EnumExtensions_GetEnumDescription_System_Enum_">EnumExtensions.GetEnumDescription(Enum)</a>
+  </div>
+  </dd></dl>
+
+  <h2 id="fields">Fields
+</h2>
+  <dl class="parameters">
+    <dt id="Dapplo_Windows_SystemState_Enums_ExitWindowsFlags_EWX_BOOTOPTIONS"><code>EWX_BOOTOPTIONS = 16777216</code></dt>
+  
+  <dd><p>Restarts only the boot application, such as the Windows Boot Manager.</p>
+</dd>
+    <dt id="Dapplo_Windows_SystemState_Enums_ExitWindowsFlags_EWX_FORCE"><code>EWX_FORCE = 4</code></dt>
+  
+  <dd><p>This flag has no effect if terminal services is enabled. Otherwise, the system does not send the WM_QUERYENDSESSION message.
+This can cause applications to lose data. Therefore, you should only use this flag in an emergency.</p>
+</dd>
+    <dt id="Dapplo_Windows_SystemState_Enums_ExitWindowsFlags_EWX_FORCEIFHUNG"><code>EWX_FORCEIFHUNG = 16</code></dt>
+  
+  <dd><p>Forces processes to terminate if they do not respond to the WM_QUERYENDSESSION or WM_ENDSESSION message within the timeout interval.</p>
+</dd>
+    <dt id="Dapplo_Windows_SystemState_Enums_ExitWindowsFlags_EWX_HYBRID_SHUTDOWN"><code>EWX_HYBRID_SHUTDOWN = 4194304</code></dt>
+  
+  <dd><p>Hybrid shutdown; on Windows 8, shuts down and begins cool boot (new fast startup feature).</p>
+</dd>
+    <dt id="Dapplo_Windows_SystemState_Enums_ExitWindowsFlags_EWX_LOGOFF"><code>EWX_LOGOFF = 0</code></dt>
+  
+  <dd><p>Shuts down all processes running in the logon session of the process that called the ExitWindowsEx function.
+Then it logs the user off. This flag can be used only by processes running in an interactive user's logon session.</p>
+</dd>
+    <dt id="Dapplo_Windows_SystemState_Enums_ExitWindowsFlags_EWX_POWEROFF"><code>EWX_POWEROFF = 8</code></dt>
+  
+  <dd><p>Shuts down the system and turns off the power. The system must support the power-off feature.
+The calling process must have the SE_SHUTDOWN_NAME privilege.</p>
+</dd>
+    <dt id="Dapplo_Windows_SystemState_Enums_ExitWindowsFlags_EWX_REBOOT"><code>EWX_REBOOT = 2</code></dt>
+  
+  <dd><p>Shuts down the system and then restarts it.
+The calling process must have the SE_SHUTDOWN_NAME privilege.</p>
+</dd>
+    <dt id="Dapplo_Windows_SystemState_Enums_ExitWindowsFlags_EWX_RESTARTAPPS"><code>EWX_RESTARTAPPS = 64</code></dt>
+  
+  <dd><p>Used with EWX_REBOOT or EWX_POWEROFF: after the restart, the system restarts the applications which were registered for restart
+with RegisterApplicationRestart (see Dapplo.Windows.AppRestartManager).</p>
+</dd>
+    <dt id="Dapplo_Windows_SystemState_Enums_ExitWindowsFlags_EWX_SHUTDOWN"><code>EWX_SHUTDOWN = 1</code></dt>
+  
+  <dd><p>Shuts down the system to a point at which it is safe to turn off the power. All file buffers have been flushed to disk, and all running processes have stopped.
+The calling process must have the SE_SHUTDOWN_NAME privilege.
+Specifying this flag will not turn off the power even if the system supports the power-off feature.</p>
+</dd>
+  </dl>
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.SystemState/Enums/ExitWindowsFlags.cs/#L14" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
