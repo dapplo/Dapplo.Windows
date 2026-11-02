@@ -155,6 +155,7 @@ public static class WicImage
         IWICBitmapFrameEncode frame = null;
         IPropertyBag2 propertyBag = null;
         IWICFormatConverter converter = null;
+        IWICFormatConverter bgraConverter = null;
         IWICMetadataQueryWriter queryWriter = null;
         IWICPalette palette = null;
         try
@@ -204,11 +205,13 @@ public static class WicImage
             }
 
             var targetIndexedBits = IndexedBitsPerPixel(pixelFormat);
+            IWICBitmapSource pixels = source;
+            WicPixelSource pixelsFailures = source;
             if (targetIndexedBits > 0)
             {
                 // An indexed format (e.g. GIF) needs a palette: the given one, the exact colors of the pixels when they fit, otherwise one which WIC makes
                 Wic.Check(factory.CreatePalette(out palette), "IWICImagingFactory.CreatePalette");
-                var colors = paletteColors ?? CollectColors(factory, source, 1 << targetIndexedBits);
+                var colors = paletteColors ?? (sourceIndexedBits == 0 ? CollectColors(factory, source, 1 << targetIndexedBits) : null);
                 if (colors != null)
                 {
                     InitializePalette(palette, colors);
@@ -218,10 +221,25 @@ public static class WicImage
                     Wic.Check(palette.InitializeFromBitmap(source, 1u << targetIndexedBits, HasAlpha(source.PixelFormat) ? 1 : 0), "IWICPalette.InitializeFromBitmap", source);
                 }
                 Wic.Check(frame.SetPalette(palette), "IWICBitmapFrameEncode.SetPalette", stream);
+
+                if (sourceIndexedBits == 0 && colors != null && pixelFormat == WicPixelFormats.Format8bppIndexed && !(options.Dither && paletteColors != null))
+                {
+                    // Map the pixels to the palette here: the WIC converter can pick a neighbor of an exact color
+                    IWICBitmapSource bgra = source;
+                    if (source.PixelFormat != WicPixelFormats.Format32bppBgra)
+                    {
+                        Wic.Check(factory.CreateFormatConverter(out bgraConverter), "IWICImagingFactory.CreateFormatConverter");
+                        var bgraFormat = WicPixelFormats.Format32bppBgra;
+                        Wic.Check(bgraConverter.Initialize(source, ref bgraFormat, WicBitmapDitherType.None, null, 0, WicBitmapPaletteType.Custom), "IWICFormatConverter.Initialize", source);
+                        bgra = (IWICBitmapSource)bgraConverter;
+                    }
+                    var indexing = new WicIndexingPixelSource(bgra, source, colors, source.Width, source.Height, source.DpiX, source.DpiY);
+                    pixels = indexing;
+                    pixelsFailures = indexing;
+                }
             }
 
-            IWICBitmapSource pixels = source;
-            if (pixelFormat != source.PixelFormat)
+            if (ReferenceEquals(pixels, source) && pixelFormat != source.PixelFormat)
             {
                 // The encoder wants another pixel format, WIC converts while it pulls the rows
                 Log.Debug().WriteLine("The encoder for {0} converts {1} to {2}", options.ContainerFormat, source.PixelFormat, pixelFormat);
@@ -230,7 +248,7 @@ public static class WicImage
                 Wic.Check(converter.Initialize(source, ref pixelFormat, dither, targetIndexedBits > 0 ? palette : null, targetIndexedBits > 0 ? 50 : 0, WicBitmapPaletteType.Custom), "IWICFormatConverter.Initialize", source);
                 pixels = (IWICBitmapSource)converter;
             }
-            Wic.Check(frame.WriteSource(pixels, IntPtr.Zero), "IWICBitmapFrameEncode.WriteSource", source, stream);
+            Wic.Check(frame.WriteSource(pixels, IntPtr.Zero), "IWICBitmapFrameEncode.WriteSource", pixelsFailures, stream);
             Wic.Check(frame.Commit(), "IWICBitmapFrameEncode.Commit", stream);
             Wic.Check(encoder.Commit(), "IWICBitmapEncoder.Commit", stream);
             stream.SeekToEndOfWritten();
@@ -247,6 +265,7 @@ public static class WicImage
             Wic.Release(queryWriter);
             Wic.Release(palette);
             Wic.Release(converter);
+            Wic.Release(bgraConverter);
             Wic.Release(propertyBag);
             Wic.Release(frame);
             Wic.Release(encoder);
@@ -698,7 +717,13 @@ public static class WicImage
                 dpiX = dpiY = 96;
             }
             var metadata = WicMetadataReading.Read(factory, frame, containerFormat);
-            var hasResolution = HasResolution(frame, metadata, containerFormat, input, origin);
+            var hasResolution = HasResolution(frame, metadata, containerFormat, input, origin, out var exifDpiX, out var exifDpiY);
+            if (exifDpiX.HasValue && exifDpiY.HasValue)
+            {
+                // The file stores its resolution only in EXIF, which this decoder doesn't report
+                dpiX = exifDpiX.Value;
+                dpiY = exifDpiY.Value;
+            }
 
             IWICBitmapSource pixels = (IWICBitmapSource)frame;
             var orientationApplied = false;
@@ -740,7 +765,7 @@ public static class WicImage
         }
     }
 
-    private static bool HasResolution(IWICBitmapFrameDecode frame, WicMetadata metadata, Guid containerFormat, Stream input, long origin)
+    private static bool HasResolution(IWICBitmapFrameDecode frame, WicMetadata metadata, Guid containerFormat, Stream input, long origin, out double? exifDpiX, out double? exifDpiY)
     {
         IWICMetadataQueryReader queryReader = null;
         try
@@ -749,7 +774,7 @@ public static class WicImage
             {
                 queryReader = null;
             }
-            return ResolutionProbe.HasResolution(queryReader, metadata, containerFormat, input, origin);
+            return ResolutionProbe.HasResolution(queryReader, metadata, containerFormat, input, origin, out exifDpiX, out exifDpiY);
         }
         finally
         {

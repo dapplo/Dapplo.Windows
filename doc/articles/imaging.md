@@ -168,7 +168,8 @@ resolution:
 | others (WebP, HEIF, AVIF, JPEG XL, RAW, ...) | an EXIF IFD with XResolution and a ResolutionUnit other than none |
 
 The metadata of the frame is used, the bytes of the file are read only for a PNG whose pHYs WIC doesn't expose, JPEG XR
-and BMP.
+and BMP. When the resolution is only in EXIF, `DpiX` / `DpiY` are the EXIF values: the JPEG decoder of WIC reports its
+default (96) for a JPEG with only EXIF XResolution.
 
 ## When there is no codec
 

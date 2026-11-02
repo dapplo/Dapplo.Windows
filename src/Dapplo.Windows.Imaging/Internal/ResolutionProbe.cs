@@ -19,6 +19,7 @@ internal static class ResolutionProbe
     private static readonly LogSource Log = new LogSource();
 
     private const int TagXResolution = 282;
+    private const int TagYResolution = 283;
     private const int TagResolutionUnit = 296;
 
     /// <summary>
@@ -31,8 +32,11 @@ internal static class ResolutionProbe
     /// <param name="containerFormat">the container format of the decoder</param>
     /// <param name="input">the seekable stream the decoder reads, its position is restored</param>
     /// <param name="origin">the position of the file in the stream</param>
-    public static bool HasResolution(IWICMetadataQueryReader queryReader, WicMetadata metadata, Guid containerFormat, Stream input, long origin)
+    /// <param name="exifDpiX">the horizontal resolution of the EXIF IFD, when the resolution comes from EXIF where the decoder doesn't use it (JPEG without JFIF density, WebP, HEIF, ...)</param>
+    /// <param name="exifDpiY">the vertical resolution of the EXIF IFD, see exifDpiX</param>
+    public static bool HasResolution(IWICMetadataQueryReader queryReader, WicMetadata metadata, Guid containerFormat, Stream input, long origin, out double? exifDpiX, out double? exifDpiY)
     {
+        exifDpiX = exifDpiY = null;
         try
         {
             if (containerFormat == WicContainerFormats.Png)
@@ -41,11 +45,12 @@ internal static class ResolutionProbe
             }
             if (containerFormat == WicContainerFormats.Jpeg)
             {
-                return Jpeg(queryReader);
+                return Jpeg(queryReader, out exifDpiX, out exifDpiY);
             }
             if (containerFormat == WicContainerFormats.Tiff || containerFormat == WicContainerFormats.Adng)
             {
-                return IfdResolution(queryReader, "/ifd");
+                // The TIFF decoder reports the resolution of the IFD itself
+                return IfdResolution(queryReader, "/ifd", out _, out _);
             }
             if (containerFormat == WicContainerFormats.Wmp)
             {
@@ -60,7 +65,7 @@ internal static class ResolutionProbe
                 // GIF only has a pixel aspect ratio, ICO and DDS have nothing
                 return false;
             }
-            return ExifResolution(metadata);
+            return ExifResolution(metadata, out exifDpiX, out exifDpiY);
         }
         catch (Exception ex) when (ex is IOException || ex is NotSupportedException || ex is ObjectDisposedException || ex is InvalidCastException)
         {
@@ -110,45 +115,92 @@ internal static class ResolutionProbe
     /// <summary>
     /// JPEG: the JFIF density unit 1 (inch) or 2 (cm), or an EXIF XResolution with a ResolutionUnit other than 1 (none)
     /// </summary>
-    private static bool Jpeg(IWICMetadataQueryReader queryReader)
+    private static bool Jpeg(IWICMetadataQueryReader queryReader, out double? exifDpiX, out double? exifDpiY)
     {
+        exifDpiX = exifDpiY = null;
         if (TryQueryInteger(queryReader, "/app0/{ushort=1}", out var units) && (units == 1 || units == 2))
         {
+            // The decoder reports the JFIF density
             return true;
         }
-        return IfdResolution(queryReader, "/app1/ifd");
+        // The JPEG decoder doesn't report the EXIF resolution (verified on the CI runner: 96 for a JPEG with only EXIF XResolution 72)
+        return IfdResolution(queryReader, "/app1/ifd", out exifDpiX, out exifDpiY);
     }
 
     /// <summary>
     /// TIFF IFD: XResolution present and ResolutionUnit not 1 (none); without ResolutionUnit the unit is inch
     /// </summary>
-    private static bool IfdResolution(IWICMetadataQueryReader queryReader, string ifdPath)
+    private static bool IfdResolution(IWICMetadataQueryReader queryReader, string ifdPath, out double? dpiX, out double? dpiY)
     {
-        if (!TryQuery(queryReader, $"{ifdPath}/{{ushort={TagXResolution}}}", out _))
+        dpiX = dpiY = null;
+        if (!TryQuery(queryReader, $"{ifdPath}/{{ushort={TagXResolution}}}", out var xResolution))
         {
             return false;
         }
-        return !TryQueryInteger(queryReader, $"{ifdPath}/{{ushort={TagResolutionUnit}}}", out var unit) || unit != 1;
+        var unit = TryQueryInteger(queryReader, $"{ifdPath}/{{ushort={TagResolutionUnit}}}", out var storedUnit) ? storedUnit : 2;
+        if (unit == 1)
+        {
+            return false;
+        }
+        TryQuery(queryReader, $"{ifdPath}/{{ushort={TagYResolution}}}", out var yResolution);
+        (dpiX, dpiY) = ToDpi(xResolution, yResolution, unit);
+        return true;
+    }
+
+    /// <summary>
+    /// The EXIF rationals (VT_UI8 with the numerator in the low 32 bits) in dots per inch, unit 3 is centimeter; null for values which can't be used
+    /// </summary>
+    private static (double? DpiX, double? DpiY) ToDpi(object xResolution, object yResolution, long unit)
+    {
+        var x = ToDouble(xResolution);
+        var y = ToDouble(yResolution) ?? x;
+        if (x == null || y == null)
+        {
+            return (null, null);
+        }
+        var factor = unit == 3 ? 2.54 : 1.0;
+        return (x * factor, y * factor);
+    }
+
+    private static double? ToDouble(object rational)
+    {
+        WicRational? value = rational switch
+        {
+            ulong packed => WicRational.FromPacked(packed),
+            long signedPacked => WicRational.FromPacked(unchecked((ulong)signedPacked)),
+            _ => null
+        };
+        if (value == null || value.Value.Denominator == 0 || value.Value.Numerator == 0)
+        {
+            return null;
+        }
+        return value.Value.ToDouble();
     }
 
     /// <summary>
     /// Other containers (WebP, HEIF, JPEG XL, RAW, codecs of other vendors): an EXIF IFD (IFD0) with XResolution and a ResolutionUnit other than 1.
     /// The path of the IFD differs per container, the IFD blocks are found in the enumerated metadata.
     /// </summary>
-    private static bool ExifResolution(WicMetadata metadata)
+    private static bool ExifResolution(WicMetadata metadata, out double? dpiX, out double? dpiY)
     {
+        dpiX = dpiY = null;
         foreach (var item in metadata.Items)
         {
             if (item.Value is not WicMetadataBlock block || block.Format != WicMetadataFormats.Ifd)
             {
                 continue;
             }
-            if (!metadata.TryGet($"{block.Path}/{{ushort={TagXResolution}}}", out _))
+            if (!metadata.TryGet($"{block.Path}/{{ushort={TagXResolution}}}", out var xResolution))
             {
                 continue;
             }
-            if (!metadata.TryGet($"{block.Path}/{{ushort={TagResolutionUnit}}}", out var unit) || unit is not IConvertible convertible || convertible.ToInt64(null) != 1)
+            var unit = metadata.TryGet($"{block.Path}/{{ushort={TagResolutionUnit}}}", out var storedUnit) && storedUnit is IConvertible convertible && storedUnit is not string
+                ? convertible.ToInt64(null)
+                : 2;
+            if (unit != 1)
             {
+                metadata.TryGet($"{block.Path}/{{ushort={TagYResolution}}}", out var yResolution);
+                (dpiX, dpiY) = ToDpi(xResolution, yResolution, unit);
                 return true;
             }
         }

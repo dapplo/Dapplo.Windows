@@ -35,7 +35,9 @@ public sealed class WicFrameInfo
     public int Height { get; }
 
     /// <summary>
-    /// The horizontal resolution in dots per inch, after the orientation when it is applied
+    /// The horizontal resolution in dots per inch, after the orientation when it is applied.
+    /// Reported by the decoder; when the file stores its resolution only in EXIF and the decoder doesn't report that (JPEG without JFIF density, WebP, HEIF, ...)
+    /// it is the EXIF XResolution. See <see cref="HasResolution"/>.
     /// </summary>
     public double DpiX { get; }
 
