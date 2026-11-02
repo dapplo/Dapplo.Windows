@@ -80,9 +80,9 @@ public static class WicMetadataPaths
     public static string Software(Guid containerFormat) => containerFormat == WicContainerFormats.Png ? PngText("Software") : ExifTag(containerFormat, TagSoftware);
 
     /// <summary>
-    /// The path of the description: the EXIF tag ImageDescription, for PNG the tEXt keyword "Description"
+    /// The path of the description: the EXIF tag ImageDescription; null for PNG, use <see cref="XmpProperty"/> or <see cref="PngText"/> with an index
     /// </summary>
-    public static string Description(Guid containerFormat) => containerFormat == WicContainerFormats.Png ? PngText("Description") : ExifTag(containerFormat, TagImageDescription);
+    public static string Description(Guid containerFormat) => ExifTag(containerFormat, TagImageDescription);
 
     /// <summary>
     /// The path of the EXIF DateTimeOriginal (capture time), the value is a string "YYYY:MM:DD HH:MM:SS"
@@ -90,9 +90,12 @@ public static class WicMetadataPaths
     public static string DateTimeOriginal(Guid containerFormat) => ExifSubTag(containerFormat, TagDateTimeOriginal);
 
     /// <summary>
-    /// The path of a PNG tEXt chunk with the keyword, e.g. "/tEXt/{str=Software}"; keywords like Title, Author, Description, Copyright, Creation Time, Software, Source and Comment are registered
+    /// The path of a PNG tEXt chunk with the keyword, e.g. "/tEXt/{str=Software}"; keywords like Title, Author, Description, Copyright, Creation Time, Software, Source and Comment are registered.
+    /// Every tEXt chunk has one keyword, a second keyword in the same chunk replaces the first: give each keyword its own chunk index, e.g. "/[1]tEXt/{str=Description}".
     /// </summary>
-    public static string PngText(string keyword) => $"/tEXt/{{str={keyword}}}";
+    /// <param name="keyword">the keyword</param>
+    /// <param name="index">the index of the tEXt chunk, 0 for the first</param>
+    public static string PngText(string keyword, int index = 0) => index == 0 ? $"/tEXt/{{str={keyword}}}" : $"/[{index}]tEXt/{{str={keyword}}}";
 
     /// <summary>
     /// The path of the XMP block: "/xmp" for JPEG and PNG (an iTXt chunk), "/ifd/xmp" for TIFF and JPEG XR

@@ -94,7 +94,7 @@ public class WicMetadataTests
             Assert.Equal(container, writer.ContainerFormat);
             // The EXIF ASCII tags are VT_LPSTR, PNG text is a VT_LPWSTR
             Assert.True(writer.Set(WicMetadataPaths.Software(container), isPng ? "Greenshot" : WicMetadataValue.AnsiString("Greenshot")));
-            Assert.True(writer.Set(WicMetadataPaths.Description(container), isPng ? "A capture" : WicMetadataValue.AnsiString("A capture")));
+            Assert.True(writer.Set(isPng ? WicMetadataPaths.PngText("Description", 1) : WicMetadataPaths.Description(container), isPng ? "A capture" : WicMetadataValue.AnsiString("A capture")));
             Assert.True(writer.Set(WicMetadataPaths.XmpProperty(container, "dc:title"), "XMP title"));
             if (!isPng)
             {
@@ -110,10 +110,9 @@ public class WicMetadataTests
             Log.Debug().WriteLine("{0} = {1}", item.Key, item.Value);
         }
         AssertValue(metadata, WicMetadataPaths.Software(container), "Greenshot");
-        AssertValue(metadata, WicMetadataPaths.Description(container), "A capture");
-        // dc:title is a language alternative, WIC creates it for a plain string
-        AssertValue(metadata, WicMetadataPaths.XmpProperty(container, "dc:title/x-default"), "XMP title");
-        Assert.IsType<WicMetadataBlock>(metadata.Items.First(i => i.Key == WicMetadataPaths.XmpProperty(container, "dc:title")).Value);
+        AssertValue(metadata, isPng ? WicMetadataPaths.PngText("Description", 1) : WicMetadataPaths.Description(container), "A capture");
+        // A plain string makes a simple XMP property, the policy System.Title writes the language alternative (see Metadata_Policies)
+        AssertValue(metadata, WicMetadataPaths.XmpProperty(container, "dc:title"), "XMP title");
         if (!isPng)
         {
             AssertValue(metadata, WicMetadataPaths.DateTimeOriginal(container), "2026:11:02 12:34:56");
@@ -267,8 +266,7 @@ public class WicMetadataTests
     /// The XMP block of a decoded image, carried over to a new image as raw bytes
     /// </summary>
     [Theory]
-    [InlineData("jpeg")]
-    [InlineData("png")]
+    [MemberData(nameof(MetadataContainers))]
     public void RawBlock_Xmp_CarriedOver(string containerName)
     {
         var container = Container(containerName);
@@ -280,7 +278,23 @@ public class WicMetadataTests
 
         var copy = Encode(container, writer => Assert.True(writer.AddRawBlock(xmp)), out var result);
         Assert.Empty(result.MetadataIssues);
-        AssertValue(WicImage.GetFrameInfo(new MemoryStream(copy)).Metadata, WicMetadataPaths.XmpProperty(container, "dc:title/x-default"), "Raw title");
+        AssertValue(WicImage.GetFrameInfo(new MemoryStream(copy)).Metadata, WicMetadataPaths.XmpProperty(container, "dc:title"), "Raw title");
+    }
+
+    /// <summary>
+    /// The APP1 (EXIF) block of a JPEG, carried over to a new JPEG as raw bytes
+    /// </summary>
+    [Fact]
+    public void RawBlock_JpegApp1_CarriedOver()
+    {
+        var software = WicMetadataPaths.Software(WicContainerFormats.Jpeg);
+        var original = Encode(WicContainerFormats.Jpeg, writer => Assert.True(writer.Set(software, WicMetadataValue.AnsiString("Raw software"))), out _);
+        var app1 = Assert.Single(WicImage.GetFrameInfo(new MemoryStream(original)).Metadata.RawBlocks, b => b.Format == WicMetadataFormats.App1);
+        Assert.Equal("/app1", app1.Path);
+
+        var copy = Encode(WicContainerFormats.Jpeg, writer => Assert.True(writer.AddRawBlock(app1)), out var result);
+        Assert.Empty(result.MetadataIssues);
+        AssertValue(WicImage.GetFrameInfo(new MemoryStream(copy)).Metadata, software, "Raw software");
     }
 
     /// <summary>

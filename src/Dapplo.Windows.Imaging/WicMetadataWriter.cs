@@ -188,6 +188,7 @@ public sealed class WicMetadataWriter
     /// <summary>
     /// Write a metadata block from its raw bytes, e.g. a <see cref="WicMetadataRawBlock"/> of a decoded image, to carry it over unchanged.
     /// With a path (e.g. "/xmp" or "/ifd/xmp") the block is set at that path, without a path it is added as top-level block of the frame.
+    /// Verified with the codecs of Windows: "/app1" and "/xmp" for JPEG, "/xmp" for PNG, "/ifd/xmp" for TIFF and JPEG XR (written as tag 700).
     /// </summary>
     /// <param name="block">the raw block</param>
     /// <returns>true when the encoder accepted it</returns>
@@ -238,6 +239,25 @@ public sealed class WicMetadataWriter
                 if (hResult.Succeeded())
                 {
                     return true;
+                }
+                // The XMP of an IFD (TIFF, JPEG XR) is the BYTE tag 700, its bytes are the XMP packet
+                if (block.Format == WicMetadataFormats.Xmp && block.Path.EndsWith("/ifd/xmp", StringComparison.OrdinalIgnoreCase))
+                {
+                    var tagPath = block.Path.Substring(0, block.Path.Length - "xmp".Length) + "{ushort=700}";
+                    var tagValue = PropVariant.Allocate();
+                    try
+                    {
+                        PropVariant.Write(tagValue, block.Data);
+                        hResult = _queryWriter.SetMetadataByName(tagPath, tagValue);
+                    }
+                    finally
+                    {
+                        PropVariant.Free(tagValue);
+                    }
+                    if (hResult.Succeeded())
+                    {
+                        return true;
+                    }
                 }
                 // A top level path can also be added as block
                 if (block.Path.LastIndexOf('/') > 0)
