@@ -47,7 +47,8 @@ internal interface IWICMetadataBlockWriter
 }
 
 /// <summary>
-/// A metadata reader (one block), only the first method is declared, which is allowed for a prefix of the vtable.
+/// A metadata reader (one block), methods in the order of wincodecsdk.idl.
+/// The PROPVARIANT parameters of GetValueByIndex are [in, out, unique]: 0 when not needed, the caller clears them.
 /// See <a href="https://learn.microsoft.com/en-us/windows/win32/api/wincodecsdk/nn-wincodecsdk-iwicmetadatareader">IWICMetadataReader interface</a>
 /// </summary>
 [ComImport]
@@ -56,6 +57,11 @@ internal interface IWICMetadataBlockWriter
 internal interface IWICMetadataReader
 {
     [PreserveSig] HResult GetMetadataFormat(out Guid pguidMetadataFormat);
+    [PreserveSig] HResult GetMetadataHandlerInfo(out nint ppIHandler);
+    [PreserveSig] HResult GetCount(out uint pcCount);
+    [PreserveSig] HResult GetValueByIndex(uint nIndex, nint pvarSchema, nint pvarId, nint pvarValue);
+    [PreserveSig] HResult GetValue(nint pvarSchema, nint pvarId, nint pvarValue);
+    [PreserveSig] HResult GetEnumerator(out nint ppIEnumMetadata);
 }
 
 /// <summary>

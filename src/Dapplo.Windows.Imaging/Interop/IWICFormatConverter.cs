@@ -25,7 +25,7 @@ internal interface IWICFormatConverter
 
     // IWICFormatConverter
     [PreserveSig]
-    HResult Initialize(IWICBitmapSource pISource, [In] ref Guid dstFormat, WicBitmapDitherType dither, nint pIPalette, double alphaThresholdPercent, WicBitmapPaletteType paletteTranslate);
+    HResult Initialize(IWICBitmapSource pISource, [In] ref Guid dstFormat, WicBitmapDitherType dither, IWICPalette pIPalette, double alphaThresholdPercent, WicBitmapPaletteType paletteTranslate);
 
     [PreserveSig]
     HResult CanConvert([In] ref Guid srcPixelFormat, [In] ref Guid dstPixelFormat, out int pfCanConvert);

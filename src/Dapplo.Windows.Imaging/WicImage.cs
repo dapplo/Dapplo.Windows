@@ -156,6 +156,7 @@ public static class WicImage
         IPropertyBag2 propertyBag = null;
         IWICFormatConverter converter = null;
         IWICMetadataQueryWriter queryWriter = null;
+        IWICPalette palette = null;
         try
         {
             factory = WicNativeMethods.CreateImagingFactory();
@@ -195,8 +196,16 @@ public static class WicImage
             {
                 // The encoder wants another pixel format, WIC converts while it pulls the rows
                 Log.Debug().WriteLine("The encoder for {0} converts {1} to {2}", options.ContainerFormat, source.PixelFormat, pixelFormat);
+                var indexedBits = IndexedBitsPerPixel(pixelFormat);
+                if (indexedBits > 0)
+                {
+                    // An indexed format (e.g. GIF) needs a palette, made from the pixels, with a transparent color when the source has alpha
+                    Wic.Check(factory.CreatePalette(out palette), "IWICImagingFactory.CreatePalette");
+                    Wic.Check(palette.InitializeFromBitmap(source, 1u << indexedBits, HasAlpha(source.PixelFormat) ? 1 : 0), "IWICPalette.InitializeFromBitmap", source);
+                    Wic.Check(frame.SetPalette(palette), "IWICBitmapFrameEncode.SetPalette", stream);
+                }
                 Wic.Check(factory.CreateFormatConverter(out converter), "IWICImagingFactory.CreateFormatConverter");
-                Wic.Check(converter.Initialize(source, ref pixelFormat, WicBitmapDitherType.None, IntPtr.Zero, 0, WicBitmapPaletteType.Custom), "IWICFormatConverter.Initialize", source);
+                Wic.Check(converter.Initialize(source, ref pixelFormat, WicBitmapDitherType.None, palette, indexedBits > 0 ? 50 : 0, WicBitmapPaletteType.Custom), "IWICFormatConverter.Initialize", source);
                 pixels = (IWICBitmapSource)converter;
             }
             Wic.Check(frame.WriteSource(pixels, IntPtr.Zero), "IWICBitmapFrameEncode.WriteSource", source, stream);
@@ -214,6 +223,7 @@ public static class WicImage
         finally
         {
             Wic.Release(queryWriter);
+            Wic.Release(palette);
             Wic.Release(converter);
             Wic.Release(propertyBag);
             Wic.Release(frame);
@@ -225,6 +235,34 @@ public static class WicImage
             }
         }
     }
+
+    /// <summary>
+    /// The bits per pixel of the indexed WIC pixel formats (GUID_WICPixelFormat1bppIndexed .. 8bppIndexed), 0 for the others
+    /// </summary>
+    private static int IndexedBitsPerPixel(Guid pixelFormat)
+    {
+        var bytes = pixelFormat.ToByteArray();
+        var indexedBase = new Guid("6FDDC324-4E03-4BFE-B185-3D77768DC900").ToByteArray();
+        for (int i = 0; i < 15; i++)
+        {
+            if (bytes[i] != indexedBase[i])
+            {
+                return 0;
+            }
+        }
+        return bytes[15] switch
+        {
+            0x01 => 1,
+            0x02 => 2,
+            0x03 => 4,
+            0x04 => 8,
+            _ => 0
+        };
+    }
+
+    private static bool HasAlpha(Guid pixelFormat) =>
+        pixelFormat == WicPixelFormats.Format32bppBgra || pixelFormat == WicPixelFormats.Format32bppPbgra || pixelFormat == WicPixelFormats.Format32bppRgba ||
+        pixelFormat == WicPixelFormats.Format64bppRgba || pixelFormat == WicPixelFormats.Format64bppRgbaHalf || pixelFormat == WicPixelFormats.Format128bppRgbaFloat;
 
     private static List<(string Name, ushort VarType)> ReadPropertyInfos(IPropertyBag2 propertyBag)
     {
@@ -572,7 +610,7 @@ public static class WicImage
         {
             Wic.Check(factory.CreateFormatConverter(out converter), "IWICImagingFactory.CreateFormatConverter");
             var target = targetPixelFormat;
-            Wic.Check(converter.Initialize(source, ref target, WicBitmapDitherType.None, IntPtr.Zero, 0, WicBitmapPaletteType.Custom), $"Converting to the pixel format {targetPixelFormat}");
+            Wic.Check(converter.Initialize(source, ref target, WicBitmapDitherType.None, null, 0, WicBitmapPaletteType.Custom), $"Converting to the pixel format {targetPixelFormat}");
             action((IWICBitmapSource)converter);
         }
         finally
@@ -583,16 +621,16 @@ public static class WicImage
 
     /// <summary>
     /// The transformation which shows an image with the EXIF orientation upright.
-    /// WIC rotates clockwise, and for the combination of a rotation and a flip it flips first.
+    /// WIC rotates clockwise; the combinations for 5 (transpose) and 7 (transverse) are verified with a test, see WicMetadataTests.
     /// </summary>
     internal static WicBitmapTransformOptions OrientationToTransform(int orientation) => orientation switch
     {
         2 => WicBitmapTransformOptions.FlipHorizontal,
         3 => WicBitmapTransformOptions.Rotate180,
         4 => WicBitmapTransformOptions.FlipVertical,
-        5 => WicBitmapTransformOptions.Rotate90 | WicBitmapTransformOptions.FlipHorizontal,
+        5 => WicBitmapTransformOptions.Rotate270 | WicBitmapTransformOptions.FlipHorizontal,
         6 => WicBitmapTransformOptions.Rotate90,
-        7 => WicBitmapTransformOptions.Rotate270 | WicBitmapTransformOptions.FlipHorizontal,
+        7 => WicBitmapTransformOptions.Rotate90 | WicBitmapTransformOptions.FlipHorizontal,
         8 => WicBitmapTransformOptions.Rotate270,
         _ => WicBitmapTransformOptions.Rotate0
     };

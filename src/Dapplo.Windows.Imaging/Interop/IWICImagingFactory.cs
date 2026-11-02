@@ -26,7 +26,7 @@ internal interface IWICImagingFactory
     [PreserveSig] HResult CreateComponentInfo([In] ref Guid clsidComponent, [MarshalAs(UnmanagedType.IUnknown)] out object ppIInfo);
     [PreserveSig] HResult CreateDecoder(nint guidContainerFormat, nint pguidVendor, out nint ppIDecoder);
     [PreserveSig] HResult CreateEncoder([In] ref Guid guidContainerFormat, nint pguidVendor, out IWICBitmapEncoder ppIEncoder);
-    [PreserveSig] HResult CreatePalette(out nint ppIPalette);
+    [PreserveSig] HResult CreatePalette(out IWICPalette ppIPalette);
     [PreserveSig] HResult CreateFormatConverter(out IWICFormatConverter ppIFormatConverter);
     [PreserveSig] HResult CreateBitmapScaler(out nint ppIBitmapScaler);
     [PreserveSig] HResult CreateBitmapClipper(out nint ppIBitmapClipper);

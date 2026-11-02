@@ -24,7 +24,7 @@ internal interface IWICBitmapFrameEncode
     /// ppIColorContext points to an array of IWICColorContext pointers
     /// </summary>
     [PreserveSig] HResult SetColorContexts(uint cCount, nint ppIColorContext);
-    [PreserveSig] HResult SetPalette(nint pIPalette);
+    [PreserveSig] HResult SetPalette(IWICPalette pIPalette);
     [PreserveSig] HResult SetThumbnail(nint pIThumbnail);
     [PreserveSig] HResult WritePixels(uint lineCount, uint cbStride, uint cbBufferSize, nint pbPixels);
     [PreserveSig] HResult WriteSource(IWICBitmapSource pIBitmapSource, nint prc);

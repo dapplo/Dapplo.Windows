@@ -24,4 +24,9 @@ internal static class WicErrors
     /// WINCODEC_ERR_COMPONENTNOTFOUND: no codec for the container format or the stream
     /// </summary>
     public const HResult ComponentNotFound = unchecked((HResult)0x88982F50);
+
+    /// <summary>
+    /// WINCODEC_ERR_COMPONENTINITIALIZEFAILURE: the codec is registered but couldn't be initialized, e.g. the HEIF encoder without the HEVC video extension
+    /// </summary>
+    public const HResult ComponentInitializeFailure = unchecked((HResult)0x88982F8B);
 }

@@ -34,7 +34,7 @@ internal static class Wic
             ExceptionDispatchInfo.Capture(cause).Throw();
         }
         var message = $"{operation} failed with 0x{(int)hResult:X8}";
-        if (hResult == WicErrors.ComponentNotFound)
+        if (hResult == WicErrors.ComponentNotFound || hResult == WicErrors.ComponentInitializeFailure)
         {
             throw new WicCodecNotFoundException(message, (int)hResult);
         }

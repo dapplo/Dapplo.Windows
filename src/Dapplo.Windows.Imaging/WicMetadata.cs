@@ -4,28 +4,30 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Dapplo.Windows.Imaging;
 
 /// <summary>
 /// The metadata of a decoded frame, read once while decoding (a snapshot, no COM object is kept).
-/// The paths are those of the WIC metadata query language, as WIC enumerates them, e.g. "/app1/ifd/{ushort=274}" for the orientation in a JPEG.
+/// The paths are those of the WIC metadata query language with the names of the blocks, e.g. "/app1/ifd/{ushort=274}" for the orientation in a JPEG
+/// and "/ifd/xmp/dc:title" for the XMP title in a TIFF. The paths with the tags of the blocks, as WIC enumerates them (e.g. "/app1/{ushort=0}/{ushort=274}"), work for <see cref="TryGet"/> too.
 /// See <a href="https://learn.microsoft.com/en-us/windows/win32/wic/-wic-codec-metadataquerylanguage">the metadata query language</a> and <see cref="WicMetadataPaths"/>.
 /// </summary>
 public sealed class WicMetadata
 {
-    internal static readonly WicMetadata Empty = new WicMetadata(Array.Empty<KeyValuePair<string, object>>(), null, null, Array.Empty<WicMetadataRawBlock>());
+    internal static readonly WicMetadata Empty = new WicMetadata(Array.Empty<KeyValuePair<string, object>>(), Array.Empty<KeyValuePair<string, object>>(), null, null, Array.Empty<WicMetadataRawBlock>());
 
     private readonly Dictionary<string, object> _lookup;
 
-    internal WicMetadata(IList<KeyValuePair<string, object>> items, int? orientation, byte[] colorProfile, IList<WicMetadataRawBlock> rawBlocks)
+    internal WicMetadata(IList<KeyValuePair<string, object>> items, IList<KeyValuePair<string, object>> aliases, int? orientation, byte[] colorProfile, IList<WicMetadataRawBlock> rawBlocks)
     {
         Items = new ReadOnlyCollection<KeyValuePair<string, object>>(items);
         Orientation = orientation;
         ColorProfile = colorProfile;
         RawBlocks = new ReadOnlyCollection<WicMetadataRawBlock>(rawBlocks);
         _lookup = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-        foreach (var item in items)
+        foreach (var item in items.Concat(aliases))
         {
             if (!_lookup.ContainsKey(item.Key))
             {
@@ -53,12 +55,14 @@ public sealed class WicMetadata
     public byte[] ColorProfile { get; }
 
     /// <summary>
-    /// The metadata blocks as raw bytes, as far as the metadata handler can save them, to carry them over unchanged with <see cref="WicMetadataWriter.AddRawBlock"/>
+    /// The EXIF, XMP and IPTC blocks as raw bytes (IWICPersistStream), to carry them over unchanged with <see cref="WicMetadataWriter.AddRawBlock"/>:
+    /// the top-level APP1 (EXIF), APP13, XMP and IPTC blocks, and the XMP and IPTC blocks nested in a top-level block (e.g. "/ifd/xmp" in a TIFF).
     /// </summary>
     public IReadOnlyList<WicMetadataRawBlock> RawBlocks { get; }
 
     /// <summary>
-    /// Get the value of a path as it is listed in <see cref="Items"/>, e.g. "/app1/ifd/{ushort=274}" (case insensitive)
+    /// Get the value of a path as it is listed in <see cref="Items"/>, e.g. "/app1/ifd/{ushort=274}", or with the tags of the blocks, e.g. "/app1/{ushort=0}/{ushort=274}" (case insensitive).
+    /// Policy names like "System.Title" are not resolved, use the paths of <see cref="WicMetadataPaths"/>.
     /// </summary>
     /// <param name="query">the path</param>
     /// <param name="value">the value, see <see cref="Items"/> for the types</param>
