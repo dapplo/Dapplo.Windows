@@ -23,6 +23,7 @@ packages for .NET Framework 4.8 and .NET 10.
 | [Keep the PC awake, sleep, shut down, wake timers, power events](articles/system-state.md) | Dapplo.Windows.SystemState |
 | [Survive updates: restart registration and installer support](articles/restart-manager.md) | Dapplo.Windows.AppRestartManager, .InstallerManager |
 | [Extract icons, write ICO / CUR files, capture the cursor](articles/icons.md) | Dapplo.Windows.Icons |
+| [Read and write images and their metadata through WIC](articles/imaging.md) | Dapplo.Windows.Imaging |
 | [File and folder dialogs without WinForms or WPF](articles/dialogs.md) | Dapplo.Windows.Dialogs |
 | [Windows Forms and WPF integration](articles/forms-and-wpf.md) | Dapplo.Windows.Forms, .Wpf |
 | [Citrix, DWM, devices, registry, sounds and more](articles/more-packages.md) | several |

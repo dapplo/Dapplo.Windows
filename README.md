@@ -37,6 +37,7 @@ Upgrading from 2.x? Version 3.0 changes many APIs on purpose: read the
 | [Dapplo.Windows.InstallerManager](https://www.nuget.org/packages/Dapplo.Windows.InstallerManager) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.InstallerManager.svg)](https://www.nuget.org/packages/Dapplo.Windows.InstallerManager) | For installers: find, close and restart the processes which lock files | - |
 | [Dapplo.Windows.Dialogs](https://www.nuget.org/packages/Dapplo.Windows.Dialogs) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.Dialogs.svg)](https://www.nuget.org/packages/Dapplo.Windows.Dialogs) | File open, file save and folder dialogs without WinForms or WPF | Common |
 | [Dapplo.Windows.Icons](https://www.nuget.org/packages/Dapplo.Windows.Icons) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.Icons.svg)](https://www.nuget.org/packages/Dapplo.Windows.Icons) | Extract icons, write ICO and CUR files, capture the mouse cursor | Common, Dpi, Gdi32, Kernel32, Messages, Shell32, User32 |
+| [Dapplo.Windows.Imaging](https://www.nuget.org/packages/Dapplo.Windows.Imaging) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.Imaging.svg)](https://www.nuget.org/packages/Dapplo.Windows.Imaging) | WIC: the codecs of the PC (also HEIF, WebP, JPEG XL), encode and decode images, metadata | Com, Common |
 | [Dapplo.Windows.Devices](https://www.nuget.org/packages/Dapplo.Windows.Devices) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.Devices.svg)](https://www.nuget.org/packages/Dapplo.Windows.Devices) | Device and volume arrival / removal notifications | Messages |
 | [Dapplo.Windows.DesktopWindowsManager](https://www.nuget.org/packages/Dapplo.Windows.DesktopWindowsManager) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.DesktopWindowsManager.svg)](https://www.nuget.org/packages/Dapplo.Windows.DesktopWindowsManager) | DWM: frame bounds, cloaking, accent color, corners | Common |
 | [Dapplo.Windows.Citrix](https://www.nuget.org/packages/Dapplo.Windows.Citrix) | [![NuGet](https://img.shields.io/nuget/v/Dapplo.Windows.Citrix.svg)](https://www.nuget.org/packages/Dapplo.Windows.Citrix) | Citrix session detection and client information | Common |
@@ -114,6 +115,7 @@ short and use `ObserveOn` for UI work. [Getting started](doc/articles/intro.md#h
 - [Power and system state](doc/articles/system-state.md)
 - [Restart Manager](doc/articles/restart-manager.md)
 - [Icons and cursors](doc/articles/icons.md)
+- [Images through WIC](doc/articles/imaging.md)
 - [File and folder dialogs](doc/articles/dialogs.md)
 - [Windows Forms and WPF](doc/articles/forms-and-wpf.md)
 - [More packages](doc/articles/more-packages.md)

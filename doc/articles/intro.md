@@ -30,6 +30,7 @@ Install the package for the feature you need, NuGet brings in its dependencies.
 | **Dapplo.Windows.InstallerManager** | For installers: find the processes which lock files, close and restart them (Restart Manager) | - |
 | **Dapplo.Windows.Dialogs** | Modern file open, file save and folder picker dialogs, without WinForms or WPF | Common |
 | **Dapplo.Windows.Icons** | Extract icons, write ICO and CUR files, capture the mouse cursor | Common, Dpi, Gdi32, Kernel32, Messages, Shell32, User32 |
+| **Dapplo.Windows.Imaging** | WIC: the image codecs of the PC (also HEIF, WebP, JPEG XL), encode and decode images, read and write metadata | Com, Common |
 | **Dapplo.Windows.Devices** | Device arrival and removal notifications (USB, volumes, ...) | Messages |
 | **Dapplo.Windows.DesktopWindowsManager** | DWM: extended frame bounds, cloaking, accent color, corner preference | Common |
 | **Dapplo.Windows.Citrix** | Detect a Citrix session and query client information | Common |
@@ -174,6 +175,7 @@ Version 3.0 changes many APIs on purpose. Read the [migration guide](migration-3
 - [Power and system state](system-state.md)
 - [Restart Manager](restart-manager.md)
 - [Icons and cursors](icons.md)
+- [Images through WIC](imaging.md)
 - [File and folder dialogs](dialogs.md)
 - [Windows Forms and WPF](forms-and-wpf.md)
 - [More packages](more-packages.md)

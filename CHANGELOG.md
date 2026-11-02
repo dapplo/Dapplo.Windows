@@ -7,6 +7,16 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.18.0]
+
+### Added
+- New package Dapplo.Windows.Imaging: the Windows Imaging Component (WIC) without WPF, System.Drawing or other pixel libraries, see [Images through WIC](doc/articles/imaging.md).
+- `WicCodecs.GetDecoders(refresh)` / `GetEncoders(refresh)`: every codec WIC reports (`IWICImagingFactory::CreateComponentEnumerator`), also the built-in codecs and the packaged (Store) codecs like HEIF/AVIF, WebP, Raw and JPEG XL, which the registry key of the WIC decoder category doesn't list on newer Windows versions. `WicCodecInfo` has the CLSID, container format, vendor, friendly name, author, version, file extensions (lower case with the dot) and MIME types (lower case, without duplicates) and the signing status. A codec which can't be read is skipped and logged.
+- `WicImage.Encode`: from memory (pointer and stride, e.g. GDI+ `BitmapData.Scan0`, read without a copy through an own `IWICBitmapSource`) or from a `WicRowProvider` callback (the encoder pulls the rows, e.g. for ImageSharp images which aren't contiguous), into a .NET `Stream`. `WicEncodeOptions` with the container format, `ImageQuality`, `Lossless`, any other encoder option by name (`WicImage.GetEncoderOptions` lists them, unknown options are skipped) and the resolution. WIC converts the pixels when the encoder wants another pixel format, indexed formats (GIF) get a palette from the pixels.
+- `WicImage.GetFrameInfo` and `WicImage.Decode` (into memory, into memory supplied once the size is known, or to a `WicRowConsumer` in bands): the first frame, converted to the requested pixel format, optionally with the EXIF orientation applied (`IWICBitmapFlipRotator`).
+- `WicCodecNotFoundException` when there is no codec for the container format or the stream (WINCODEC_ERR_COMPONENTNOTFOUND), or the codec can't be initialized (WINCODEC_ERR_COMPONENTINITIALIZEFAILURE), so callers can fall back.
+- Metadata through the WIC metadata query language: `WicFrameInfo.Metadata` (`WicMetadata`: every item with its path, `TryGet`, `TryGetRational`, `Orientation`, the ICC `ColorProfile` and the EXIF/XMP/IPTC blocks as `RawBlocks`), and `WicEncodeOptions.Metadata` with a `WicMetadataWriter` (`Set`, `Remove`, `SetColorProfile`, `AddRawBlock`); what an encoder doesn't accept is reported in `WicEncodeResult.MetadataIssues`, never a failure. `WicMetadataPaths` has the paths per container, `WicPixelFormats`, `WicContainerFormats`, `WicMetadataFormats` and `WicVendors` the GUIDs.
+
 ## [3.17.0]
 
 ### Added
