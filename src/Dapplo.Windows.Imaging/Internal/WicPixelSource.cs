@@ -3,6 +3,7 @@
 
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Common.Enums;
 using Dapplo.Windows.Imaging.Interop;
@@ -56,7 +57,39 @@ internal abstract class WicPixelSource : IWICBitmapSource, IFailureSource
         return HResult.S_OK;
     }
 
-    public HResult CopyPalette(nint palette) => WicErrors.PaletteUnavailable;
+    /// <summary>
+    /// The colors of an indexed pixel format (WICColor, 0xAARRGGBB), null for the other formats
+    /// </summary>
+    public uint[] Palette { get; set; }
+
+    public HResult CopyPalette(nint palette)
+    {
+        if (Palette == null || Palette.Length == 0)
+        {
+            return WicErrors.PaletteUnavailable;
+        }
+        if (palette == IntPtr.Zero)
+        {
+            return HResult.E_INVALIDARG;
+        }
+        object paletteObject = null;
+        var handle = GCHandle.Alloc(Palette, GCHandleType.Pinned);
+        try
+        {
+            paletteObject = Marshal.GetObjectForIUnknown(palette);
+            return ((IWICPalette)paletteObject).InitializeCustom(handle.AddrOfPinnedObject(), (uint)Palette.Length);
+        }
+        catch (Exception ex)
+        {
+            LastException = ex;
+            return ex.HResult < 0 ? (HResult)ex.HResult : HResult.E_FAIL;
+        }
+        finally
+        {
+            handle.Free();
+            Wic.Release(paletteObject);
+        }
+    }
 
     public unsafe HResult CopyPixels(nint rectangle, uint stride, uint bufferSize, nint buffer)
     {
@@ -164,5 +197,107 @@ internal sealed class WicRowPixelSource : WicPixelSource
         {
             ArrayPool<byte>.Shared.Return(rowBuffer);
         }
+    }
+}
+
+/// <summary>
+/// 8 bit palette indexes for 32bpp BGRA pixels, each pixel gets its exact color or the nearest color of the palette.
+/// The WIC format converter maps colors through a reduced lookup and can pick a neighbor of an exact color, this keeps the colors exact.
+/// </summary>
+internal sealed class WicIndexingPixelSource : WicPixelSource
+{
+    private readonly IWICBitmapSource _bgra;
+    private readonly IFailureSource _bgraFailures;
+    private readonly Dictionary<uint, byte> _indexes = new Dictionary<uint, byte>();
+    private readonly int _transparentIndex = -1;
+
+    /// <param name="bgra">the pixels as GUID_WICPixelFormat32bppBGRA</param>
+    /// <param name="bgraFailures">the source which reports the exceptions of the pixels, e.g. of a row callback</param>
+    /// <param name="palette">at most 256 colors (0xAARRGGBB)</param>
+    public WicIndexingPixelSource(IWICBitmapSource bgra, IFailureSource bgraFailures, uint[] palette, int width, int height, double dpiX, double dpiY)
+        : base(width, height, WicPixelFormats.Format8bppIndexed, 8, dpiX, dpiY)
+    {
+        _bgra = bgra;
+        _bgraFailures = bgraFailures;
+        Palette = palette;
+        for (int i = 0; i < palette.Length; i++)
+        {
+            if (palette[i] >> 24 == 0)
+            {
+                _transparentIndex = i;
+                break;
+            }
+        }
+    }
+
+    protected override unsafe void CopyRows(WicRect rect, int xOffset, int rectRowBytes, int destinationStride, uint destinationSize, byte* destination)
+    {
+        var rowPixels = rect.Width;
+        var bandRows = Math.Max(1, Math.Min(rect.Height, 1024 * 1024 / Math.Max(1, rowPixels)));
+        var buffer = ArrayPool<uint>.Shared.Rent(bandRows * rowPixels);
+        try
+        {
+            fixed (uint* bufferPointer = buffer)
+            {
+                for (int top = 0; top < rect.Height; top += bandRows)
+                {
+                    var count = Math.Min(bandRows, rect.Height - top);
+                    var band = new WicRect(rect.X, rect.Y + top, rect.Width, count);
+                    Wic.Check(_bgra.CopyPixels((nint)(&band), (uint)(rowPixels * 4), (uint)(count * rowPixels * 4), (nint)bufferPointer), "IWICBitmapSource.CopyPixels", _bgraFailures);
+                    for (int row = 0; row < count; row++)
+                    {
+                        var target = destination + (long)(top + row) * destinationStride;
+                        var source = bufferPointer + row * rowPixels;
+                        for (int x = 0; x < rowPixels; x++)
+                        {
+                            target[x] = IndexOf(source[x]);
+                        }
+                    }
+                }
+            }
+        }
+        finally
+        {
+            ArrayPool<uint>.Shared.Return(buffer);
+        }
+    }
+
+    private byte IndexOf(uint color)
+    {
+        // Mostly transparent pixels (below the threshold of 50 % WIC uses) get the transparent color, when the palette has one
+        if (color >> 24 < 128 && _transparentIndex >= 0)
+        {
+            return (byte)_transparentIndex;
+        }
+        if (_indexes.TryGetValue(color, out var index))
+        {
+            return index;
+        }
+        var best = 0;
+        var bestDistance = long.MaxValue;
+        for (int i = 0; i < Palette.Length; i++)
+        {
+            var entry = Palette[i];
+            if (entry == color)
+            {
+                best = i;
+                break;
+            }
+            if (i == _transparentIndex)
+            {
+                continue;
+            }
+            long db = (int)(entry & 0xFF) - (int)(color & 0xFF);
+            long dg = (int)(entry >> 8 & 0xFF) - (int)(color >> 8 & 0xFF);
+            long dr = (int)(entry >> 16 & 0xFF) - (int)(color >> 16 & 0xFF);
+            var distance = dr * dr + dg * dg + db * db;
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                best = i;
+            }
+        }
+        _indexes[color] = (byte)best;
+        return (byte)best;
     }
 }

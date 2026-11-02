@@ -27,7 +27,8 @@ internal enum WicBitmapEncoderCacheOption : uint
 /// </summary>
 internal enum WicBitmapDitherType : uint
 {
-    None = 0x00000000
+    None = 0x00000000,
+    ErrorDiffusion = 0x00000008
 }
 
 /// <summary>

@@ -74,8 +74,14 @@ The pixel formats are WIC GUIDs, `WicPixelFormats` has the common ones: `Format3
 ImageSharp `Bgra32`), `Format32bppPbgra`, `Format24bppBgr` (GDI+ `Format24bppRgb`, ImageSharp `Bgr24`),
 `Format32bppRgba` (ImageSharp `Rgba32`), and `Format64bppRgbaHalf` and `Format128bppRgbaFloat` for HDR. When the encoder
 wants another pixel format (e.g. JPEG has no alpha), WIC converts the pixels while it reads them;
-`WicEncodeResult.PixelFormat` is the format which was written. For an indexed format (GIF) a palette is made from the
-pixels, with a transparent color when the source has alpha.
+`WicEncodeResult.PixelFormat` is the format which was written.
+
+For an indexed format (GIF) a palette is made from the pixels: with at most 256 colors (and no partly transparent
+pixel) exactly these colors, so the GIF has the same pixels; otherwise WIC chooses the colors, with
+`WicEncodeOptions.Dither` using error diffusion. `WicEncodeOptions.Palette` (up to 256 colors as `0xAARRGGBB`, alpha 0
+is the transparent color) sets the palette yourself: pixels in `WicPixelFormats.Format8bppIndexed` (or 1, 2, 4 bpp)
+are indexes into it, other pixels get the nearest color and the encoder is asked for an indexed format, so a PNG gets a
+palette too.
 
 When the pixels aren't in one buffer (ImageSharp can split a large image), the other overload takes a callback. The
 encoder pulls the rows it needs, no copy of the image is made.
@@ -125,7 +131,8 @@ try
     WicFrameInfo info = WicImage.Decode(source, WicPixelFormats.Format32bppBgra, (WicFrameInfo frame, out int stride) =>
     {
         bitmap = new Bitmap(frame.Width, frame.Height, PixelFormat.Format32bppArgb);
-        bitmap.SetResolution((float)frame.DpiX, (float)frame.DpiY);
+        // The resolution of the file; when it stores none, WIC reports the default of the decoder (96 or 72), use your own
+        bitmap.SetResolution(frame.HasResolution ? (float)frame.DpiX : 96, frame.HasResolution ? (float)frame.DpiY : 96);
         bitmapData = bitmap.LockBits(new Rectangle(0, 0, frame.Width, frame.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
         stride = bitmapData.Stride;
         return bitmapData.Scan0;
@@ -143,6 +150,26 @@ finally
 With `applyOrientation: true` the EXIF orientation is applied (rotated and flipped before the pixel format conversion),
 `WicFrameInfo.Width` and `Height` are then those of the upright image. A third overload hands the rows to a
 `WicRowConsumer`, in bands from a pooled buffer.
+
+### Resolution
+
+WIC always reports a resolution: when the file stores none, each decoder fills in its own default (e.g. 96 for
+PNG, 72 for WebP). `WicFrameInfo.HasResolution` tells the two apart, it is true only when the file itself stores a
+resolution:
+
+| Container | Stored resolution |
+|---|---|
+| PNG | a pHYs chunk with the unit meter (unit 0 is only an aspect ratio) |
+| JPEG | JFIF density with the unit inch or cm, or EXIF XResolution with a ResolutionUnit other than none |
+| TIFF, DNG | XResolution with a ResolutionUnit other than none (no ResolutionUnit means inch) |
+| JPEG XR | WIDTH_RESOLUTION of the container |
+| BMP | pixels per meter other than 0 |
+| GIF, ICO, DDS | never, GIF only has an aspect ratio |
+| others (WebP, HEIF, AVIF, JPEG XL, RAW, ...) | an EXIF IFD with XResolution and a ResolutionUnit other than none |
+
+The metadata of the frame is used, the bytes of the file are read only for a PNG whose pHYs WIC doesn't expose, JPEG XR
+and BMP. When the resolution is only in EXIF, `DpiX` / `DpiY` are the EXIF values: the JPEG decoder of WIC reports its
+default (96) for a JPEG with only EXIF XResolution.
 
 ## When there is no codec
 
