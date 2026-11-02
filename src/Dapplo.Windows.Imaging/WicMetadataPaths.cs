@@ -95,11 +95,11 @@ public static class WicMetadataPaths
     public static string PngText(string keyword) => $"/tEXt/{{str={keyword}}}";
 
     /// <summary>
-    /// The path of the XMP block: "/xmp" for JPEG, "/ifd/xmp" for TIFF and JPEG XR
+    /// The path of the XMP block: "/xmp" for JPEG and PNG (an iTXt chunk), "/ifd/xmp" for TIFF and JPEG XR
     /// </summary>
     public static string Xmp(Guid containerFormat)
     {
-        if (containerFormat == WicContainerFormats.Jpeg)
+        if (containerFormat == WicContainerFormats.Jpeg || containerFormat == WicContainerFormats.Png)
         {
             return "/xmp";
         }

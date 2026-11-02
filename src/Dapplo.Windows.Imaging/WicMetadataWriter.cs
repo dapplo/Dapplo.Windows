@@ -209,7 +209,8 @@ public sealed class WicMetadataWriter
                 AddIssue(description, HResult.E_NOINTERFACE, "The factory has no IWICComponentFactory");
                 return false;
             }
-            using var memoryStream = new MemoryStream(block.Data, false);
+            // Not disposed: the metadata reader reads from the stream until the encoder has written the block
+            var memoryStream = new MemoryStream(block.Data, false);
             var format = block.Format;
             var hResult = componentFactory.CreateMetadataReader(ref format, IntPtr.Zero, 0, new ManagedIStream(memoryStream), out reader);
             if (hResult.Succeeded())
