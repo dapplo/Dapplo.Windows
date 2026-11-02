@@ -16,6 +16,8 @@
   href: restart-manager.md
 - name: Icons and cursors
   href: icons.md
+- name: Images through WIC
+  href: imaging.md
 - name: File and folder dialogs
   href: dialogs.md
 - name: Windows Forms and WPF
