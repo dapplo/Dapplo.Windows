@@ -7,6 +7,16 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.22.0]
+
+### Changed
+- `UiAutomationText.ReadVisibleTextAsync` is fast on browser pages: Edge with a normal page (about 90 lines) gave nothing within 15 seconds, because the document of a Chromium page was read through its TextPattern word by word, about 8 to 10 requests per word, and Chromium's text ranges take 5 to 30 ms per request. Now an element with a TextPattern is read with one request for its whole subtree (BuildUpdatedCache with TreeScope_Subtree, only the visible elements of the control view, with name, bounds, control type, value, password and offscreen state); when the subtree has Text elements (Chromium, Firefox, Electron and WebView2 expose every run of text as one) the text comes from these elements, the Text elements inside a Hyperlink get its value as link target. Only an element without Text elements inside (an edit field, a WPF RichTextBox, Word) is read through the TextPattern, and that line by line (the text and the rectangles of each line) instead of word by word; lines with a link are still read word by word, so the link's words get the target exactly. When the request for the subtree fails (e.g. it timed out on a huge page) the elements are read level by level as before.
+- The words of a run of text (an element, or a line of a TextPattern) get their share of its bounds by characters: an estimate, good for selections and labels. Before, a Text element was one word with the whole name. A run which is higher than one and a half lines wraps: inside a document its line rectangles come from TextPattern.RangeFromChild, else it is cut into bands of a line.
+
+### Added
+- `maxDuration` for `UiAutomationText.ReadVisibleTextAsync(windowHandle or IInteropWindow, area, connectionTimeout, transactionTimeout, maxDuration, cancellationToken)`: when it has passed the reading stops and returns the lines read until then, with `IsComplete` false and the new `UiAutomationTextSnapshot.TimedOut` true (also true when a request to the application timed out), instead of losing everything to a cancellation. The content wait for Chromium is limited to it too. The overloads without `maxDuration` remain for binary compatibility.
+- Verbose log per read: the time to the first word, the number of UI Automation requests, elements, runs, the documents read from their subtree or through the TextPattern with their times, and the lines (and how many of them word by word). Still no text or link targets.
+
 ## [3.21.0]
 
 ### Added

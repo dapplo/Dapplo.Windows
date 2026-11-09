@@ -82,6 +82,9 @@ internal static class UiaConstants
     /// <summary>TreeScope_Descendants</summary>
     public const int TreeScopeDescendants = 0x04;
 
+    /// <summary>TreeScope_Subtree: the element, its children and its descendants</summary>
+    public const int TreeScopeSubtree = 0x07;
+
     /// <summary>UIA_E_ELEMENTNOTAVAILABLE: the element is gone (e.g. the page navigated or the window closed)</summary>
     public const int ElementNotAvailable = unchecked((int)0x80040201);
 
@@ -245,7 +248,12 @@ internal interface IUIAutomationElement
     void FindFirstBuildCache();
     [PreserveSig]
     int FindAllBuildCache(int scope, IUIAutomationCondition condition, IUIAutomationCacheRequest cacheRequest, out IUIAutomationElementArray found);
-    void BuildUpdatedCache();
+
+    /// <summary>
+    ///     Fetch the cache of the request for the element, with TreeScope_Subtree the whole subtree in one request (GetCachedChildren)
+    /// </summary>
+    [PreserveSig]
+    int BuildUpdatedCache(IUIAutomationCacheRequest cacheRequest, out IUIAutomationElement updatedElement);
 
     [PreserveSig]
     int GetCurrentPropertyValue(int propertyId, [MarshalAs(UnmanagedType.Struct)] out object value);
@@ -264,7 +272,12 @@ internal interface IUIAutomationElement
 
     void GetCachedPattern();
     void GetCachedParent();
-    void GetCachedChildren();
+
+    /// <summary>
+    ///     The cached children (cache request with TreeScope_Children or _Subtree), S_OK with null when there are none
+    /// </summary>
+    [PreserveSig]
+    int GetCachedChildren(out IUIAutomationElementArray children);
 
     [PreserveSig]
     int get_CurrentProcessId(out int processId);
@@ -418,7 +431,9 @@ internal interface IUIAutomationCacheRequest
     void AddPattern();
     void Clone();
     void get_TreeScope();
-    void put_TreeScope();
+
+    [PreserveSig]
+    int put_TreeScope(int scope);
     void get_TreeFilter();
 
     [PreserveSig]

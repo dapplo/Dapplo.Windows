@@ -554,21 +554,25 @@ if (root != null)
 
 ### The text of a window: UI Automation text
 
-`UiAutomationText.ReadVisibleTextAsync(window, area, connectionTimeout, transactionTimeout, cancellationToken)` reads the
+`UiAutomationText.ReadVisibleTextAsync(window, area, connectionTimeout, transactionTimeout, maxDuration, cancellationToken)` reads the
 text a window shows inside `area` (screen pixels, `NativeRect.Empty` for the whole window) and returns an immutable
 `UiAutomationTextSnapshot`: `Lines` from top to bottom, each with its `Bounds` and `Words` (`Bounds`, `Text`, and
 `LinkTarget` when the word is part of a link). It is meant for windows whose text should not go through OCR (browsers,
 Electron, WPF, UWP, Office) and has nothing specific to an application. Like the areas it works on a window handle, also
 while your own window covers the screen, and the calls run on a background (MTA) thread.
 
-- Elements with a TextPattern (the document of a browser page, edit fields, a WPF RichTextBox) are read through it: the
-  visible ranges are split into lines and the lines into words, each with the bounds UI Automation reports. A word whose
-  middle lies in the text of a hyperlink inside the element gets the hyperlink's value (its ValuePattern, the URL in a
-  browser) as `LinkTarget`.
-- Elements without TextPattern: a Text element is one word with its name and bounds (a hyperlink inside it is read too
-  and replaces it when it is the whole text, e.g. a WPF TextBlock with only a Hyperlink), a Hyperlink element one word
-  with its name and its value as target, a single-line Edit element one word with its value. Such words which overlap
-  vertically are one line.
+- An element with a TextPattern (the document of a browser page, an edit field, a WPF RichTextBox, Word) is read with
+  one request for its whole subtree. When the subtree has Text elements (browsers, Electron and WebView2 expose every run
+  of text as one) the text comes from them, a few requests for a whole page: Chromium's text ranges are slow, 5 to 30 ms
+  per request, so reading a page through them took tens of seconds. Else the TextPattern is read line by line (the text
+  and the rectangles of each line); a line with a link (a hyperlink inside the element) is read word by word, so its words
+  get the hyperlink's value (its ValuePattern, the URL in a browser) as `LinkTarget`.
+- Elements: a Text element is a run of text with its name and bounds (a hyperlink inside it is read too and replaces it
+  when it covers the whole text, e.g. a WPF TextBlock with only a Hyperlink), the Text elements inside a Hyperlink get its
+  value as target, a Hyperlink without them is a run with its name, a single-line Edit element a run with its value.
+- A run (or a line of a TextPattern) is split into words which get their share of its bounds by characters, an estimate
+  good for selections and labels. A run higher than one and a half lines wraps: inside a document its line rectangles come
+  from `RangeFromChild`, else it is cut into bands of a line. Words which overlap vertically are one line.
 - Password elements are left out with their children, so are the words of a TextPattern which lie in one; offscreen
   elements are left out, and everything is clipped to its element, the window and `area`.
 - While nothing is found and the tree looks incomplete (Chromium builds it on the first request) the text is read again,
@@ -576,15 +580,18 @@ while your own window covers the screen, and the calls run on a background (MTA)
   when it gave up, a request timed out, a limit was reached, the window is gone or UI Automation isn't available.
 - A window of a remote display client (Citrix, Remote Desktop, Horizon, see below) is read once, `IsComplete` is false
   and `RemoteDisplay` says which client it is: its content is a picture, use OCR.
-- The connection and transaction timeouts (default 2 seconds each) are set where CUIAutomation8 is available. Every word
-  costs a few requests to the application, so pass the area the user is interested in rather than the whole screen.
+- The connection and transaction timeouts (default 2 seconds each) are set where CUIAutomation8 is available. After
+  `maxDuration` the reading stops and the snapshot has what was read until then, with `TimedOut` true and `IsComplete`
+  false; the cancellation token throws instead. The verbose log has the time to the first word, the number of requests,
+  elements, runs and lines, and the time per phase, so a slow provider is visible.
 - Text and link targets are never logged, `ToString()` of the snapshot types leaves them out too.
 
 <!-- sample: WindowSamples.UiAutomationVisibleText -->
 ```csharp
 // Read the text of the part of a window the user selected, e.g. to copy it or to find the links, without OCR (a browser,
-// an Electron or WPF app, Office); on a background thread, cancel it when the selection changes
-UiAutomationTextSnapshot snapshot = await UiAutomationText.ReadVisibleTextAsync(window, selection, cancellationToken: cancellationToken);
+// an Electron or WPF app, Office); on a background thread. After maxDuration it returns what it has (TimedOut), the token throws.
+UiAutomationTextSnapshot snapshot = await UiAutomationText.ReadVisibleTextAsync(window, selection, maxDuration: TimeSpan.FromSeconds(2),
+    cancellationToken: cancellationToken);
 string text = snapshot.Text;
 // The links in the selection, with the bounds to draw them
 var links = snapshot.Words.Where(word => word.IsLink).Select(word => (word.Bounds, word.LinkTarget)).ToList();

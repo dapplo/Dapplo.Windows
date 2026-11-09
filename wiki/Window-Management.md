@@ -229,8 +229,9 @@ text are left out:
 <!-- sample: WindowSamples.UiAutomationVisibleText -->
 ```csharp
 // Read the text of the part of a window the user selected, e.g. to copy it or to find the links, without OCR (a browser,
-// an Electron or WPF app, Office); on a background thread, cancel it when the selection changes
-UiAutomationTextSnapshot snapshot = await UiAutomationText.ReadVisibleTextAsync(window, selection, cancellationToken: cancellationToken);
+// an Electron or WPF app, Office); on a background thread. After maxDuration it returns what it has (TimedOut), the token throws.
+UiAutomationTextSnapshot snapshot = await UiAutomationText.ReadVisibleTextAsync(window, selection, maxDuration: TimeSpan.FromSeconds(2),
+    cancellationToken: cancellationToken);
 string text = snapshot.Text;
 // The links in the selection, with the bounds to draw them
 var links = snapshot.Words.Where(word => word.IsLink).Select(word => (word.Bounds, word.LinkTarget)).ToList();
