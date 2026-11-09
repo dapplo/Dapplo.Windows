@@ -37,14 +37,14 @@ public class CitrixTests
     }
 
     /// <summary>
-    ///     Not on Citrix: the protocol is unknown, no ICA session, nothing can be queried
+    ///     Not on Citrix: the protocol is unknown, no ICA session. The query methods need the WFAPI DLL, check IsAvailable before using them.
     /// </summary>
     [Fact]
     public void TestCitrix_NotOnCitrix_NothingIsAvailable()
     {
         Assert.Null(WinFrame.GetActiveProtocol());
         Assert.False(WinFrame.IsIcaSession);
-        Assert.Null(WinFrame.QuerySessionConnectState());
+        Assert.Throws<DllNotFoundException>(() => WinFrame.QuerySessionConnectState());
     }
 
     [Fact]
