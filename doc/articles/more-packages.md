@@ -24,11 +24,20 @@ Bottom are exclusive, as in a Win32 `RECT`. `HResult` has `Succeeded()`, `Failed
 
 ## Citrix (Dapplo.Windows.Citrix)
 
-Detects a Citrix session through `WFAPI.DLL`; on a machine without Citrix `IsAvailable` is simply `false`.
+Answers questions about the Citrix session your own process runs in, through the WinFrame API: `WFAPI.DLL` in a 32-bit
+process, `WFAPI64.DLL` in a 64-bit process (`WinFrame.DllName`). On a machine without Citrix `IsAvailable` is simply
+`false`. `IsIcaSession` asks Windows first (WTSClientProtocolType, no Citrix needed) and falls back to
+`GetActiveProtocol()` (WFGetActiveProtocol), because a Citrix VDA for desktop operating systems reports its ICA sessions to
+Windows as console. `TryQuerySessionInformation<T>` tells a failed query apart from an empty struct; `GetClientName()` and
+`GetClientIpAddress()` (IPv4 and IPv6) return null when the information isn't available.
+
+To find out if a window on the local desktop *shows* a Citrix (or Remote Desktop, Horizon ...) session, for example to
+use OCR instead of UI Automation, use `RemoteDisplayWindow` in Dapplo.Windows, see
+[remote display windows](window-management.md#remote-display-windows-citrix-remote-desktop-horizon).
 
 <!-- sample: MorePackagesSamples.Citrix -->
 ```csharp
-if (WinFrame.IsAvailable)
+if (WinFrame.IsIcaSession)
 {
     Console.WriteLine($"Citrix session, client {WinFrame.GetClientName()} ({WinFrame.GetClientIpAddress()})");
 }

@@ -11,6 +11,7 @@ using Dapplo.Windows.Automation.Interop;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Automation;
 
@@ -91,6 +92,12 @@ public static class UiAutomationText
     ///     up, a request timed out, a limit was reached, the window is gone or UI Automation isn't available.
     ///     </para>
     ///     <para>
+    ///     A window of a remote display client (Citrix Workspace app, Remote Desktop, Horizon, ..., see
+    ///     <see cref="RemoteDisplayWindow.GetKind(IntPtr)"/>) is a picture for Windows, UI Automation has no text for the remote content: it is
+    ///     read once without waiting for the tree, <see cref="UiAutomationTextSnapshot.IsComplete"/> is false and
+    ///     <see cref="UiAutomationTextSnapshot.RemoteDisplay"/> says which client it is, so the caller knows it has to use OCR.
+    ///     </para>
+    ///     <para>
     ///     Where IUIAutomation2 is available (Windows 8+) the connection and transaction timeouts are set, so a hanging application can't
     ///     block for the default 20 seconds. Neither text nor link targets are logged, only counts and timings.
     ///     </para>
@@ -137,17 +144,20 @@ public static class UiAutomationText
             ? Task.FromResult(Incomplete())
             : ReadVisibleTextAsync(window.Handle, area, connectionTimeout, transactionTimeout, cancellationToken);
 
-    private static UiAutomationTextSnapshot Incomplete() => new UiAutomationTextSnapshot(null, false);
+    private static UiAutomationTextSnapshot Incomplete(RemoteDisplayKinds remoteDisplay = RemoteDisplayKinds.None) => new UiAutomationTextSnapshot(null, false, remoteDisplay);
 
     private static UiAutomationTextSnapshot ReadVisibleText(IntPtr windowHandle, NativeRect area, TimeSpan connectionTimeout, TimeSpan transactionTimeout,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var stopwatch = Stopwatch.StartNew();
+        // The content of a remote display window is a picture, waiting for a tree to be built (Chromium) would only cost time
+        var remoteDisplay = RemoteDisplayWindow.GetKind(windowHandle);
+        var contentWait = remoteDisplay == RemoteDisplayKinds.None ? UiAutomationAreas.DefaultContentWait : TimeSpan.Zero;
         var automation = UiAutomationScroller.CreateAutomation(connectionTimeout, transactionTimeout);
         if (automation is null)
         {
-            return Incomplete();
+            return Incomplete(remoteDisplay);
         }
         try
         {
@@ -185,18 +195,18 @@ public static class UiAutomationText
                 // part with the page was read. A read after the check is reliable.
                 cancellationToken.ThrowIfCancellationRequested();
                 return (ReadOnce() ?? reader, false);
-            }, UiAutomationAreas.DefaultContentWait, UiAutomationAreas.ContentPause, windowHandle, cancellationToken);
+            }, contentWait, UiAutomationAreas.ContentPause, windowHandle, cancellationToken);
 
             if (result is null)
             {
                 Log.Verbose().WriteLine("Reading the text of window 0x{0:X} failed, the window is gone or has no UI Automation element.", windowHandle.ToInt64());
-                return Incomplete();
+                return Incomplete(remoteDisplay);
             }
-            var isComplete = !looksIncomplete && !gone && !result.IsTruncated && !result.TimedOut;
-            var snapshot = new UiAutomationTextSnapshot(result.BuildLines(), isComplete);
-            Log.Verbose().WriteLine("Read {0} lines with {1} words ({2} links) of window 0x{3:X} from {4} elements in {5} ms with {6} attempts, complete: {7} (truncated: {8}, timed out: {9})",
+            var isComplete = remoteDisplay == RemoteDisplayKinds.None && !looksIncomplete && !gone && !result.IsTruncated && !result.TimedOut;
+            var snapshot = new UiAutomationTextSnapshot(result.BuildLines(), isComplete, remoteDisplay);
+            Log.Verbose().WriteLine("Read {0} lines with {1} words ({2} links) of window 0x{3:X} from {4} elements in {5} ms with {6} attempts, complete: {7} (truncated: {8}, timed out: {9}, remote display: {10})",
                 snapshot.Lines.Count, result.WordCount, result.LinkWordCount, windowHandle.ToInt64(), result.ElementCount, (long)stopwatch.Elapsed.TotalMilliseconds,
-                attempts, isComplete, result.IsTruncated, result.TimedOut);
+                attempts, isComplete, result.IsTruncated, result.TimedOut, remoteDisplay);
             return snapshot;
         }
         finally

@@ -38,7 +38,7 @@ public static class MorePackagesSamples
     public static void Citrix()
     {
         #region Citrix
-        if (WinFrame.IsAvailable)
+        if (WinFrame.IsIcaSession)
         {
             Console.WriteLine($"Citrix session, client {WinFrame.GetClientName()} ({WinFrame.GetClientIpAddress()})");
         }

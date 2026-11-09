@@ -5,21 +5,33 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Dapplo.Log;
 using Dapplo.Windows.Citrix.Enums;
+using Dapplo.Windows.Citrix.Internals;
 using Dapplo.Windows.Citrix.Structs;
 
 namespace Dapplo.Windows.Citrix;
 
 /// <summary>
-///     Helper class for the WinFrame API, which is used by Citrix XenApp and XenDesktop.
+///     Helper class for the WinFrame API (WFAPI), which is used by Citrix Virtual Apps and Desktops (XenApp / XenDesktop) inside a session.
+///     It answers questions about the session the current process runs in. It doesn't help to find out if a window on the local desktop shows
+///     a Citrix session, for that see RemoteDisplayWindow in Dapplo.Windows.
 /// </summary>
+/// <remarks>
+///     Citrix ships WFAPI.DLL for 32-bit processes and WFAPI64.DLL for 64-bit processes, the right one is used automatically.
+/// </remarks>
 public static class WinFrame
 {
     private const int CurrentSession = -1;
+    private const uint CurrentSessionId = unchecked((uint)-1);
     private static readonly LogSource Log = new LogSource();
     private static readonly IntPtr CurrentServer = IntPtr.Zero;
 
     /// <summary>
-    ///     Checks if WinFrame, the API for Citrix, is available
+    ///     The name of the WFAPI DLL which is used by this process: WFAPI for a 32-bit process, WFAPI64 for a 64-bit process
+    /// </summary>
+    public static string DllName => WfApi.DllName;
+
+    /// <summary>
+    ///     Checks if WinFrame, the API for Citrix, is available: the WFAPI DLL can be loaded and returns the connect state of the current session
     /// </summary>
     public static bool IsAvailable
     {
@@ -29,50 +41,96 @@ public static class WinFrame
             {
                 return QuerySessionConnectState().HasValue;
             }
-            catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException or BadImageFormatException)
+            catch (Exception ex) when (IsNotAvailable(ex))
             {
-                Log.Warn().WriteLine("Couldn't load WFAPI.DLL, this only means that the process is not running on Citrix and could be okay. Error: {0}", ex.Message);
+                Log.Debug().WriteLine("Couldn't use {0}.DLL, this only means that the process is not running on Citrix and could be okay. Error: {1}", WfApi.DllName, ex.Message);
             }
             return false;
         }
     }
 
     /// <summary>
+    ///     Checks if the current process runs in a Citrix ICA (HDX) session. This first asks Windows (WTSClientProtocolType), which doesn't need
+    ///     Citrix, and falls back to WFGetActiveProtocol when Windows reports the console: a Citrix VDA for desktop operating systems
+    ///     (XenDesktop) reports its ICA sessions as console to Windows.
+    /// </summary>
+    public static bool IsIcaSession
+    {
+        get
+        {
+            ushort? windowsProtocol = null;
+            try
+            {
+                windowsProtocol = WtsApi.QueryClientProtocolType();
+            }
+            catch (Exception ex) when (IsNotAvailable(ex))
+            {
+                Log.Debug().WriteLine("Couldn't use wtsapi32.dll: {0}", ex.Message);
+            }
+            switch (windowsProtocol)
+            {
+                case (ushort)SessionProtocols.Ica:
+                    return true;
+                case (ushort)SessionProtocols.Rdp:
+                    return false;
+            }
+            return GetActiveProtocol() == SessionProtocols.Ica;
+        }
+    }
+
+    /// <summary>
+    ///     The protocol of the current session according to Citrix (WFGetActiveProtocol)
+    /// </summary>
+    /// <returns>SessionProtocols, or null when WFAPI isn't available (not on Citrix)</returns>
+    public static SessionProtocols? GetActiveProtocol()
+    {
+        try
+        {
+            return (SessionProtocols)WfApi.GetActiveProtocol(CurrentSessionId);
+        }
+        catch (Exception ex) when (IsNotAvailable(ex))
+        {
+            Log.Debug().WriteLine("Couldn't use {0}.DLL: {1}", WfApi.DllName, ex.Message);
+            return null;
+        }
+    }
+
+    /// <summary>
     ///     Retrieve the ip-address of the client PC
     /// </summary>
-    /// <returns>string with the ip address</returns>
+    /// <returns>string with the ip address, null when it can't be retrieved or the address is neither IPv4 nor IPv6</returns>
     public static string GetClientIpAddress()
     {
-        return QuerySessionInformation<ClientAddress>(InfoClasses.ClientAddress).IpAddress;
+        return TryQuerySessionInformation<ClientAddress>(InfoClasses.ClientAddress, out var clientAddress) ? clientAddress.IpAddress : null;
     }
 
     /// <summary>
     ///     Retrieve the name of the client PC
     /// </summary>
-    /// <returns>string with the hostname of the client</returns>
+    /// <returns>string with the hostname of the client, null when it can't be retrieved</returns>
     public static string GetClientName()
     {
         return QuerySessionInformation(InfoClasses.ClientName);
     }
 
     /// <summary>
-    ///     Retrieve a string value from the WFQuerySessionInformation
+    ///     Retrieve the connect state of the current session
     /// </summary>
-    /// <returns>Optional ConnectStates</returns>
+    /// <returns>Optional ConnectStates, null when it can't be retrieved</returns>
     public static ConnectStates? QuerySessionConnectState()
     {
-        if (!WFQuerySessionInformation(CurrentServer, CurrentSession, InfoClasses.ConnectState, out var state, out _))
+        if (!WfApi.QuerySessionInformation(CurrentServer, CurrentSession, InfoClasses.ConnectState, out var state, out var bytesReturned))
         {
             return null;
         }
         try
         {
             // ppBuffer points to an INT with the connect state
-            return (ConnectStates)Marshal.ReadInt32(state);
+            return state == IntPtr.Zero || bytesReturned < sizeof(int) ? null : (ConnectStates)Marshal.ReadInt32(state);
         }
         finally
         {
-            WFFreeMemory(state);
+            WfApi.FreeMemory(state);
         }
     }
 
@@ -80,22 +138,42 @@ public static class WinFrame
     ///     Retrieve the specified struct
     /// </summary>
     /// <typeparam name="T">type of the struct to return</typeparam>
-    /// <returns>struct of type T</returns>
+    /// <param name="infoClass">InfoClasses which matches the struct</param>
+    /// <returns>struct of type T, default when it can't be retrieved; use <see cref="TryQuerySessionInformation{T}"/> to tell these apart</returns>
     public static T QuerySessionInformation<T>(InfoClasses infoClass)
         where T : struct
     {
-        var expectedType = typeof(T);
-        if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out var addr, out _))
+        TryQuerySessionInformation<T>(infoClass, out var result);
+        return result;
+    }
+
+    /// <summary>
+    ///     Retrieve the specified struct
+    /// </summary>
+    /// <typeparam name="T">type of the struct to return</typeparam>
+    /// <param name="infoClass">InfoClasses which matches the struct</param>
+    /// <param name="result">struct of type T, default when false is returned</param>
+    /// <returns>true when the information was retrieved</returns>
+    public static bool TryQuerySessionInformation<T>(InfoClasses infoClass, out T result)
+        where T : struct
+    {
+        result = default;
+        if (!WfApi.QuerySessionInformation(CurrentServer, CurrentSession, infoClass, out var addr, out var bytesReturned))
         {
-            return default;
+            return false;
         }
         try
         {
-            return (T)Marshal.PtrToStructure(addr, expectedType);
+            if (addr == IntPtr.Zero || bytesReturned < Marshal.SizeOf<T>())
+            {
+                return false;
+            }
+            result = Marshal.PtrToStructure<T>(addr);
+            return true;
         }
         finally
         {
-            WFFreeMemory(addr);
+            WfApi.FreeMemory(addr);
         }
     }
 
@@ -106,7 +184,7 @@ public static class WinFrame
     /// <returns>EventMask with the events that happened</returns>
     public static EventMask WaitSystemEvent(EventMask eventMask)
     {
-        if (WFWaitSystemEvent(CurrentServer, eventMask, out var result))
+        if (WfApi.WaitSystemEvent(CurrentServer, eventMask, out var result))
         {
             return result;
         }
@@ -114,63 +192,27 @@ public static class WinFrame
         throw new Win32Exception();
     }
 
-
     /// <summary>
     ///     Retrieve a string value from the WFQuerySessionInformation
     /// </summary>
-    /// <returns>string with the value</returns>
+    /// <param name="infoClass">InfoClasses of a string value, e.g. ClientName</param>
+    /// <returns>string with the value, null when it can't be retrieved</returns>
     public static string QuerySessionInformation(InfoClasses infoClass)
     {
-        if (!WFQuerySessionInformation(CurrentServer, CurrentSession, infoClass, out var addr, out _))
+        if (!WfApi.QuerySessionInformation(CurrentServer, CurrentSession, infoClass, out var addr, out _))
         {
             return null;
         }
         try
         {
-            return Marshal.PtrToStringAuto(addr);
+            // Always the Unicode version: WFQuerySessionInformationW
+            return addr == IntPtr.Zero ? null : Marshal.PtrToStringUni(addr);
         }
         finally
         {
-            WFFreeMemory(addr);
+            WfApi.FreeMemory(addr);
         }
     }
 
-    /// <summary>
-    ///     See <a href="https://www.citrix.com/content/dam/citrix/en_us/documents/downloads/sdk/wf-api-sdk-guide.pdf">WFQuerySessionInformation Documentation</a>
-    ///     Important is that we always use the Unicode version: WFQuerySessionInformationW
-    /// </summary>
-    /// <param name="hServer">
-    ///     A handle to a server. Use the WFOpenServer() function to obtain a handle for a particular server,
-    ///     or specify WF_CURRENT_SERVER_HANDLE to use the current server.
-    /// </param>
-    /// <param name="iSessionId">The session ID of the target session. WF_CURRENT_SESSION specifies the current session.</param>
-    /// <param name="infotype">WFInfoClasses, Type of information to be retrieved from the specified session.</param>
-    /// <param name="ppBuffer">IntPtr to the buffer where the string, struct or whatever resides</param>
-    /// <param name="pBytesReturned">number of bytes returned</param>
-    /// <returns>bool if ok</returns>
-    [DllImport("WFAPI", EntryPoint = "WFQuerySessionInformationW", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool WFQuerySessionInformation(IntPtr hServer, int iSessionId, InfoClasses infotype, out IntPtr ppBuffer, out int pBytesReturned);
-
-    /// <summary>
-    ///     Free the memory which was reserved by the call to e.g. WFQuerySessionInformation
-    /// </summary>
-    /// <param name="pMemory">IntPtr</param>
-    [DllImport("WFAPI")]
-    private static extern void WFFreeMemory(IntPtr pMemory);
-
-    /// <summary>
-    ///     This function waits for an event (ICA session create/delete/connect, user logon/logoff, and so on)
-    ///     before it returns.
-    /// </summary>
-    /// <param name="hServer">
-    ///     A handle to a server. Use the WFOpenServer() function to obtain a handle for a particular server,
-    ///     or specify WF_CURRENT_SERVER_HANDLE to use the current server.
-    /// </param>
-    /// <param name="eventMask">EventMask mask</param>
-    /// <param name="pEventFlags">EventMask as result</param>
-    /// <returns>bool</returns>
-    [DllImport("WFAPI", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool WFWaitSystemEvent(IntPtr hServer, EventMask eventMask, out EventMask pEventFlags);
+    private static bool IsNotAvailable(Exception ex) => ex is DllNotFoundException or EntryPointNotFoundException or BadImageFormatException;
 }

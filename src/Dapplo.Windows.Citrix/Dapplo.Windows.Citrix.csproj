@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>Dapplo.Windows.Citrix is a library which has citrix supporting code</Description>
+    <Description>Dapplo.Windows.Citrix answers questions about the Citrix session the current process runs in, through the WinFrame API (WFAPI / WFAPI64): is it an ICA session, the client name, address and display, session times and events.</Description>
     <PackageTags>windows native citrix</PackageTags>
     <TargetFrameworks>net480;net10.0-windows</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
