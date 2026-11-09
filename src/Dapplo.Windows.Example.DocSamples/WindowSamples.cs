@@ -356,6 +356,22 @@ public static class WindowSamples
         #endregion
     }
 
+    public static async Task UiAutomationVisibleText(IInteropWindow window, NativeRect selection, CancellationToken cancellationToken)
+    {
+        #region UiAutomationVisibleText
+        // Read the text of the part of a window the user selected, e.g. to copy it or to find the links, without OCR (a browser,
+        // an Electron or WPF app, Office); on a background thread, cancel it when the selection changes
+        UiAutomationTextSnapshot snapshot = await UiAutomationText.ReadVisibleTextAsync(window, selection, cancellationToken: cancellationToken);
+        string text = snapshot.Text;
+        // The links in the selection, with the bounds to draw them
+        var links = snapshot.Words.Where(word => word.IsLink).Select(word => (word.Bounds, word.LinkTarget)).ToList();
+        if (!snapshot.IsComplete)
+        {
+            // Not all text could be read (the tree wasn't ready, a timeout): fall back to OCR, or tell the user
+        }
+        #endregion
+    }
+
     public static void MonitorCreateDestroy()
     {
         #region MonitorCreateDestroy

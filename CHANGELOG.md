@@ -7,6 +7,11 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.20.0]
+
+### Added
+- `UiAutomationText.ReadVisibleTextAsync(windowHandle or IInteropWindow, area, connectionTimeout, transactionTimeout, cancellationToken)` in Dapplo.Windows.Automation: the text a window shows inside `area` (screen pixels, `NativeRect.Empty` for the whole window) as an immutable `UiAutomationTextSnapshot` with `Lines` from top to bottom, each with its `Bounds` and `Words` (`Bounds`, `Text`, `LinkTarget`), for windows whose text should not go through OCR (browsers, Electron, WPF, UWP, Office). Generic, nothing is specific to an application. Elements with a TextPattern are read through it: the visible ranges split into lines and words, each with the bounds UI Automation reports; a word whose middle lies in the text of a hyperlink inside the element (`RangeFromChild`) gets the hyperlink's value (ValuePattern, the URL in a browser) as `LinkTarget`. Elements without TextPattern: Text elements are one word with their name and bounds, Hyperlink elements one word with the name and the value as target, single-line Edit elements one word with their value; these words are grouped into lines by vertical overlap. Password elements are left out with their children (and words of a TextPattern which lie in one), offscreen elements too, everything is clipped to its element, the window and the area. The calls run on an MTA thread, with the connection and transaction timeouts of CUIAutomation8 where available; while nothing is found and the tree looks incomplete (Chromium builds it on the first request) it is read again like `UiAutomationAreas.FindAreasAsync`. `IsComplete` is false when it gave up, a request timed out, a limit was reached (20000 words or elements), the window is gone or UI Automation isn't available. Text and link targets are never logged, `ToString()` of the snapshot types leaves them out.
+
 ## [3.19.0]
 
 ### Added

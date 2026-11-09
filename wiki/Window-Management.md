@@ -222,6 +222,24 @@ if (root != null)
 }
 ```
 
+`UiAutomationText.ReadVisibleTextAsync(window, area)` reads the text a window shows inside an area as lines and words with
+their bounds and the targets of links (browsers, Electron, WPF, UWP, Office), without OCR; password fields and offscreen
+text are left out:
+
+<!-- sample: WindowSamples.UiAutomationVisibleText -->
+```csharp
+// Read the text of the part of a window the user selected, e.g. to copy it or to find the links, without OCR (a browser,
+// an Electron or WPF app, Office); on a background thread, cancel it when the selection changes
+UiAutomationTextSnapshot snapshot = await UiAutomationText.ReadVisibleTextAsync(window, selection, cancellationToken: cancellationToken);
+string text = snapshot.Text;
+// The links in the selection, with the bounds to draw them
+var links = snapshot.Words.Where(word => word.IsLink).Select(word => (word.Bounds, word.LinkTarget)).ToList();
+if (!snapshot.IsComplete)
+{
+    // Not all text could be read (the tree wasn't ready, a timeout): fall back to OCR, or tell the user
+}
+```
+
 ## Window events
 
 `WinEventHook` events arrive on the thread of the [[SharedMessageWindow]]. Filter on
