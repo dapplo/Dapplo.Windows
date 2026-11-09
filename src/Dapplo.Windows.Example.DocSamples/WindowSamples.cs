@@ -365,9 +365,25 @@ public static class WindowSamples
         string text = snapshot.Text;
         // The links in the selection, with the bounds to draw them
         var links = snapshot.Words.Where(word => word.IsLink).Select(word => (word.Bounds, word.LinkTarget)).ToList();
-        if (!snapshot.IsComplete)
+        if (snapshot.RemoteDisplay != RemoteDisplayKinds.None)
+        {
+            // A Citrix, Remote Desktop, Horizon ... window: only a picture for Windows, the text has to come from OCR
+        }
+        else if (!snapshot.IsComplete)
         {
             // Not all text could be read (the tree wasn't ready, a timeout): fall back to OCR, or tell the user
+        }
+        #endregion
+    }
+
+    public static void RemoteDisplay(IntPtr windowHandle)
+    {
+        #region RemoteDisplay
+        // Is the window the picture of a session on another machine (Citrix Workspace app, Remote Desktop, Horizon, Hyper-V, VNC)?
+        RemoteDisplayKinds kind = RemoteDisplayWindow.GetKind(windowHandle);
+        if (RemoteDisplayWindow.IsRemoteDisplay(windowHandle))
+        {
+            Console.WriteLine($"The window is drawn by a remote display client: {kind}, use OCR for its text");
         }
         #endregion
     }

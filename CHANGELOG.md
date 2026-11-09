@@ -7,6 +7,17 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.21.0]
+
+### Added
+- `RemoteDisplayWindow.GetKind(windowHandle or IInteropWindow)` / `IsRemoteDisplay` in Dapplo.Windows: is a window on the local desktop the picture of a session on another machine, and which client draws it (`RemoteDisplayKinds`: `Citrix` for the Citrix Workspace app (wfica32 / CDViewer, seamless windows of the class "Transparent Windows Client"), `RemoteDesktop` for mstsc session and RemoteApp windows and msrdc (Azure Virtual Desktop, Windows App), `Horizon` for vmware-remotemks, `HyperV` for vmconnect, `Vnc` for VNC viewers). Such a window is a bitmap for UI Automation, so its text has to come from OCR. Uses only the executable of the process and the class names of the window and its top-level window; `RemoteDisplayWindow.Classify(processName, className)` has the rules without a window.
+- `UiAutomationTextSnapshot.RemoteDisplay` in Dapplo.Windows.Automation: `UiAutomationText.ReadVisibleTextAsync` reads a remote display window once without waiting for the tree, `IsComplete` is then false and `RemoteDisplay` says which client it is.
+- Dapplo.Windows.Citrix: `WinFrame.IsIcaSession` (WTSClientProtocolType, falling back to WFGetActiveProtocol because a desktop OS VDA reports ICA sessions to Windows as console), `WinFrame.GetActiveProtocol()` with `SessionProtocols`, `WinFrame.TryQuerySessionInformation<T>`, `WinFrame.DllName`, and `ClientAddress.Address` (`IPAddress`, IPv4 and IPv6).
+
+### Fixed
+- Dapplo.Windows.Citrix in a 64-bit process: the WFAPI functions were imported from WFAPI.DLL, but Citrix ships WFAPI64.DLL for 64-bit processes, so `IsAvailable` was false on Citrix for every 64-bit process. The DLL is now chosen by the bitness of the process.
+- `WinFrame.GetClientIpAddress()` returned "0.0.0.0" when the query failed, and IPv6 addresses as garbage; it now returns null when the address isn't available or is neither IPv4 nor IPv6, and formats IPv6. `ClientAddress.IpAddress` likewise. `QuerySessionInformation<T>` no longer reads a struct from a buffer which is too small.
+
 ## [3.20.0]
 
 ### Added

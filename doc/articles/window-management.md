@@ -574,6 +574,8 @@ while your own window covers the screen, and the calls run on a background (MTA)
 - While nothing is found and the tree looks incomplete (Chromium builds it on the first request) the text is read again,
   like `UiAutomationAreas.FindAreasAsync` does, for up to `UiAutomationAreas.DefaultContentWait`. `IsComplete` is false
   when it gave up, a request timed out, a limit was reached, the window is gone or UI Automation isn't available.
+- A window of a remote display client (Citrix, Remote Desktop, Horizon, see below) is read once, `IsComplete` is false
+  and `RemoteDisplay` says which client it is: its content is a picture, use OCR.
 - The connection and transaction timeouts (default 2 seconds each) are set where CUIAutomation8 is available. Every word
   costs a few requests to the application, so pass the area the user is interested in rather than the whole screen.
 - Text and link targets are never logged, `ToString()` of the snapshot types leaves them out too.
@@ -586,9 +588,38 @@ UiAutomationTextSnapshot snapshot = await UiAutomationText.ReadVisibleTextAsync(
 string text = snapshot.Text;
 // The links in the selection, with the bounds to draw them
 var links = snapshot.Words.Where(word => word.IsLink).Select(word => (word.Bounds, word.LinkTarget)).ToList();
-if (!snapshot.IsComplete)
+if (snapshot.RemoteDisplay != RemoteDisplayKinds.None)
+{
+    // A Citrix, Remote Desktop, Horizon ... window: only a picture for Windows, the text has to come from OCR
+}
+else if (!snapshot.IsComplete)
 {
     // Not all text could be read (the tree wasn't ready, a timeout): fall back to OCR, or tell the user
+}
+```
+
+### Remote display windows: Citrix, Remote Desktop, Horizon
+
+A window of a remote display client is the picture of a session on another machine: for Windows and UI Automation it is
+a bitmap, there is no text or element for what it shows. `RemoteDisplayWindow.GetKind(handle)` (and `IsRemoteDisplay`)
+tells which client draws a window: `Citrix` (Citrix Workspace app: wfica32 / CDViewer, seamless windows of the class
+"Transparent Windows Client"), `RemoteDesktop` (mstsc session and RemoteApp windows, msrdc for Azure Virtual Desktop and
+Windows App), `Horizon` (vmware-remotemks), `HyperV` (vmconnect) or `Vnc`. It only looks at the executable of the process
+and the class names of the window and its top-level window, so it is cheap and needs nothing of the client.
+`RemoteDisplayWindow.Classify(processName, className)` has the same rules without a window.
+
+`UiAutomationText.ReadVisibleTextAsync` uses it: for a remote display window it doesn't wait for the tree,
+`IsComplete` is false and `UiAutomationTextSnapshot.RemoteDisplay` says which client it is. This is the opposite question
+of [Dapplo.Windows.Citrix](more-packages.md#citrix-dapplowindowscitrix), which tells if your own process runs inside a
+Citrix session.
+
+<!-- sample: WindowSamples.RemoteDisplay -->
+```csharp
+// Is the window the picture of a session on another machine (Citrix Workspace app, Remote Desktop, Horizon, Hyper-V, VNC)?
+RemoteDisplayKinds kind = RemoteDisplayWindow.GetKind(windowHandle);
+if (RemoteDisplayWindow.IsRemoteDisplay(windowHandle))
+{
+    Console.WriteLine($"The window is drawn by a remote display client: {kind}, use OCR for its text");
 }
 ```
 

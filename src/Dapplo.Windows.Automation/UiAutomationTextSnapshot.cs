@@ -3,6 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dapplo.Windows.Desktop;
+using Dapplo.Windows.Enums;
 
 namespace Dapplo.Windows.Automation;
 
@@ -18,10 +20,21 @@ public sealed class UiAutomationTextSnapshot
     /// </summary>
     /// <param name="lines">the lines from top to bottom, null for none</param>
     /// <param name="isComplete">false when not all text could be read</param>
-    public UiAutomationTextSnapshot(IReadOnlyList<UiAutomationTextLine> lines, bool isComplete)
+    public UiAutomationTextSnapshot(IReadOnlyList<UiAutomationTextLine> lines, bool isComplete) : this(lines, isComplete, RemoteDisplayKinds.None)
+    {
+    }
+
+    /// <summary>
+    ///     Create a snapshot, e.g. for tests
+    /// </summary>
+    /// <param name="lines">the lines from top to bottom, null for none</param>
+    /// <param name="isComplete">false when not all text could be read</param>
+    /// <param name="remoteDisplay">RemoteDisplayKinds of the window, None when it shows its own content</param>
+    public UiAutomationTextSnapshot(IReadOnlyList<UiAutomationTextLine> lines, bool isComplete, RemoteDisplayKinds remoteDisplay)
     {
         Lines = lines ?? NoLines;
         IsComplete = isComplete;
+        RemoteDisplay = remoteDisplay;
     }
 
     /// <summary>
@@ -36,6 +49,13 @@ public sealed class UiAutomationTextSnapshot
     public bool IsComplete { get; }
 
     /// <summary>
+    ///     The remote display client which draws the window (<see cref="RemoteDisplayWindow.GetKind(System.IntPtr)"/>), None when the window
+    ///     shows its own content. A remote display window (Citrix, Remote Desktop, Horizon, ...) is a picture for Windows, UI Automation has no
+    ///     text for its content: the snapshot is then never complete and the text has to come from OCR.
+    /// </summary>
+    public RemoteDisplayKinds RemoteDisplay { get; }
+
+    /// <summary>
     ///     All words of all lines, top to bottom
     /// </summary>
     public IEnumerable<UiAutomationTextWord> Words => Lines.SelectMany(line => line.Words);
@@ -47,5 +67,5 @@ public sealed class UiAutomationTextSnapshot
 
     /// <inheritdoc />
     /// <remarks>Without the text, so it can be logged</remarks>
-    public override string ToString() => $"UiAutomationTextSnapshot {{Lines: {Lines.Count}; IsComplete: {IsComplete}}}";
+    public override string ToString() => $"UiAutomationTextSnapshot {{Lines: {Lines.Count}; IsComplete: {IsComplete}; RemoteDisplay: {RemoteDisplay}}}";
 }
