@@ -552,6 +552,46 @@ if (root != null)
 }
 ```
 
+### The text of a window: UI Automation text
+
+`UiAutomationText.ReadVisibleTextAsync(window, area, connectionTimeout, transactionTimeout, cancellationToken)` reads the
+text a window shows inside `area` (screen pixels, `NativeRect.Empty` for the whole window) and returns an immutable
+`UiAutomationTextSnapshot`: `Lines` from top to bottom, each with its `Bounds` and `Words` (`Bounds`, `Text`, and
+`LinkTarget` when the word is part of a link). It is meant for windows whose text should not go through OCR (browsers,
+Electron, WPF, UWP, Office) and has nothing specific to an application. Like the areas it works on a window handle, also
+while your own window covers the screen, and the calls run on a background (MTA) thread.
+
+- Elements with a TextPattern (the document of a browser page, edit fields, a WPF RichTextBox) are read through it: the
+  visible ranges are split into lines and the lines into words, each with the bounds UI Automation reports. A word whose
+  middle lies in the text of a hyperlink inside the element gets the hyperlink's value (its ValuePattern, the URL in a
+  browser) as `LinkTarget`.
+- Elements without TextPattern: a Text element is one word with its name and bounds (a hyperlink inside it is read too
+  and replaces it when it is the whole text, e.g. a WPF TextBlock with only a Hyperlink), a Hyperlink element one word
+  with its name and its value as target, a single-line Edit element one word with its value. Such words which overlap
+  vertically are one line.
+- Password elements are left out with their children, so are the words of a TextPattern which lie in one; offscreen
+  elements are left out, and everything is clipped to its element, the window and `area`.
+- While nothing is found and the tree looks incomplete (Chromium builds it on the first request) the text is read again,
+  like `UiAutomationAreas.FindAreasAsync` does, for up to `UiAutomationAreas.DefaultContentWait`. `IsComplete` is false
+  when it gave up, a request timed out, a limit was reached, the window is gone or UI Automation isn't available.
+- The connection and transaction timeouts (default 2 seconds each) are set where CUIAutomation8 is available. Every word
+  costs a few requests to the application, so pass the area the user is interested in rather than the whole screen.
+- Text and link targets are never logged, `ToString()` of the snapshot types leaves them out too.
+
+<!-- sample: WindowSamples.UiAutomationVisibleText -->
+```csharp
+// Read the text of the part of a window the user selected, e.g. to copy it or to find the links, without OCR (a browser,
+// an Electron or WPF app, Office); on a background thread, cancel it when the selection changes
+UiAutomationTextSnapshot snapshot = await UiAutomationText.ReadVisibleTextAsync(window, selection, cancellationToken: cancellationToken);
+string text = snapshot.Text;
+// The links in the selection, with the bounds to draw them
+var links = snapshot.Words.Where(word => word.IsLink).Select(word => (word.Bounds, word.LinkTarget)).ToList();
+if (!snapshot.IsComplete)
+{
+    // Not all text could be read (the tree wasn't ready, a timeout): fall back to OCR, or tell the user
+}
+```
+
 ## Window events
 
 `WinEventHook` turns [WinEvents](https://learn.microsoft.com/en-us/windows/win32/winauto/winevents) into observables.

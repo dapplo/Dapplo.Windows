@@ -85,6 +85,33 @@ internal static class UiaConstants
     /// <summary>UIA_E_ELEMENTNOTAVAILABLE: the element is gone (e.g. the page navigated or the window closed)</summary>
     public const int ElementNotAvailable = unchecked((int)0x80040201);
 
+    /// <summary>UIA_E_TIMEOUT: the connection or transaction timeout passed</summary>
+    public const int Timeout = unchecked((int)0x80131505);
+
+    /// <summary>UIA_IsPasswordPropertyId</summary>
+    public const int IsPasswordPropertyId = 30019;
+
+    /// <summary>UIA_IsTextPatternAvailablePropertyId</summary>
+    public const int IsTextPatternAvailablePropertyId = 30040;
+
+    /// <summary>UIA_ValueValuePropertyId: IUIAutomationValuePattern::CurrentValue as a property, so it can be cached</summary>
+    public const int ValueValuePropertyId = 30045;
+
+    /// <summary>UIA_TextPatternId</summary>
+    public const int TextPatternId = 10014;
+
+    /// <summary>UIA_EditControlTypeId</summary>
+    public const int EditControlTypeId = 50004;
+
+    /// <summary>UIA_HyperlinkControlTypeId</summary>
+    public const int HyperlinkControlTypeId = 50005;
+
+    /// <summary>UIA_TextControlTypeId</summary>
+    public const int TextControlTypeId = 50020;
+
+    /// <summary>UIA_DocumentControlTypeId</summary>
+    public const int DocumentControlTypeId = 50030;
+
     public const int S_OK = 0;
 
     /// <summary>
@@ -219,9 +246,15 @@ internal interface IUIAutomationElement
     [PreserveSig]
     int FindAllBuildCache(int scope, IUIAutomationCondition condition, IUIAutomationCacheRequest cacheRequest, out IUIAutomationElementArray found);
     void BuildUpdatedCache();
-    void GetCurrentPropertyValue();
+
+    [PreserveSig]
+    int GetCurrentPropertyValue(int propertyId, [MarshalAs(UnmanagedType.Struct)] out object value);
+
     void GetCurrentPropertyValueEx();
-    void GetCachedPropertyValue();
+
+    [PreserveSig]
+    int GetCachedPropertyValue(int propertyId, [MarshalAs(UnmanagedType.Struct)] out object value);
+
     void GetCachedPropertyValueEx();
     void GetCurrentPatternAs();
     void GetCachedPatternAs();
@@ -291,7 +324,10 @@ internal interface IUIAutomationElement
     void get_CachedCulture();
     void get_CachedIsControlElement();
     void get_CachedIsContentElement();
-    void get_CachedIsPassword();
+
+    [PreserveSig]
+    int get_CachedIsPassword(out int isPassword);
+
     void get_CachedNativeWindowHandle();
     void get_CachedItemType();
 
@@ -485,4 +521,110 @@ internal interface IUIAutomation2
 
     [PreserveSig]
     int put_TransactionTimeout(uint timeoutMilliseconds);
+}
+
+/// <summary>
+///     enum TextUnit
+/// </summary>
+internal enum TextUnit
+{
+    Character = 0,
+    Format = 1,
+    Word = 2,
+    Line = 3,
+    Paragraph = 4,
+    Page = 5,
+    Document = 6
+}
+
+/// <summary>
+///     enum TextPatternRangeEndpoint
+/// </summary>
+internal enum TextPatternRangeEndpoint
+{
+    Start = 0,
+    End = 1
+}
+
+/// <summary>
+///     IUIAutomationTextPattern
+/// </summary>
+[ComImport]
+[Guid("32eba289-3583-42c9-9c59-3b6d9a1e9b6a")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IUIAutomationTextPattern
+{
+    [PreserveSig]
+    int RangeFromPoint(NativePoint point, out IUIAutomationTextRange range);
+
+    [PreserveSig]
+    int RangeFromChild(IUIAutomationElement child, out IUIAutomationTextRange range);
+
+    void GetSelection();
+
+    [PreserveSig]
+    int GetVisibleRanges(out IUIAutomationTextRangeArray ranges);
+
+    [PreserveSig]
+    int get_DocumentRange(out IUIAutomationTextRange range);
+}
+
+/// <summary>
+///     IUIAutomationTextRangeArray
+/// </summary>
+[ComImport]
+[Guid("ce4ae76a-e717-4c98-81ea-47371d028eb6")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IUIAutomationTextRangeArray
+{
+    [PreserveSig]
+    int get_Length(out int length);
+
+    [PreserveSig]
+    int GetElement(int index, out IUIAutomationTextRange range);
+}
+
+/// <summary>
+///     IUIAutomationTextRange
+/// </summary>
+[ComImport]
+[Guid("a543cc6a-f4ae-494b-8239-c814481187fa")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IUIAutomationTextRange
+{
+    [PreserveSig]
+    int Clone(out IUIAutomationTextRange clone);
+
+    void Compare();
+
+    [PreserveSig]
+    int CompareEndpoints(TextPatternRangeEndpoint sourceEndpoint, IUIAutomationTextRange range, TextPatternRangeEndpoint targetEndpoint, out int result);
+
+    [PreserveSig]
+    int ExpandToEnclosingUnit(TextUnit unit);
+
+    void FindAttribute();
+    void FindText();
+    void GetAttributeValue();
+
+    /// <summary>
+    ///     left, top, width, height for every line of the range, empty for a range which isn't visible
+    /// </summary>
+    [PreserveSig]
+    int GetBoundingRectangles([MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_R8)] out double[] rectangles);
+
+    [PreserveSig]
+    int GetEnclosingElement(out IUIAutomationElement element);
+
+    [PreserveSig]
+    int GetText(int maxLength, [MarshalAs(UnmanagedType.BStr)] out string text);
+
+    [PreserveSig]
+    int Move(TextUnit unit, int count, out int moved);
+
+    [PreserveSig]
+    int MoveEndpointByUnit(TextPatternRangeEndpoint endpoint, TextUnit unit, int count, out int moved);
+
+    [PreserveSig]
+    int MoveEndpointByRange(TextPatternRangeEndpoint sourceEndpoint, IUIAutomationTextRange range, TextPatternRangeEndpoint targetEndpoint);
 }

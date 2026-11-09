@@ -1390,7 +1390,12 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
     /// <summary>
     ///     Create a UI Automation object with short timeouts (Windows 8+: CUIAutomation8 and IUIAutomation2), else the default one
     /// </summary>
-    internal static IUIAutomation CreateAutomation(TimeSpan timeout)
+    internal static IUIAutomation CreateAutomation(TimeSpan timeout) => CreateAutomation(timeout, timeout);
+
+    /// <summary>
+    ///     Create the UI Automation object, with the connection and transaction timeouts where IUIAutomation2 is available (Windows 8+)
+    /// </summary>
+    internal static IUIAutomation CreateAutomation(TimeSpan connectionTimeout, TimeSpan transactionTimeout)
     {
         try
         {
@@ -1399,9 +1404,8 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
             {
                 if (automation is IUIAutomation2 automation2)
                 {
-                    var milliseconds = (uint)Math.Max(1, Math.Min(uint.MaxValue, timeout.TotalMilliseconds));
-                    automation2.put_ConnectionTimeout(milliseconds);
-                    automation2.put_TransactionTimeout(milliseconds);
+                    automation2.put_ConnectionTimeout(ToMilliseconds(connectionTimeout));
+                    automation2.put_TransactionTimeout(ToMilliseconds(transactionTimeout));
                 }
                 return automation;
             }
@@ -1413,6 +1417,8 @@ public sealed class UiAutomationScroller : IScroller, IDisposable
         }
         return CreateAutomation();
     }
+
+    private static uint ToMilliseconds(TimeSpan timeout) => (uint)Math.Max(1, Math.Min(uint.MaxValue, timeout.TotalMilliseconds));
 
     private static IUIAutomation CreateAutomation()
     {
