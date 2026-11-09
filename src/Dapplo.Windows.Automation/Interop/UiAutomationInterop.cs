@@ -588,7 +588,7 @@ internal interface IUIAutomationTextRangeArray
 ///     IUIAutomationTextRange
 /// </summary>
 [ComImport]
-[Guid("a543cc6a-f4ae-494b-8239-c814481187fa")]
+[Guid("a543cc6a-f4ae-494b-8239-c814481187a8")]
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 internal interface IUIAutomationTextRange
 {
