@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
@@ -162,6 +163,45 @@ public class UiAutomationTextTests
     private static List<NativeRect> ToRectangles(double[] rectangles) =>
         (List<NativeRect>)typeof(UiAutomationText).GetMethod("ToRectangles", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[] { rectangles });
 
+    private static List<UiAutomationTextWord> SplitIntoWords(string text, IReadOnlyList<NativeRect> rectangles, NativeRect clip, string linkTarget) =>
+        (List<UiAutomationTextWord>)typeof(UiAutomationText).GetMethod("SplitIntoWords", BindingFlags.NonPublic | BindingFlags.Static)
+            .Invoke(null, new object[] { text, rectangles, clip, linkTarget });
+
+    private static List<NativeRect> SplitIntoLineBands(NativeRect bounds, double lineHeight) =>
+        (List<NativeRect>)typeof(UiAutomationText).GetMethod("SplitIntoLineBands", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[] { bounds, lineHeight });
+
+    /// <summary>
+    ///     The internal read, with readDocumentSubtrees false: elements with a TextPattern are read level by level (the fallback when the
+    ///     request for the subtree fails)
+    /// </summary>
+    private static Task<UiAutomationTextSnapshot> ReadLevelByLevelAsync(IntPtr windowHandle) =>
+        Task.Run(() => (UiAutomationTextSnapshot)typeof(UiAutomationText).GetMethod("ReadVisibleText", BindingFlags.NonPublic | BindingFlags.Static)
+            .Invoke(null, new object[] { windowHandle, NativeRect.Empty, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2), null, false, CancellationToken.None }));
+
+    /// <summary>
+    ///     What every read of a <see cref="TextTestWindow"/> must have
+    /// </summary>
+    private static void AssertTextOfTestWindow(UiAutomationTextSnapshot snapshot, IntPtr windowHandle)
+    {
+        Assert.True(snapshot.IsComplete);
+        Assert.False(snapshot.TimedOut);
+        var words = snapshot.Words.ToList();
+        Assert.NotEmpty(words);
+        var text = snapshot.Text;
+        Assert.Contains("Plain", text);
+        Assert.Contains("block", text);
+        // The link in a TextBlock, with its target
+        Assert.Contains(words, word => word.Text.Contains("Dapplo") && word.LinkTarget == TextTestWindow.LinkTarget);
+        // The RichTextBox through its TextPattern: words, the link with its target, the other words without
+        Assert.Contains(words, word => word.Text == "Rich" && word.LinkTarget is null);
+        Assert.Contains(words, word => word.Text.StartsWith("Greenshot", StringComparison.Ordinal) && word.LinkTarget == TextTestWindow.RichLinkTarget);
+        Assert.Contains("Visible inside", text);
+        Assert.DoesNotContain("Offscreen", text);
+        Assert.DoesNotContain("Secret", text);
+        var windowBounds = WindowBounds(windowHandle);
+        Assert.All(words, word => Assert.True(IsInside(windowBounds, word.Bounds), $"{word} is not inside {windowBounds}"));
+    }
+
     private static NativeRect WindowBounds(IntPtr windowHandle)
     {
         var info = WindowInfo.Create();
@@ -220,6 +260,76 @@ public class UiAutomationTextTests
         Assert.DoesNotContain("Rich", snapshot.Text);
         Assert.DoesNotContain("Visible inside", snapshot.Text);
         Assert.All(snapshot.Words, word => Assert.True(IsInside(area, word.Bounds), $"{word} is not inside {area}"));
+    }
+
+    [Fact]
+    public async Task ReadVisibleText_LevelByLevel_HasTheSameText()
+    {
+        using var testWindow = new TextTestWindow();
+
+        var snapshot = await ReadLevelByLevelAsync(testWindow.WindowHandle);
+
+        AssertTextOfTestWindow(snapshot, testWindow.WindowHandle);
+    }
+
+    [Fact]
+    public async Task ReadVisibleText_MaxDurationPassed_ReturnsWhatItHasWithoutThrowing()
+    {
+        using var testWindow = new TextTestWindow();
+
+        var snapshot = await UiAutomationText.ReadVisibleTextAsync(testWindow.WindowHandle, NativeRect.Empty, maxDuration: TimeSpan.Zero,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.True(snapshot.TimedOut);
+        Assert.False(snapshot.IsComplete);
+
+        // With time enough the same window is complete
+        var complete = await UiAutomationText.ReadVisibleTextAsync(testWindow.WindowHandle, NativeRect.Empty, maxDuration: TimeSpan.FromSeconds(30),
+            cancellationToken: TestContext.Current.CancellationToken);
+        AssertTextOfTestWindow(complete, testWindow.WindowHandle);
+    }
+
+    [Fact]
+    public void SplitIntoWords_OneRectangle_GivesEachWordItsShare()
+    {
+        var words = SplitIntoWords("Hello big world", new[] { new NativeRect(0, 0, 150, 10) }, NativeRect.Empty, "https://example.com/");
+
+        Assert.Equal(new[] { "Hello", "big", "world" }, words.Select(word => word.Text));
+        Assert.Equal(new NativeRect(0, 0, 50, 10), words[0].Bounds);
+        Assert.Equal(new NativeRect(60, 0, 30, 10), words[1].Bounds);
+        Assert.Equal(new NativeRect(100, 0, 50, 10), words[2].Bounds);
+        Assert.All(words, word => Assert.Equal("https://example.com/", word.LinkTarget));
+    }
+
+    [Fact]
+    public void SplitIntoWords_TwoLines_SplitsAtWhiteSpaceAndClips()
+    {
+        var first = new NativeRect(0, 0, 90, 10);
+        var second = new NativeRect(0, 10, 90, 10);
+
+        var words = SplitIntoWords("one two three four", new[] { first, second }, NativeRect.Empty, null);
+
+        Assert.Equal(new[] { "one", "two", "three", "four" }, words.Select(word => word.Text));
+        Assert.All(words.Take(2), word => Assert.Equal(0, word.Bounds.Top));
+        Assert.All(words.Skip(2), word => Assert.Equal(10, word.Bounds.Top));
+        Assert.All(words, word => Assert.Null(word.LinkTarget));
+
+        // Only the first line is visible
+        var clipped = SplitIntoWords("one two three four", new[] { first, second }, new NativeRect(0, 0, 200, 10), null);
+        Assert.Equal(new[] { "one", "two" }, clipped.Select(word => word.Text));
+        Assert.Empty(SplitIntoWords("   ", new[] { first }, NativeRect.Empty, null));
+    }
+
+    [Fact]
+    public void SplitIntoLineBands_CutsIntoLines()
+    {
+        var bands = SplitIntoLineBands(new NativeRect(10, 100, 200, 61), 20);
+
+        Assert.Equal(3, bands.Count);
+        Assert.Equal(100, bands[0].Top);
+        Assert.Equal(161, bands[2].Bottom);
+        Assert.All(bands, band => Assert.InRange(band.Height, 20, 21));
+        Assert.Single(SplitIntoLineBands(new NativeRect(0, 0, 10, 10), 0));
     }
 
     [Fact]

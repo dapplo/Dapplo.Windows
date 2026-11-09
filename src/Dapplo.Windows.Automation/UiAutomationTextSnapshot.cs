@@ -9,7 +9,7 @@ using Dapplo.Windows.Enums;
 namespace Dapplo.Windows.Automation;
 
 /// <summary>
-///     The visible text of a window at one moment, from <see cref="UiAutomationText.ReadVisibleTextAsync(System.IntPtr, Dapplo.Windows.Common.Structs.NativeRect, System.TimeSpan?, System.TimeSpan?, System.Threading.CancellationToken)"/>. Immutable.
+///     The visible text of a window at one moment, from <see cref="UiAutomationText.ReadVisibleTextAsync(System.IntPtr, Dapplo.Windows.Common.Structs.NativeRect, System.TimeSpan?, System.TimeSpan?, System.TimeSpan?, System.Threading.CancellationToken)"/>. Immutable.
 /// </summary>
 public sealed class UiAutomationTextSnapshot
 {
@@ -31,11 +31,30 @@ public sealed class UiAutomationTextSnapshot
     /// <param name="isComplete">false when not all text could be read</param>
     /// <param name="remoteDisplay">RemoteDisplayKinds of the window, None when it shows its own content</param>
     public UiAutomationTextSnapshot(IReadOnlyList<UiAutomationTextLine> lines, bool isComplete, RemoteDisplayKinds remoteDisplay)
+        : this(lines, isComplete, remoteDisplay, false)
+    {
+    }
+
+    /// <summary>
+    ///     Create a snapshot, e.g. for tests
+    /// </summary>
+    /// <param name="lines">the lines from top to bottom, null for none</param>
+    /// <param name="isComplete">false when not all text could be read</param>
+    /// <param name="remoteDisplay">RemoteDisplayKinds of the window, None when it shows its own content</param>
+    /// <param name="timedOut">true when the reading was stopped by the maximum duration or a UI Automation timeout</param>
+    public UiAutomationTextSnapshot(IReadOnlyList<UiAutomationTextLine> lines, bool isComplete, RemoteDisplayKinds remoteDisplay, bool timedOut)
     {
         Lines = lines ?? NoLines;
-        IsComplete = isComplete;
+        IsComplete = isComplete && !timedOut;
         RemoteDisplay = remoteDisplay;
+        TimedOut = timedOut;
     }
+
+    /// <summary>
+    ///     True when the reading was stopped because the maximum duration passed or a request to the application timed out: the lines are
+    ///     what was read until then, <see cref="IsComplete"/> is false
+    /// </summary>
+    public bool TimedOut { get; }
 
     /// <summary>
     ///     The lines from top to bottom (lines with the same top from left to right), never null
@@ -67,5 +86,5 @@ public sealed class UiAutomationTextSnapshot
 
     /// <inheritdoc />
     /// <remarks>Without the text, so it can be logged</remarks>
-    public override string ToString() => $"UiAutomationTextSnapshot {{Lines: {Lines.Count}; IsComplete: {IsComplete}; RemoteDisplay: {RemoteDisplay}}}";
+    public override string ToString() => $"UiAutomationTextSnapshot {{Lines: {Lines.Count}; IsComplete: {IsComplete}; TimedOut: {TimedOut}; RemoteDisplay: {RemoteDisplay}}}";
 }
