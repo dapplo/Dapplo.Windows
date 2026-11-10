@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 using Dapplo.Windows.Common.Enums;
 
 namespace Dapplo.Windows.Imaging.Interop;
@@ -21,7 +20,7 @@ namespace Dapplo.Windows.Imaging.Interop;
 internal interface IWICImagingFactory
 {
     [PreserveSig] HResult CreateDecoderFromFilename(nint wzFilename, nint pguidVendor, uint dwDesiredAccess, int metadataOptions, out nint ppIDecoder);
-    [PreserveSig] HResult CreateDecoderFromStream(IStream pIStream, nint pguidVendor, WicDecodeOptions metadataOptions, out IWICBitmapDecoder ppIDecoder);
+    [PreserveSig] HResult CreateDecoderFromStream(IWicStream pIStream, nint pguidVendor, WicDecodeOptions metadataOptions, out IWICBitmapDecoder ppIDecoder);
     [PreserveSig] HResult CreateDecoderFromFileHandle(nint hFile, nint pguidVendor, int metadataOptions, out nint ppIDecoder);
     [PreserveSig] HResult CreateComponentInfo([In] ref Guid clsidComponent, [MarshalAs(UnmanagedType.IUnknown)] out object ppIInfo);
     [PreserveSig] HResult CreateDecoder(nint guidContainerFormat, nint pguidVendor, out nint ppIDecoder);

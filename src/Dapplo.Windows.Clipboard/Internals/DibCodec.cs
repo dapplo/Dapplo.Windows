@@ -47,9 +47,20 @@ internal static class DibCodec
 
     public static bool TryDecode(byte[] data, long maxPixelCount, out DibImage image)
     {
+        if (data == null)
+        {
+            ThrowWhenNotPositive(maxPixelCount);
+            image = null;
+            return false;
+        }
+        return TryDecode(new ReadOnlySpan<byte>(data), maxPixelCount, out image);
+    }
+
+    public static bool TryDecode(ReadOnlySpan<byte> data, long maxPixelCount, out DibImage image)
+    {
         ThrowWhenNotPositive(maxPixelCount);
         image = null;
-        if (data == null || !TryParseHeader(data, maxPixelCount, out var header))
+        if (!TryParseHeader(data, maxPixelCount, out var header))
         {
             return false;
         }
@@ -342,10 +353,41 @@ internal static class DibCodec
         var anyAlphaValue = false;
         var anyTransparent = false;
 
+        var isBgra32 = bitCount == 32 && header.UsesMasks && header.RedMask == 0x00FF0000 && header.GreenMask == 0x0000FF00 && header.BlueMask == 0x000000FF
+                       && (alphaMask == 0 || alphaMask == 0xFF000000);
         for (var y = 0; y < height; y++)
         {
             var sourceRow = header.PixelOffset + (header.IsTopDown ? y : height - 1 - y) * stride;
             var target = destination.Slice(y * destinationStride, width * 4);
+            if (isBgra32)
+            {
+                // The common case (screenshots, browsers, Office): the pixels are already BGRA, copy the row instead of every channel
+                data.Slice(sourceRow, width * 4).CopyTo(target);
+                for (var i = 3; i < target.Length; i += 4)
+                {
+                    if (alphaMask == 0)
+                    {
+                        target[i] = 255;
+                        continue;
+                    }
+                    var alpha = target[i];
+                    anyAlphaValue |= alpha != 0;
+                    anyTransparent |= alpha != 255;
+                }
+                continue;
+            }
+            if (bitCount == 24)
+            {
+                var sourcePixels = data.Slice(sourceRow, width * 3);
+                for (int x = 0, source = 0, destinationIndex = 0; x < width; x++, source += 3, destinationIndex += 4)
+                {
+                    target[destinationIndex] = sourcePixels[source];
+                    target[destinationIndex + 1] = sourcePixels[source + 1];
+                    target[destinationIndex + 2] = sourcePixels[source + 2];
+                    target[destinationIndex + 3] = 255;
+                }
+                continue;
+            }
             for (var x = 0; x < width; x++)
             {
                 byte b, g, r, a = 255;
@@ -478,22 +520,22 @@ internal static class DibCodec
         {
             var source = bgra32.Slice(y * stride, width * 4);
             var target = destination.Slice(headerSize + (height - 1 - y) * width * 4, width * 4);
-            for (var x = 0; x < width * 4; x += 4)
+            // The DIB has the same BGRA layout: copy the row, only pixels which aren't opaque need to be un-premultiplied
+            source.CopyTo(target);
+            if (!premultipliedAlpha)
             {
-                var b = source[x];
-                var g = source[x + 1];
-                var r = source[x + 2];
-                var a = source[x + 3];
-                if (premultipliedAlpha && a != 255)
+                continue;
+            }
+            for (var x = 0; x < target.Length; x += 4)
+            {
+                var a = target[x + 3];
+                if (a == 255)
                 {
-                    b = Unpremultiply(b, a);
-                    g = Unpremultiply(g, a);
-                    r = Unpremultiply(r, a);
+                    continue;
                 }
-                target[x] = b;
-                target[x + 1] = g;
-                target[x + 2] = r;
-                target[x + 3] = a;
+                target[x] = Unpremultiply(target[x], a);
+                target[x + 1] = Unpremultiply(target[x + 1], a);
+                target[x + 2] = Unpremultiply(target[x + 2], a);
             }
         }
     }

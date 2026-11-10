@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
+using System.Buffers;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
@@ -151,32 +152,49 @@ public static class RawInputApi
     /// <param name="rawInput">RawInput with the header and the mouse, keyboard or fixed HID information</param>
     /// <param name="hidData">byte array with the HID input reports, null for a mouse or keyboard</param>
     /// <returns>bool true if the raw input could be read</returns>
-    public static bool TryGetRawInputData(IntPtr hRawInput, out RawInput rawInput, out byte[] hidData)
+    public static unsafe bool TryGetRawInputData(IntPtr hRawInput, out RawInput rawInput, out byte[] hidData)
     {
         rawInput = default;
         hidData = null;
-        var headerSize = (uint)Marshal.SizeOf<RawInputHeader>();
         uint size = 0;
         // Query the size first, a HID report can be larger than the RawInput struct
-        if (GetRawInputData(hRawInput, RawInputDataCommands.Input, IntPtr.Zero, ref size, headerSize) != 0 || size == 0)
+        if (GetRawInputData(hRawInput, RawInputDataCommands.Input, IntPtr.Zero, ref size, (uint)RawInputHeaderSize) != 0 || size == 0 || size > int.MaxValue)
         {
             return false;
         }
 
-        var data = new byte[size];
-        unsafe
+        // WM_INPUT arrives for every mouse move (up to 8000 per second for gaming mice): mouse and keyboard data is read on the stack,
+        // only a large HID report needs a (pooled) buffer
+        if (size <= StackAllocRawInputThreshold)
         {
-            fixed (byte* dataPointer = data)
+            byte* stackBuffer = stackalloc byte[(int)size];
+            return GetRawInputData(hRawInput, RawInputDataCommands.Input, (IntPtr)stackBuffer, ref size, (uint)RawInputHeaderSize) != uint.MaxValue
+                   && TryParseRawInput(new ReadOnlySpan<byte>(stackBuffer, (int)size), out rawInput, out hidData);
+        }
+
+        var pooledBuffer = ArrayPool<byte>.Shared.Rent((int)size);
+        try
+        {
+            fixed (byte* dataPointer = pooledBuffer)
             {
-                var result = GetRawInputData(hRawInput, RawInputDataCommands.Input, (IntPtr)dataPointer, ref size, headerSize);
-                if (result == uint.MaxValue)
-                {
-                    return false;
-                }
+                return GetRawInputData(hRawInput, RawInputDataCommands.Input, (IntPtr)dataPointer, ref size, (uint)RawInputHeaderSize) != uint.MaxValue
+                       && TryParseRawInput(new ReadOnlySpan<byte>(dataPointer, (int)size), out rawInput, out hidData);
             }
         }
-        return TryParseRawInput(data, out rawInput, out hidData);
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(pooledBuffer);
+        }
     }
+
+    /// <summary>
+    /// Raw input up to this size, which covers mouse and keyboard input and small HID reports, is read into a buffer on the stack
+    /// </summary>
+    private const int StackAllocRawInputThreshold = 256;
+
+    private static readonly int RawInputHeaderSize = Marshal.SizeOf<RawInputHeader>();
+    private static readonly int RawInputSize = Marshal.SizeOf<RawInput>();
+    private static readonly int RawHidHeaderSize = Marshal.SizeOf<RawHID>();
 
     /// <summary>
     /// Parse the RAWINPUT data, as returned by GetRawInputData with RID_INPUT, including the variable length data of a HID device.
@@ -187,28 +205,44 @@ public static class RawInputApi
     /// <returns>bool true if the data could be parsed</returns>
     public static bool TryParseRawInput(byte[] data, out RawInput rawInput, out byte[] hidData)
     {
+        if (data == null)
+        {
+            rawInput = default;
+            hidData = null;
+            return false;
+        }
+        return TryParseRawInput(new ReadOnlySpan<byte>(data), out rawInput, out hidData);
+    }
+
+    /// <summary>
+    /// Parse the RAWINPUT data without copying it, only the HID input reports are copied into a new array.
+    /// </summary>
+    /// <param name="data">ReadOnlySpan with the RAWINPUT, as the current process (32 or 64 bit) gets it</param>
+    /// <param name="rawInput">RawInput with the header and the mouse, keyboard or fixed HID information</param>
+    /// <param name="hidData">byte array with the HID input reports (Count * SizeHid bytes), null for a mouse or keyboard</param>
+    /// <returns>bool true if the data could be parsed</returns>
+    public static bool TryParseRawInput(ReadOnlySpan<byte> data, out RawInput rawInput, out byte[] hidData)
+    {
         rawInput = default;
         hidData = null;
-        var headerSize = Marshal.SizeOf<RawInputHeader>();
-        if (data == null || data.Length < headerSize)
+        var headerSize = RawInputHeaderSize;
+        if (data.Length < headerSize)
         {
             return false;
         }
 
-        // The data for a keyboard is smaller than the RawInput struct (the size of the union is the size of the largest member), pad it for PtrToStructure
-        var rawInputSize = Marshal.SizeOf<RawInput>();
-        var buffer = data;
-        if (buffer.Length < rawInputSize)
+        // RawInput is blittable. The data for a keyboard is smaller than the RawInput struct (the size of the union is the size of
+        // its largest member), it is padded with zeros on the stack.
+        if (data.Length >= RawInputSize)
         {
-            buffer = new byte[rawInputSize];
-            Array.Copy(data, buffer, data.Length);
+            rawInput = MemoryMarshal.Read<RawInput>(data);
         }
-        unsafe
+        else
         {
-            fixed (byte* bufferPointer = buffer)
-            {
-                rawInput = Marshal.PtrToStructure<RawInput>((IntPtr)bufferPointer);
-            }
+            Span<byte> padded = stackalloc byte[RawInputSize];
+            padded.Clear();
+            data.CopyTo(padded);
+            rawInput = MemoryMarshal.Read<RawInput>(padded);
         }
 
         if (rawInput.Header.Type != RawInputDeviceTypes.HID)
@@ -217,7 +251,7 @@ public static class RawInputApi
         }
 
         // RAWHID: DWORD dwSizeHid; DWORD dwCount; BYTE bRawData[dwSizeHid * dwCount], inline directly after the header
-        var hidHeaderSize = Marshal.SizeOf<RawHID>();
+        var hidHeaderSize = RawHidHeaderSize;
         if (data.Length < headerSize + hidHeaderSize)
         {
             return false;
@@ -228,8 +262,7 @@ public static class RawInputApi
         {
             return false;
         }
-        hidData = new byte[hidDataLength];
-        Array.Copy(data, headerSize + hidHeaderSize, hidData, 0, (int)hidDataLength);
+        hidData = data.Slice(headerSize + hidHeaderSize, (int)hidDataLength).ToArray();
         return true;
     }
 

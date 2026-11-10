@@ -1,4 +1,4 @@
-// Copyright (c) Dapplo and contributors. All rights reserved.
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.IO;
@@ -358,6 +358,62 @@ public class WicImageTests
         var encoded = EncodeFromRows(new WicEncodeOptions { ContainerFormat = WicContainerFormats.Png }, pixels, width, height, stride, WicPixelFormats.Format32bppBgra, 4);
         var decoded = DecodeToMemory(encoded, WicPixelFormats.Format32bppBgra, stride, out _);
         AssertSamePixels(pixels, stride, decoded, stride, width * 4, height);
+    }
+
+    /// <summary>
+    /// The COM stream copies from and to the buffer of a MemoryStream directly, other streams are read and written in chunks
+    /// </summary>
+    [Fact]
+    public void RoundTrip_ThroughStreamsWhichAreNoMemoryStream()
+    {
+        const int width = 300, height = 200, stride = width * 4;
+        var pixels = CreatePixels(width, height, 4, stride);
+        var options = new WicEncodeOptions { ContainerFormat = WicContainerFormats.Png };
+
+        var target = new SeekableStream(new MemoryStream());
+        var handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+        try
+        {
+            WicImage.Encode(target, options, handle.AddrOfPinnedObject(), width, height, stride, WicPixelFormats.Format32bppBgra);
+        }
+        finally
+        {
+            handle.Free();
+        }
+        var encoded = target.Inner.ToArray();
+        Assert.True(encoded.Length > 0);
+
+        foreach (var source in new Stream[] { new SeekableStream(new MemoryStream(encoded)), new MemoryStream(encoded, 0, encoded.Length, false, true) })
+        {
+            var decoded = new byte[stride * height];
+            WicImage.Decode(source, WicPixelFormats.Format32bppBgra, (top, count, rows, rowStride) =>
+            {
+                for (int row = 0; row < count; row++)
+                {
+                    rows.Slice(row * rowStride, width * 4).CopyTo(new Span<byte>(decoded, (top + row) * stride, width * 4));
+                }
+            });
+            AssertSamePixels(pixels, stride, decoded, stride, width * 4, height);
+        }
+    }
+
+    /// <summary>
+    /// A seekable stream which is not a MemoryStream
+    /// </summary>
+    private sealed class SeekableStream : Stream
+    {
+        public SeekableStream(MemoryStream inner) => Inner = inner;
+        public MemoryStream Inner { get; }
+        public override bool CanRead => true;
+        public override bool CanSeek => true;
+        public override bool CanWrite => true;
+        public override long Length => Inner.Length;
+        public override long Position { get => Inner.Position; set => Inner.Position = value; }
+        public override void Flush() => Inner.Flush();
+        public override int Read(byte[] buffer, int offset, int count) => Inner.Read(buffer, offset, count);
+        public override long Seek(long offset, SeekOrigin origin) => Inner.Seek(offset, origin);
+        public override void SetLength(long value) => Inner.SetLength(value);
+        public override void Write(byte[] buffer, int offset, int count) => Inner.Write(buffer, offset, count);
     }
 
     /// <summary>

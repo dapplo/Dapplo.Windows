@@ -160,11 +160,12 @@ public static class ClipboardDibExtensions
         {
             throw new ArgumentOutOfRangeException(nameof(maxPixelCount), maxPixelCount, "The maximum pixel count must be positive.");
         }
-        image = null;
-        if (source.TryGetAsBytes(StandardClipboardFormats.DeviceIndependentBitmapV5.AsString(), out var dibV5) && DibImage.TryDecode(dibV5, maxPixelCount, out image))
+        // Decoded directly from the clipboard memory (or the buffer of the source), the DIB isn't copied into a byte array first
+        DibImage Decode(ReadOnlySpan<byte> data) => DibCodec.TryDecode(data, maxPixelCount, out var decoded) ? decoded : null;
+        if (ClipboardSpanReading.TryRead(source, StandardClipboardFormats.DeviceIndependentBitmapV5.AsString(), Decode, out image) && image != null)
         {
             return true;
         }
-        return source.TryGetAsBytes(StandardClipboardFormats.DeviceIndependentBitmap.AsString(), out var dib) && DibImage.TryDecode(dib, maxPixelCount, out image);
+        return ClipboardSpanReading.TryRead(source, StandardClipboardFormats.DeviceIndependentBitmap.AsString(), Decode, out image) && image != null;
     }
 }

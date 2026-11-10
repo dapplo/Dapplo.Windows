@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -244,13 +245,21 @@ public static class User32Api
 
         while (true)
         {
-            var heapBuffer = new char[capacity];
-            fixed (char* buffer = heapBuffer)
+            // Pooled: a long caption is read with buffers of up to 2 MB, which would be large object heap garbage
+            var heapBuffer = ArrayPool<char>.Shared.Rent(capacity);
+            try
             {
-                if (TryReadCaption(hWnd, buffer, capacity, useInternalGetWindowText, out var caption))
+                fixed (char* buffer = heapBuffer)
                 {
-                    return caption;
+                    if (TryReadCaption(hWnd, buffer, capacity, useInternalGetWindowText, out var caption))
+                    {
+                        return caption;
+                    }
                 }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(heapBuffer);
             }
             capacity = (int)Math.Min(capacity * 2L, MaxWindowTextLength);
         }
@@ -334,10 +343,17 @@ public static class User32Api
                 return ReadWindowText(hWnd, stackBuffer, bufferSize);
             }
 
-            var heapBuffer = new char[bufferSize];
-            fixed (char* text = heapBuffer)
+            var heapBuffer = ArrayPool<char>.Shared.Rent(bufferSize);
+            try
             {
-                return ReadWindowText(hWnd, text, bufferSize);
+                fixed (char* text = heapBuffer)
+                {
+                    return ReadWindowText(hWnd, text, bufferSize);
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(heapBuffer);
             }
         }
     }

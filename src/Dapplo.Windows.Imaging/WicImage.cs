@@ -1,4 +1,4 @@
-// Copyright (c) Dapplo and contributors. All rights reserved.
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -338,23 +338,21 @@ public static class WicImage
             }
             var rowBytes = source.Width * 4;
             var bandRows = Math.Max(1, Math.Min(source.Height, BandBytes / rowBytes));
-            var buffer = new uint[bandRows * source.Width];
+            // Pooled, a band is several MB and would be a new large object heap allocation for every encode
+            var buffer = ArrayPool<uint>.Shared.Rent(bandRows * source.Width);
             var colors = new HashSet<uint>();
-            var bufferHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
             try
             {
                 for (int top = 0; top < source.Height; top += bandRows)
                 {
                     var count = Math.Min(bandRows, source.Height - top);
                     var rect = new WicRect(0, top, source.Width, count);
-                    var rectHandle = GCHandle.Alloc(rect, GCHandleType.Pinned);
-                    try
+                    unsafe
                     {
-                        Wic.Check(bgra.CopyPixels(rectHandle.AddrOfPinnedObject(), (uint)rowBytes, (uint)(count * rowBytes), bufferHandle.AddrOfPinnedObject()), "IWICBitmapSource.CopyPixels", source);
-                    }
-                    finally
-                    {
-                        rectHandle.Free();
+                        fixed (uint* bufferPointer = buffer)
+                        {
+                            Wic.Check(bgra.CopyPixels((nint)(&rect), (uint)rowBytes, (uint)(count * rowBytes), (nint)bufferPointer), "IWICBitmapSource.CopyPixels", source);
+                        }
                     }
                     for (int i = 0; i < count * source.Width; i++)
                     {
@@ -377,7 +375,7 @@ public static class WicImage
             }
             finally
             {
-                bufferHandle.Free();
+                ArrayPool<uint>.Shared.Return(buffer);
             }
             var result = new uint[colors.Count];
             colors.CopyTo(result);
@@ -651,16 +649,13 @@ public static class WicImage
                     {
                         var count = Math.Min(bandRows, info.Height - top);
                         var rect = new WicRect(0, top, info.Width, count);
-                        var rectHandle = GCHandle.Alloc(rect, GCHandleType.Pinned);
-                        var bufferHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-                        try
+                        unsafe
                         {
-                            Wic.Check(converted.CopyPixels(rectHandle.AddrOfPinnedObject(), (uint)rowBytes, (uint)(count * rowBytes), bufferHandle.AddrOfPinnedObject()), "IWICBitmapSource.CopyPixels");
-                        }
-                        finally
-                        {
-                            bufferHandle.Free();
-                            rectHandle.Free();
+                            // No boxing of the rectangle or GCHandles for every band
+                            fixed (byte* bufferPointer = buffer)
+                            {
+                                Wic.Check(converted.CopyPixels((nint)(&rect), (uint)rowBytes, (uint)(count * rowBytes), (nint)bufferPointer), "IWICBitmapSource.CopyPixels");
+                            }
                         }
                         rows(top, count, new ReadOnlySpan<byte>(buffer, 0, count * rowBytes), rowBytes);
                     }

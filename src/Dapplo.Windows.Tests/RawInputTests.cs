@@ -113,6 +113,18 @@ public class RawInputTests
         Assert.Equal((ushort)0x1E, rawInput.Device.Keyboard.ScanCode);
     }
 
+    [Fact]
+    public void Test_RawInput_Parse_Span_IsTheSameAsTheArray()
+    {
+        var payload = new byte[] { 3, 0, 0, 0, 2, 0, 0, 0, 1, 2, 3, 4, 5, 6 };
+        var buffer = CreateRawInputBuffer(RawInputDeviceTypes.HID, payload);
+
+        Assert.True(RawInputApi.TryParseRawInput(new ReadOnlySpan<byte>(buffer), out var rawInput, out var hidData));
+        Assert.Equal(RawInputDeviceTypes.HID, rawInput.Header.Type);
+        Assert.Equal(new byte[] { 1, 2, 3, 4, 5, 6 }, hidData);
+        Assert.False(RawInputApi.TryParseRawInput(new ReadOnlySpan<byte>(buffer, 0, 4), out _, out _));
+    }
+
     /// <summary>
     /// Two listeners for the keyboard must combine their registrations, and remove them again when they are disposed.
     /// This only registers for raw input in the test process, no input is generated.

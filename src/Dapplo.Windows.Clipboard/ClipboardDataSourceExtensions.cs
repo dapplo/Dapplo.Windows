@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using Dapplo.Windows.Clipboard.Internals;
@@ -46,27 +45,8 @@ public static class ClipboardDataSourceExtensions
     /// <returns>true when the format is available</returns>
     public static bool TryGetAsBytes(this IClipboardDataSource source, string format, out byte[] bytes)
     {
-        if (source == null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
-        bytes = null;
-        if (!source.TryGetStream(format, out var stream) || stream == null)
-        {
-            return false;
-        }
-        using (stream)
-        {
-            if (stream is MemoryStream memoryStream)
-            {
-                bytes = memoryStream.ToArray();
-                return true;
-            }
-            using var copy = new MemoryStream();
-            stream.CopyTo(copy);
-            bytes = copy.ToArray();
-        }
-        return true;
+        // One copy into the result, directly from the clipboard memory or the buffer of the stream
+        return ClipboardSpanReading.TryRead(source, format, data => data.ToArray(), out bytes);
     }
 
     /// <summary>
@@ -96,9 +76,8 @@ public static class ClipboardDataSourceExtensions
         text = null;
         var unicodeTextFormat = StandardClipboardFormats.UnicodeText.AsString();
         format ??= unicodeTextFormat;
-        if (source.TryGetAsBytes(format, out var bytes))
+        if (ClipboardSpanReading.TryRead(source, format, ClipboardSpanReading.DecodeUnicode, out text))
         {
-            text = DecodeNullTerminated(Encoding.Unicode.GetString(bytes));
             return true;
         }
         return string.Equals(format, unicodeTextFormat, StringComparison.OrdinalIgnoreCase)
@@ -151,13 +130,7 @@ public static class ClipboardDataSourceExtensions
     /// <returns>true when the format is available</returns>
     public static bool TryGetAsUtf8String(this IClipboardDataSource source, string format, out string text)
     {
-        text = null;
-        if (!source.TryGetAsBytes(format, out var bytes))
-        {
-            return false;
-        }
-        text = DecodeNullTerminated(Encoding.UTF8.GetString(bytes));
-        return true;
+        return ClipboardSpanReading.TryRead(source, format, ClipboardSpanReading.DecodeUtf8, out text);
     }
 
     /// <summary>
@@ -254,11 +227,5 @@ public static class ClipboardDataSourceExtensions
             result.Add(text.Substring(start, end - start));
             start = end + 1;
         }
-    }
-
-    private static string DecodeNullTerminated(string text)
-    {
-        var terminatorIndex = text.IndexOf('\0');
-        return terminatorIndex >= 0 ? text.Substring(0, terminatorIndex) : text;
     }
 }

@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 using Dapplo.Windows.Common.Enums;
 
 namespace Dapplo.Windows.Imaging.Interop;
@@ -90,13 +89,13 @@ internal interface IWICPersistStream
 
     // IPersistStream
     [PreserveSig] HResult IsDirty();
-    [PreserveSig] HResult Load(IStream pStm);
-    [PreserveSig] HResult Save(IStream pStm, int fClearDirty);
+    [PreserveSig] HResult Load(IWicStream pStm);
+    [PreserveSig] HResult Save(IWicStream pStm, int fClearDirty);
     [PreserveSig] HResult GetSizeMax(out ulong pcbSize);
 
     // IWICPersistStream
-    [PreserveSig] HResult LoadEx(IStream pIStream, nint pguidPreferredVendor, uint dwPersistOptions);
-    [PreserveSig] HResult SaveEx(IStream pIStream, uint dwPersistOptions, int fClearDirty);
+    [PreserveSig] HResult LoadEx(IWicStream pIStream, nint pguidPreferredVendor, uint dwPersistOptions);
+    [PreserveSig] HResult SaveEx(IWicStream pIStream, uint dwPersistOptions, int fClearDirty);
 }
 
 /// <summary>
@@ -136,7 +135,7 @@ internal interface IWICComponentFactory
     [PreserveSig] HResult CreateQueryWriterFromReader(nint a, nint b, out nint c);
 
     // IWICComponentFactory
-    [PreserveSig] HResult CreateMetadataReader([In] ref Guid guidMetadataFormat, nint pguidVendor, uint dwOptions, IStream pIStream, out IWICMetadataReader ppIReader);
+    [PreserveSig] HResult CreateMetadataReader([In] ref Guid guidMetadataFormat, nint pguidVendor, uint dwOptions, IWicStream pIStream, out IWICMetadataReader ppIReader);
     [PreserveSig] HResult CreateMetadataReaderFromContainer(nint guidContainerFormat, nint pguidVendor, uint dwOptions, nint pIStream, out nint ppIReader);
     [PreserveSig] HResult CreateMetadataWriter(nint guidMetadataFormat, nint pguidVendor, uint dwMetadataOptions, out nint ppIWriter);
     [PreserveSig] HResult CreateMetadataWriterFromReader(IWICMetadataReader pIReader, nint pguidVendor, out IWICMetadataWriter ppIWriter);

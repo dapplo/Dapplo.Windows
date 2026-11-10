@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 
@@ -72,7 +71,7 @@ public static class KeyboardHook
         var message = wParam.ToInt64();
         var isKeyDown = message is WmKeyDown or WmSysKeyDown;
         var isSystemKey = message is WmSysKeyDown or WmSysKeyUp;
-        var keyboardLowLevelHookStruct = Marshal.PtrToStructure<KeyboardLowLevelHookStruct>(lParam);
+        var keyboardLowLevelHookStruct = ReadHookStruct<KeyboardLowLevelHookStruct>(lParam);
         var key = keyboardLowLevelHookStruct.VirtualKeyCode;
 
         // Query the current state of modifiers
@@ -155,4 +154,9 @@ public static class KeyboardHook
             IsCapsLockActive = capsLock
         };
     }
+
+    /// <summary>
+    ///     Read the blittable hook struct directly, Marshal.PtrToStructure boxes it on .NET Framework, for every event
+    /// </summary>
+    private static unsafe T ReadHookStruct<T>(IntPtr lParam) where T : unmanaged => *(T*)lParam;
 }
