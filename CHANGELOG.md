@@ -7,6 +7,22 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.23.0]
+
+### Changed
+- Less garbage and copying on hot paths, the public API is unchanged:
+  - Raw input (`RawInputMonitor`, `RawInputApi.TryGetRawInputData`): the WM_INPUT data, which arrives for every mouse move, is read into a buffer on the stack (a pooled one for a large HID report) and parsed without `Marshal.PtrToStructure` and the padding copy. Only the HID reports are still copied into their array.
+  - `MouseHook` and `KeyboardHook` read the hook structure directly, `Marshal.PtrToStructure` boxed it on .NET Framework for every event.
+  - `SharedMessageWindow` doesn't create a `WindowMessage` for messages nobody listens to.
+  - Clipboard: `TryGetAsBytes`, `TryGetAsUnicodeString`, `TryGetAsUtf8String` and `TryGetAsDib` of the clipboard data source read directly from the clipboard memory. Before, the content was copied into a byte array and then copied again (`MemoryStream.ToArray`), for an image of a 4K screen that was twice 33 MB on the large object heap. `GetAsUnicodeString` decodes from the clipboard memory, `SetAsUnicodeString` encodes into it (no copy of the string with the terminator, no byte array). `SetAsStream` reads directly into the clipboard memory on .NET and uses a pooled buffer on .NET Framework, from a `MemoryStream` it copies from its buffer.
+  - DIBs: 32 bpp BGRA rows (the usual clipboard format) are decoded with a row copy instead of extracting every channel with its mask, encoding copies rows and only un-premultiplies pixels which aren't opaque.
+  - Imaging: the COM stream for WIC passes the native buffers of Read and Write. `System.Runtime.InteropServices.ComTypes.IStream` allocated a new byte array for every call of a decoder or encoder (and a large one on the large object heap). The band buffer to collect the colors for a palette is pooled, the bands are copied without boxing the rectangle and pinning with GCHandles.
+  - `User32Api` reads long window texts with pooled buffers, `Kernel32Api.QueryFullProcessImageName` reads into a buffer on the stack first.
+
+### Added
+- `RawInputApi.TryParseRawInput(ReadOnlySpan<byte>, ...)`, to parse raw input data without an array.
+- Benchmarks for encoding and decoding a DIB.
+
 ## [3.22.0]
 
 ### Changed
