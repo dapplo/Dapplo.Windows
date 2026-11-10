@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class ClipboardSnapshot | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ClipboardSnapshot | Dapplo.Windows ">
+      
+      <meta name="description" content="A copy of clipboard formats in memory, read in one short clipboard session with  or . Decoding, saving or uploading the data happens afterwards, while other applications can use the clipboard again. The snapshot doesn&#39;t change when the clipboard changes, and can be used on any thread. Request only the formats you need, reading a format makes the application which copied render it:  selects them without opening the clipboard.">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Clipboard_ClipboardSnapshot.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Clipboard.ClipboardSnapshot%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot">
+
+
+
+  <h1 id="Dapplo_Windows_Clipboard_ClipboardSnapshot" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot" class="text-break">
+Class ClipboardSnapshot  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Clipboard.html">Clipboard</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Clipboard.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>A copy of clipboard formats in memory, read in one short clipboard session with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_ReadSnapshotAsync_System_Collections_Generic_IEnumerable_System_String__Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken_">ReadSnapshotAsync(IEnumerable&lt;string&gt;, ClipboardAccessOptions, CancellationToken)</a>
+or <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshotExtensions.html#Dapplo_Windows_Clipboard_ClipboardSnapshotExtensions_ReadSnapshot_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Collections_Generic_IEnumerable_System_String__System_Int64_">ReadSnapshot(IClipboardAccessToken, IEnumerable&lt;string&gt;, long)</a>. Decoding, saving or uploading the data happens afterwards, while other
+applications can use the clipboard again. The snapshot doesn't change when the clipboard changes, and can be used on any thread.
+Request only the formats you need, reading a format makes the application which copied render it: <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_AvailableFormats_System_Collections_Generic_IEnumerable_System_String__System_Int32_">AvailableFormats(IEnumerable&lt;string&gt;, int)</a>
+selects them without opening the clipboard.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class ClipboardSnapshot : IClipboardDataSource</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ClipboardSnapshot</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_GetAsBytes_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String_">ClipboardDataSourceExtensions.GetAsBytes(IClipboardDataSource, string)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_GetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String_">ClipboardDataSourceExtensions.GetAsUnicodeString(IClipboardDataSource, string)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_GetFileNames_Dapplo_Windows_Clipboard_IClipboardDataSource_">ClipboardDataSourceExtensions.GetFileNames(IClipboardDataSource)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_HasFormat_Dapplo_Windows_Clipboard_IClipboardDataSource_Dapplo_Windows_Clipboard_StandardClipboardFormats_">ClipboardDataSourceExtensions.HasFormat(IClipboardDataSource, StandardClipboardFormats)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_HasVirtualFiles_Dapplo_Windows_Clipboard_IClipboardDataSource_">ClipboardDataSourceExtensions.HasVirtualFiles(IClipboardDataSource)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsBytes_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String_System_Byte____">ClipboardDataSourceExtensions.TryGetAsBytes(IClipboardDataSource, string, out byte[])</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String__System_String_">ClipboardDataSourceExtensions.TryGetAsUnicodeString(IClipboardDataSource, out string, string)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_TryGetAsUtf8String_Dapplo_Windows_Clipboard_IClipboardDataSource_System_String_System_String__">ClipboardDataSourceExtensions.TryGetAsUtf8String(IClipboardDataSource, string, out string)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDibExtensions.html#Dapplo_Windows_Clipboard_ClipboardDibExtensions_TryGetAsDib_Dapplo_Windows_Clipboard_IClipboardDataSource_Dapplo_Windows_Clipboard_DibImage__">ClipboardDibExtensions.TryGetAsDib(IClipboardDataSource, out DibImage)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDibExtensions.html#Dapplo_Windows_Clipboard_ClipboardDibExtensions_TryGetAsDib_Dapplo_Windows_Clipboard_IClipboardDataSource_System_Int64_Dapplo_Windows_Clipboard_DibImage__">ClipboardDibExtensions.TryGetAsDib(IClipboardDataSource, long, out DibImage)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardHtmlExtensions.html#Dapplo_Windows_Clipboard_ClipboardHtmlExtensions_TryGetAsHtml_Dapplo_Windows_Clipboard_IClipboardDataSource_Dapplo_Windows_Clipboard_ClipboardHtml__">ClipboardHtmlExtensions.TryGetAsHtml(IClipboardDataSource, out ClipboardHtml)</a>
+  </div>
+  </dd></dl>
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardSnapshot_Formats_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.Formats*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardSnapshot_Formats" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.Formats">
+  Formats
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The formats in this snapshot, in the order the clipboard listed them (the order of preference of the application which copied)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyCollection&lt;string&gt; Formats { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1">IReadOnlyCollection</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardSnapshot_OwnerHandle_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.OwnerHandle*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardSnapshot_OwnerHandle" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.OwnerHandle">
+  OwnerHandle
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The window which owned the clipboard content</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public nint OwnerHandle { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardSnapshot_SequenceNumber_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.SequenceNumber*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardSnapshot_SequenceNumber" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.SequenceNumber">
+  SequenceNumber
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The clipboard sequence number of the content, compare it with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_SequenceNumber">SequenceNumber</a> or <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardUpdateInformation.html#Dapplo_Windows_Clipboard_ClipboardUpdateInformation_Id">Id</a>
+to see if the clipboard changed since</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public uint SequenceNumber { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardSnapshot_SkippedFormats_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.SkippedFormats*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardSnapshot_SkippedFormats" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.SkippedFormats">
+  SkippedFormats
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L55"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Formats which were on the clipboard (and requested) but aren't in the snapshot: handle formats (CF_BITMAP, CF_ENHMETAFILE, CF_PALETTE, …),
+formats larger than the size limit, and formats which couldn't be rendered</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyCollection&lt;string&gt; SkippedFormats { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1">IReadOnlyCollection</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardSnapshot_Timestamp_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.Timestamp*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardSnapshot_Timestamp" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.Timestamp">
+  Timestamp
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>When the snapshot was taken</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DateTimeOffset Timestamp { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetimeoffset">DateTimeOffset</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardSnapshot_GetSize_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.GetSize*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardSnapshot_GetSize_System_String_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.GetSize(System.String)">
+  GetSize(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The size of the data of a format in bytes, -1 when the format isn't in the snapshot</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long GetSize(string format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the format name</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd><p>long</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardSnapshot_HasFormat_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.HasFormat*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardSnapshot_HasFormat_System_String_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.HasFormat(System.String)">
+  HasFormat(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check if the format is available</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HasFormat(string format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the format name, e.g. &quot;PNG&quot; or StandardClipboardFormats.UnicodeText.AsString()</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardSnapshot_ToContents_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.ToContents*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardSnapshot_ToContents" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.ToContents">
+  ToContents()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L171"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create the contents to write this snapshot back to the clipboard, e.g. to restore the clipboard after using it temporarily.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ClipboardContents ToContents()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>ClipboardContents with all formats of the snapshot</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardSnapshot_TryGetStream_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.TryGetStream*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardSnapshot_TryGetStream_System_String_System_IO_Stream__" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.TryGetStream(System.String,System.IO.Stream@)">
+  TryGetStream(string, out Stream)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L75"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A read-only MemoryStream on the data of the format, no copy. The stream exposes the snapshot's own array:
+use <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.memorystream.trygetbuffer">TryGetBuffer(out ArraySegment&lt;byte&gt;)</a> to read it without copying (e.g. to decode a large bitmap with
+<a class="xref" href="Dapplo.Windows.Clipboard.DibImage.html#Dapplo_Windows_Clipboard_DibImage_TryDecode_System_ReadOnlySpan_System_Byte__System_Int64_System_Span_System_Byte__System_Int32_">TryDecode(ReadOnlySpan&lt;byte&gt;, long, Span&lt;byte&gt;, int)</a>), but don't change the buffer, it is the snapshot's data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryGetStream(string format, out Stream stream)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the format name</p>
+</dd>
+    <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>Stream, a read-only MemoryStream</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true when the snapshot has the format</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardSnapshot_TryUseVirtualFiles_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.TryUseVirtualFiles*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardSnapshot_TryUseVirtualFiles__1_System_Func_System_Collections_Generic_IReadOnlyList_Dapplo_Windows_Clipboard_VirtualFile____0____0__System_Int64_" data-uid="Dapplo.Windows.Clipboard.ClipboardSnapshot.TryUseVirtualFiles``1(System.Func{System.Collections.Generic.IReadOnlyList{Dapplo.Windows.Clipboard.VirtualFile},``0},``0@,System.Int64)">
+  TryUseVirtualFiles&lt;T&gt;(Func&lt;IReadOnlyList&lt;VirtualFile&gt;, T&gt;, out T, long)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L114"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Use the virtual files (FileGroupDescriptorW + FileContents, e.g. Outlook attachments) of the clipboard content this snapshot was taken of.
+Their content can't be read with the Win32 clipboard API, it needs the OLE data object of the clipboard, and so an STA thread with OLE
+initialized (e.g. the UI thread). This takes the OLE data object only when the snapshot has a file group descriptor, this is an STA
+thread and the clipboard didn't change since the snapshot (<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html#Dapplo_Windows_Clipboard_ClipboardSnapshot_SequenceNumber">SequenceNumber</a>), lets <code class="paramref">use</code> read the files,
+and releases the data object again.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryUseVirtualFiles&lt;T&gt;(Func&lt;IReadOnlyList&lt;VirtualFile&gt;, T&gt; use, out T result, long maxDataSize = 536870912)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>use</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Dapplo.Windows.Clipboard.VirtualFile.html">VirtualFile</a>&gt;, T&gt;</dt>
+    <dd><p>Func which reads the virtual files, it's only called when there is at least one</p>
+</dd>
+    <dt><code>result</code> <span class="xref">T</span></dt>
+    <dd><p>the result of <code class="paramref">use</code>, default when false is returned</p>
+</dd>
+    <dt><code>maxDataSize</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd><p>long with the maximum size of one virtual file (or the descriptor) in bytes, larger ones return null from
+<a class="xref" href="Dapplo.Windows.Clipboard.VirtualFile.html#Dapplo_Windows_Clipboard_VirtualFile_OpenContent">OpenContent()</a>; default <a class="xref" href="Dapplo.Windows.Clipboard.DataObjectReader.html#Dapplo_Windows_Clipboard_DataObjectReader_DefaultMaxDataSize">DefaultMaxDataSize</a></p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true when <code class="paramref">use</code> was called; false when there are no virtual files, this isn't an STA thread, the clipboard
+changed since the snapshot, or the OLE data object couldn't be taken</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>Type of the result</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Clipboard_ClipboardSnapshot_TryUseVirtualFiles__1_System_Func_System_Collections_Generic_IReadOnlyList_Dapplo_Windows_Clipboard_VirtualFile____0____0__System_Int64__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><ul><li>Include <a class="xref" href="Dapplo.Windows.Clipboard.DataObjectReader.html#Dapplo_Windows_Clipboard_DataObjectReader_FileGroupDescriptorWFormat">FileGroupDescriptorWFormat</a> and <a class="xref" href="Dapplo.Windows.Clipboard.DataObjectReader.html#Dapplo_Windows_Clipboard_DataObjectReader_FileGroupDescriptorFormat">FileGroupDescriptorFormat</a>
+in the formats of the snapshot, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_HasVirtualFiles_Dapplo_Windows_Clipboard_IClipboardDataSource_">HasVirtualFiles(IClipboardDataSource)</a>.</li><li>The data object is only valid inside <code class="paramref">use</code>: read the content there with <a class="xref" href="Dapplo.Windows.Clipboard.VirtualFile.html#Dapplo_Windows_Clipboard_VirtualFile_OpenContent">OpenContent()</a>
+and return materialized results. Calling OpenContent after <code class="paramref">use</code> returned throws an ObjectDisposedException.</li><li><code class="paramref">use</code> runs synchronously on the calling thread; the clipboard isn't open meanwhile, but opening the OLE data
+object retries shortly (up to about 100 ms) when another application has the clipboard open.</li><li>Exceptions of <code class="paramref">use</code> are passed on; failing to get the data object returns false.</li></ul>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p>When <code class="paramref">use</code> is null</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>When <code class="paramref">maxDataSize</code> isn't positive</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardSnapshot.cs/#L17" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

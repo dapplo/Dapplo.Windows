@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class InteropWindowQuery | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class InteropWindowQuery | Dapplo.Windows ">
+      
+      <meta name="description" content="Query for native windows">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Desktop_InteropWindowQuery.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Desktop.InteropWindowQuery%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Desktop.InteropWindowQuery">
+
+
+
+  <h1 id="Dapplo_Windows_Desktop_InteropWindowQuery" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery" class="text-break">
+Class InteropWindowQuery  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Desktop.html">Desktop</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Query for native windows</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class InteropWindowQuery</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">InteropWindowQuery</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_IgnoreClasses_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.IgnoreClasses*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_IgnoreClasses" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.IgnoreClasses">
+  IgnoreClasses
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Window classes which can be ignored, this is a snapshot, use <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_AddIgnoreClass_System_String_">AddIgnoreClass(string)</a> and <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_RemoveIgnoreClass_System_String_">RemoveIgnoreClass(string)</a> to change it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyCollection&lt;string&gt; IgnoreClasses { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1">IReadOnlyCollection</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_AddIgnoreClass_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.AddIgnoreClass*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_AddIgnoreClass_System_String_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.AddIgnoreClass(System.String)">
+  AddIgnoreClass(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L36"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add a window class to the classes which are ignored</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool AddIgnoreClass(string classname)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>classname</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the window class</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if it was added, false if it was already ignored</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_CanIgnoreClass_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.CanIgnoreClass*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_CanIgnoreClass_Dapplo_Windows_Desktop_IInteropWindow_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.CanIgnoreClass(Dapplo.Windows.Desktop.IInteropWindow)">
+  CanIgnoreClass(IInteropWindow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L177"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check the Classname of the IInteropWindow against a list of know classes which can be ignored.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool CanIgnoreClass(this IInteropWindow interopWindow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>interopWindow</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_GetDesktopWindow_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.GetDesktopWindow*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_GetDesktopWindow" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.GetDesktopWindow">
+  GetDesktopWindow()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the Desktop window</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IInteropWindow GetDesktopWindow()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow for the desktop window</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_GetForegroundWindow_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.GetForegroundWindow*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_GetForegroundWindow" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.GetForegroundWindow">
+  GetForegroundWindow()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the window with which the user is currently working</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IInteropWindow GetForegroundWindow()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_GetTopWindows_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.GetTopWindows*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_GetTopWindows_Dapplo_Windows_Desktop_IInteropWindow_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.GetTopWindows(Dapplo.Windows.Desktop.IInteropWindow)">
+  GetTopWindows(IInteropWindow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L149"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the windows in Z-order, from top (front) to bottom (back), without any filter.
+This is a snapshot, taken at once when this method is called (it's not lazy): without a parent (or with the desktop window as parent)
+EnumWindows is used, with a parent EnumChildWindows, filtered to the direct children (GetAncestor with GA_PARENT is the parent).
+Windows builds the list when the enumeration starts, so unlike a GetWindow(GW_HWNDNEXT) walk the result can't loop, skip or repeat windows when the Z-order changes.
+The windows can still change or be destroyed after the snapshot was taken, use <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowExtensions.html#Dapplo_Windows_Desktop_InteropWindowExtensions_Exists_Dapplo_Windows_Desktop_IInteropWindow_">Exists(IInteropWindow)</a> when that matters.
+Note: the EnumWindows documentation states that Windows 8 and later only enumerate the top-level windows of desktop apps, so windows of Windows 8 style immersive apps might be missing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;IInteropWindow&gt; GetTopWindows(IInteropWindow parent = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>parent</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>InteropWindow as the parent, to get its direct children, or null for the top-level windows</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a>&gt;</dt>
+    <dd><p>IReadOnlyList with the windows, empty if there are none</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_GetVisibleApplicationWindows_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.GetVisibleApplicationWindows*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_GetVisibleApplicationWindows_System_Boolean_System_Boolean_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.GetVisibleApplicationWindows(System.Boolean,System.Boolean)">
+  GetVisibleApplicationWindows(bool, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L125"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the windows the user sees as application windows (see <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_IsVisibleApplicationWindow_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_System_Boolean_">IsVisibleApplicationWindow(IInteropWindow, bool, bool)</a>), from top to bottom:
+visible (and not cloaked), not minimized unless <code class="paramref">includeMinimized</code>, with a title and a size, no tool window and no child window.
+The windows are a snapshot taken by <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_GetTopWindows_Dapplo_Windows_Desktop_IInteropWindow_">GetTopWindows(IInteropWindow)</a> when this method is called, the filter is applied lazily while enumerating the result.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IEnumerable&lt;IInteropWindow&gt; GetVisibleApplicationWindows(bool ignoreKnownClasses = true, bool includeMinimized = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>ignoreKnownClasses</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true (default) to ignore windows with a class from <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_IgnoreClasses">IgnoreClasses</a></p>
+</dd>
+    <dt><code>includeMinimized</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to include minimized windows, e.g. for a &quot;capture this window&quot; menu which restores the window first</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a>&gt;</dt>
+    <dd><p>IEnumerable with the visible application windows</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_GetWindowsForProcess_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.GetWindowsForProcess*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_GetWindowsForProcess_System_Int32_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.GetWindowsForProcess(System.Int32)">
+  GetWindowsForProcess(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L101"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Find windows belonging to the same process (thread) as the process ID.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IEnumerable&lt;IInteropWindow&gt; GetWindowsForProcess(int processId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>processId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with process Id</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a>&gt;</dt>
+    <dd><p>IEnumerable with IInteropWindow</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_IsVisibleApplicationWindow_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.IsVisibleApplicationWindow*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_IsVisibleApplicationWindow_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_System_Boolean_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.IsVisibleApplicationWindow(Dapplo.Windows.Desktop.IInteropWindow,System.Boolean,System.Boolean)">
+  IsVisibleApplicationWindow(IInteropWindow, bool, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L279"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check if the window is what the user sees as an application window (e.g. what Alt+Tab shows):
+a top-level window (it can be owned, it has no parent) which is visible (WS_VISIBLE and not cloaked, so not on another virtual desktop
+and no suspended UWP app), has a size, is not a tool window (WS_EX_TOOLWINDOW), is not a background Windows 10 app, has a title and
+is not minimized (unless <code class="paramref">includeMinimized</code>).
+Windows which render with DirectComposition (WS_EX_NOREDIRECTIONBITMAP, e.g. Chromium based browsers) are included.
+This method will retrieve all information, and fill it to the interopWindow, it needs to make the decision.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsVisibleApplicationWindow(this IInteropWindow interopWindow, bool ignoreKnownClasses = true, bool includeMinimized = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>interopWindow</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>InteropWindow</p>
+</dd>
+    <dt><code>ignoreKnownClasses</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true (default) to ignore windows with a class from <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_IgnoreClasses">IgnoreClasses</a></p>
+</dd>
+    <dt><code>includeMinimized</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true to accept minimized windows (their bounds are the small off-screen rectangle, which is not empty)</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the window is a visible application window</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_IsVisiblePopup_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.IsVisiblePopup*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_IsVisiblePopup_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.IsVisiblePopup(Dapplo.Windows.Desktop.IInteropWindow,System.Boolean)">
+  IsVisiblePopup(IInteropWindow, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L224"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Is the specified window a visible popup: a top-level window (it can be owned, it has no parent) with the WS_POPUP style,
+which is visible (WS_VISIBLE and not cloaked), has a size and is not minimized. Unlike <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_IsVisibleApplicationWindow_Dapplo_Windows_Desktop_IInteropWindow_System_Boolean_System_Boolean_">IsVisibleApplicationWindow(IInteropWindow, bool, bool)</a>
+tool windows and windows without a title are included.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsVisiblePopup(this IInteropWindow interopWindow, bool ignoreKnownClasses = true)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>interopWindow</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+    <dt><code>ignoreKnownClasses</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true (default) to ignore windows with a class from <a class="xref" href="Dapplo.Windows.Desktop.InteropWindowQuery.html#Dapplo_Windows_Desktop_InteropWindowQuery_IgnoreClasses">IgnoreClasses</a></p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the IInteropWindow is a visible popup</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Desktop_InteropWindowQuery_RemoveIgnoreClass_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.RemoveIgnoreClass*"></a>
+
+  <h3 id="Dapplo_Windows_Desktop_InteropWindowQuery_RemoveIgnoreClass_System_String_" data-uid="Dapplo.Windows.Desktop.InteropWindowQuery.RemoveIgnoreClass(System.String)">
+  RemoveIgnoreClass(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Remove a window class from the classes which are ignored</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool RemoveIgnoreClass(string classname)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>classname</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the window class</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if it was removed, false if it wasn't ignored</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows/Desktop/InteropWindowQuery.cs/#L19" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

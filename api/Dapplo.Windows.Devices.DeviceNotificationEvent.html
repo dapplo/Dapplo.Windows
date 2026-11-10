@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DeviceNotificationEvent | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DeviceNotificationEvent | Dapplo.Windows ">
+      
+      <meta name="description" content="Information on device changes, a copy of the information of a WM_DEVICECHANGE message.">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Devices_DeviceNotificationEvent.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Devices.DeviceNotificationEvent%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent">
+
+
+
+  <h1 id="Dapplo_Windows_Devices_DeviceNotificationEvent" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent" class="text-break">
+Class DeviceNotificationEvent  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Devices/DeviceNotificationEvent.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Devices.html">Devices</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Devices.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Information on device changes, a copy of the information of a WM_DEVICECHANGE message.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class DeviceNotificationEvent</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DeviceNotificationEvent</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="Dapplo_Windows_Devices_DeviceNotificationEvent_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>The DEV_BROADCAST_* structure which lParam points to is only valid while the message is processed,
+therefore the constructor copies everything which is needed. The instance can be used on any thread and at any time later.</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Dapplo_Windows_Devices_DeviceNotificationEvent__ctor_" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.#ctor*"></a>
+
+  <h3 id="Dapplo_Windows_Devices_DeviceNotificationEvent__ctor_System_IntPtr_System_IntPtr_" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.#ctor(System.IntPtr,System.IntPtr)">
+  DeviceNotificationEvent(nint, nint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Devices/DeviceNotificationEvent.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates an DeviceNotificationEvent from a WM_DEVICECHANGE message.
+This must be called synchronously while the message is processed (inside OnNext on the window thread), as lParam is only valid at that time.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DeviceNotificationEvent(nint wParam, nint lParam)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>wParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the wParam of the WM_DEVICECHANGE, the DeviceChangeEvent</p>
+</dd>
+    <dt><code>lParam</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the lParam of the WM_DEVICECHANGE, a pointer to a DEV_BROADCAST_* structure or 0</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Devices_DeviceNotificationEvent_EventType_" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.EventType*"></a>
+
+  <h3 id="Dapplo_Windows_Devices_DeviceNotificationEvent_EventType" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.EventType">
+  EventType
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Devices/DeviceNotificationEvent.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Type of the event</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DeviceChangeEvent EventType { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Devices.Enums.DeviceChangeEvent.html">DeviceChangeEvent</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Devices_DeviceNotificationEvent_Is_" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.Is*"></a>
+
+  <h3 id="Dapplo_Windows_Devices_DeviceNotificationEvent_Is_Dapplo_Windows_Devices_Enums_DeviceBroadcastDeviceType_" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.Is(Dapplo.Windows.Devices.Enums.DeviceBroadcastDeviceType)">
+  Is(DeviceBroadcastDeviceType)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Devices/DeviceNotificationEvent.cs/#L70"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the message is a certain DeviceBroadcastDeviceType</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Is(DeviceBroadcastDeviceType deviceBroadcastDeviceType)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>deviceBroadcastDeviceType</code> <a class="xref" href="Dapplo.Windows.Devices.Enums.DeviceBroadcastDeviceType.html">DeviceBroadcastDeviceType</a></dt>
+    <dd><p>DeviceBroadcastDeviceType</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Devices_DeviceNotificationEvent_TryGetDevBroadcastDeviceInterface_" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.TryGetDevBroadcastDeviceInterface*"></a>
+
+  <h3 id="Dapplo_Windows_Devices_DeviceNotificationEvent_TryGetDevBroadcastDeviceInterface_Dapplo_Windows_Devices_Structs_DevBroadcastDeviceInterface__" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.TryGetDevBroadcastDeviceInterface(Dapplo.Windows.Devices.Structs.DevBroadcastDeviceInterface@)">
+  TryGetDevBroadcastDeviceInterface(out DevBroadcastDeviceInterface)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Devices/DeviceNotificationEvent.cs/#L88"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the DevBroadcastDeviceInterface</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryGetDevBroadcastDeviceInterface(out DevBroadcastDeviceInterface devBroadcastDeviceInterface)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>devBroadcastDeviceInterface</code> <a class="xref" href="Dapplo.Windows.Devices.Structs.DevBroadcastDeviceInterface.html">DevBroadcastDeviceInterface</a></dt>
+    <dd><p>out DevBroadcastDeviceInterface</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true the value could be converted</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Devices_DeviceNotificationEvent_TryGetDevBroadcastHandle_" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.TryGetDevBroadcastHandle*"></a>
+
+  <h3 id="Dapplo_Windows_Devices_DeviceNotificationEvent_TryGetDevBroadcastHandle_Dapplo_Windows_Devices_Structs_DevBroadcastHandle__" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.TryGetDevBroadcastHandle(Dapplo.Windows.Devices.Structs.DevBroadcastHandle@)">
+  TryGetDevBroadcastHandle(out DevBroadcastHandle)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Devices/DeviceNotificationEvent.cs/#L110"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the DevBroadcastHandle</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryGetDevBroadcastHandle(out DevBroadcastHandle devBroadcastHandle)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>devBroadcastHandle</code> <a class="xref" href="Dapplo.Windows.Devices.Structs.DevBroadcastHandle.html">DevBroadcastHandle</a></dt>
+    <dd><p>out DevBroadcastHandle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true the value could be converted</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Devices_DeviceNotificationEvent_TryGetDevBroadcastPort_" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.TryGetDevBroadcastPort*"></a>
+
+  <h3 id="Dapplo_Windows_Devices_DeviceNotificationEvent_TryGetDevBroadcastPort_Dapplo_Windows_Devices_Structs_DevBroadcastPort__" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.TryGetDevBroadcastPort(Dapplo.Windows.Devices.Structs.DevBroadcastPort@)">
+  TryGetDevBroadcastPort(out DevBroadcastPort)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Devices/DeviceNotificationEvent.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the DevBroadcastPort</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryGetDevBroadcastPort(out DevBroadcastPort devBroadcastPort)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>devBroadcastPort</code> <a class="xref" href="Dapplo.Windows.Devices.Structs.DevBroadcastPort.html">DevBroadcastPort</a></dt>
+    <dd><p>out DevBroadcastPort</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true the value could be converted</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Devices_DeviceNotificationEvent_TryGetDevBroadcastVolume_" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.TryGetDevBroadcastVolume*"></a>
+
+  <h3 id="Dapplo_Windows_Devices_DeviceNotificationEvent_TryGetDevBroadcastVolume_Dapplo_Windows_Devices_Structs_DevBroadcastVolume__" data-uid="Dapplo.Windows.Devices.DeviceNotificationEvent.TryGetDevBroadcastVolume(Dapplo.Windows.Devices.Structs.DevBroadcastVolume@)">
+  TryGetDevBroadcastVolume(out DevBroadcastVolume)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Devices/DeviceNotificationEvent.cs/#L77"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the DevBroadcastVolume</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryGetDevBroadcastVolume(out DevBroadcastVolume devBroadcastVolume)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>devBroadcastVolume</code> <a class="xref" href="Dapplo.Windows.Devices.Structs.DevBroadcastVolume.html">DevBroadcastVolume</a></dt>
+    <dd><p>out DevBroadcastVolume</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true the value could be converted</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Devices/DeviceNotificationEvent.cs/#L17" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

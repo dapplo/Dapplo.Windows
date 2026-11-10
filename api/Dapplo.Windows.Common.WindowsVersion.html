@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class WindowsVersion | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class WindowsVersion | Dapplo.Windows ">
+      
+      <meta name="description" content="Extension methods to test the windows version. The properties named IsWindowsXyz are only true for exactly that version, IsWindowsXyzOrLater also for all later versions.">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Common_WindowsVersion.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Common.WindowsVersion%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Common.WindowsVersion">
+
+
+
+  <h1 id="Dapplo_Windows_Common_WindowsVersion" data-uid="Dapplo.Windows.Common.WindowsVersion" class="text-break">
+Class WindowsVersion  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L13"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Common.html">Common</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Common.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Extension methods to test the windows version.
+The properties named IsWindowsXyz are only true for exactly that version, IsWindowsXyzOrLater also for all later versions.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class WindowsVersion</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">WindowsVersion</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindows10_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows10*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindows10" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows10">
+  IsWindows10
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows 10, this is false on Windows 11</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindows10 { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows 10</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindows10OrLater_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows10OrLater*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindows10OrLater" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows10OrLater">
+  IsWindows10OrLater
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows 10 or later</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindows10OrLater { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows 10 or later</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindows11OrLater_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows11OrLater*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindows11OrLater" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows11OrLater">
+  IsWindows11OrLater
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows 11 or later</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindows11OrLater { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows 11 or later</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindows7OrLater_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows7OrLater*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindows7OrLater" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows7OrLater">
+  IsWindows7OrLater
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows 7 or later</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindows7OrLater { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows 7 or later</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindows8_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows8*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindows8" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows8">
+  IsWindows8
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L50"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows 8.0</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindows8 { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows 8.0</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindows81_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows81*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindows81" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows81">
+  IsWindows81
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows 8(.1)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindows81 { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows 8(.1)</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindows81OrLater_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows81OrLater*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindows81OrLater" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows81OrLater">
+  IsWindows81OrLater
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows 8.1 or later</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindows81OrLater { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows 8.1 or later</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindows8OrLater_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows8OrLater*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindows8OrLater" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows8OrLater">
+  IsWindows8OrLater
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows 8 or later</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindows8OrLater { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows 8 or later</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindows8X_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows8X*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindows8X" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows8X">
+  IsWindows8X
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows 8.0 or 8.1</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindows8X { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows 8.1 or 8.0</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindowsBeforeVista_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindowsBeforeVista*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindowsBeforeVista" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindowsBeforeVista">
+  IsWindowsBeforeVista
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is from before Windows Vista (e.g. Windows XP)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindowsBeforeVista { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows from before Vista</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindowsVista_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindowsVista*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindowsVista" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindowsVista">
+  IsWindowsVista
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L80"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows Vista (6.0)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindowsVista { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows Vista</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindowsVistaOrLater_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindowsVistaOrLater*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindowsVistaOrLater" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindowsVistaOrLater">
+  IsWindowsVistaOrLater
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L86"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows Vista or later</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindowsVistaOrLater { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows Vista or later</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindowsXp_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindowsXp*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindowsXp" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindowsXp">
+  IsWindowsXp
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows XP</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindowsXp { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows XP (5.1, or 5.2 for XP x64)</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindowsXpOrLater_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindowsXpOrLater*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindowsXpOrLater" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindowsXpOrLater">
+  IsWindowsXpOrLater
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L104"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current OS is Windows XP or later</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindowsXpOrLater { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if we are running on Windows XP or later</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_WinVersion_" data-uid="Dapplo.Windows.Common.WindowsVersion.WinVersion*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_WinVersion" data-uid="Dapplo.Windows.Common.WindowsVersion.WinVersion">
+  WinVersion
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L20"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the current windows version (Major.Minor.Build.0).
+This is retrieved with RtlGetVersion, so it is correct even when the host executable has no supportedOS entries in its manifest
+(in that case Environment.OSVersion reports 6.2 on Windows 8.1 and later, on .NET Framework).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Version WinVersion { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.version">Version</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Common_WindowsVersion_IsWindows10BuildOrLater_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows10BuildOrLater*"></a>
+
+  <h3 id="Dapplo_Windows_Common_WindowsVersion_IsWindows10BuildOrLater_System_Int32_" data-uid="Dapplo.Windows.Common.WindowsVersion.IsWindows10BuildOrLater(System.Int32)">
+  IsWindows10BuildOrLater(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current Windows version is 10 (or later, e.g. Windows 11) and has the specified build number or later
+See the build numbers <a href="https://en.wikipedia.org/wiki/Windows_10_version_history">here</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsWindows10BuildOrLater(int minimalBuildNumber)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>minimalBuildNumber</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/WindowsVersion.cs/#L13" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

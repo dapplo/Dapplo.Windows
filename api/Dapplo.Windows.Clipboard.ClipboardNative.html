@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class ClipboardNative | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ClipboardNative | Dapplo.Windows ">
+      
+      <meta name="description" content="Provides low level access to the Windows clipboard">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Clipboard_ClipboardNative.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Clipboard.ClipboardNative%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Clipboard.ClipboardNative">
+
+
+
+  <h1 id="Dapplo_Windows_Clipboard_ClipboardNative" data-uid="Dapplo.Windows.Clipboard.ClipboardNative" class="text-break">
+Class ClipboardNative  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L22"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Clipboard.html">Clipboard</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Clipboard.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Provides low level access to the Windows clipboard</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class ClipboardNative</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ClipboardNative</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_CurrentOwner_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.CurrentOwner*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_CurrentOwner" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.CurrentOwner">
+  CurrentOwner
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L380"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the current owner</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static nint CurrentOwner { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_OnUpdate_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.OnUpdate*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_OnUpdate" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.OnUpdate">
+  OnUpdate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This observable publishes information on the clipboard contents after every clipboard change.
+Every subscriber first receives the current state, and then an update for every change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IObservable&lt;ClipboardUpdateInformation&gt; OnUpdate { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">IObservable</a>&lt;<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardUpdateInformation.html">ClipboardUpdateInformation</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Clipboard_ClipboardNative_OnUpdate_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The information is collected without opening the clipboard, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardUpdateInformation.html">ClipboardUpdateInformation</a>.
+Updates are published on the SharedMessageWindow thread, don't block it: use ObserveOn to process them elsewhere,
+especially if you want to read the clipboard content with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_Access_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__">Access(nint, int, TimeSpan?, TimeSpan?)</a> or <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_AccessAsync_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">AccessAsync(nint, int, TimeSpan?, TimeSpan?, CancellationToken)</a>.</p>
+</div>
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_OpenClipboardWindow_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.OpenClipboardWindow*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_OpenClipboardWindow" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.OpenClipboardWindow">
+  OpenClipboardWindow
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L285"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The window which has the clipboard open right now (GetOpenClipboardWindow), IntPtr.Zero when the clipboard isn't open
+or was opened without a window. Use it to tell the user which application blocks the clipboard,
+see also <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html#Dapplo_Windows_Clipboard_IClipboardAccessToken_BlockingWindow">BlockingWindow</a> and <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html#Dapplo_Windows_Clipboard_ClipboardAccessDeniedException_BlockingWindow">BlockingWindow</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static nint OpenClipboardWindow { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_SequenceNumber_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.SequenceNumber*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_SequenceNumber" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.SequenceNumber">
+  SequenceNumber
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L386"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves the current clipboard sequence number via GetClipboardSequenceNumber
+This returns 0 if there is no WINSTA_ACCESSCLIPBOARD</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static uint SequenceNumber { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_Access_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.Access*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_Access_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.Access(System.IntPtr,System.Int32,System.Nullable{System.TimeSpan},System.Nullable{System.TimeSpan})">
+  Access(nint, int, TimeSpan?, TimeSpan?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L145"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get access, a global lock, to the clipboard.
+The clipboard is opened on the calling thread, use the token only on this thread and dispose it there.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IClipboardAccessToken Access(nint hWnd = 0, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the windows handle which becomes the owner when the content is cleared, default is the SharedMessageWindow</p>
+</dd>
+    <dt><code>retries</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the amount of open attempts which are made, default 5</p>
+</dd>
+    <dt><code>retryInterval</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>Timespan between retries, default 100ms</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>Timeout for getting the in-process lock, default 200ms</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd><p>IClipboardAccessToken, which will unlock when Dispose is called</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_AccessAsync_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.AccessAsync*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_AccessAsync_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.AccessAsync(System.IntPtr,System.Int32,System.Nullable{System.TimeSpan},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)">
+  AccessAsync(nint, int, TimeSpan?, TimeSpan?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L161"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get access, a global lock, to the clipboard.
+Only the waiting is asynchronous, the clipboard is opened on the thread which continues after the await (the SynchronizationContext of the caller).
+Use the token only on that thread and dispose it there: don't await while holding the token.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ValueTask&lt;IClipboardAccessToken&gt; AccessAsync(nint hWnd = 0, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the windows handle which becomes the owner when the content is cleared, default is the SharedMessageWindow</p>
+</dd>
+    <dt><code>retries</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the amount of open attempts which are made, default 5</p>
+</dd>
+    <dt><code>retryInterval</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>Timespan between retries, default 100ms</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>Timespan to wait for the in-process lock, default 200ms</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.valuetask-1">ValueTask</a>&lt;<a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a>&gt;</dt>
+    <dd><p>IClipboardAccessToken in a ValueTask, which will unlock when Dispose is called</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_AvailableFormats_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.AvailableFormats*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_AvailableFormats_System_Collections_Generic_IEnumerable_System_String__System_Int32_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.AvailableFormats(System.Collections.Generic.IEnumerable{System.String},System.Int32)">
+  AvailableFormats(IEnumerable&lt;string&gt;, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L432"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The formats of <code class="paramref">preferred</code> which are available on the clipboard right now, in the order of <code class="paramref">preferred</code>,
+at most <code class="paramref">max</code>. The clipboard isn't opened (IsClipboardFormatAvailable), so this never blocks or fails because another
+application has it open. Formats which Windows synthesizes (e.g. CF_DIB from CF_BITMAP, CF_UNICODETEXT from CF_TEXT) count as available.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;string&gt; AvailableFormats(IEnumerable&lt;string&gt; preferred, int max = 2147483647)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>preferred</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>the format names in the order of preference, null or empty names are ignored, duplicates are returned once</p>
+</dd>
+    <dt><code>max</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the maximum number of formats to return, default all</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>list with the available format names, as passed in <code class="paramref">preferred</code></p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Clipboard_ClipboardNative_AvailableFormats_System_Collections_Generic_IEnumerable_System_String__System_Int32__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Reading a format makes the application which copied render it, which can be slow (e.g. large images in several formats). Use this to
+pass only the formats you need to <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_ReadSnapshotAsync_System_Collections_Generic_IEnumerable_System_String__Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken_">ReadSnapshotAsync(IEnumerable&lt;string&gt;, ClipboardAccessOptions, CancellationToken)</a>, e.g.
+the best two image formats: the second one is a fallback when the first can't be decoded.
+The clipboard can change between this call and the read: the snapshot then simply has fewer formats.</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p>When <code class="paramref">preferred</code> is null</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>When <code class="paramref">max</code> is negative</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_GetOleDataObject_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.GetOleDataObject*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_GetOleDataObject_System_Int32_System_Nullable_System_TimeSpan__" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.GetOleDataObject(System.Int32,System.Nullable{System.TimeSpan})">
+  GetOleDataObject(int, TimeSpan?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L334"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Get the OLE data object of the clipboard (OleGetClipboard), for what the Win32 clipboard API can't read: formats with an index,
+IStream data and virtual files (FileGroupDescriptorW + FileContents, e.g. Outlook attachments).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataObjectReader GetOleDataObject(int retries = 5, TimeSpan? retryInterval = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>retries</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the number of retries when another application has the clipboard open (CLIPBRD_E_CANT_OPEN), default 5</p>
+</dd>
+    <dt><code>retryInterval</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan between the retries, default 100ms. The retries block the calling thread, like <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_Access_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__">Access(nint, int, TimeSpan?, TimeSpan?)</a>.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.DataObjectReader.html">DataObjectReader</a></dt>
+    <dd><p>DataObjectReader, dispose it to release the data object</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Clipboard_ClipboardNative_GetOleDataObject_System_Int32_System_Nullable_System_TimeSpan___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>OLE requires an STA thread on which OLE is initialized (every WinForms / WPF UI thread is one), unlike the rest of this library.
+Use the reader on that thread, keep the usage short and dispose it: the data object is a snapshot of the clipboard at this moment.</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>When called on a thread which isn't STA, or on which OLE isn't initialized</p>
+</dd>
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html">ClipboardAccessDeniedException</a></dt>
+    <dd><p>When the clipboard stays open by another application, with the blocking window</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.comexception">COMException</a></dt>
+    <dd><p>When OleGetClipboard fails otherwise</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_HasFormat_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.HasFormat*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_HasFormat_Dapplo_Windows_Clipboard_StandardClipboardFormats_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.HasFormat(Dapplo.Windows.Clipboard.StandardClipboardFormats)">
+  HasFormat(StandardClipboardFormats)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L400"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the specified format is available on the clipboard</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool HasFormat(StandardClipboardFormats format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="Dapplo.Windows.Clipboard.StandardClipboardFormats.html">StandardClipboardFormats</a></dt>
+    <dd><p>StandardClipboardFormats</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_HasFormat_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.HasFormat*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_HasFormat_System_String_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.HasFormat(System.String)">
+  HasFormat(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L407"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the specified format is available on the clipboard</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool HasFormat(string format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_HasFormat_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.HasFormat*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_HasFormat_System_UInt32_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.HasFormat(System.UInt32)">
+  HasFormat(uint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L393"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the specified format is available on the clipboard</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool HasFormat(uint formatId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>formatId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_HasVirtualFiles_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.HasVirtualFiles*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_HasVirtualFiles" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.HasVirtualFiles">
+  HasVirtualFiles()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L414"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the clipboard has virtual files (FileGroupDescriptorW or the ANSI FileGroupDescriptor), e.g. Outlook attachments,
+without opening the clipboard. Reading them needs OLE, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html#Dapplo_Windows_Clipboard_ClipboardSnapshot_TryUseVirtualFiles__1_System_Func_System_Collections_Generic_IReadOnlyList_Dapplo_Windows_Clipboard_VirtualFile____0____0__System_Int64_">TryUseVirtualFiles&lt;T&gt;(Func&lt;IReadOnlyList&lt;VirtualFile&gt;, T&gt;, out T, long)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool HasVirtualFiles()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_ReadSnapshotAsync_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.ReadSnapshotAsync*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_ReadSnapshotAsync_System_Collections_Generic_IEnumerable_System_String__Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.ReadSnapshotAsync(System.Collections.Generic.IEnumerable{System.String},Dapplo.Windows.Clipboard.ClipboardAccessOptions,System.Threading.CancellationToken)">
+  ReadSnapshotAsync(IEnumerable&lt;string&gt;, ClipboardAccessOptions, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L298"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Read the formats into memory in one short clipboard session, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshotExtensions.html#Dapplo_Windows_Clipboard_ClipboardSnapshotExtensions_ReadSnapshot_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Collections_Generic_IEnumerable_System_String__System_Int64_">ReadSnapshot(IClipboardAccessToken, IEnumerable&lt;string&gt;, long)</a>.
+Decode or send the data afterwards, while the clipboard is available for other applications again.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;ClipboardSnapshot&gt; ReadSnapshotAsync(IEnumerable&lt;string&gt; formats = null, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>formats</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>The formats to read, null reads every format which is stored in memory (handle formats like CF_BITMAP, CF_ENHMETAFILE and CF_PALETTE are skipped).
+Pass the formats you need: reading all formats makes the copying application render every delayed rendered format.
+<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_AvailableFormats_System_Collections_Generic_IEnumerable_System_String__System_Int32_">AvailableFormats(IEnumerable&lt;string&gt;, int)</a> selects the available ones without opening the clipboard.</p>
+</dd>
+    <dt><code>options</code> <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessOptions.html">ClipboardAccessOptions</a></dt>
+    <dd><p>optional ClipboardAccessOptions</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken, cancels the waiting for the clipboard</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html">ClipboardSnapshot</a>&gt;</dt>
+    <dd><p>Task with the ClipboardSnapshot</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html">ClipboardAccessDeniedException</a></dt>
+    <dd><p>When the clipboard couldn't be opened</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_ReadSnapshotAsync_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.ReadSnapshotAsync*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_ReadSnapshotAsync_System_Collections_Generic_IEnumerable_System_String__System_Int64_Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.ReadSnapshotAsync(System.Collections.Generic.IEnumerable{System.String},System.Int64,Dapplo.Windows.Clipboard.ClipboardAccessOptions,System.Threading.CancellationToken)">
+  ReadSnapshotAsync(IEnumerable&lt;string&gt;, long, ClipboardAccessOptions, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L313"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Read the formats into memory in one short clipboard session, formats larger than <code class="paramref">maxBytesPerFormat</code> are skipped
+(see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html#Dapplo_Windows_Clipboard_ClipboardSnapshot_SkippedFormats">SkippedFormats</a>).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;ClipboardSnapshot&gt; ReadSnapshotAsync(IEnumerable&lt;string&gt; formats, long maxBytesPerFormat, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>formats</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>The formats to read, null reads every format which is stored in memory</p>
+</dd>
+    <dt><code>maxBytesPerFormat</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd><p>long with the maximum size of one format in bytes</p>
+</dd>
+    <dt><code>options</code> <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessOptions.html">ClipboardAccessOptions</a></dt>
+    <dd><p>optional ClipboardAccessOptions</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken, cancels the waiting for the clipboard</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html">ClipboardSnapshot</a>&gt;</dt>
+    <dd><p>Task with the ClipboardSnapshot</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html">ClipboardAccessDeniedException</a></dt>
+    <dd><p>When the clipboard couldn't be opened</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.RegisterDelayedRenderer*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_Dapplo_Windows_Clipboard_StandardClipboardFormats_System_Action_Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest__" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.RegisterDelayedRenderer(Dapplo.Windows.Clipboard.StandardClipboardFormats,System.Action{Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest})">
+  RegisterDelayedRenderer(StandardClipboardFormats, Action&lt;ClipboardRenderFormatRequest&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L131"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Register a renderer for a clipboard format which is placed on the clipboard with delayed rendering, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_System_UInt32_System_Action_Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest__">RegisterDelayedRenderer(uint, Action&lt;ClipboardRenderFormatRequest&gt;)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IDisposable RegisterDelayedRenderer(StandardClipboardFormats format, Action&lt;ClipboardRenderFormatRequest&gt; renderer)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="Dapplo.Windows.Clipboard.StandardClipboardFormats.html">StandardClipboardFormats</a></dt>
+    <dd><p>StandardClipboardFormats with the clipboard format</p>
+</dd>
+    <dt><code>renderer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.html">ClipboardRenderFormatRequest</a>&gt;</dt>
+    <dd><p>Action which places the data for the requested format on the clipboard</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></dt>
+    <dd><p>IDisposable, dispose to unregister the renderer</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.RegisterDelayedRenderer*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_System_String_System_Action_Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest__" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.RegisterDelayedRenderer(System.String,System.Action{Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest})">
+  RegisterDelayedRenderer(string, Action&lt;ClipboardRenderFormatRequest&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Register a renderer for a clipboard format which is placed on the clipboard with delayed rendering, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_System_UInt32_System_Action_Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest__">RegisterDelayedRenderer(uint, Action&lt;ClipboardRenderFormatRequest&gt;)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IDisposable RegisterDelayedRenderer(string format, Action&lt;ClipboardRenderFormatRequest&gt; renderer)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the clipboard format</p>
+</dd>
+    <dt><code>renderer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.html">ClipboardRenderFormatRequest</a>&gt;</dt>
+    <dd><p>Action which places the data for the requested format on the clipboard</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></dt>
+    <dd><p>IDisposable, dispose to unregister the renderer</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.RegisterDelayedRenderer*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_System_UInt32_System_Action_Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest__" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.RegisterDelayedRenderer(System.UInt32,System.Action{Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest})">
+  RegisterDelayedRenderer(uint, Action&lt;ClipboardRenderFormatRequest&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L109"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Register a renderer for a clipboard format which is placed on the clipboard with delayed rendering (SetDelayedRenderedContent).
+The renderer is called synchronously on the SharedMessageWindow thread when the format is requested (WM_RENDERFORMAT),
+or when all formats need to be rendered (WM_RENDERALLFORMATS, when the SharedMessageWindow is destroyed: at process exit or with SharedMessageWindow.Shutdown),
+and needs to place the data via <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.html#Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest_AccessToken">AccessToken</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IDisposable RegisterDelayedRenderer(uint formatId, Action&lt;ClipboardRenderFormatRequest&gt; renderer)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>formatId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with the clipboard format ID</p>
+</dd>
+    <dt><code>renderer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.html">ClipboardRenderFormatRequest</a>&gt;</dt>
+    <dd><p>Action which places the data for the requested format on the clipboard</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></dt>
+    <dd><p>IDisposable, dispose to unregister the renderer</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_System_UInt32_System_Action_Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The renderer must render directly: don't switch threads, await or open the clipboard yourself, the token is only valid while the renderer runs.
+Only one renderer per format can be registered at a time.</p>
+</div>
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_ReplaceContents_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.ReplaceContents*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_ReplaceContents_Dapplo_Windows_Clipboard_ClipboardContents_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.ReplaceContents(Dapplo.Windows.Clipboard.ClipboardContents,System.IntPtr,System.Int32,System.Nullable{System.TimeSpan},System.Nullable{System.TimeSpan})">
+  ReplaceContents(ClipboardContents, nint, int, TimeSpan?, TimeSpan?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L247"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Replace the content of the clipboard with the contents: opens the clipboard, clears it, places all formats and closes it again.
+This is the recommended way to write to the clipboard, prepare the contents before calling this so the clipboard is only open briefly.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ReplaceContents(ClipboardContents contents, nint hWnd = 0, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>contents</code> <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>ClipboardContents with all formats</p>
+</dd>
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the windows handle which becomes the owner, default is the SharedMessageWindow (needed for delayed rendering)</p>
+</dd>
+    <dt><code>retries</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the amount of open attempts which are made, default 5</p>
+</dd>
+    <dt><code>retryInterval</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>Timespan between retries, default 100ms</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>Timeout for getting the in-process lock, default 200ms</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html">ClipboardAccessDeniedException</a></dt>
+    <dd><p>When the clipboard couldn't be opened</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_ReplaceContentsAsync_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.ReplaceContentsAsync*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_ReplaceContentsAsync_Dapplo_Windows_Clipboard_ClipboardContents_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.ReplaceContentsAsync(Dapplo.Windows.Clipboard.ClipboardContents,System.IntPtr,System.Int32,System.Nullable{System.TimeSpan},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)">
+  ReplaceContentsAsync(ClipboardContents, nint, int, TimeSpan?, TimeSpan?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L269"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Replace the content of the clipboard with the contents, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_ReplaceContents_Dapplo_Windows_Clipboard_ClipboardContents_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__">ReplaceContents(ClipboardContents, nint, int, TimeSpan?, TimeSpan?)</a>.
+Only the waiting for the clipboard is asynchronous, the clipboard is opened, written and closed on the thread which continues after the await.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task ReplaceContentsAsync(ClipboardContents contents, nint hWnd = 0, int retries = 5, TimeSpan? retryInterval = null, TimeSpan? timeout = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>contents</code> <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+    <dd><p>ClipboardContents with all formats</p>
+</dd>
+    <dt><code>hWnd</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the windows handle which becomes the owner, default is the SharedMessageWindow (needed for delayed rendering)</p>
+</dd>
+    <dt><code>retries</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int with the amount of open attempts which are made, default 5</p>
+</dd>
+    <dt><code>retryInterval</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>Timespan between retries, default 100ms</p>
+</dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>Timespan to wait for the in-process lock, default 200ms</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd><p>Task</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html">ClipboardAccessDeniedException</a></dt>
+    <dd><p>When the clipboard couldn't be opened</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_UseAsync_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.UseAsync*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_UseAsync_System_Action_Dapplo_Windows_Clipboard_IClipboardAccessToken__Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.UseAsync(System.Action{Dapplo.Windows.Clipboard.IClipboardAccessToken},Dapplo.Windows.Clipboard.ClipboardAccessOptions,System.Threading.CancellationToken)">
+  UseAsync(Action&lt;IClipboardAccessToken&gt;, ClipboardAccessOptions, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L204"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Use the clipboard, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_UseAsync__1_System_Func_Dapplo_Windows_Clipboard_IClipboardAccessToken___0__Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken_">UseAsync&lt;T&gt;(Func&lt;IClipboardAccessToken, T&gt;, ClipboardAccessOptions, CancellationToken)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task UseAsync(Action&lt;IClipboardAccessToken&gt; work, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>work</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a>&gt;</dt>
+    <dd><p>Action which reads or writes the clipboard via the token, it must not be async</p>
+</dd>
+    <dt><code>options</code> <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessOptions.html">ClipboardAccessOptions</a></dt>
+    <dd><p>optional ClipboardAccessOptions (owner, retries, retry interval, lock timeout)</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken, cancels the waiting</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd><p>Task</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html">ClipboardAccessDeniedException</a></dt>
+    <dd><p>When the clipboard couldn't be opened, or the in-process lock timed out</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardNative_UseAsync_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.UseAsync*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardNative_UseAsync__1_System_Func_Dapplo_Windows_Clipboard_IClipboardAccessToken___0__Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Clipboard.ClipboardNative.UseAsync``1(System.Func{Dapplo.Windows.Clipboard.IClipboardAccessToken,``0},Dapplo.Windows.Clipboard.ClipboardAccessOptions,System.Threading.CancellationToken)">
+  UseAsync&lt;T&gt;(Func&lt;IClipboardAccessToken, T&gt;, ClipboardAccessOptions, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L185"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Use the clipboard: wait asynchronously until it can be opened, then open it, run <code class="paramref">work</code> and close it again,
+synchronously on one thread. This is the recommended way to access the clipboard from async code.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;T&gt; UseAsync&lt;T&gt;(Func&lt;IClipboardAccessToken, T&gt; work, ClipboardAccessOptions options = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>work</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a>, T&gt;</dt>
+    <dd><p>Func which reads or writes the clipboard via the token and returns a result</p>
+</dd>
+    <dt><code>options</code> <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessOptions.html">ClipboardAccessOptions</a></dt>
+    <dd><p>optional ClipboardAccessOptions (owner, retries, retry interval, lock timeout)</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken, cancels the waiting</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;T&gt;</dt>
+    <dd><p>Task with the result of the work</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>Type of the result</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Clipboard_ClipboardNative_UseAsync__1_System_Func_Dapplo_Windows_Clipboard_IClipboardAccessToken___0__Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><ul><li>Works on any thread, no STA thread is needed.</li><li>Only the waiting is asynchronous. The awaits run on the context of the caller, so the work runs there too (e.g. the UI thread).</li><li><code class="paramref">work</code> must not be async: never await while the clipboard is open, the token is only valid until the work returns.
+Read the data into memory and process it after UseAsync returns; prepare the data to write before calling UseAsync.</li><li>Don't call <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_Access_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__">Access(nint, int, TimeSpan?, TimeSpan?)</a>, <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_AccessAsync_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">AccessAsync(nint, int, TimeSpan?, TimeSpan?, CancellationToken)</a> or UseAsync inside the work, the in-process lock isn't reentrant.</li></ul>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html">ClipboardAccessDeniedException</a></dt>
+    <dd><p>When the clipboard couldn't be opened, or the in-process lock timed out</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardNative.cs/#L22" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

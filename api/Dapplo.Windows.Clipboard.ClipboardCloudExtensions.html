@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class ClipboardCloudExtensions | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ClipboardCloudExtensions | Dapplo.Windows ">
+      
+      <meta name="description" content="Extensions for Windows Cloud Clipboard and Clipboard History support. See https://docs.microsoft.com/en-us/windows/win32/dataxchg/clipboard-formats#cloud-clipboard-and-clipboard-history-formats">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Clipboard_ClipboardCloudExtensions.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Clipboard.ClipboardCloudExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions">
+
+
+
+  <h1 id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions" class="text-break">
+Class ClipboardCloudExtensions  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardCloudExtensions.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Clipboard.html">Clipboard</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Clipboard.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Extensions for Windows Cloud Clipboard and Clipboard History support.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/dataxchg/clipboard-formats#cloud-clipboard-and-clipboard-history-formats">https://docs.microsoft.com/en-us/windows/win32/dataxchg/clipboard-formats#cloud-clipboard-and-clipboard-history-formats</a></p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class ClipboardCloudExtensions</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ClipboardCloudExtensions</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_CanIncludeInClipboardHistoryFormat" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.CanIncludeInClipboardHistoryFormat">
+  CanIncludeInClipboardHistoryFormat
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardCloudExtensions.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Format name for controlling whether clipboard content can be included in clipboard history.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string CanIncludeInClipboardHistoryFormat = &quot;CanIncludeInClipboardHistory&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_CanUploadToCloudClipboardFormat" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.CanUploadToCloudClipboardFormat">
+  CanUploadToCloudClipboardFormat
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardCloudExtensions.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Format name for controlling whether clipboard content can be uploaded to cloud clipboard.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string CanUploadToCloudClipboardFormat = &quot;CanUploadToCloudClipboard&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_ExcludeClipboardContentFromMonitorProcessingFormat" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.ExcludeClipboardContentFromMonitorProcessingFormat">
+  ExcludeClipboardContentFromMonitorProcessingFormat
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardCloudExtensions.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Format name for excluding clipboard content from monitor processing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string ExcludeClipboardContentFromMonitorProcessingFormat = &quot;ExcludeClipboardContentFromMonitorProcessing&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_ExcludeFromMonitorProcessing_" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.ExcludeFromMonitorProcessing*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_ExcludeFromMonitorProcessing_Dapplo_Windows_Clipboard_IClipboardAccessToken_" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.ExcludeFromMonitorProcessing(Dapplo.Windows.Clipboard.IClipboardAccessToken)">
+  ExcludeFromMonitorProcessing(IClipboardAccessToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardCloudExtensions.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Excludes the clipboard content from clipboard history, cloud sync and clipboard monitoring applications,
+by placing the ExcludeClipboardContentFromMonitorProcessing format (its presence is what counts).
+Use this e.g. for passwords.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ExcludeFromMonitorProcessing(this IClipboardAccessToken clipboardAccessToken)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>clipboardAccessToken</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd><p>The IClipboardAccessToken</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_SetCanIncludeInClipboardHistory_" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.SetCanIncludeInClipboardHistory*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_SetCanIncludeInClipboardHistory_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Boolean_" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.SetCanIncludeInClipboardHistory(Dapplo.Windows.Clipboard.IClipboardAccessToken,System.Boolean)">
+  SetCanIncludeInClipboardHistory(IClipboardAccessToken, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardCloudExtensions.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets whether clipboard content can be included in clipboard history, this places the CanIncludeInClipboardHistory format with a DWORD 1 or 0.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetCanIncludeInClipboardHistory(this IClipboardAccessToken clipboardAccessToken, bool canInclude)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>clipboardAccessToken</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd><p>The IClipboardAccessToken</p>
+</dd>
+    <dt><code>canInclude</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True to explicitly allow inclusion in history, false to prevent it.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_SetCanUploadToCloudClipboard_" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.SetCanUploadToCloudClipboard*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_SetCanUploadToCloudClipboard_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Boolean_" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.SetCanUploadToCloudClipboard(Dapplo.Windows.Clipboard.IClipboardAccessToken,System.Boolean)">
+  SetCanUploadToCloudClipboard(IClipboardAccessToken, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardCloudExtensions.cs/#L87"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets whether clipboard content can be uploaded to cloud clipboard, this places the CanUploadToCloudClipboard format with a DWORD 1 or 0.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetCanUploadToCloudClipboard(this IClipboardAccessToken clipboardAccessToken, bool canUpload)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>clipboardAccessToken</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd><p>The IClipboardAccessToken</p>
+</dd>
+    <dt><code>canUpload</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True to explicitly allow cloud upload, false to prevent it.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_SetCloudClipboardOptions_" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.SetCloudClipboardOptions*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardCloudExtensions_SetCloudClipboardOptions_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Nullable_System_Boolean__System_Nullable_System_Boolean__System_Boolean_" data-uid="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.SetCloudClipboardOptions(Dapplo.Windows.Clipboard.IClipboardAccessToken,System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Boolean)">
+  SetCloudClipboardOptions(IClipboardAccessToken, bool?, bool?, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardCloudExtensions.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets cloud clipboard options on the clipboard to control clipboard history and cloud sync behavior.
+Only the formats for the options which are specified are placed on the clipboard, without any option the Windows defaults apply.
+Call this after placing the content, with the same access token.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetCloudClipboardOptions(this IClipboardAccessToken clipboardAccessToken, bool? canIncludeInHistory = null, bool? canUploadToCloud = null, bool excludeFromMonitoring = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>clipboardAccessToken</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd><p>The IClipboardAccessToken</p>
+</dd>
+    <dt><code>canIncludeInHistory</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>?</dt>
+    <dd><p>null (default) doesn't place the CanIncludeInClipboardHistory format.
+true explicitly allows the content to be included in the clipboard history, false prevents it.</p>
+</dd>
+    <dt><code>canUploadToCloud</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>?</dt>
+    <dd><p>null (default) doesn't place the CanUploadToCloudClipboard format.
+true explicitly allows the content to be synced to other devices, false prevents it.</p>
+</dd>
+    <dt><code>excludeFromMonitoring</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>When true, the ExcludeClipboardContentFromMonitorProcessing format is placed, this excludes the content from clipboard history, cloud sync and clipboard monitoring applications.
+When false (default), the format is not placed (the mere presence of this format excludes the content, whatever its value).</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardCloudExtensions.cs/#L14" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

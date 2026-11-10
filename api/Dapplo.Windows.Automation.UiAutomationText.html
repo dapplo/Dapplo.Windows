@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class UiAutomationText | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class UiAutomationText | Dapplo.Windows ">
+      
+      <meta name="description" content="Read the text a window shows on the screen through UI Automation, as lines and words with their bounds and the targets of links: for windows whose text should not go through OCR (browsers, Electron, WPF, UWP, Office). Generic, nothing is specific to an application. Works on a window handle, so also while another window (a full-screen selection window) covers the window.">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Automation_UiAutomationText.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Automation.UiAutomationText%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Automation.UiAutomationText">
+
+
+
+  <h1 id="Dapplo_Windows_Automation_UiAutomationText" data-uid="Dapplo.Windows.Automation.UiAutomationText" class="text-break">
+Class UiAutomationText  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationText.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Automation.html">Automation</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Automation.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Read the text a window shows on the screen through UI Automation, as lines and words with their bounds and the targets of links:
+for windows whose text should not go through OCR (browsers, Electron, WPF, UWP, Office). Generic, nothing is specific to an
+application. Works on a window handle, so also while another window (a full-screen selection window) covers the window.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class UiAutomationText</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">UiAutomationText</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationText_DefaultConnectionTimeout" data-uid="Dapplo.Windows.Automation.UiAutomationText.DefaultConnectionTimeout">
+  DefaultConnectionTimeout
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationText.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The default for the connection timeout of
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationText.html#Dapplo_Windows_Automation_UiAutomationText_ReadVisibleTextAsync_System_IntPtr_Dapplo_Windows_Common_Structs_NativeRect_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">ReadVisibleTextAsync(nint, NativeRect, TimeSpan?, TimeSpan?, TimeSpan?, CancellationToken)</a>: 2 seconds</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly TimeSpan DefaultConnectionTimeout</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationText_DefaultTransactionTimeout" data-uid="Dapplo.Windows.Automation.UiAutomationText.DefaultTransactionTimeout">
+  DefaultTransactionTimeout
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationText.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The default for the transaction timeout (one request to the application) of
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationText.html#Dapplo_Windows_Automation_UiAutomationText_ReadVisibleTextAsync_System_IntPtr_Dapplo_Windows_Common_Structs_NativeRect_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">ReadVisibleTextAsync(nint, NativeRect, TimeSpan?, TimeSpan?, TimeSpan?, CancellationToken)</a>: 2 seconds</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly TimeSpan DefaultTransactionTimeout</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationText_ReadVisibleTextAsync_" data-uid="Dapplo.Windows.Automation.UiAutomationText.ReadVisibleTextAsync*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationText_ReadVisibleTextAsync_Dapplo_Windows_Desktop_IInteropWindow_Dapplo_Windows_Common_Structs_NativeRect_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Automation.UiAutomationText.ReadVisibleTextAsync(Dapplo.Windows.Desktop.IInteropWindow,Dapplo.Windows.Common.Structs.NativeRect,System.Nullable{System.TimeSpan},System.Nullable{System.TimeSpan},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)">
+  ReadVisibleTextAsync(IInteropWindow, NativeRect, TimeSpan?, TimeSpan?, TimeSpan?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationText.cs/#L172"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Read the text the window shows inside the area, see
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationText.html#Dapplo_Windows_Automation_UiAutomationText_ReadVisibleTextAsync_System_IntPtr_Dapplo_Windows_Common_Structs_NativeRect_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">ReadVisibleTextAsync(nint, NativeRect, TimeSpan?, TimeSpan?, TimeSpan?, CancellationToken)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;UiAutomationTextSnapshot&gt; ReadVisibleTextAsync(IInteropWindow window, NativeRect area, TimeSpan? connectionTimeout = null, TimeSpan? transactionTimeout = null, TimeSpan? maxDuration = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>window</code> <a class="xref" href="Dapplo.Windows.Desktop.IInteropWindow.html">IInteropWindow</a></dt>
+    <dd><p>IInteropWindow</p>
+</dd>
+    <dt><code>area</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect in screen pixels, <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html#Dapplo_Windows_Common_Structs_NativeRect_Empty">Empty</a> for the whole window</p>
+</dd>
+    <dt><code>connectionTimeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation connection timeout, default <a class="xref" href="Dapplo.Windows.Automation.UiAutomationText.html#Dapplo_Windows_Automation_UiAutomationText_DefaultConnectionTimeout">DefaultConnectionTimeout</a></p>
+</dd>
+    <dt><code>transactionTimeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation transaction timeout, default <a class="xref" href="Dapplo.Windows.Automation.UiAutomationText.html#Dapplo_Windows_Automation_UiAutomationText_DefaultTransactionTimeout">DefaultTransactionTimeout</a></p>
+</dd>
+    <dt><code>maxDuration</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan after which the reading stops and returns what it has, null (default) for no limit</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="Dapplo.Windows.Automation.UiAutomationTextSnapshot.html">UiAutomationTextSnapshot</a>&gt;</dt>
+    <dd><p>Task with the UiAutomationTextSnapshot, never null</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Automation_UiAutomationText_ReadVisibleTextAsync_" data-uid="Dapplo.Windows.Automation.UiAutomationText.ReadVisibleTextAsync*"></a>
+
+  <h3 id="Dapplo_Windows_Automation_UiAutomationText_ReadVisibleTextAsync_System_IntPtr_Dapplo_Windows_Common_Structs_NativeRect_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_" data-uid="Dapplo.Windows.Automation.UiAutomationText.ReadVisibleTextAsync(System.IntPtr,Dapplo.Windows.Common.Structs.NativeRect,System.Nullable{System.TimeSpan},System.Nullable{System.TimeSpan},System.Nullable{System.TimeSpan},System.Threading.CancellationToken)">
+  ReadVisibleTextAsync(nint, NativeRect, TimeSpan?, TimeSpan?, TimeSpan?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationText.cs/#L137"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Read the text the window shows inside <code class="paramref">area</code>, as lines from top to bottom with the words and their bounds.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;UiAutomationTextSnapshot&gt; ReadVisibleTextAsync(nint windowHandle, NativeRect area, TimeSpan? connectionTimeout = null, TimeSpan? transactionTimeout = null, TimeSpan? maxDuration = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>windowHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the handle of the window</p>
+</dd>
+    <dt><code>area</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect in screen pixels (physical pixels for a per-monitor DPI aware process), <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html#Dapplo_Windows_Common_Structs_NativeRect_Empty">Empty</a> for the whole window</p>
+</dd>
+    <dt><code>connectionTimeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation connection timeout, default <a class="xref" href="Dapplo.Windows.Automation.UiAutomationText.html#Dapplo_Windows_Automation_UiAutomationText_DefaultConnectionTimeout">DefaultConnectionTimeout</a></p>
+</dd>
+    <dt><code>transactionTimeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan for the UI Automation transaction timeout (one request), default <a class="xref" href="Dapplo.Windows.Automation.UiAutomationText.html#Dapplo_Windows_Automation_UiAutomationText_DefaultTransactionTimeout">DefaultTransactionTimeout</a></p>
+</dd>
+    <dt><code>maxDuration</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?</dt>
+    <dd><p>TimeSpan after which the reading stops and returns what it has, null (default) for no limit</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>CancellationToken, checked before every element and line, and during every pause; it throws, use
+<code class="paramref">maxDuration</code> to get what was read so far</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="Dapplo.Windows.Automation.UiAutomationTextSnapshot.html">UiAutomationTextSnapshot</a>&gt;</dt>
+    <dd><p>Task with the UiAutomationTextSnapshot, never null</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Automation_UiAutomationText_ReadVisibleTextAsync_System_IntPtr_Dapplo_Windows_Common_Structs_NativeRect_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>
+The UI Automation calls run on a background (MTA) thread of the thread pool, the returned task completes with a snapshot.
+The control view of the window is read level by level (one FindAllBuildCache per element whose children are read, only the
+children which aren't offscreen, with a cache for the bounds, control type, name, value, password and TextPattern state).
+</p>
+<p>
+An element with a TextPattern (a document of a browser, an edit field, a WPF RichTextBox, Word) is read with one request for its
+whole subtree (BuildUpdatedCache with TreeScope_Subtree). When that subtree has Text elements (browsers, Electron and WebView2
+expose every run of text as one) the text comes from the elements: a few requests for the whole page instead of several per word
+through the TextPattern, which is slow in Chromium. Else the TextPattern is read line by line: per line its text and its
+rectangles, the words get their share of the line by characters. Lines with a link (a hyperlink element inside the element,
+located with TextPattern.RangeFromChild) are read word by word, so the words of the link get its target exactly.
+</p>
+<p>
+Elements: a Text element is a run with its name and bounds (a hyperlink inside it is read too and, when it covers the whole text,
+replaces it), the Text elements inside a Hyperlink get the hyperlink's value (ValuePattern, the URL in a browser) as link target,
+a Hyperlink without Text elements is a run with its name, a single-line Edit element without TextPattern a run with its value.
+A run is split into words which get their share of the run's bounds by characters; a run which is higher than one and a half
+lines wraps: inside a document its line rectangles come from TextPattern.RangeFromChild, else it is cut into bands of a line.
+Words which overlap vertically are put on one line. The boxes are estimates, good for selections and labels.
+</p>
+<p>
+Password elements (IsPassword) are left out with their children, also words of a TextPattern which lie in a password element.
+Offscreen elements are left out, and everything is clipped to its element, the window and <code class="paramref">area</code>; a word with
+nothing left is left out.
+</p>
+<p>
+Some applications (e.g. Chromium based browsers) build their accessibility tree only when a UI Automation client asks for it:
+while no text is found and the tree looks incomplete (the check of <a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_FindAreasAsync_System_IntPtr_System_Int32_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">FindAreasAsync(nint, int, int, TimeSpan?, TimeSpan?, CancellationToken)</a>),
+the text is read again with a pause of a quarter of a second, until it is found, the tree is complete or
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationAreas.html#Dapplo_Windows_Automation_UiAutomationAreas_DefaultContentWait">DefaultContentWait</a> (at most <code class="paramref">maxDuration</code>) has passed.
+</p>
+<p>
+When <code class="paramref">maxDuration</code> has passed the reading stops and the snapshot has the lines read until then, with
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationTextSnapshot.html#Dapplo_Windows_Automation_UiAutomationTextSnapshot_TimedOut">TimedOut</a> true. <a class="xref" href="Dapplo.Windows.Automation.UiAutomationTextSnapshot.html#Dapplo_Windows_Automation_UiAutomationTextSnapshot_IsComplete">IsComplete</a> is false when it stopped,
+gave up waiting for the tree, a request timed out, a limit was reached, the window is gone or UI Automation isn't available.
+</p>
+<p>
+A window of a remote display client (Citrix Workspace app, Remote Desktop, Horizon, ..., see
+<a class="xref" href="Dapplo.Windows.Desktop.RemoteDisplayWindow.html#Dapplo_Windows_Desktop_RemoteDisplayWindow_GetKind_System_IntPtr_">GetKind(nint)</a>) is a picture for Windows, UI Automation has no text for the remote content: it is
+read once without waiting for the tree, <a class="xref" href="Dapplo.Windows.Automation.UiAutomationTextSnapshot.html#Dapplo_Windows_Automation_UiAutomationTextSnapshot_IsComplete">IsComplete</a> is false and
+<a class="xref" href="Dapplo.Windows.Automation.UiAutomationTextSnapshot.html#Dapplo_Windows_Automation_UiAutomationTextSnapshot_RemoteDisplay">RemoteDisplay</a> says which client it is, so the caller knows it has to use OCR.
+</p>
+<p>
+Where IUIAutomation2 is available (Windows 8+) the connection and transaction timeouts are set, so a hanging application can't
+block for the default 20 seconds. Neither text nor link targets are logged, only counts and timings (at verbose level, per phase,
+with the number of UI Automation requests).
+</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.operationcanceledexception">OperationCanceledException</a></dt>
+    <dd><p>When <code class="paramref">cancellationToken</code> was canceled</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Automation/UiAutomationText.cs/#L24" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

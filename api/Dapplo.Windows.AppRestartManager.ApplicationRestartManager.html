@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class ApplicationRestartManager | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ApplicationRestartManager | Dapplo.Windows ">
+      
+      <meta name="description" content="Provides methods for registering and unregistering the current application for automatic restart using Windows Restart Manager, as well as utilities for detecting restart events and handling system shutdown notifications.">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_AppRestartManager_ApplicationRestartManager.md&amp;value=---%0Auid%3A%20Dapplo.Windows.AppRestartManager.ApplicationRestartManager%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager">
+
+
+
+  <h1 id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager" class="text-break">
+Class ApplicationRestartManager  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.AppRestartManager/ApplicationRestartManager.cs/#L22"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.AppRestartManager.html">AppRestartManager</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.AppRestartManager.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Provides methods for registering and unregistering the current application for automatic restart using Windows
+Restart Manager, as well as utilities for detecting restart events and handling system shutdown notifications.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class ApplicationRestartManager</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ApplicationRestartManager</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Use this class to enable your application to be automatically restarted after system updates or
+shutdowns managed by Windows Restart Manager. It also provides helper methods for detecting restart conditions and
+responding to session end events, allowing applications to preserve state and handle shutdowns gracefully.</p>
+</div>
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_RestartMaxCmdLine" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.RestartMaxCmdLine">
+  RestartMaxCmdLine
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.AppRestartManager/ApplicationRestartManager.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Maximum length for the command line arguments (in characters).
+This corresponds to the Windows RESTART_MAX_CMD_LINE constant.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const int RestartMaxCmdLine = 1024</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_GetRestartCommandLineArgs_" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.GetRestartCommandLineArgs*"></a>
+
+  <h3 id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_GetRestartCommandLineArgs" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.GetRestartCommandLineArgs">
+  GetRestartCommandLineArgs()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.AppRestartManager/ApplicationRestartManager.cs/#L144"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the command-line arguments that were passed to the current process.
+Applications can use this to implement their own restart detection logic
+based on the specific arguments they registered via RegisterForRestart().</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string[] GetRestartCommandLineArgs()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd><p>Array of command-line arguments, excluding the executable path.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_GetRestartCommandLineArgs_examples">Examples</h4>
+  <pre><code class="lang-csharp">// If you registered with "/restore", check for it:
+var args = ApplicationRestartManager.GetRestartCommandLineArgs();
+if (args.Contains("/restore"))
+{
+    // Application was restarted, restore state
+}</code></pre>
+
+
+
+
+
+
+  <a id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_ListenForEndSession_" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.ListenForEndSession*"></a>
+
+  <h3 id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_ListenForEndSession" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.ListenForEndSession">
+  ListenForEndSession()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.AppRestartManager/ApplicationRestartManager.cs/#L164"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>An observable stream of the WM_QUERYENDSESSION and WM_ENDSESSION messages which the shared message window receives,
+this allows applications to be notified when the session ends (shutdown, restart, log off) or the Restart Manager wants the application to close.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IObservable&lt;EndSessionMessage&gt; ListenForEndSession()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">IObservable</a>&lt;<a class="xref" href="Dapplo.Windows.AppRestartManager.EndSessionMessage.html">EndSessionMessage</a>&gt;</dt>
+    <dd><p>IObservable of EndSessionMessage</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_ListenForEndSession_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Every call returns an independent subscription source, all subscribers see every message.
+OnNext is called synchronously on the thread of the shared message window, WM_QUERYENDSESSION can be answered with
+<a class="xref" href="Dapplo.Windows.AppRestartManager.EndSessionMessage.html#Dapplo_Windows_AppRestartManager_EndSessionMessage_CanEndSession">CanEndSession</a> or <a class="xref" href="Dapplo.Windows.AppRestartManager.EndSessionMessage.html#Dapplo_Windows_AppRestartManager_EndSessionMessage_Veto_System_String_">Veto(string)</a> from within OnNext.
+If nobody answers, the session end is allowed.
+For WM_ENDSESSION with <a class="xref" href="Dapplo.Windows.AppRestartManager.EndSessionMessage.html#Dapplo_Windows_AppRestartManager_EndSessionMessage_IsSessionEnding">IsSessionEnding</a> the process can be terminated at any time after OnNext returned,
+save state synchronously and do not rely on marshalling to the UI thread.</p>
+</div>
+
+
+
+
+  <a id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_RegisterForRestart_" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.RegisterForRestart*"></a>
+
+  <h3 id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_RegisterForRestart_System_String_Dapplo_Windows_AppRestartManager_Enums_ApplicationRestartFlags_" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.RegisterForRestart(System.String,Dapplo.Windows.AppRestartManager.Enums.ApplicationRestartFlags)">
+  RegisterForRestart(string, ApplicationRestartFlags)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.AppRestartManager/ApplicationRestartManager.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Registers the current application for automatic restart.
+When the Restart Manager shuts down the application during an update, it will be automatically restarted afterwards.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void RegisterForRestart(string commandLineArgs = null, ApplicationRestartFlags flags = ApplicationRestartFlags.None)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>commandLineArgs</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Command-line arguments to pass to the application when it is restarted.
+Do not include the executable name - it will be added automatically.
+Maximum length is 1024 characters. Use null or empty string to clear previous registration.</p>
+</dd>
+    <dt><code>flags</code> <a class="xref" href="Dapplo.Windows.AppRestartManager.Enums.ApplicationRestartFlags.html">ApplicationRestartFlags</a></dt>
+    <dd><p>Flags that control when the application should NOT be restarted.
+Default is None, meaning the application will always be restarted.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_RegisterForRestart_System_String_Dapplo_Windows_AppRestartManager_Enums_ApplicationRestartFlags__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>A restart after a crash or hang (unless <a class="xref" href="Dapplo.Windows.AppRestartManager.Enums.ApplicationRestartFlags.html">ApplicationRestartFlags</a> excludes it) only happens when the process was running for at least 60 seconds.</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>Thrown when command line arguments exceed maximum length.</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.win32exception">Win32Exception</a></dt>
+    <dd><p>Thrown when registration fails.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_UnregisterForRestart_" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.UnregisterForRestart*"></a>
+
+  <h3 id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_UnregisterForRestart" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.UnregisterForRestart">
+  UnregisterForRestart()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.AppRestartManager/ApplicationRestartManager.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Unregisters the current application from automatic restart.
+Call this if you no longer want the application to be restarted by Restart Manager.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void UnregisterForRestart()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.win32exception">Win32Exception</a></dt>
+    <dd><p>Thrown when unregistration fails.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_WasRestartRequested_" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.WasRestartRequested*"></a>
+
+  <h3 id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_WasRestartRequested_System_String_" data-uid="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.WasRestartRequested(System.String)">
+  WasRestartRequested(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.AppRestartManager/ApplicationRestartManager.cs/#L119"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Checks if the current process was started with the specified command-line argument.
+Register for restart with an argument which is only used for this, e.g. <code>RegisterForRestart(&quot;/restore&quot;)</code>,
+and check for that argument on startup with <code>WasRestartRequested(&quot;/restore&quot;)</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool WasRestartRequested(string restartArgument)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>restartArgument</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>One of the arguments which were passed to <a class="xref" href="Dapplo.Windows.AppRestartManager.ApplicationRestartManager.html#Dapplo_Windows_AppRestartManager_ApplicationRestartManager_RegisterForRestart_System_String_Dapplo_Windows_AppRestartManager_Enums_ApplicationRestartFlags_">RegisterForRestart(string, ApplicationRestartFlags)</a>, compared case-insensitive</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True if the current process was started with the argument</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_AppRestartManager_ApplicationRestartManager_WasRestartRequested_System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Windows cannot tell a process that it was restarted, this only checks the command line: a manual start with the same argument also returns true.</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>When restartArgument is null or empty</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.AppRestartManager/ApplicationRestartManager.cs/#L22" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

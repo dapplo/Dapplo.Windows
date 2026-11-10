@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Enum MouseEventFlags | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Enum MouseEventFlags | Dapplo.Windows ">
+      
+      <meta name="description" content="A set of bit flags that specify various aspects of mouse motion and button clicks. The bits in this member can be any reasonable combination of the following values. The bit flags that specify mouse button status are set to indicate changes in status, not ongoing conditions. For example, if the left mouse button is pressed and held down, MOUSEEVENTF_LEFTDOWN is set when the left button is first pressed, but not for subsequent motions. Similarly, MOUSEEVENTF_LEFTUP is set only when the button is first released. You cannot specify both the MOUSEEVENTF_WHEEL flag and either MOUSEEVENTF_XDOWN or MOUSEEVENTF_XUP flags simultaneously in the dwFlags parameter, because they both require use of the mouseData field. See">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Input_Enums_MouseEventFlags.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Input.Enums.MouseEventFlags%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Input.Enums.MouseEventFlags">
+
+
+
+
+  <h1 id="Dapplo_Windows_Input_Enums_MouseEventFlags" data-uid="Dapplo.Windows.Input.Enums.MouseEventFlags" class="text-break">
+Enum MouseEventFlags  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Enums/MouseEventFlags.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Input.html">Input</a>.<a class="xref" href="Dapplo.Windows.Input.Enums.html">Enums</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Input.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>A set of bit flags that specify various aspects of mouse motion and button clicks.
+The bits in this member can be any reasonable combination of the following values.
+The bit flags that specify mouse button status are set to indicate changes in status, not ongoing conditions.
+For example, if the left mouse button is pressed and held down,
+MOUSEEVENTF_LEFTDOWN is set when the left button is first pressed, but not for subsequent motions.
+Similarly, MOUSEEVENTF_LEFTUP is set only when the button is first released.
+You cannot specify both the MOUSEEVENTF_WHEEL flag and either MOUSEEVENTF_XDOWN or MOUSEEVENTF_XUP flags
+simultaneously
+in the dwFlags parameter, because they both require use of the mouseData field.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms646273(v=vs.85).aspx"></a></p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Flags]
+public enum MouseEventFlags : uint</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Common.Extensions.EnumExtensions.html#Dapplo_Windows_Common_Extensions_EnumExtensions_GetAttributeOfType__1_System_Enum_">EnumExtensions.GetAttributeOfType&lt;T&gt;(Enum)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Common.Extensions.EnumExtensions.html#Dapplo_Windows_Common_Extensions_EnumExtensions_GetEnumDescription_System_Enum_">EnumExtensions.GetEnumDescription(Enum)</a>
+  </div>
+  </dd></dl>
+
+  <h2 id="fields">Fields
+</h2>
+  <dl class="parameters">
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_Absolute"><code>Absolute = 32768</code></dt>
+  
+  <dd><p>The dx and dy members contain normalized absolute coordinates.
+If the flag is not set, dxand dy contain relative data (the change in position since the last reported position).
+This flag can be set, or not set, regardless of what kind of mouse or other pointing device, if any, is connected
+to the system.
+For further information about relative mouse motion, see the following Remarks section.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_HorizontalWheel"><code>HorizontalWheel = 4096</code></dt>
+  
+  <dd><p>The wheel was moved horizontally, if the mouse has a wheel.
+The amount of movement is specified in mouseData.
+Windows XP/2000:  This value is not supported.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_LeftDown"><code>LeftDown = 2</code></dt>
+  
+  <dd><p>The left button was pressed.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_LeftUp"><code>LeftUp = 4</code></dt>
+  
+  <dd><p>The left button was released.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_MiddleDown"><code>MiddleDown = 32</code></dt>
+  
+  <dd><p>The middle button was pressed.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_MiddleUp"><code>MiddleUp = 64</code></dt>
+  
+  <dd><p>The middle button was released.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_Move"><code>Move = 1</code></dt>
+  
+  <dd><p>Movement occurred.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_MoveNocoalesce"><code>MoveNocoalesce = 8192</code></dt>
+  
+  <dd><p>The WM_MOUSEMOVE messages will not be coalesced. The default behavior is to coalesce WM_MOUSEMOVE messages.
+Windows XP/2000:  This value is not supported.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_None"><code>None = 0</code></dt>
+  
+  <dd><p>Default value</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_RightDown"><code>RightDown = 8</code></dt>
+  
+  <dd><p>The right button was pressed.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_RightUp"><code>RightUp = 16</code></dt>
+  
+  <dd><p>The right button was released.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_Virtualdesk"><code>Virtualdesk = 16384</code></dt>
+  
+  <dd><p>Maps coordinates to the entire desktop. Must be used with MOUSEEVENTF_ABSOLUTE.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_Wheel"><code>Wheel = 2048</code></dt>
+  
+  <dd><p>The wheel was moved, if the mouse has a wheel. The amount of movement is specified in mouseData.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_XDown"><code>XDown = 128</code></dt>
+  
+  <dd><p>An X button was pressed.</p>
+</dd>
+    <dt id="Dapplo_Windows_Input_Enums_MouseEventFlags_XUp"><code>XUp = 256</code></dt>
+  
+  <dd><p>An X button was released.</p>
+</dd>
+  </dl>
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Input/Enums/MouseEventFlags.cs/#L19" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
