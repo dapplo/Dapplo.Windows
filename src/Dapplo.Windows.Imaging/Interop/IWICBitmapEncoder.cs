@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 using Dapplo.Windows.Common.Enums;
 
 namespace Dapplo.Windows.Imaging.Interop;
@@ -17,7 +16,7 @@ namespace Dapplo.Windows.Imaging.Interop;
 [Guid("00000103-a8f2-4877-ba0a-fd2b6645fb94")]
 internal interface IWICBitmapEncoder
 {
-    [PreserveSig] HResult Initialize(IStream pIStream, WicBitmapEncoderCacheOption cacheOption);
+    [PreserveSig] HResult Initialize(IWicStream pIStream, WicBitmapEncoderCacheOption cacheOption);
     [PreserveSig] HResult GetContainerFormat(out Guid pguidContainerFormat);
     [PreserveSig] HResult GetEncoderInfo(out nint ppIEncoderInfo);
     [PreserveSig] HResult SetColorContexts(uint cCount, nint ppIColorContext);

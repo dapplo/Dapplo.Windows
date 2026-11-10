@@ -94,10 +94,7 @@ public static class ClipboardStreamExtensions
             unsafe
             {
                 using var writeInfo = clipboardAccessToken.WriteInfo(formatId, length);
-                using (var unsafeMemoryStream = new UnmanagedMemoryStream((byte*)writeInfo.MemoryPtr, length, length, FileAccess.Write))
-                {
-                    CopyExactly(stream, unsafeMemoryStream, length);
-                }
+                CopyExactly(stream, (byte*)writeInfo.MemoryPtr, length);
                 writeInfo.Commit();
             }
         }
@@ -117,20 +114,58 @@ public static class ClipboardStreamExtensions
     /// <param name="target">Stream to write to</param>
     /// <param name="length">long with the number of bytes to copy</param>
     /// <exception cref="EndOfStreamException">When the source has less bytes than specified</exception>
-    private static void CopyExactly(Stream source, Stream target, long length)
+    private static unsafe void CopyExactly(Stream source, byte* target, long length)
     {
-        var buffer = new byte[(int)Math.Min(81920, length)];
         var remaining = length;
+        if (source is MemoryStream memoryStream && memoryStream.TryGetBuffer(out var segment))
+        {
+            // Copy straight from the buffer of the MemoryStream
+            var position = memoryStream.Position;
+            var available = Math.Max(0, Math.Min(remaining, segment.Count - position));
+            if (available > 0)
+            {
+                new ReadOnlySpan<byte>(segment.Array, segment.Offset + (int)position, (int)available).CopyTo(new Span<byte>(target, (int)available));
+                memoryStream.Position = position + available;
+            }
+            if (available < remaining)
+            {
+                throw new EndOfStreamException($"The stream ended after {available} bytes, but {length} bytes were expected.");
+            }
+            return;
+        }
+#if NET
+        // Read directly into the clipboard memory
         while (remaining > 0)
         {
-            var read = source.Read(buffer, 0, (int)Math.Min(buffer.Length, remaining));
+            var chunk = (int)Math.Min(int.MaxValue, remaining);
+            var read = source.Read(new Span<byte>(target + (length - remaining), chunk));
             if (read <= 0)
             {
                 throw new EndOfStreamException($"The stream ended after {length - remaining} bytes, but {length} bytes were expected.");
             }
-            target.Write(buffer, 0, read);
             remaining -= read;
         }
+#else
+        // A pooled buffer, which stays below the large object heap threshold
+        var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent((int)Math.Min(81920, length));
+        try
+        {
+            while (remaining > 0)
+            {
+                var read = source.Read(buffer, 0, (int)Math.Min(buffer.Length, remaining));
+                if (read <= 0)
+                {
+                    throw new EndOfStreamException($"The stream ended after {length - remaining} bytes, but {length} bytes were expected.");
+                }
+                new ReadOnlySpan<byte>(buffer, 0, read).CopyTo(new Span<byte>(target + (length - remaining), read));
+                remaining -= read;
+            }
+        }
+        finally
+        {
+            System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
+        }
+#endif
     }
 
     /// <summary>

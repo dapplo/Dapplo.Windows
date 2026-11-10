@@ -2,9 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Buffers;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
+using Dapplo.Windows.Imaging.Interop;
 using STATSTG = System.Runtime.InteropServices.ComTypes.STATSTG;
 
 namespace Dapplo.Windows.Imaging.Internal;
@@ -14,8 +15,13 @@ namespace Dapplo.Windows.Imaging.Internal;
 /// so a decoder or encoder can work on a part of a larger stream. The stream must be seekable.
 /// Exceptions of the stream are kept in <see cref="LastException"/> and become an HRESULT for COM.
 /// </summary>
+/// <remarks>
+/// Read and Write get the native buffer of the caller (<see cref="IWicStream"/>): a MemoryStream is copied from or to directly,
+/// other streams read and write the native memory directly (.NET) or through a pooled buffer (.NET Framework).
+/// No managed array is allocated for a call, the decoders and encoders call these a lot.
+/// </remarks>
 [ComVisible(true)]
-internal sealed class ManagedIStream : IStream, IFailureSource
+internal sealed class ManagedIStream : IWicStream, IFailureSource
 {
     private const int StreamSeekSet = 0;
     private const int StreamSeekCur = 1;
@@ -25,6 +31,8 @@ internal sealed class ManagedIStream : IStream, IFailureSource
     private const int StgmWrite = 0x1;
     private const int StgmReadWrite = 0x2;
     private const int StgEInvalidFunction = unchecked((int)0x80030001);
+    // Below the large object heap threshold (85000 bytes)
+    private const int CopyBufferSize = 81920;
 
     private readonly Stream _stream;
     private readonly long _origin;
@@ -41,68 +49,128 @@ internal sealed class ManagedIStream : IStream, IFailureSource
 
     public Exception LastException { get; private set; }
 
-    /// <summary>
-    /// The highest position (relative to the origin) which was written, the end of what an encoder wrote
-    /// </summary>
     public long WrittenLength { get; private set; }
 
-    /// <summary>
-    /// Position the stream after what was written
-    /// </summary>
     public void SeekToEndOfWritten() => _stream.Position = _origin + WrittenLength;
 
-    private T Guard<T>(Func<T> action)
+    public unsafe void Read(nint pv, int cb, nint pcbRead)
     {
+        int total;
         try
         {
-            return action();
+            total = cb <= 0 ? 0 : ReadInto((byte*)pv, cb);
         }
         catch (Exception ex)
         {
             LastException = ex;
             throw;
         }
-    }
-
-    public void Read(byte[] pv, int cb, IntPtr pcbRead)
-    {
-        var total = Guard(() =>
-        {
-            int read = 0;
-            while (read < cb)
-            {
-                var count = _stream.Read(pv, read, cb - read);
-                if (count <= 0)
-                {
-                    break;
-                }
-                read += count;
-            }
-            return read;
-        });
-        if (pcbRead != IntPtr.Zero)
+        if (pcbRead != 0)
         {
             Marshal.WriteInt32(pcbRead, total);
         }
     }
 
-    public void Write(byte[] pv, int cb, IntPtr pcbWritten)
+    /// <summary>
+    /// Read up to count bytes into the native buffer, less only at the end of the stream
+    /// </summary>
+    private unsafe int ReadInto(byte* target, int count)
     {
-        Guard(() =>
+        if (_stream is MemoryStream memoryStream && memoryStream.TryGetBuffer(out var segment))
         {
-            _stream.Write(pv, 0, cb);
+            var position = memoryStream.Position;
+            var available = (int)Math.Max(0, Math.Min(count, segment.Count - position));
+            if (available > 0)
+            {
+                new ReadOnlySpan<byte>(segment.Array, segment.Offset + (int)position, available).CopyTo(new Span<byte>(target, available));
+                memoryStream.Position = position + available;
+            }
+            return available;
+        }
+
+        var read = 0;
+#if NET
+        while (read < count)
+        {
+            var bytesRead = _stream.Read(new Span<byte>(target + read, count - read));
+            if (bytesRead <= 0)
+            {
+                break;
+            }
+            read += bytesRead;
+        }
+#else
+        var buffer = ArrayPool<byte>.Shared.Rent(Math.Min(count, CopyBufferSize));
+        try
+        {
+            while (read < count)
+            {
+                var bytesRead = _stream.Read(buffer, 0, Math.Min(buffer.Length, count - read));
+                if (bytesRead <= 0)
+                {
+                    break;
+                }
+                new ReadOnlySpan<byte>(buffer, 0, bytesRead).CopyTo(new Span<byte>(target + read, bytesRead));
+                read += bytesRead;
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+#endif
+        return read;
+    }
+
+    public unsafe void Write(nint pv, int cb, nint pcbWritten)
+    {
+        try
+        {
+            if (cb > 0)
+            {
+                WriteFrom((byte*)pv, cb);
+            }
             WrittenLength = Math.Max(WrittenLength, _stream.Position - _origin);
-            return cb;
-        });
-        if (pcbWritten != IntPtr.Zero)
+        }
+        catch (Exception ex)
+        {
+            LastException = ex;
+            throw;
+        }
+        if (pcbWritten != 0)
         {
             Marshal.WriteInt32(pcbWritten, cb);
         }
     }
 
-    public void Seek(long dlibMove, int dwOrigin, IntPtr plibNewPosition)
+    private unsafe void WriteFrom(byte* source, int count)
     {
-        var position = Guard(() =>
+#if NET
+        _stream.Write(new ReadOnlySpan<byte>(source, count));
+#else
+        var buffer = ArrayPool<byte>.Shared.Rent(Math.Min(count, CopyBufferSize));
+        try
+        {
+            var written = 0;
+            while (written < count)
+            {
+                var chunk = Math.Min(buffer.Length, count - written);
+                new ReadOnlySpan<byte>(source + written, chunk).CopyTo(buffer);
+                _stream.Write(buffer, 0, chunk);
+                written += chunk;
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+#endif
+    }
+
+    public void Seek(long dlibMove, int dwOrigin, nint plibNewPosition)
+    {
+        long position;
+        try
         {
             long target = dwOrigin switch
             {
@@ -116,53 +184,83 @@ internal sealed class ManagedIStream : IStream, IFailureSource
                 throw new IOException("Seek before the start of the stream");
             }
             _stream.Position = target;
-            return target - _origin;
-        });
-        if (plibNewPosition != IntPtr.Zero)
+            position = target - _origin;
+        }
+        catch (Exception ex)
+        {
+            LastException = ex;
+            throw;
+        }
+        if (plibNewPosition != 0)
         {
             Marshal.WriteInt64(plibNewPosition, position);
         }
     }
 
-    public void SetSize(long libNewSize) => Guard(() =>
+    public void SetSize(long libNewSize)
     {
-        _stream.SetLength(_origin + libNewSize);
-        return 0;
-    });
-
-    public void CopyTo(IStream pstm, long cb, IntPtr pcbRead, IntPtr pcbWritten)
-    {
-        var buffer = new byte[81920];
-        long copied = Guard(() =>
+        try
         {
-            long total = 0;
-            while (total < cb)
+            _stream.SetLength(_origin + libNewSize);
+        }
+        catch (Exception ex)
+        {
+            LastException = ex;
+            throw;
+        }
+    }
+
+    public unsafe void CopyTo(IWicStream pstm, long cb, nint pcbRead, nint pcbWritten)
+    {
+        long copied = 0;
+        var buffer = ArrayPool<byte>.Shared.Rent(CopyBufferSize);
+        try
+        {
+            fixed (byte* bufferPointer = buffer)
             {
-                var read = _stream.Read(buffer, 0, (int)Math.Min(buffer.Length, cb - total));
-                if (read <= 0)
+                while (copied < cb)
                 {
-                    break;
+                    var read = ReadInto(bufferPointer, (int)Math.Min(CopyBufferSize, cb - copied));
+                    if (read <= 0)
+                    {
+                        break;
+                    }
+                    pstm.Write((nint)bufferPointer, read, 0);
+                    copied += read;
                 }
-                pstm.Write(buffer, read, IntPtr.Zero);
-                total += read;
             }
-            return total;
-        });
-        if (pcbRead != IntPtr.Zero)
+        }
+        catch (Exception ex)
+        {
+            LastException = ex;
+            throw;
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+        if (pcbRead != 0)
         {
             Marshal.WriteInt64(pcbRead, copied);
         }
-        if (pcbWritten != IntPtr.Zero)
+        if (pcbWritten != 0)
         {
             Marshal.WriteInt64(pcbWritten, copied);
         }
     }
 
-    public void Commit(int grfCommitFlags) => Guard(() =>
+    public void Commit(int grfCommitFlags)
     {
-        _stream.Flush();
-        return 0;
-    });
+        try
+        {
+            _stream.Flush();
+        }
+        catch (Exception ex)
+        {
+            LastException = ex;
+            throw;
+        }
+    }
 
     public void Revert()
     {
@@ -175,7 +273,16 @@ internal sealed class ManagedIStream : IStream, IFailureSource
 
     public void Stat(out STATSTG pstatstg, int grfStatFlag)
     {
-        var length = Guard(() => _stream.Length - _origin);
+        long length;
+        try
+        {
+            length = _stream.Length - _origin;
+        }
+        catch (Exception ex)
+        {
+            LastException = ex;
+            throw;
+        }
         pstatstg = new STATSTG
         {
             type = StgTyStream,
@@ -184,5 +291,5 @@ internal sealed class ManagedIStream : IStream, IFailureSource
         };
     }
 
-    public void Clone(out IStream ppstm) => throw new COMException("Clone is not supported", StgEInvalidFunction);
+    public void Clone(out IWicStream ppstm) => throw new COMException("Clone is not supported", StgEInvalidFunction);
 }

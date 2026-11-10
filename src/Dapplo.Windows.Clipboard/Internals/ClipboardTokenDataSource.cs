@@ -13,6 +13,11 @@ internal sealed class ClipboardTokenDataSource : IClipboardDataSource
 {
     private readonly IClipboardAccessToken _clipboardAccessToken;
 
+    /// <summary>
+    /// The token, to read the content directly from the clipboard memory
+    /// </summary>
+    internal IClipboardAccessToken Token => _clipboardAccessToken;
+
     public ClipboardTokenDataSource(IClipboardAccessToken clipboardAccessToken)
     {
         _clipboardAccessToken = clipboardAccessToken;

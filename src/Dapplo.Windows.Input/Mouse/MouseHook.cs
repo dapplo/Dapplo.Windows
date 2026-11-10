@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
-using System.Runtime.InteropServices;
 using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Structs;
 using Dapplo.Windows.Messages.Enums;
@@ -54,7 +53,7 @@ public static class MouseHook
     /// <returns>MouseEventArgs</returns>
     private static MouseHookEventArgs CreateMouseEventArgs(IntPtr wParam, IntPtr lParam)
     {
-        var mouseLowLevelHookStruct = Marshal.PtrToStructure<MouseLowLevelHookStruct>(lParam);
+        var mouseLowLevelHookStruct = ReadHookStruct<MouseLowLevelHookStruct>(lParam);
 
         return new MouseHookEventArgs
         {
@@ -65,4 +64,9 @@ public static class MouseHook
             TimeStamp = mouseLowLevelHookStruct.TimeStamp
         };
     }
+
+    /// <summary>
+    ///     Read the blittable hook struct directly, Marshal.PtrToStructure boxes it on .NET Framework, for every event
+    /// </summary>
+    private static unsafe T ReadHookStruct<T>(IntPtr lParam) where T : unmanaged => *(T*)lParam;
 }

@@ -31,6 +31,7 @@ public static class Program
 
         BenchmarkRunner.Run<ScreenboundsBenchmark>(config);
         BenchmarkRunner.Run<ClipboardBenchmarks>(config);
+        BenchmarkRunner.Run<DibBenchmarks>(config);
         BenchmarkRunner.Run<EnumerateWindowsBenchmark>(config);
         BenchmarkRunner.Run<InteropWindowBenchmark>(config);
         Console.ReadLine();

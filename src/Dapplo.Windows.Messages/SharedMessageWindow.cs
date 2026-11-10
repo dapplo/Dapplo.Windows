@@ -806,17 +806,22 @@ public static class SharedMessageWindow
                 return 0;
             }
 
-            var windowMessage = new WindowMessage(hWnd, msg, wParam, lParam);
+            // Without listeners (e.g. between subscriptions) the window still gets messages, don't allocate for those
             var observers = Volatile.Read(ref _observers);
-            foreach (var observer in observers)
+            WindowMessage windowMessage = null;
+            if (observers.Length > 0)
             {
-                try
+                windowMessage = new WindowMessage(hWnd, msg, wParam, lParam);
+                foreach (var observer in observers)
                 {
-                    observer.OnNext(windowMessage);
-                }
-                catch (Exception ex)
-                {
-                    ReportError(ex);
+                    try
+                    {
+                        observer.OnNext(windowMessage);
+                    }
+                    catch (Exception ex)
+                    {
+                        ReportError(ex);
+                    }
                 }
             }
 
@@ -829,7 +834,7 @@ public static class SharedMessageWindow
                 PostQuitMessage(0);
             }
 
-            if (windowMessage.Handled)
+            if (windowMessage is { Handled: true })
             {
                 return windowMessage.Result;
             }

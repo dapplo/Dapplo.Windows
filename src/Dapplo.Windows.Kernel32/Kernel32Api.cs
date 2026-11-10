@@ -112,8 +112,23 @@ public static class Kernel32Api
         const int errorInsufficientBuffer = 122;
         const int maxCapacity = 32768;
         var capacity = 260;
+        unsafe
+        {
+            // Almost every path fits in MAX_PATH: the first attempt uses a buffer on the stack, this is called for every process when enumerating windows
+            var stackBuffer = stackalloc char[capacity];
+            int stackBufferSize = capacity;
+            if (QueryFullProcessImageName(hProcess, 0, stackBuffer, ref stackBufferSize))
+            {
+                return stackBufferSize > 0 ? new string(stackBuffer, 0, stackBufferSize) : null;
+            }
+            if (Marshal.GetLastWin32Error() != errorInsufficientBuffer)
+            {
+                return null;
+            }
+        }
         while (true)
         {
+            capacity = Math.Min(capacity * 4, maxCapacity);
             var pathBuffer = new char[capacity];
             unsafe
             {
@@ -131,7 +146,6 @@ public static class Kernel32Api
             {
                 return null;
             }
-            capacity = Math.Min(capacity * 4, maxCapacity);
         }
     }
 
