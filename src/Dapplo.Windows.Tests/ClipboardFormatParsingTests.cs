@@ -147,6 +147,16 @@ public class ClipboardFormatParsingTests
     }
 
     [Fact]
+    public void Dib_Bgra32WithUnusedAlphaByte_IsOpaque()
+    {
+        // BI_RGB 32 bpp where every fourth byte is 0: the alpha byte is unused, the pixels are opaque (and copied row by row)
+        var pixels = new byte[] { 1, 2, 3, 0, 4, 5, 6, 0, 7, 8, 9, 0, 10, 11, 12, 0 };
+        Assert.True(TryDecodeChecked(DibImage.CreateDib(pixels, 2, 2, 8, false), out var image));
+        Assert.False(image.HasAlpha);
+        Assert.Equal(new byte[] { 1, 2, 3, 255, 4, 5, 6, 255, 7, 8, 9, 255, 10, 11, 12, 255 }, image.Pixels);
+    }
+
+    [Fact]
     public void Dib_Premultiplied_IsWrittenStraight()
     {
         // 50% transparent red, premultiplied: R = 128
