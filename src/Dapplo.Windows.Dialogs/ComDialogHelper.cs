@@ -64,13 +64,15 @@ internal static class ComDialogHelper
     }
 
     /// <summary>
-    /// Converts filter tuples to <see cref="FilterSpec"/> structs and applies them to the dialog.
+    /// Converts filter tuples to <see cref="FilterSpec"/> structs and applies them to the dialog,
+    /// preselecting the filter with the 0-based <paramref name="selectedFilterIndex"/> (the first one when it is out of range).
     /// Does nothing when <paramref name="filters"/> is empty.
     /// </summary>
     internal static void ApplyFilters(
         Action<uint, FilterSpec[]> setFileTypes,
         Action<uint> setFileTypeIndex,
-        List<(string Name, string Pattern)> filters)
+        List<(string Name, string Pattern)> filters,
+        int selectedFilterIndex = 0)
     {
         if (filters == null || filters.Count == 0) return;
 
@@ -79,8 +81,83 @@ internal static class ComDialogHelper
             specs[i] = new FilterSpec(filters[i].Name, filters[i].Pattern);
 
         setFileTypes((uint)specs.Length, specs);
-        setFileTypeIndex(1); // 1-based; select the first filter by default
+        setFileTypeIndex(ToComFileTypeIndex(selectedFilterIndex, specs.Length));
     }
+
+    /// <summary>
+    /// Converts the 0-based filter index of the builder API to the 1-based index of <c>IFileDialog::SetFileTypeIndex</c>.
+    /// An index outside the filters selects the first filter (1).
+    /// </summary>
+    /// <param name="filterIndex">0-based index of the filter</param>
+    /// <param name="filterCount">Number of filters</param>
+    internal static uint ToComFileTypeIndex(int filterIndex, int filterCount) =>
+        filterIndex >= 0 && filterIndex < filterCount ? (uint)filterIndex + 1 : 1u;
+
+    /// <summary>
+    /// Converts the 1-based index of <c>IFileDialog::GetFileTypeIndex</c> to the 0-based filter index of <see cref="FileDialogResult.SelectedFilterIndex"/>.
+    /// Returns -1 when there are no filters or the index isn't one of them.
+    /// </summary>
+    /// <param name="comFileTypeIndex">1-based index from GetFileTypeIndex</param>
+    /// <param name="filterCount">Number of filters</param>
+    internal static int FromComFileTypeIndex(uint comFileTypeIndex, int filterCount) =>
+        filterCount > 0 && comFileTypeIndex >= 1 && comFileTypeIndex <= (uint)filterCount ? (int)comFileTypeIndex - 1 : -1;
+
+    /// <summary>
+    /// Reads the file type the user chose, after <c>Show</c> returned S_OK and before the dialog is released.
+    /// </summary>
+    /// <param name="getFileTypeIndex">IFileDialog.GetFileTypeIndex of the dialog</param>
+    /// <param name="filterCount">Number of filters which were set</param>
+    /// <returns>0-based index of the filter, -1 when no filters were set or the dialog doesn't report one</returns>
+    internal static int ReadSelectedFilterIndex(GetFileTypeIndexDelegate getFileTypeIndex, int filterCount)
+    {
+        if (filterCount == 0) return -1;
+        try
+        {
+            getFileTypeIndex(out var comFileTypeIndex);
+            return FromComFileTypeIndex(comFileTypeIndex, filterCount);
+        }
+        catch (COMException)
+        {
+            // Non-critical: the path is there, only the file type is unknown
+            return -1;
+        }
+    }
+
+    /// <summary>Signature of IFileDialog.GetFileTypeIndex.</summary>
+    internal delegate void GetFileTypeIndexDelegate(out uint fileTypeIndex);
+
+    /// <summary>
+    /// Parses a Windows Forms / WPF style filter text, e.g. <c>"Images|*.png;*.jpg|All files|*.*"</c>, into name and pattern pairs.
+    /// </summary>
+    /// <param name="filter">Filter text: pairs of display name and pattern, all separated by <c>|</c>. <see langword="null"/> or empty gives no filters.</param>
+    /// <exception cref="ArgumentException">The text doesn't consist of name and pattern pairs (an odd number of parts), like Windows Forms and WPF.</exception>
+    internal static List<(string Name, string Pattern)> ParseFilter(string filter)
+    {
+        var result = new List<(string Name, string Pattern)>();
+        if (string.IsNullOrEmpty(filter)) return result;
+
+        var parts = filter.Split('|');
+        if (parts.Length % 2 != 0)
+        {
+            throw new ArgumentException($"The filter \"{filter}\" must consist of pairs of a name and a pattern, separated by '|', e.g. \"Images|*.png;*.jpg|All files|*.*\".", nameof(filter));
+        }
+        for (int i = 0; i < parts.Length; i += 2)
+        {
+            result.Add((parts[i], parts[i + 1]));
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// The owner for <c>Show</c>: <paramref name="ownerHandle"/>, or when it is <see cref="IntPtr.Zero"/> the active window of the calling thread
+    /// (like the Windows Forms and WPF dialogs), so the dialog stays in front of the window it was opened from.
+    /// Stays <see cref="IntPtr.Zero"/> (a top-level dialog) when the thread has no active window.
+    /// </summary>
+    internal static IntPtr ResolveOwner(IntPtr ownerHandle) =>
+        ownerHandle != IntPtr.Zero ? ownerHandle : GetActiveWindow();
+
+    [DllImport("user32.dll", ExactSpelling = true)]
+    private static extern IntPtr GetActiveWindow();
 
     /// <summary>
     /// Sets the initial folder on the dialog using <see cref="SHCreateItemFromParsingName"/>.

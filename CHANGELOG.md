@@ -7,6 +7,16 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.24.0]
+
+### Added
+- `FileSaveDialogBuilder.WithSelectedFilter(int index)` and `FileOpenDialogBuilder.WithSelectedFilter(int index)` in Dapplo.Windows.Dialogs: preselect a file type, the 0-based index of the filters in the order they were added (`IFileDialog::SetFileTypeIndex(index + 1)`). An index out of range keeps the first filter, it doesn't throw. Before, the first filter was always selected.
+- `FileDialogResult.SelectedFilterIndex`: the 0-based index of the file type the user chose (`IFileDialog::GetFileTypeIndex` after `Show`, read before the dialog is released), -1 after a cancel, when no filters were added and for the folder picker. For the format of a file when the name has no or an unknown extension, the user's choice wins over a guess from the path.
+- `FileSaveDialogBuilder.AddFilters(string)` and `FileOpenDialogBuilder.AddFilters(string)`: add the filters of a Windows Forms / WPF style filter text ("Images|*.png;*.jpg|All files|*.*"); a text with an odd number of parts throws an `ArgumentException`, like there.
+
+### Changed
+- `ShowDialog()` of the dialog builders (and the `FileDialog` methods) without an owner handle use the active window of the calling thread (`GetActiveWindow`) as owner, like the Windows Forms and WPF dialogs, so the dialog stays in front of the window it was opened from. Only when the thread has no active window (e.g. a console application) the dialog is top-level, as before. `SetDefaultExtension` is still only called when `WithDefaultExtension` was used.
+
 ## [3.23.0]
 
 ### Changed

@@ -97,6 +97,41 @@ public static class DialogSamples
         #endregion
     }
 
+    public static void SaveWithFileType(string configuredFormat)
+    {
+        #region SaveWithFileType
+        string[] formats = { "png", "jpg", "bmp", "gif" };
+        int configured = Array.IndexOf(formats, configuredFormat);
+
+        FileDialogResult result = new FileSaveDialogBuilder()
+            .WithSuggestedFileName("screenshot")
+            .AddFilter("PNG", "*.png")
+            .AddFilter("JPEG", "*.jpg;*.jpeg")
+            .AddFilter("Bitmap", "*.bmp")
+            .AddFilter("GIF", "*.gif")
+            // 0-based, in the order of AddFilter; -1 or another index out of range keeps the first filter
+            .WithSelectedFilter(configured)
+            .ShowDialog();
+
+        if (!result.WasCancelled)
+        {
+            // The file type the user chose, also when the name has no or an unknown extension
+            string format = result.SelectedFilterIndex >= 0 ? formats[result.SelectedFilterIndex] : configuredFormat;
+            Console.WriteLine($"Save {result.SelectedPath} as {format}");
+        }
+        #endregion
+    }
+
+    public static void AddFilters()
+    {
+        #region AddFilters
+        // A filter text as for the Filter property of the Windows Forms and WPF dialogs
+        FileDialogResult result = new FileOpenDialogBuilder()
+            .AddFilters("Images|*.png;*.jpg;*.bmp|All files|*.*")
+            .ShowDialog();
+        #endregion
+    }
+
     public static void PickFolder()
     {
         #region PickFolder

@@ -91,6 +91,32 @@ if (!result.WasCancelled)
 }
 ```
 
+`WithSelectedFilter` preselects a file type (0-based, in the order of `AddFilter`), `SelectedFilterIndex` is the type
+the user chose (-1 after a cancel or without filters):
+
+<!-- sample: DialogSamples.SaveWithFileType -->
+```csharp
+string[] formats = { "png", "jpg", "bmp", "gif" };
+int configured = Array.IndexOf(formats, configuredFormat);
+
+FileDialogResult result = new FileSaveDialogBuilder()
+    .WithSuggestedFileName("screenshot")
+    .AddFilter("PNG", "*.png")
+    .AddFilter("JPEG", "*.jpg;*.jpeg")
+    .AddFilter("Bitmap", "*.bmp")
+    .AddFilter("GIF", "*.gif")
+    // 0-based, in the order of AddFilter; -1 or another index out of range keeps the first filter
+    .WithSelectedFilter(configured)
+    .ShowDialog();
+
+if (!result.WasCancelled)
+{
+    // The file type the user chose, also when the name has no or an unknown extension
+    string format = result.SelectedFilterIndex >= 0 ? formats[result.SelectedFilterIndex] : configuredFormat;
+    Console.WriteLine($"Save {result.SelectedPath} as {format}");
+}
+```
+
 <!-- sample: DialogSamples.PickFolder -->
 ```csharp
 FileDialogResult result = new FolderPickerBuilder()
