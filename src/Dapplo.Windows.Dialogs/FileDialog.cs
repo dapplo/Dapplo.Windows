@@ -22,7 +22,7 @@ public static class FileDialog
     /// Presents a modern open-file dialog and returns the selected file path,
     /// or <see langword="null"/> if the user cancelled.
     /// </summary>
-    /// <param name="ownerHandle">Handle of the owner window (<see cref="IntPtr.Zero"/> for top-level).</param>
+    /// <param name="ownerHandle">Handle of the owner window; <see cref="IntPtr.Zero"/> uses the active window of the calling thread, or none.</param>
     /// <param name="title">Title bar text; <see langword="null"/> uses the Windows default ("Open").</param>
     /// <param name="initialDirectory">Folder shown on open; <see langword="null"/> reuses the last-visited folder.</param>
     /// <param name="filters">File-type filters, e.g. <c>new[] { ("Images", "*.png;*.jpg"), ("All files", "*.*") }</c>.</param>
@@ -51,7 +51,7 @@ public static class FileDialog
     /// Presents a modern open-file dialog with multiple selection enabled and returns the selected paths,
     /// or <see langword="null"/> if the user cancelled.
     /// </summary>
-    /// <param name="ownerHandle">Handle of the owner window (<see cref="IntPtr.Zero"/> for top-level).</param>
+    /// <param name="ownerHandle">Handle of the owner window; <see cref="IntPtr.Zero"/> uses the active window of the calling thread, or none.</param>
     /// <param name="title">Title bar text; <see langword="null"/> uses the Windows default ("Open").</param>
     /// <param name="initialDirectory">Folder shown on open; <see langword="null"/> reuses the last-visited folder.</param>
     /// <param name="filters">File-type filters, e.g. <c>new[] { ("Images", "*.png;*.jpg") }</c>.</param>
@@ -77,7 +77,7 @@ public static class FileDialog
     /// Presents a modern save-file dialog and returns the chosen path,
     /// or <see langword="null"/> if the user cancelled.
     /// </summary>
-    /// <param name="ownerHandle">Handle of the owner window (<see cref="IntPtr.Zero"/> for top-level).</param>
+    /// <param name="ownerHandle">Handle of the owner window; <see cref="IntPtr.Zero"/> uses the active window of the calling thread, or none.</param>
     /// <param name="title">Title bar text; <see langword="null"/> uses the Windows default ("Save As").</param>
     /// <param name="initialDirectory">Folder shown on open; <see langword="null"/> reuses the last-visited folder.</param>
     /// <param name="suggestedFileName">Pre-filled file-name, e.g. <c>"screenshot.png"</c>.</param>
@@ -109,7 +109,7 @@ public static class FileDialog
     /// Presents a modern folder-picker dialog and returns the selected folder path,
     /// or <see langword="null"/> if the user cancelled.
     /// </summary>
-    /// <param name="ownerHandle">Handle of the owner window (<see cref="IntPtr.Zero"/> for top-level).</param>
+    /// <param name="ownerHandle">Handle of the owner window; <see cref="IntPtr.Zero"/> uses the active window of the calling thread, or none.</param>
     /// <param name="title">Title bar text; <see langword="null"/> uses the Windows default.</param>
     /// <param name="initialDirectory">Folder shown on open; <see langword="null"/> reuses the last-visited folder.</param>
     /// <exception cref="System.Runtime.InteropServices.COMException">Unexpected COM failure.</exception>

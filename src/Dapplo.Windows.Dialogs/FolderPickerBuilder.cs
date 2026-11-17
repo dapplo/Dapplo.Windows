@@ -49,7 +49,9 @@ public sealed class FolderPickerBuilder
     /// Shows the dialog and returns the result.
     /// </summary>
     /// <param name="ownerHandle">
-    /// Handle of the owner window. Pass <see cref="IntPtr.Zero"/> (default) for a top-level dialog.
+    /// Handle of the owner window. With <see cref="IntPtr.Zero"/> (default) the active window of the calling thread is the owner,
+    /// like for the Windows Forms and WPF dialogs, so the dialog stays in front of the window it was opened from;
+    /// only when the thread has no active window the dialog is top-level.
     /// </param>
     /// <returns>
     /// A <see cref="FileDialogResult"/> describing the outcome.
@@ -69,7 +71,7 @@ public sealed class FolderPickerBuilder
             dialog.SetOptions(ComDialogHelper.CombineOptions(currentOptions, FileOpenOptions.PickFolders));
             ComDialogHelper.ApplyInitialDirectory(dialog.SetFolder, _initialDirectory);
 
-            var hr = dialog.Show(ownerHandle);
+            var hr = dialog.Show(ComDialogHelper.ResolveOwner(ownerHandle));
             if (hr == ComDialogHelper.HResultCancelled) return FileDialogResult.Cancelled();
             if (hr != 0) Marshal.ThrowExceptionForHR(hr);
 

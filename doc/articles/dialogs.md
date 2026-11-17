@@ -41,7 +41,8 @@ string folder = FileDialog.PickFolder(title: "Select Output Folder");
 
 For more options use `FileOpenDialogBuilder`, `FileSaveDialogBuilder` and `FolderPickerBuilder`. `FileDialog` uses
 them too. `ShowDialog` returns a `FileDialogResult`: `WasCancelled`, `SelectedPath` and, for multiple selection,
-`SelectedPaths`. Pass the handle of your window to `ShowDialog` to make the dialog modal for it.
+`SelectedPaths`. Pass the handle of your window to `ShowDialog` to make the dialog modal for it; without a handle the active window of
+the calling thread is the owner (as for the Windows Forms and WPF dialogs).
 
 <!-- sample: DialogSamples.OpenFile -->
 ```csharp
@@ -93,6 +94,45 @@ if (!result.WasCancelled)
 }
 ```
 
+`WithSelectedFilter(index)` preselects a file type: the 0-based index of the filters, in the order they were added. An
+index out of range keeps the first filter. After the dialog `SelectedFilterIndex` is the index of the type the user
+chose, -1 after a cancel, without filters and for the folder picker. Use it when the type matters more than the
+extension in the path, e.g. for the format of an image when the user typed a name without extension:
+
+<!-- sample: DialogSamples.SaveWithFileType -->
+```csharp
+string[] formats = { "png", "jpg", "bmp", "gif" };
+int configured = Array.IndexOf(formats, configuredFormat);
+
+FileDialogResult result = new FileSaveDialogBuilder()
+    .WithSuggestedFileName("screenshot")
+    .AddFilter("PNG", "*.png")
+    .AddFilter("JPEG", "*.jpg;*.jpeg")
+    .AddFilter("Bitmap", "*.bmp")
+    .AddFilter("GIF", "*.gif")
+    // 0-based, in the order of AddFilter; -1 or another index out of range keeps the first filter
+    .WithSelectedFilter(configured)
+    .ShowDialog();
+
+if (!result.WasCancelled)
+{
+    // The file type the user chose, also when the name has no or an unknown extension
+    string format = result.SelectedFilterIndex >= 0 ? formats[result.SelectedFilterIndex] : configuredFormat;
+    Console.WriteLine($"Save {result.SelectedPath} as {format}");
+}
+```
+
+`AddFilters` reads a filter text in the form of the `Filter` property of the Windows Forms and WPF dialogs: pairs of
+name and pattern, all separated by `|`. A text with an odd number of parts throws an `ArgumentException`, like there.
+
+<!-- sample: DialogSamples.AddFilters -->
+```csharp
+// A filter text as for the Filter property of the Windows Forms and WPF dialogs
+FileDialogResult result = new FileOpenDialogBuilder()
+    .AddFilters("Images|*.png;*.jpg;*.bmp|All files|*.*")
+    .ShowDialog();
+```
+
 <!-- sample: DialogSamples.PickFolder -->
 ```csharp
 FileDialogResult result = new FolderPickerBuilder()
@@ -122,12 +162,13 @@ FileDialogResult result = new FileOpenDialogBuilder()
 
 | Option | How |
 |---|---|
-| File types | `AddFilter("Images", "*.png;*.jpg")`, the first filter is selected |
-| Default extension | `WithDefaultExtension("png")`, without the dot |
+| File types | `AddFilter("Images", "*.png;*.jpg")` or `AddFilters(filterText)` (Windows Forms / WPF style), the first filter is selected |
+| Preselected file type | `WithSelectedFilter(index)`, 0-based; the chosen one is `SelectedFilterIndex` |
+| Default extension | `WithDefaultExtension("png")`, without the dot; only set when you call it. Windows then changes the appended extension when the user picks another file type |
 | Start folder | `WithInitialDirectory(path)`; without it Windows uses the folder the user used last |
 | File name | `FileSaveDialogBuilder.WithSuggestedFileName("report.pdf")` |
 | Several files | `FileOpenDialogBuilder.AllowMultipleSelection()` |
-| Owner window | `ShowDialog(ownerHandle)` |
+| Owner window | `ShowDialog(ownerHandle)`; without a handle the active window of the calling thread is the owner, a top-level dialog only when there is none |
 
 ## Errors and threading
 

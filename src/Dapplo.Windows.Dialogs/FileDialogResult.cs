@@ -44,11 +44,12 @@ namespace Dapplo.Windows.Dialogs;
 /// </remarks>
 public sealed class FileDialogResult
 {
-    private FileDialogResult(bool wasCancelled, string selectedPath, IReadOnlyList<string> selectedPaths)
+    private FileDialogResult(bool wasCancelled, string selectedPath, IReadOnlyList<string> selectedPaths, int selectedFilterIndex)
     {
         WasCancelled = wasCancelled;
         SelectedPath = selectedPath;
         SelectedPaths = selectedPaths;
+        SelectedFilterIndex = selectedFilterIndex;
     }
 
     /// <summary>
@@ -74,14 +75,25 @@ public sealed class FileDialogResult
     /// </summary>
     public IReadOnlyList<string> SelectedPaths { get; }
 
+    /// <summary>
+    /// Gets the 0-based index of the file type the user chose in the type drop-down, in the order the filters were added
+    /// (<c>AddFilter</c> / <c>AddFilters</c>), or -1 when the dialog was cancelled, no filters were added, or it is a folder picker.
+    /// </summary>
+    /// <remarks>
+    /// Use it when the chosen file type matters more than the extension of the path, e.g. to pick the image format
+    /// when the user typed a name without (or with an unknown) extension.
+    /// </remarks>
+    public int SelectedFilterIndex { get; }
+
     internal static FileDialogResult Cancelled() =>
-        new FileDialogResult(wasCancelled: true, selectedPath: null, selectedPaths: null);
+        new FileDialogResult(wasCancelled: true, selectedPath: null, selectedPaths: null, selectedFilterIndex: -1);
 
-    internal static FileDialogResult FromPath(string path) =>
-        new FileDialogResult(wasCancelled: false, selectedPath: path, selectedPaths: null);
+    internal static FileDialogResult FromPath(string path, int selectedFilterIndex = -1) =>
+        new FileDialogResult(wasCancelled: false, selectedPath: path, selectedPaths: null, selectedFilterIndex: selectedFilterIndex);
 
-    internal static FileDialogResult FromPaths(IReadOnlyList<string> paths) =>
+    internal static FileDialogResult FromPaths(IReadOnlyList<string> paths, int selectedFilterIndex = -1) =>
         new FileDialogResult(wasCancelled: false,
             selectedPath: paths.Count > 0 ? paths[0] : null,
-            selectedPaths: paths);
+            selectedPaths: paths,
+            selectedFilterIndex: selectedFilterIndex);
 }

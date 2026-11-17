@@ -32,6 +32,7 @@ public sealed class FileSaveDialogBuilder
     private string _initialDirectory;
     private string _suggestedFileName;
     private string _defaultExtension;
+    private int _selectedFilterIndex;
     private readonly List<(string Name, string Pattern)> _filters = new();
     private readonly List<(string Path, bool AtTop)> _places = new();
 
@@ -83,6 +84,31 @@ public sealed class FileSaveDialogBuilder
     }
 
     /// <summary>
+    /// Adds the file-type filters of a Windows Forms / WPF style filter text, e.g. <c>"Images|*.png;*.jpg|All files|*.*"</c>:
+    /// pairs of display name and pattern, all separated by <c>|</c>. Several patterns of one filter are separated by <c>;</c>.
+    /// <see langword="null"/> or an empty text adds nothing.
+    /// </summary>
+    /// <param name="filter">The filter text, as for <c>System.Windows.Forms.FileDialog.Filter</c> or <c>Microsoft.Win32.FileDialog.Filter</c>.</param>
+    /// <exception cref="ArgumentException">The text isn't made of name and pattern pairs (an odd number of parts).</exception>
+    public FileSaveDialogBuilder AddFilters(string filter)
+    {
+        _filters.AddRange(ComDialogHelper.ParseFilter(filter));
+        return this;
+    }
+
+    /// <summary>
+    /// Preselects a file type in the type drop-down: the 0-based index of the filters added with <c>AddFilter</c> / <c>AddFilters</c>,
+    /// in the order they were added. When the index is out of range when the dialog is shown, the first filter is selected.
+    /// Without this the first filter is selected.
+    /// </summary>
+    /// <param name="index">0-based index of the filter</param>
+    public FileSaveDialogBuilder WithSelectedFilter(int index)
+    {
+        _selectedFilterIndex = index;
+        return this;
+    }
+
+    /// <summary>
     /// Adds a custom location to the dialog's navigation sidebar.
     /// Ignored when <paramref name="path"/> does not exist.
     /// </summary>
@@ -101,7 +127,9 @@ public sealed class FileSaveDialogBuilder
     /// Shows the dialog and returns the result.
     /// </summary>
     /// <param name="ownerHandle">
-    /// Handle of the owner window. Pass <see cref="IntPtr.Zero"/> (default) for a top-level dialog.
+    /// Handle of the owner window. With <see cref="IntPtr.Zero"/> (default) the active window of the calling thread is the owner,
+    /// like for the Windows Forms and WPF dialogs, so the dialog stays in front of the window it was opened from;
+    /// only when the thread has no active window the dialog is top-level.
     /// </param>
     /// <returns>
     /// A <see cref="FileDialogResult"/> describing the outcome.
@@ -119,18 +147,21 @@ public sealed class FileSaveDialogBuilder
             // OverwritePrompt is one of the save dialog defaults; the defaults are kept and it is added explicitly.
             dialog.GetOptions(out var currentOptions);
             dialog.SetOptions(ComDialogHelper.CombineOptions(currentOptions, FileOpenOptions.OverwritePrompt));
-            ComDialogHelper.ApplyFilters(dialog.SetFileTypes, dialog.SetFileTypeIndex, _filters);
+            ComDialogHelper.ApplyFilters(dialog.SetFileTypes, dialog.SetFileTypeIndex, _filters, _selectedFilterIndex);
             if (_suggestedFileName != null) dialog.SetFileName(_suggestedFileName);
             if (_defaultExtension != null) dialog.SetDefaultExtension(_defaultExtension);
             ComDialogHelper.ApplyInitialDirectory(dialog.SetFolder, _initialDirectory);
             ComDialogHelper.ApplyPlaces(dialog.AddPlace, _places);
 
-            var hr = dialog.Show(ownerHandle);
+            var hr = dialog.Show(ComDialogHelper.ResolveOwner(ownerHandle));
             if (hr == ComDialogHelper.HResultCancelled) return FileDialogResult.Cancelled();
             if (hr != 0) Marshal.ThrowExceptionForHR(hr);
 
+            // Read before the dialog is released
+            var selectedFilterIndex = ComDialogHelper.ReadSelectedFilterIndex(dialog.GetFileTypeIndex, _filters.Count);
+
             dialog.GetResult(out var item);
-            return FileDialogResult.FromPath(ComDialogHelper.GetFileSysPathAndRelease(item));
+            return FileDialogResult.FromPath(ComDialogHelper.GetFileSysPathAndRelease(item), selectedFilterIndex);
         }
         finally
         {
