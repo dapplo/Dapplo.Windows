@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class NativeIconMethods | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class NativeIconMethods | Dapplo.Windows ">
+      
+      <meta name="description" content="Win32 native methods for Icon">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Icons_NativeIconMethods.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Icons.NativeIconMethods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Icons.NativeIconMethods">
+
+
+
+  <h1 id="Dapplo_Windows_Icons_NativeIconMethods" data-uid="Dapplo.Windows.Icons.NativeIconMethods" class="text-break">
+Class NativeIconMethods  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Icons/NativeIconMethods.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Icons.html">Icons</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Icons.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Win32 native methods for Icon</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class NativeIconMethods</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">NativeIconMethods</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_CopyIcon_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.CopyIcon*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_CopyIcon_Dapplo_Windows_Icons_SafeHandles_SafeIconHandle_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.CopyIcon(Dapplo.Windows.Icons.SafeHandles.SafeIconHandle)">
+  CopyIcon(SafeIconHandle)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>The following is used for Icon handling, and copies a hicon to a new</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern SafeIconHandle CopyIcon(SafeIconHandle hIcon)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hIcon</code> <a class="xref" href="Dapplo.Windows.Icons.SafeHandles.SafeIconHandle.html">SafeIconHandle</a></dt>
+    <dd><p>SafeIconHandle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Icons.SafeHandles.SafeIconHandle.html">SafeIconHandle</a></dt>
+    <dd><p>SafeIconHandle</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_CopyIcon_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.CopyIcon*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_CopyIcon_System_IntPtr_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.CopyIcon(System.IntPtr)">
+  CopyIcon(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>The following is used for Icon handling, and copies a hicon to a new</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern SafeIconHandle CopyIcon(nint hIcon)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hIcon</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>SafeIconHandle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Icons.SafeHandles.SafeIconHandle.html">SafeIconHandle</a></dt>
+    <dd><p>IntPtr</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_CreateIconIndirect_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.CreateIconIndirect*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_CreateIconIndirect_Dapplo_Windows_Icons_Structs_IconInfo__" data-uid="Dapplo.Windows.Icons.NativeIconMethods.CreateIconIndirect(Dapplo.Windows.Icons.Structs.IconInfo@)">
+  CreateIconIndirect(ref IconInfo)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648062(v=vs.85).aspx">CreateIconIndirect function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern nint CreateIconIndirect(ref IconInfo icon)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>icon</code> <a class="xref" href="Dapplo.Windows.Icons.Structs.IconInfo.html">IconInfo</a></dt>
+    <dd><p>IconInfo</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>IntPtr with the icon handle</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_DestroyIcon_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.DestroyIcon*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_DestroyIcon_System_IntPtr_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.DestroyIcon(System.IntPtr)">
+  DestroyIcon(nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Destroys an icon and frees any memory the icon occupied.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool DestroyIcon(nint hIcon)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hIcon</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the icon to be destroyed. The icon must not be in use.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the destroy succeeded</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Icons_NativeIconMethods_DestroyIcon_System_IntPtr__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>It is only necessary to call DestroyIcon for icons and cursors created with the following functions: CreateIconFromResourceEx (if called without the LR_SHARED flag), CreateIconIndirect, and CopyIcon. Do not use this function to destroy a shared icon. A shared icon is valid as long as the module from which it was loaded remains in memory. The following functions obtain a shared icon.</p>
+</div>
+
+
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_GetIconInfo_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.GetIconInfo*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_GetIconInfo_Dapplo_Windows_Icons_SafeHandles_SafeIconHandle_Dapplo_Windows_Icons_Structs_IconInfo__" data-uid="Dapplo.Windows.Icons.NativeIconMethods.GetIconInfo(Dapplo.Windows.Icons.SafeHandles.SafeIconHandle,Dapplo.Windows.Icons.Structs.IconInfo@)">
+  GetIconInfo(SafeIconHandle, out IconInfo)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves information about the specified icon or cursor.
+See <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648070(v=vs.85).aspx">GetIconInfo function</a>
+This also describes to get more info on standard icons and cursors</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetIconInfo(SafeIconHandle iconHandle, out IconInfo iconInfo)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>iconHandle</code> <a class="xref" href="Dapplo.Windows.Icons.SafeHandles.SafeIconHandle.html">SafeIconHandle</a></dt>
+    <dd><p>A handle to the icon or cursor.</p>
+</dd>
+    <dt><code>iconInfo</code> <a class="xref" href="Dapplo.Windows.Icons.Structs.IconInfo.html">IconInfo</a></dt>
+    <dd><p>A pointer to an ICONINFO structure. The function fills in the structure's members.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the function succeeds, the return value is in the IconInfo structure.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_GetIconInfoEx_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.GetIconInfoEx*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_GetIconInfoEx_Dapplo_Windows_Icons_SafeHandles_SafeIconHandle_Dapplo_Windows_Icons_Structs_IconInfoEx__" data-uid="Dapplo.Windows.Icons.NativeIconMethods.GetIconInfoEx(Dapplo.Windows.Icons.SafeHandles.SafeIconHandle,Dapplo.Windows.Icons.Structs.IconInfoEx@)">
+  GetIconInfoEx(SafeIconHandle, ref IconInfoEx)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves information about the specified icon or cursor.
+See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-geticoninfoexw">GetIconInfoEx function</a>
+This also describes to get more info on standard icons and cursors</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetIconInfoEx(SafeIconHandle iconOrCursorHandle, ref IconInfoEx iconInfoEx)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>iconOrCursorHandle</code> <a class="xref" href="Dapplo.Windows.Icons.SafeHandles.SafeIconHandle.html">SafeIconHandle</a></dt>
+    <dd><p>A handle to the icon or cursor.</p>
+</dd>
+    <dt><code>iconInfoEx</code> <a class="xref" href="Dapplo.Windows.Icons.Structs.IconInfoEx.html">IconInfoEx</a></dt>
+    <dd><p>A pointer to an ICONINFOEX structure. The function fills in the structure's members.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the function succeeds, the return value is in the IconInfo structure.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_GetIconInfoEx_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.GetIconInfoEx*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_GetIconInfoEx_System_IntPtr_Dapplo_Windows_Icons_Structs_IconInfoEx__" data-uid="Dapplo.Windows.Icons.NativeIconMethods.GetIconInfoEx(System.IntPtr,Dapplo.Windows.Icons.Structs.IconInfoEx@)">
+  GetIconInfoEx(nint, ref IconInfoEx)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves information about the specified icon or cursor.
+See <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-geticoninfoexw">GetIconInfoEx function</a>
+This also describes to get more info on standard icons and cursors</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern bool GetIconInfoEx(nint iconOrCursorHandle, ref IconInfoEx iconInfoEx)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>iconOrCursorHandle</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A IntPtr handle to the icon or cursor.</p>
+</dd>
+    <dt><code>iconInfoEx</code> <a class="xref" href="Dapplo.Windows.Icons.Structs.IconInfoEx.html">IconInfoEx</a></dt>
+    <dd><p>A pointer to an ICONINFOEX structure. The function fills in the structure's members.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool true if the function succeeds, the return value is in the IconInfo structure.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_LoadIconMetric_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.LoadIconMetric*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_LoadIconMetric_System_IntPtr_System_IntPtr_Dapplo_Windows_Icons_Enums_IconMetricSize_System_IntPtr__" data-uid="Dapplo.Windows.Icons.NativeIconMethods.LoadIconMetric(System.IntPtr,System.IntPtr,Dapplo.Windows.Icons.Enums.IconMetricSize,System.IntPtr@)">
+  LoadIconMetric(nint, nint, IconMetricSize, out nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Loads an icon with the specified dimensions from an icon resource.
+The icon resource can be from an application instance or loaded from a file.
+This function automatically scales down a larger image to the requested size.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric">LoadIconMetric function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int LoadIconMetric(nint hInstance, nint pszIconName, IconMetricSize lims, out nint hIcon)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hInstance</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the module of either a DLL or executable (.exe) that contains the icon to be loaded.
+To load a stock system icon, set this parameter to IntPtr.Zero.</p>
+</dd>
+    <dt><code>pszIconName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>The icon name. To load a stock system icon, use one of the IDI_* constants.
+To load from resources, use MAKEINTRESOURCE macro result or the string name.</p>
+</dd>
+    <dt><code>lims</code> <a class="xref" href="Dapplo.Windows.Icons.Enums.IconMetricSize.html">IconMetricSize</a></dt>
+    <dd><p>The size of the icon to load. This can be SmallIcon (SM_CXSMICON) or StandardIcon (SM_CXICON).</p>
+</dd>
+    <dt><code>hIcon</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>When this function returns, contains a handle to the loaded icon.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>If the function succeeds, it returns S_OK (0). Otherwise, it returns an HRESULT error code.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_LoadIconMetric_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.LoadIconMetric*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_LoadIconMetric_System_IntPtr_System_String_Dapplo_Windows_Icons_Enums_IconMetricSize_System_IntPtr__" data-uid="Dapplo.Windows.Icons.NativeIconMethods.LoadIconMetric(System.IntPtr,System.String,Dapplo.Windows.Icons.Enums.IconMetricSize,System.IntPtr@)">
+  LoadIconMetric(nint, string, IconMetricSize, out nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Loads an icon with the specified dimensions from an icon resource.
+The icon resource can be from an application instance or loaded from a file.
+This function automatically scales down a larger image to the requested size.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric">LoadIconMetric function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int LoadIconMetric(nint hInstance, string pszIconName, IconMetricSize lims, out nint hIcon)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hInstance</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the module of either a DLL or executable (.exe) that contains the icon to be loaded.
+To load a stock system icon, set this parameter to IntPtr.Zero.</p>
+</dd>
+    <dt><code>pszIconName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The icon name as a string.</p>
+</dd>
+    <dt><code>lims</code> <a class="xref" href="Dapplo.Windows.Icons.Enums.IconMetricSize.html">IconMetricSize</a></dt>
+    <dd><p>The size of the icon to load. This can be SmallIcon (SM_CXSMICON) or StandardIcon (SM_CXICON).</p>
+</dd>
+    <dt><code>hIcon</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>When this function returns, contains a handle to the loaded icon.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>If the function succeeds, it returns S_OK (0). Otherwise, it returns an HRESULT error code.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_LoadIconWithScaleDown_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.LoadIconWithScaleDown*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_LoadIconWithScaleDown_System_IntPtr_System_IntPtr_System_Int32_System_Int32_System_IntPtr__" data-uid="Dapplo.Windows.Icons.NativeIconMethods.LoadIconWithScaleDown(System.IntPtr,System.IntPtr,System.Int32,System.Int32,System.IntPtr@)">
+  LoadIconWithScaleDown(nint, nint, int, int, out nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Loads an icon. If the icon is larger than the requested size, this function scales down the icon to the requested size.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconwithscaledown">LoadIconWithScaleDown function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int LoadIconWithScaleDown(nint hInstance, nint pszIconName, int cx, int cy, out nint hIcon)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hInstance</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the module of either a DLL or executable (.exe) that contains the icon to be loaded.
+To load a stock system icon, set this parameter to IntPtr.Zero.</p>
+</dd>
+    <dt><code>pszIconName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>The icon name. To load a stock system icon, use one of the IDI_* constants.
+To load from resources, use MAKEINTRESOURCE macro result or the string name.</p>
+</dd>
+    <dt><code>cx</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The desired width, in pixels, of the icon.</p>
+</dd>
+    <dt><code>cy</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The desired height, in pixels, of the icon.</p>
+</dd>
+    <dt><code>hIcon</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>When this function returns, contains a handle to the loaded icon.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>If the function succeeds, it returns S_OK (0). Otherwise, it returns an HRESULT error code.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Icons_NativeIconMethods_LoadIconWithScaleDown_" data-uid="Dapplo.Windows.Icons.NativeIconMethods.LoadIconWithScaleDown*"></a>
+
+  <h3 id="Dapplo_Windows_Icons_NativeIconMethods_LoadIconWithScaleDown_System_IntPtr_System_String_System_Int32_System_Int32_System_IntPtr__" data-uid="Dapplo.Windows.Icons.NativeIconMethods.LoadIconWithScaleDown(System.IntPtr,System.String,System.Int32,System.Int32,System.IntPtr@)">
+  LoadIconWithScaleDown(nint, string, int, int, out nint)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Loads an icon. If the icon is larger than the requested size, this function scales down the icon to the requested size.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconwithscaledown">LoadIconWithScaleDown function</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static extern int LoadIconWithScaleDown(nint hInstance, string pszIconName, int cx, int cy, out nint hIcon)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hInstance</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>A handle to the module of either a DLL or executable (.exe) that contains the icon to be loaded.
+To load a stock system icon, set this parameter to IntPtr.Zero.</p>
+</dd>
+    <dt><code>pszIconName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The icon name as a string.</p>
+</dd>
+    <dt><code>cx</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The desired width, in pixels, of the icon.</p>
+</dd>
+    <dt><code>cy</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The desired height, in pixels, of the icon.</p>
+</dd>
+    <dt><code>hIcon</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd><p>When this function returns, contains a handle to the loaded icon.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>If the function succeeds, it returns S_OK (0). Otherwise, it returns an HRESULT error code.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Icons/NativeIconMethods.cs/#L19" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

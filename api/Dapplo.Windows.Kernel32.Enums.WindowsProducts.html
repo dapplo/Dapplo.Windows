@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Enum WindowsProducts | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Enum WindowsProducts | Dapplo.Windows ">
+      
+      <meta name="description" content="Windows Product types, returned by GetProductInfo">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Kernel32_Enums_WindowsProducts.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Kernel32.Enums.WindowsProducts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Kernel32.Enums.WindowsProducts">
+
+
+
+
+  <h1 id="Dapplo_Windows_Kernel32_Enums_WindowsProducts" data-uid="Dapplo.Windows.Kernel32.Enums.WindowsProducts" class="text-break">
+Enum WindowsProducts  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Enums/WindowsProducts.cs/#L11"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Kernel32.html">Kernel32</a>.<a class="xref" href="Dapplo.Windows.Kernel32.Enums.html">Enums</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Kernel32.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Windows Product types, returned by GetProductInfo</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[SuppressMessage(&quot;ReSharper&quot;, &quot;InconsistentNaming&quot;)]
+public enum WindowsProducts : uint</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Common.Extensions.EnumExtensions.html#Dapplo_Windows_Common_Extensions_EnumExtensions_GetAttributeOfType__1_System_Enum_">EnumExtensions.GetAttributeOfType&lt;T&gt;(Enum)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Common.Extensions.EnumExtensions.html#Dapplo_Windows_Common_Extensions_EnumExtensions_GetEnumDescription_System_Enum_">EnumExtensions.GetEnumDescription(Enum)</a>
+  </div>
+  </dd></dl>
+
+  <h2 id="fields">Fields
+</h2>
+  <dl class="parameters">
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ARM64_SERVER"><code>PRODUCT_ARM64_SERVER = 120</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_BUSINESS"><code>PRODUCT_BUSINESS = 6</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_BUSINESS_N"><code>PRODUCT_BUSINESS_N = 16</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CLOUD_HOST_INFRASTRUCTURE_SERVER"><code>PRODUCT_CLOUD_HOST_INFRASTRUCTURE_SERVER = 124</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CLOUD_STORAGE_SERVER"><code>PRODUCT_CLOUD_STORAGE_SERVER = 110</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CLUSTER_SERVER"><code>PRODUCT_CLUSTER_SERVER = 18</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CLUSTER_SERVER_V"><code>PRODUCT_CLUSTER_SERVER_V = 64</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CONNECTED_CAR"><code>PRODUCT_CONNECTED_CAR = 117</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CORE"><code>PRODUCT_CORE = 101</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CORE_ARM"><code>PRODUCT_CORE_ARM = 97</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CORE_CONNECTED"><code>PRODUCT_CORE_CONNECTED = 111</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CORE_CONNECTED_COUNTRYSPECIFIC"><code>PRODUCT_CORE_CONNECTED_COUNTRYSPECIFIC = 116</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CORE_CONNECTED_N"><code>PRODUCT_CORE_CONNECTED_N = 113</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CORE_CONNECTED_SINGLELANGUAGE"><code>PRODUCT_CORE_CONNECTED_SINGLELANGUAGE = 115</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CORE_COUNTRYSPECIFIC"><code>PRODUCT_CORE_COUNTRYSPECIFIC = 99</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CORE_N"><code>PRODUCT_CORE_N = 98</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_CORE_SINGLELANGUAGE"><code>PRODUCT_CORE_SINGLELANGUAGE = 100</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_DATACENTER_EVALUATION_SERVER"><code>PRODUCT_DATACENTER_EVALUATION_SERVER = 80</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_DATACENTER_EVALUATION_SERVER_CORE"><code>PRODUCT_DATACENTER_EVALUATION_SERVER_CORE = 159</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_DATACENTER_SERVER"><code>PRODUCT_DATACENTER_SERVER = 8</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_DATACENTER_SERVER_CORE"><code>PRODUCT_DATACENTER_SERVER_CORE = 12</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_DATACENTER_SERVER_CORE_V"><code>PRODUCT_DATACENTER_SERVER_CORE_V = 39</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_DATACENTER_SERVER_V"><code>PRODUCT_DATACENTER_SERVER_V = 37</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EDUCATION"><code>PRODUCT_EDUCATION = 121</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EDUCATION_N"><code>PRODUCT_EDUCATION_N = 122</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED"><code>PRODUCT_EMBEDDED = 65</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_A"><code>PRODUCT_EMBEDDED_A = 88</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_AUTOMOTIVE"><code>PRODUCT_EMBEDDED_AUTOMOTIVE = 85</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_E"><code>PRODUCT_EMBEDDED_E = 90</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_EVAL"><code>PRODUCT_EMBEDDED_EVAL = 107</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_E_EVAL"><code>PRODUCT_EMBEDDED_E_EVAL = 108</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_INDUSTRY"><code>PRODUCT_EMBEDDED_INDUSTRY = 89</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_INDUSTRY_A"><code>PRODUCT_EMBEDDED_INDUSTRY_A = 86</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_INDUSTRY_A_E"><code>PRODUCT_EMBEDDED_INDUSTRY_A_E = 92</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_INDUSTRY_E"><code>PRODUCT_EMBEDDED_INDUSTRY_E = 91</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_INDUSTRY_EVAL"><code>PRODUCT_EMBEDDED_INDUSTRY_EVAL = 105</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_EMBEDDED_INDUSTRY_E_EVAL"><code>PRODUCT_EMBEDDED_INDUSTRY_E_EVAL = 106</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE"><code>PRODUCT_ENTERPRISE = 4</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_E"><code>PRODUCT_ENTERPRISE_E = 70</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_EVALUATION"><code>PRODUCT_ENTERPRISE_EVALUATION = 72</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_N"><code>PRODUCT_ENTERPRISE_N = 27</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_N_EVALUATION"><code>PRODUCT_ENTERPRISE_N_EVALUATION = 84</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_S"><code>PRODUCT_ENTERPRISE_S = 125</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_SERVER"><code>PRODUCT_ENTERPRISE_SERVER = 10</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_SERVER_CORE"><code>PRODUCT_ENTERPRISE_SERVER_CORE = 14</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_SERVER_CORE_V"><code>PRODUCT_ENTERPRISE_SERVER_CORE_V = 41</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_SERVER_IA64"><code>PRODUCT_ENTERPRISE_SERVER_IA64 = 15</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_SERVER_V"><code>PRODUCT_ENTERPRISE_SERVER_V = 38</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_SUBSCRIPTION"><code>PRODUCT_ENTERPRISE_SUBSCRIPTION = 140</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_S_EVALUATION"><code>PRODUCT_ENTERPRISE_S_EVALUATION = 129</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_S_N"><code>PRODUCT_ENTERPRISE_S_N = 126</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ENTERPRISE_S_N_EVALUATION"><code>PRODUCT_ENTERPRISE_S_N_EVALUATION = 130</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ESSENTIALBUSINESS_SERVER_ADDL"><code>PRODUCT_ESSENTIALBUSINESS_SERVER_ADDL = 60</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ESSENTIALBUSINESS_SERVER_ADDLSVC"><code>PRODUCT_ESSENTIALBUSINESS_SERVER_ADDLSVC = 62</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ESSENTIALBUSINESS_SERVER_MGMT"><code>PRODUCT_ESSENTIALBUSINESS_SERVER_MGMT = 59</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ESSENTIALBUSINESS_SERVER_MGMTSVC"><code>PRODUCT_ESSENTIALBUSINESS_SERVER_MGMTSVC = 61</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_HOME_BASIC"><code>PRODUCT_HOME_BASIC = 2</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_HOME_BASIC_E"><code>PRODUCT_HOME_BASIC_E = 67</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_HOME_BASIC_N"><code>PRODUCT_HOME_BASIC_N = 5</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_HOME_PREMIUM"><code>PRODUCT_HOME_PREMIUM = 3</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_HOME_PREMIUM_E"><code>PRODUCT_HOME_PREMIUM_E = 68</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_HOME_PREMIUM_N"><code>PRODUCT_HOME_PREMIUM_N = 26</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_HOME_PREMIUM_SERVER"><code>PRODUCT_HOME_PREMIUM_SERVER = 34</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_HOME_SERVER"><code>PRODUCT_HOME_SERVER = 19</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_HYPERV"><code>PRODUCT_HYPERV = 42</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_INDUSTRY_HANDHELD"><code>PRODUCT_INDUSTRY_HANDHELD = 118</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_IOTENTERPRISE"><code>PRODUCT_IOTENTERPRISE = 188</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_IOTENTERPRISE_S"><code>PRODUCT_IOTENTERPRISE_S = 191</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_IOTUAP"><code>PRODUCT_IOTUAP = 123</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_IOTUAPCOMMERCIAL"><code>PRODUCT_IOTUAPCOMMERCIAL = 131</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_MEDIUMBUSINESS_SERVER_MANAGEMENT"><code>PRODUCT_MEDIUMBUSINESS_SERVER_MANAGEMENT = 30</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_MEDIUMBUSINESS_SERVER_MESSAGING"><code>PRODUCT_MEDIUMBUSINESS_SERVER_MESSAGING = 32</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_MEDIUMBUSINESS_SERVER_SECURITY"><code>PRODUCT_MEDIUMBUSINESS_SERVER_SECURITY = 31</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_MOBILE_CORE"><code>PRODUCT_MOBILE_CORE = 104</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_MULTIPOINT_PREMIUM_SERVER"><code>PRODUCT_MULTIPOINT_PREMIUM_SERVER = 77</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_MULTIPOINT_STANDARD_SERVER"><code>PRODUCT_MULTIPOINT_STANDARD_SERVER = 76</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_NANO_SERVER"><code>PRODUCT_NANO_SERVER = 109</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PPI_PRO"><code>PRODUCT_PPI_PRO = 119</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PROFESSIONAL"><code>PRODUCT_PROFESSIONAL = 48</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PROFESSIONAL_E"><code>PRODUCT_PROFESSIONAL_E = 69</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PROFESSIONAL_EMBEDDED"><code>PRODUCT_PROFESSIONAL_EMBEDDED = 58</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PROFESSIONAL_N"><code>PRODUCT_PROFESSIONAL_N = 49</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PROFESSIONAL_S"><code>PRODUCT_PROFESSIONAL_S = 127</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PROFESSIONAL_STUDENT"><code>PRODUCT_PROFESSIONAL_STUDENT = 112</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PROFESSIONAL_STUDENT_N"><code>PRODUCT_PROFESSIONAL_STUDENT_N = 114</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PROFESSIONAL_S_N"><code>PRODUCT_PROFESSIONAL_S_N = 128</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PROFESSIONAL_WMC"><code>PRODUCT_PROFESSIONAL_WMC = 103</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PRO_FOR_EDUCATION"><code>PRODUCT_PRO_FOR_EDUCATION = 164</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PRO_FOR_EDUCATION_N"><code>PRODUCT_PRO_FOR_EDUCATION_N = 165</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PRO_WORKSTATION"><code>PRODUCT_PRO_WORKSTATION = 161</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_PRO_WORKSTATION_N"><code>PRODUCT_PRO_WORKSTATION_N = 162</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SB_SOLUTION_SERVER"><code>PRODUCT_SB_SOLUTION_SERVER = 50</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SB_SOLUTION_SERVER_EM"><code>PRODUCT_SB_SOLUTION_SERVER_EM = 54</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SERVERRDSH"><code>PRODUCT_SERVERRDSH = 175</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SERVER_FOR_SB_SOLUTIONS"><code>PRODUCT_SERVER_FOR_SB_SOLUTIONS = 51</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SERVER_FOR_SB_SOLUTIONS_EM"><code>PRODUCT_SERVER_FOR_SB_SOLUTIONS_EM = 55</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SERVER_FOR_SMALLBUSINESS"><code>PRODUCT_SERVER_FOR_SMALLBUSINESS = 24</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SERVER_FOR_SMALLBUSINESS_V"><code>PRODUCT_SERVER_FOR_SMALLBUSINESS_V = 35</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SERVER_FOUNDATION"><code>PRODUCT_SERVER_FOUNDATION = 33</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SMALLBUSINESS_SERVER"><code>PRODUCT_SMALLBUSINESS_SERVER = 9</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SMALLBUSINESS_SERVER_PREMIUM"><code>PRODUCT_SMALLBUSINESS_SERVER_PREMIUM = 25</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SMALLBUSINESS_SERVER_PREMIUM_CORE"><code>PRODUCT_SMALLBUSINESS_SERVER_PREMIUM_CORE = 63</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SOLUTION_EMBEDDEDSERVER"><code>PRODUCT_SOLUTION_EMBEDDEDSERVER = 56</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_SOLUTION_EMBEDDEDSERVER_CORE"><code>PRODUCT_SOLUTION_EMBEDDEDSERVER_CORE = 57</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STANDARD_EVALUATION_SERVER"><code>PRODUCT_STANDARD_EVALUATION_SERVER = 79</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STANDARD_EVALUATION_SERVER_CORE"><code>PRODUCT_STANDARD_EVALUATION_SERVER_CORE = 160</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STANDARD_SERVER"><code>PRODUCT_STANDARD_SERVER = 7</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STANDARD_SERVER_CORE"><code>PRODUCT_STANDARD_SERVER_CORE = 13</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STANDARD_SERVER_CORE_V"><code>PRODUCT_STANDARD_SERVER_CORE_V = 40</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STANDARD_SERVER_SOLUTIONS"><code>PRODUCT_STANDARD_SERVER_SOLUTIONS = 52</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STANDARD_SERVER_SOLUTIONS_CORE"><code>PRODUCT_STANDARD_SERVER_SOLUTIONS_CORE = 53</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STANDARD_SERVER_V"><code>PRODUCT_STANDARD_SERVER_V = 36</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STARTER"><code>PRODUCT_STARTER = 11</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STARTER_E"><code>PRODUCT_STARTER_E = 66</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STARTER_N"><code>PRODUCT_STARTER_N = 47</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STORAGE_ENTERPRISE_SERVER"><code>PRODUCT_STORAGE_ENTERPRISE_SERVER = 23</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STORAGE_ENTERPRISE_SERVER_CORE"><code>PRODUCT_STORAGE_ENTERPRISE_SERVER_CORE = 46</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STORAGE_EXPRESS_SERVER"><code>PRODUCT_STORAGE_EXPRESS_SERVER = 20</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STORAGE_EXPRESS_SERVER_CORE"><code>PRODUCT_STORAGE_EXPRESS_SERVER_CORE = 43</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STORAGE_STANDARD_EVALUATION_SERVER"><code>PRODUCT_STORAGE_STANDARD_EVALUATION_SERVER = 96</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STORAGE_STANDARD_SERVER"><code>PRODUCT_STORAGE_STANDARD_SERVER = 21</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STORAGE_STANDARD_SERVER_CORE"><code>PRODUCT_STORAGE_STANDARD_SERVER_CORE = 44</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STORAGE_WORKGROUP_EVALUATION_SERVER"><code>PRODUCT_STORAGE_WORKGROUP_EVALUATION_SERVER = 95</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STORAGE_WORKGROUP_SERVER"><code>PRODUCT_STORAGE_WORKGROUP_SERVER = 22</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_STORAGE_WORKGROUP_SERVER_CORE"><code>PRODUCT_STORAGE_WORKGROUP_SERVER_CORE = 45</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_THINPC"><code>PRODUCT_THINPC = 87</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ULTIMATE"><code>PRODUCT_ULTIMATE = 1</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ULTIMATE_E"><code>PRODUCT_ULTIMATE_E = 71</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_ULTIMATE_N"><code>PRODUCT_ULTIMATE_N = 28</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_UNDEFINED"><code>PRODUCT_UNDEFINED = 0</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_UNLICENSED"><code>PRODUCT_UNLICENSED = 2882382797</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_WEB_SERVER"><code>PRODUCT_WEB_SERVER = 17</code></dt>
+  
+  <dd></dd>
+    <dt id="Dapplo_Windows_Kernel32_Enums_WindowsProducts_PRODUCT_WEB_SERVER_CORE"><code>PRODUCT_WEB_SERVER_CORE = 29</code></dt>
+  
+  <dd></dd>
+  </dl>
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Kernel32/Enums/WindowsProducts.cs/#L11" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

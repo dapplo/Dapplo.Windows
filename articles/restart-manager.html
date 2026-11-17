@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Restart Manager | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Restart Manager | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/restart-manager.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="restart-manager">Restart Manager</h1>
+
+<p>The Windows <a href="https://learn.microsoft.com/windows/win32/rstmgr/restart-manager-portal">Restart Manager</a> lets an
+installer find the applications that use the files it wants to replace, close them, and restart them afterwards.
+Dapplo.Windows has a package for each side:</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>For</th>
+<th>Main type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dapplo.Windows.AppRestartManager</strong></td>
+<td>applications which should survive an update or a reboot</td>
+<td><code>ApplicationRestartManager</code></td>
+</tr>
+<tr>
+<td><strong>Dapplo.Windows.InstallerManager</strong></td>
+<td>installers and updaters</td>
+<td><code>InstallerRestartManager</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows.AppRestartManager
+dotnet add package Dapplo.Windows.InstallerManager
+</code></pre>
+<p>Namespaces used on this page: <code>Dapplo.Windows.AppRestartManager</code>, <code>Dapplo.Windows.AppRestartManager.Enums</code>,
+<code>Dapplo.Windows.InstallerManager</code>, <code>Dapplo.Windows.InstallerManager.Enums</code>, <code>System.Reactive.Linq</code>.</p>
+<h2 id="application-side">Application side</h2>
+<h3 id="register-for-restart">Register for restart</h3>
+<p>Register early, for example in <code>Main</code>. When an installer closes the application through the Restart Manager (or
+Windows Update restarts the PC and &quot;Restart apps&quot; is enabled), Windows starts it again with the command line you
+registered. Windows doesn't tell the new process that it was restarted, so register an argument that you only use
+for this and check for it.</p>
+<!-- sample: RestartManagerSamples.Register -->
+<pre><code class="lang-csharp">// Early in Main: restart me with &quot;/restore&quot; when an installer or Windows Update closes me.
+// Don't include the executable, Windows adds it. At most RestartMaxCmdLine (1024) characters.
+ApplicationRestartManager.RegisterForRestart(&quot;/restore&quot;);
+
+// Windows can't tell a process that it was restarted, check for your own argument instead
+// (a manual start with the same argument returns true too)
+if (ApplicationRestartManager.WasRestartRequested(&quot;/restore&quot;))
+{
+    RestoreDocuments();
+}
+</code></pre>
+<p>The flags exclude cases in which you don't want a restart. A restart after a crash or a hang only happens when the
+process was running for at least 60 seconds.</p>
+<!-- sample: RestartManagerSamples.RegisterFlags -->
+<pre><code class="lang-csharp">// Restart after an update, but not after a crash or hang (those restarts need 60 seconds of uptime anyway)
+ApplicationRestartManager.RegisterForRestart(&quot;/restore&quot;,
+    ApplicationRestartFlags.RestartNoCrash | ApplicationRestartFlags.RestartNoHang);
+
+// No automatic restart anymore
+ApplicationRestartManager.UnregisterForRestart();
+</code></pre>
+<table>
+<thead>
+<tr>
+<th><code>ApplicationRestartFlags</code></th>
+<th>Don't restart when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RestartNoCrash</code></td>
+<td>the application crashed</td>
+</tr>
+<tr>
+<td><code>RestartNoHang</code></td>
+<td>the application hung</td>
+</tr>
+<tr>
+<td><code>RestartNoPatch</code></td>
+<td>the application is closed for an update</td>
+</tr>
+<tr>
+<td><code>RestartNoReboot</code></td>
+<td>the system restarts for an update</td>
+</tr>
+</tbody>
+</table>
+<h3 id="being-asked-to-close">Being asked to close</h3>
+<p>Before the session ends (shutdown, restart, log off) and when an installer wants to close the application, Windows
+sends <code>WM_QUERYENDSESSION</code> and then <code>WM_ENDSESSION</code> to every top-level window. <code>ListenForEndSession()</code> gives you these
+messages of the SharedMessageWindow as <code>EndSessionMessage</code>, so this also works for console applications and services
+without windows.</p>
+<ul>
+<li>Answer a query (<code>IsQuery</code>) synchronously inside <code>OnNext</code>: <code>Veto(reason)</code> asks Windows not to end the session and
+shows the reason in the &quot;apps are preventing shutdown&quot; screen; <code>CanEndSession = true</code> (or not answering) allows it.
+The user can still choose to shut down anyway.</li>
+<li><code>EndSessionReason</code> says why: <code>ENDSESSION_CLOSEAPP</code> is the Restart Manager (an installer), <code>ENDSESSION_LOGOFF</code> a
+log off, <code>ENDSESSION_CRITICAL</code> a forced shutdown.</li>
+<li>For <code>WM_ENDSESSION</code> with <code>IsSessionEnding</code>, the process can be ended as soon as <code>OnNext</code> returns: save synchronously,
+don't rely on marshalling to the UI thread.</li>
+</ul>
+<!-- sample: RestartManagerSamples.EndSession -->
+<pre><code class="lang-csharp">// WM_QUERYENDSESSION and WM_ENDSESSION, received by the SharedMessageWindow.
+// OnNext runs on the SharedMessageWindow thread, answer synchronously: no ObserveOn before the answer.
+IDisposable subscription = ApplicationRestartManager.ListenForEndSession()
+    .Subscribe(message =&gt;
+    {
+        if (message.IsQuery)
+        {
+            // ENDSESSION_CLOSEAPP: an installer (Restart Manager) wants to replace files which this process uses
+            bool isRestartManager = (message.EndSessionReason &amp; EndSessionReasons.ENDSESSION_CLOSEAPP) != 0;
+            if (HasUnsavedWork() &amp;&amp; !isRestartManager)
+            {
+                // Windows shows the reason in its &quot;apps are preventing shutdown&quot; screen
+                message.Veto(&quot;Unsaved changes&quot;);
+            }
+            // Not answering allows the session to end
+        }
+        else if (message.IsSessionEnding)
+        {
+            // WM_ENDSESSION: the process can be terminated as soon as this returns, save synchronously
+            SaveState();
+        }
+    });
+</code></pre>
+<p>Windows Forms (<code>FormClosing</code> with <code>CloseReason.WindowsShutDown</code>) and WPF (<code>Application.SessionEnding</code>) report the
+same messages for their own windows; <code>ListenForEndSession</code> works without a UI framework.</p>
+<h2 id="installer-side">Installer side</h2>
+<p><code>InstallerRestartManager.CreateSession()</code> starts a Restart Manager session; dispose it to end the session. Register
+the files, processes or services you want to replace, then ask which processes use them.</p>
+<!-- sample: RestartManagerSamples.FindLockingProcesses -->
+<pre><code class="lang-csharp">using var session = InstallerRestartManager.CreateSession();
+session.RegisterFiles(@&quot;C:\Program Files\MyApp\MyApp.exe&quot;, @&quot;C:\Program Files\MyApp\MyApp.Core.dll&quot;);
+
+var processes = session.GetProcessesUsingResources(out RmRebootReason rebootReason);
+foreach (var process in processes)
+{
+    Console.WriteLine($&quot;{process.AppName} (PID {process.Process.ProcessId}, {process.ApplicationType}), can be restarted: {process.IsRestartable}&quot;);
+}
+if (rebootReason != RmRebootReason.RmRebootReasonNone)
+{
+    Console.WriteLine($&quot;Replacing the files needs a reboot: {rebootReason}&quot;);
+}
+</code></pre>
+<p><code>RmProcessInfo</code> has <code>AppName</code>, <code>Process.ProcessId</code> (with <code>Process.ProcessStartTime</code> to tell a reused process id apart),
+<code>ServiceShortName</code>, <code>ApplicationType</code> (<code>RmMainWindow</code>, <code>RmService</code>, <code>RmExplorer</code>, <code>RmConsole</code>, <code>RmCritical</code>, ...),
+<code>AppStatus</code>, <code>TerminalServicesSessionId</code> and <code>IsRestartable</code>.</p>
+<h3 id="replace-files-and-restart-the-applications">Replace files and restart the applications</h3>
+<p><code>Shutdown()</code> asks the applications to close. The default, <code>RmShutdownType.Graceful</code>, fails with a <code>Win32Exception</code>
+when an application refuses (for example because of unsaved work), so nobody loses data.
+<code>RmShutdownType.Force</code> kills applications which don't respond; use it only when you must.
+<code>RmShutdownType.OnlyRegistered</code> (a flag, it can be combined with <code>Force</code>) only closes applications which registered for restart. After the files are replaced,
+<code>Restart()</code> starts the applications again which registered for restart.</p>
+<!-- sample: RestartManagerSamples.UpdateFiles -->
+<pre><code class="lang-csharp">using var session = InstallerRestartManager.CreateSession();
+session.RegisterFiles(Directory.GetFiles(installDirectory, &quot;*.dll&quot;));
+
+if (session.IsRebootRequired())
+{
+    Console.WriteLine(&quot;Can't update without a reboot, schedule the update instead&quot;);
+    return;
+}
+
+try
+{
+    // Graceful (the default): asks the applications to close, fails when one of them refuses (e.g. unsaved work)
+    session.Shutdown(statusCallback: percent =&gt; Console.WriteLine($&quot;Closing applications: {percent}%&quot;));
+}
+catch (Win32Exception ex)
+{
+    Console.WriteLine($&quot;An application refused to close: {ex.Message}&quot;);
+    // Only when you must: RmShutdownType.Force kills unresponsive applications, which can lose data
+    return;
+}
+
+foreach (var file in Directory.GetFiles(newFilesDirectory))
+{
+    File.Copy(file, Path.Combine(installDirectory, Path.GetFileName(file)), overwrite: true);
+}
+
+// Restart the applications which registered for restart (RegisterApplicationRestart)
+session.Restart();
+</code></pre>
+<p><code>IsRebootRequired()</code> and <code>GetRebootReason()</code> query the Restart Manager again; when you also need the process list, use
+<code>GetProcessesUsingResources(out rebootReason)</code> which gives both.</p>
+<table>
+<thead>
+<tr>
+<th><code>RmRebootReason</code></th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RmRebootReasonNone</code></td>
+<td>no reboot needed</td>
+</tr>
+<tr>
+<td><code>RmRebootReasonPermissionDenied</code></td>
+<td>a process can't be closed with the current rights (run elevated)</td>
+</tr>
+<tr>
+<td><code>RmRebootReasonSessionMismatch</code></td>
+<td>a process runs in another session</td>
+</tr>
+<tr>
+<td><code>RmRebootReasonCriticalProcess</code> / <code>RmRebootReasonCriticalService</code></td>
+<td>a critical process or service uses the files</td>
+</tr>
+<tr>
+<td><code>RmRebootReasonDetectedSelf</code></td>
+<td>the installer itself uses the files</td>
+</tr>
+</tbody>
+</table>
+<h3 id="services">Services</h3>
+<!-- sample: RestartManagerSamples.Services -->
+<pre><code class="lang-csharp">using var session = InstallerRestartManager.CreateSession();
+// Services are registered by their short name, stopping them needs administrator rights
+session.RegisterServices(&quot;Spooler&quot;);
+var affected = session.GetProcessesUsingResources();
+Console.WriteLine($&quot;Affected: {string.Join(&quot;, &quot;, affected.Select(p =&gt; p.AppName))}&quot;);
+</code></pre>
+<p><code>RestartManagerApi</code> has the raw P/Invoke declarations (<code>RmStartSession</code>, <code>RmRegisterResources</code>, <code>RmGetList</code>,
+<code>RmShutdown</code>, <code>RmRestart</code>, <code>RmEndSession</code>) if you need more control.</p>
+<p>The example project
+<a href="https://github.com/dapplo/Dapplo.Windows/tree/master/src/Dapplo.Windows.Example.InstallerExample">Dapplo.Windows.Example.InstallerExample</a>
+closes and restarts the FormsExample.</p>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="system-state.html">Power and system state</a></li>
+<li><a href="window-messages.html">Window messages and the SharedMessageWindow</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/restart-manager.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class NativeRectExtensions | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class NativeRectExtensions | Dapplo.Windows ">
+      
+      <meta name="description" content="Helper method for the NativeRect struct">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Common_Extensions_NativeRectExtensions.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Common.Extensions.NativeRectExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions">
+
+
+
+  <h1 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions" class="text-break">
+Class NativeRectExtensions  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Common.html">Common</a>.<a class="xref" href="Dapplo.Windows.Common.Extensions.html">Extensions</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Common.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Helper method for the NativeRect struct</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class NativeRectExtensions</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">NativeRectExtensions</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_ChangeHeight_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.ChangeHeight*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_ChangeHeight_Dapplo_Windows_Common_Structs_NativeRect_System_Int32_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.ChangeHeight(Dapplo.Windows.Common.Structs.NativeRect,System.Int32)">
+  ChangeHeight(NativeRect, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect, from the supplied one, using the specified height</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect ChangeHeight(this NativeRect rect, int height)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>height</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_ChangeWidth_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.ChangeWidth*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_ChangeWidth_Dapplo_Windows_Common_Structs_NativeRect_System_Int32_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.ChangeWidth(Dapplo.Windows.Common.Structs.NativeRect,System.Int32)">
+  ChangeWidth(NativeRect, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L46"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect, from the supplied one, using the specified width</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect ChangeWidth(this NativeRect rect, int width)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_ChangeX_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.ChangeX*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_ChangeX_Dapplo_Windows_Common_Structs_NativeRect_System_Int32_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.ChangeX(Dapplo.Windows.Common.Structs.NativeRect,System.Int32)">
+  ChangeX(NativeRect, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L22"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect, from the supplied one, using the specified X coordinate</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect ChangeX(this NativeRect rect, int x)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>x</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_ChangeY_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.ChangeY*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_ChangeY_Dapplo_Windows_Common_Structs_NativeRect_System_Int32_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.ChangeY(Dapplo.Windows.Common.Structs.NativeRect,System.Int32)">
+  ChangeY(NativeRect, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect, from the supplied one, using the specified Y coordinate</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect ChangeY(this NativeRect rect, int y)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>y</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Contains_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Contains*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Contains_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativePoint_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Contains(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativePoint)">
+  Contains(NativeRect, NativePoint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L70"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if this NativeRect contains the specified NativePoint</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool Contains(this NativeRect rect, NativePoint point)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd></dd>
+    <dt><code>point</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if it contains</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Contains_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Contains*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Contains_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Contains(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativeRect)">
+  Contains(NativeRect, NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L95"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if small NativeRect is entirely contained within the larger NativeRect</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool Contains(this NativeRect largerRectangle, NativeRect smallerRectangle)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>largerRectangle</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect, the larger rectangle</p>
+</dd>
+    <dt><code>smallerRectangle</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect, the smaller rectangle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True if small NativeRect is entirely contained within the larger NativeRect, false otherwise</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Contains_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Contains*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Contains_Dapplo_Windows_Common_Structs_NativeRect_System_Int32_System_Int32_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Contains(Dapplo.Windows.Common.Structs.NativeRect,System.Int32,System.Int32)">
+  Contains(NativeRect, int, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if this NativeRect contains the specified coordinates</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool Contains(this NativeRect rect, int x, int y)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd></dd>
+    <dt><code>x</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>y</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if it contains</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_HasOverlap_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.HasOverlap*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_HasOverlap_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.HasOverlap(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativeRect)">
+  HasOverlap(NativeRect, NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L114"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check that two rectangles overlap with each other, this means they share a non-empty area.
+Right and Bottom are exclusive, so adjacent rectangles (e.g. rect1.Right == rect2.Left) do not overlap,
+a rectangle which contains the other (or is contained) does overlap.
+This is the same as <a class="xref" href="Dapplo.Windows.Common.Extensions.NativeRectExtensions.html#Dapplo_Windows_Common_Extensions_NativeRectExtensions_IntersectsWith_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeRect_">IntersectsWith(NativeRect, NativeRect)</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool HasOverlap(this NativeRect rect1, NativeRect rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>The first rectangle</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>The second rectangle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>The rectangles overlap</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Inflate_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Inflate*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Inflate_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeSize_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Inflate(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativeSize)">
+  Inflate(NativeRect, NativeSize)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L265"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a new NativeRect which is rect but inflated with the specified size</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect Inflate(this NativeRect rect, NativeSize size)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>size</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeSize.html">NativeSize</a></dt>
+    <dd><p>NativeSize</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Inflate_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Inflate*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Inflate_Dapplo_Windows_Common_Structs_NativeRect_System_Int32_System_Int32_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Inflate(Dapplo.Windows.Common.Structs.NativeRect,System.Int32,System.Int32)">
+  Inflate(NativeRect, int, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L253"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a new NativeRect which is rect but inflated with the specified width and height</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect Inflate(this NativeRect rect, int width, int height)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>height</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Intersect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Intersect*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Intersect_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Intersect(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativeRect)">
+  Intersect(NativeRect, NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L227"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a new NativeRect which is the intersection of rect1 and rect2</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect Intersect(this NativeRect rect1, NativeRect rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect which is the intersection of rect1 and rect2</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_IntersectsWith_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.IntersectsWith*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_IntersectsWith_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.IntersectsWith(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativeRect)">
+  IntersectsWith(NativeRect, NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L277"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if the current rectangle intersects with the specified.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool IntersectsWith(this NativeRect rect1, NativeRect rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_IsAdjacent_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.IsAdjacent*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_IsAdjacent_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.IsAdjacent(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativeRect)">
+  IsAdjacent(NativeRect, NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L123"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if either rectangle is adjacent to the other rectangle</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static AdjacentTo IsAdjacent(this NativeRect rect1, NativeRect rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>The first rectangle</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>The second rectangle</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Enums.AdjacentTo.html">AdjacentTo</a></dt>
+    <dd><p>At least one rectangle is adjacent to the other rectangle</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_IsDockedToLeftOf_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.IsDockedToLeftOf*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_IsDockedToLeftOf_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.IsDockedToLeftOf(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativeRect)">
+  IsDockedToLeftOf(NativeRect, NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L164"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if a NativeRect is docked to the left of another NativeRect</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool IsDockedToLeftOf(this NativeRect rect1, NativeRect rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect to test if it's docked</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect rect to be docked to</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool with true if they are docked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_IsDockedToRightOf_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.IsDockedToRightOf*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_IsDockedToRightOf_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.IsDockedToRightOf(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativeRect)">
+  IsDockedToRightOf(NativeRect, NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L177"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Test if a NativeRect is docked to the right of another NativeRect</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static bool IsDockedToRightOf(this NativeRect rect1, NativeRect rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect to test if it's docked</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect rect to be docked to</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>bool with true if they are docked</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_MoveTo_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.MoveTo*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_MoveTo_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativePoint_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.MoveTo(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativePoint)">
+  MoveTo(NativeRect, NativePoint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L317"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect from the specified one, but on a different location</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect MoveTo(this NativeRect rect, NativePoint location)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>location</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_MoveTo_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.MoveTo*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_MoveTo_Dapplo_Windows_Common_Structs_NativeRect_System_Nullable_System_Int32__System_Nullable_System_Int32__" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.MoveTo(Dapplo.Windows.Common.Structs.NativeRect,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+  MoveTo(NativeRect, int?, int?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L330"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect from the specified one, but on a different location</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect MoveTo(this NativeRect rect, int? x = null, int? y = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>x</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>y</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Normalize_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Normalize*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Normalize_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Normalize(Dapplo.Windows.Common.Structs.NativeRect)">
+  Normalize(NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L366"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Normalize the NativeRect by making a negative width and or height absolute</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect Normalize(this NativeRect rect)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Offset_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Offset*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Offset_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativePoint_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Offset(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativePoint)">
+  Offset(NativeRect, NativePoint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L292"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect by offsetting the specified one</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect Offset(this NativeRect rect, NativePoint offset)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>offset</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativePoint.html">NativePoint</a></dt>
+    <dd><p>NativePoint</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Offset_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Offset*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Offset_Dapplo_Windows_Common_Structs_NativeRect_System_Nullable_System_Int32__System_Nullable_System_Int32__" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Offset(Dapplo.Windows.Common.Structs.NativeRect,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+  Offset(NativeRect, int?, int?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L305"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect by offsetting the specified one</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect Offset(this NativeRect rect, int? offsetX = null, int? offsetY = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>offsetX</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>offsetY</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Resize_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Resize*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Resize_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeSize_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Resize(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativeSize)">
+  Resize(NativeRect, NativeSize)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L342"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect from the specified one, but with a different size</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect Resize(this NativeRect rect, NativeSize size)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>size</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeSize.html">NativeSize</a></dt>
+    <dd><p>NativeSize</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Resize_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Resize*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Resize_Dapplo_Windows_Common_Structs_NativeRect_System_Nullable_System_Int32__System_Nullable_System_Int32__" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Resize(Dapplo.Windows.Common.Structs.NativeRect,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+  Resize(NativeRect, int?, int?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L355"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Create a new NativeRect from the specified one, but with a different size</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect Resize(this NativeRect rect, int? width = null, int? height = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>width</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>int</p>
+</dd>
+    <dt><code>height</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>int</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Union_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Union*"></a>
+
+  <h3 id="Dapplo_Windows_Common_Extensions_NativeRectExtensions_Union_Dapplo_Windows_Common_Structs_NativeRect_Dapplo_Windows_Common_Structs_NativeRect_" data-uid="Dapplo.Windows.Common.Extensions.NativeRectExtensions.Union(Dapplo.Windows.Common.Structs.NativeRect,Dapplo.Windows.Common.Structs.NativeRect)">
+  Union(NativeRect, NativeRect)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L191"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a new NativeRect which is the union of rect1 and rect2.
+Like the Win32 UnionRect, empty rectangles (see <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html#Dapplo_Windows_Common_Structs_NativeRect_IsEmpty">IsEmpty</a>) are ignored, so accumulating from NativeRect.Empty works.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Pure]
+public static NativeRect Union(this NativeRect rect1, NativeRect rect2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rect1</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+    <dt><code>rect2</code> <a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dapplo.Windows.Common.Structs.NativeRect.html">NativeRect</a></dt>
+    <dd><p>NativeRect which is the union of rect1 and rect2, or NativeRect.Empty if both are empty</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Common/Extensions/NativeRectExtensions.cs/#L14" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
