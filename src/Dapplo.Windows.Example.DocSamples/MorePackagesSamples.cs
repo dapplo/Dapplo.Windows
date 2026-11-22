@@ -114,6 +114,18 @@ public static class MorePackagesSamples
         #endregion
     }
 
+    public static void DefaultBrowserSample()
+    {
+        #region DefaultBrowser
+        // Opens the address, or a local page as file:/// address, with the application which handles https,
+        // not with the application of the .html association (which can be an editor)
+        DefaultBrowser.Open(@"C:\Temp\search.html");
+
+        // The command of the default browser, e.g. "C:\...\msedge.exe" --single-argument %1
+        string command = DefaultBrowser.GetCommand();
+        #endregion
+    }
+
     public static void Sounds()
     {
         #region Sounds

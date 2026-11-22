@@ -123,6 +123,25 @@ if (Shell32Api.TryGetTaskbarPosition(out var appBarData))
 }
 ```
 
+### Default browser
+
+`DefaultBrowser` starts the application which handles the https protocol for an address or a local page. Opening a `.html` file
+with ShellExecute starts the application of the `.html` association, which can be an editor. `DefaultBrowser` reads the "open" command
+of the https protocol (`ShlwapiApi.GetAssociationString(AssocStr.Command, "https", "open", AssocF.IsProtocol)`) and starts it itself:
+a rooted local path becomes a `file:///` address, `"%1"` and `%1` are replaced with the quoted target, but after `--single-argument`
+(registered by Edge and Chrome) the target is passed without quotes, because everything after that switch is taken literally.
+Without a command the target is opened with ShellExecute.
+
+<!-- sample: MorePackagesSamples.DefaultBrowser -->
+```csharp
+// Opens the address, or a local page as file:/// address, with the application which handles https,
+// not with the application of the .html association (which can be an editor)
+DefaultBrowser.Open(@"C:\Temp\search.html");
+
+// The command of the default browser, e.g. "C:\...\msedge.exe" --single-argument %1
+string command = DefaultBrowser.GetCommand();
+```
+
 ## Sounds (Dapplo.Windows.Multimedia)
 
 <!-- sample: MorePackagesSamples.Sounds -->
