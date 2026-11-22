@@ -7,6 +7,12 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.25.0]
+
+### Added
+- `ShlwapiApi.AssocQueryString` in Dapplo.Windows.Shell32, with the `AssocF` flags and `AssocStr` values, and the safe wrapper `ShlwapiApi.GetAssociationString(AssocStr str, string assoc, string extra = "open", AssocF flags = AssocF.None)`: it asks for the size first and retries with a larger buffer on E_POINTER (it always passes `AssocF.NoTruncate`), and returns null when there is no association.
+- `DefaultBrowser` in Dapplo.Windows.Shell32: `Open(target)` and `CreateStartInfo(target)` start the application which handles the https protocol for an address or a local page, instead of ShellExecute of a `.html` file, which starts the application of the `.html` association (which can be an editor). The "open" command of the https protocol is split into program (quoted, or up to the first space) and arguments; a rooted local path becomes a `file:///` address; `"%1"`, `%1` (and `%L`) become the quoted target, but after `--single-argument` (Edge and Chrome register `--single-argument %1`) the target is passed without quotes, because everything after that switch is taken literally and a quoted target is an invalid address; without a placeholder the quoted target is appended. Without a usable command the target is opened with ShellExecute. `CreateStartInfo(command, target)` does the splitting for a given command, `ToAddress(target)` the path conversion, `GetCommand()` returns the command of the https protocol.
+
 ## [3.24.0]
 
 ### Added
