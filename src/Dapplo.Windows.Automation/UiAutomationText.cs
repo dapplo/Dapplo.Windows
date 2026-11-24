@@ -1333,25 +1333,25 @@ public static class UiAutomationText
             {
                 return;
             }
+            // The line read before, null for the first
+            IUIAutomationTextRange previous = null;
             try
             {
                 if (Call(line.MoveEndpointByRange(TextPatternRangeEndpoint.End, line, TextPatternRangeEndpoint.Start)) != UiaConstants.S_OK)
                 {
                     return;
                 }
-                var isFirst = true;
                 for (var count = 0; count < MaxUnitsPerRange; count++)
                 {
                     if (CheckStop())
                     {
                         return;
                     }
-                    if (Call(line.ExpandToEnclosingUnit(TextUnit.Line)) != UiaConstants.S_OK || !ClampTo(line, visibleRange, isFirst))
+                    if (!ExpandToNext(line, previous, visibleRange, TextUnit.Line))
                     {
                         return;
                     }
-                    isFirst = false;
-                    if (!ReadLine(line, clip, links, passwords, out var isEmpty) || !MoveToNext(line, visibleRange, TextUnit.Line, isEmpty))
+                    if (!ReadLine(line, clip, links, passwords, out var isEmpty) || !MoveToNext(ref line, ref previous, visibleRange, TextUnit.Line, isEmpty))
                     {
                         return;
                     }
@@ -1365,6 +1365,7 @@ public static class UiAutomationText
             finally
             {
                 UiAutomationScroller.Release(line);
+                UiAutomationScroller.Release(previous);
             }
         }
 
@@ -1423,22 +1424,22 @@ public static class UiAutomationText
                 return;
             }
             var words = new List<UiAutomationTextWord>();
+            // The word read before, null for the first
+            IUIAutomationTextRange previous = null;
             try
             {
                 if (Call(wordRange.MoveEndpointByRange(TextPatternRangeEndpoint.End, wordRange, TextPatternRangeEndpoint.Start)) != UiaConstants.S_OK)
                 {
                     return;
                 }
-                var isFirst = true;
                 for (var count = 0; count < MaxUnitsPerRange && !CheckStop(); count++)
                 {
-                    if (Call(wordRange.ExpandToEnclosingUnit(TextUnit.Word)) != UiaConstants.S_OK || !ClampTo(wordRange, line, isFirst))
+                    if (!ExpandToNext(wordRange, previous, line, TextUnit.Word))
                     {
                         break;
                     }
-                    isFirst = false;
                     var isEmpty = ReadWord(wordRange, clip, links, passwords, words);
-                    if (!MoveToNext(wordRange, line, TextUnit.Word, isEmpty))
+                    if (!MoveToNext(ref wordRange, ref previous, line, TextUnit.Word, isEmpty))
                     {
                         break;
                     }
@@ -1447,6 +1448,7 @@ public static class UiAutomationText
             finally
             {
                 UiAutomationScroller.Release(wordRange);
+                UiAutomationScroller.Release(previous);
                 AddLine(words);
             }
         }
@@ -1482,6 +1484,52 @@ public static class UiAutomationText
         }
 
         /// <summary>
+        ///     Expand the (empty) range to the unit which starts there. Some providers (Chromium, on short lines) expand the end of a unit to
+        ///     that same unit again instead of the next one: the range then moves on by one unit, else the same unit is read until the guard
+        /// </summary>
+        /// <param name="range">the empty range at the end of the previous unit</param>
+        /// <param name="previous">the unit read before, null for the first</param>
+        /// <param name="outer">the range which is split</param>
+        /// <param name="unit">TextUnit</param>
+        /// <returns>false when a request failed, or there is no next unit</returns>
+        private bool ExpandToNext(IUIAutomationTextRange range, IUIAutomationTextRange previous, IUIAutomationTextRange outer, TextUnit unit)
+        {
+            if (Call(range.ExpandToEnclosingUnit(unit)) != UiaConstants.S_OK || !ClampTo(range, outer, previous is null))
+            {
+                return false;
+            }
+            if (previous is null)
+            {
+                return true;
+            }
+            if (!StartsBefore(range, previous, out var isBefore))
+            {
+                return false;
+            }
+            if (!isBefore)
+            {
+                return true;
+            }
+            // Expanded backwards over the previous unit: from its end move on by one unit, and only use what starts after it
+            return Call(range.MoveEndpointByRange(TextPatternRangeEndpoint.Start, range, TextPatternRangeEndpoint.End)) == UiaConstants.S_OK
+                && Call(range.Move(unit, 1, out var moved)) == UiaConstants.S_OK && moved != 0
+                && HasRest(range, outer)
+                && Call(range.ExpandToEnclosingUnit(unit)) == UiaConstants.S_OK && ClampTo(range, outer, false)
+                && StartsBefore(range, previous, out isBefore) && !isBefore;
+        }
+
+        /// <summary>
+        ///     Whether the range starts before the end of the previous range
+        /// </summary>
+        /// <returns>false when the request failed</returns>
+        private bool StartsBefore(IUIAutomationTextRange range, IUIAutomationTextRange previous, out bool isBefore)
+        {
+            var isOk = Call(range.CompareEndpoints(TextPatternRangeEndpoint.Start, previous, TextPatternRangeEndpoint.End, out var compared)) == UiaConstants.S_OK;
+            isBefore = compared < 0;
+            return isOk;
+        }
+
+        /// <summary>
         ///     Limit the range to the outer range; the start only for the first unit (only it can start before the outer range)
         /// </summary>
         /// <returns>false when a request failed</returns>
@@ -1506,33 +1554,37 @@ public static class UiAutomationText
         }
 
         /// <summary>
-        ///     Make the range the (empty) start of the next unit
+        ///     Make the range the (empty) start of the next unit; the unit just read is kept as the previous one, the old previous range is
+        ///     reused for the next unit (no new range per unit)
         /// </summary>
-        /// <param name="range">the range of the current unit</param>
+        /// <param name="range">the range of the current unit, afterwards the empty range at its end</param>
+        /// <param name="previous">the unit read before (null for none), afterwards the current unit</param>
         /// <param name="outer">the range which is split</param>
         /// <param name="unit">TextUnit</param>
         /// <param name="isEmpty">whether the range is empty, null when it isn't known (asked then)</param>
         /// <returns>false when the outer range ends there, or the range can't move on</returns>
-        private bool MoveToNext(IUIAutomationTextRange range, IUIAutomationTextRange outer, TextUnit unit, bool? isEmpty)
+        private bool MoveToNext(ref IUIAutomationTextRange range, ref IUIAutomationTextRange previous, IUIAutomationTextRange outer, TextUnit unit, bool? isEmpty)
         {
+            if (previous is null && (Call(range.Clone(out previous)) != UiaConstants.S_OK || previous is null))
+            {
+                return false;
+            }
+            (range, previous) = (previous, range);
             if (isEmpty is null)
             {
-                if (Call(range.CompareEndpoints(TextPatternRangeEndpoint.Start, range, TextPatternRangeEndpoint.End, out var length)) != UiaConstants.S_OK)
+                if (Call(previous.CompareEndpoints(TextPatternRangeEndpoint.Start, previous, TextPatternRangeEndpoint.End, out var length)) != UiaConstants.S_OK)
                 {
                     return false;
                 }
                 isEmpty = length >= 0;
             }
-            if (isEmpty == false)
+            // Continue at the end of the current unit: the start of the reused range moves there, its end lies before it and moves along
+            if (Call(range.MoveEndpointByRange(TextPatternRangeEndpoint.Start, previous, TextPatternRangeEndpoint.End)) != UiaConstants.S_OK)
             {
-                // Not empty: continue at its end
-                if (Call(range.MoveEndpointByRange(TextPatternRangeEndpoint.Start, range, TextPatternRangeEndpoint.End)) != UiaConstants.S_OK)
-                {
-                    return false;
-                }
+                return false;
             }
             // Empty (a provider whose unit didn't expand): move on by one unit, else ExpandToEnclosingUnit gives the same range again
-            else if (Call(range.Move(unit, 1, out var moved)) != UiaConstants.S_OK || moved == 0)
+            if (isEmpty == true && (Call(range.Move(unit, 1, out var moved)) != UiaConstants.S_OK || moved == 0))
             {
                 return false;
             }

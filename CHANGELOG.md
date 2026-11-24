@@ -7,6 +7,11 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.25.x]
+
+### Fixed
+- `UiAutomationText.ReadVisibleTextAsync` on Chromium and Electron windows read the same short line (a single letter, a number like "1791", an avatar) up to 5000 times and reported the text as incomplete, which took 2 to 3 seconds. For such lines Chromium expands the empty range at the end of the line to that same line again instead of the next one. The line and word reader now compares the start of every expanded unit with the end of the unit read before; when it lies before it, the range moves on by one unit (`Move`) and is expanded again, and when that doesn't get past the previous unit the range is done (and counts as complete). This costs one request more per line or word; the range of the previous unit is reused, so no extra range is created per unit.
+
 ## [3.25.0]
 
 ### Added
