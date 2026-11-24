@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Power and system state | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Power and system state | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/system-state.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="power-and-system-state">Power and system state</h1>
+
+<p><strong>Dapplo.Windows.SystemState</strong> keeps the system awake while your application works, puts it to sleep or shuts it
+down, wakes it up with a timer, and reports power events.</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows.SystemState
+</code></pre>
+<p>Namespaces used on this page: <code>Dapplo.Windows.SystemState</code>, <code>Dapplo.Windows.SystemState.Enums</code>,
+<code>System.Reactive.Linq</code>.</p>
+<h2 id="preventing-sleep">Preventing sleep</h2>
+<p><code>SystemStateApi.PreventSleep(reason)</code> keeps the system <em>and</em> the display on, <code>PreventSystemSleep(reason)</code> only the
+system. Both return a <code>SleepBlocker</code>; the system can sleep again when it's disposed.</p>
+<!-- sample: SystemStateSamples.PreventSleep -->
+<pre><code class="lang-csharp">// Keep the system and the display on until the blocker is disposed
+using (SystemStateApi.PreventSleep(&quot;Recording the screen&quot;))
+{
+    await RecordAsync();
+}
+
+// Keep only the system awake, the display may turn off
+using (SystemStateApi.PreventSystemSleep(&quot;Uploading files&quot;))
+{
+    await UploadAsync();
+}
+</code></pre>
+<p>A <code>SleepBlocker</code> is a power request (<code>PowerCreateRequest</code> / <code>PowerSetRequest</code>). Unlike <code>SetThreadExecutionState</code> it
+isn't bound to a thread, so you can create it before an <code>await</code> and dispose it after, or keep it in a field. Several
+blockers can be active at the same time. The reason is shown by <code>powercfg /requests</code>.</p>
+<!-- sample: SystemStateSamples.PreventSleepLongRunning -->
+<pre><code class="lang-csharp">// A SleepBlocker is not bound to a thread, you can keep it in a field and dispose it anywhere
+SleepBlocker blocker = SystemStateApi.PreventSystemSleep(&quot;Download in progress&quot;);
+Console.WriteLine($&quot;Blocking sleep: {blocker.Reason}, display kept on: {blocker.KeepsDisplayOn}&quot;);
+// ... later, e.g. in a completion callback on another thread
+blocker.Dispose();
+</code></pre>
+<p><code>SystemStateApi.SetThreadExecutionState</code> is still there, but a state set with <code>ES_CONTINUOUS</code> belongs to the calling
+thread: only that thread can reset it, and it ends when the thread ends. Don't use it from thread-pool threads or async
+code.</p>
+<h2 id="sleep-and-hibernate">Sleep and hibernate</h2>
+<!-- sample: SystemStateSamples.SleepAndHibernate -->
+<pre><code class="lang-csharp">// Sleep (suspend to RAM), applications get PBT_APMSUSPEND first
+bool ok = PowerManagementApi.Sleep();
+
+// Hibernate (suspend to disk)
+ok = PowerManagementApi.Hibernate();
+
+// Sleep, and don't let wake timers wake the system
+ok = PowerManagementApi.Sleep(disableWakeEvent: true);
+</code></pre>
+<p>Applications are told with <code>PBT_APMSUSPEND</code> before the system suspends. <code>SetSuspendState</code> is also available with all
+its parameters.</p>
+<h2 id="shut-down-restart-log-off-lock">Shut down, restart, log off, lock</h2>
+<p><code>Shutdown()</code> and <code>Restart()</code> enable the shutdown privilege of the process first (interactive users have it, but it's
+disabled by default), and log a <em>planned</em> shutdown in the event log. Without <code>force</code>, applications which don't respond
+are ended after a timeout (<code>EWX_FORCEIFHUNG</code>); <code>force: true</code> closes all applications without asking (<code>EWX_FORCE</code>),
+which can lose data. They return <code>false</code> on failure, <code>Marshal.GetLastWin32Error()</code> has the reason.</p>
+<!-- sample: SystemStateSamples.ShutdownRestartLogOff -->
+<pre><code class="lang-csharp">// Log off the current user
+PowerManagementApi.LogOff();
+
+// Power off; applications which don't respond are terminated after a timeout
+if (!PowerManagementApi.Shutdown())
+{
+    // e.g. 1314 (ERROR_PRIVILEGE_NOT_HELD) when the user may not shut down
+    Console.WriteLine($&quot;Shutdown failed: {System.Runtime.InteropServices.Marshal.GetLastWin32Error()}&quot;);
+}
+
+// Restart
+PowerManagementApi.Restart();
+
+// Close all applications without asking them, they can lose data
+PowerManagementApi.Shutdown(force: true);
+</code></pre>
+<p>For other combinations call <code>ExitWindowsEx</code> yourself, after <code>EnableShutdownPrivilege()</code>:</p>
+<!-- sample: SystemStateSamples.ExitWindowsExDirect -->
+<pre><code class="lang-csharp">// ExitWindowsEx needs the shutdown privilege, which is disabled by default
+if (PowerManagementApi.EnableShutdownPrivilege())
+{
+    PowerManagementApi.ExitWindowsEx(ExitWindowsFlags.EWX_REBOOT | ExitWindowsFlags.EWX_RESTARTAPPS | ExitWindowsFlags.EWX_FORCEIFHUNG,
+        PowerManagementApi.ShutdownReasonPlannedOther);
+}
+</code></pre>
+<!-- sample: SystemStateSamples.LockWorkStation -->
+<pre><code class="lang-csharp">// The same as Win+L. true means the lock was started, the screen might not be locked yet.
+bool started = PowerManagementApi.LockWorkStation();
+</code></pre>
+<h2 id="waitable-timers">Waitable timers</h2>
+<p><code>WaitableTimer</code> wraps a Windows waitable timer. Unlike a .NET timer it can wake the system from sleep or hibernation.
+The handle is a <code>SafeWaitHandle</code>, so it's released even when you forget <code>Dispose</code>.</p>
+<!-- sample: SystemStateSamples.TimerOnce -->
+<pre><code class="lang-csharp">using var timer = new WaitableTimer();
+
+// Fire once, in 30 seconds
+timer.SetOnce(TimeSpan.FromSeconds(30));
+
+// Block this thread until the timer fires, but wait at most 60 seconds
+bool signaled = timer.Wait(TimeSpan.FromSeconds(60));
+Console.WriteLine(signaled ? &quot;Timer fired&quot; : &quot;Timed out&quot;);
+</code></pre>
+<!-- sample: SystemStateSamples.TimerAt -->
+<pre><code class="lang-csharp">using var timer = new WaitableTimer();
+
+// Fire at a point in time, the offset of the DateTimeOffset is taken into account
+timer.SetAt(DateTimeOffset.Now.AddHours(2));
+timer.Wait(TimeSpan.FromHours(3));
+</code></pre>
+<!-- sample: SystemStateSamples.TimerPeriodic -->
+<pre><code class="lang-csharp">using var timer = new WaitableTimer();
+
+// First after 1 second, then every 5000 milliseconds
+timer.SetPeriodic(initialDelay: TimeSpan.FromSeconds(1), period: 5000);
+
+for (var i = 0; i &lt; 5; i++)
+{
+    timer.Wait(TimeSpan.FromSeconds(10));
+    Console.WriteLine($&quot;Tick {i + 1}&quot;);
+}
+
+timer.Cancel();
+</code></pre>
+<h3 id="waking-the-system">Waking the system</h3>
+<p>With <code>wakeSystem: true</code> the timer wakes the PC. No privilege is needed, but the power option &quot;Allow wake timers&quot; must
+be enabled (it's often disabled on battery). After the wake-up Windows broadcasts <code>PBT_APMRESUMEAUTOMATIC</code>.</p>
+<!-- sample: SystemStateSamples.TimerWakeSystem -->
+<pre><code class="lang-csharp">using var timer = new WaitableTimer();
+
+// Wake the PC from sleep or hibernation in 2 hours.
+// No privilege is needed, but the &quot;Allow wake timers&quot; power setting must be enabled.
+if (!timer.SetOnce(TimeSpan.FromHours(2), wakeSystem: true))
+{
+    Console.WriteLine(&quot;Could not set the timer&quot;);
+    return;
+}
+
+// After the wake-up Windows broadcasts PBT_APMRESUMEAUTOMATIC, and the wait returns
+timer.Wait(TimeSpan.FromHours(3));
+</code></pre>
+<p><code>Wait</code> blocks the thread. To avoid that, register the <code>WaitHandle</code> with the thread pool:</p>
+<!-- sample: SystemStateSamples.TimerWaitHandle -->
+<pre><code class="lang-csharp">var timer = new WaitableTimer();
+timer.SetOnce(TimeSpan.FromMinutes(5));
+
+// Don't block a thread: let the thread pool call you when the timer fires
+System.Threading.ThreadPool.RegisterWaitForSingleObject(timer.WaitHandle, (state, timedOut) =&gt;
+{
+    Console.WriteLine(&quot;Five minutes are over&quot;);
+    timer.Dispose();
+}, null, System.Threading.Timeout.Infinite, executeOnlyOnce: true);
+</code></pre>
+<p>A timer with a name can be opened by other processes:</p>
+<!-- sample: SystemStateSamples.TimerNamed -->
+<pre><code class="lang-csharp">// Process A creates the timer ...
+using var timerA = new WaitableTimer(&quot;MyApp_WakeTimer&quot;);
+timerA.SetOnce(TimeSpan.FromMinutes(30), wakeSystem: true);
+
+// ... process B opens the same timer by its name and waits for it
+using var timerB = new WaitableTimer(&quot;MyApp_WakeTimer&quot;);
+bool fired = timerB.Wait(TimeSpan.FromHours(1));
+</code></pre>
+<p>See <a href="https://learn.microsoft.com/windows/win32/power/system-wake-up-events">System Wake-up Events</a>.</p>
+<h2 id="power-events">Power events</h2>
+<p><code>PowerBroadcastListener</code> reports <code>WM_POWERBROADCAST</code> messages of the SharedMessageWindow as <code>PowerBroadcastEvent</code>
+values. The events arrive on the SharedMessageWindow thread while Windows waits for the answer: for <code>PBT_APMSUSPEND</code>
+Windows waits about 2 seconds, so save your state synchronously.</p>
+<table>
+<thead>
+<tr>
+<th>Observable</th>
+<th>Event</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Suspending</code></td>
+<td><code>PBT_APMSUSPEND</code></td>
+<td>the system is about to sleep or hibernate</td>
+</tr>
+<tr>
+<td><code>ResumedAutomatically</code></td>
+<td><code>PBT_APMRESUMEAUTOMATIC</code></td>
+<td>after every wake-up; the user might not be there</td>
+</tr>
+<tr>
+<td><code>ResumedFromSuspend</code></td>
+<td><code>PBT_APMRESUMESUSPEND</code></td>
+<td>after a wake-up by the user (key, lid, power button)</td>
+</tr>
+<tr>
+<td><code>PowerStatusChanged</code></td>
+<td><code>PBT_APMPOWERSTATUSCHANGE</code></td>
+<td>AC / battery switch, battery level</td>
+</tr>
+<tr>
+<td><code>PowerEvents</code></td>
+<td>all of them</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<!-- sample: SystemStateSamples.SuspendResume -->
+<pre><code class="lang-csharp">// Called on the SharedMessageWindow thread while Windows waits (about 2 seconds): save your state synchronously
+var suspendSubscription = PowerBroadcastListener.Suspending
+    .Subscribe(_ =&gt; SaveState());
+
+// The user is back (opened the lid, pressed a key); this is the moment to reconnect
+var resumeSubscription = PowerBroadcastListener.ResumedFromSuspend
+    .Subscribe(_ =&gt; Reconnect());
+
+// Stop listening
+suspendSubscription.Dispose();
+resumeSubscription.Dispose();
+</code></pre>
+<p>When a timer or another program wakes the PC, only <code>PBT_APMRESUMEAUTOMATIC</code> arrives; don't show UI then, nobody might
+be looking. When the user is there, <code>PBT_APMRESUMESUSPEND</code> follows.</p>
+<!-- sample: SystemStateSamples.ResumedAutomatically -->
+<pre><code class="lang-csharp">// Fires after every wake-up, e.g. by a wake timer. Don't show UI here, maybe nobody is in front of the PC.
+// When a user is present, ResumedFromSuspend follows.
+var subscription = PowerBroadcastListener.ResumedAutomatically
+    .Subscribe(_ =&gt; RunScheduledWork());
+</code></pre>
+<!-- sample: SystemStateSamples.AllPowerEvents -->
+<pre><code class="lang-csharp">var subscription = PowerBroadcastListener.PowerEvents
+    .Subscribe(powerEvent =&gt;
+    {
+        switch (powerEvent)
+        {
+            case PowerBroadcastEvent.PBT_APMSUSPEND:
+                Console.WriteLine(&quot;Suspending&quot;);
+                break;
+            case PowerBroadcastEvent.PBT_APMRESUMEAUTOMATIC:
+                Console.WriteLine(&quot;Resumed&quot;);
+                break;
+            case PowerBroadcastEvent.PBT_APMRESUMESUSPEND:
+                Console.WriteLine(&quot;Resumed, the user is present&quot;);
+                break;
+            case PowerBroadcastEvent.PBT_APMPOWERSTATUSCHANGE:
+                Console.WriteLine(&quot;Power source or battery level changed&quot;);
+                break;
+        }
+    });
+</code></pre>
+<h2 id="wake-up-work-sleep-again">Wake up, work, sleep again</h2>
+<p>A nightly job: a wake timer wakes the PC, the work runs on another thread under a <code>SleepBlocker</code>, and when the blocker
+is disposed Windows goes back to sleep after its idle timeout.</p>
+<!-- sample: SystemStateSamples.WakeTimerWithPowerEvents -->
+<pre><code class="lang-csharp">var timer = new WaitableTimer();
+
+// Do the nightly work when the PC woke up for it ...
+var subscription = PowerBroadcastListener.ResumedAutomatically
+    .Take(1)
+    .Subscribe(_ =&gt;
+    {
+        // ... on another thread, the SharedMessageWindow thread must not be blocked
+        Task.Run(() =&gt;
+        {
+            // ... and keep the PC awake until the work is done
+            using (SystemStateApi.PreventSystemSleep(&quot;Nightly backup&quot;))
+            {
+                RunScheduledWork();
+            }
+            timer.Dispose();
+        });
+    });
+
+// Wake up tomorrow at 03:00 local time
+timer.SetAt(new DateTimeOffset(DateTime.Today.AddDays(1).AddHours(3)), wakeSystem: true);
+</code></pre>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="window-messages.html">Window messages and the SharedMessageWindow</a> for session lock / unlock</li>
+<li><a href="restart-manager.html">Restart Manager</a> for shutdown requests to your application</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/system-state.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

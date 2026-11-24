@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class ClipboardMiscExtensions | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ClipboardMiscExtensions | Dapplo.Windows ">
+      
+      <meta name="description" content="These are extensions to work with the clipboard">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Clipboard_ClipboardMiscExtensions.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Clipboard.ClipboardMiscExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions">
+
+
+
+  <h1 id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions" class="text-break">
+Class ClipboardMiscExtensions  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardMiscExtensions.cs/#L16"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Clipboard.html">Clipboard</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Clipboard.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>These are extensions to work with the clipboard</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class ClipboardMiscExtensions</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ClipboardMiscExtensions</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_ClearContents_" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.ClearContents*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_ClearContents_Dapplo_Windows_Clipboard_IClipboardAccessToken_" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.ClearContents(Dapplo.Windows.Clipboard.IClipboardAccessToken)">
+  ClearContents(IClipboardAccessToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardMiscExtensions.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Empties the clipboard, this assumes that a lock has already been retrieved.
+This makes the window which was used to open the clipboard (default the SharedMessageWindow) the owner of the clipboard.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ClearContents(this IClipboardAccessToken clipboardAccessToken)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>clipboardAccessToken</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.win32exception">Win32Exception</a></dt>
+    <dd><p>When EmptyClipboard failed</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.SetDelayedRenderedContent*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_StandardClipboardFormats_" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.SetDelayedRenderedContent(Dapplo.Windows.Clipboard.IClipboardAccessToken,Dapplo.Windows.Clipboard.StandardClipboardFormats)">
+  SetDelayedRenderedContent(IClipboardAccessToken, StandardClipboardFormats)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardMiscExtensions.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This places delayed rendered content on the clipboard, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.html#Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_UInt32_">SetDelayedRenderedContent(IClipboardAccessToken, uint)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetDelayedRenderedContent(this IClipboardAccessToken clipboardAccessToken, StandardClipboardFormats format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>clipboardAccessToken</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd><p>The IClipboardAccessToken</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="Dapplo.Windows.Clipboard.StandardClipboardFormats.html">StandardClipboardFormats</a></dt>
+    <dd><p>StandardClipboardFormats with the clipboard format</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.SetDelayedRenderedContent*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.SetDelayedRenderedContent(Dapplo.Windows.Clipboard.IClipboardAccessToken,System.String)">
+  SetDelayedRenderedContent(IClipboardAccessToken, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardMiscExtensions.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This places delayed rendered content on the clipboard, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.html#Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_UInt32_">SetDelayedRenderedContent(IClipboardAccessToken, uint)</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetDelayedRenderedContent(this IClipboardAccessToken clipboardAccessToken, string format)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>clipboardAccessToken</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd><p>The IClipboardAccessToken</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the clipboard format</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.SetDelayedRenderedContent*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_System_Func_System_IO_Stream__" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.SetDelayedRenderedContent(Dapplo.Windows.Clipboard.IClipboardAccessToken,System.String,System.Func{System.IO.Stream})">
+  SetDelayedRenderedContent(IClipboardAccessToken, string, Func&lt;Stream&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardMiscExtensions.cs/#L71"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Place a format with delayed rendering, rendered by <code class="paramref">renderer</code> when an application requests it.
+The renderer belongs to the current clipboard content: it's dropped when the content is replaced (WM_DESTROYCLIPBOARD),
+so there is nothing to unregister. Call ClearContents with this token first; the token must use the SharedMessageWindow (the default owner).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetDelayedRenderedContent(this IClipboardAccessToken clipboardAccessToken, string format, Func&lt;Stream&gt; renderer)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>clipboardAccessToken</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd><p>The IClipboardAccessToken</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>string with the clipboard format</p>
+</dd>
+    <dt><code>renderer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-1">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>&gt;</dt>
+    <dd><p>Func which creates a stream with the data, it's disposed after the data is placed</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_System_Func_System_IO_Stream___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><ul><li>The renderer runs on the SharedMessageWindow thread (WM_RENDERFORMAT) while the requesting application waits in GetClipboardData,
+Windows only waits a limited time for the data. Render quickly, don't await or open the clipboard.</li><li>Clipboard history (Win+V), cloud clipboard and clipboard managers usually request the formats right after the copy,
+so the renderer often runs immediately. Delayed rendering saves work only when nobody listens.</li><li>When the process exits (or SharedMessageWindow.Shutdown is called) every format which wasn't requested yet is rendered (WM_RENDERALLFORMATS),
+so the content survives the process.</li></ul>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>When the token doesn't use the SharedMessageWindow, or the clipboard isn't owned by it</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.SetDelayedRenderedContent*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_UInt32_" data-uid="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.SetDelayedRenderedContent(Dapplo.Windows.Clipboard.IClipboardAccessToken,System.UInt32)">
+  SetDelayedRenderedContent(IClipboardAccessToken, uint)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardMiscExtensions.cs/#L106"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This places delayed rendered content on the clipboard: the format is announced, and the data is only rendered when an application requests it.
+Requirements: register a renderer for the format with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_System_UInt32_System_Action_Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest__">RegisterDelayedRenderer(uint, Action&lt;ClipboardRenderFormatRequest&gt;)</a> first,
+and call <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.html#Dapplo_Windows_Clipboard_ClipboardMiscExtensions_ClearContents_Dapplo_Windows_Clipboard_IClipboardAccessToken_">ClearContents(IClipboardAccessToken)</a> with the same access token before, so the window of the token (default the SharedMessageWindow) is the clipboard owner.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetDelayedRenderedContent(this IClipboardAccessToken clipboardAccessToken, uint formatId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>clipboardAccessToken</code> <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+    <dd><p>The IClipboardAccessToken</p>
+</dd>
+    <dt><code>formatId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd><p>uint with the clipboard format</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>When there is no renderer registered for the format, or when the clipboard is not owned by the window of the token</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.win32exception">Win32Exception</a></dt>
+    <dd><p>When SetClipboardData failed</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/ClipboardMiscExtensions.cs/#L16" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

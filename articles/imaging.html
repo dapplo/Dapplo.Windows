@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Images through WIC | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Images through WIC | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/imaging.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="images-through-wic">Images through WIC</h1>
+
+<p><strong>Dapplo.Windows.Imaging</strong> uses the Windows Imaging Component (WIC) directly: it lists the image codecs of the PC, encodes
+and decodes images, and reads and writes their metadata. It needs no WPF, no System.Drawing and no other pixel library:
+pixels are passed as memory (a pointer and a stride) or row by row through a callback, and the input and output are .NET
+streams.</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows.Imaging
+</code></pre>
+<p>Namespace used on this page: <code>Dapplo.Windows.Imaging</code>.</p>
+<p>Every COM object is created per call and released before the call returns, and every method works from STA and MTA
+threads.</p>
+<h2 id="which-formats-the-pc-can-read-and-write">Which formats the PC can read and write</h2>
+<p>WIC lists every codec it has, including the packaged (Store) codecs like HEIF (also AVIF), WebP, Raw and JPEG XL. The
+registry key of the WIC decoder category (<code>HKCR\CLSID\{7ED96837-96F0-4812-B211-F13C24117ED3}\Instance</code>) doesn't list
+the built-in codecs on newer Windows versions and never lists the packaged ones, <code>WicCodecs</code> asks WIC itself.</p>
+<!-- sample: ImagingSamples.DiscoverCodecs -->
+<pre><code class="lang-csharp">// Every decoder WIC has, also the packaged (Store) codecs like HEIF, AVIF, WebP and JPEG XL
+foreach (var decoder in WicCodecs.GetDecoders())
+{
+    Console.WriteLine($&quot;{decoder.FriendlyName}: {string.Join(&quot; &quot;, decoder.FileExtensions)} ({string.Join(&quot; &quot;, decoder.MimeTypes)})&quot;);
+}
+
+// Can this PC write JPEG XL?
+bool canWriteJpegXl = WicCodecs.GetEncoders().Any(encoder =&gt; encoder.ContainerFormat == WicContainerFormats.JpegXl);
+</code></pre>
+<p>Each <code>WicCodecInfo</code> has the CLSID, the container format, the vendor, the friendly name, author and version, the file
+extensions (lower case with the dot, e.g. <code>.heic</code>) and MIME types (lower case), and the signing status. <code>IsFromMicrosoft</code>
+is true for the codecs of Windows and for the Store codecs of Microsoft. A codec which can't be read is left out (and
+logged), it doesn't break the list. <code>GetDecoders(refresh: true)</code> lets WIC refresh its list, e.g. after a codec was
+installed.</p>
+<h2 id="encoding">Encoding</h2>
+<p><code>WicImage.Encode</code> takes the pixels as memory, for example the <code>Scan0</code> of a locked GDI+ bitmap or a contiguous ImageSharp
+buffer, and reads them without a copy of the image.</p>
+<!-- sample: ImagingSamples.EncodeBitmap -->
+<pre><code class="lang-csharp">// Save a GDI+ bitmap as lossless JPEG XL, the pixels are read straight from the locked bitmap
+var bitmapData = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+try
+{
+    var options = new WicEncodeOptions
+    {
+        ContainerFormat = WicContainerFormats.JpegXl,
+        Lossless = true,
+        DpiX = bitmap.HorizontalResolution,
+        DpiY = bitmap.VerticalResolution,
+        Metadata = metadata =&gt; metadata.Set(&quot;System.ApplicationName&quot;, &quot;Greenshot&quot;)
+    };
+    // Format32bppArgb has the byte order B, G, R, A: WicPixelFormats.Format32bppBgra
+    WicEncodeResult result = WicImage.Encode(destination, options, bitmapData.Scan0, bitmapData.Width, bitmapData.Height, bitmapData.Stride, WicPixelFormats.Format32bppBgra);
+}
+catch (WicCodecNotFoundException)
+{
+    // The JPEG XL extension isn't installed (or can't be used), fall back to PNG
+}
+finally
+{
+    bitmap.UnlockBits(bitmapData);
+}
+</code></pre>
+<p>The pixel formats are WIC GUIDs, <code>WicPixelFormats</code> has the common ones: <code>Format32bppBgra</code> (GDI+ <code>Format32bppArgb</code>,
+ImageSharp <code>Bgra32</code>), <code>Format32bppPbgra</code>, <code>Format24bppBgr</code> (GDI+ <code>Format24bppRgb</code>, ImageSharp <code>Bgr24</code>),
+<code>Format32bppRgba</code> (ImageSharp <code>Rgba32</code>), and <code>Format64bppRgbaHalf</code> and <code>Format128bppRgbaFloat</code> for HDR. When the encoder
+wants another pixel format (e.g. JPEG has no alpha), WIC converts the pixels while it reads them;
+<code>WicEncodeResult.PixelFormat</code> is the format which was written.</p>
+<p>For an indexed format (GIF) a palette is made from the pixels: with at most 256 colors (and no partly transparent
+pixel) exactly these colors, so the GIF has the same pixels; otherwise WIC chooses the colors, with
+<code>WicEncodeOptions.Dither</code> using error diffusion. <code>WicEncodeOptions.Palette</code> (up to 256 colors as <code>0xAARRGGBB</code>, alpha 0
+is the transparent color) sets the palette yourself: pixels in <code>WicPixelFormats.Format8bppIndexed</code> (or 1, 2, 4 bpp)
+are indexes into it, other pixels get the nearest color and the encoder is asked for an indexed format, so a PNG gets a
+palette too.</p>
+<p>When the pixels aren't in one buffer (ImageSharp can split a large image), the other overload takes a callback. The
+encoder pulls the rows it needs, no copy of the image is made.</p>
+<!-- sample: ImagingSamples.EncodeRows -->
+<pre><code class="lang-csharp">// Pixels which aren't in one buffer (e.g. ImageSharp ProcessPixelRows): the encoder pulls the rows it needs
+WicImage.Encode(destination, new WicEncodeOptions { ContainerFormat = WicContainerFormats.Png }, width, height, WicPixelFormats.Format32bppBgra,
+    (top, count, rows, stride) =&gt;
+    {
+        for (int row = 0; row &lt; count; row++)
+        {
+            getRow(top + row).AsSpan().CopyTo(rows.Slice(row * stride));
+        }
+    });
+</code></pre>
+<p><code>ImageQuality</code> (0..1) and <code>Lossless</code> are set when the encoder has them, <code>EncoderOptions</code> takes any other option by
+name. An option the encoder doesn't have is skipped; <code>WicEncodeResult.AppliedOptions</code> lists what was set and
+<code>WicImage.GetEncoderOptions(containerFormat)</code> lists what an encoder has:</p>
+<table>
+<thead>
+<tr>
+<th>Encoder</th>
+<th>Options</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JPEG</td>
+<td>ImageQuality, BitmapTransform, SuppressApp0, JpegYCrCbSubsampling, Luminance, Chrominance and the Huffman tables</td>
+</tr>
+<tr>
+<td>TIFF</td>
+<td>TiffCompressionMethod, CompressionQuality</td>
+</tr>
+<tr>
+<td>PNG</td>
+<td>InterlaceOption, FilterOption</td>
+</tr>
+<tr>
+<td>JPEG XR</td>
+<td>ImageQuality, Lossless, BitmapTransform, UseCodecOptions, Quality, Overlap, Subsampling, tile slices, FrequencyOrder, InterleavedAlpha, AlphaQuality ...</td>
+</tr>
+<tr>
+<td>BMP</td>
+<td>EnableV5Header32bppBGRA</td>
+</tr>
+<tr>
+<td>GIF</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<p>A stream which can't seek is written through a <code>MemoryStream</code>. A seekable stream is written from its current position
+and ends up after the image.</p>
+<h2 id="decoding">Decoding</h2>
+<p>Decoding reads the first frame and converts it to the pixel format you ask for. <code>GetFrameInfo</code> reads only the size,
+resolution, pixel format and metadata. <code>Decode</code> writes the pixels into your memory, either memory you allocated with
+the size from <code>GetFrameInfo</code>, or memory you supply once the size is known, so the stream is read once:</p>
+<!-- sample: ImagingSamples.DecodeIntoBitmap -->
+<pre><code class="lang-csharp">// Load any image WIC can read into a new GDI+ bitmap, upright, without WPF and without an extra copy
+Bitmap bitmap = null;
+BitmapData bitmapData = null;
+try
+{
+    WicFrameInfo info = WicImage.Decode(source, WicPixelFormats.Format32bppBgra, (WicFrameInfo frame, out int stride) =&gt;
+    {
+        bitmap = new Bitmap(frame.Width, frame.Height, PixelFormat.Format32bppArgb);
+        // The resolution of the file; when it stores none, WIC reports the default of the decoder (96 or 72), use your own
+        bitmap.SetResolution(frame.HasResolution ? (float)frame.DpiX : 96, frame.HasResolution ? (float)frame.DpiY : 96);
+        bitmapData = bitmap.LockBits(new Rectangle(0, 0, frame.Width, frame.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+        stride = bitmapData.Stride;
+        return bitmapData.Scan0;
+    }, applyOrientation: true);
+}
+finally
+{
+    if (bitmapData != null)
+    {
+        bitmap.UnlockBits(bitmapData);
+    }
+}
+</code></pre>
+<p>With <code>applyOrientation: true</code> the EXIF orientation is applied (rotated and flipped before the pixel format conversion),
+<code>WicFrameInfo.Width</code> and <code>Height</code> are then those of the upright image. A third overload hands the rows to a
+<code>WicRowConsumer</code>, in bands from a pooled buffer.</p>
+<h3 id="resolution">Resolution</h3>
+<p>WIC always reports a resolution: when the file stores none, each decoder fills in its own default (e.g. 96 for
+PNG, 72 for WebP). <code>WicFrameInfo.HasResolution</code> tells the two apart, it is true only when the file itself stores a
+resolution:</p>
+<table>
+<thead>
+<tr>
+<th>Container</th>
+<th>Stored resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PNG</td>
+<td>a pHYs chunk with the unit meter (unit 0 is only an aspect ratio)</td>
+</tr>
+<tr>
+<td>JPEG</td>
+<td>JFIF density with the unit inch or cm, or EXIF XResolution with a ResolutionUnit other than none</td>
+</tr>
+<tr>
+<td>TIFF, DNG</td>
+<td>XResolution with a ResolutionUnit other than none (no ResolutionUnit means inch)</td>
+</tr>
+<tr>
+<td>JPEG XR</td>
+<td>WIDTH_RESOLUTION of the container</td>
+</tr>
+<tr>
+<td>BMP</td>
+<td>pixels per meter other than 0</td>
+</tr>
+<tr>
+<td>GIF, ICO, DDS</td>
+<td>never, GIF only has an aspect ratio</td>
+</tr>
+<tr>
+<td>others (WebP, HEIF, AVIF, JPEG XL, RAW, ...)</td>
+<td>an EXIF IFD with XResolution and a ResolutionUnit other than none</td>
+</tr>
+</tbody>
+</table>
+<p>The metadata of the frame is used, the bytes of the file are read only for a PNG whose pHYs WIC doesn't expose, JPEG XR
+and BMP. When the resolution is only in EXIF, <code>DpiX</code> / <code>DpiY</code> are the EXIF values: the JPEG decoder of WIC reports its
+default (96) for a JPEG with only EXIF XResolution.</p>
+<h2 id="when-there-is-no-codec">When there is no codec</h2>
+<p>When WIC has no codec for the container format or doesn't recognize the stream, a <code>WicCodecNotFoundException</code> (a
+<code>COMException</code>) is thrown, so you can fall back. It is also thrown when a codec is registered but can't be initialized:
+on the CI runner (Windows Server) the HEIF and JPEG XL encoders are listed but fail with
+<code>WINCODEC_ERR_COMPONENTINITIALIZEFAILURE</code> (0x88982F8B); HEIF encoding needs the HEVC video extension. Other WIC
+failures are a <code>COMException</code> with the HRESULT, and an exception of your stream or row callback reaches you unchanged.</p>
+<h2 id="metadata">Metadata</h2>
+<p>The metadata uses the <a href="https://learn.microsoft.com/en-us/windows/win32/wic/-wic-codec-metadataquerylanguage">WIC metadata query language</a>,
+so it is not a fixed set of properties. The same EXIF tag has a different path in each container, <code>WicMetadataPaths</code> has
+them, e.g. <code>Software(WicContainerFormats.Jpeg)</code> is <code>/app1/ifd/{ushort=305}</code> and <code>Software(WicContainerFormats.Tiff)</code> is
+<code>/ifd/{ushort=305}</code>.</p>
+<h3 id="writing">Writing</h3>
+<p><code>WicEncodeOptions.Metadata</code> is called after the frame is initialized and before the pixels are written. Everything the
+encoder doesn't accept is skipped and listed in <code>WicEncodeResult.MetadataIssues</code> (and logged), it never fails the
+encoding.</p>
+<!-- sample: ImagingSamples.WriteMetadata -->
+<pre><code class="lang-csharp">var container = WicContainerFormats.Jpeg;
+var options = new WicEncodeOptions
+{
+    ContainerFormat = container,
+    ImageQuality = 0.9f,
+    Metadata = metadata =&gt;
+    {
+        // The EXIF ASCII tags are VT_LPSTR
+        metadata.Set(WicMetadataPaths.Software(container), WicMetadataValue.AnsiString(&quot;Greenshot&quot;));
+        metadata.Set(WicMetadataPaths.DateTimeOriginal(container), WicMetadataValue.AnsiString(DateTime.Now.ToString(&quot;yyyy:MM:dd HH:mm:ss&quot;, CultureInfo.InvariantCulture)));
+        // dc:title becomes a language alternative with x-default
+        metadata.Set(WicMetadataPaths.XmpProperty(container, &quot;dc:title&quot;), &quot;Capture of the Explorer window&quot;);
+        metadata.Set(WicMetadataPaths.XmpProperty(container, &quot;xmp:CreatorTool&quot;), &quot;Greenshot&quot;);
+        metadata.SetColorProfile(iccProfile);
+    }
+};
+var result = WicImage.Encode(destination, options, pixels, width, height, stride, WicPixelFormats.Format32bppBgra);
+foreach (var issue in result.MetadataIssues)
+{
+    Console.WriteLine($&quot;Not written: {issue}&quot;);
+}
+</code></pre>
+<p>Values: <code>string</code> is written as VT_LPWSTR, <code>WicMetadataValue.AnsiString</code> as VT_LPSTR (the EXIF ASCII tags like Software,
+DateTime and DateTimeOriginal), <code>bool</code>, the integer types, <code>float</code>, <code>double</code>, <code>WicRational</code> and <code>WicSignedRational</code> (EXIF
+RATIONAL and SRATIONAL), <code>DateTime</code> (FILETIME), <code>Guid</code>, <code>byte[]</code> (VT_BLOB, or <code>WicMetadataValue.ByteVector</code> for
+VT_VECTOR | VT_UI1), <code>ushort[]</code>, <code>uint[]</code>, <code>int[]</code> and <code>string[]</code>.</p>
+<p>The photo metadata policies of Windows, e.g. <code>System.ApplicationName</code>, <code>System.Title</code>, <code>System.Comment</code> and
+<code>System.Photo.Orientation</code>, write every location the container has: <code>System.ApplicationName</code> writes the EXIF Software
+and the XMP xmp:CreatorTool, <code>System.Title</code> the EXIF ImageDescription and the XMP dc:title as language alternative. A
+plain string at <code>/xmp/dc:title</code> makes a simple XMP property.</p>
+<h3 id="reading">Reading</h3>
+<p><code>WicFrameInfo.Metadata</code> is a snapshot of every readable item of the first frame, walked through the nested blocks.</p>
+<!-- sample: ImagingSamples.ReadMetadata -->
+<pre><code class="lang-csharp">WicFrameInfo info = WicImage.GetFrameInfo(source);
+WicMetadata metadata = info.Metadata;
+if (metadata.TryGet(WicMetadataPaths.Software(info.ContainerFormat), out var software))
+{
+    Console.WriteLine($&quot;Written by {software}&quot;);
+}
+int? orientation = metadata.Orientation; // 1..8
+byte[] icc = metadata.ColorProfile;      // null without a profile
+foreach (var item in metadata.Items)
+{
+    // e.g. &quot;/app1/ifd/exif/{ushort=36867}&quot; = &quot;2026:11:02 12:34:56&quot;
+    Console.WriteLine($&quot;{item.Key} = {item.Value}&quot;);
+}
+</code></pre>
+<p>The paths use the names of the blocks (<code>/app1/ifd/exif</code>), the paths with the tags as WIC enumerates them
+(<code>/app1/{ushort=0}/{ushort=34665}</code>) work for <code>TryGet</code> too. EXIF rationals are stored by WIC as <code>ulong</code> / <code>long</code>
+(numerator in the low 32 bits), <code>TryGetRational</code> converts them. A nested block is listed as a <code>WicMetadataBlock</code> with its
+metadata format. <code>Orientation</code> is read with the path of the container or <code>System.Photo.Orientation</code>, <code>ColorProfile</code> is
+the ICC profile of the first color context.</p>
+<h3 id="raw-blocks">Raw blocks</h3>
+<p>To carry metadata over unchanged, <code>RawBlocks</code> has the EXIF, XMP and IPTC blocks as bytes, and <code>AddRawBlock</code> writes one:</p>
+<!-- sample: ImagingSamples.CarryOverXmp -->
+<pre><code class="lang-csharp">// Copy the XMP block of the original unchanged into the new file
+var original = WicImage.GetFrameInfo(source).Metadata;
+WicImage.Encode(destination, new WicEncodeOptions
+{
+    ContainerFormat = WicContainerFormats.Jpeg,
+    Metadata = metadata =&gt;
+    {
+        foreach (var block in original.RawBlocks.Where(block =&gt; block.Format == WicMetadataFormats.Xmp))
+        {
+            metadata.AddRawBlock(new WicMetadataRawBlock(WicMetadataPaths.Xmp(WicContainerFormats.Jpeg), block.Format, block.Data));
+        }
+    }
+}, pixels, width, height, stride, WicPixelFormats.Format32bppBgra);
+</code></pre>
+<h3 id="what-the-codecs-of-windows-accept">What the codecs of Windows accept</h3>
+<p>Tested with the codecs of Windows on the CI runner (Windows Server 2025, <code>windows-latest</code>), see <code>WicMetadataTests</code>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>JPEG</th>
+<th>TIFF</th>
+<th>PNG</th>
+<th>JPEG XR</th>
+<th>GIF</th>
+<th>BMP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EXIF tags (Software, ImageDescription, Orientation, XResolution)</td>
+<td><code>/app1/ifd/{ushort=n}</code></td>
+<td><code>/ifd/{ushort=n}</code></td>
+<td>-</td>
+<td><code>/ifd/{ushort=n}</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>EXIF sub IFD (DateTimeOriginal, ExposureTime)</td>
+<td><code>/app1/ifd/exif/{ushort=n}</code></td>
+<td><code>/ifd/exif/{ushort=n}</code></td>
+<td>-</td>
+<td><code>/ifd/exif/{ushort=n}</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>XMP</td>
+<td><code>/xmp/...</code></td>
+<td><code>/ifd/xmp/...</code></td>
+<td><code>/xmp/...</code></td>
+<td><code>/ifd/xmp/...</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>PNG text</td>
+<td>-</td>
+<td>-</td>
+<td><code>/tEXt/{str=keyword}</code>, <code>/[1]tEXt/...</code>, <code>/iTXt/...</code></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Policies (System.ApplicationName, System.Title, System.Comment, System.Photo.Orientation)</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Color profile</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes (iCCP)</td>
+<td>yes</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Raw blocks</td>
+<td><code>/app1</code>, <code>/xmp</code></td>
+<td><code>/ifd/xmp</code> (tag 700)</td>
+<td><code>/xmp</code></td>
+<td><code>/ifd/xmp</code> (tag 700)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p>GIF has only its own blocks (<code>/imgdesc</code>, <code>/grctlext</code>, ...), BMP has no metadata. A PNG tEXt chunk holds one keyword: a
+second keyword at <code>/tEXt</code> replaces the first, give each its own chunk index (<code>WicMetadataPaths.PngText(&quot;Description&quot;, 1)</code>).
+HEIF and JPEG XL couldn't be tested on the CI runner (their encoders don't initialize there); their decoders are listed.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/imaging.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

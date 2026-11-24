@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Keyboard and mouse | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Keyboard and mouse | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/input-handling.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="keyboard-and-mouse">Keyboard and mouse</h1>
+
+<p><strong>Dapplo.Windows.Input</strong> has global (low-level) keyboard and mouse hooks, handlers for key combinations and sequences,
+input generation with <code>SendInput</code>, and raw input.</p>
+<pre><code class="lang-powershell">dotnet add package Dapplo.Windows.Input
+</code></pre>
+<p>Namespaces used on this page: <code>Dapplo.Windows.Input</code>, <code>Dapplo.Windows.Input.Enums</code>, <code>Dapplo.Windows.Input.Keyboard</code>,
+<code>Dapplo.Windows.Input.Mouse</code>, <code>Dapplo.Windows.Messages.Enums</code>, <code>Dapplo.Windows.Common.Structs</code>,
+<code>System.Reactive.Linq</code>, <code>System.Reactive.Concurrency</code>.</p>
+<h2 id="keyboard-hook">Keyboard hook</h2>
+<p><code>KeyboardHook.KeyboardEvents</code> reports every key-down and key-up of the system. The hook is installed with the first
+subscription and removed when the last one is disposed.</p>
+<!-- sample: InputSamples.KeyboardHookBasics -->
+<pre><code class="lang-csharp">// The hook is installed with the first subscription and removed with the last
+IDisposable subscription = KeyboardHook.KeyboardEvents
+    .Where(args =&gt; args.IsKeyDown)
+    .Subscribe(args =&gt; Console.WriteLine($&quot;{args.Key} down, Ctrl: {args.IsControl}, Shift: {args.IsShift}&quot;));
+
+// ...
+subscription.Dispose();
+</code></pre>
+<p><code>KeyboardHookEventArgs</code> tells you the <code>Key</code> (<code>VirtualKeyCode</code>), <code>IsKeyDown</code>, the modifier state (<code>IsControl</code>,
+<code>IsShift</code>, <code>IsAlt</code>, <code>IsWindows</code> and the left / right variants), the lock keys (<code>IsCapsLockActive</code>, ...), <code>ScanCode</code>,
+<code>IsExtended</code> and whether the event was injected by a program (<code>IsInjectedByProcess</code>).</p>
+<p>Text which is sent as Unicode characters (by <code>KeyboardInputGenerator.TypeText</code>, an IME, an on-screen keyboard or a
+remote desktop client) arrives as <code>VirtualKeyCode.Packet</code> (VK_PACKET) events: <code>IsPacket</code> is true and
+<code>PacketCharacter</code> is the UTF-16 code unit. A character outside the Basic Multilingual Plane, like most emoji, arrives
+as two packets (the surrogates). The key combination and sequence handlers ignore packets.</p>
+<h3 id="the-hook-thread">The hook thread</h3>
+<p><code>KeyboardHook</code> and <code>MouseHook</code> run on their own background thread with a message loop. It doesn't matter which thread
+subscribes, and your <code>OnNext</code> is called on the hook thread.</p>
+<p>While your <code>OnNext</code> runs, <strong>the keyboard of the whole system waits</strong>. When a low-level hook takes too long (the
+<code>LowLevelHooksTimeout</code>, at most about a second), Windows removes it silently and no events arrive anymore. So:</p>
+<ul>
+<li>In <code>KeyboardEvents</code> only decide <code>Handled</code>, quickly. Then use <code>ObserveOn</code> for the real work:</li>
+</ul>
+<!-- sample: InputSamples.ObserveOnUi -->
+<pre><code class="lang-csharp">// Decide Handled on the hook thread (quick!), then do the real work on the UI thread.
+// Call this on the UI thread, so SynchronizationContext.Current is the one of the UI.
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(args =&gt; args.Key == VirtualKeyCode.PrintScreen)
+    // Swallow the key-down and the key-up, so Windows doesn't take its own screenshot
+    .Do(args =&gt; args.Handled = true)
+    .Where(args =&gt; args.IsKeyDown)
+    .ObserveOn(SynchronizationContext.Current)
+    .Subscribe(args =&gt; TakeScreenshot());
+</code></pre>
+<ul>
+<li>If you never set <code>Handled</code>, use <code>KeyboardEventsNonBlocking</code>. The events are delivered in order on a separate thread,
+so a slow subscriber never delays the keyboard:</li>
+</ul>
+<!-- sample: InputSamples.NonBlocking -->
+<pre><code class="lang-csharp">// For listeners which never set Handled: the events are delivered in order on another thread,
+// so a slow subscriber never delays the keyboard of the whole system
+var subscription = KeyboardHook.KeyboardEventsNonBlocking
+    .Where(args =&gt; args.IsKeyDown)
+    .Subscribe(args =&gt; LogKey(args.Key));
+</code></pre>
+<ul>
+<li>An exception in a subscriber never reaches the hook. It ends that subscription and is published on
+<code>SubscriberErrors</code>:</li>
+</ul>
+<!-- sample: InputSamples.SubscriberErrors -->
+<pre><code class="lang-csharp">// An exception in a subscriber never reaches the hook, it is published here and ends only that subscription
+var errors = KeyboardHook.SubscriberErrors
+    .Subscribe(ex =&gt; Console.Error.WriteLine($&quot;Keyboard subscriber failed: {ex}&quot;));
+</code></pre>
+<p>If the hook can't be installed, the subscriber gets <code>OnError</code> with a <code>Win32Exception</code>.</p>
+<h3 id="swallowing-keys">Swallowing keys</h3>
+<p>Set <code>Handled = true</code> in <code>OnNext</code> (on the hook thread, before any <code>ObserveOn</code>) and other applications don't see the key.
+Swallow the key-down and the key-up, otherwise other applications see half a key press.</p>
+<!-- sample: InputSamples.SuppressKey -->
+<pre><code class="lang-csharp">// Swallow the Windows keys, e.g. while a game or a kiosk application is active.
+// Swallow both the key-down and the key-up, otherwise other applications see half a key press.
+var subscription = KeyboardHook.KeyboardEvents
+    .Subscribe(args =&gt;
+    {
+        if (args.Key == VirtualKeyCode.LeftWin || args.Key == VirtualKeyCode.RightWin)
+        {
+            args.Handled = true;
+        }
+    });
+</code></pre>
+<h2 id="key-combinations">Key combinations</h2>
+<p>A <code>KeyCombinationHandler</code> keeps track of the pressed keys and reports when exactly the keys of the combination are
+down, nothing else. <code>Control</code>, <code>Shift</code>, <code>Menu</code> (Alt) and <code>Win</code> match both the left and the right key. Use the
+<code>Where(handler)</code> extension on the keyboard observable:</p>
+<!-- sample: InputSamples.KeyCombination -->
+<pre><code class="lang-csharp">// Ctrl+Shift+S, Control and Shift match both the left and the right key.
+// The handler marks the key events as handled, so other applications don't see the combination.
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyS))
+    .ObserveOn(SynchronizationContext.Current)
+    .Subscribe(args =&gt; SaveAll());
+</code></pre>
+<p>By default the handler marks the key events of the combination as handled, so the active application doesn't get
+them. The options:</p>
+<!-- sample: InputSamples.KeyCombinationOptions -->
+<pre><code class="lang-csharp">var handler = new KeyCombinationHandler(VirtualKeyCode.Win, VirtualKeyCode.Shift, VirtualKeyCode.KeyA)
+{
+    // Let other applications see the keys too (default false: they are swallowed)
+    IsPassThrough = true,
+    // Fire again while the keys are held and auto-repeat (default false)
+    CanRepeat = false,
+    // Also react to keys sent with SendInput by other programs (default true: ignore them)
+    IgnoreInjected = true
+};
+var subscription = KeyboardHook.KeyboardEvents.Where(handler).Subscribe(_ =&gt; Console.WriteLine(&quot;Win+Shift+A&quot;));
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IsPassThrough</code></td>
+<td><code>false</code></td>
+<td><code>true</code> lets other applications see the keys too</td>
+</tr>
+<tr>
+<td><code>CanRepeat</code></td>
+<td><code>false</code></td>
+<td><code>true</code> fires again for auto-repeat while the keys are held</td>
+</tr>
+<tr>
+<td><code>IgnoreInjected</code></td>
+<td><code>true</code></td>
+<td><code>false</code> also reacts to keys sent by programs (<code>SendInput</code>)</td>
+</tr>
+<tr>
+<td><code>TriggerMode</code></td>
+<td><code>KeyDown</code></td>
+<td><code>FirstKeyUp</code> or <code>AllKeysUp</code> fire on the release of the combination, see <a href="#trigger-mode">Trigger mode</a></td>
+</tr>
+<tr>
+<td><code>KeyStateVerifier</code></td>
+<td>physical key state</td>
+<td>checks on every key-down that the keys it considers pressed are still down, so a missed key-up (Win+L, UAC, Ctrl+Alt+Del) doesn't block the combination</td>
+</tr>
+</tbody>
+</table>
+<p>Combinations can be parsed from text, for example from a settings file:</p>
+<!-- sample: InputSamples.KeyCombinationFromString -->
+<pre><code class="lang-csharp">// &quot;ctrl&quot;, &quot;alt&quot;, &quot;shift&quot; and &quot;win&quot; match the left and the right key, single characters become KeyA .. KeyZ, Key0 .. Key9
+var keys = KeyHelper.VirtualKeyCodesFromString(&quot;Ctrl + Alt + P&quot;).ToArray();
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(new KeyCombinationHandler(keys))
+    .Subscribe(_ =&gt; Console.WriteLine(&quot;Ctrl+Alt+P&quot;));
+
+// A readable, localized name for a key, e.g. for a settings dialog
+string text = KeyHelper.VirtualCodeToLocaleDisplayText(VirtualKeyCode.PrintScreen);
+</code></pre>
+<h3 id="one-handler-per-subscription">One handler per subscription</h3>
+<p>A handler has state (which keys are down), so one instance may only be used by one active subscription. Using it in a
+second subscription gives that subscription an <code>InvalidOperationException</code>. When you subscribe to the same observable
+more than once, pass a factory, then every subscription gets its own handler:</p>
+<!-- sample: InputSamples.HandlerFactory -->
+<pre><code class="lang-csharp">// A handler keeps track of the pressed keys, so it may be used by one subscription only.
+// When an observable is subscribed more than once, give Where a factory: every subscription gets its own handler.
+IObservable&lt;KeyboardHookEventArgs&gt; saveHotkey = KeyboardHook.KeyboardEvents
+    .Where(() =&gt; new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.KeyS));
+
+var first = saveHotkey.Subscribe(_ =&gt; Console.WriteLine(&quot;Save (1)&quot;));
+var second = saveHotkey.Subscribe(_ =&gt; Console.WriteLine(&quot;Save (2)&quot;));
+</code></pre>
+<h3 id="either-of-several-combinations-or-a-sequence">Either of several combinations, or a sequence</h3>
+<!-- sample: InputSamples.KeyOrCombination -->
+<pre><code class="lang-csharp">// PrintScreen, or Ctrl+Shift+4
+var handler = new KeyOrCombinationHandler(
+    new KeyCombinationHandler(VirtualKeyCode.PrintScreen),
+    new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.Key4));
+
+var subscription = KeyboardHook.KeyboardEvents.Where(handler).Subscribe(_ =&gt; Console.WriteLine(&quot;Capture&quot;));
+</code></pre>
+<p>A <code>KeySequenceHandler</code> fires when the combinations are pressed one after the other, each within <code>Timeout</code> (default 1
+second) of the previous one:</p>
+<!-- sample: InputSamples.KeySequence -->
+<pre><code class="lang-csharp">// Ctrl+K followed by Ctrl+C (like Visual Studio), at most 2 seconds apart
+var handler = new KeySequenceHandler(
+    new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.KeyK),
+    new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.KeyC))
+{
+    Timeout = TimeSpan.FromSeconds(2)
+};
+
+var subscription = KeyboardHook.KeyboardEvents.Where(handler).Subscribe(_ =&gt; Console.WriteLine(&quot;Comment selection&quot;));
+</code></pre>
+<h3 id="trigger-mode">Trigger mode</h3>
+<p><code>TriggerMode</code> sets when the handler fires:</p>
+<table>
+<thead>
+<tr>
+<th><code>TriggerMode</code></th>
+<th>Fires</th>
+<th>Key events</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KeyDown</code> (default)</td>
+<td>on the key-down which completes the combination</td>
+<td>swallowed, unless <code>IsPassThrough</code></td>
+</tr>
+<tr>
+<td><code>FirstKeyUp</code></td>
+<td>when the first key of the combination is released; the other keys can still be down</td>
+<td>passed on</td>
+</tr>
+<tr>
+<td><code>AllKeysUp</code></td>
+<td>once, when the last key of the combination is released</td>
+<td>passed on</td>
+</tr>
+</tbody>
+</table>
+<p>In both key-up modes the key events are never marked as handled: the key-downs already reached the active
+application, and swallowing only the key-up would leave a stuck key. <code>IsPassThrough</code> has no effect. Choose a
+combination which doesn't mean anything in the applications of your users.</p>
+<p>A key-up mode only fires when all keys of the combination were down together, without another key. With <code>AllKeysUp</code>,
+another key pressed while a key of the combination is still down (Ctrl+A, then C while Ctrl is held) cancels the
+trigger; pressing the complete combination again arms it again (auto-repeat doesn't count).</p>
+<p><code>AllKeysUp</code> is the mode for hotkeys which send input: when it fires, the user doesn't hold any key of the combination
+anymore, so your input isn't combined with it.</p>
+<!-- sample: InputSamples.AllKeysUp -->
+<pre><code class="lang-csharp">// Ctrl+Alt+D types the date into the active application, when the user released all keys of the combination
+var handler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.KeyD)
+{
+    TriggerMode = TriggerMode.AllKeysUp
+};
+
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(handler)
+    // Leave the hook thread, sending input from there would block the keyboard
+    .ObserveOn(TaskPoolScheduler.Default)
+    // No key of the combination is down anymore, so the text isn't combined with Ctrl or Alt
+    .Subscribe(_ =&gt; KeyboardInputGenerator.TypeText(DateTime.Now.ToString(&quot;yyyy-MM-dd&quot;)));
+</code></pre>
+<p>With <code>FirstKeyUp</code> the other keys can still be down when the handler fires. If you send input in reaction, wait until
+the user released them, otherwise your input is combined with them (Ctrl+Shift+Home instead of Home):</p>
+<!-- sample: InputSamples.WaitForRelease -->
+<pre><code class="lang-csharp">private static void WaitUntilReleased(params VirtualKeyCode[] keys)
+{
+    // The asynchronous (current, system wide) key state, Control and Shift match the left and the right key
+    while (KeyboardState.IsAnyDown(keys))
+    {
+        Thread.Sleep(20);
+    }
+}
+</code></pre>
+<!-- sample: InputSamples.FirstKeyUp -->
+<pre><code class="lang-csharp">var handler = new KeyCombinationHandler(VirtualKeyCode.Control, VirtualKeyCode.Shift, VirtualKeyCode.KeyH)
+{
+    TriggerMode = TriggerMode.FirstKeyUp
+};
+
+var subscription = KeyboardHook.KeyboardEvents
+    .Where(handler)
+    // Leave the hook thread, waiting there would block the keyboard
+    .ObserveOn(TaskPoolScheduler.Default)
+    .Subscribe(_ =&gt;
+    {
+        // The other keys of the combination can still be down, wait for them before sending input
+        WaitUntilReleased(VirtualKeyCode.Control, VirtualKeyCode.Shift);
+        KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Home);
+    });
+</code></pre>
+<h2 id="key-state">Key state</h2>
+<p><code>KeyboardState</code> reads the state of a key. <code>Shift</code>, <code>Control</code>, <code>Menu</code> and <code>Win</code> check the left and the right key.
+Windows keeps two states:</p>
+<ul>
+<li><strong>Asynchronous</strong> (<code>IsDown</code>, <code>IsAnyDown</code>, GetAsyncKeyState): the state right now, system wide, including injected
+input. Use it in background threads and hooks, e.g. to wait until the user released some keys. In a low-level hook
+the key of the current event isn't updated yet (use <code>IsKeyDown</code> of the event), and while another desktop (UAC,
+Win+L) is active all keys read as up.</li>
+<li><strong>Per thread</strong> (<code>IsDownForCurrentThread</code>, <code>IsToggled</code>, GetKeyState): the state at the time of the keyboard message
+which the calling thread is processing. Use it in a key event handler of your UI. It lags behind when the thread
+doesn't process keyboard messages. The toggle state (CapsLock, NumLock, ScrollLock) only exists here.</li>
+</ul>
+<!-- sample: InputSamples.KeyStateQuery -->
+<pre><code class="lang-csharp">// Right now, system wide (GetAsyncKeyState): use this in background threads and hooks
+bool shiftDown = KeyboardState.IsDown(VirtualKeyCode.Shift);
+bool anyModifier = KeyboardState.IsAnyDown(VirtualKeyCode.Shift, VirtualKeyCode.Control, VirtualKeyCode.Menu, VirtualKeyCode.Win);
+
+// At the time of the keyboard message the UI thread is processing (GetKeyState): use this in a key event handler
+bool ctrlWithThisKey = KeyboardState.IsDownForCurrentThread(VirtualKeyCode.Control);
+
+// Toggle keys
+bool capsLock = KeyboardState.IsToggled(VirtualKeyCode.Capital);
+</code></pre>
+<h2 id="generating-keyboard-input">Generating keyboard input</h2>
+<p><code>KeyboardInputGenerator</code> sends keys with <code>SendInput</code>. Arrow, navigation, right Ctrl / Alt, Windows and media keys are
+sent as extended keys. <code>VirtualKeyCode.Win</code> is sent as the left Windows key.</p>
+<!-- sample: InputSamples.GenerateKeys -->
+<pre><code class="lang-csharp">// Press and release keys one after the other: types &quot;hi&quot; (with the current keyboard layout)
+KeyboardInputGenerator.KeyPresses(VirtualKeyCode.KeyH, VirtualKeyCode.KeyI);
+
+// Ctrl+C: all keys down, then all keys up in reverse order
+KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Control, VirtualKeyCode.KeyC);
+
+// Hold Shift while pressing some keys
+KeyboardInputGenerator.KeyDown(VirtualKeyCode.Shift);
+KeyboardInputGenerator.KeyPresses(VirtualKeyCode.Right, VirtualKeyCode.Right);
+KeyboardInputGenerator.KeyUp(VirtualKeyCode.Shift);
+
+// Win+D shows the desktop, Win is sent as the left Windows key
+KeyboardInputGenerator.KeyCombinationPress(VirtualKeyCode.Win, VirtualKeyCode.KeyD);
+</code></pre>
+<h3 id="typing-text">Typing text</h3>
+<p>Virtual keys depend on the keyboard layout (<code>KeyPresses(VirtualKeyCode.KeyY)</code> types a &quot;z&quot; with a German layout).
+<code>TypeText</code> sends the text as Unicode characters instead (<code>SendInput</code> with <code>KEYEVENTF_UNICODE</code>), so every character
+arrives as it is, including accents and emoji:</p>
+<!-- sample: InputSamples.TypeText -->
+<pre><code class="lang-csharp">// Types the text as Unicode characters, independent of the keyboard layout.
+// Line breaks become Enter, \t becomes Tab, other control characters are skipped.
+var text = &quot;Grüße aus Köln 👋\r\nPrice:\t42 €&quot;;
+uint inserted = KeyboardInputGenerator.TypeText(text);
+
+// Two events (down and up) per UTF-16 code unit, Enter and Tab, fewer means the input was blocked
+if (inserted &lt; KeyboardInput.ForText(text).Length)
+{
+    Console.Error.WriteLine(&quot;The input was blocked, e.g. by an elevated application&quot;);
+}
+</code></pre>
+<ul>
+<li>Every UTF-16 code unit is a key-down and a key-up; a surrogate pair is sent as two code units, the high one first.</li>
+<li><code>&quot;\r\n&quot;</code>, <code>&quot;\n&quot;</code> and <code>&quot;\r&quot;</code> are sent as the Enter key, <code>&quot;\t&quot;</code> as the Tab key. All other control characters are
+skipped, applications treat them as commands (Backspace, Escape, Ctrl+C in a console), not as text.</li>
+<li>The text is sent in batches; the result is the number of inserted events. When the input is blocked (an elevated
+foreground application, the secure desktop), the rest of the text isn't sent and the result is lower than
+<code>KeyboardInput.ForText(text).Length</code>.</li>
+<li>Keys the user holds are combined with the input: send text from a hotkey with <code>TriggerMode.AllKeysUp</code>, or wait until
+the keys are released.</li>
+<li>Low-level hooks see the characters as <code>VirtualKeyCode.Packet</code>. Some applications ignore such input: games, remote
+desktop and virtual machine windows, and applications which read keys with raw input or GetAsyncKeyState. For those
+use <code>KeyPresses</code> or paste via the clipboard.</li>
+</ul>
+<p>Input goes to the foreground window. Windows blocks input into windows of processes with a higher integrity level
+(e.g. an elevated application) unless your process is elevated too.</p>
+<h2 id="mouse-hook">Mouse hook</h2>
+<p><code>MouseHook.MouseEvents</code> works like the keyboard hook, with the same threading rules, <code>MouseEventsNonBlocking</code> and
+<code>SubscriberErrors</code>. <code>WindowsMessage</code> says what happened (<code>WM_MOUSEMOVE</code>, <code>WM_LBUTTONDOWN</code>, <code>WM_MOUSEWHEEL</code>, ...),
+<code>Point</code> is the position in screen coordinates.</p>
+<!-- sample: InputSamples.MouseHookBasics -->
+<pre><code class="lang-csharp">// WindowsMessage tells what happened: WM_MOUSEMOVE, WM_LBUTTONDOWN, WM_MOUSEWHEEL, ...
+var clicks = MouseHook.MouseEvents
+    .Where(args =&gt; args.WindowsMessage == WindowsMessages.WM_LBUTTONDOWN)
+    .Subscribe(args =&gt; Console.WriteLine($&quot;Left click at {args.Point}&quot;));
+
+// Wheel events have a WheelDelta, 120 is one notch (positive is away from the user)
+var wheel = MouseHook.MouseEventsNonBlocking
+    .Where(args =&gt; args.WindowsMessage == WindowsMessages.WM_MOUSEWHEEL)
+    .Subscribe(args =&gt; Console.WriteLine($&quot;Wheel {args.WheelDelta / 120} notches&quot;));
+
+// Mouse moves are frequent: sample them, and never do slow work in the hook
+var moves = MouseHook.MouseEventsNonBlocking
+    .Where(args =&gt; args.WindowsMessage == WindowsMessages.WM_MOUSEMOVE)
+    .Sample(TimeSpan.FromMilliseconds(100))
+    .Subscribe(args =&gt; Console.WriteLine($&quot;Mouse at {args.Point}&quot;));
+</code></pre>
+<!-- sample: InputSamples.SuppressMouse -->
+<pre><code class="lang-csharp">// Swallow right clicks (down and up), e.g. while your application shows its own context menu
+var subscription = MouseHook.MouseEvents
+    .Where(args =&gt; args.WindowsMessage == WindowsMessages.WM_RBUTTONDOWN || args.WindowsMessage == WindowsMessages.WM_RBUTTONUP)
+    .Subscribe(args =&gt; args.Handled = true);
+</code></pre>
+<h2 id="generating-mouse-input">Generating mouse input</h2>
+<!-- sample: InputSamples.GenerateMouse -->
+<pre><code class="lang-csharp">// Coordinates are screen pixels, also on monitors left of or above the primary one
+MouseInputGenerator.MoveMouse(new NativePoint(100, 200));
+
+// Click at the current position, or at a location
+MouseInputGenerator.MouseClick(MouseButtons.Left);
+MouseInputGenerator.MouseClick(MouseButtons.Right, new NativePoint(300, 400));
+
+// Drag: press, move, release
+MouseInputGenerator.MouseDown(MouseButtons.Left, new NativePoint(100, 100));
+MouseInputGenerator.MoveMouse(new NativePoint(400, 100));
+MouseInputGenerator.MouseUp(MouseButtons.Left, new NativePoint(400, 100));
+
+// Scroll one notch down
+MouseInputGenerator.MoveMouseWheel(-120);
+</code></pre>
+<h2 id="idle-time">Idle time</h2>
+<!-- sample: InputSamples.Idle -->
+<pre><code class="lang-csharp">// How long ago did the user touch the keyboard or mouse?
+TimeSpan idle = NativeInput.LastInputTimeSpan;
+if (idle &gt; TimeSpan.FromMinutes(5))
+{
+    Console.WriteLine(&quot;The user is away&quot;);
+}
+</code></pre>
+<h2 id="raw-input">Raw input</h2>
+<p>Raw input tells you which device (which keyboard, which mouse) the input came from, and it also works while your
+application is in the background. <code>RawInputMonitor.Listen</code> registers the device types on the SharedMessageWindow when
+you subscribe, and unregisters them when you dispose; several monitors can be active at the same time. The events
+arrive on the SharedMessageWindow thread. HID reports of other devices are in <code>RawInputEventArgs.HidData</code>.</p>
+<!-- sample: InputSamples.RawInput -->
+<pre><code class="lang-csharp">// Raw input tells which device the input came from, and works while the application is in the background.
+// The events arrive on the SharedMessageWindow thread.
+var subscription = RawInputMonitor.Listen(RawInputDevices.Keyboard)
+    .Subscribe(args =&gt;
+    {
+        var keyboard = args.RawInput.Device.Keyboard;
+        Console.WriteLine($&quot;Device {args.RawInput.Header.DeviceHandle}: {keyboard.VirtualKey} ({keyboard.Flags})&quot;);
+    });
+</code></pre>
+<!-- sample: InputSamples.RawInputDevices -->
+<pre><code class="lang-csharp">// All currently connected keyboards and mice
+foreach (var device in RawInputApi.GetAllDevices())
+{
+    Console.WriteLine($&quot;{device.DisplayName}: {device.DeviceName}&quot;);
+}
+
+// Get told when a keyboard is connected or removed
+var subscription = RawInputDeviceMonitor.Listen(RawInputDevices.Keyboard)
+    .Subscribe(change =&gt; Console.WriteLine($&quot;{(change.Added ? &quot;Added&quot; : &quot;Removed&quot;)}: {change.DeviceInformation.DisplayName}&quot;));
+</code></pre>
+<h2 id="tips">Tips</h2>
+<ul>
+<li>Dispose hook subscriptions when you don't need them anymore, every hook costs every key press of the system a little
+time.</li>
+<li>Never block in <code>KeyboardEvents</code> / <code>MouseEvents</code>: no I/O, no UI, no locks, no <code>Thread.Sleep</code>.</li>
+<li>Security software may treat global hooks and injected input as suspicious; tell your users why your application
+needs them.</li>
+</ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="window-messages.html">Window messages and the SharedMessageWindow</a> for <code>RegisterHotKey</code></li>
+<li><a href="common-scenarios.html">Common scenarios</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/doc/articles/input-handling.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

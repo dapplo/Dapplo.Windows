@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Namespace Dapplo.Windows.Clipboard | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Namespace Dapplo.Windows.Clipboard | Dapplo.Windows ">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Clipboard">
+
+  <h1 id="Dapplo_Windows_Clipboard" data-uid="Dapplo.Windows.Clipboard" class="text-break">Namespace Dapplo.Windows.Clipboard</h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+
+    <h3 id="classes">
+Classes
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html">ClipboardAccessDeniedException</a></dt>
+      <dd><p>The clipboard couldn't be accessed: another application keeps it open (<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html#Dapplo_Windows_Clipboard_ClipboardAccessDeniedException_IsOpenTimeout">IsOpenTimeout</a>, see <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html#Dapplo_Windows_Clipboard_ClipboardAccessDeniedException_BlockingWindow">BlockingWindow</a>,
+<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html#Dapplo_Windows_Clipboard_ClipboardAccessDeniedException_BlockingProcessId">BlockingProcessId</a> and <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html#Dapplo_Windows_Clipboard_ClipboardAccessDeniedException_BlockingProcessName">BlockingProcessName</a>), or another thread of this application uses it (<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html#Dapplo_Windows_Clipboard_ClipboardAccessDeniedException_IsLockTimeout">IsLockTimeout</a>).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessOptions.html">ClipboardAccessOptions</a></dt>
+      <dd><p>Options for opening the clipboard with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_UseAsync__1_System_Func_Dapplo_Windows_Clipboard_IClipboardAccessToken___0__Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken_">UseAsync&lt;T&gt;(Func&lt;IClipboardAccessToken, T&gt;, ClipboardAccessOptions, CancellationToken)</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessTokenExtensions.html">ClipboardAccessTokenExtensions</a></dt>
+      <dd><p>Extensions for <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardByteExtensions.html">ClipboardByteExtensions</a></dt>
+      <dd><p>These are extensions to work with the clipboard</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.html">ClipboardCloudExtensions</a></dt>
+      <dd><p>Extensions for Windows Cloud Clipboard and Clipboard History support.
+See <a href="https://docs.microsoft.com/en-us/windows/win32/dataxchg/clipboard-formats#cloud-clipboard-and-clipboard-history-formats">https://docs.microsoft.com/en-us/windows/win32/dataxchg/clipboard-formats#cloud-clipboard-and-clipboard-history-formats</a></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a></dt>
+      <dd><p>Describes the complete content for the clipboard: one or more formats of the same data, and optionally the clipboard history / cloud clipboard options.
+Build it before opening the clipboard, then place it in one short operation with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_ReplaceContents_Dapplo_Windows_Clipboard_ClipboardContents_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__">ReplaceContents(ClipboardContents, nint, int, TimeSpan?, TimeSpan?)</a>
+or <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContentsExtensions.html#Dapplo_Windows_Clipboard_ClipboardContentsExtensions_ReplaceContents_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_ClipboardContents_">ReplaceContents(IClipboardAccessToken, ClipboardContents)</a>, which always clear the clipboard first.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContentsExtensions.html">ClipboardContentsExtensions</a></dt>
+      <dd><p>Places a complete <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContents.html">ClipboardContents</a> on the clipboard with an opened <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html">ClipboardDataSourceExtensions</a></dt>
+      <dd><p>Read helpers for every <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a>: the open clipboard, a <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html">ClipboardSnapshot</a>, drag and drop data, …</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDibExtensions.html">ClipboardDibExtensions</a></dt>
+      <dd><p>Read and write bitmaps as CF_DIB / CF_DIBV5 without System.Drawing: the pixels are raw BGRA32 bytes,
+so any imaging library can be used to produce or consume them.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardFileExtensions.html">ClipboardFileExtensions</a></dt>
+      <dd><p>These are extensions to work with the clipboard</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardFormatExtensions.html">ClipboardFormatExtensions</a></dt>
+      <dd><p>These are extensions to work with the clipboard</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardHtml.html">ClipboardHtml</a></dt>
+      <dd><p>The CF_HTML clipboard format (&quot;HTML Format&quot;): an HTML document with a header which marks the copied fragment,
+see <a href="https://learn.microsoft.com/windows/win32/dataxchg/html-clipboard-format">HTML Clipboard Format</a>.
+The offsets in the header are UTF-8 byte offsets.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardHtmlExtensions.html">ClipboardHtmlExtensions</a></dt>
+      <dd><p>Read and write the CF_HTML (&quot;HTML Format&quot;) clipboard format</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMetafileExtensions.html">ClipboardMetafileExtensions</a></dt>
+      <dd><p>Read enhanced metafiles (vector graphics, e.g. copied from Office or Visio) from the clipboard</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.html">ClipboardMiscExtensions</a></dt>
+      <dd><p>These are extensions to work with the clipboard</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html">ClipboardNative</a></dt>
+      <dd><p>Provides low level access to the Windows clipboard</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardRenderFormatRequest.html">ClipboardRenderFormatRequest</a></dt>
+      <dd><p>Information about a delayed rendering request, this is passed to a renderer registered with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_RegisterDelayedRenderer_System_UInt32_System_Action_Dapplo_Windows_Clipboard_ClipboardRenderFormatRequest__">RegisterDelayedRenderer(uint, Action&lt;ClipboardRenderFormatRequest&gt;)</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html">ClipboardSnapshot</a></dt>
+      <dd><p>A copy of clipboard formats in memory, read in one short clipboard session with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_ReadSnapshotAsync_System_Collections_Generic_IEnumerable_System_String__Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken_">ReadSnapshotAsync(IEnumerable&lt;string&gt;, ClipboardAccessOptions, CancellationToken)</a>
+or <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshotExtensions.html#Dapplo_Windows_Clipboard_ClipboardSnapshotExtensions_ReadSnapshot_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Collections_Generic_IEnumerable_System_String__System_Int64_">ReadSnapshot(IClipboardAccessToken, IEnumerable&lt;string&gt;, long)</a>. Decoding, saving or uploading the data happens afterwards, while other
+applications can use the clipboard again. The snapshot doesn't change when the clipboard changes, and can be used on any thread.
+Request only the formats you need, reading a format makes the application which copied render it: <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_AvailableFormats_System_Collections_Generic_IEnumerable_System_String__System_Int32_">AvailableFormats(IEnumerable&lt;string&gt;, int)</a>
+selects them without opening the clipboard.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshotExtensions.html">ClipboardSnapshotExtensions</a></dt>
+      <dd><p>Read a <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html">ClipboardSnapshot</a> with an open clipboard</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html">ClipboardStreamExtensions</a></dt>
+      <dd><p>These are extensions to work with the clipboard.
+The streams returned by GetAsStream and TryGetAsStream contain a copy of the clipboard content (the complete clipboard memory allocation, which can be larger than the actual data).
+This costs memory for the size of the content, but the stream can't outlive the clipboard lock and stays valid after the access token is disposed.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStringExtensions.html">ClipboardStringExtensions</a></dt>
+      <dd><p>These are extensions to work with the clipboard</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.ClipboardUpdateInformation.html">ClipboardUpdateInformation</a></dt>
+      <dd><p>Information about what the clipboard contained at the most recent clipboard update.
+This information is collected without opening the clipboard (GetClipboardSequenceNumber, GetClipboardOwner and GetUpdatedClipboardFormats),
+to read the content use <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_Access_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__">Access(nint, int, TimeSpan?, TimeSpan?)</a> or <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_AccessAsync_System_IntPtr_System_Int32_System_Nullable_System_TimeSpan__System_Nullable_System_TimeSpan__System_Threading_CancellationToken_">AccessAsync(nint, int, TimeSpan?, TimeSpan?, CancellationToken)</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.DataObjectReader.html">DataObjectReader</a></dt>
+      <dd><p>Reads an OLE data object (<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.comtypes.idataobject">IDataObject</a>), from drag and drop or from
+<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_GetOleDataObject_System_Int32_System_Nullable_System_TimeSpan__">GetOleDataObject(int, TimeSpan?)</a>. It supports what the Win32 clipboard API can't: formats with an index (lindex),
+IStream data and virtual files (FileGroupDescriptorW + FileContents, e.g. Outlook attachments).
+As <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a> the same read helpers work as for the clipboard and snapshots.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.DibImage.html">DibImage</a></dt>
+      <dd><p>A decoded device independent bitmap (CF_DIB / CF_DIBV5), normalized to top-down 32 bpp BGRA with straight alpha,
+so it can be handed to any imaging library (ImageSharp, System.Drawing, SkiaSharp, WPF, …).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.VirtualFile.html">VirtualFile</a></dt>
+      <dd><p>A file which only exists in the data object (&quot;virtual file&quot;), e.g. an Outlook attachment or an image dragged from some
+browsers: described by FileGroupDescriptorW, its content is the FileContents format with the index of the file.</p>
+</dd>
+    </dl>
+    <h3 id="interfaces">
+Interfaces
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html">IClipboardAccessToken</a></dt>
+      <dd><p>This interface is returned by ClipboardNative.Access() and ClipboardNative.AccessAsync().
+When you got a IClipboardAccessToken, you can access the clipboard, until it's disposed. Don't forget to dispose this!!!</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.IClipboardDataSource.html">IClipboardDataSource</a></dt>
+      <dd><p>Read access to clipboard-like data: the open clipboard (<a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_AsDataSource_Dapplo_Windows_Clipboard_IClipboardAccessToken_">AsDataSource(IClipboardAccessToken)</a>),
+a <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshot.html">ClipboardSnapshot</a>, or other data such as drag and drop data.
+The extension methods in <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html">ClipboardDataSourceExtensions</a> read text, bytes and file names from every source,
+so one piece of code works for all of them.</p>
+</dd>
+    </dl>
+    <h3 id="enums">
+Enums
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.DibFormats.html">DibFormats</a></dt>
+      <dd><p>The device independent bitmap formats to write with <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDibExtensions.html#Dapplo_Windows_Clipboard_ClipboardDibExtensions_SetAsDib_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_ReadOnlySpan_System_Byte__System_Int32_System_Int32_System_Int32_System_Boolean_Dapplo_Windows_Clipboard_DibFormats_">SetAsDib(IClipboardAccessToken, ReadOnlySpan&lt;byte&gt;, int, int, int, bool, DibFormats)</a></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dapplo.Windows.Clipboard.StandardClipboardFormats.html">StandardClipboardFormats</a></dt>
+      <dd><p>Standard Clipboard Formats
+The clipboard formats defined by the system are called standard clipboard formats.
+These clipboard formats are described in the following table.</p>
+</dd>
+    </dl>
+
+
+</article>
+
+        <div class="contribution d-print-none">
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

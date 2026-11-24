@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Interface IClipboardAccessToken | Dapplo.Windows </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Interface IClipboardAccessToken | Dapplo.Windows ">
+      
+      <meta name="description" content="This interface is returned by ClipboardNative.Access() and ClipboardNative.AccessAsync(). When you got a IClipboardAccessToken, you can access the clipboard, until it&#39;s disposed. Don&#39;t forget to dispose this!!!">
+      <link rel="icon" href="../images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dapplo/Dapplo.Windows/new/master/apiSpec/new?filename=Dapplo_Windows_Clipboard_IClipboardAccessToken.md&amp;value=---%0Auid%3A%20Dapplo.Windows.Clipboard.IClipboardAccessToken%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/d.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken">
+
+
+
+  <h1 id="Dapplo_Windows_Clipboard_IClipboardAccessToken" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken" class="text-break">
+Interface IClipboardAccessToken  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/IClipboardAccessToken.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><span class="xref">Dapplo</span>.<span class="xref">Windows</span>.<a class="xref" href="Dapplo.Windows.Clipboard.html">Clipboard</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Dapplo.Windows.Clipboard.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>This interface is returned by ClipboardNative.Access() and ClipboardNative.AccessAsync().
+When you got a IClipboardAccessToken, you can access the clipboard, until it's disposed. Don't forget to dispose this!!!</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface IClipboardAccessToken : IDisposable</code></pre>
+  </div>
+
+
+
+
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable.dispose">IDisposable.Dispose()</a>
+    </div>
+  </dd></dl>
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessTokenExtensions.html#Dapplo_Windows_Clipboard_ClipboardAccessTokenExtensions_GetBlockingProcessName_Dapplo_Windows_Clipboard_IClipboardAccessToken_">ClipboardAccessTokenExtensions.GetBlockingProcessName(IClipboardAccessToken)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardByteExtensions.html#Dapplo_Windows_Clipboard_ClipboardByteExtensions_GetAsBytes_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_StandardClipboardFormats_">ClipboardByteExtensions.GetAsBytes(IClipboardAccessToken, StandardClipboardFormats)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardByteExtensions.html#Dapplo_Windows_Clipboard_ClipboardByteExtensions_GetAsBytes_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_">ClipboardByteExtensions.GetAsBytes(IClipboardAccessToken, string)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardByteExtensions.html#Dapplo_Windows_Clipboard_ClipboardByteExtensions_GetAsBytes_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_UInt32_">ClipboardByteExtensions.GetAsBytes(IClipboardAccessToken, uint)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardByteExtensions.html#Dapplo_Windows_Clipboard_ClipboardByteExtensions_SetAsBytes_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Byte___Dapplo_Windows_Clipboard_StandardClipboardFormats_">ClipboardByteExtensions.SetAsBytes(IClipboardAccessToken, byte[], StandardClipboardFormats)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardByteExtensions.html#Dapplo_Windows_Clipboard_ClipboardByteExtensions_SetAsBytes_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Byte___System_String_">ClipboardByteExtensions.SetAsBytes(IClipboardAccessToken, byte[], string)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardByteExtensions.html#Dapplo_Windows_Clipboard_ClipboardByteExtensions_SetAsBytes_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Byte___System_UInt32_">ClipboardByteExtensions.SetAsBytes(IClipboardAccessToken, byte[], uint)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.html#Dapplo_Windows_Clipboard_ClipboardCloudExtensions_ExcludeFromMonitorProcessing_Dapplo_Windows_Clipboard_IClipboardAccessToken_">ClipboardCloudExtensions.ExcludeFromMonitorProcessing(IClipboardAccessToken)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.html#Dapplo_Windows_Clipboard_ClipboardCloudExtensions_SetCanIncludeInClipboardHistory_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Boolean_">ClipboardCloudExtensions.SetCanIncludeInClipboardHistory(IClipboardAccessToken, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.html#Dapplo_Windows_Clipboard_ClipboardCloudExtensions_SetCanUploadToCloudClipboard_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Boolean_">ClipboardCloudExtensions.SetCanUploadToCloudClipboard(IClipboardAccessToken, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardCloudExtensions.html#Dapplo_Windows_Clipboard_ClipboardCloudExtensions_SetCloudClipboardOptions_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Nullable_System_Boolean__System_Nullable_System_Boolean__System_Boolean_">ClipboardCloudExtensions.SetCloudClipboardOptions(IClipboardAccessToken, bool?, bool?, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContentsExtensions.html#Dapplo_Windows_Clipboard_ClipboardContentsExtensions_AddToCurrentContents_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_ClipboardContents_">ClipboardContentsExtensions.AddToCurrentContents(IClipboardAccessToken, ClipboardContents)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardContentsExtensions.html#Dapplo_Windows_Clipboard_ClipboardContentsExtensions_ReplaceContents_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_ClipboardContents_">ClipboardContentsExtensions.ReplaceContents(IClipboardAccessToken, ClipboardContents)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDataSourceExtensions.html#Dapplo_Windows_Clipboard_ClipboardDataSourceExtensions_AsDataSource_Dapplo_Windows_Clipboard_IClipboardAccessToken_">ClipboardDataSourceExtensions.AsDataSource(IClipboardAccessToken)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardDibExtensions.html#Dapplo_Windows_Clipboard_ClipboardDibExtensions_SetAsDib_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_ReadOnlySpan_System_Byte__System_Int32_System_Int32_System_Int32_System_Boolean_Dapplo_Windows_Clipboard_DibFormats_">ClipboardDibExtensions.SetAsDib(IClipboardAccessToken, ReadOnlySpan&lt;byte&gt;, int, int, int, bool, DibFormats)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardFileExtensions.html#Dapplo_Windows_Clipboard_ClipboardFileExtensions_GetFileNames_Dapplo_Windows_Clipboard_IClipboardAccessToken_">ClipboardFileExtensions.GetFileNames(IClipboardAccessToken)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardFileExtensions.html#Dapplo_Windows_Clipboard_ClipboardFileExtensions_SetFileNames_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Collections_Generic_IEnumerable_System_String__">ClipboardFileExtensions.SetFileNames(IClipboardAccessToken, IEnumerable&lt;string&gt;)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardFormatExtensions.html#Dapplo_Windows_Clipboard_ClipboardFormatExtensions_AvailableFormatIds_Dapplo_Windows_Clipboard_IClipboardAccessToken_">ClipboardFormatExtensions.AvailableFormatIds(IClipboardAccessToken)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardFormatExtensions.html#Dapplo_Windows_Clipboard_ClipboardFormatExtensions_AvailableFormats_Dapplo_Windows_Clipboard_IClipboardAccessToken_">ClipboardFormatExtensions.AvailableFormats(IClipboardAccessToken)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardHtmlExtensions.html#Dapplo_Windows_Clipboard_ClipboardHtmlExtensions_SetAsHtml_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_System_Uri_">ClipboardHtmlExtensions.SetAsHtml(IClipboardAccessToken, string, Uri)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMetafileExtensions.html#Dapplo_Windows_Clipboard_ClipboardMetafileExtensions_TryGetEnhancedMetafileBits_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Byte____">ClipboardMetafileExtensions.TryGetEnhancedMetafileBits(IClipboardAccessToken, out byte[])</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.html#Dapplo_Windows_Clipboard_ClipboardMiscExtensions_ClearContents_Dapplo_Windows_Clipboard_IClipboardAccessToken_">ClipboardMiscExtensions.ClearContents(IClipboardAccessToken)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.html#Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_StandardClipboardFormats_">ClipboardMiscExtensions.SetDelayedRenderedContent(IClipboardAccessToken, StandardClipboardFormats)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.html#Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_">ClipboardMiscExtensions.SetDelayedRenderedContent(IClipboardAccessToken, string)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.html#Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_System_Func_System_IO_Stream__">ClipboardMiscExtensions.SetDelayedRenderedContent(IClipboardAccessToken, string, Func&lt;Stream&gt;)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardMiscExtensions.html#Dapplo_Windows_Clipboard_ClipboardMiscExtensions_SetDelayedRenderedContent_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_UInt32_">ClipboardMiscExtensions.SetDelayedRenderedContent(IClipboardAccessToken, uint)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardSnapshotExtensions.html#Dapplo_Windows_Clipboard_ClipboardSnapshotExtensions_ReadSnapshot_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_Collections_Generic_IEnumerable_System_String__System_Int64_">ClipboardSnapshotExtensions.ReadSnapshot(IClipboardAccessToken, IEnumerable&lt;string&gt;, long)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html#Dapplo_Windows_Clipboard_ClipboardStreamExtensions_GetAsStream_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_StandardClipboardFormats_">ClipboardStreamExtensions.GetAsStream(IClipboardAccessToken, StandardClipboardFormats)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html#Dapplo_Windows_Clipboard_ClipboardStreamExtensions_GetAsStream_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_">ClipboardStreamExtensions.GetAsStream(IClipboardAccessToken, string)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html#Dapplo_Windows_Clipboard_ClipboardStreamExtensions_GetAsStream_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_UInt32_">ClipboardStreamExtensions.GetAsStream(IClipboardAccessToken, uint)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html#Dapplo_Windows_Clipboard_ClipboardStreamExtensions_SetAsStream_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_StandardClipboardFormats_System_IO_Stream_System_Nullable_System_Int64__">ClipboardStreamExtensions.SetAsStream(IClipboardAccessToken, StandardClipboardFormats, Stream, long?)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html#Dapplo_Windows_Clipboard_ClipboardStreamExtensions_SetAsStream_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_System_IO_Stream_System_Nullable_System_Int64__">ClipboardStreamExtensions.SetAsStream(IClipboardAccessToken, string, Stream, long?)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html#Dapplo_Windows_Clipboard_ClipboardStreamExtensions_SetAsStream_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_UInt32_System_IO_Stream_System_Nullable_System_Int64__">ClipboardStreamExtensions.SetAsStream(IClipboardAccessToken, uint, Stream, long?)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html#Dapplo_Windows_Clipboard_ClipboardStreamExtensions_TryGetAsStream_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_StandardClipboardFormats_System_IO_Stream__">ClipboardStreamExtensions.TryGetAsStream(IClipboardAccessToken, StandardClipboardFormats, out Stream)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html#Dapplo_Windows_Clipboard_ClipboardStreamExtensions_TryGetAsStream_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_System_IO_Stream__">ClipboardStreamExtensions.TryGetAsStream(IClipboardAccessToken, string, out Stream)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStreamExtensions.html#Dapplo_Windows_Clipboard_ClipboardStreamExtensions_TryGetAsStream_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_UInt32_System_IO_Stream__">ClipboardStreamExtensions.TryGetAsStream(IClipboardAccessToken, uint, out Stream)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStringExtensions.html#Dapplo_Windows_Clipboard_ClipboardStringExtensions_GetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardAccessToken_Dapplo_Windows_Clipboard_StandardClipboardFormats_">ClipboardStringExtensions.GetAsUnicodeString(IClipboardAccessToken, StandardClipboardFormats)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStringExtensions.html#Dapplo_Windows_Clipboard_ClipboardStringExtensions_GetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_">ClipboardStringExtensions.GetAsUnicodeString(IClipboardAccessToken, string)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStringExtensions.html#Dapplo_Windows_Clipboard_ClipboardStringExtensions_GetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_UInt32_">ClipboardStringExtensions.GetAsUnicodeString(IClipboardAccessToken, uint)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStringExtensions.html#Dapplo_Windows_Clipboard_ClipboardStringExtensions_SetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_Dapplo_Windows_Clipboard_StandardClipboardFormats_">ClipboardStringExtensions.SetAsUnicodeString(IClipboardAccessToken, string, StandardClipboardFormats)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStringExtensions.html#Dapplo_Windows_Clipboard_ClipboardStringExtensions_SetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_System_String_">ClipboardStringExtensions.SetAsUnicodeString(IClipboardAccessToken, string, string)</a>
+  </div>
+  <div>
+      <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardStringExtensions.html#Dapplo_Windows_Clipboard_ClipboardStringExtensions_SetAsUnicodeString_Dapplo_Windows_Clipboard_IClipboardAccessToken_System_String_System_UInt32_">ClipboardStringExtensions.SetAsUnicodeString(IClipboardAccessToken, string, uint)</a>
+  </div>
+  </dd></dl>
+
+
+
+  <h2 id="Dapplo_Windows_Clipboard_IClipboardAccessToken_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>The clipboard can be used from any thread, no STA thread is needed. But Windows ties an opened clipboard to the thread which opened it:
+the token can only be used on the thread which opened the clipboard, and must be disposed on that thread (disposing it elsewhere throws an
+InvalidOperationException and leaves the clipboard open). Never await, ObserveOn or otherwise switch threads while holding the token,
+keep the usage short: while the token is held, no other application can access the clipboard.
+Prefer <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardNative.html#Dapplo_Windows_Clipboard_ClipboardNative_UseAsync__1_System_Func_Dapplo_Windows_Clipboard_IClipboardAccessToken___0__Dapplo_Windows_Clipboard_ClipboardAccessOptions_System_Threading_CancellationToken_">UseAsync&lt;T&gt;(Func&lt;IClipboardAccessToken, T&gt;, ClipboardAccessOptions, CancellationToken)</a>,
+which guarantees this.</p>
+</div>
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_IClipboardAccessToken_BlockingProcessId_" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.BlockingProcessId*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_IClipboardAccessToken_BlockingProcessId" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.BlockingProcessId">
+  BlockingProcessId
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/IClipboardAccessToken.cs/#L45"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>When <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html#Dapplo_Windows_Clipboard_IClipboardAccessToken_IsOpenTimeout">IsOpenTimeout</a>: the process ID of <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html#Dapplo_Windows_Clipboard_IClipboardAccessToken_BlockingWindow">BlockingWindow</a>, 0 when unknown</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int BlockingProcessId { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_IClipboardAccessToken_BlockingWindow_" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.BlockingWindow*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_IClipboardAccessToken_BlockingWindow" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.BlockingWindow">
+  BlockingWindow
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/IClipboardAccessToken.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>When <a class="xref" href="Dapplo.Windows.Clipboard.IClipboardAccessToken.html#Dapplo_Windows_Clipboard_IClipboardAccessToken_IsOpenTimeout">IsOpenTimeout</a>: the window which had the clipboard open when the last attempt failed, IntPtr.Zero when unknown
+(the clipboard was opened without a window, or was already closed again).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">nint BlockingWindow { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">nint</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_IClipboardAccessToken_CanAccess_" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.CanAccess*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_IClipboardAccessToken_CanAccess" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.CanAccess">
+  CanAccess
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/IClipboardAccessToken.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Check if the clipboard can be accessed, this is false after disposing and when called from another thread than the one which opened the clipboard</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool CanAccess { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_IClipboardAccessToken_IsLockTimeout_" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.IsLockTimeout*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_IClipboardAccessToken_IsLockTimeout" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.IsLockTimeout">
+  IsLockTimeout
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/IClipboardAccessToken.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The clipboard access was denied due to a timeout</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool IsLockTimeout { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Dapplo_Windows_Clipboard_IClipboardAccessToken_IsOpenTimeout_" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.IsOpenTimeout*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_IClipboardAccessToken_IsOpenTimeout" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.IsOpenTimeout">
+  IsOpenTimeout
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/IClipboardAccessToken.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The clipboard couldn't be opened</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool IsOpenTimeout { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dapplo_Windows_Clipboard_IClipboardAccessToken_ThrowWhenNoAccess_" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.ThrowWhenNoAccess*"></a>
+
+  <h3 id="Dapplo_Windows_Clipboard_IClipboardAccessToken_ThrowWhenNoAccess" data-uid="Dapplo.Windows.Clipboard.IClipboardAccessToken.ThrowWhenNoAccess">
+  ThrowWhenNoAccess()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/IClipboardAccessToken.cs/#L51"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>This throws a <a class="xref" href="Dapplo.Windows.Clipboard.ClipboardAccessDeniedException.html">ClipboardAccessDeniedException</a> when the clipboard couldn't be opened or is no longer open,
+and an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a> when it's used on another thread than the one which opened it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void ThrowWhenNoAccess()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/dapplo/Dapplo.Windows/blob/master/src/Dapplo.Windows.Clipboard/IClipboardAccessToken.cs/#L19" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright © 2016-2026 Dapplo
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
