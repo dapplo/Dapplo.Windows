@@ -7,6 +7,11 @@ and the packages use [Semantic Versioning](https://semver.org/). Finding IDs suc
 Version 3.0 fixes a large number of interop bugs and deliberately breaks APIs whose concept was wrong.
 Read the [migration guide](doc/articles/migration-3.0.md) before upgrading.
 
+## [3.26.0]
+
+### Fixed
+- `UiAutomationText.ReadVisibleTextAsync` on Chromium / Electron windows: for a short line ("1791", "?", a single letter) Chromium expands the empty range at the end of the line to that same line again, its start lies before the end which was just read. The reader then read that line again until its guard of 5000 lines per visible range, so the snapshot had thousands of copies of one label, was incomplete and took seconds (also for visible ranges outside the clip, which add no text but ran to the guard as well). Lines and words (of a line with a link) are now checked after `ExpandToEnclosingUnit`: when the new unit starts before the end of the previous one, the range moves on by one unit (`Move(unit, 1)`) and is expanded again; when it can't move past the previous unit the visible range is done (not counted as incomplete). This costs two requests per line (a clone of the end and a compare). The verbose log of a read has the line and word steps, the backward expansions and the ranges which stalled.
+
 ## [3.25.0]
 
 ### Added

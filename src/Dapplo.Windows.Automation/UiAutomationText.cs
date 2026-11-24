@@ -282,9 +282,10 @@ public static class UiAutomationText
             Log.Verbose().WriteLine("Read {0} lines with {1} words ({2} links) of window 0x{3:X} in {4} ms with {5} attempts and {6} UI Automation requests, complete: {7} (truncated: {8}, timed out: {9}, deadline: {10}, remote display: {11})",
                 snapshot.Lines.Count, result.WordCount, result.LinkWordCount, windowHandle.ToInt64(), elapsed, attempts, calls, isComplete,
                 result.IsTruncated, result.TimedOut, result.DeadlineReached, remoteDisplay);
-            Log.Verbose().WriteLine("Phases of window 0x{0:X} (last attempt): first word after {1} ms; {2} elements, {3} runs; {4} documents from their subtree in {5} ms ({6} failed), {7} through the TextPattern in {8} ms ({9} lines, {10} of them word by word); {11} requests",
+            Log.Verbose().WriteLine("Phases of window 0x{0:X} (last attempt): first word after {1} ms; {2} elements, {3} runs; {4} documents from their subtree in {5} ms ({6} failed), {7} through the TextPattern in {8} ms ({9} lines, {10} of them word by word; {11} line and {12} word steps, {13} backward expansions, {14} stalled); {15} requests",
                 windowHandle.ToInt64(), result.FirstWordMilliseconds, result.ElementCount, result.RunCount, result.SubtreeDocuments, result.SubtreeMilliseconds,
-                result.FailedSubtrees, result.TextPatternDocuments, result.TextPatternMilliseconds, result.TextPatternLines, result.WordByWordLines, result.Calls);
+                result.FailedSubtrees, result.TextPatternDocuments, result.TextPatternMilliseconds, result.TextPatternLines, result.WordByWordLines,
+                result.LineSteps, result.WordSteps, result.BackwardExpansions, result.StalledRanges, result.Calls);
             return snapshot;
         }
         finally
@@ -642,6 +643,18 @@ public static class UiAutomationText
         public int TextPatternLines { get; private set; }
 
         public int WordByWordLines { get; private set; }
+
+        /// <summary>The lines which were expanded through the TextPattern, visible or not (the iterations of the visible ranges)</summary>
+        public int LineSteps { get; private set; }
+
+        /// <summary>The words which were expanded through the TextPattern</summary>
+        public int WordSteps { get; private set; }
+
+        /// <summary>How often the provider expanded backwards to the unit which was just read (Chromium, short lines and words)</summary>
+        public int BackwardExpansions { get; private set; }
+
+        /// <summary>Visible ranges (or lines) which ended because the provider couldn't move past a unit</summary>
+        public int StalledRanges { get; private set; }
 
         /// <summary>
         ///     A limit was reached, not all text was read
@@ -1333,6 +1346,8 @@ public static class UiAutomationText
             {
                 return;
             }
+            // The (empty) end of the line which was read last, null before the first line
+            IUIAutomationTextRange previousEnd = null;
             try
             {
                 if (Call(line.MoveEndpointByRange(TextPatternRangeEndpoint.End, line, TextPatternRangeEndpoint.Start)) != UiaConstants.S_OK)
@@ -1346,12 +1361,15 @@ public static class UiAutomationText
                     {
                         return;
                     }
-                    if (Call(line.ExpandToEnclosingUnit(TextUnit.Line)) != UiaConstants.S_OK || !ClampTo(line, visibleRange, isFirst))
+                    LineSteps++;
+                    // advanced false: the provider can't move past the previous line, the range is done (not truncated)
+                    if (!ExpandToNext(line, TextUnit.Line, previousEnd, out var advanced) || !advanced || !ClampTo(line, visibleRange, isFirst))
                     {
                         return;
                     }
                     isFirst = false;
-                    if (!ReadLine(line, clip, links, passwords, out var isEmpty) || !MoveToNext(line, visibleRange, TextUnit.Line, isEmpty))
+                    if (!ReadLine(line, clip, links, passwords, out var isEmpty) || !MoveToNext(line, visibleRange, TextUnit.Line, isEmpty)
+                        || !RememberEnd(line, ref previousEnd))
                     {
                         return;
                     }
@@ -1364,6 +1382,7 @@ public static class UiAutomationText
             }
             finally
             {
+                UiAutomationScroller.Release(previousEnd);
                 UiAutomationScroller.Release(line);
             }
         }
@@ -1423,6 +1442,8 @@ public static class UiAutomationText
                 return;
             }
             var words = new List<UiAutomationTextWord>();
+            // The (empty) end of the word which was read last, null before the first word
+            IUIAutomationTextRange previousEnd = null;
             try
             {
                 if (Call(wordRange.MoveEndpointByRange(TextPatternRangeEndpoint.End, wordRange, TextPatternRangeEndpoint.Start)) != UiaConstants.S_OK)
@@ -1432,13 +1453,14 @@ public static class UiAutomationText
                 var isFirst = true;
                 for (var count = 0; count < MaxUnitsPerRange && !CheckStop(); count++)
                 {
-                    if (Call(wordRange.ExpandToEnclosingUnit(TextUnit.Word)) != UiaConstants.S_OK || !ClampTo(wordRange, line, isFirst))
+                    WordSteps++;
+                    if (!ExpandToNext(wordRange, TextUnit.Word, previousEnd, out var advanced) || !advanced || !ClampTo(wordRange, line, isFirst))
                     {
                         break;
                     }
                     isFirst = false;
                     var isEmpty = ReadWord(wordRange, clip, links, passwords, words);
-                    if (!MoveToNext(wordRange, line, TextUnit.Word, isEmpty))
+                    if (!MoveToNext(wordRange, line, TextUnit.Word, isEmpty) || !RememberEnd(wordRange, ref previousEnd))
                     {
                         break;
                     }
@@ -1446,6 +1468,7 @@ public static class UiAutomationText
             }
             finally
             {
+                UiAutomationScroller.Release(previousEnd);
                 UiAutomationScroller.Release(wordRange);
                 AddLine(words);
             }
@@ -1503,6 +1526,82 @@ public static class UiAutomationText
                 return false;
             }
             return end <= 0 || Call(range.MoveEndpointByRange(TextPatternRangeEndpoint.End, outer, TextPatternRangeEndpoint.End)) == UiaConstants.S_OK;
+        }
+
+        /// <summary>
+        ///     Expand the (empty) range at the end of the previous unit to the next unit. Some providers expand backwards: Chromium gives the
+        ///     line (or word) which was just read again when it is short ("1791", "?"), its start lies before the end of that unit. Without a
+        ///     check the same unit would be read until <see cref="MaxUnitsPerRange"/>. Then the range moves on by one unit and is expanded again.
+        /// </summary>
+        /// <param name="range">the empty range at the end of the previous unit (or at the start of the outer range)</param>
+        /// <param name="unit">TextUnit</param>
+        /// <param name="previousEnd">the empty end of the previous unit, null for the first unit</param>
+        /// <param name="advanced">false when the range can't move past the previous unit: the outer range is done</param>
+        /// <returns>false when a request failed</returns>
+        private bool ExpandToNext(IUIAutomationTextRange range, TextUnit unit, IUIAutomationTextRange previousEnd, out bool advanced)
+        {
+            advanced = true;
+            if (Call(range.ExpandToEnclosingUnit(unit)) != UiaConstants.S_OK)
+            {
+                return false;
+            }
+            if (previousEnd is null)
+            {
+                return true;
+            }
+            if (!StartsBefore(range, previousEnd, out var before))
+            {
+                return false;
+            }
+            if (!before)
+            {
+                return true;
+            }
+            BackwardExpansions++;
+            if (Call(range.MoveEndpointByRange(TextPatternRangeEndpoint.Start, range, TextPatternRangeEndpoint.End)) != UiaConstants.S_OK
+                || Call(range.Move(unit, 1, out var moved)) != UiaConstants.S_OK)
+            {
+                return false;
+            }
+            if (moved == 0)
+            {
+                advanced = false;
+            }
+            else if (Call(range.ExpandToEnclosingUnit(unit)) != UiaConstants.S_OK || !StartsBefore(range, previousEnd, out before))
+            {
+                return false;
+            }
+            else
+            {
+                advanced = !before;
+            }
+            if (!advanced)
+            {
+                StalledRanges++;
+            }
+            return true;
+        }
+
+        /// <summary>
+        ///     Whether the start of the range lies before the (empty) previous end
+        /// </summary>
+        /// <returns>false when the request failed</returns>
+        private bool StartsBefore(IUIAutomationTextRange range, IUIAutomationTextRange previousEnd, out bool before)
+        {
+            var hResult = Call(range.CompareEndpoints(TextPatternRangeEndpoint.Start, previousEnd, TextPatternRangeEndpoint.Start, out var compared));
+            before = compared < 0;
+            return hResult == UiaConstants.S_OK;
+        }
+
+        /// <summary>
+        ///     Keep a copy of the (empty) range at the end of the unit which was read, for <see cref="ExpandToNext"/>
+        /// </summary>
+        /// <returns>false when the request failed</returns>
+        private bool RememberEnd(IUIAutomationTextRange range, ref IUIAutomationTextRange previousEnd)
+        {
+            UiAutomationScroller.Release(previousEnd);
+            previousEnd = null;
+            return Call(range.Clone(out previousEnd)) == UiaConstants.S_OK && previousEnd is not null;
         }
 
         /// <summary>
